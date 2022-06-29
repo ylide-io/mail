@@ -30,7 +30,11 @@ export abstract class AbstractMessagingLayer {
         options?: retrievingMessagesOptions
     ): Promise<IMessage[]>;
     abstract retrieveMessageById(id: string): Promise<IMessage>;
-    abstract decodeMailText(data: string, nonce: string): Promise<string>;
+    abstract decodeMailText(
+        sender: string,
+        data: string,
+        nonce: string
+    ): Promise<string>;
 
     abstract extractPublicKeyFromAddress(
         address: string

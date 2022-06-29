@@ -228,17 +228,27 @@ export class EverscaleMessagingLayer extends AbstractMessagingLayer {
         isDecoded: false,
     });
 
-    async decodeMailText(data: string, nonce: string): Promise<string> {
+    async decodeMailText(
+        sender: string,
+        data: string,
+        nonce: string
+    ): Promise<string> {
         if (!auth.account) {
             throw new Error("No account authenticated");
         }
         try {
+            const senderPublicKey = await this.extractPublicKeyFromAddress(
+                sender
+            );
+            if (!senderPublicKey) {
+                throw new Error("Error decrypting message text");
+            }
             const decryptedText = await this.ever.decryptData({
                 algorithm: "ChaCha20Poly1305",
                 data: data,
                 nonce: nonce,
                 recipientPublicKey: auth.account.publicKey,
-                sourcePublicKey: auth.account.publicKey,
+                sourcePublicKey: senderPublicKey,
             });
             if (decryptedText) {
                 return Buffer.from(decryptedText, "base64").toString("utf8");

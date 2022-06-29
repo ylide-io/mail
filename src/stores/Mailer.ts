@@ -394,6 +394,7 @@ class Mailer {
     async decodeMessage(message: IStoreMessage): Promise<void> {
         try {
             const decodedData = await auth.wallet?.decodeMailText(
+                message.decodedBody.data.sender,
                 message.decodedBody.data.data,
                 message.decodedBody.data.nonce
             );
