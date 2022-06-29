@@ -42,18 +42,25 @@ export class IndexedDB {
                     keyPath: "id",
                 });
                 contactsStore.add({
-                    name: "ignat.ever",
+                    name: "ignat.ylide",
                     address:
                         "0:9ee55e89c3b48603d34d65f67e4c638863a1a3920b79dd662d7cd8c484f77445",
                     tags: [],
                     id: 1,
                 });
                 contactsStore.add({
-                    name: "danila.ever",
+                    name: "danila.ylide",
                     address:
                         "0:81f452f5aec2263ab10116f7108a20209d5051081bb3caed34f139f976a0e279",
                     tags: [],
                     id: 2,
+                });
+                contactsStore.add({
+                    name: "kirill.ylide",
+                    address:
+                        "0:9308bdf06ed5839075da88a3c86a2273075969b18e6b8ea2d120b8aed427ccf7",
+                    tags: [],
+                    id: 3,
                 });
 
                 contactsStore.createIndex("name", "name");
