@@ -9,8 +9,7 @@
 /coverage
 
 # production
-/build/*
-!/build/touch.txt
+/build
 
 # misc
 .DS_Store
