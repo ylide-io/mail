@@ -435,6 +435,7 @@ class Mailer {
             this.readMessage(elem)
         );
         await Promise.all(readPromises);
+        this.checkedMessages = [];
     }
 
     async deleteMessage(message: IStoreMessage) {
@@ -464,6 +465,7 @@ class Mailer {
             this.deleteMessage(elem)
         );
         await Promise.all(deletePromises);
+        this.checkedMessages = [];
         await this.reFetchMessagesToFullPage();
     }
 
