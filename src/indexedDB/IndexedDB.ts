@@ -48,6 +48,13 @@ export class IndexedDB {
                     tags: [],
                     id: 1,
                 });
+                contactsStore.add({
+                    name: "danila.ever",
+                    address:
+                        "0:81f452f5aec2263ab10116f7108a20209d5051081bb3caed34f139f976a0e279",
+                    tags: [],
+                    id: 2,
+                });
 
                 contactsStore.createIndex("name", "name");
 
