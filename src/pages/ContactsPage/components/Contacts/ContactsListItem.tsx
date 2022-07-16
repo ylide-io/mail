@@ -6,8 +6,8 @@ import contacts from "../../../../stores/Contacts";
 import { IContact } from "../../../../stores/models/IContact";
 import TagsStore from "../../../../stores/Tags";
 import mailbox from "../../../../stores/Mailbox";
-import auth from "../../../../stores/Auth";
 import { useNav } from "../../../../utils/navigate";
+import domain from "../../../../stores/Domain";
 
 interface ContactsListItemProps {
     contact: IContact;
@@ -52,7 +52,6 @@ const ContactsListItem: React.FC<ContactsListItemProps> = ({
 
     const saveClickHandler = () => {
         const newContact = {
-            id: contact.id,
             tags: tags.map((tag) => tag.id),
             name,
             address,
@@ -72,7 +71,7 @@ const ContactsListItem: React.FC<ContactsListItemProps> = ({
     const checkNewContactErrors = (newContact: IContact) => {
         let isError = false;
 
-        if (!auth.wallet?.isAddressValid(address)) {
+        if (!domain.isAddressValid(address)) {
             setAddressError(true);
             isError = true;
         }
@@ -100,7 +99,7 @@ const ContactsListItem: React.FC<ContactsListItemProps> = ({
         if (isNew) {
             contacts.resetNewContact();
         } else {
-            await contacts.deleteContact(contact.id);
+            await contacts.deleteContact(contact.address);
         }
     };
 

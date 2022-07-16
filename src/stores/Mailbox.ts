@@ -1,34 +1,34 @@
-import {makeAutoObservable} from "mobx";
+import { makeAutoObservable } from "mobx";
 
 class Mailbox {
-    recipients: string[] = []
-    subject: string = ""
+    recipients: string[] = [];
+    subject: string = "";
 
-    textEditorData: any | null = null
+    textEditorData: any | null = null;
 
     constructor() {
-        makeAutoObservable(this)
+        makeAutoObservable(this);
     }
 
     setRecipients(addresses: string[]) {
-        this.recipients = addresses
+        this.recipients = addresses;
     }
 
     setSubject(str: string) {
-        this.subject = str
+        this.subject = str;
     }
 
     saveEditorData(data: any) {
-        this.textEditorData = data
+        this.textEditorData = data;
     }
 
     resetData() {
-        this.setRecipients([])
-        this.setSubject("")
-        this.saveEditorData("")
+        this.setRecipients([]);
+        this.setSubject("");
+        this.saveEditorData("");
     }
 }
 
-const mailbox = new Mailbox()
+const mailbox = new Mailbox();
 
-export default mailbox
+export default mailbox;

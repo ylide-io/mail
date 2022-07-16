@@ -1,18 +1,11 @@
-import React, { useEffect, useMemo } from "react";
+import React from "react";
 import contacts from "../../../../stores/Contacts";
 import ContactsListItem from "./ContactsListItem";
 import { observer } from "mobx-react";
-import tags from "../../../../stores/Tags";
 import ContactsEmpty from "./ContactsEmpty";
 
 const ContactsList = observer(() => {
-    useEffect(() => {
-        tags.retrieveTags().then(() => {
-            contacts.getContacts();
-        });
-    }, []);
-
-    const contactsList = useMemo(() => {
+    const contactsList = (() => {
         if (contacts.filteredContacts?.length) {
             return contacts.filteredContacts;
         } else if (contacts.filteredContacts === null) {
@@ -20,7 +13,7 @@ const ContactsList = observer(() => {
         } else {
             return contacts.contacts;
         }
-    }, [contacts.contacts, contacts.filteredContacts]);
+    })();
 
     return (
         <>
@@ -45,7 +38,7 @@ const ContactsList = observer(() => {
                             })
                             .map((contact) => (
                                 <ContactsListItem
-                                    key={contact.id}
+                                    key={contact.address}
                                     contact={{ ...contact }}
                                 />
                             ))}

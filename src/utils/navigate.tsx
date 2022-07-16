@@ -1,16 +1,15 @@
-import {useNavigate} from "react-router-dom";
-import auth from "../stores/Auth";
+import { useNavigate } from "react-router-dom";
 
 export const useNav = () => {
-    const navigate = useNavigate()
+    const navigate = useNavigate();
 
     const nav = (path: string) => {
-        const dev = auth.isDev
+        const dev = document.location.search.includes("dev=true");
         navigate({
             pathname: path,
-            search: dev ? `?dev=${dev}`: ""
-        })
-    }
+            search: dev ? `?dev=${dev}` : "",
+        });
+    };
 
-    return nav
-}
+    return nav;
+};

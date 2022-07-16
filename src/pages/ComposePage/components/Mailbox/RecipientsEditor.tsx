@@ -1,77 +1,71 @@
-import React, {useEffect, useState} from 'react';
-import {observer} from "mobx-react";
+import React, { useEffect, useState } from "react";
+import { observer } from "mobx-react";
 import contacts from "../../../../stores/Contacts";
-import {IContact} from "../../../../stores/models/IContact";
+import { IContact } from "../../../../stores/models/IContact";
 import CreatableSelect from "react-select/creatable";
-import auth from "../../../../stores/Auth";
 import mailbox from "../../../../stores/Mailbox";
-import mailer from "../../../../stores/Mailer";
+import domain from "../../../../stores/Domain";
 
 interface Option {
-    value: number | string,
-    label: string
-    __isNew__?: boolean
+    value: number | string;
+    label: string;
+    __isNew__?: boolean;
 }
 
 const RecipientsEditor = observer(() => {
+    const [value, setValue] = useState<Option[]>([]);
 
     useEffect(() => {
-        contacts.getContacts()
-        getInitialValue().then(value => setValue(value))
-    }, [])
+        const newValue = [];
+        const foundContacts: IContact[] = [];
 
-    const getInitialValue = async () => {
-        const value = []
-        const contacts: IContact[] = []
-
-        for (let address of mailbox.recipients) {
-            const contact = await mailer.findContact(address)
+        for (const address of mailbox.recipients) {
+            const contact = contacts.contactsByAddress[address];
             if (contact) {
-                contacts.push(contact)
+                foundContacts.push(contact);
             } else {
-                value.push({value: address, label: address})
+                newValue.push({ value: address, label: address });
             }
         }
 
-        for (let contact of contacts) {
-            value.push(makeOption(contact))
+        for (const contact of foundContacts) {
+            newValue.push(makeOption(contact));
         }
 
-        return value
-    }
-
-    const [value, setValue] = useState<Option[]>([])
+        setValue(newValue);
+    }, []);
 
     const makeOption = (contact: IContact) => {
-        return {value: contact.id, label: contact.name}
-    }
+        return { value: contact.address, label: contact.name };
+    };
 
     const fromOption = (option: Option) => {
-        return contacts.contacts.find(contact => contact.id === +option.value)
-    }
+        return contacts.contacts.find(
+            (contact) => contact.address === option.value
+        );
+    };
 
-    const options = contacts.contacts.map(tag => makeOption(tag))
+    const options = contacts.contacts.map((tag) => makeOption(tag));
 
     useEffect(() => {
-        const recipientsAddresses: string[] = []
-        value.forEach(option => {
-            const isAddress = auth.wallet?.isAddressValid(option.value.toString())
+        const recipientsAddresses: string[] = [];
+        value.forEach((option) => {
+            const isAddress = domain.isAddressValid(option.value.toString());
             if (isAddress) {
-                recipientsAddresses.push(option.value.toString())
+                recipientsAddresses.push(option.value.toString());
             } else {
-                const address = fromOption(option)?.address
+                const address = fromOption(option)?.address;
                 if (address) {
-                    recipientsAddresses.push(address)
+                    recipientsAddresses.push(address);
                 }
             }
-        })
-        mailbox.setRecipients(recipientsAddresses)
-    }, [value])
-
+        });
+        mailbox.setRecipients(recipientsAddresses);
+    }, [value]);
 
     const selectHandler = (options: readonly Option[]) => {
-        setValue([...options])
-    }
+        setValue([...options]);
+    };
 
     const createOption = (label: string) => ({
         label,
@@ -79,13 +73,13 @@ const RecipientsEditor = observer(() => {
     });
 
     const handleCreate = async (inputValue: string) => {
-        const isValid = await auth.wallet?.isAddressValid(inputValue)
+        const isValid = await domain.isAddressValid(inputValue);
 
         if (isValid) {
-            const newOption = createOption(inputValue)
-            setValue([...value, newOption])
+            const newOption = createOption(inputValue);
+            setValue([...value, newOption]);
         }
-    }
+    };
 
     return (
         <div className="form-group row">

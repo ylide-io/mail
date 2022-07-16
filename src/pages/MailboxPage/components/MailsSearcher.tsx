@@ -1,30 +1,37 @@
-import React, {ChangeEvent, FormEvent, useEffect} from 'react';
-import {observer} from "mobx-react";
+import React, { FormEvent, useEffect, useState } from "react";
+import { observer } from "mobx-react";
 import mailer from "../../../stores/Mailer";
 
 const MailsSearcher = observer(() => {
-    const changeHandler = (e: ChangeEvent<HTMLInputElement>) => {
-        mailer.setSearchingText(e.target.value || "")
-    }
+    const [searchingText, setSearchingText] = useState("");
 
     useEffect(() => {
-        const delayDebounce = setTimeout(() => {
-                mailer.retrieveFirstPage()
-        }, 400)
+        if (!searchingText) {
+            return () => {};
+        }
 
-        return () => clearTimeout(delayDebounce)
-    }, [mailer.searchingText])
+        const delayDebounce = setTimeout(() => {
+            mailer.setSearchingText(searchingText);
+            mailer.retrieveFirstPage();
+        }, 400);
+
+        return () => clearTimeout(delayDebounce);
+    }, [searchingText]);
 
     const submitHandler = (e: FormEvent) => {
-        e.preventDefault()
-    }
+        e.preventDefault();
+    };
 
     return (
-        <form method="get" onSubmit={submitHandler} className="float-right mail-search">
+        <form
+            method="get"
+            onSubmit={submitHandler}
+            className="float-right mail-search"
+        >
             <div className="input-group">
                 <input
                     value={mailer.searchingText}
-                    onChange={changeHandler}
+                    onChange={(e) => setSearchingText(e.target.value)}
                     type="text"
                     className="form-control form-control-sm"
                     name="search"

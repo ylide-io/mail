@@ -1,18 +1,22 @@
-import { makeAutoObservable } from "mobx";
-import auth from "./Auth";
-import messagesDB from "../indexedDB/MessagesDB";
-import { IStoreMessage } from "./models/IStoreMessage";
+import { makeAutoObservable, toJS } from "mobx";
+import messagesDB, { IMessageDecodedContent } from "../indexedDB/MessagesDB";
 import contacts from "./Contacts";
-import { IContact } from "./models/IContact";
 import fuzzysort from "fuzzysort";
 import { filterAsync } from "../utils/asyncFilter";
+import {
+    IMessage,
+    MessageChunks,
+    MessageContainer,
+    MessageContentV3,
+} from "@ylide/sdk";
+import domain, { ConnectedKey } from "./Domain";
 
 interface filteringTypesInterface {
-    unread: (arg1: IStoreMessage) => Promise<boolean>;
-    read: (arg1: IStoreMessage) => Promise<boolean>;
-    notArchived: (arg1: IStoreMessage) => Promise<boolean>;
-    archived: (arg1: IStoreMessage) => Promise<boolean>;
-    byFolder: (arg1: IStoreMessage) => Promise<boolean>;
+    unread: (arg1: IMessage) => Promise<boolean>;
+    read: (arg1: IMessage) => Promise<boolean>;
+    notArchived: (arg1: IMessage) => Promise<boolean>;
+    archived: (arg1: IMessage) => Promise<boolean>;
+    byFolder: (arg1: IMessage) => Promise<boolean>;
 }
 
 class Mailer {
@@ -20,36 +24,33 @@ class Mailer {
     loading: boolean = false;
     pageSwitchLoading: boolean = false;
 
-    saveDecodedMessages: boolean | null = null;
+    saveDecodedMessages = false;
 
-    messages: IStoreMessage[] = [];
-    message: IStoreMessage | null = null;
-    decodedMessages: IStoreMessage[] = [];
-    checkedMessages: IStoreMessage[] = [];
+    messagesById: Record<string, IMessage> = {};
+    decodedMessagesById: Record<string, IMessageDecodedContent> = {};
+
+    messageIds: string[] = [];
+    checkedMessageIds: string[] = [];
 
     activeFolderId: number | null = null;
     searchingText: string = "";
 
-    readonly messagesOnPage = 10;
+    readonly messagesOnPage = 2;
     isNextPage: boolean = false;
-    previousPages: IStoreMessage[][] = [];
+    page: number = 1;
 
     readonly filteringTypes: filteringTypesInterface = {
-        unread: (message) => Promise.resolve(message.isUnread),
-        read: (message) => Promise.resolve(!message.isUnread),
-        notArchived: async (message) => Promise.resolve(!message.isDeleted),
-        archived: async (message) =>
-            Promise.resolve(message.isDeleted || false),
+        unread: async (message) =>
+            !(await messagesDB.isMessageRead(message.msgId)),
+        read: (message) => messagesDB.isMessageRead(message.msgId),
+        notArchived: async (message) =>
+            !(await messagesDB.isMessageDeleted(message.msgId)),
+        archived: async (message) => messagesDB.isMessageDeleted(message.msgId),
         byFolder: async (message) => {
-            if (!message.contactId) return false;
-
-            const contactsList = await contacts.getContacts();
-
-            const contact = contactsList.find(
-                (contact) => contact.id === message.contactId
-            );
-
-            if (!contact) return false;
+            const contact = contacts.contactsByAddress[message.senderAddress];
+            if (!contact) {
+                return false;
+            }
 
             const foundTag = contact.tags.find(
                 (tagId) => tagId === this.activeFolderId
@@ -65,16 +66,49 @@ class Mailer {
         makeAutoObservable(this);
     }
 
-    async sendMail(text: string, receiver: string): Promise<void> {
+    async init() {
+        const dmsgs = await messagesDB.retrieveAllDecodedMessages();
+        this.decodedMessagesById = dmsgs.reduce(
+            (p, c) => ({
+                ...p,
+                [c.msgId]: c,
+            }),
+            {}
+        );
+        console.log(
+            "this.decodedMessagesById: ",
+            toJS(this.decodedMessagesById)
+        );
+    }
+
+    async sendMail(
+        sender: ConnectedKey,
+        subject: string,
+        text: string,
+        receiver: string
+    ): Promise<void> {
         try {
-            if (!auth.wallet) throw new Error("Wallet not available");
             if (!receiver) throw new Error("Receiver must be specified");
             this.sending = true;
-            const publicKey = await auth.wallet.extractPublicKeyFromAddress(
+            const publicKey = await sender.reader.extractPublicKeyFromAddress(
                 receiver
             );
-            if (!publicKey) throw new Error("Public key is non extractable");
-            await auth.wallet.sendMessage(text, receiver, publicKey);
+            if (!publicKey)
+                throw new Error("Recipient has no registered public key");
+            await sender.key.execute("send mail", async (keypair) => {
+                const content = MessageContentV3.plain(subject, text);
+                await sender.sender.sendMessage(
+                    [0, 0, 0, 1],
+                    keypair,
+                    content,
+                    [
+                        {
+                            address: receiver,
+                            publicKey,
+                        },
+                    ]
+                );
+            });
         } catch (e) {
             throw e;
         } finally {
@@ -87,38 +121,33 @@ class Mailer {
         nextPageAfterMessage,
         beforeMessage,
     }: {
-        nextPageAfterMessage?: IStoreMessage;
-        beforeMessage?: IStoreMessage;
+        nextPageAfterMessage?: IMessage;
+        beforeMessage?: IMessage;
     }): Promise<{
-        pageMessages: IStoreMessage[];
+        pageMessages: IMessage[];
         isNextPage: boolean;
     }> {
-        const messages = await auth.wallet?.retrieveMessageHistoryByDates({
-            messagesLimit: this.messagesOnPage,
-            firstMessageIdToStopSearching: beforeMessage?.id,
+        console.log("retrieveMessages", {
             nextPageAfterMessage,
+            beforeMessage,
         });
+        const messages =
+            await domain.readers.everscale.retrieveMessageHistoryByDates(
+                domain.everscaleKey.address,
+                {
+                    messagesLimit: this.messagesOnPage,
+                    firstMessageIdToStopSearching: beforeMessage?.msgId,
+                    nextPageAfterMessage,
+                }
+            );
+
+        console.log("messages: ", messages);
 
         if (!messages) {
             return {
                 pageMessages: [],
                 isNextPage: false,
             };
-        }
-
-        const decodedMessages: IStoreMessage[] = [];
-
-        for (let elem of messages) {
-            const message = (await this.findDecodedInstance(elem.id)) || elem;
-
-            const contact = await this.findContact(
-                message.decodedBody?.data?.sender
-            );
-
-            decodedMessages.push({
-                ...message,
-                contactId: contact?.id,
-            });
         }
 
         let isNextPage = false;
@@ -130,7 +159,7 @@ class Mailer {
         }
 
         return {
-            pageMessages: decodedMessages || [],
+            pageMessages: messages || [],
             isNextPage,
         };
     }
@@ -143,17 +172,23 @@ class Mailer {
     }: {
         filteringType: keyof filteringTypesInterface;
         searchingText?: string;
-        beforeMessage?: IStoreMessage;
-        nextPageAfterMessage?: IStoreMessage;
+        beforeMessage?: IMessage;
+        nextPageAfterMessage?: IMessage;
     }): Promise<{
-        pageMessages: IStoreMessage[];
+        pageMessages: IMessage[];
         isNextPage: boolean;
     }> {
+        console.log("retrieveMessagesPage", {
+            filteringType,
+            beforeMessage,
+            nextPageAfterMessage,
+            searchingText,
+        });
         this.loading = true;
-        let lastFetchedPage: IStoreMessage[] = [];
+        let lastFetchedPage: IMessage[] = [];
 
         //Length = messagesOnPage + 1, this additional message mean we have next page
-        const fullMessages: IStoreMessage[] = [];
+        const fullMessages: IMessage[] = [];
 
         while (true) {
             const { pageMessages, isNextPage } = await this.retrieveMessages({
@@ -164,7 +199,7 @@ class Mailer {
             });
             lastFetchedPage = pageMessages;
 
-            let filteredMessages: IStoreMessage[] = pageMessages;
+            let filteredMessages: IMessage[] = pageMessages;
 
             if (filteringType) {
                 filteredMessages = await filterAsync(
@@ -197,11 +232,15 @@ class Mailer {
     }
 
     async retrieveNewMessages(): Promise<void> {
+        console.log("retrieveNewMessages");
         if (this.loading) return;
-        if (this.previousPages.length) return;
+
+        const firstMessage = this.messageIds.length
+            ? this.messagesById[this.messageIds[0]]
+            : null;
 
         let { pageMessages } = await this.retrieveMessagesPage({
-            beforeMessage: this.messages[0],
+            beforeMessage: firstMessage || undefined,
             searchingText: this.searchingText,
             filteringType: this.filteringMethod,
         });
@@ -209,24 +248,39 @@ class Mailer {
         if (!this.isNextPage) {
             let newMessagesCounter = 0;
 
-            for (const newMessage of pageMessages) {
-                if (newMessage.id === this.messages[0].id) break;
-                newMessagesCounter++;
+            if (firstMessage) {
+                for (const newMessage of pageMessages) {
+                    if (newMessage.msgId === firstMessage.msgId) break;
+                    newMessagesCounter++;
+                }
+            } else {
+                newMessagesCounter = pageMessages.length;
             }
 
             if (
-                this.messages.length + newMessagesCounter >
+                this.messageIds.length + newMessagesCounter >
                 this.messagesOnPage
             ) {
                 this.isNextPage = true;
             }
         }
 
-        this.messages = pageMessages;
+        for (const msg of pageMessages) {
+            this.messagesById[msg.msgId] = msg;
+        }
+        if (firstMessage) {
+            for (const msgId of pageMessages
+                .filter((m) => !this.messageIds.includes(m.msgId))
+                .map((p) => p.msgId)) {
+                this.messageIds.unshift(msgId);
+            }
+        } else {
+            this.messageIds = pageMessages.map((p) => p.msgId);
+        }
     }
 
     async retrieveFirstPage(): Promise<void> {
-        this.previousPages = [];
+        console.log("retrieveFirstPage");
         const filteringType = this.filteringMethod;
 
         let { pageMessages, isNextPage } = await this.retrieveMessagesPage({
@@ -234,38 +288,41 @@ class Mailer {
             searchingText: this.searchingText,
         });
 
-        this.messages = pageMessages;
+        for (const msg of pageMessages) {
+            this.messagesById[msg.msgId] = msg;
+        }
+        this.messageIds = pageMessages.map((p) => p.msgId);
         this.isNextPage = isNextPage;
     }
 
     async goNextPage(): Promise<void> {
         this.pageSwitchLoading = true;
-        const lastMessage = this.messages[this.messages.length - 1];
-
-        this.previousPages?.push(this.messages);
+        const lastMessage = this.messageIds.length
+            ? this.messagesById[this.messageIds[this.messageIds.length - 1]]
+            : null;
 
         const filteringType = this.filteringMethod;
 
         const { pageMessages, isNextPage } = await this.retrieveMessagesPage({
             searchingText: this.searchingText,
             filteringType,
-            nextPageAfterMessage: lastMessage,
+            nextPageAfterMessage: lastMessage || undefined,
         });
 
-        this.messages = pageMessages;
+        for (const msg of pageMessages) {
+            this.messagesById[msg.msgId] = msg;
+        }
+        this.messageIds.push(...pageMessages.map((m) => m.msgId));
+        this.page++;
         this.isNextPage = isNextPage;
         this.pageSwitchLoading = false;
     }
 
     async goPrevPage(isNextPage?: boolean): Promise<void> {
         this.pageSwitchLoading = true;
-        const prevPage = this.previousPages.pop();
-        if (!prevPage) {
-            await this.retrieveFirstPage();
-            return;
+        if (this.page > 1) {
+            this.page--;
         }
-        this.messages = prevPage;
-        this.isNextPage = isNextPage === false ? isNextPage : true;
         this.pageSwitchLoading = false;
     }
 
@@ -287,12 +344,16 @@ class Mailer {
     }
 
     private static async checkIsNextPage(
-        lastMessage: IStoreMessage
+        lastMessage: IMessage
     ): Promise<boolean> {
-        const message = await auth.wallet?.retrieveMessageHistoryByDates({
-            messagesLimit: 1,
-            nextPageAfterMessage: lastMessage,
-        });
+        const message =
+            await domain.readers.everscale.retrieveMessageHistoryByDates(
+                domain.everscaleKey.address,
+                {
+                    messagesLimit: 1,
+                    nextPageAfterMessage: lastMessage,
+                }
+            );
 
         let isNextPage = false;
 
@@ -302,223 +363,158 @@ class Mailer {
         return isNextPage;
     }
 
-    async getMessageById(id: string): Promise<void> {
-        try {
-            const message =
-                (await this.findDecodedInstance(id)) ||
-                (await auth.wallet?.retrieveMessageById(id));
-
-            if (message) {
-                const contact = await this.findContact(
-                    message?.decodedBody?.data?.sender
-                );
-
-                this.message = {
-                    ...message,
-                    contactId: contact?.id,
-                };
-            } else {
-                throw new Error("Message was not retreived");
-            }
-        } catch (e) {
-            throw e;
-        }
-    }
-
-    async findContact(address: string): Promise<IContact | undefined> {
-        const allContacts = await contacts.getContacts();
-
-        for (const contact of allContacts) {
-            if (contact.address === address) {
-                return contact;
-            }
-        }
-    }
-
-    private async findDecodedInstance(
-        messageId: string
-    ): Promise<IStoreMessage | null> {
-        try {
-            let message = this.decodedMessages.find(
-                (msg) => msg.id === messageId
-            );
-
-            if (!message) {
-                message = await messagesDB.retrieveMessageById(messageId);
-                if (message.isDecoded) {
-                    this.decodedMessages.push(message);
-                }
-            }
-
-            return message;
-        } catch (e) {
-            return null;
-        }
-    }
-
-    fuzzyFilterMessages(searchingText: string, messages: IStoreMessage[]) {
-        const decodedMessages = messages.filter((msg) => msg.isDecoded);
+    fuzzyFilterMessages(
+        searchingText: string,
+        messages: IMessage[]
+    ): IMessage[] {
+        const decodedMessages = messages.filter(
+            (msg) => !!this.decodedMessagesById[msg.msgId]
+        );
         const preparedMessages = decodedMessages.map((message) =>
-            this.prepareMessagesText(message)
+            this.prepareMessagesText(message.msgId)
         );
         const results = fuzzysort.go(searchingText, preparedMessages, {
             keys: ["text", "subject"],
         });
-        return results.map((res) => res.obj.message);
+        return results.map((res) => this.messagesById[res.obj.msgId]);
     }
 
-    private prepareMessagesText = (message: IStoreMessage) => {
+    private prepareMessagesText = (msgId: string) => {
         const textArr: string[] = [];
-        message.decodedTextData?.blocks.forEach((block: any) => {
+        const decoded = this.decodedMessagesById[msgId];
+        decoded.decodedTextData.blocks.forEach((block: any) => {
             const filteredText = block?.data?.text?.split("<br>").join(" ");
             textArr.push(filteredText);
         });
         return {
+            msgId,
             text: textArr.join(" "),
-            subject: message.decodedSubject,
-            message,
+            subject: decoded.decodedSubject,
         };
     };
 
-    resetCurrentMessage(): void {
-        this.message = null;
+    async readAndDecodeMessage(message: IMessage): Promise<void> {
+        await this.decodeMessage(message);
     }
 
-    async readAndDecodeMessage(message: IStoreMessage): Promise<void> {
-        await this.decodeMessage({
-            ...message,
-            isUnread: false,
-        });
-    }
-
-    async decodeMessage(message: IStoreMessage): Promise<void> {
+    async decodeMessage(pushMsg: IMessage): Promise<void> {
         try {
-            const decodedData = await auth.wallet?.decodeMailText(
-                message.decodedBody.data.sender,
-                message.decodedBody.data.data,
-                message.decodedBody.data.nonce
+            if (!pushMsg.contentLink) {
+                const content =
+                    await domain.readers.everscale.retrieveMessageContentByMsgId(
+                        pushMsg.msgId
+                    );
+                if (!content || content.corrupted) {
+                    throw new Error("Content is not available or corrupted");
+                }
+                Object.assign(pushMsg, {
+                    isContentLoaded: true,
+                    contentLink: content,
+                });
+            }
+            if (!pushMsg.contentLink) {
+                throw new Error("Content not retrievable");
+            }
+            if (!pushMsg.isContentDecrypted) {
+                const key = domain.connectedKeys.find(
+                    (t) => t.address === pushMsg.recipientAddress
+                );
+                if (!key) {
+                    throw new Error("Decryption key is not available");
+                }
+                const unpackedContent =
+                    await MessageChunks.unpackContentFromChunks([
+                        pushMsg.contentLink.content,
+                    ]);
+                let symmKey;
+                await key.key.execute("read mail", async (keypair) => {
+                    symmKey = keypair.decrypt(
+                        pushMsg.key,
+                        unpackedContent.publicKey
+                    );
+                });
+                if (!symmKey) {
+                    throw new Error("Decryption key is not accessable");
+                }
+                const content = MessageContainer.decodeRawContent(
+                    unpackedContent.content,
+                    symmKey
+                );
+                Object.assign(pushMsg, {
+                    isContentDecrypted: true,
+                    decryptedContent: content,
+                });
+            }
+            if (!pushMsg.isContentDecrypted) {
+                throw new Error("Content not decryptable");
+            }
+
+            const content = MessageContainer.messageContentFromBytes(
+                pushMsg.decryptedContent!
             );
-            if (!decodedData) throw new Error("Error decoding message");
 
-            const { data, subject } = JSON.parse(decodedData);
-
-            const updates = {
-                decodedTextData: data,
-                decodedSubject: subject,
-                isDecoded: true,
+            this.decodedMessagesById[pushMsg.msgId] = {
+                msgId: pushMsg.msgId,
+                decodedSubject: content.subject,
+                decodedTextData: content.content,
             };
 
-            const decodedMessage = {
-                ...message,
-                ...updates,
-            };
-
-            this.decodedMessages.push(decodedMessage);
-
-            this.updateMessage(message.id, updates);
-
-            await this.saveToDB(decodedMessage);
+            if (this.getSaveDecodedSetting()) {
+                console.log("msg saved: ", pushMsg.msgId);
+                await messagesDB.saveDecodedMessage(
+                    this.decodedMessagesById[pushMsg.msgId]
+                );
+            }
         } catch (e) {
             throw e;
         }
     }
 
-    async readMessage(message: IStoreMessage) {
-        this.updateMessage(message.id, { isUnread: false });
-        await this.saveToDB({
-            ...message,
-            isUnread: false,
-        });
+    async readMessage(msgId: string) {
+        await messagesDB.saveMessageRead(msgId);
     }
 
     async readCheckedMessage() {
-        const readPromises = this.checkedMessages.map((elem) =>
-            this.readMessage(elem)
+        const readPromises = this.checkedMessageIds.map((msgId) =>
+            this.readMessage(msgId)
         );
         await Promise.all(readPromises);
-        this.checkedMessages = [];
+        this.checkedMessageIds = [];
     }
 
-    async deleteMessage(message: IStoreMessage) {
-        if (!message.isDeleted) {
-            if (this.filteringMethod !== "archived") {
-                this.messages = this.messages.filter(
-                    (elem) => elem.id !== message.id
-                );
-            }
-        } else {
-            if (this.filteringMethod === "archived") {
-                this.messages = this.messages.filter(
-                    (elem) => elem.id !== message.id
-                );
-            }
-        }
-
-        this.updateMessage(message.id, { isDeleted: !message.isDeleted });
-        await this.saveToDB({
-            ...message,
-            isDeleted: !message.isDeleted,
-        });
+    async deleteMessage(msgId: string) {
+        await messagesDB.saveMessageDeleted(msgId);
     }
 
     async deleteCheckedMessages() {
-        const deletePromises = this.checkedMessages.map((elem) =>
-            this.deleteMessage(elem)
+        const deletePromises = this.checkedMessageIds.map((msgId) =>
+            this.deleteMessage(msgId)
         );
         await Promise.all(deletePromises);
-        this.checkedMessages = [];
-        await this.reFetchMessagesToFullPage();
+        this.checkedMessageIds = [];
     }
 
-    private async reFetchMessagesToFullPage() {
-        const fromMessage = this.messages[0];
-
-        console.log(this.messages);
-
-        console.log(fromMessage, this.isNextPage);
-
-        if (!fromMessage) return this.goPrevPage(this.isNextPage);
-
-        const filteringType = this.filteringMethod;
-
-        const { pageMessages, isNextPage } = await this.retrieveMessagesPage({
-            searchingText: this.searchingText,
-            filteringType,
-            nextPageAfterMessage: fromMessage,
-        });
-
-        console.log(pageMessages);
-
-        this.messages = pageMessages;
-        this.isNextPage = isNextPage;
-    }
-
-    checkMessage(message: IStoreMessage, flag: boolean) {
+    checkMessage(message: IMessage, flag: boolean) {
         if (flag) {
-            this.checkedMessages.push(message);
+            this.checkedMessageIds.push(message.msgId);
         } else {
-            this.checkedMessages = this.checkedMessages.filter(
-                (elem) => elem.id !== message.id
+            this.checkedMessageIds = this.checkedMessageIds.filter(
+                (msgId) => msgId !== message.msgId
             );
         }
     }
 
-    isMessageChecked(messageId: string) {
-        return !!this.checkedMessages.find((elem) => elem.id === messageId);
+    isMessageChecked(msgId: string) {
+        return !!this.checkedMessageIds.includes(msgId);
     }
 
     async clearMessagesDB() {
         await messagesDB.clearAllMessages();
     }
 
-    async getSaveDecodedSetting() {
-        if (this.saveDecodedMessages === null) {
-            const storageItem = localStorage.getItem("saveDecodedMessages");
-            if (storageItem) {
-                this.saveDecodedMessages = !!Number(storageItem);
-            }
-        }
-
+    getSaveDecodedSetting() {
+        this.saveDecodedMessages =
+            localStorage.getItem("saveDecodedMessages") === "true";
         return this.saveDecodedMessages;
     }
 
@@ -528,82 +524,25 @@ class Mailer {
 
     setSaveDecodedSetting(flag: boolean) {
         this.saveDecodedMessages = flag;
-        localStorage.removeItem("saveDecodedMessages");
-        localStorage.setItem("saveDecodedMessages", flag ? "1" : "0");
+        localStorage.setItem("saveDecodedMessages", flag ? "true" : "false");
+        if (!flag) {
+            messagesDB.clearAllDecodedMessages();
+        }
     }
 
     resetAllMessages() {
-        this.messages = [];
-        this.message = null;
-        this.decodedMessages = [];
+        this.messageIds = [];
+        this.checkedMessageIds = [];
+        this.messagesById = {};
+        this.decodedMessagesById = {};
     }
 
     async wipeOffDecodedMessagesFromDB() {
-        const dbMessages = await messagesDB.retrieveAllMessages();
-
-        const promiseArray: Promise<void>[] = [];
-
-        dbMessages.forEach((message) => {
-            if (message.isDecoded) {
-                promiseArray.push(
-                    messagesDB.saveMessage({
-                        ...message,
-                        decodedSubject: null,
-                        decodedTextData: null,
-                        isDecoded: false,
-                    })
-                );
-            }
-        });
-
-        await Promise.all(promiseArray);
-    }
-
-    private async saveToDB(message: IStoreMessage) {
-        if (await this.getSaveDecodedSetting()) {
-            await messagesDB.saveMessage(message);
-        } else {
-            await messagesDB.saveMessage({
-                ...message,
-                isDecoded: false,
-                decodedSubject: null,
-                decodedTextData: null,
-            });
-        }
-    }
-
-    private updateMessage(messageId: string, updates: Partial<IStoreMessage>) {
-        if (this.message?.id === messageId) {
-            this.message = {
-                ...this.message,
-                ...updates,
-            };
-        }
-
-        this.messages = this.messages.map((msg) => {
-            if (msg.id === messageId) {
-                return {
-                    ...msg,
-                    ...updates,
-                };
-            } else {
-                return msg;
-            }
-        });
-
-        this.decodedMessages = this.decodedMessages.map((msg) => {
-            if (msg.id === messageId) {
-                return {
-                    ...msg,
-                    ...updates,
-                };
-            } else {
-                return msg;
-            }
-        });
+        await messagesDB.clearAllDecodedMessages();
     }
 }
 
-const mailer = new Mailer();
+//@ts-ignore
+const mailer = (window.mailer = new Mailer());
 
 export default mailer;

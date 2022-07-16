@@ -1,54 +1,56 @@
-import React, {useEffect, useRef} from 'react';
+import React, { useEffect, useRef } from "react";
 import MailboxMail from "./MailboxMail/MailboxMail";
 import mailer from "../../../stores/Mailer";
-import {observer} from "mobx-react";
+import { observer } from "mobx-react";
 import MailboxEmpty from "./MailboxEmpty";
 
-
 const MailsList = observer(() => {
-    const interval = useRef<any>(null)
+    const interval = useRef<any>(null);
 
     useEffect(() => {
-        mailer.retrieveFirstPage()
-        startSubscribe()
+        mailer.retrieveFirstPage();
+        startSubscribe();
         return () => {
-            mailer.messages = []
-            stopSubscribe()
-        }
-    }, [])
+            mailer.messageIds = [];
+            stopSubscribe();
+        };
+    }, []);
 
-
-    useEffect(() => {
-        stopSubscribe()
-        if (!mailer.previousPages.length) {
-            startSubscribe()
-        }
-    }, [mailer.previousPages.length])
+    const messageIds = mailer.messageIds.slice(
+        (mailer.page - 1) * mailer.messagesOnPage,
+        mailer.page * mailer.messagesOnPage
+    );
 
     const startSubscribe = () => {
         interval.current = setInterval(() => {
-            if (!mailer.previousPages.length && !mailer.loading) {
-                mailer.retrieveNewMessages()
+            if (mailer.page === 1 && !mailer.loading) {
+                mailer.retrieveNewMessages();
             }
-        }, 5000)
-    }
+        }, 5000);
+    };
 
-    const stopSubscribe = () => clearInterval(interval.current)
+    const stopSubscribe = () => clearInterval(interval.current);
 
     return (
         <div className="mail-box">
-            {mailer.messages.length ?
+            {messageIds.length ? (
                 <table className="table table-hover table-mail">
                     <tbody>
-                    {mailer.messages.map(msg => <MailboxMail key={msg.id} message={{...msg}} />)}
+                        {messageIds.map((msgId) => (
+                            <MailboxMail
+                                key={msgId}
+                                message={mailer.messagesById[msgId]}
+                            />
+                        ))}
                     </tbody>
                 </table>
-                :
-                <>{!mailer.searchingText && !mailer.filteringMethod &&
-                    <MailboxEmpty />
-                }
+            ) : (
+                <>
+                    {!mailer.searchingText && !mailer.filteringMethod && (
+                        <MailboxEmpty />
+                    )}
                 </>
-            }
+            )}
         </div>
     );
 });

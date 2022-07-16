@@ -1,15 +1,12 @@
 import { makeAutoObservable } from "mobx";
-import { IGenericAccount } from "../EverStackSDK/types/IGenericAccount";
-import EverStackSDK from "../EverStackSDK";
-import { WalletType } from "../EverStackSDK/types/WalletType";
-import { AbstractMessagingLayer } from "../EverStackSDK/abstracts/AbstractMessagingLayer";
+import Ylide, { AbstractMessagingLayer, IGenericAccount } from "@ylide/sdk";
 import mailer from "./Mailer";
 
 class Auth {
     wallet: AbstractMessagingLayer | null = null;
 
     account: IGenericAccount | null = null;
-    wallets: WalletType[] | null = null;
+    wallets: { blockchain: string; wallet: string }[] = [];
 
     loading: boolean = true;
     authenticating: boolean = false;
@@ -25,29 +22,39 @@ class Auth {
     };
 
     async setAvailableWallets() {
-        this.wallets = await EverStackSDK.getAvailableWallets();
+        this.wallets = await this.getAvailableWallets();
     }
 
-    async setWallet(walletType: WalletType | null) {
+    async setWallet(walletType: string | null) {
         try {
             if (walletType === null) {
                 this.wallet = null;
                 this.removeStorageWallet();
                 return;
             }
+            //@ts-ignore
+            this.wallet = window.wallet = await Ylide.instantiateWallet(
+                Ylide.providers[walletType],
+                {
+                    dev: this.isDev,
+                }
+            );
 
-            this.wallet = await EverStackSDK.instantiateWallet(walletType, {
-                dev: this.isDev,
-            });
-
-            localStorage.setItem("walletType", WalletType[walletType]);
+            localStorage.setItem("walletType", walletType);
         } catch (e) {
             localStorage.removeItem("walletType");
         }
     }
 
-    async getAvailableWallets(): Promise<WalletType[]> {
-        return await EverStackSDK.getAvailableWallets();
+    async getAvailableWallets(): Promise<
+        { blockchain: string; wallet: string }[]
+    > {
+        const wallets = await Ylide.getAvailableWallets();
+        console.log("wallets: ", wallets);
+        return wallets.map((cls) => ({
+            blockchain: cls.blockchainType(),
+            wallet: cls.walletType(),
+        }));
     }
 
     async checkAuth() {
@@ -55,9 +62,9 @@ class Auth {
         if (!this.wallet) {
             const wallet = localStorage.getItem("walletType");
             if (wallet) {
-                const parsedWallet = Auth.parseWalletType(wallet);
-                if (parsedWallet !== null) {
-                    await this.setWallet(parsedWallet);
+                const walletCls = Ylide.providers[wallet];
+                if (walletCls) {
+                    await this.setWallet(wallet);
                 }
             }
         }
@@ -88,21 +95,6 @@ class Auth {
 
     removeStorageWallet() {
         localStorage.removeItem("walletType");
-    }
-
-    private static parseWalletType(typeString: string): WalletType | null {
-        try {
-            if (!Object.keys(WalletType).includes(typeString)) return null;
-            // @ts-ignore
-            const type = WalletType[typeString];
-            if (type === undefined) {
-                return null;
-            }
-
-            return type;
-        } catch (e) {
-            return null;
-        }
     }
 }
 

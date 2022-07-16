@@ -7,6 +7,7 @@ import mailer from "../../../../stores/Mailer";
 import { observer } from "mobx-react";
 import mailbox from "../../../../stores/Mailbox";
 import { useNav } from "../../../../utils/navigate";
+import domain from "../../../../stores/Domain";
 
 const Tooltip = observer(() => {
     const navigate = useNav();
@@ -21,18 +22,18 @@ const Tooltip = observer(() => {
             )
                 return;
 
-            const mailData = {
-                subject: mailbox.subject,
-                data: mailbox.textEditorData,
-            };
-
             //Filter duplicates addresses
             const recipients = mailbox.recipients.filter(
                 (value, index, array) => array.indexOf(value) === index
             );
 
             const mailsPromises = recipients.map((recipient) =>
-                mailer.sendMail(JSON.stringify(mailData), recipient)
+                mailer.sendMail(
+                    domain.everscaleKey,
+                    mailbox.subject,
+                    JSON.stringify(mailbox.textEditorData),
+                    recipient
+                )
             );
 
             await Promise.all(mailsPromises);

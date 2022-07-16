@@ -1,21 +1,24 @@
-import React, { useMemo, useState } from "react";
+import React, { useMemo } from "react";
 import EthereumLogo from "../images/EthereumLogo";
-import { WalletType } from "../../../EverStackSDK/types/WalletType";
 import auth from "../../../stores/Auth";
 import EverscaleLogo from "../images/EverscaleLogo";
 import SolanaLogo from "../images/SolanaLogo";
-import TronLogo from "../images/TronLogo";
 import classNames from "classnames";
 
 interface ChainButtonProps {
-    chain: WalletType;
+    chain: string;
+    type: string;
     available?: boolean;
 }
 
-const ChainButton: React.FC<ChainButtonProps> = ({ chain, available }) => {
+const ChainButton: React.FC<ChainButtonProps> = ({
+    type,
+    chain,
+    available,
+}) => {
     const { text, logo, link, walletName, isWalletAvailable } = useMemo(() => {
         switch (chain) {
-            case WalletType.EverScale:
+            case "everscale":
                 return {
                     text: "EverScale",
                     logo: <EverscaleLogo />,
@@ -23,7 +26,7 @@ const ChainButton: React.FC<ChainButtonProps> = ({ chain, available }) => {
                     walletName: "EverWallet",
                     isWalletAvailable: true,
                 };
-            case WalletType.Ethereum:
+            case "ethereum":
                 return {
                     text: "Ethereum",
                     logo: <EthereumLogo />,
@@ -31,20 +34,12 @@ const ChainButton: React.FC<ChainButtonProps> = ({ chain, available }) => {
                     walletName: "MetaMask",
                     isWalletAvailable: false,
                 };
-            case WalletType.Solana:
+            case "solana":
                 return {
                     text: "Solana",
                     logo: <SolanaLogo />,
                     link: "https://phantom.app/",
                     walletName: "Phantom",
-                    isWalletAvailable: false,
-                };
-            case WalletType.Tron:
-                return {
-                    text: "Tron",
-                    logo: <TronLogo />,
-                    link: "https://metamask.io/",
-                    walletName: "MetaMask",
                     isWalletAvailable: false,
                 };
             default:
@@ -58,10 +53,9 @@ const ChainButton: React.FC<ChainButtonProps> = ({ chain, available }) => {
     const clickHandler = async () => {
         if (!available) return;
         if (auth.authenticating) return;
-
         try {
             auth.authenticating = true;
-            await auth.setWallet(chain);
+            await auth.setWallet(type);
             await auth.authenticate();
         } finally {
             auth.authenticating = false;

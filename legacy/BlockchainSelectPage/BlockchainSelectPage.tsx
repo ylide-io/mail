@@ -1,15 +1,14 @@
 import React, { useEffect, useState } from "react";
 import "./BlockchainSelectPage.scss";
 import auth from "../../stores/Auth";
-import {
-    allWalletTypes,
-    WalletType,
-} from "../../EverStackSDK/types/WalletType";
+
 import ChainButton from "./components/ChainButton";
 import { observer } from "mobx-react";
 
 const BlockchainSelectPage = observer(() => {
-    const [availableWallets, setAvailableWallets] = useState<WalletType[]>([]);
+    const [availableWallets, setAvailableWallets] = useState<
+        { blockchain: string; wallet: string }[]
+    >([]);
 
     useEffect(() => {
         retrieveAvailableWallets();
@@ -31,11 +30,12 @@ const BlockchainSelectPage = observer(() => {
                         </div>
                     </div>
                     <div className="selectANetworkContent">
-                        {allWalletTypes.map((chain) => (
+                        {availableWallets.map(({ blockchain, wallet }) => (
                             <ChainButton
-                                key={chain}
-                                available={availableWallets.includes(chain)}
-                                chain={chain}
+                                type={`${blockchain}:${wallet}`}
+                                key={`${blockchain}:${wallet}`}
+                                available={true}
+                                chain={blockchain}
                             />
                         ))}
                     </div>

@@ -1,50 +1,102 @@
-import React from 'react';
-import auth from "../../stores/Auth";
+import React from "react";
 import Searcher from "../../layouts/components/searcher";
-import {useNav} from "../../utils/navigate";
+import domain from "../../stores/Domain";
+import { useNav } from "../../utils/navigate";
+import { Dropdown, Menu } from "antd";
+import { DownOutlined, LogoutOutlined } from "@ant-design/icons";
+import { observer } from "mobx-react";
 
-const Header = () => {
-    const nav = useNav()
+const Header = observer(() => {
+    const nav = useNav();
 
-    const disconnect = () => {
-        auth.disconnectAccount()
-    }
+    const menu = (
+        <Menu
+            items={domain.connectedKeys.map((key) => ({
+                key: `${key.blockchain}:${key.address}`,
+                label: (
+                    <div
+                        style={{
+                            display: "flex",
+                            flexDirection: "row",
+                            alignItems: "center",
+                        }}
+                    >
+                        <LogoutOutlined
+                            style={{ marginTop: 0, marginRight: 10 }}
+                        />{" "}
+                        {key.address.substr(0, 10)}... ({key.blockchain})
+                    </div>
+                ),
+            }))}
+            onClick={(info) => {
+                const dk = domain.connectedKeys.find(
+                    (key) => info.key === `${key.blockchain}:${key.address}`
+                );
+                domain.removeKey(dk!);
+            }}
+        />
+    );
 
     return (
         <div className="row border-bottom">
             <nav
                 className="navbar navbar-static-top white-bg mb-0"
                 role="navigation"
-                style={{paddingLeft: 20, paddingRight: 20}}
+                style={{ paddingLeft: 20, paddingRight: 20 }}
             >
                 <div className="navbar-header">
-                    <Searcher/>
+                    <Searcher />
                 </div>
                 <ul className="nav navbar-top-links navbar-right">
                     <li>
-                        <a onClick={() => nav("/contacts")} style={{cursor: "pointer"}} className="m-r-sm text-muted welcome-message">
+                        <a
+                            onClick={(e) => {
+                                e.preventDefault();
+                                nav("/contacts");
+                            }}
+                            style={{ cursor: "pointer" }}
+                            className="m-r-sm text-muted welcome-message"
+                            href="_none"
+                        >
                             <i className="fa fa-users"></i>
                         </a>
                     </li>
                     <li>
-                        <a onClick={() => nav("/settings")} style={{cursor: "pointer"}} className="m-r-sm text-muted welcome-message">
+                        <a
+                            onClick={(e) => {
+                                e.preventDefault();
+                                nav("/settings");
+                            }}
+                            style={{ cursor: "pointer" }}
+                            className="m-r-sm text-muted welcome-message"
+                            href="_none"
+                        >
                             <i className="fa fa-gear"></i>
                         </a>
                     </li>
                     <li>
-                            <span className="m-r-sm text-muted welcome-message">
-                                {auth.account!.address.toString().substring(0, 20)}...
-                            </span>
-                    </li>
-                    <li>
-                        <a onClick={disconnect}>
-                            <i className="fa fa-sign-out"></i> Disconnect wallet
-                        </a>
+                        <Dropdown overlay={menu}>
+                            <div
+                                style={{
+                                    display: "flex",
+                                    flexDirection: "row",
+                                    alignItems: "center",
+                                    color: "#707070",
+                                    cursor: "pointer",
+                                }}
+                            >
+                                {`Connected ${domain.connectedKeys.length} account`}
+                                <DownOutlined
+                                    size={16}
+                                    style={{ marginLeft: 5 }}
+                                />
+                            </div>
+                        </Dropdown>
                     </li>
                 </ul>
             </nav>
         </div>
     );
-};
+});
 
 export default Header;

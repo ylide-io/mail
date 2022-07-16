@@ -1,92 +1,92 @@
-import {IContact} from "./models/IContact";
+import { IContact } from "./models/IContact";
 import contactsDB from "../indexedDB/ContactsDB";
-import {makeAutoObservable} from "mobx";
+import { makeAutoObservable } from "mobx";
 import fuzzysort from "fuzzysort";
-import {ITag} from "./models/ITag";
+import { ITag } from "./models/ITag";
 
 class Contacts {
-    contacts: IContact[] = []
+    contacts: IContact[] = [];
+    contactsByAddress: Record<string, IContact> = {};
 
-    filteredContacts: IContact[] | null = []
-    newContact: IContact | null = null
+    filteredContacts: IContact[] | null = [];
+    newContact: IContact | null = null;
 
-    filterByTag: ITag | null = null
+    filterByTag: ITag | null = null;
 
     constructor() {
-        makeAutoObservable(this)
+        makeAutoObservable(this);
     }
 
-    async getContacts(): Promise<IContact[]> {
-        if(!this.contacts.length) {
-            await this.retrieveContacts()
-        }
-
-        return this.contacts
+    async init() {
+        await this.retrieveContacts();
     }
 
     async retrieveContacts(): Promise<void> {
-        const dbContacts = await contactsDB.retrieveAllContacts()
+        const dbContacts = await contactsDB.retrieveAllContacts();
 
-        this.contacts = dbContacts.reverse()
+        this.contacts = dbContacts.reverse();
+        this.contactsByAddress = this.contacts.reduce(
+            (p, c) => ({
+                ...p,
+                [c.address]: c,
+            }),
+            {}
+        );
     }
 
     async saveContact(contact: IContact): Promise<void> {
-        this.contacts.unshift(contact)
-        await contactsDB.saveContact(contact)
+        this.contacts.unshift(contact);
+        this.contactsByAddress[contact.address] = contact;
+        await contactsDB.saveContact(contact);
     }
 
     async updateContact(contact: IContact): Promise<void> {
-        this.contacts = this.contacts.map(elem => {
-            if(elem.id !== contact.id) {
-                return elem
-            } else {
-                return contact
-            }
-        })
-        await contactsDB.saveContact(contact)
+        await contactsDB.saveContact(contact);
     }
 
     filterContacts(searchingText: string) {
-        const contacts = this.contacts
-        const results = fuzzysort.go(searchingText, contacts, {key: "name"})
+        const contacts = this.contacts;
+        const results = fuzzysort.go(searchingText, contacts, { key: "name" });
 
-        const resultContacts = results.map(res => res.obj)
+        const resultContacts = results.map((res) => res.obj);
 
         if (!searchingText) {
-            this.setFilteredContacts([])
+            this.setFilteredContacts([]);
         } else if (resultContacts.length) {
-            this.setFilteredContacts(resultContacts)
+            this.setFilteredContacts(resultContacts);
         } else {
-            this.setFilteredContacts(null)
+            this.setFilteredContacts(null);
         }
     }
 
     setFilteredContacts(contacts: IContact[] | null) {
-        this.filteredContacts = contacts
+        this.filteredContacts = contacts;
     }
 
     setFilterByTag(tag: ITag | null) {
-        this.filterByTag = tag
+        this.filterByTag = tag;
     }
 
     generateNewContact() {
         this.newContact = {
-            id: Date.now(),
             name: "",
             address: "",
-            tags: []
-        }
+            tags: [],
+        };
     }
 
     resetNewContact() {
-        this.newContact = null
+        this.newContact = null;
     }
 
-    async deleteContact(id: number): Promise<void> {
-        this.contacts = this.contacts.filter(elem => elem.id !== id)
-        await contactsDB.deleteContact(id)
+    async deleteContact(address: string): Promise<void> {
+        this.contacts = this.contacts.filter(
+            (elem) => elem.address !== address
+        );
+        delete this.contactsByAddress[address];
+        await contactsDB.deleteContact(address);
     }
 }
 
-const contacts = new Contacts()
-export default contacts
+const contacts = new Contacts();
+export default contacts;
