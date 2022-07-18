@@ -141,6 +141,7 @@ const MailDetail = observer(() => {
                             <ReactEditorJS
                                 tools={EDITOR_JS_TOOLS}
                                 readOnly={true}
+                                //@ts-ignore
                                 data={data}
                             />
                         ) : (

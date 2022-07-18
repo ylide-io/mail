@@ -118,7 +118,8 @@ class Domain {
             this.senders[wallet.blockchain] = {
                 ...(this.senders[wallet.blockchain] || {}),
                 [wallet.wallet]: await Ylide.instantiateSender(
-                    Ylide.getSender(wallet.blockchain, wallet.wallet)
+                    Ylide.getSender(wallet.blockchain, wallet.wallet),
+                    { dev: document.location.hostname === "localhost" }
                 ),
             };
         }
@@ -137,7 +138,8 @@ class Domain {
         }
         for (const { blockchain } of this.availableReaders) {
             this.readers[blockchain] = await Ylide.instantiateReader(
-                Ylide.getReader(blockchain)
+                Ylide.getReader(blockchain),
+                { dev: document.location.hostname === "localhost" }
             );
         }
         this.connectedKeys = this.keystore.keys

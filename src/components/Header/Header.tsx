@@ -28,11 +28,13 @@ const Header = observer(() => {
                     </div>
                 ),
             }))}
-            onClick={(info) => {
+            onClick={async (info) => {
                 const dk = domain.connectedKeys.find(
                     (key) => info.key === `${key.blockchain}:${key.address}`
                 );
-                domain.removeKey(dk!);
+                await domain.senders.everscale.everwallet.disconnectAccount();
+                await domain.removeKey(dk!);
+                document.location.href = "/first-time";
             }}
         />
     );
