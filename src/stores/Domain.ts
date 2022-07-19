@@ -4,10 +4,10 @@ import {
     AbstractSendingController,
     BlockchainMap,
     BlockchainWalletMap,
-    BrowserLocalStorage,
     IGenericAccount,
     YlideKeyPair,
     YlideKeyStore,
+    BrowserIframeStorage,
 } from "@ylide/sdk";
 import {
     EverscaleReadingController,
@@ -32,7 +32,7 @@ export interface ConnectedKey {
 class Domain {
     savedPassword: string | null = null;
 
-    storage = new BrowserLocalStorage();
+    storage = new BrowserIframeStorage();
     keystore = new YlideKeyStore(this.storage, {
         onPasswordRequest: this.handlePasswordRequest.bind(this),
         onDeriveRequest: this.handleDeriveRequest.bind(this),
@@ -170,10 +170,11 @@ class Domain {
             return;
         }
 
+        await this.keystore.init();
+
         await contacts.init();
         await mailer.init();
 
-        await this.keystore.load();
         await this.extractWalletsData();
 
         this.initialized = true;

@@ -35,7 +35,7 @@ class Mailer {
     activeFolderId: number | null = null;
     searchingText: string = "";
 
-    readonly messagesOnPage = 2;
+    readonly messagesOnPage = 10;
     isNextPage: boolean = false;
     page: number = 1;
 
