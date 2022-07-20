@@ -11,7 +11,7 @@
         "@types/node": "^16.11.36",
         "@types/react": "^18.0.9",
         "@types/react-dom": "^18.0.4",
-        "@ylide/everscale": "^0.1.13",
+        "@ylide/everscale": "^0.1.14",
         "@ylide/sdk": "^0.1.11",
         "antd": "^4.21.5",
         "classnames": "^2.3.1",
