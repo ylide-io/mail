@@ -18,13 +18,11 @@ const Tooltip = observer(() => {
 			//Filter duplicates addresses
 			const recipients = mailbox.recipients.filter((value, index, array) => array.indexOf(value) === index);
 
-			const pRecipients = await mailer.prepareRecipients(domain.everscaleKey, recipients);
-
-			const mailsPromise = await mailer.sendMail(
+			await mailer.sendMail(
 				domain.everscaleKey,
 				mailbox.subject,
 				JSON.stringify(mailbox.textEditorData),
-				pRecipients,
+				recipients,
 			);
 
 			alert('Successfully sent');

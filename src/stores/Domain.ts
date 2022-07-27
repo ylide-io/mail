@@ -1,29 +1,28 @@
 import {
 	Ylide,
-	AbstractReadingController,
-	AbstractSendingController,
 	BlockchainMap,
 	BlockchainWalletMap,
 	IGenericAccount,
 	YlideKeyPair,
 	YlideKeyStore,
 	BrowserIframeStorage,
+	AbstractWalletController,
+	AbstractBlockchainController,
 } from '@ylide/sdk';
-import { EverscaleReadingController, EverscaleSendingController } from '@ylide/everscale';
+import { everscaleBlockchainFactory, everscaleWalletFactory } from '@ylide/everscale';
 import { computed, makeAutoObservable } from 'mobx';
 import modals from './Modals';
 import contacts from './Contacts';
 import mailer from './Mailer';
 
-Ylide.registerReader(EverscaleReadingController);
-Ylide.registerSender(EverscaleSendingController);
+Ylide.registerBlockchainFactory(everscaleBlockchainFactory);
+Ylide.registerWalletFactory(everscaleWalletFactory);
 
 export interface ConnectedKey {
 	blockchain: string;
 	address: string;
 	key: YlideKeyPair;
-	sender: AbstractSendingController;
-	reader: AbstractReadingController;
+	wallet: AbstractWalletController;
 }
 
 class Domain {
@@ -37,9 +36,11 @@ class Domain {
 
 	initialized = false;
 
-	readers: BlockchainMap<AbstractReadingController> = {};
+	ylide: Ylide = new Ylide(this.keystore);
+
+	readers: BlockchainMap<AbstractBlockchainController> = {};
 	availableReaders: { blockchain: string }[] = [];
-	senders: BlockchainWalletMap<AbstractSendingController> = {};
+	senders: BlockchainWalletMap<AbstractWalletController> = {};
 	availableSenders: { blockchain: string; wallet: string }[] = [];
 	availableWallets: { blockchain: string; wallet: string }[] = [];
 	connectedWallets: {
@@ -82,11 +83,17 @@ class Domain {
 		});
 	}
 
-	async handleDeriveRequest(reason: string, blockchain: string, address: string, magicString: string) {
+	async handleDeriveRequest(
+		reason: string,
+		blockchain: string,
+		wallet: string,
+		address: string,
+		magicString: string,
+	) {
 		const w = this.connectedWallets.find(t => t.blockchain === blockchain && t.account.address === address)!;
 		const sender = this.senders[blockchain][w.wallet];
 		try {
-			return sender.deriveMessagingKeypair(magicString);
+			return sender.signMagicString(magicString);
 		} catch (err) {
 			return null;
 		}
@@ -97,19 +104,21 @@ class Domain {
 	}
 
 	async extractWalletsData() {
-		this.availableSenders = Ylide.sendersList;
-		this.availableReaders = Ylide.readersList;
-		this.availableWallets = (await Ylide.getAvailableSenders()).map(cls => ({
-			blockchain: cls.blockchainType(),
-			wallet: cls.walletType(),
-		}));
+		this.availableSenders = Ylide.walletsList;
+		this.availableReaders = Ylide.blockchainsList;
+		this.availableWallets = await Ylide.getAvailableWallets();
 		for (const wallet of this.availableWallets) {
-			this.senders[wallet.blockchain] = {
-				...(this.senders[wallet.blockchain] || {}),
-				[wallet.wallet]: await Ylide.instantiateSender(Ylide.getSender(wallet.blockchain, wallet.wallet), {
-					dev: document.location.hostname === 'localhost',
-				}),
-			};
+			if (!this.senders[wallet.blockchain] || !this.senders[wallet.blockchain][wallet.wallet]) {
+				this.senders[wallet.blockchain] = {
+					...(this.senders[wallet.blockchain] || {}),
+					[wallet.wallet]: (
+						await this.ylide.addWallet(wallet.blockchain, wallet.wallet, {
+							dev: false, //document.location.hostname === 'localhost',
+						})
+					).walletController,
+				};
+			}
+			this.readers[wallet.blockchain] = this.senders[wallet.blockchain][wallet.wallet].blockchainController;
 		}
 		for (const blockchain of Object.keys(this.senders)) {
 			for (const wallet of Object.keys(this.senders[blockchain])) {
@@ -125,9 +134,11 @@ class Domain {
 			}
 		}
 		for (const { blockchain } of this.availableReaders) {
-			this.readers[blockchain] = await Ylide.instantiateReader(Ylide.getReader(blockchain), {
-				dev: document.location.hostname === 'localhost',
-			});
+			if (!this.readers[blockchain]) {
+				this.readers[blockchain] = await this.ylide.addBlockchain(blockchain, {
+					dev: false, //document.location.hostname === 'localhost',
+				});
+			}
 		}
 		this.connectedKeys = this.keystore.keys
 			.map(key => {
@@ -141,8 +152,7 @@ class Domain {
 					blockchain: key.blockchain,
 					address: key.address,
 					key: key.key,
-					sender: this.senders[cw.blockchain][cw.wallet],
-					reader: this.readers[cw.blockchain],
+					wallet: this.senders[cw.blockchain][cw.wallet],
 				};
 			})
 			.filter(t => !!t)

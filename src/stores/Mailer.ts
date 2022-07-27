@@ -3,10 +3,8 @@ import messagesDB, { IMessageDecodedContent } from '../indexedDB/MessagesDB';
 import contacts from './Contacts';
 import fuzzysort from 'fuzzysort';
 import { filterAsync } from '../utils/asyncFilter';
-import { IMessage, MessageChunks, MessageContainer, MessageContentV3 } from '@ylide/sdk';
+import { IMessage, MessageContentV3, ServiceCode } from '@ylide/sdk';
 import domain, { ConnectedKey } from './Domain';
-import SmartBuffer from '@ylide/smart-buffer';
-import { EverscaleReadingController, EverscaleSendingController } from '@ylide/everscale';
 
 interface filteringTypesInterface {
 	unread: (arg1: IMessage) => Promise<boolean>;
@@ -14,12 +12,6 @@ interface filteringTypesInterface {
 	notArchived: (arg1: IMessage) => Promise<boolean>;
 	archived: (arg1: IMessage) => Promise<boolean>;
 	byFolder: (arg1: IMessage) => Promise<boolean>;
-}
-
-interface MailRecipient {
-	address: string;
-	publicKey: Uint8Array | null;
-	state: 'none' | 'ylide' | 'native';
 }
 
 class Mailer {
@@ -77,59 +69,18 @@ class Mailer {
 		console.log('this.decodedMessagesById: ', toJS(this.decodedMessagesById));
 	}
 
-	async prepareRecipients(sender: ConnectedKey, recipients: string[]): Promise<MailRecipient[]> {
-		const recipientYlideKeys = await Promise.all(
-			recipients.map(async r => {
-				try {
-					return await sender.reader.extractPublicKeyFromAddress(r);
-				} catch (err) {
-					return null;
-				}
-			}),
-		);
-		const recipientNativeKeys = await Promise.all(
-			recipients.map(async r => {
-				try {
-					return await (sender.reader as EverscaleReadingController).extractNativePublicKeyFromAddress(r);
-				} catch (err) {
-					return null;
-				}
-			}),
-		);
-		return recipients.map((r, idx) => ({
-			address: r,
-			state: (recipientYlideKeys[idx] ? 'ylide' : recipientNativeKeys[idx] ? 'native' : 'none') as
-				| 'none'
-				| 'native'
-				| 'ylide',
-			publicKey: recipientYlideKeys[idx] || recipientNativeKeys[idx] || null,
-		}));
-	}
-
-	async sendMail(sender: ConnectedKey, subject: string, text: string, recipients: MailRecipient[]): Promise<void> {
+	async sendMail(sender: ConnectedKey, subject: string, text: string, recipients: string[]): Promise<void> {
 		try {
 			this.sending = true;
 			const content = MessageContentV3.plain(subject, text);
 
-			const ylides = recipients.filter(r => r.state === 'ylide') as { address: string; publicKey: Uint8Array }[];
-			const native = recipients.filter(r => r.state === 'native') as { address: string; publicKey: Uint8Array }[];
-			if (ylides.length) {
-				await sender.key.execute('send mail', async keypair => {
-					await sender.sender.sendMessage([0, 0, 0, 1], keypair, content, ylides);
-				});
-			}
-			if (native.length) {
-				const { content: encContent, key } = MessageContainer.encodeContent(content);
-				await (sender.sender as EverscaleSendingController).sendNativeMessage(
-					[0, 0, 0, 1],
-					encContent,
-					key,
-					native.map(n => ({
-						address: n.address,
-						publicKey: new SmartBuffer(n.publicKey).toHexString(),
-					})),
-				);
-			}
+			await domain.ylide.sendMessage({
+				wallet: sender.wallet,
+				sender: (await sender.wallet.getAuthenticatedAccount())!,
+				content,
+				recipients,
+				serviceCode: ServiceCode.MAIL,
+			});
 		} catch (e) {
 			throw e;
 		} finally {
@@ -267,13 +218,6 @@ class Mailer {
 				mLink.isContentLoaded = true;
 				mLink.contentLink = content;
 			}
-			if (mLink.contentLink && !mLink.userspaceMeta) {
-				const unpackedContent = MessageChunks.unpackContentFromChunks([mLink.contentLink.content]);
-				mLink.userspaceMeta = {
-					...(mLink.userspaceMeta || {}),
-					isNative: unpackedContent.isNative,
-				};
-			}
 		}
 		if (firstMessage) {
 			for (const msgId of pageMessages.filter(m => !this.messageIds.includes(m.msgId)).map(p => p.msgId)) {
@@ -306,13 +250,6 @@ class Mailer {
 				mLink.isContentLoaded = true;
 				mLink.contentLink = content;
 			}
-			if (mLink.contentLink && !mLink.userspaceMeta) {
-				const unpackedContent = MessageChunks.unpackContentFromChunks([mLink.contentLink.content]);
-				mLink.userspaceMeta = {
-					...(mLink.userspaceMeta || {}),
-					isNative: unpackedContent.isNative,
-				};
-			}
 		}
 		this.messageIds = pageMessages.map(p => p.msgId);
 		this.isNextPage = isNextPage;
@@ -344,13 +281,6 @@ class Mailer {
 				}
 				mLink.isContentLoaded = true;
 				mLink.contentLink = content;
-			}
-			if (mLink.contentLink && !mLink.userspaceMeta) {
-				const unpackedContent = MessageChunks.unpackContentFromChunks([mLink.contentLink.content]);
-				mLink.userspaceMeta = {
-					...(mLink.userspaceMeta || {}),
-					isNative: unpackedContent.isNative,
-				};
 			}
 		}
 		this.messageIds.push(...pageMessages.map(m => m.msgId));
@@ -430,70 +360,35 @@ class Mailer {
 		if (!key) {
 			throw new Error('Decryption key is not available');
 		}
-		const me = await key.sender.getAuthenticatedAccount();
+		const me = await key.wallet.getAuthenticatedAccount();
 		if (!me) {
 			throw new Error('Account is not connected');
 		}
-		try {
-			if (!pushMsg.contentLink) {
-				const content = await domain.readers.everscale.retrieveMessageContentByMsgId(pushMsg.msgId);
-				if (!content || content.corrupted) {
-					throw new Error('Content is not available or corrupted');
-				}
-				const unpackedContent = MessageChunks.unpackContentFromChunks([content.content]);
-				pushMsg.isContentLoaded = true;
-				console.log('setting content');
-				pushMsg.contentLink = content;
-				pushMsg.userspaceMeta = {
-					...(pushMsg.userspaceMeta || {}),
-					isNative: unpackedContent.isNative,
-				};
+		if (!pushMsg.contentLink) {
+			const content = await domain.readers.everscale.retrieveMessageContentByMsgId(pushMsg.msgId);
+			if (!content || content.corrupted) {
+				throw new Error('Content is not available or corrupted');
 			}
-			if (!pushMsg.contentLink) {
-				throw new Error('Content not retrievable');
-			}
-			if (!pushMsg.isContentDecrypted) {
-				const unpackedContent = MessageChunks.unpackContentFromChunks([pushMsg.contentLink.content]);
+			pushMsg.isContentLoaded = true;
+			pushMsg.contentLink = content;
+		}
+		if (!pushMsg.contentLink) {
+			throw new Error('Content not retrievable');
+		}
 
-				let symmKey;
-				if (unpackedContent.isNative) {
-					const myNativePublicKey = SmartBuffer.ofHexString(me.publicKey).bytes;
-					symmKey = await (key.reader as EverscaleReadingController).decodeNativeKey(
-						unpackedContent.publicKey,
-						myNativePublicKey,
-						pushMsg.key,
-					);
-				} else {
-					await key.key.execute('read mail', async keypair => {
-						symmKey = keypair.decrypt(pushMsg.key, unpackedContent.publicKey);
-					});
-				}
+		const decrypted = await domain.ylide.decryptMessageContent(pushMsg, pushMsg.contentLink);
+		pushMsg.isContentDecrypted = true;
+		pushMsg.decryptedContent = decrypted.decryptedContent;
 
-				if (!symmKey) {
-					throw new Error('Decryption key is not accessable');
-				}
-				const content = MessageContainer.decodeRawContent(unpackedContent.content, symmKey);
-				pushMsg.isContentDecrypted = true;
-				pushMsg.decryptedContent = content;
-			}
-			if (!pushMsg.isContentDecrypted) {
-				throw new Error('Content not decryptable');
-			}
+		this.decodedMessagesById[pushMsg.msgId] = {
+			msgId: pushMsg.msgId,
+			decodedSubject: decrypted.subject,
+			decodedTextData: decrypted.content,
+		};
 
-			const content = MessageContainer.messageContentFromBytes(pushMsg.decryptedContent!);
-
-			this.decodedMessagesById[pushMsg.msgId] = {
-				msgId: pushMsg.msgId,
-				decodedSubject: content.subject,
-				decodedTextData: content.content,
-			};
-
-			if (this.getSaveDecodedSetting()) {
-				console.log('msg saved: ', pushMsg.msgId);
-				await messagesDB.saveDecodedMessage(this.decodedMessagesById[pushMsg.msgId]);
-			}
-		} catch (e) {
-			throw e;
+		if (this.getSaveDecodedSetting()) {
+			console.log('msg saved: ', pushMsg.msgId);
+			await messagesDB.saveDecodedMessage(this.decodedMessagesById[pushMsg.msgId]);
 		}
 	}
 
