@@ -16,9 +16,9 @@ const ReactEditorJS = createReactEditorJS();
 const MailDetail = observer(() => {
 	const navigate = useNav();
 	const { id } = useParams();
-	const message = mailer.messagesById[id!];
+	const message = mailer.inboxMessages.find(m => m.link.msgId === id!)!;
 	const decoded = mailer.decodedMessagesById[id!];
-	const contact = contacts.contactsByAddress[message?.senderAddress || '-1'];
+	const contact = contacts.contactsByAddress[message?.link.senderAddress || '-1'];
 
 	useEffect(() => {
 		if (!message) return;
@@ -26,7 +26,7 @@ const MailDetail = observer(() => {
 			if (!decoded) {
 				await mailer.decodeMessage(message);
 			}
-			await mailer.readMessage(message.msgId);
+			await mailer.readMessage(message.link.msgId);
 		})();
 	}, [decoded, message]);
 
@@ -46,7 +46,7 @@ const MailDetail = observer(() => {
 	})();
 
 	const replyClickHandler = () => {
-		mailbox.recipients = [message.senderAddress || ''];
+		mailbox.recipients = [message.link.senderAddress || ''];
 		mailbox.subject = decoded?.decodedSubject || '';
 		navigate('/compose');
 	};
@@ -59,7 +59,7 @@ const MailDetail = observer(() => {
 
 	const deleteHandler = () => {
 		if (message) {
-			mailer.deleteMessage(message.msgId);
+			mailer.deleteMessage(message.link.msgId);
 		}
 	};
 
@@ -105,12 +105,12 @@ const MailDetail = observer(() => {
 								{message && (
 									<div>
 										<span>
-											{new Date(message.createdAt).toLocaleTimeString('en-us', {
+											{new Date(message.link.createdAt).toLocaleTimeString('en-us', {
 												hour12: false,
 											})}
 										</span>
 										<span style={{ marginLeft: 6 }}>
-											{new Date(message.createdAt)
+											{new Date(message.link.createdAt)
 												.toLocaleDateString('en-us', {
 													day: '2-digit',
 													month: '2-digit',
@@ -123,7 +123,7 @@ const MailDetail = observer(() => {
 								)}
 							</span>
 							<span className="font-normal">From: </span>
-							<span>{contact ? contact.name : message.senderAddress}</span>
+							<span>{contact ? contact.name : message.link.senderAddress}</span>
 						</h5>
 					</div>
 				</div>

@@ -15,17 +15,42 @@ const Tooltip = observer(() => {
 
 			if (!mailbox.textEditorData?.blocks?.length || !mailbox.recipients.length) return;
 
+			mailer.sending = true;
+
 			//Filter duplicates addresses
 			const recipients = mailbox.recipients.filter((value, index, array) => array.indexOf(value) === index);
-
-			await mailer.sendMail(
-				domain.everscaleKey,
-				mailbox.subject,
-				JSON.stringify(mailbox.textEditorData),
-				recipients,
+			const recipientKeys = await Promise.all(
+				recipients.map(async r => {
+					const blockchains = domain.getBlockchainsForAddress(r);
+					const keys = await Promise.all(
+						blockchains.map(async bc => {
+							try {
+								return await bc.reader.extractPublicKeyFromAddress(r);
+							} catch (err) {
+								return null;
+							}
+						}),
+					);
+					return keys.some(k => !!k);
+				}),
 			);
 
-			alert('Successfully sent');
+			const recs = recipients.filter((e, i) => recipientKeys[i]);
+
+			if (!recs.length) {
+				alert('For your recipients we found no keys on the blockchain');
+				mailer.sending = false;
+				return;
+			}
+
+			const msgId = await mailer.sendMail(
+				domain.accounts[0],
+				mailbox.subject,
+				JSON.stringify(mailbox.textEditorData),
+				recs,
+			);
+
+			alert(`Successfully sent, msgId: ${msgId}`);
 
 			navigate('/mailbox');
 		} catch (e) {

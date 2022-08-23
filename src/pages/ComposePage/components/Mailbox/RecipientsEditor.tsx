@@ -48,8 +48,8 @@ const RecipientsEditor = observer(() => {
 	useEffect(() => {
 		const recipientsAddresses: string[] = [];
 		value.forEach(option => {
-			const isAddress = domain.isAddressValid(option.value.toString());
-			if (isAddress) {
+			const isAddress = domain.getBlockchainsForAddress(option.value.toString());
+			if (isAddress.length) {
 				recipientsAddresses.push(option.value.toString());
 			} else {
 				const address = fromOption(option)?.address;
@@ -71,9 +71,9 @@ const RecipientsEditor = observer(() => {
 	});
 
 	const handleCreate = async (inputValue: string) => {
-		const isValid = await domain.isAddressValid(inputValue);
+		const isValid = await domain.getBlockchainsForAddress(inputValue);
 
-		if (isValid) {
+		if (isValid.length) {
 			const newOption = createOption(inputValue);
 			setValue([...value, newOption]);
 		}

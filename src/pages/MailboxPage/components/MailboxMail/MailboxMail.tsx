@@ -6,39 +6,40 @@ import { isToday } from '../../../../utils/date';
 import './MailStyles.scss';
 import { observer } from 'mobx-react';
 import { useNav } from '../../../../utils/navigate';
-import { IMessage } from '@ylide/sdk';
+import { BlockchainSource, GenericEntry, IMessage } from '@ylide/sdk';
 import messagesDB from '../../../../indexedDB/MessagesDB';
+import { blockchainsMap } from '../../../../constants';
 
 interface MailboxMailProps {
-	message: IMessage;
+	message: GenericEntry<IMessage, BlockchainSource>;
 }
 
 const MailboxMail: React.FC<MailboxMailProps> = observer(({ message }) => {
 	const navigate = useNav();
 	const [inUnread, setIsUnread] = useState(true);
-	const contact = contacts.contactsByAddress[message.senderAddress];
-	const sender = contact ? contact.name : message.senderAddress;
-	const checked = mailer.isMessageChecked(message.msgId);
-	const decoded = mailer.decodedMessagesById[message.msgId];
-	const isNative: boolean = message.userspaceMeta && message.userspaceMeta.isNative;
+	const contact = contacts.contactsByAddress[message.link.senderAddress];
+	const sender = contact ? contact.name : message.link.senderAddress;
+	const checked = mailer.isMessageChecked(message.link.msgId);
+	const decoded = mailer.decodedMessagesById[message.link.msgId];
+	const isNative: boolean = message.link.userspaceMeta && message.link.userspaceMeta.isNative;
 
 	useEffect(() => {
 		(async () => {
-			setIsUnread(!(await messagesDB.isMessageRead(message.msgId)));
+			setIsUnread(!(await messagesDB.isMessageRead(message.link.msgId)));
 		})();
 	}, [message]);
 
 	const messageClickHandler = async () => {
 		if (decoded) {
-			navigate(message.msgId);
+			navigate(message.link.msgId);
 		} else {
 			await mailer.decodeMessage(message);
-			navigate(message.msgId);
+			navigate(message.link.msgId);
 		}
 	};
 
 	const date = (() => {
-		const fullDate = new Date(message.createdAt * 1000);
+		const fullDate = new Date(message.link.createdAt * 1000);
 
 		if (isToday(fullDate)) {
 			return fullDate.toLocaleTimeString('en-us', {
@@ -52,7 +53,7 @@ const MailboxMail: React.FC<MailboxMailProps> = observer(({ message }) => {
 	})();
 
 	const checkHandler = (checked: boolean) => {
-		mailer.checkMessage(message, !checked);
+		mailer.checkMessage(message.link, !checked);
 	};
 
 	return (
@@ -81,11 +82,13 @@ const MailboxMail: React.FC<MailboxMailProps> = observer(({ message }) => {
 					{decoded ? decoded.decodedSubject || 'No subject' : 'Message is not decoded'}
 				</span>
 				{!decoded && <span style={{ marginLeft: 7 }}>[Not decoded]</span>}
-				{isNative ? (
-					<span className="label label-info" style={{ float: 'right', fontSize: '80%' }}>
-						Everscale Native
-					</span>
-				) : null}
+
+				<span
+					className="label label-info"
+					style={{ float: 'right', fontSize: '80%', background: 'rgb(221, 241, 255)', color: 'black' }}
+				>
+					{blockchainsMap[message.link.blockchain].logo(12)} {message.link.blockchain}
+				</span>
 			</td>
 			<td className="text-right mail-date">{date}</td>
 		</tr>

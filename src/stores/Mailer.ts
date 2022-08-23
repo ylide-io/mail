@@ -1,10 +1,11 @@
-import { makeAutoObservable, toJS } from 'mobx';
+import { makeAutoObservable, observable, toJS } from 'mobx';
 import messagesDB, { IMessageDecodedContent } from '../indexedDB/MessagesDB';
 import contacts from './Contacts';
 import fuzzysort from 'fuzzysort';
 import { filterAsync } from '../utils/asyncFilter';
-import { IMessage, MessageContentV3, ServiceCode } from '@ylide/sdk';
-import domain, { ConnectedKey } from './Domain';
+import { BlockchainSource, GenericEntry, IMessage, MessageContentV3, ServiceCode, Ylide } from '@ylide/sdk';
+import domain, { DomainAccount } from './Domain';
+import { EVM_NAMES, EVMNetwork } from '@ylide/ethereum';
 
 interface filteringTypesInterface {
 	unread: (arg1: IMessage) => Promise<boolean>;
@@ -53,6 +54,9 @@ class Mailer {
 
 	filteringMethod: keyof filteringTypesInterface = 'notArchived';
 
+	@observable inboxMessages: GenericEntry<IMessage, BlockchainSource>[] = [];
+	@observable sentMessages: GenericEntry<IMessage, BlockchainSource>[] = [];
+
 	constructor() {
 		makeAutoObservable(this);
 	}
@@ -66,21 +70,34 @@ class Mailer {
 			}),
 			{},
 		);
-		console.log('this.decodedMessagesById: ', toJS(this.decodedMessagesById));
+		domain.inbox.on('windowUpdate', () => (this.inboxMessages = domain.inbox.getWindow()));
+		domain.sent.on('windowUpdate', () => (this.sentMessages = domain.sent.getWindow()));
 	}
 
-	async sendMail(sender: ConnectedKey, subject: string, text: string, recipients: string[]): Promise<void> {
+	async sendMail(sender: DomainAccount, subject: string, text: string, recipients: string[]): Promise<string | null> {
 		try {
 			this.sending = true;
 			const content = MessageContentV3.plain(subject, text);
 
-			await domain.ylide.sendMessage({
-				wallet: sender.wallet,
-				sender: (await sender.wallet.getAuthenticatedAccount())!,
-				content,
-				recipients,
-				serviceCode: ServiceCode.MAIL,
-			});
+			const evmNetworks = (Object.keys(EVM_NAMES) as unknown as EVMNetwork[]).map((network: EVMNetwork) => ({
+				name: EVM_NAMES[network],
+				network: Number(network) as EVMNetwork,
+			}));
+			const blockchainName = await sender.wallet.getCurrentBlockchain();
+			const network = evmNetworks.find(n => n.name === blockchainName)?.network;
+
+			return await domain.ylide.sendMessage(
+				{
+					wallet: sender.wallet,
+					sender: sender.account,
+					content,
+					recipients,
+					serviceCode: ServiceCode.MAIL,
+				},
+				{
+					network,
+				},
+			);
 		} catch (e) {
 			throw e;
 		} finally {
@@ -89,213 +106,213 @@ class Mailer {
 	}
 
 	//beforeMessage
-	private async retrieveMessages({
-		nextPageAfterMessage,
-		beforeMessage,
-	}: {
-		nextPageAfterMessage?: IMessage;
-		beforeMessage?: IMessage;
-	}): Promise<{
-		pageMessages: IMessage[];
-		isNextPage: boolean;
-	}> {
-		const messages = await domain.readers.everscale.retrieveMessageHistoryByDates(domain.everscaleKey.address, {
-			messagesLimit: this.messagesOnPage,
-			firstMessageIdToStopSearching: beforeMessage?.msgId,
-			nextPageAfterMessage,
-		});
+	// private async retrieveMessages({
+	// 	nextPageAfterMessage,
+	// 	beforeMessage,
+	// }: {
+	// 	nextPageAfterMessage?: IMessage;
+	// 	beforeMessage?: IMessage;
+	// }): Promise<{
+	// 	pageMessages: IMessage[];
+	// 	isNextPage: boolean;
+	// }> {
+	// 	const messages = await domain.readers.everscale.retrieveMessageHistoryByDates(domain.everscaleKey.address, {
+	// 		messagesLimit: this.messagesOnPage,
+	// 		firstMessageIdToStopSearching: beforeMessage?.msgId,
+	// 		nextPageAfterMessage,
+	// 	});
 
-		if (!messages) {
-			return {
-				pageMessages: [],
-				isNextPage: false,
-			};
-		}
+	// 	if (!messages) {
+	// 		return {
+	// 			pageMessages: [],
+	// 			isNextPage: false,
+	// 		};
+	// 	}
 
-		let isNextPage = false;
+	// 	let isNextPage = false;
 
-		if (messages && messages.length === this.messagesOnPage) {
-			isNextPage = await Mailer.checkIsNextPage(messages[messages.length - 1]);
-		}
+	// 	if (messages && messages.length === this.messagesOnPage) {
+	// 		isNextPage = await Mailer.checkIsNextPage(messages[messages.length - 1]);
+	// 	}
 
-		return {
-			pageMessages: messages || [],
-			isNextPage,
-		};
-	}
+	// 	return {
+	// 		pageMessages: messages || [],
+	// 		isNextPage,
+	// 	};
+	// }
 
-	async retrieveMessagesPage({
-		filteringType,
-		beforeMessage,
-		nextPageAfterMessage,
-		searchingText,
-	}: {
-		filteringType: keyof filteringTypesInterface;
-		searchingText?: string;
-		beforeMessage?: IMessage;
-		nextPageAfterMessage?: IMessage;
-	}): Promise<{
-		pageMessages: IMessage[];
-		isNextPage: boolean;
-	}> {
-		this.loading = true;
-		let lastFetchedPage: IMessage[] = [];
+	// async retrieveMessagesPage({
+	// 	filteringType,
+	// 	beforeMessage,
+	// 	nextPageAfterMessage,
+	// 	searchingText,
+	// }: {
+	// 	filteringType: keyof filteringTypesInterface;
+	// 	searchingText?: string;
+	// 	beforeMessage?: IMessage;
+	// 	nextPageAfterMessage?: IMessage;
+	// }): Promise<{
+	// 	pageMessages: IMessage[];
+	// 	isNextPage: boolean;
+	// }> {
+	// 	this.loading = true;
+	// 	let lastFetchedPage: IMessage[] = [];
 
-		//Length = messagesOnPage + 1, this additional message mean we have next page
-		const fullMessages: IMessage[] = [];
+	// 	//Length = messagesOnPage + 1, this additional message mean we have next page
+	// 	const fullMessages: IMessage[] = [];
 
-		while (true) {
-			const { pageMessages, isNextPage } = await this.retrieveMessages({
-				nextPageAfterMessage: lastFetchedPage[lastFetchedPage.length - 1] || nextPageAfterMessage,
-				beforeMessage,
-			});
-			lastFetchedPage = pageMessages;
+	// 	while (true) {
+	// 		const { pageMessages, isNextPage } = await this.retrieveMessages({
+	// 			nextPageAfterMessage: lastFetchedPage[lastFetchedPage.length - 1] || nextPageAfterMessage,
+	// 			beforeMessage,
+	// 		});
+	// 		lastFetchedPage = pageMessages;
 
-			let filteredMessages: IMessage[] = pageMessages;
+	// 		let filteredMessages: IMessage[] = pageMessages;
 
-			if (filteringType) {
-				filteredMessages = await filterAsync(pageMessages, this.filteringTypes[filteringType]);
-			}
+	// 		if (filteringType) {
+	// 			filteredMessages = await filterAsync(pageMessages, this.filteringTypes[filteringType]);
+	// 		}
 
-			if (searchingText) {
-				filteredMessages = this.fuzzyFilterMessages(searchingText, filteredMessages);
-			}
+	// 		if (searchingText) {
+	// 			filteredMessages = this.fuzzyFilterMessages(searchingText, filteredMessages);
+	// 		}
 
-			for (const msg of filteredMessages) {
-				if (fullMessages.length === this.messagesOnPage + 1) break;
-				fullMessages.push(msg);
-			}
+	// 		for (const msg of filteredMessages) {
+	// 			if (fullMessages.length === this.messagesOnPage + 1) break;
+	// 			fullMessages.push(msg);
+	// 		}
 
-			if (!isNextPage) break;
-			if (fullMessages.length === this.messagesOnPage + 1) break;
-		}
+	// 		if (!isNextPage) break;
+	// 		if (fullMessages.length === this.messagesOnPage + 1) break;
+	// 	}
 
-		this.loading = false;
-		return {
-			pageMessages: fullMessages.slice(0, this.messagesOnPage),
-			isNextPage: fullMessages.length === this.messagesOnPage + 1,
-		};
-	}
+	// 	this.loading = false;
+	// 	return {
+	// 		pageMessages: fullMessages.slice(0, this.messagesOnPage),
+	// 		isNextPage: fullMessages.length === this.messagesOnPage + 1,
+	// 	};
+	// }
 
-	async retrieveNewMessages(): Promise<void> {
-		if (this.loading) return;
+	// async retrieveNewMessages(): Promise<void> {
+	// 	if (this.loading) return;
 
-		const firstMessage = this.messageIds.length ? this.messagesById[this.messageIds[0]] : null;
+	// 	const firstMessage = this.messageIds.length ? this.messagesById[this.messageIds[0]] : null;
 
-		let { pageMessages } = await this.retrieveMessagesPage({
-			beforeMessage: firstMessage || undefined,
-			searchingText: this.searchingText,
-			filteringType: this.filteringMethod,
-		});
+	// 	let { pageMessages } = await this.retrieveMessagesPage({
+	// 		beforeMessage: firstMessage || undefined,
+	// 		searchingText: this.searchingText,
+	// 		filteringType: this.filteringMethod,
+	// 	});
 
-		if (!this.isNextPage) {
-			let newMessagesCounter = 0;
+	// 	if (!this.isNextPage) {
+	// 		let newMessagesCounter = 0;
 
-			if (firstMessage) {
-				for (const newMessage of pageMessages) {
-					if (newMessage.msgId === firstMessage.msgId) break;
-					newMessagesCounter++;
-				}
-			} else {
-				newMessagesCounter = pageMessages.length;
-			}
+	// 		if (firstMessage) {
+	// 			for (const newMessage of pageMessages) {
+	// 				if (newMessage.msgId === firstMessage.msgId) break;
+	// 				newMessagesCounter++;
+	// 			}
+	// 		} else {
+	// 			newMessagesCounter = pageMessages.length;
+	// 		}
 
-			if (this.messageIds.length + newMessagesCounter > this.messagesOnPage) {
-				this.isNextPage = true;
-			}
-		}
+	// 		if (this.messageIds.length + newMessagesCounter > this.messagesOnPage) {
+	// 			this.isNextPage = true;
+	// 		}
+	// 	}
 
-		for (const msg of pageMessages) {
-			if (!this.messagesById[msg.msgId]) {
-				this.messagesById[msg.msgId] = msg;
-			}
-			const mLink = this.messagesById[msg.msgId];
-			if (!mLink.contentLink) {
-				const content = await domain.readers.everscale.retrieveMessageContentByMsgId(mLink.msgId);
-				if (!content || content.corrupted) {
-					continue;
-				}
-				mLink.isContentLoaded = true;
-				mLink.contentLink = content;
-			}
-		}
-		if (firstMessage) {
-			for (const msgId of pageMessages.filter(m => !this.messageIds.includes(m.msgId)).map(p => p.msgId)) {
-				this.messageIds.unshift(msgId);
-			}
-		} else {
-			this.messageIds = pageMessages.map(p => p.msgId);
-		}
-	}
+	// 	for (const msg of pageMessages) {
+	// 		if (!this.messagesById[msg.msgId]) {
+	// 			this.messagesById[msg.msgId] = msg;
+	// 		}
+	// 		const mLink = this.messagesById[msg.msgId];
+	// 		if (!mLink.contentLink) {
+	// 			const content = await domain.readers.everscale.retrieveMessageContentByMsgId(mLink.msgId);
+	// 			if (!content || content.corrupted) {
+	// 				continue;
+	// 			}
+	// 			mLink.isContentLoaded = true;
+	// 			mLink.contentLink = content;
+	// 		}
+	// 	}
+	// 	if (firstMessage) {
+	// 		for (const msgId of pageMessages.filter(m => !this.messageIds.includes(m.msgId)).map(p => p.msgId)) {
+	// 			this.messageIds.unshift(msgId);
+	// 		}
+	// 	} else {
+	// 		this.messageIds = pageMessages.map(p => p.msgId);
+	// 	}
+	// }
 
-	async retrieveFirstPage(): Promise<void> {
-		console.log('retrieveFirstPage');
-		const filteringType = this.filteringMethod;
+	// async retrieveFirstPage(): Promise<void> {
+	// 	console.log('retrieveFirstPage');
+	// 	const filteringType = this.filteringMethod;
 
-		let { pageMessages, isNextPage } = await this.retrieveMessagesPage({
-			filteringType,
-			searchingText: this.searchingText,
-		});
+	// 	let { pageMessages, isNextPage } = await this.retrieveMessagesPage({
+	// 		filteringType,
+	// 		searchingText: this.searchingText,
+	// 	});
 
-		for (const msg of pageMessages) {
-			if (!this.messagesById[msg.msgId]) {
-				this.messagesById[msg.msgId] = msg;
-			}
-			const mLink = this.messagesById[msg.msgId];
-			if (!mLink.contentLink) {
-				const content = await domain.readers.everscale.retrieveMessageContentByMsgId(mLink.msgId);
-				if (!content || content.corrupted) {
-					continue;
-				}
-				mLink.isContentLoaded = true;
-				mLink.contentLink = content;
-			}
-		}
-		this.messageIds = pageMessages.map(p => p.msgId);
-		this.isNextPage = isNextPage;
-	}
+	// 	for (const msg of pageMessages) {
+	// 		if (!this.messagesById[msg.msgId]) {
+	// 			this.messagesById[msg.msgId] = msg;
+	// 		}
+	// 		const mLink = this.messagesById[msg.msgId];
+	// 		if (!mLink.contentLink) {
+	// 			const content = await domain.readers.everscale.retrieveMessageContentByMsgId(mLink.msgId);
+	// 			if (!content || content.corrupted) {
+	// 				continue;
+	// 			}
+	// 			mLink.isContentLoaded = true;
+	// 			mLink.contentLink = content;
+	// 		}
+	// 	}
+	// 	this.messageIds = pageMessages.map(p => p.msgId);
+	// 	this.isNextPage = isNextPage;
+	// }
 
-	async goNextPage(): Promise<void> {
-		this.pageSwitchLoading = true;
-		const lastMessage = this.messageIds.length
-			? this.messagesById[this.messageIds[this.messageIds.length - 1]]
-			: null;
+	// async goNextPage(): Promise<void> {
+	// 	this.pageSwitchLoading = true;
+	// 	const lastMessage = this.messageIds.length
+	// 		? this.messagesById[this.messageIds[this.messageIds.length - 1]]
+	// 		: null;
 
-		const filteringType = this.filteringMethod;
+	// 	const filteringType = this.filteringMethod;
 
-		const { pageMessages, isNextPage } = await this.retrieveMessagesPage({
-			searchingText: this.searchingText,
-			filteringType,
-			nextPageAfterMessage: lastMessage || undefined,
-		});
+	// 	const { pageMessages, isNextPage } = await this.retrieveMessagesPage({
+	// 		searchingText: this.searchingText,
+	// 		filteringType,
+	// 		nextPageAfterMessage: lastMessage || undefined,
+	// 	});
 
-		for (const msg of pageMessages) {
-			if (!this.messagesById[msg.msgId]) {
-				this.messagesById[msg.msgId] = msg;
-			}
-			const mLink = this.messagesById[msg.msgId];
-			if (!mLink.contentLink) {
-				const content = await domain.readers.everscale.retrieveMessageContentByMsgId(mLink.msgId);
-				if (!content || content.corrupted) {
-					continue;
-				}
-				mLink.isContentLoaded = true;
-				mLink.contentLink = content;
-			}
-		}
-		this.messageIds.push(...pageMessages.map(m => m.msgId));
-		this.page++;
-		this.isNextPage = isNextPage;
-		this.pageSwitchLoading = false;
-	}
+	// 	for (const msg of pageMessages) {
+	// 		if (!this.messagesById[msg.msgId]) {
+	// 			this.messagesById[msg.msgId] = msg;
+	// 		}
+	// 		const mLink = this.messagesById[msg.msgId];
+	// 		if (!mLink.contentLink) {
+	// 			const content = await domain.readers.everscale.retrieveMessageContentByMsgId(mLink.msgId);
+	// 			if (!content || content.corrupted) {
+	// 				continue;
+	// 			}
+	// 			mLink.isContentLoaded = true;
+	// 			mLink.contentLink = content;
+	// 		}
+	// 	}
+	// 	this.messageIds.push(...pageMessages.map(m => m.msgId));
+	// 	this.page++;
+	// 	this.isNextPage = isNextPage;
+	// 	this.pageSwitchLoading = false;
+	// }
 
-	async goPrevPage(isNextPage?: boolean): Promise<void> {
-		this.pageSwitchLoading = true;
-		if (this.page > 1) {
-			this.page--;
-		}
-		this.pageSwitchLoading = false;
-	}
+	// async goPrevPage(isNextPage?: boolean): Promise<void> {
+	// 	this.pageSwitchLoading = true;
+	// 	if (this.page > 1) {
+	// 		this.page--;
+	// 	}
+	// 	this.pageSwitchLoading = false;
+	// }
 
 	filterByFolder(folderId: number | null) {
 		if (!folderId) {
@@ -305,28 +322,28 @@ class Mailer {
 			this.filteringMethod = 'byFolder';
 			this.activeFolderId = folderId;
 		}
-		this.retrieveFirstPage();
+		// this.retrieveFirstPage();
 	}
 
 	filterByArchived() {
 		this.filteringMethod = 'archived';
 		this.activeFolderId = null;
-		this.retrieveFirstPage();
+		// this.retrieveFirstPage();
 	}
 
-	private static async checkIsNextPage(lastMessage: IMessage): Promise<boolean> {
-		const message = await domain.readers.everscale.retrieveMessageHistoryByDates(domain.everscaleKey.address, {
-			messagesLimit: 1,
-			nextPageAfterMessage: lastMessage,
-		});
+	// private static async checkIsNextPage(lastMessage: IMessage): Promise<boolean> {
+	// 	const message = await domain.readers.everscale.retrieveMessageHistoryByDates(domain.everscaleKey.address, {
+	// 		messagesLimit: 1,
+	// 		nextPageAfterMessage: lastMessage,
+	// 	});
 
-		let isNextPage = false;
+	// 	let isNextPage = false;
 
-		if (message?.length) {
-			isNextPage = true;
-		}
-		return isNextPage;
-	}
+	// 	if (message?.length) {
+	// 		isNextPage = true;
+	// 	}
+	// 	return isNextPage;
+	// }
 
 	fuzzyFilterMessages(searchingText: string, messages: IMessage[]): IMessage[] {
 		const decodedMessages = messages.filter(msg => !!this.decodedMessagesById[msg.msgId]);
@@ -351,44 +368,60 @@ class Mailer {
 		};
 	};
 
-	async readAndDecodeMessage(message: IMessage): Promise<void> {
+	async readAndDecodeMessage(message: GenericEntry<IMessage, BlockchainSource>): Promise<void> {
 		await this.decodeMessage(message);
 	}
 
-	async decodeMessage(pushMsg: IMessage): Promise<void> {
-		const key = domain.connectedKeys.find(t => t.address === pushMsg.recipientAddress);
-		if (!key) {
-			throw new Error('Decryption key is not available');
+	async decodeMessage(pushMsg: GenericEntry<IMessage, BlockchainSource>): Promise<void> {
+		const reader = pushMsg.source.reader;
+		const recipient = domain.accounts.find(
+			acc =>
+				acc.wallet.addressToUint256(acc.account.address) === pushMsg.source.subject.address ||
+				Ylide.getSentAddress(acc.wallet.addressToUint256(acc.account.address)) ===
+					pushMsg.source.subject.address,
+		);
+		if (!recipient) {
+			return;
 		}
-		const me = await key.wallet.getAuthenticatedAccount();
-		if (!me) {
-			throw new Error('Account is not connected');
-		}
-		if (!pushMsg.contentLink) {
-			const content = await domain.readers.everscale.retrieveMessageContentByMsgId(pushMsg.msgId);
+
+		if (!pushMsg.link.contentLink) {
+			const content = await reader.retrieveMessageContentByMsgId(pushMsg.link.msgId);
 			if (!content || content.corrupted) {
 				throw new Error('Content is not available or corrupted');
 			}
-			pushMsg.isContentLoaded = true;
-			pushMsg.contentLink = content;
+			pushMsg.link.isContentLoaded = true;
+			pushMsg.link.contentLink = content;
 		}
-		if (!pushMsg.contentLink) {
+		if (!pushMsg.link.contentLink) {
 			throw new Error('Content not retrievable');
 		}
 
-		const decrypted = await domain.ylide.decryptMessageContent(pushMsg, pushMsg.contentLink);
-		pushMsg.isContentDecrypted = true;
-		pushMsg.decryptedContent = decrypted.decryptedContent;
+		const result = await domain.ylide.decryptMessageContent(
+			recipient.account,
+			pushMsg.link,
+			pushMsg.link.contentLink,
+		);
+		// const key = domain.connectedKeys.find(t => t.address === pushMsg.recipientAddress);
+		// if (!key) {
+		// 	throw new Error('Decryption key is not available');
+		// }
+		// const me = await key.wallet.getAuthenticatedAccount();
+		// if (!me) {
+		// 	throw new Error('Account is not connected');
+		// }
 
-		this.decodedMessagesById[pushMsg.msgId] = {
-			msgId: pushMsg.msgId,
-			decodedSubject: decrypted.subject,
-			decodedTextData: decrypted.content,
+		pushMsg.link.isContentDecrypted = true;
+		pushMsg.link.decryptedContent = result.decryptedContent;
+
+		this.decodedMessagesById[pushMsg.link.msgId] = {
+			msgId: pushMsg.link.msgId,
+			decodedSubject: result.subject,
+			decodedTextData: result.content,
 		};
 
 		if (this.getSaveDecodedSetting()) {
-			console.log('msg saved: ', pushMsg.msgId);
-			await messagesDB.saveDecodedMessage(this.decodedMessagesById[pushMsg.msgId]);
+			console.log('msg saved: ', pushMsg.link.msgId);
+			await messagesDB.saveDecodedMessage(this.decodedMessagesById[pushMsg.link.msgId]);
 		}
 	}
 
