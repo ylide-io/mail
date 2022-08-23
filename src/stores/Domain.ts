@@ -14,7 +14,14 @@ import {
 	BlockchainSourceSubjectType,
 } from '@ylide/sdk';
 import { everscaleBlockchainFactory, everscaleWalletFactory } from '@ylide/everscale';
-import { ethereumWalletFactory, evmFactories, EVMNetwork, EVM_NAMES } from '@ylide/ethereum';
+import {
+	EthereumBlockchainController,
+	ethereumWalletFactory,
+	evmFactories,
+	EVMNetwork,
+	EVM_NAMES,
+	EthereumBlockchainSource,
+} from '@ylide/ethereum';
 import { computed, makeAutoObservable, observable } from 'mobx';
 import modals from './Modals';
 import contacts from './Contacts';
@@ -189,22 +196,45 @@ class Domain {
 	async activateAccountReading(account: DomainAccount) {
 		for (const blockchain of Object.keys(this.blockchains)) {
 			const reader = this.blockchains[blockchain];
-			this.inbox.addReader(
-				reader,
-				{
-					type: BlockchainSourceSubjectType.RECIPIENT,
-					address: account.wallet.addressToUint256(account.account.address),
-				},
-				10000,
-			);
-			this.sent.addReader(
-				reader,
-				{
-					type: BlockchainSourceSubjectType.RECIPIENT,
-					address: Ylide.getSentAddress(account.wallet.addressToUint256(account.account.address)),
-				},
-				10000,
-			);
+			if (reader instanceof EthereumBlockchainController) {
+				this.inbox.addSource(
+					new EthereumBlockchainSource(
+						reader,
+						{
+							type: BlockchainSourceSubjectType.RECIPIENT,
+							address: account.wallet.addressToUint256(account.account.address),
+						},
+						10000,
+					),
+				);
+				this.sent.addSource(
+					new EthereumBlockchainSource(
+						reader,
+						{
+							type: BlockchainSourceSubjectType.RECIPIENT,
+							address: Ylide.getSentAddress(account.wallet.addressToUint256(account.account.address)),
+						},
+						60000,
+					),
+				);
+			} else {
+				this.inbox.addReader(
+					reader,
+					{
+						type: BlockchainSourceSubjectType.RECIPIENT,
+						address: account.wallet.addressToUint256(account.account.address),
+					},
+					20000,
+				);
+				this.sent.addReader(
+					reader,
+					{
+						type: BlockchainSourceSubjectType.RECIPIENT,
+						address: Ylide.getSentAddress(account.wallet.addressToUint256(account.account.address)),
+					},
+					60000,
+				);
+			}
 		}
 	}
 
