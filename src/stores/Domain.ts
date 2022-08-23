@@ -14,7 +14,7 @@ import {
 	BlockchainSourceSubjectType,
 } from '@ylide/sdk';
 import { everscaleBlockchainFactory, everscaleWalletFactory } from '@ylide/everscale';
-import { EthereumWalletController, ethereumWalletFactory, evmFactories, EVMNetwork, EVM_NAMES } from '@ylide/ethereum';
+import { ethereumWalletFactory, evmFactories, EVMNetwork, EVM_NAMES } from '@ylide/ethereum';
 import { computed, makeAutoObservable, observable } from 'mobx';
 import modals from './Modals';
 import contacts from './Contacts';
