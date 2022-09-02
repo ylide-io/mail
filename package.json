@@ -11,7 +11,7 @@
 		"@types/node": "^16.11.36",
 		"@types/react": "^18.0.9",
 		"@types/react-dom": "^18.0.4",
-		"@ylide/everscale": "0.5.2",
+		"@ylide/everscale": "0.5.3",
 		"@ylide/ethereum": "0.5.2",
 		"@ylide/sdk": "0.5.2",
 		"@ylide/smart-buffer": "0.0.9",
