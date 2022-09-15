@@ -243,11 +243,12 @@ class Domain {
 		if (idx > -1) {
 			this.accounts.splice(idx, 1);
 		}
+		await this.saveAccounts();
 		const key = this.keystore.keys.find(k => k.address === account.account.address);
 		if (!key) {
 			return;
 		}
-		this.keystore.delete(key);
+		await this.keystore.delete(key);
 	}
 
 	// async removeKey(dk: ConnectedKey) {

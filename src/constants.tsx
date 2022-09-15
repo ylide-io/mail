@@ -10,6 +10,7 @@ import { OptimismLogo } from './icons/OptimismLogo';
 import { PhantomLogo } from './icons/PhantomLogo';
 import { PolygonLogo } from './icons/PolygonLogo';
 import { SolanaLogo } from './icons/SolanaLogo';
+import { WalletConnectLogo } from './icons/WalletConnectLogo';
 
 export const blockchainsMap: Record<string, { title: string; logo: (s?: number) => JSX.Element }> = {
 	everscale: {
@@ -54,6 +55,11 @@ export const walletsMap: Record<string, { title: string; link: string; logo: JSX
 	web3: {
 		title: 'MetaMask',
 		logo: <MetaMaskLogo size={30} />,
+		link: 'https://metamask.io/',
+	},
+	walletconnect: {
+		title: 'Wallet Connect',
+		logo: <WalletConnectLogo size={30} />,
 		link: 'https://metamask.io/',
 	},
 	everwallet: {

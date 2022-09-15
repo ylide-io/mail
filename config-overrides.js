@@ -11,6 +11,8 @@ module.exports = function override(config) {
 		url: require.resolve('url'),
 	});
 	config.resolve.fallback = fallback;
+	// config.resolve.mainFields = ['esnext'];
+	// config.resolve.mainFields = ['browser', 'module', 'main'];
 	config.plugins = (config.plugins || []).concat([
 		new webpack.ProvidePlugin({
 			process: 'process/browser',

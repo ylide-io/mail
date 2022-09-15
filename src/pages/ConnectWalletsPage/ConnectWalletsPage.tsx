@@ -4,6 +4,7 @@ import cn from 'classnames';
 import { YlideButton } from '../../controls/YlideButton';
 import { ArrowRight } from '../../icons/ArrowRight';
 import { useNavigate } from 'react-router-dom';
+import WalletConnectProvider from '@walletconnect/web3-provider';
 
 import './style.scss';
 import domain, { DomainAccount } from '../../stores/Domain';
@@ -11,6 +12,29 @@ import { useState } from 'react';
 import { Spin } from 'antd';
 import { EVMNetwork, EVM_NAMES } from '@ylide/ethereum';
 import { blockchainsMap, walletsMap } from '../../constants';
+
+const topWallets: { wallet: string; blockchains: string[] }[] = [
+	{
+		wallet: 'everwallet',
+		blockchains: ['everscale'],
+	},
+	{
+		wallet: 'web3',
+		// provider: 'web3',
+		blockchains: [
+			EVM_NAMES[EVMNetwork.ETHEREUM],
+			EVM_NAMES[EVMNetwork.BNBCHAIN],
+			EVM_NAMES[EVMNetwork.AVALANCHE],
+			EVM_NAMES[EVMNetwork.ARBITRUM],
+			EVM_NAMES[EVMNetwork.OPTIMISM],
+			EVM_NAMES[EVMNetwork.POLYGON],
+		],
+	},
+	{
+		wallet: 'phantom',
+		blockchains: ['solana'],
+	},
+];
 
 const ConnectWalletsPage = observer(() => {
 	const navigate = useNavigate();
@@ -21,28 +45,6 @@ const ConnectWalletsPage = observer(() => {
 	let subtitleText = 'We found some wallets in your browser which you can use with Ylide';
 
 	const firstTime = document.location.search.includes('firstTime=true');
-
-	const topWallets: { wallet: string; blockchains: string[] }[] = [
-		{
-			wallet: 'everwallet',
-			blockchains: ['everscale'],
-		},
-		{
-			wallet: 'web3',
-			blockchains: [
-				EVM_NAMES[EVMNetwork.ETHEREUM],
-				EVM_NAMES[EVMNetwork.BNBCHAIN],
-				EVM_NAMES[EVMNetwork.AVALANCHE],
-				EVM_NAMES[EVMNetwork.ARBITRUM],
-				EVM_NAMES[EVMNetwork.OPTIMISM],
-				EVM_NAMES[EVMNetwork.POLYGON],
-			],
-		},
-		{
-			wallet: 'phantom',
-			blockchains: ['solana'],
-		},
-	];
 
 	const installWallet = useCallback((wallet: string) => {
 		const wData = walletsMap[wallet];
@@ -112,6 +114,15 @@ const ConnectWalletsPage = observer(() => {
 		},
 		[firstTime, publishKey],
 	);
+
+	const areThereDerivedWallets = topWallets.some(({ blockchains, wallet }) => {
+		const wData = walletsMap[wallet];
+		const isWalletSupported = domain.registeredWallets.find(t => t.wallet === wallet);
+		const isWalletAvailable = domain.availableWallets.find(t => t.wallet === wallet);
+		const isWalletConnected = domain.accounts.find(t => t._wallet === wallet);
+		const isKeyDerived = !isWalletConnected ? null : isWalletConnected.localKey;
+		return isKeyDerived;
+	});
 
 	let content = (
 		<div className="wallets-block">
@@ -341,7 +352,7 @@ const ConnectWalletsPage = observer(() => {
 				>
 					{subtitleText}
 				</p>
-				{domain.areThereAccounts ? (
+				{areThereDerivedWallets ? (
 					<div style={{ marginTop: 20 }}>
 						<YlideButton
 							onClick={() => {
