@@ -27,8 +27,8 @@ const Header = observer(() => {
 						</div>
 					),
 				},
-				...domain.accounts.map(acc => ({
-					key: `${acc._wallet}:${acc.account.address}`,
+				...domain.accounts.accounts.map(acc => ({
+					key: `${acc.wallet.factory.wallet}:${acc.account.address}`,
 					label: (
 						<div
 							style={{
@@ -38,8 +38,8 @@ const Header = observer(() => {
 							}}
 						>
 							<LogoutOutlined style={{ marginTop: 0, marginRight: 10 }} />{' '}
-							{acc.account.address.substr(0, 10)}
-							... ({acc._wallet})
+							{acc.account.address.substring(0, 10)}
+							... ({acc.wallet.factory.wallet})
 						</div>
 					),
 				})),
@@ -49,12 +49,14 @@ const Header = observer(() => {
 					document.location.href = '/connect-wallets';
 					return;
 				}
-				const account = domain.accounts.find(acc => info.key === `${acc._wallet}:${acc.account.address}`);
+				const account = domain.accounts.accounts.find(
+					acc => info.key === `${acc.wallet.factory.wallet}:${acc.account.address}`,
+				);
 				if (!account) {
 					return;
 				}
-				await account.wallet.disconnectAccount(account.account);
-				await domain.removeAccount(account);
+				await account.wallet.disconnectAccount(account);
+				await domain.accounts.removeAccount(account);
 				document.location.href = '/first-time';
 			}}
 		/>
@@ -108,7 +110,9 @@ const Header = observer(() => {
 									cursor: 'pointer',
 								}}
 							>
-								{`Connected ${domain.accounts.length} account${domain.accounts.length > 1 ? 's' : ''}`}
+								{`Connected ${domain.accounts.accounts.length} account${
+									domain.accounts.accounts.length > 1 ? 's' : ''
+								}`}
 								<DownOutlined size={16} style={{ marginLeft: 5 }} />
 							</div>
 						</Dropdown>

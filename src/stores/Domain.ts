@@ -2,8 +2,6 @@ import {
 	Ylide,
 	BlockchainMap,
 	BlockchainWalletMap,
-	IGenericAccount,
-	YlideKeyPair,
 	YlideKeyStore,
 	BrowserIframeStorage,
 	AbstractWalletController,
@@ -12,6 +10,7 @@ import {
 	WalletControllerFactory,
 	MessagesList,
 	BlockchainSourceSubjectType,
+	IGenericAccount,
 } from '@ylide/sdk';
 import { everscaleBlockchainFactory, everscaleWalletFactory } from '@ylide/everscale';
 import {
@@ -22,110 +21,28 @@ import {
 	EVM_NAMES,
 	EthereumBlockchainSource,
 } from '@ylide/ethereum';
-import { computed, makeAutoObservable, observable } from 'mobx';
-import modals from './Modals';
+import { makeObservable, observable } from 'mobx';
 import contacts from './Contacts';
 import mailer from './Mailer';
+import { DomainAccount } from './models/DomainAccount';
+import { Wallet } from './models/Wallet';
+import { Accounts } from './Accounts';
+import { supportedWallets, walletsMap } from '../constants';
+import SwitchModal from '../modals/SwitchModal';
+import PasswordNewModal from '../modals/PasswordModalNew';
 
 Ylide.registerBlockchainFactory(everscaleBlockchainFactory);
 // Ylide.registerBlockchainFactory(evmFactories[EVMNetwork.LOCAL_HARDHAT]);
 Ylide.registerBlockchainFactory(evmFactories[EVMNetwork.ETHEREUM]);
-Ylide.registerBlockchainFactory(evmFactories[EVMNetwork.AVALANCHE]);
+// Ylide.registerBlockchainFactory(evmFactories[EVMNetwork.AVALANCHE]);
 Ylide.registerBlockchainFactory(evmFactories[EVMNetwork.ARBITRUM]);
-Ylide.registerBlockchainFactory(evmFactories[EVMNetwork.BNBCHAIN]);
+// Ylide.registerBlockchainFactory(evmFactories[EVMNetwork.BNBCHAIN]);
 Ylide.registerBlockchainFactory(evmFactories[EVMNetwork.OPTIMISM]);
 Ylide.registerBlockchainFactory(evmFactories[EVMNetwork.POLYGON]);
 Ylide.registerWalletFactory(everscaleWalletFactory);
 Ylide.registerWalletFactory(ethereumWalletFactory);
 
-export class DomainAccount {
-	account: IGenericAccount;
-	blockchainGroup: string;
-	_wallet: string;
-
-	@observable pair: YlideKeyPair | null = null;
-
-	@observable localKey: Uint8Array | null = null;
-	@observable remoteKey: Uint8Array | null = null;
-
-	constructor(private readonly domain: Domain, account: IGenericAccount, blockchainGroup: string, wallet: string) {
-		makeAutoObservable(this);
-
-		this.account = account;
-		this.blockchainGroup = blockchainGroup;
-		this._wallet = wallet;
-		this.readLocalKey();
-	}
-
-	get wallet() {
-		if (!this.domain.wallets[this.blockchainGroup] || !this.domain.wallets[this.blockchainGroup][this._wallet]) {
-			throw new Error();
-		}
-		return this.domain.wallets[this.blockchainGroup][this._wallet];
-	}
-
-	readLocalKey() {
-		const keystoreAccount = this.domain.keystore.get(this.account.address);
-		this.localKey = keystoreAccount?.publicKey || null;
-	}
-
-	async destroyLocalKey() {
-		const key = this.domain.keystore.keys.find(k => k.address === this.account.address);
-		if (key) {
-			await this.domain.keystore.delete(key);
-		}
-		this.localKey = null;
-	}
-
-	get isKeysEqual() {
-		if (!this.localKey) {
-			return false;
-		}
-		if (!this.remoteKey) {
-			return false;
-		}
-		return (
-			this.localKey.length === this.remoteKey.length && this.localKey.every((e, i) => e === this.remoteKey![i])
-		);
-	}
-
-	async readRemoteKey() {
-		const blockchainName = await this.wallet.getCurrentBlockchain();
-		const blockchain = this.domain.blockchains[blockchainName];
-		const pk = await blockchain.extractPublicKeyFromAddress(this.account.address);
-		if (pk) {
-			this.remoteKey = pk.bytes;
-		}
-	}
-
-	async createLocalKey(password: string) {
-		this.pair = await this.domain.keystore.create(
-			'New account connection',
-			this.blockchainGroup,
-			this._wallet,
-			this.account.address,
-			password,
-		);
-		this.localKey = this.pair.publicKey;
-	}
-
-	async attachRemoteKey() {
-		if (!this.localKey) {
-			throw new Error(`Create local key first`);
-		}
-		const evmNetworks = (Object.keys(EVM_NAMES) as unknown as EVMNetwork[]).map((network: EVMNetwork) => ({
-			name: EVM_NAMES[network],
-			network: Number(network) as EVMNetwork,
-		}));
-		const blockchainName = await this.wallet.getCurrentBlockchain();
-		const network = evmNetworks.find(n => n.name === blockchainName)?.network;
-		this.wallet.attachPublicKey(this.account, this.localKey, {
-			network,
-		});
-	}
-}
-
-class Domain {
+export class Domain {
 	savedPassword: string | null = null;
 
 	storage = new BrowserIframeStorage();
@@ -134,9 +51,11 @@ class Domain {
 		onDeriveRequest: this.handleDeriveRequest.bind(this),
 	});
 
-	initialized = false;
+	@observable initialized = false;
 
 	ylide: Ylide = new Ylide(this.keystore);
+
+	@observable security: 'none' | 'encrypted' = 'none';
 
 	@observable registeredBlockchains: BlockchainControllerFactory[] = [];
 	@observable registeredWallets: WalletControllerFactory[] = [];
@@ -144,15 +63,16 @@ class Domain {
 	@observable availableWallets: WalletControllerFactory[] = [];
 
 	@observable blockchains: BlockchainMap<AbstractBlockchainController> = {};
-	@observable wallets: BlockchainWalletMap<AbstractWalletController> = {};
+	@observable walletControllers: BlockchainWalletMap<AbstractWalletController> = {};
 
-	@observable accounts: DomainAccount[] = [];
+	@observable wallets: Wallet[] = [];
+	@observable accounts: Accounts = new Accounts(this);
 
 	inbox: MessagesList;
 	sent: MessagesList;
 
 	constructor() {
-		makeAutoObservable(this);
+		makeObservable(this);
 
 		this.inbox = new MessagesList();
 		this.sent = new MessagesList();
@@ -167,32 +87,6 @@ class Domain {
 			}));
 	}
 
-	async addAccount(blockchainGroup: string, wallet: string) {
-		const instance = this.wallets[blockchainGroup][wallet];
-		const account = await instance.requestAuthentication();
-		if (!account) {
-			return;
-		}
-		const domainAccount = new DomainAccount(this, account, blockchainGroup, wallet);
-		domainAccount.readLocalKey();
-		await domainAccount.readRemoteKey();
-		this.accounts.push(domainAccount);
-		await this.activateAccountReading(domainAccount);
-
-		await this.saveAccounts();
-
-		if (this.accounts.length === 1) {
-			try {
-				this.inbox.readFirstPage();
-				this.sent.readFirstPage();
-			} catch (err) {
-				//
-			}
-		}
-
-		return domainAccount;
-	}
-
 	async activateAccountReading(account: DomainAccount) {
 		for (const blockchain of Object.keys(this.blockchains)) {
 			const reader = this.blockchains[blockchain];
@@ -202,7 +96,7 @@ class Domain {
 						reader,
 						{
 							type: BlockchainSourceSubjectType.RECIPIENT,
-							address: account.wallet.addressToUint256(account.account.address),
+							address: account.uint256Address,
 						},
 						10000,
 					),
@@ -212,7 +106,7 @@ class Domain {
 						reader,
 						{
 							type: BlockchainSourceSubjectType.RECIPIENT,
-							address: Ylide.getSentAddress(account.wallet.addressToUint256(account.account.address)),
+							address: Ylide.getSentAddress(account.uint256Address),
 						},
 						60000,
 					),
@@ -222,7 +116,7 @@ class Domain {
 					reader,
 					{
 						type: BlockchainSourceSubjectType.RECIPIENT,
-						address: account.wallet.addressToUint256(account.account.address),
+						address: account.uint256Address,
 					},
 					20000,
 				);
@@ -230,98 +124,72 @@ class Domain {
 					reader,
 					{
 						type: BlockchainSourceSubjectType.RECIPIENT,
-						address: Ylide.getSentAddress(account.wallet.addressToUint256(account.account.address)),
+						address: Ylide.getSentAddress(account.uint256Address),
 					},
 					60000,
 				);
 			}
 		}
-	}
 
-	async removeAccount(account: DomainAccount) {
-		const idx = this.accounts.indexOf(account);
-		if (idx > -1) {
-			this.accounts.splice(idx, 1);
+		if (this.accounts.accounts.length === 1) {
+			try {
+				this.inbox.readFirstPage();
+				this.sent.readFirstPage();
+			} catch (err) {
+				//
+			}
 		}
-		await this.saveAccounts();
-		const key = this.keystore.keys.find(k => k.address === account.account.address);
-		if (!key) {
-			return;
-		}
-		await this.keystore.delete(key);
 	}
-
-	// async removeKey(dk: ConnectedKey) {
-	// 	const key = this.keystore.keys.find(key => key.key === dk.key);
-	// 	await this.keystore.delete(key!);
-	// 	await this.extractWalletsData();
-	// }
 
 	async handlePasswordRequest(reason: string) {
-		return new Promise<string | null>((resolve, reject) => {
+		return new Promise<string | null>(async (resolve, reject) => {
 			if (domain.savedPassword) {
 				return resolve(domain.savedPassword);
 			}
-			modals.passwordModalVisible = true;
-			modals.passwordModalReason = reason;
-			modals.passwordModalHandler = resolve;
+			const result = await PasswordNewModal.show(reason);
+			resolve(result ? result.value : null);
+
+			// modals.passwordModalVisible = true;
+			// modals.passwordModalReason = reason;
+			// modals.passwordModalHandler = resolve;
 		});
+	}
+
+	async handleSwitchRequest(
+		walletName: string,
+		currentAccount: IGenericAccount | null,
+		needAccount: IGenericAccount,
+	) {
+		const wallet = this.wallets.find(w => w.factory.wallet === walletName);
+		if (!wallet) {
+			return;
+		}
+		await SwitchModal.show('account', wallet, needAccount);
 	}
 
 	async handleDeriveRequest(
 		reason: string,
 		blockchainGroup: string,
-		wallet: string,
+		walletName: string,
 		address: string,
 		magicString: string,
 	) {
 		try {
-			const domainAccount = this.accounts.find(a => a.account.address === address);
-			if (domainAccount) {
-				return domainAccount.wallet.signMagicString(domainAccount.account, magicString);
-			} else {
+			const wallet = this.wallets.find(w => w.factory.wallet === walletName);
+			if (!wallet) {
 				return null;
 			}
+			return wallet.controller.signMagicString(
+				{
+					address,
+					blockchain: blockchainGroup,
+					publicKey: null,
+				},
+				magicString,
+			);
 		} catch (err) {
 			return null;
 		}
-	}
-
-	async loadAccounts() {
-		console.log('accounts loaded');
-		const accs = await this.storage.readJSON<{ accountAddress: string; blockchainGroup: string; wallet: string }[]>(
-			'N1_accounts',
-		);
-		if (accs) {
-			for (const acc of accs) {
-				const domainAccount = new DomainAccount(
-					this,
-					{
-						address: acc.accountAddress,
-						blockchain: acc.blockchainGroup,
-						publicKey: null,
-					},
-					acc.blockchainGroup,
-					acc.wallet,
-				);
-				domainAccount.readLocalKey();
-				await domainAccount.readRemoteKey();
-				this.accounts.push(domainAccount);
-				await this.activateAccountReading(domainAccount);
-			}
-		}
-	}
-
-	async saveAccounts() {
-		console.log('accounts saved');
-		await this.storage.storeJSON(
-			'N1_accounts',
-			this.accounts.map<{ accountAddress: string; blockchainGroup: string; wallet: string }>(acc => ({
-				accountAddress: acc.account.address,
-				blockchainGroup: acc.blockchainGroup,
-				wallet: acc._wallet,
-			})),
-		);
 	}
 
 	async extractWalletsData() {
@@ -331,11 +199,15 @@ class Domain {
 		this.availableWallets = await Ylide.getAvailableWallets();
 
 		for (const factory of this.availableWallets) {
-			if (!this.wallets[factory.blockchainGroup] || !this.wallets[factory.blockchainGroup][factory.wallet]) {
-				this.wallets[factory.blockchainGroup] = {
-					...(this.wallets[factory.blockchainGroup] || {}),
+			if (
+				!this.walletControllers[factory.blockchainGroup] ||
+				!this.walletControllers[factory.blockchainGroup][factory.wallet]
+			) {
+				this.walletControllers[factory.blockchainGroup] = {
+					...(this.walletControllers[factory.blockchainGroup] || {}),
 					[factory.wallet]: await this.ylide.addWallet(factory.blockchainGroup, factory.wallet, {
 						dev: false, //document.location.hostname === 'localhost',
+						onSwitchAccountRequest: this.handleSwitchRequest.bind(this, factory.wallet),
 						onNetworkSwitchRequest: async (
 							reason: string,
 							currentNetwork: EVMNetwork | undefined,
@@ -359,14 +231,23 @@ class Domain {
 			});
 		}
 
-		await this.loadAccounts();
+		for (const supportedWallet of supportedWallets) {
+			const factory = this.registeredWallets.find(factory => factory.wallet === supportedWallet.wallet);
+			if (!factory) {
+				continue;
+			}
+			const controller = this.walletControllers[factory.blockchainGroup][factory.wallet];
+			if (!controller) {
+				continue;
+			}
+			const newWallet = new Wallet(this, factory.wallet, factory, controller, walletsMap[factory.wallet].link);
+			await newWallet.init();
+			this.wallets.push(newWallet);
+		}
 
-		this.inbox.readFirstPage();
-		this.sent.readFirstPage();
-
-		// for (const blockchain of Object.keys(this.wallets)) {
-		// 	for (const wallet of Object.keys(this.wallets[blockchain])) {
-		// 		const sender = this.wallets[blockchain][wallet];
+		// for (const blockchain of Object.keys(this.walletControllers)) {
+		// 	for (const wallet of Object.keys(this.walletControllers[blockchain])) {
+		// 		const sender = this.walletControllers[blockchain][wallet];
 		// 		const account = await sender.getAuthenticatedAccount();
 		// 		if (account) {
 		// 			this.connectedWallets.push({
@@ -396,7 +277,7 @@ class Domain {
 		// 			blockchain: key.blockchain,
 		// 			address: key.address,
 		// 			key: key.key,
-		// 			wallet: this.wallets[cw.blockchain][cw.wallet],
+		// 			wallet: this.walletControllers[cw.blockchain][cw.wallet],
 		// 		};
 		// 	})
 		// 	.filter(t => !!t)
@@ -408,22 +289,19 @@ class Domain {
 			return;
 		}
 
+		await this.extractWalletsData();
+
 		await this.keystore.init();
+
+		await this.accounts.accountsProcessed;
 
 		await contacts.init();
 		await mailer.init();
 
-		await this.extractWalletsData();
+		this.inbox.readFirstPage();
+		this.sent.readFirstPage();
 
 		this.initialized = true;
-	}
-
-	@computed get areThereAccounts() {
-		return !!this.accounts.length;
-	}
-
-	@computed get isFirstTime() {
-		return this.accounts.length === 0;
 	}
 
 	// @computed get everscaleKey() {

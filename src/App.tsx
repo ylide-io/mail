@@ -17,6 +17,7 @@ import ConnectWalletsPage from './pages/ConnectWalletsPage/ConnectWalletsPage';
 import './modals/style.scss';
 import { PasswordModal } from './modals/PasswordModal';
 import modals from './stores/Modals';
+import { Loader } from './controls/Loader';
 
 const App = observer(() => {
 	const location = useLocation();
@@ -37,13 +38,21 @@ const App = observer(() => {
 	}, [modals.anyModalVisible]);
 
 	if (!domain.initialized) {
-		return <>Loading...</>;
+		return (
+			<div style={{ display: 'flex', flexGrow: 1, width: '100vw', height: '100vh', alignItems: 'stretch' }}>
+				<Loader />
+			</div>
+		);
 	}
 
-	console.log('domain.isFirstTime: ', domain.isFirstTime);
+	console.log('domain.isFirstTime: ', domain.accounts.isFirstTime);
 	console.log('location.pathname: ', location.pathname);
 
-	if (domain.isFirstTime && location.pathname !== '/first-time' && location.pathname !== '/connect-wallets') {
+	if (
+		domain.accounts.isFirstTime &&
+		location.pathname !== '/first-time' &&
+		location.pathname !== '/connect-wallets'
+	) {
 		return <Navigate to="/first-time" state={{ from: location }} replace />;
 	}
 
@@ -72,6 +81,7 @@ const App = observer(() => {
 					modals.passwordModalHandler(val);
 				}}
 			/>
+			{modals.render()}
 		</>
 	);
 });

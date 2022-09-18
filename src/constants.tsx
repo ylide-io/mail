@@ -73,3 +73,25 @@ export const walletsMap: Record<string, { title: string; link: string; logo: JSX
 		link: 'https://l1.broxus.com/freeton/wallet',
 	},
 };
+
+export const supportedWallets: { wallet: string; blockchains: string[] }[] = [
+	{
+		wallet: 'everwallet',
+		blockchains: ['everscale'],
+	},
+	{
+		wallet: 'web3',
+		blockchains: [
+			EVM_NAMES[EVMNetwork.ETHEREUM],
+			EVM_NAMES[EVMNetwork.BNBCHAIN],
+			EVM_NAMES[EVMNetwork.AVALANCHE],
+			EVM_NAMES[EVMNetwork.ARBITRUM],
+			EVM_NAMES[EVMNetwork.OPTIMISM],
+			EVM_NAMES[EVMNetwork.POLYGON],
+		],
+	},
+	{
+		wallet: 'phantom',
+		blockchains: ['solana'],
+	},
+];

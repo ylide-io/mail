@@ -31,7 +31,7 @@ const MailboxEmpty = observer(() => {
 			<h3>Your mailbox is empty yet.</h3>
 			<div style={{ marginTop: 6 }}>
 				<span>Share your addresses: </span>
-				{domain.accounts.map(acc => (
+				{domain.accounts.accounts.map(acc => (
 					<span
 						style={{
 							position: 'relative',

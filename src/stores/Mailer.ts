@@ -4,7 +4,8 @@ import contacts from './Contacts';
 import fuzzysort from 'fuzzysort';
 import { filterAsync } from '../utils/asyncFilter';
 import { BlockchainSource, GenericEntry, IMessage, MessageContentV3, ServiceCode, Ylide } from '@ylide/sdk';
-import domain, { DomainAccount } from './Domain';
+import domain from './Domain';
+import { DomainAccount } from './models/DomainAccount';
 import { EVM_NAMES, EVMNetwork } from '@ylide/ethereum';
 
 interface filteringTypesInterface {
@@ -83,12 +84,12 @@ class Mailer {
 				name: EVM_NAMES[network],
 				network: Number(network) as EVMNetwork,
 			}));
-			const blockchainName = await sender.wallet.getCurrentBlockchain();
+			const blockchainName = await sender.wallet.controller.getCurrentBlockchain();
 			const network = evmNetworks.find(n => n.name === blockchainName)?.network;
 
 			return await domain.ylide.sendMessage(
 				{
-					wallet: sender.wallet,
+					wallet: sender.wallet.controller,
 					sender: sender.account,
 					content,
 					recipients,
@@ -374,11 +375,10 @@ class Mailer {
 
 	async decodeMessage(pushMsg: GenericEntry<IMessage, BlockchainSource>): Promise<void> {
 		const reader = pushMsg.source.reader;
-		const recipient = domain.accounts.find(
+		const recipient = domain.accounts.accounts.find(
 			acc =>
-				acc.wallet.addressToUint256(acc.account.address) === pushMsg.source.subject.address ||
-				Ylide.getSentAddress(acc.wallet.addressToUint256(acc.account.address)) ===
-					pushMsg.source.subject.address,
+				acc.uint256Address === pushMsg.source.subject.address ||
+				acc.sentAddress === pushMsg.source.subject.address,
 		);
 		if (!recipient) {
 			return;

@@ -44,7 +44,7 @@ const Tooltip = observer(() => {
 			}
 
 			const msgId = await mailer.sendMail(
-				domain.accounts[0],
+				domain.accounts.accounts[0],
 				mailbox.subject,
 				JSON.stringify(mailbox.textEditorData),
 				recs,
