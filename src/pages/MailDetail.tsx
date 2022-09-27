@@ -10,6 +10,7 @@ import { EDITOR_JS_TOOLS } from '../utils/editorJs';
 import mailbox from '../stores/Mailbox';
 import contacts from '../stores/Contacts';
 import { useNav } from '../utils/navigate';
+import moment from 'moment';
 
 const ReactEditorJS = createReactEditorJS();
 
@@ -46,7 +47,17 @@ const MailDetail = observer(() => {
 	})();
 
 	const replyClickHandler = () => {
-		mailbox.recipients = [message.link.senderAddress || ''];
+		mailbox.recipients = message.link.senderAddress
+			? [
+					{
+						type: 'address',
+						loading: false,
+						isAchievable: null,
+						input: message.link.senderAddress,
+						address: message.link.senderAddress,
+					},
+			  ]
+			: [];
 		mailbox.subject = decoded?.decodedSubject || '';
 		navigate('/compose');
 	};
@@ -82,9 +93,9 @@ const MailDetail = observer(() => {
 							title={'Move to trash'}
 						/>
 					</div>
-					<h2>View Message</h2>
+					<h2>{decoded ? decoded.decodedSubject || 'View Message' : 'View Message'}</h2>
 					<div className="mail-tools tooltip-demo m-t-md">
-						<h3>
+						{/* <h3>
 							<span className="font-normal">Subject: </span>
 							<span
 								onClick={encodedMessageClickHandler}
@@ -99,25 +110,13 @@ const MailDetail = observer(() => {
 							>
 								{decoded ? decoded.decodedSubject || 'No subject' : 'Message is not decoded'}
 							</span>
-						</h3>
+						</h3> */}
 						<h5>
 							<span className="float-right font-normal">
 								{message && (
 									<div>
-										<span>
-											{new Date(message.link.createdAt).toLocaleTimeString('en-us', {
-												hour12: false,
-											})}
-										</span>
 										<span style={{ marginLeft: 6 }}>
-											{new Date(message.link.createdAt)
-												.toLocaleDateString('en-us', {
-													day: '2-digit',
-													month: '2-digit',
-													year: 'numeric',
-												})
-												.split('/')
-												.join('.')}
+											{moment.unix(message.link.createdAt).format('HH:mm DD.MM.YYYY')}
 										</span>
 									</div>
 								)}

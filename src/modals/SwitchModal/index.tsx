@@ -139,6 +139,9 @@ export default class SwitchModal extends PureComponent<SwitchModalProps> {
 
 	render() {
 		const wallet = this.props.wallet;
+		if (wallet.factory.wallet === 'everwallet') {
+			return null;
+		}
 
 		return (
 			<Modal

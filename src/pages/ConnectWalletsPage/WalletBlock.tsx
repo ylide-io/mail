@@ -133,6 +133,7 @@ export class WalletBlock extends PureComponent<WalletBlockProps> {
 		const publishCtrl = PublishKeyModal.view(account.wallet);
 		try {
 			await account.attachRemoteKey();
+			await account.init();
 		} catch (err) {
 			alert('Transaction was not published. Please, try again');
 		} finally {
@@ -164,6 +165,9 @@ export class WalletBlock extends PureComponent<WalletBlockProps> {
 			return await this.publishLocalKey(domainAccount);
 		} else if (isBytesEqual(remoteKey, tempLocalKey.publicKey)) {
 			return await wallet.instantiateNewAccount(account, tempLocalKey);
+		} else if (result.forceNew) {
+			const domainAccount = await wallet.instantiateNewAccount(account, tempLocalKey);
+			return await this.publishLocalKey(domainAccount);
 		} else {
 			alert('Ylide password was wrong, please, try again');
 			return;

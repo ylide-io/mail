@@ -46,7 +46,7 @@ const Header = observer(() => {
 			]}
 			onClick={async info => {
 				if (info.key === 'add') {
-					document.location.href = '/connect-wallets';
+					nav('/connect-wallets');
 					return;
 				}
 				const account = domain.accounts.accounts.find(
@@ -57,7 +57,7 @@ const Header = observer(() => {
 				}
 				await account.wallet.disconnectAccount(account);
 				await domain.accounts.removeAccount(account);
-				document.location.href = '/first-time';
+				nav('/connect-wallets');
 			}}
 		/>
 	);

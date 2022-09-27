@@ -11,6 +11,8 @@ import {
 	MessagesList,
 	BlockchainSourceSubjectType,
 	IGenericAccount,
+	DynamicEncryptionRouter,
+	AbstractNameService,
 } from '@ylide/sdk';
 import { everscaleBlockchainFactory, everscaleWalletFactory } from '@ylide/everscale';
 import {
@@ -85,6 +87,53 @@ export class Domain {
 				blockchain,
 				reader: this.blockchains[blockchain],
 			}));
+	}
+
+	getNSBlockchainsForAddress(
+		name: string,
+	): { blockchain: string; reader: AbstractBlockchainController; service: AbstractNameService }[] {
+		return Object.keys(this.blockchains)
+			.filter(bc => {
+				const service = this.blockchains[bc].defaultNameService();
+				return service && service.isCandidate(name);
+			})
+			.map(blockchain => {
+				const service = this.blockchains[blockchain].defaultNameService()!;
+				return {
+					blockchain,
+					service,
+					reader: this.blockchains[blockchain],
+				};
+			});
+	}
+
+	async identifyAddressAchievability(address: string) {
+		const blockchains = this.getBlockchainsForAddress(address);
+		if (!blockchains.length) {
+			return false;
+		}
+		const actualRecipients = [
+			{
+				keyAddress: blockchains[0].reader.addressToUint256(address),
+				keyAddressOriginal: address,
+				address: blockchains[0].reader.addressToUint256(address),
+			},
+		];
+		const route = await DynamicEncryptionRouter.findEncyptionRoute(
+			actualRecipients,
+			blockchains.map(b => b.reader),
+		);
+		const apprRoute = route.find(r => r.recipients.some(e => e.address === actualRecipients[0].address));
+		if (!apprRoute) {
+			return false;
+		} else {
+			return {
+				type: apprRoute.type,
+				blockchain:
+					Object.keys(this.blockchains).find(bc => this.blockchains[bc] === apprRoute.blockchainController) ||
+					null,
+			};
+		}
 	}
 
 	async activateAccountReading(account: DomainAccount) {

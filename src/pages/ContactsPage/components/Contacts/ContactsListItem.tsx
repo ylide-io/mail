@@ -124,7 +124,15 @@ const ContactsListItem: React.FC<ContactsListItemProps> = ({ contact, isNew }) =
 	};
 
 	const mailThisContact = () => {
-		mailbox.recipients = [contact.address];
+		mailbox.recipients = [
+			{
+				type: 'contact',
+				loading: false,
+				isAchievable: null,
+				input: contact.name,
+				address: contact.address,
+			},
+		];
 		navigate('/compose');
 	};
 

@@ -5,6 +5,7 @@ import { observer } from 'mobx-react';
 import mailbox from '../../../../stores/Mailbox';
 import { useNav } from '../../../../utils/navigate';
 import domain from '../../../../stores/Domain';
+import AlertModal from '../../../../modals/AlertModal';
 
 const Tooltip = observer(() => {
 	const navigate = useNav();
@@ -18,7 +19,10 @@ const Tooltip = observer(() => {
 			mailer.sending = true;
 
 			//Filter duplicates addresses
-			const recipients = mailbox.recipients.filter((value, index, array) => array.indexOf(value) === index);
+			const recipients = mailbox.recipients
+				.filter(v => !!v.address)
+				.filter((value, index, array) => array.indexOf(value) === index)
+				.map(v => v.address!);
 			const recipientKeys = await Promise.all(
 				recipients.map(async r => {
 					const blockchains = domain.getBlockchainsForAddress(r);
@@ -43,14 +47,15 @@ const Tooltip = observer(() => {
 				return;
 			}
 
-			const msgId = await mailer.sendMail(
-				domain.accounts.accounts[0],
-				mailbox.subject,
-				JSON.stringify(mailbox.textEditorData),
-				recs,
-			);
+			const acc = domain.accounts.accounts[0];
+			const curr = await acc.wallet.getCurrentAccount();
+			if (curr?.address !== acc.account.address) {
+				await domain.handleSwitchRequest(acc.wallet.factory.wallet, curr, acc.account);
+			}
 
-			alert(`Successfully sent, msgId: ${msgId}`);
+			const msgId = await mailer.sendMail(acc, mailbox.subject, JSON.stringify(mailbox.textEditorData), recs);
+
+			await AlertModal.show('Message sent', 'Your message was successfully sent');
 
 			navigate('/mailbox');
 		} catch (e) {

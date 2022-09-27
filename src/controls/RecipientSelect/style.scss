@@ -1,0 +1,24 @@
+.ant-tag.recipient-tag {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+
+	.anticon-close {
+		padding-top: 2px;
+	}
+	&.achievable {
+		border: 0;
+		background-color: rgb(85 230 211 / 26%);
+	}
+	&.not-achievable {
+		border: 0;
+		background-color: rgb(255 181 181 / 50%);
+	}
+	.ant-spin {
+		margin-top: 2px;
+		margin-right: 5px;
+		&.ant-spin-sm .ant-spin-dot {
+			font-size: 12px;
+		}
+	}
+}
