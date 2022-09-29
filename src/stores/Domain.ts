@@ -277,6 +277,7 @@ export class Domain {
 		for (const factory of this.registeredBlockchains) {
 			this.blockchains[factory.blockchain] = await this.ylide.addBlockchain(factory.blockchain, {
 				dev: false, //document.location.hostname === 'localhost',
+				endpoints: ['https://mainnet.evercloud.dev/695e40eeac6b4e3fa4a11666f6e0d6af/graphql'],
 			});
 		}
 
