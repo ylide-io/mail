@@ -64,7 +64,7 @@ const App = observer(() => {
 					<Route path={'/connect-wallets'} element={<ConnectWalletsPage />} />
 					<Route path={'/compose'} element={<ComposePage />} />
 					<Route path={'/mailbox'} element={<MailboxPage />} />
-					<Route path={'/mailbox/:id'} element={<MailDetail />} />
+					{/* <Route path={'/mailbox/:id'} element={<MailDetail />} /> */}
 					<Route path={'/contacts'} element={<ContactsPage />}>
 						<Route index element={<ContactsTab />} />
 						<Route path={'folders'} element={<TagsTab />} />

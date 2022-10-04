@@ -8,7 +8,6 @@ import {
 	AbstractWalletController,
 	WalletEvent,
 	YlideKeyPair,
-	YlideKey,
 } from '@ylide/sdk';
 import { Domain } from '../Domain';
 import { DomainAccount } from './DomainAccount';

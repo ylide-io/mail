@@ -1,6 +1,7 @@
-import { Select, Tag, Spin, Tooltip, Menu } from 'antd';
+import React from 'react';
+import { Select, Tag, Spin, Tooltip, Menu, RefSelectProps } from 'antd';
 import { autobind } from 'core-decorators';
-import { observable, makeObservable, toJS } from 'mobx';
+import { observable, makeObservable, action } from 'mobx';
 import { observer } from 'mobx-react';
 import { PureComponent } from 'react';
 import cn from 'classnames';
@@ -19,15 +20,15 @@ export interface IRecipientOption {
 }
 
 export interface RecipientsSelectProps {
-	values: IRecipient[];
-	onChange: (vals: IRecipient[]) => void;
+	mutableValues: IRecipient[];
 }
 
 @observer
 export class RecipientsSelect extends PureComponent<RecipientsSelectProps> {
-	@observable value: IRecipient[] = [];
 	@observable options: IRecipientOption[] = [];
 	@observable search: string = '';
+
+	selectRef = React.createRef<RefSelectProps>();
 
 	constructor(props: RecipientsSelectProps) {
 		super(props);
@@ -84,6 +85,10 @@ export class RecipientsSelect extends PureComponent<RecipientsSelectProps> {
 		this.updateOptions();
 	}
 
+	get values() {
+		return this.props.mutableValues;
+	}
+
 	updateOptions() {
 		this.options = (
 			(this.search
@@ -105,45 +110,46 @@ export class RecipientsSelect extends PureComponent<RecipientsSelectProps> {
 					name: v.name,
 				}))
 				.filter(o => o.name.toLowerCase().includes(this.search))
-				.filter(o => !this.value.find(rec => rec.address === o.address)),
+				.filter(o => !this.values.find(rec => rec.address === o.address)),
 		);
 	}
 
-	@autobind
+	@action.bound
 	handleChange(values: string[]) {
+		values = values.filter(v => v !== this.search);
 		for (const value of values) {
-			const rec = this.value.find(r => r.address === value || r.input === value);
+			const rec = this.values.find(r => r.address === value || r.input === value);
 			if (!rec) {
 				const contact = contacts.contacts.find(c => c.name === value || c.address === value);
 				if (contact) {
-					this.value.push({
+					this.values.push({
 						loading: true,
 						input: contact.name,
 						type: 'contact',
 						address: contact.address,
 						isAchievable: null,
 					});
-					this.loadRecipient(this.value.at(-1)!);
+					this.loadRecipient(this.values.at(-1)!);
 				} else if (this.isENS(value)) {
-					this.value.push({
+					this.values.push({
 						loading: true,
 						input: value,
 						type: 'ns',
 						address: null,
 						isAchievable: null,
 					});
-					this.loadRecipient(this.value.at(-1)!);
+					this.loadRecipient(this.values.at(-1)!);
 				} else if (this.isAddress(value)) {
-					this.value.push({
+					this.values.push({
 						loading: true,
 						input: value,
 						type: 'address',
 						address: value,
 						isAchievable: null,
 					});
-					this.loadRecipient(this.value.at(-1)!);
+					this.loadRecipient(this.values.at(-1)!);
 				} else {
-					this.value.push({
+					this.values.push({
 						loading: false,
 						input: value,
 						type: 'invalid',
@@ -154,11 +160,11 @@ export class RecipientsSelect extends PureComponent<RecipientsSelectProps> {
 			}
 		}
 		let i = 0;
-		while (i < this.value.length) {
-			const rec = this.value[i];
+		while (i < this.values.length) {
+			const rec = this.values[i];
 			const val = values.find(v => v === rec.input || v === rec.address);
 			if (!val) {
-				this.value.splice(i, 1);
+				this.values.splice(i, 1);
 				continue;
 			}
 			i++;
@@ -174,7 +180,7 @@ export class RecipientsSelect extends PureComponent<RecipientsSelectProps> {
 	}
 
 	render() {
-		const values = this.value.slice().map(v => ({
+		const values = this.values.slice().map(v => ({
 			...v,
 		}));
 		const options = this.options.slice().map(o => ({
@@ -182,93 +188,82 @@ export class RecipientsSelect extends PureComponent<RecipientsSelectProps> {
 		}));
 		const search = this.search;
 		return (
-			<>
-				<div className="form-group row">
-					<label className="col-sm-1 col-form-label">From:</label>
-					<div className="col-sm-11" style={{ position: 'relative', zIndex: 2 }}>
-						<Select style={{ width: '100%' }} value={'0'}>
-							{domain.accounts.accounts.map((acc, idx) => (
-								<Select.Option key={idx} value={String(idx)}>
-									{acc.account.address} [
-									{acc.wallet.factory.wallet === 'web3' ? 'MetaMask' : 'EverWallet'}]
-								</Select.Option>
-							))}
-						</Select>
-					</div>
-				</div>
-				<div className="form-group row">
-					<label className="col-sm-1 col-form-label">To:</label>
-					<div className="col-sm-11" style={{ position: 'relative', zIndex: 2 }}>
-						<Select
-							dropdownRender={menu => {
-								return (
-									<Menu
-										onClick={item => {
-											const opt = options[Number(item.key)];
-											console.log('item click: ', opt);
-											console.log('search: ', search);
-											console.log('this.value: ', toJS(this.value));
-											if (opt.id === 'search:null' && search === opt.name) {
-												this.search = '';
-												return;
-											}
-											if (this.value.find(t => t.input === opt.name)) {
-												this.handleChange(
-													this.value.filter(t => t.input !== opt.name).map(v => v.input),
-												);
-											} else {
-												this.handleChange(this.value.map(v => v.input).concat([opt.name]));
-											}
-										}}
-									>
-										{options.map((r, idx) => {
-											const isSelected = this.value.find(t => t.input === r.name);
-											return (
-												<Menu.Item icon={isSelected ? <CheckOutlined /> : null} key={idx}>
-													{r.name}
-												</Menu.Item>
-											);
-										})}
-									</Menu>
-								); //menu;
-							}}
-							tagRender={props => {
-								const rec = values.find(r => r.input === props.value);
-								const content = (
-									<Tag
-										className={cn('recipient-tag', {
-											'achievable': !!rec?.isAchievable,
-											'not-achievable': rec?.isAchievable === false,
-										})}
-										closable={true}
-										onClose={props.onClose}
-										key={props.value}
-									>
-										{rec?.loading ? <Spin size="small" /> : null}
-										{props.label}
-									</Tag>
-								);
-								let tooltipContent = 'Loading...';
-								if (rec?.isAchievable) {
-									tooltipContent = `We found ${
-										rec.isAchievable.type === 'ylide' ? 'Ylide' : rec.isAchievable.type
-									} key suitable for receiving messages`;
-								} else {
-									if (rec?.isAchievable === false) {
-										tooltipContent = 'Public key of the recipient was not found';
-									}
+			<Select
+				ref={this.selectRef}
+				dropdownRender={menu => {
+					return (
+						<Menu
+							onClick={item => {
+								const opt = options[Number(item.key)];
+								console.log('options: ', options);
+								console.log('item click: ', opt);
+								console.log('search: ', search);
+								console.log('this.value: ', values);
+								if (opt.id === 'search:null' && search === opt.name) {
+									this.search = '';
+									// this.selectRef.current?.focus();
 								}
-								return <Tooltip title={tooltipContent}>{content}</Tooltip>;
+								if (values.find(t => t.input === opt.name)) {
+									this.handleChange(values.filter(t => t.input !== opt.name).map(v => v.input));
+								} else {
+									this.handleChange(values.map(v => v.input).concat([opt.name]));
+								}
+								this.selectRef.current?.focus();
 							}}
-							mode="tags"
-							style={{ width: '100%' }}
-							value={this.value.map(r => r.input)}
-							onSearch={this.handleSearch}
-							onChange={this.handleChange}
-						></Select>
-					</div>
-				</div>
-			</>
+							items={options.map((r, idx) => {
+								const isSelected = values.find(t => t.input === r.name);
+								return {
+									key: idx,
+									icon: isSelected ? <CheckOutlined /> : null,
+									label: r.name,
+								};
+							})}
+						/>
+					);
+				}}
+				tagRender={props => {
+					const rec = values.find(r => r.input === props.value);
+					const content = (
+						<Tag
+							className={cn('recipient-tag', {
+								'achievable': !!rec?.isAchievable,
+								'not-achievable': rec?.isAchievable === false,
+							})}
+							closable={true}
+							onClose={props.onClose}
+							key={props.value}
+						>
+							{rec?.loading ? <Spin size="small" /> : null}
+							{props.label}
+						</Tag>
+					);
+					let tooltipContent = 'Loading...';
+					if (rec?.isAchievable) {
+						tooltipContent = `We found ${
+							rec.isAchievable.type === 'ylide' ? 'Ylide' : rec.isAchievable.type
+						} key suitable for receiving messages`;
+					} else {
+						if (rec?.isAchievable === false) {
+							tooltipContent = 'Public key of the recipient was not found';
+						}
+					}
+					return <Tooltip title={tooltipContent}>{content}</Tooltip>;
+				}}
+				mode="tags"
+				style={{ width: '100%' }}
+				value={values.map(r => r.input)}
+				autoClearSearchValue
+				onDropdownVisibleChange={open => {
+					console.log('open: ', open);
+					if (!open) {
+						this.search = '';
+						setTimeout(() => this.updateOptions(), 200);
+					}
+				}}
+				searchValue={this.search}
+				onSearch={this.handleSearch}
+				onChange={this.handleChange}
+			/>
 		);
 	}
 }

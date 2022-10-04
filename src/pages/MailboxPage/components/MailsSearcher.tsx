@@ -11,7 +11,7 @@ const MailsSearcher = observer(() => {
 		}
 
 		const delayDebounce = setTimeout(() => {
-			mailer.setSearchingText(searchingText);
+			// mailer.setSearchingText(searchingText);
 			// mailer.retrieveFirstPage();
 		}, 400);
 
@@ -26,7 +26,7 @@ const MailsSearcher = observer(() => {
 		<form method="get" onSubmit={submitHandler} className="float-right mail-search">
 			<div className="input-group">
 				<input
-					value={mailer.searchingText}
+					value={'none'} //mailer.searchingText}
 					onChange={e => setSearchingText(e.target.value)}
 					type="text"
 					className="form-control form-control-sm"

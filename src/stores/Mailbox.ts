@@ -1,4 +1,4 @@
-import { makeAutoObservable } from 'mobx';
+import { makeObservable, observable } from 'mobx';
 
 export interface IRecipient {
 	loading: boolean;
@@ -16,31 +16,21 @@ export interface IRecipient {
 }
 
 class Mailbox {
-	recipients: IRecipient[] = [];
-	subject: string = '';
+	@observable to: IRecipient[] = [];
+	@observable bcc: IRecipient[] = [];
 
-	textEditorData: any | null = null;
+	@observable subject: string = '';
+
+	@observable textEditorData: any | null = null;
 
 	constructor() {
-		makeAutoObservable(this);
-	}
-
-	setRecipients(addresses: IRecipient[]) {
-		this.recipients = addresses;
-	}
-
-	setSubject(str: string) {
-		this.subject = str;
-	}
-
-	saveEditorData(data: any) {
-		this.textEditorData = data;
+		makeObservable(this);
 	}
 
 	resetData() {
-		this.setRecipients([]);
-		this.setSubject('');
-		this.saveEditorData('');
+		this.to = [];
+		this.subject = '';
+		this.textEditorData = '';
 	}
 }
 

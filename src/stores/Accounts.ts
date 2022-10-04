@@ -71,7 +71,7 @@ export class Accounts {
 		wallet.accounts.push(domainAccount);
 		this.accounts.push(domainAccount);
 
-		await this.domain.activateAccountReading(domainAccount);
+		// await this.domain.activateAccountReading(domainAccount);
 
 		if (this.handlers[account.address]) {
 			for (const handler of this.handlers[account.address]) {

@@ -1,19 +1,13 @@
 import React from 'react';
 import MailboxEditor from './MailboxEditor/MailboxEditor';
-import SubjectEditor from './SubjectEditor';
-// import RecipientsEditor from "./RecipientsEditor";
-import { RecipientsSelect } from '../../../../controls/RecipientSelect';
-import mailbox from '../../../../stores/Mailbox';
+import { observer } from 'mobx-react';
+import { MailMeta } from '../MailMeta';
 
-const MailboxBody = () => {
+const MailboxBody = observer(() => {
 	return (
 		<>
 			<div className="mail-body">
-				<form method="get">
-					<RecipientsSelect values={mailbox.recipients} onChange={e => (mailbox.recipients = e)} />
-					{/* <RecipientsEditor /> */}
-					<SubjectEditor />
-				</form>
+				<MailMeta />
 			</div>
 			<div className="mail-text h-200">
 				<MailboxEditor />
@@ -21,6 +15,6 @@ const MailboxBody = () => {
 			</div>
 		</>
 	);
-};
+});
 
 export default MailboxBody;

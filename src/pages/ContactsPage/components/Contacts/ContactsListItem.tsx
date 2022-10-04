@@ -124,7 +124,7 @@ const ContactsListItem: React.FC<ContactsListItemProps> = ({ contact, isNew }) =
 	};
 
 	const mailThisContact = () => {
-		mailbox.recipients = [
+		mailbox.to = [
 			{
 				type: 'contact',
 				loading: false,

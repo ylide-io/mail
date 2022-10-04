@@ -3,6 +3,7 @@ import MailboxMail from './MailboxMail/MailboxMail';
 import mailer from '../../../stores/Mailer';
 import { observer } from 'mobx-react';
 import MailboxEmpty from './MailboxEmpty';
+import mailList from '../../../stores/MailList';
 
 const MailsList = observer(() => {
 	useEffect(() => {
@@ -11,16 +12,17 @@ const MailsList = observer(() => {
 
 	return (
 		<div className="mail-box">
-			{mailer.inboxMessages.length ? (
+			{mailList.messages.length ? (
 				<table className="table table-hover table-mail">
 					<tbody>
-						{mailer.inboxMessages.map(msg => (
-							<MailboxMail key={msg.link.msgId} message={msg} />
+						{mailList.messages.map(msg => (
+							<MailboxMail key={msg.msgId} message={msg} />
 						))}
 					</tbody>
 				</table>
 			) : (
-				<>{!mailer.searchingText && !mailer.filteringMethod && <MailboxEmpty />}</>
+				'test'
+				// <>{!mailer.searchingText && !mailer.filteringMethod && <MailboxEmpty />}</>
 			)}
 		</div>
 	);

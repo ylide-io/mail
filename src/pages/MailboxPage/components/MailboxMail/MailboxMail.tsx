@@ -1,45 +1,44 @@
 import React, { useEffect, useState } from 'react';
 import classNames from 'classnames';
-import mailer from '../../../../stores/Mailer';
 import contacts from '../../../../stores/Contacts';
 import { isToday } from '../../../../utils/date';
 import './MailStyles.scss';
 import { observer } from 'mobx-react';
 import { useNav } from '../../../../utils/navigate';
-import { BlockchainSource, GenericEntry, IMessage } from '@ylide/sdk';
 import messagesDB from '../../../../indexedDB/MessagesDB';
 import { blockchainsMap } from '../../../../constants';
+import mailList, { ILinkedMessage } from '../../../../stores/MailList';
 
 interface MailboxMailProps {
-	message: GenericEntry<IMessage, BlockchainSource>;
+	message: ILinkedMessage;
 }
 
 const MailboxMail: React.FC<MailboxMailProps> = observer(({ message }) => {
 	const navigate = useNav();
 	const [inUnread, setIsUnread] = useState(true);
-	const contact = contacts.contactsByAddress[message.link.senderAddress];
-	const sender = contact ? contact.name : message.link.senderAddress;
-	const checked = mailer.isMessageChecked(message.link.msgId);
-	const decoded = mailer.decodedMessagesById[message.link.msgId];
-	const isNative: boolean = message.link.userspaceMeta && message.link.userspaceMeta.isNative;
+	const contact = contacts.contactsByAddress[message.msg.senderAddress];
+	const sender = contact ? contact.name : message.msg.senderAddress;
+	const checked = mailList.isMessageChecked(message.msgId);
+	const decoded = mailList.decodedMessagesById[message.msgId];
+	// const isNative: boolean = message.link.userspaceMeta && message.link.userspaceMeta.isNative;
 
 	useEffect(() => {
 		(async () => {
-			setIsUnread(!(await messagesDB.isMessageRead(message.link.msgId)));
+			setIsUnread(!(await messagesDB.isMessageRead(message.msgId)));
 		})();
 	}, [message]);
 
 	const messageClickHandler = async () => {
 		if (decoded) {
-			navigate(message.link.msgId);
+			navigate(message.msgId);
 		} else {
-			await mailer.decodeMessage(message);
-			navigate(message.link.msgId);
+			await mailList.decodeMessage(message);
+			navigate(message.msgId);
 		}
 	};
 
 	const date = (() => {
-		const fullDate = new Date(message.link.createdAt * 1000);
+		const fullDate = new Date(message.msg.createdAt * 1000);
 
 		if (isToday(fullDate)) {
 			return fullDate.toLocaleTimeString('en-us', {
@@ -53,7 +52,7 @@ const MailboxMail: React.FC<MailboxMailProps> = observer(({ message }) => {
 	})();
 
 	const checkHandler = (checked: boolean) => {
-		mailer.checkMessage(message.link, !checked);
+		mailList.checkMessage(message, !checked);
 	};
 
 	return (
@@ -87,7 +86,7 @@ const MailboxMail: React.FC<MailboxMailProps> = observer(({ message }) => {
 					className="label label-info"
 					style={{ float: 'right', fontSize: '80%', background: 'rgb(221, 241, 255)', color: 'black' }}
 				>
-					{blockchainsMap[message.link.blockchain].logo(12)} {message.link.blockchain}
+					{blockchainsMap[message.msg.blockchain].logo(12)} {message.msg.blockchain}
 				</span>
 			</td>
 			<td className="text-right mail-date">{date}</td>

@@ -8,25 +8,15 @@ import {
 	AbstractBlockchainController,
 	BlockchainControllerFactory,
 	WalletControllerFactory,
-	MessagesList,
-	BlockchainSourceSubjectType,
 	IGenericAccount,
 	DynamicEncryptionRouter,
 	AbstractNameService,
 } from '@ylide/sdk';
 import { everscaleBlockchainFactory, everscaleWalletFactory } from '@ylide/everscale';
-import {
-	EthereumBlockchainController,
-	ethereumWalletFactory,
-	evmFactories,
-	EVMNetwork,
-	EVM_NAMES,
-	EthereumBlockchainSource,
-} from '@ylide/ethereum';
+import { ethereumWalletFactory, evmFactories, EVMNetwork, EVM_NAMES } from '@ylide/ethereum';
 import { makeObservable, observable } from 'mobx';
 import contacts from './Contacts';
 import mailer from './Mailer';
-import { DomainAccount } from './models/DomainAccount';
 import { Wallet } from './models/Wallet';
 import { Accounts } from './Accounts';
 import { supportedWallets, walletsMap } from '../constants';
@@ -70,14 +60,8 @@ export class Domain {
 	@observable wallets: Wallet[] = [];
 	@observable accounts: Accounts = new Accounts(this);
 
-	inbox: MessagesList;
-	sent: MessagesList;
-
 	constructor() {
 		makeObservable(this);
-
-		this.inbox = new MessagesList();
-		this.sent = new MessagesList();
 	}
 
 	getBlockchainsForAddress(address: string): { blockchain: string; reader: AbstractBlockchainController }[] {
@@ -133,60 +117,6 @@ export class Domain {
 					Object.keys(this.blockchains).find(bc => this.blockchains[bc] === apprRoute.blockchainController) ||
 					null,
 			};
-		}
-	}
-
-	async activateAccountReading(account: DomainAccount) {
-		for (const blockchain of Object.keys(this.blockchains)) {
-			const reader = this.blockchains[blockchain];
-			if (reader instanceof EthereumBlockchainController) {
-				this.inbox.addSource(
-					new EthereumBlockchainSource(
-						reader,
-						{
-							type: BlockchainSourceSubjectType.RECIPIENT,
-							address: account.uint256Address,
-						},
-						10000,
-					),
-				);
-				this.sent.addSource(
-					new EthereumBlockchainSource(
-						reader,
-						{
-							type: BlockchainSourceSubjectType.RECIPIENT,
-							address: Ylide.getSentAddress(account.uint256Address),
-						},
-						60000,
-					),
-				);
-			} else {
-				this.inbox.addReader(
-					reader,
-					{
-						type: BlockchainSourceSubjectType.RECIPIENT,
-						address: account.uint256Address,
-					},
-					20000,
-				);
-				this.sent.addReader(
-					reader,
-					{
-						type: BlockchainSourceSubjectType.RECIPIENT,
-						address: Ylide.getSentAddress(account.uint256Address),
-					},
-					60000,
-				);
-			}
-		}
-
-		if (this.accounts.accounts.length === 1) {
-			try {
-				this.inbox.readFirstPage();
-				this.sent.readFirstPage();
-			} catch (err) {
-				//
-			}
 		}
 	}
 
@@ -347,9 +277,6 @@ export class Domain {
 
 		await contacts.init();
 		await mailer.init();
-
-		this.inbox.readFirstPage();
-		this.sent.readFirstPage();
 
 		this.initialized = true;
 	}

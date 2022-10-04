@@ -14,12 +14,12 @@ const Tooltip = observer(() => {
 		try {
 			e.preventDefault();
 
-			if (!mailbox.textEditorData?.blocks?.length || !mailbox.recipients.length) return;
+			if (!mailbox.textEditorData?.blocks?.length || !mailbox.to.length) return;
 
 			mailer.sending = true;
 
 			//Filter duplicates addresses
-			const recipients = mailbox.recipients
+			const recipients = mailbox.to
 				.filter(v => !!v.address)
 				.filter((value, index, array) => array.indexOf(value) === index)
 				.map(v => v.address!);
@@ -75,26 +75,6 @@ const Tooltip = observer(() => {
 					disabled: mailer.sending,
 				}}
 			/>
-
-			<SmallButton
-				onClick={() => {
-					navigate('/mailbox');
-				}}
-				text={'Discard'}
-				color={smallButtonColors.white}
-				title={'Discard email'}
-				icon={smallButtonIcons.cross}
-			/>
-
-			{/* <SmallButton
-                onClick={() => {
-                    navigate("/mailbox");
-                }}
-                text={"Draft"}
-                color={smallButtonColors.white}
-                title={"Move to draft folder"}
-                icon={smallButtonIcons.pencil}
-            /> */}
 		</div>
 	);
 });
