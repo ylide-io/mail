@@ -35,6 +35,16 @@ Ylide.registerBlockchainFactory(evmFactories[EVMNetwork.ARBITRUM]);
 Ylide.registerBlockchainFactory(evmFactories[EVMNetwork.BNBCHAIN]);
 Ylide.registerBlockchainFactory(evmFactories[EVMNetwork.OPTIMISM]);
 Ylide.registerBlockchainFactory(evmFactories[EVMNetwork.POLYGON]);
+Ylide.registerBlockchainFactory(evmFactories[EVMNetwork.FANTOM]);
+Ylide.registerBlockchainFactory(evmFactories[EVMNetwork.KLAYTN]);
+Ylide.registerBlockchainFactory(evmFactories[EVMNetwork.GNOSIS]);
+Ylide.registerBlockchainFactory(evmFactories[EVMNetwork.AURORA]);
+Ylide.registerBlockchainFactory(evmFactories[EVMNetwork.CELO]);
+Ylide.registerBlockchainFactory(evmFactories[EVMNetwork.MOONBEAM]);
+Ylide.registerBlockchainFactory(evmFactories[EVMNetwork.MOONRIVER]);
+Ylide.registerBlockchainFactory(evmFactories[EVMNetwork.METIS]);
+Ylide.registerBlockchainFactory(evmFactories[EVMNetwork.ASTAR]);
+// -----
 Ylide.registerWalletFactory(everscaleWalletFactory);
 Ylide.registerWalletFactory(ethereumWalletFactory);
 

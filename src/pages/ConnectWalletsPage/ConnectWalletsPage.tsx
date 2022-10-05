@@ -36,6 +36,16 @@ const ConnectWalletsPage = observer(() => {
 				EVM_NAMES[EVMNetwork.ARBITRUM],
 				EVM_NAMES[EVMNetwork.OPTIMISM],
 				EVM_NAMES[EVMNetwork.POLYGON],
+
+				EVM_NAMES[EVMNetwork.FANTOM],
+				EVM_NAMES[EVMNetwork.KLAYTN],
+				EVM_NAMES[EVMNetwork.GNOSIS],
+				EVM_NAMES[EVMNetwork.AURORA],
+				EVM_NAMES[EVMNetwork.CELO],
+				EVM_NAMES[EVMNetwork.MOONBEAM],
+				EVM_NAMES[EVMNetwork.MOONRIVER],
+				EVM_NAMES[EVMNetwork.METIS],
+				EVM_NAMES[EVMNetwork.ASTAR],
 			],
 		},
 		{
