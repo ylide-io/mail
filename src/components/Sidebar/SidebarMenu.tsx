@@ -37,7 +37,7 @@ const SidebarMenu = () => {
 	};
 
 	return (
-		<div className="col-lg-2">
+		<div className="sidebar">
 			<div className="ibox ">
 				<div className="ibox-content mailbox-content">
 					<div className="file-manager">

@@ -1,32 +1,28 @@
-import React, { useEffect, useState } from 'react';
-import classNames from 'classnames';
-import contacts from '../../../../stores/Contacts';
-import { isToday } from '../../../../utils/date';
-import './MailStyles.scss';
+import React, { CSSProperties, useEffect, useState } from 'react';
 import { observer } from 'mobx-react';
-import { useNav } from '../../../../utils/navigate';
-import messagesDB from '../../../../indexedDB/MessagesDB';
-import { blockchainsMap } from '../../../../constants';
-import mailList, { ILinkedMessage } from '../../../../stores/MailList';
+import classNames from 'classnames';
 
-interface MailboxMailProps {
+import contacts from '../../../stores/Contacts';
+import { isToday } from '../../../utils/date';
+import { useNav } from '../../../utils/navigate';
+import { blockchainsMap } from '../../../constants';
+import mailList, { ILinkedMessage } from '../../../stores/MailList';
+import { YlideCheckbox } from '../../../controls/YlideCheckbox';
+import domain from '../../../stores/Domain';
+
+interface MailboxListRowProps {
 	message: ILinkedMessage;
+	style: CSSProperties;
 }
 
-const MailboxMail: React.FC<MailboxMailProps> = observer(({ message }) => {
+const MailboxListRow: React.FC<MailboxListRowProps> = observer(({ style, message }) => {
 	const navigate = useNav();
-	const [inUnread, setIsUnread] = useState(true);
 	const contact = contacts.contactsByAddress[message.msg.senderAddress];
 	const sender = contact ? contact.name : message.msg.senderAddress;
 	const checked = mailList.isMessageChecked(message.msgId);
 	const decoded = mailList.decodedMessagesById[message.msgId];
+	const isUnread = mailList.readMessageIds.has(message.msgId);
 	// const isNative: boolean = message.link.userspaceMeta && message.link.userspaceMeta.isNative;
-
-	useEffect(() => {
-		(async () => {
-			setIsUnread(!(await messagesDB.isMessageRead(message.msgId)));
-		})();
-	}, [message]);
 
 	const messageClickHandler = async () => {
 		if (decoded) {
@@ -56,27 +52,27 @@ const MailboxMail: React.FC<MailboxMailProps> = observer(({ message }) => {
 	};
 
 	return (
-		<tr
-			style={{ cursor: 'pointer' }}
+		<div
+			style={style}
 			onClick={messageClickHandler}
-			className={classNames({
-				unread: inUnread,
-				read: !inUnread,
+			className={classNames('mailbox-list-row', {
+				unread: isUnread,
+				read: !isUnread,
 			})}
 		>
-			<td onClick={e => e.stopPropagation()} className="check-mail" style={{ cursor: 'pointer' }}>
-				<label className="cont">
-					<input type="checkbox" onChange={() => checkHandler(checked)} checked={checked} />
-					<span className="checkmark"></span>
-				</label>
-			</td>
-			<td className="mail-contact" style={{ paddingLeft: 20 }}>
-				<div>
-					{sender.slice(0, 12)}
-					{sender.length > 12 && '...'}
+			<div onClick={e => e.stopPropagation()} className="check-mail" style={{ cursor: 'pointer' }}>
+				<YlideCheckbox checked={checked} onCheck={val => {}} />
+			</div>
+			<div className="mail-contact">
+				{sender.slice(0, 12)}
+				{sender.length > 12 && '...'}
+			</div>
+			{domain.devMode ? (
+				<div className="mail-id">
+					{message.msgId.substring(0, 4)}...{message.msgId.substring(message.msgId.length - 4)}
 				</div>
-			</td>
-			<td className="mail-subject">
+			) : null}
+			<div className="mail-subject">
 				<span style={!decoded ? { filter: 'blur(5px)' } : {}}>
 					{decoded ? decoded.decodedSubject || 'No subject' : 'Message is not decoded'}
 				</span>
@@ -88,10 +84,10 @@ const MailboxMail: React.FC<MailboxMailProps> = observer(({ message }) => {
 				>
 					{blockchainsMap[message.msg.blockchain].logo(12)} {message.msg.blockchain}
 				</span>
-			</td>
-			<td className="text-right mail-date">{date}</td>
-		</tr>
+			</div>
+			<div className="text-right mail-date">{date}</div>
+		</div>
 	);
 });
 
-export default MailboxMail;
+export default MailboxListRow;

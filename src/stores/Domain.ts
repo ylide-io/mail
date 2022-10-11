@@ -47,6 +47,8 @@ export class Domain {
 
 	ylide: Ylide = new Ylide(this.keystore);
 
+	@observable devMode = document.location.href.includes('localhost');
+
 	@observable security: 'none' | 'encrypted' = 'none';
 
 	@observable registeredBlockchains: BlockchainControllerFactory[] = [];
@@ -62,6 +64,12 @@ export class Domain {
 
 	constructor() {
 		makeObservable(this);
+
+		window.addEventListener('keydown', e => {
+			if (e.ctrlKey && e.key === 'KeyD') {
+				this.devMode = !this.devMode;
+			}
+		});
 	}
 
 	getBlockchainsForAddress(address: string): { blockchain: string; reader: AbstractBlockchainController }[] {

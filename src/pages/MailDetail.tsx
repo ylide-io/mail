@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import MainLayout from '../layouts/mainLayout';
+import MainLayout from '../layouts/MainLayout';
 import SmallButton, { smallButtonColors, smallButtonIcons } from '../components/smallButton/smallButton';
 import { useParams } from 'react-router-dom';
 import mailer from '../stores/Mailer';

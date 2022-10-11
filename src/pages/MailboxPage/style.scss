@@ -1,0 +1,71 @@
+.mailbox-page {
+	display: flex;
+	flex-direction: column;
+	align-items: stretch;
+
+	flex: 1;
+}
+
+.mail-box {
+	flex-grow: 1;
+}
+
+.mailbox-list-row {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+
+	height: 40px;
+	flex-basis: 40px;
+
+	cursor: pointer;
+
+	.check-mail {
+		display: flex;
+		flex-direction: row;
+		align-items: center;
+
+		flex-basis: 30px;
+		margin-left: 20px;
+		flex-grow: 0;
+		flex-shrink: 0;
+	}
+
+	.mail-contact {
+		display: flex;
+		flex-direction: row;
+		align-items: center;
+
+		padding-left: 20px;
+		flex-basis: 160px;
+		flex-grow: 0;
+		flex-shrink: 0;
+	}
+
+	.mail-id {
+		display: flex;
+		flex-direction: row;
+		align-items: center;
+
+		flex-basis: 100px;
+		flex-grow: 0;
+		flex-shrink: 0;
+	}
+
+	.mail-subject {
+		flex: 1;
+	}
+
+	.mail-date {
+		flex: 0 0 120px;
+		padding-right: 20px;
+	}
+
+	&.unread {
+		font-weight: bold;
+	}
+
+	&:hover {
+		background-color: #1ab39412;
+	}
+}

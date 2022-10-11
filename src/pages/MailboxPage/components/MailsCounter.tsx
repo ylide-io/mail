@@ -1,13 +1,10 @@
-import React, { useEffect } from 'react';
-import mailer from '../../../stores/Mailer';
 import { observer } from 'mobx-react';
-import tags from '../../../stores/Tags';
-import domain from '../../../stores/Domain';
+import mailList from '../../../stores/MailList';
 
 const MailsCounter = observer(() => {
-	useEffect(() => {
-		tags.getTags();
-	}, []);
+	// useEffect(() => {
+	// 	tags.getTags();
+	// }, []);
 
 	// const calculateFolderLength = (): string => {
 	// 	const length: number = mailer.inboxMessages.length;
@@ -31,7 +28,7 @@ const MailsCounter = observer(() => {
 	// })();
 
 	const folderName = 'Temp';
-	const folderLength = 5;
+	const folderLength = mailList.messages.length;
 
 	return (
 		<h2>

@@ -2,8 +2,11 @@ import { EthereumBlockchainController, EthereumBlockchainSource } from '@ylide/e
 import {
 	AbstractBlockchainController,
 	BlockchainSource,
-	GenericEntry,
-	GenericSortedSource,
+	IListSource,
+	IMessageWithSource,
+	ListSourceDrainer,
+	ListSourceMultiplexer,
+	SourceReadingSession,
 	Uint256,
 	Ylide,
 } from '@ylide/sdk';
@@ -16,7 +19,7 @@ import {
 	MessagesList,
 } from '@ylide/sdk';
 import { autobind } from 'core-decorators';
-import { observable } from 'mobx';
+import { makeObservable, observable } from 'mobx';
 import messagesDB, { IMessageDecodedContent } from '../indexedDB/MessagesDB';
 import domain from './Domain';
 import { DomainAccount } from './models/DomainAccount';
@@ -37,26 +40,35 @@ export interface ILinkedMessage {
 }
 
 export class MailList {
+	readingSession: SourceReadingSession = new SourceReadingSession();
+
 	@observable messages: ILinkedMessage[] = [];
 	@observable isNextPageAvailable: boolean = false;
-	@observable loading: boolean = false;
+	@observable loading: boolean = true;
+	@observable firstLoading: boolean = true;
 
 	@observable saveDecodedMessages = localStorage.getItem('saveDecodedMessages') === 'true';
 
 	@observable folderById: Record<string, IFolder> = {};
 	@observable folderIds: string[] = ['inbox', 'sent', 'archive'];
 
-	listById: Record<string, MessagesList> = {};
+	currentList!: ListSourceDrainer;
+
 	initedById: Record<string, boolean> = {};
 
 	@observable messagesContentById: Record<string, IMessageContent> = {};
 	@observable decodedMessagesById: Record<string, IMessageDecodedContent> = {};
 	@observable checkedMessageIds: string[] = [];
+	@observable readMessageIds: Set<string> = new Set();
 
 	deletedMessageIds: Record<string, Set<string>> = {};
 
 	@observable activeFolderId: string | null = null;
 	@observable globalSubscriptions: string[] = [];
+
+	constructor() {
+		makeObservable(this);
+	}
 
 	checkMessage(message: ILinkedMessage, flag: boolean) {
 		if (flag) {
@@ -129,6 +141,22 @@ export class MailList {
 		for (const acc in deletedMessageIds) {
 			this.deletedMessageIds[acc] = new Set(deletedMessageIds[acc]);
 		}
+		const readMessageIds = await messagesDB.getReadMessages();
+		this.readMessageIds = new Set(readMessageIds);
+	}
+
+	@autobind
+	async nextPage() {
+		this.loading = true;
+		this.messages = (await this.currentList.readMore(10)).map(this.wrapMessage);
+		this.isNextPageAvailable = !this.currentList.drained;
+		// const result = await this.listById[this.activeFolderId!].goNextPage();
+		// if (result.type === 'success' && result.result) {
+		// 	this.messages = result.result.map(this.wrapMessage);
+		// 	this.isNextPageAvailable = this.listById[this.activeFolderId!].isNextPageAvailable();
+		// }
+		this.loading = false;
+		this.firstLoading = false;
 	}
 
 	buildFolderBasement(id: string, manager: IMessagesListConfigurationManager) {
@@ -142,42 +170,88 @@ export class MailList {
 	}
 
 	@autobind
-	private wrapMessage(p: GenericEntry<IMessage, GenericSortedSource<IMessage>>) {
+	private wrapMessage(p: IMessageWithSource) {
 		return {
-			id: `${p.link.msgId}:${p.source instanceof BlockchainSource ? p.source.meta.account.account.address : ''}`,
-			msgId: p.link.msgId,
-			msg: p.link,
+			id: `${p.msg.msgId}:${p.source instanceof BlockchainSource ? p.source.meta.account.account.address : ''}`,
+			msgId: p.msg.msgId,
+			msg: p.msg,
 			recipient: p.source instanceof BlockchainSource ? p.source.meta.account : null,
 			reader: p.source instanceof BlockchainSource ? p.source.meta.reader : null,
 		};
 	}
 
-	async openFolder(folderId: string) {
-		if (!this.activeFolderId) {
-			return;
-		}
-		if (this.initedById[folderId]) {
-			const result = await this.listById[folderId].configure(() => {});
-			if (result.type === 'success' && result.result) {
-				this.messages = result.result.map(this.wrapMessage);
-			}
+	buildSourcesByFolder(folderId: string): IListSource[] {
+		if (folderId === 'inbox') {
+			return domain.accounts.accounts
+				.map(acc => {
+					const res: IListSource[] = [];
+					for (const blockchain of Object.keys(domain.blockchains)) {
+						const reader = domain.blockchains[blockchain];
+						res.push(
+							this.readingSession.listSource(
+								{
+									blockchain,
+									type: BlockchainSourceType.DIRECT,
+									recipient: acc.uint256Address,
+									sender: null,
+								},
+								reader,
+							),
+						);
+					}
+					return res;
+				})
+				.flat();
 		} else {
-			this.listById[folderId] = new MessagesList();
-			const result = await this.listById[folderId].configure(manager => {
-				manager.setFilter(entry => {
-					return !domain.accounts.accounts.some(acc =>
-						this.deletedMessageIds[acc.account.address].has(entry.link.msgId),
-					);
-				});
-				this.buildFolderBasement(folderId, manager);
-				for (const account of domain.accounts.accounts) {
-					this.inflateFolderByAccount(folderId, manager, account);
-				}
-			});
-			if (result.type === 'success' && result.result) {
-				this.messages = result.result.map(this.wrapMessage);
-			}
+			return [];
 		}
+	}
+
+	async openFolder(folderId: string) {
+		if (this.activeFolderId === folderId) {
+			this.currentList.resetFilter(null);
+			await this.nextPage();
+		} else {
+			if (this.activeFolderId) {
+				this.currentList.pause();
+			}
+			this.currentList = new ListSourceDrainer(new ListSourceMultiplexer(this.buildSourcesByFolder(folderId)));
+			await this.currentList.resume();
+			await this.nextPage();
+		}
+
+		// this.activeFolderId = folderId;
+		// if (this.initedById[folderId]) {
+		// 	const result = await this.listById[folderId].configure(() => {});
+		// 	if (result.type === 'success' && result.result) {
+		// 		this.messages = result.result.map(this.wrapMessage);
+		// 		this.isNextPageAvailable = this.listById[folderId].isNextPageAvailable();
+		// 	}
+		// } else {
+		// 	this.listById[folderId] = new MessagesList();
+		// 	this.firstLoading = true;
+		// 	this.loading = true;
+		// 	const result = await this.listById[folderId].configure(manager => {
+		// 		manager.setFilter(entry => {
+		// 			return !domain.accounts.accounts.some(acc =>
+		// 				this.deletedMessageIds[acc.account.address]?.has(entry.link.msgId),
+		// 			);
+		// 		});
+		// 		this.buildFolderBasement(folderId, manager);
+		// 		for (const account of domain.accounts.accounts) {
+		// 			this.inflateFolderByAccount(folderId, manager, account);
+		// 			this.inflateFolderByAccount(folderId, manager, account);
+		// 			this.inflateFolderByAccount(folderId, manager, account);
+		// 		}
+		// 	});
+		// 	this.loading = false;
+		// 	this.firstLoading = false;
+		// 	console.log('woppy: ', result);
+		// 	if (result.type === 'success' && result.result) {
+		// 		this.messages = result.result.map(this.wrapMessage);
+		// 		this.isNextPageAvailable = this.listById[folderId].isNextPageAvailable();
+		// 	}
+		// }
 	}
 
 	inflateFolderByAccount(id: string, manager: IMessagesListConfigurationManager, account: DomainAccount) {
@@ -185,6 +259,7 @@ export class MailList {
 			for (const blockchain of Object.keys(domain.blockchains)) {
 				const reader = domain.blockchains[blockchain];
 				if (reader instanceof EthereumBlockchainController) {
+					console.log('evm-source added');
 					manager.addSource(
 						new EthereumBlockchainSource(
 							reader,
@@ -199,6 +274,7 @@ export class MailList {
 						),
 					);
 				} else {
+					console.log('non-source added');
 					manager.addReader(
 						reader,
 						{

@@ -62,6 +62,11 @@ class MessagesDB extends IndexedDB {
 		return (await db.get('readMessages', id)) ? true : false;
 	}
 
+	async getReadMessages(): Promise<string[]> {
+		const db = await this.getDB();
+		return (await db.getAll('readMessages')).map(v => v.msgId);
+	}
+
 	async clearAllReadMessages(): Promise<void> {
 		const db = await this.getDB();
 		await db.clear('readMessages');
