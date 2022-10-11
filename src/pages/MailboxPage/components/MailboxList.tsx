@@ -5,6 +5,8 @@ import { Loader } from '../../../controls/Loader';
 import { FixedSizeList } from 'react-window';
 import AutoSizer from 'react-virtualized-auto-sizer';
 import { useEffect, useState } from 'react';
+import MailboxEmpty from './MailboxEmpty';
+import domain from '../../../stores/Domain';
 
 const MailboxList = observer(() => {
 	const [scrollParams, setScrollParams] = useState({
@@ -21,20 +23,18 @@ const MailboxList = observer(() => {
 		const itemsHeight = itemSize * messagesCount;
 		const offsetToEnd = itemsHeight - (scrollParams.height + scrollParams.offset);
 		if (offsetToEnd < itemSize && pageAvailable && !isLoading) {
-			console.log('np');
 			mailList.nextPage();
 		}
 	}, [scrollParams, isLoading, messagesCount, pageAvailable]);
-
-	console.log('pageAvailable: ', pageAvailable);
-	console.log('loading: ', mailList.loading);
 
 	return (
 		<div className="mail-box">
 			{mailList.firstLoading ? (
 				<div style={{ height: 400 }}>
 					{mailList.loading}
-					<Loader />
+					<Loader
+						reason={`Retrieving your mails from ${Object.keys(domain.blockchains).length} blockchains`}
+					/>
 				</div>
 			) : mailList.messages.length ? (
 				<AutoSizer>
@@ -54,8 +54,8 @@ const MailboxList = observer(() => {
 						>
 							{({ index, style, data, isScrolling }) =>
 								index === messagesCount ? (
-									<div style={Object.assign({ height: itemSize, background: 'red' }, style)}>
-										Do you want more, bitch?
+									<div style={Object.assign({ height: itemSize, textAlign: 'center' }, style)}>
+										Loading...
 									</div>
 								) : (
 									<MailboxListRow style={style} message={data[index]} key={index} />
@@ -65,15 +65,7 @@ const MailboxList = observer(() => {
 					)}
 				</AutoSizer>
 			) : (
-				// <table className="table table-hover table-mail">
-				// 	<tbody>
-				// 		{mailList.messages.map(msg => (
-				// 			<MailboxListRow key={msg.msgId} message={msg} />
-				// 		))}
-				// 	</tbody>
-				// </table>
-				'test'
-				// <>{!mailer.searchingText && !mailer.filteringMethod && <MailboxEmpty />}</>
+				<MailboxEmpty />
 			)}
 		</div>
 	);

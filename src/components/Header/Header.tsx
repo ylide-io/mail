@@ -67,7 +67,7 @@ const Header = observer(() => {
 			<nav
 				className="navbar navbar-static-top white-bg mb-0"
 				role="navigation"
-				style={{ paddingLeft: 20, paddingRight: 20 }}
+				style={{ paddingLeft: 30, paddingRight: 30 }}
 			>
 				<div className="navbar-header">
 					<Searcher />

@@ -13,15 +13,15 @@ import {
 	AbstractNameService,
 } from '@ylide/sdk';
 import { everscaleBlockchainFactory, everscaleWalletFactory } from '@ylide/everscale';
-import { ethereumWalletFactory, evmFactories, EVMNetwork, EVM_NAMES } from '@ylide/ethereum';
+import { ethereumWalletFactory, evmFactories, EVMNetwork, EVM_CHAINS, EVM_NAMES } from '@ylide/ethereum';
 import { makeObservable, observable } from 'mobx';
 import contacts from './Contacts';
-import mailer from './Mailer';
 import { Wallet } from './models/Wallet';
 import { Accounts } from './Accounts';
 import { supportedWallets, walletsMap } from '../constants';
 import SwitchModal from '../modals/SwitchModal';
 import PasswordNewModal from '../modals/PasswordModalNew';
+import mailList from './MailList';
 
 Ylide.registerBlockchainFactory(everscaleBlockchainFactory);
 // Ylide.registerBlockchainFactory(evmFactories[EVMNetwork.LOCAL_HARDHAT]);
@@ -31,6 +31,15 @@ Ylide.registerBlockchainFactory(evmFactories[EVMNetwork.ARBITRUM]);
 // Ylide.registerBlockchainFactory(evmFactories[EVMNetwork.BNBCHAIN]);
 Ylide.registerBlockchainFactory(evmFactories[EVMNetwork.OPTIMISM]);
 Ylide.registerBlockchainFactory(evmFactories[EVMNetwork.POLYGON]);
+Ylide.registerBlockchainFactory(evmFactories[EVMNetwork.FANTOM]);
+Ylide.registerBlockchainFactory(evmFactories[EVMNetwork.KLAYTN]);
+Ylide.registerBlockchainFactory(evmFactories[EVMNetwork.GNOSIS]);
+Ylide.registerBlockchainFactory(evmFactories[EVMNetwork.AURORA]);
+Ylide.registerBlockchainFactory(evmFactories[EVMNetwork.CELO]);
+Ylide.registerBlockchainFactory(evmFactories[EVMNetwork.MOONBEAM]);
+Ylide.registerBlockchainFactory(evmFactories[EVMNetwork.MOONRIVER]);
+Ylide.registerBlockchainFactory(evmFactories[EVMNetwork.METIS]);
+Ylide.registerBlockchainFactory(evmFactories[EVMNetwork.ASTAR]);
 Ylide.registerWalletFactory(everscaleWalletFactory);
 Ylide.registerWalletFactory(ethereumWalletFactory);
 
@@ -201,12 +210,20 @@ export class Domain {
 							needNetwork: EVMNetwork,
 							needChainId: number,
 						) => {
-							alert(
-								'Wrong network (' +
-									(currentNetwork ? EVM_NAMES[currentNetwork] : 'undefined') +
-									'), switch to ' +
-									EVM_NAMES[needNetwork],
-							);
+							try {
+								// @ts-ignore
+								await window.ethereum.request({
+									method: 'wallet_switchEthereumChain',
+									params: [{ chainId: '0x' + Number(EVM_CHAINS[needNetwork]).toString(16) }], // chainId must be in hexadecimal numbers
+								});
+							} catch (err) {
+								alert(
+									'Wrong network (' +
+										(currentNetwork ? EVM_NAMES[currentNetwork] : 'undefined') +
+										'), switch to ' +
+										EVM_NAMES[needNetwork],
+								);
+							}
 						},
 					}),
 				};
@@ -284,7 +301,7 @@ export class Domain {
 		await this.accounts.accountsProcessed;
 
 		await contacts.init();
-		await mailer.init();
+		await mailList.init();
 
 		this.initialized = true;
 	}

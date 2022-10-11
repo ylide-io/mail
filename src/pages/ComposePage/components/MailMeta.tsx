@@ -7,13 +7,25 @@ import mailbox from '../../../stores/Mailbox';
 
 @observer
 export class MailMeta extends PureComponent {
+	componentDidMount(): void {
+		if (!mailbox.from && domain.accounts.accounts.length) {
+			mailbox.from = domain.accounts.accounts[0];
+		}
+	}
+
 	render() {
 		return (
 			<>
 				<div className="form-group row">
 					<label className="col-sm-1 col-form-label">From:</label>
 					<div className="col-sm-11" style={{ position: 'relative', zIndex: 2 }}>
-						<Select style={{ width: '100%' }} value={'0'}>
+						<Select
+							style={{ width: '100%' }}
+							value={mailbox.from ? String(domain.accounts.accounts.indexOf(mailbox.from)) : ''}
+							onSelect={(val: string) => {
+								mailbox.from = domain.accounts.accounts[Number(val)];
+							}}
+						>
 							{domain.accounts.accounts.map((acc, idx) => (
 								<Select.Option key={idx} value={String(idx)}>
 									{acc.account.address} [

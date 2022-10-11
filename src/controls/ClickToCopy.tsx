@@ -1,3 +1,4 @@
+import { Tooltip } from 'antd';
 import React, { PropsWithChildren, useState } from 'react';
 
 const ClickToCopy: React.FC<PropsWithChildren<{ dataToCopy: string }>> = ({ children, dataToCopy }) => {
@@ -16,58 +17,20 @@ const ClickToCopy: React.FC<PropsWithChildren<{ dataToCopy: string }>> = ({ chil
 	};
 
 	return (
-		<span
-			style={{
-				position: 'relative',
-				wordBreak: 'break-word',
-				backgroundColor: 'rgba(136,136,136,0.26)',
-				fontWeight: 'bold',
-				cursor: 'pointer',
-			}}
-			onMouseEnter={() => {
-				if (status !== 'Copied') {
-					setStatus('Hover');
-				}
-			}}
-			onMouseLeave={() => {
-				if (status !== 'Copied') {
-					setStatus('None');
-				}
-			}}
-			onClick={() => copyHandler(dataToCopy)}
-		>
-			{children}
-			{status === 'Copied' && (
-				<div
-					style={{
-						position: 'absolute',
-						top: 30,
-						right: 0,
-						padding: 3,
-						borderRadius: '5px',
-						backgroundColor: '#18a689',
-						color: '#ffffff',
-					}}
-				>
-					Copied
-				</div>
-			)}
-			{status === 'Hover' && (
-				<div
-					style={{
-						position: 'absolute',
-						top: 30,
-						right: 0,
-						padding: 3,
-						borderRadius: '5px',
-						backgroundColor: '#18a689',
-						color: '#ffffff',
-					}}
-				>
-					Click to copy
-				</div>
-			)}
-		</span>
+		<Tooltip title={status === 'Copied' ? 'Copied' : 'Click to copy'}>
+			<span
+				style={{
+					position: 'relative',
+					wordBreak: 'break-word',
+					backgroundColor: 'rgba(136,136,136,0.26)',
+					fontWeight: 'bold',
+					cursor: 'pointer',
+				}}
+				onClick={() => copyHandler(dataToCopy)}
+			>
+				{children}
+			</span>
+		</Tooltip>
 	);
 };
 

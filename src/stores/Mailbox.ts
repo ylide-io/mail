@@ -1,4 +1,7 @@
+import { EVMNetwork } from '@ylide/ethereum';
 import { makeObservable, observable } from 'mobx';
+import domain from './Domain';
+import { DomainAccount } from './models/DomainAccount';
 
 export interface IRecipient {
 	loading: boolean;
@@ -16,8 +19,10 @@ export interface IRecipient {
 }
 
 class Mailbox {
+	@observable from?: DomainAccount;
 	@observable to: IRecipient[] = [];
 	@observable bcc: IRecipient[] = [];
+	@observable network?: EVMNetwork;
 
 	@observable subject: string = '';
 
@@ -28,6 +33,8 @@ class Mailbox {
 	}
 
 	resetData() {
+		this.network = undefined;
+		this.from = domain.accounts.accounts[0];
 		this.to = [];
 		this.subject = '';
 		this.textEditorData = '';

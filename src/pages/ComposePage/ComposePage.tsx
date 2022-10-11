@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import MainLayout from '../../layouts/MainLayout';
 import SmallButton, { smallButtonColors, smallButtonIcons } from '../../components/smallButton/smallButton';
 import MailboxBody from './components/Mailbox/MailboxBody';

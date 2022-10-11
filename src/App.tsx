@@ -35,12 +35,22 @@ const App = observer(() => {
 		} else {
 			document.body.classList.remove('modal-body-catch');
 		}
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [modals.anyModalVisible]);
 
 	if (!domain.initialized) {
 		return (
-			<div style={{ display: 'flex', flexGrow: 1, width: '100vw', height: '100vh', alignItems: 'stretch' }}>
-				<Loader />
+			<div
+				style={{
+					display: 'flex',
+					flexDirection: 'column',
+					flexGrow: 1,
+					width: '100vw',
+					height: '100vh',
+					alignItems: 'stretch',
+				}}
+			>
+				<Loader reason="Loading your accounts data from blockchain..." />
 			</div>
 		);
 	}
@@ -60,17 +70,18 @@ const App = observer(() => {
 		<>
 			<Routes>
 				<>
+					<Route path={'/'} element={<Navigate replace to="/inbox" />} />
 					<Route path={'/first-time'} element={<FirstTimePage />} />
 					<Route path={'/connect-wallets'} element={<ConnectWalletsPage />} />
 					<Route path={'/compose'} element={<ComposePage />} />
-					<Route path={'/mailbox'} element={<MailboxPage />} />
-					{/* <Route path={'/mailbox/:id'} element={<MailDetail />} /> */}
 					<Route path={'/contacts'} element={<ContactsPage />}>
 						<Route index element={<ContactsTab />} />
 						<Route path={'folders'} element={<TagsTab />} />
 					</Route>
 					<Route path={'/settings'} element={<SettingsPage />} />
-					<Route path={'/*'} element={<Navigate replace to="/mailbox" />} />
+					<Route path={'/:folderId'} element={<MailboxPage />} />
+					<Route path={'/:folderId/:id'} element={<MailDetail />} />
+					<Route path={'/*'} element={<Navigate replace to="/inbox" />} />
 				</>
 			</Routes>
 			<PasswordModal

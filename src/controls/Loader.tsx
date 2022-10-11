@@ -1,4 +1,4 @@
-export const Loader = () => {
+export const Loader = ({ reason }: { reason?: string }) => {
 	return (
 		<div
 			style={{
@@ -6,6 +6,7 @@ export const Loader = () => {
 				width: '100%',
 				height: '100%',
 				display: 'flex',
+				flexDirection: 'column',
 				alignItems: 'center',
 				justifyContent: 'center',
 			}}
@@ -33,6 +34,7 @@ export const Loader = () => {
 					{(() => [...new Array(9)].map((_, i) => <div key={i} />))()}
 				</div>
 			</div>
+			{reason ? <div style={{ fontSize: 20, marginTop: 60 }}>{reason}</div> : null}
 		</div>
 	);
 };

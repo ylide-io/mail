@@ -1,13 +1,14 @@
 import SmallButton, { smallButtonColors, smallButtonIcons } from '../../../components/smallButton/smallButton';
 import { observer } from 'mobx-react';
+import mailList from '../../../stores/MailList';
 
 const MailboxControls = observer(() => {
 	const readHandler = () => {
-		// mailer.readCheckedMessage();
+		mailList.markAsReaded();
 	};
 
 	const deleteHandler = () => {
-		// mailer.deleteCheckedMessages();
+		mailList.markAsDeleted();
 	};
 
 	// const pagesCount =

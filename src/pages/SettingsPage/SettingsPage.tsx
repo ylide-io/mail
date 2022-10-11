@@ -1,6 +1,5 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import MainLayout from '../../layouts/MainLayout';
-import mailer from '../../stores/Mailer';
 import { observer } from 'mobx-react';
 import mailList from '../../stores/MailList';
 

@@ -1,34 +1,31 @@
-import React, { useCallback } from 'react';
+import React from 'react';
 import { observer } from 'mobx-react';
-import cn from 'classnames';
 import { YlideButton } from '../../controls/YlideButton';
 import { ArrowRight } from '../../icons/ArrowRight';
 import { useNavigate } from 'react-router-dom';
 
 import './style.scss';
 import domain from '../../stores/Domain';
-import { useState } from 'react';
 import { supportedWallets } from '../../constants';
-import { DomainAccount } from '../../stores/models/DomainAccount';
 import { WalletBlock } from './WalletBlock';
 
 const ConnectWalletsPage = observer(() => {
 	const navigate = useNavigate();
-	const [helperModal, setHelperModal] = useState<string | null>(null);
-	const [loading, setLoading] = useState(false);
+	// const [helperModal, setHelperModal] = useState<string | null>(null);
+	// const [loading, setLoading] = useState(false);
 
 	let titleText = 'Connect your wallets';
 	let subtitleText = 'We found some wallets in your browser which you can use with Ylide';
 
-	const firstTime = document.location.search.includes('firstTime=true');
+	// const firstTime = document.location.search.includes('firstTime=true');
 
-	const publishKey = useCallback(async (account: DomainAccount) => {
-		setLoading(true);
-		setHelperModal('publish');
-		await account.attachRemoteKey();
-		setHelperModal(null);
-		setLoading(false);
-	}, []);
+	// const publishKey = useCallback(async (account: DomainAccount) => {
+	// 	setLoading(true);
+	// 	setHelperModal('publish');
+	// 	await account.attachRemoteKey();
+	// 	setHelperModal(null);
+	// 	setLoading(false);
+	// }, []);
 
 	// const instantiateKey = useCallback(
 	// 	async (wallet: string) => {
@@ -124,7 +121,7 @@ const ConnectWalletsPage = observer(() => {
 				position: 'relative',
 			}}
 		>
-			{helperModal !== null ? (
+			{/* {helperModal !== null ? (
 				<div
 					style={{
 						position: 'absolute',
@@ -223,7 +220,7 @@ const ConnectWalletsPage = observer(() => {
 						)}
 					</div>
 				</div>
-			) : null}
+			) : null} */}
 			<div style={{ width: 350, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
 				<h3
 					style={{

@@ -57,6 +57,20 @@ class MessagesDB extends IndexedDB {
 		});
 	}
 
+	async saveMessagesRead(ids: string[]) {
+		const db = await this.getDB();
+		const tx = db.transaction('readMessages', 'readwrite');
+		await Promise.all(
+			ids.map(id =>
+				tx.store.put({
+					msgId: id,
+					readAt: new Date().toISOString(),
+				}),
+			),
+		);
+		await tx.done;
+	}
+
 	async isMessageRead(id: string): Promise<boolean> {
 		const db = await this.getDB();
 		return (await db.get('readMessages', id)) ? true : false;
@@ -86,6 +100,21 @@ class MessagesDB extends IndexedDB {
 			}),
 			{} as Record<string, string[]>,
 		);
+	}
+
+	async saveMessagesDeleted(ids: { id: string; accountAddress: string }[]) {
+		const db = await this.getDB();
+		const tx = db.transaction('deletedMessages', 'readwrite');
+		await Promise.all(
+			ids.map(v =>
+				tx.store.put({
+					msgId: v.id,
+					accountAddress: v.accountAddress,
+					deletedAt: new Date().toISOString(),
+				}),
+			),
+		);
+		await tx.done;
 	}
 
 	async saveMessageDeleted(id: string, accountAddress: string) {

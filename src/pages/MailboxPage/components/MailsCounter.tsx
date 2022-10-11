@@ -27,14 +27,10 @@ const MailsCounter = observer(() => {
 	// 	}
 	// })();
 
-	const folderName = 'Temp';
-	const folderLength = mailList.messages.length;
+	const folderName = mailList.activeFolderId ? mailList.getFolderName(mailList.activeFolderId) : 'Loading...';
+	// const folderLength = mailList.messages.length;
 
-	return (
-		<h2>
-			{folderName} ({folderLength})
-		</h2>
-	);
+	return <h2>{folderName}</h2>;
 });
 
 export default MailsCounter;

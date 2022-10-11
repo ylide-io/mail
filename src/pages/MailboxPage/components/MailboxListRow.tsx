@@ -1,4 +1,4 @@
-import React, { CSSProperties, useEffect, useState } from 'react';
+import React, { CSSProperties } from 'react';
 import { observer } from 'mobx-react';
 import classNames from 'classnames';
 
@@ -19,17 +19,17 @@ const MailboxListRow: React.FC<MailboxListRowProps> = observer(({ style, message
 	const navigate = useNav();
 	const contact = contacts.contactsByAddress[message.msg.senderAddress];
 	const sender = contact ? contact.name : message.msg.senderAddress;
-	const checked = mailList.isMessageChecked(message.msgId);
+	const checked = mailList.isMessageChecked(message.id);
 	const decoded = mailList.decodedMessagesById[message.msgId];
-	const isUnread = mailList.readMessageIds.has(message.msgId);
+	const isUnread = !mailList.readMessageIds.has(message.id);
 	// const isNative: boolean = message.link.userspaceMeta && message.link.userspaceMeta.isNative;
 
 	const messageClickHandler = async () => {
 		if (decoded) {
-			navigate(message.msgId);
+			navigate(message.id);
 		} else {
 			await mailList.decodeMessage(message);
-			navigate(message.msgId);
+			navigate(message.id);
 		}
 	};
 
@@ -47,10 +47,6 @@ const MailboxListRow: React.FC<MailboxListRowProps> = observer(({ style, message
 		return fullDate.toLocaleString('en-us', { day: 'numeric', month: 'short' }).split(' ').reverse().join(' ');
 	})();
 
-	const checkHandler = (checked: boolean) => {
-		mailList.checkMessage(message, !checked);
-	};
-
 	return (
 		<div
 			style={style}
@@ -61,7 +57,13 @@ const MailboxListRow: React.FC<MailboxListRowProps> = observer(({ style, message
 			})}
 		>
 			<div onClick={e => e.stopPropagation()} className="check-mail" style={{ cursor: 'pointer' }}>
-				<YlideCheckbox checked={checked} onCheck={val => {}} />
+				<YlideCheckbox
+					checked={checked}
+					onCheck={val => {
+						console.log('new val: ', val);
+						mailList.checkMessage(message, val);
+					}}
+				/>
 			</div>
 			<div className="mail-contact">
 				{sender.slice(0, 12)}

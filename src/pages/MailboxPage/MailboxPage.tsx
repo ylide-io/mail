@@ -5,11 +5,14 @@ import { MailboxHeader } from './components/MailboxHeader';
 
 import './style.scss';
 import mailList from '../../stores/MailList';
+import { useParams } from 'react-router-dom';
 
 const MailboxPage = () => {
+	const { folderId } = useParams();
+
 	useEffect(() => {
-		mailList.openFolder('inbox');
-	}, []);
+		mailList.openFolder(folderId!);
+	}, [folderId]);
 
 	return (
 		<MainLayout>

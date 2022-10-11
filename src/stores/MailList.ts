@@ -1,7 +1,6 @@
 import { EthereumBlockchainController, EthereumBlockchainSource } from '@ylide/ethereum';
 import {
 	AbstractBlockchainController,
-	BlockchainSource,
 	IListSource,
 	IMessageWithSource,
 	ListSourceDrainer,
@@ -40,7 +39,8 @@ export interface ILinkedMessage {
 }
 
 export class MailList {
-	readingSession: SourceReadingSession = new SourceReadingSession();
+	// @ts-ignore
+	readingSession: SourceReadingSession = (window.rs = new SourceReadingSession());
 
 	@observable messages: ILinkedMessage[] = [];
 	@observable isNextPageAvailable: boolean = false;
@@ -66,20 +66,122 @@ export class MailList {
 	@observable activeFolderId: string | null = null;
 	@observable globalSubscriptions: string[] = [];
 
+	accountSourceMatch: Map<IListSource, { account: DomainAccount; reader: AbstractBlockchainController }> = new Map();
+
 	constructor() {
 		makeObservable(this);
 	}
 
-	checkMessage(message: ILinkedMessage, flag: boolean) {
-		if (flag) {
-			this.checkedMessageIds.push(message.msgId);
+	async init() {
+		const dmsgs = await messagesDB.retrieveAllDecodedMessages();
+		this.decodedMessagesById = dmsgs.reduce(
+			(p, c) => ({
+				...p,
+				[c.msgId]: c,
+			}),
+			{},
+		);
+		const deletedMessageIds = await messagesDB.retrieveAllDeletedMessages();
+		for (const acc in deletedMessageIds) {
+			this.deletedMessageIds[acc] = new Set(deletedMessageIds[acc]);
+		}
+		const readMessageIds = await messagesDB.getReadMessages();
+		this.readMessageIds = new Set(readMessageIds);
+	}
+
+	getFolderName(folderId: string) {
+		if (folderId === 'inbox') {
+			return 'Inbox';
+		} else if (folderId === 'sent') {
+			return 'Sent';
+		} else if (folderId === 'subscriptions') {
+			return 'Subscription';
+		} else if (folderId === 'archive') {
+			return 'Archive';
 		} else {
-			this.checkedMessageIds = this.checkedMessageIds.filter(msgId => msgId !== message.msgId);
+			return this.folderById[folderId].title;
 		}
 	}
 
-	isMessageChecked(msgId: string) {
-		return !!this.checkedMessageIds.includes(msgId);
+	checkMessage(message: ILinkedMessage, flag: boolean) {
+		if (flag) {
+			this.checkedMessageIds.push(message.id);
+		} else {
+			this.checkedMessageIds = this.checkedMessageIds.filter(id => id !== message.id);
+		}
+	}
+
+	isMessageChecked(id: string) {
+		return this.checkedMessageIds.includes(id);
+	}
+
+	async markMessagesAsReaded(ids: string[]) {
+		ids.forEach(id => this.readMessageIds.add(id));
+		await messagesDB.saveMessagesRead(ids);
+	}
+
+	async markMessageAsReaded(id: string) {
+		this.readMessageIds.add(id);
+		await messagesDB.saveMessageRead(id);
+	}
+
+	async markAsReaded() {
+		await this.markMessagesAsReaded(this.checkedMessageIds);
+		this.checkedMessageIds = [];
+	}
+
+	@autobind
+	deletedFilter(m: IMessageWithSource): boolean {
+		const { id, recipient } = this.wrapMessage(m);
+		return !this.deletedMessageIds[recipient?.account.address || 'null']?.has(id);
+	}
+
+	@autobind
+	onlyDeletedFilter(m: IMessageWithSource): boolean {
+		const { id, recipient } = this.wrapMessage(m);
+		return this.deletedMessageIds[recipient?.account.address || 'null']?.has(id);
+	}
+
+	async deletedWasUpdated() {
+		if (this.activeFolderId === 'inbox') {
+			this.currentList.resetFilter(this.deletedFilter);
+			this.messages = (await this.currentList.readMore(10)).map(this.wrapMessage);
+		} else if (this.activeFolderId === 'archive') {
+			this.currentList.resetFilter(this.onlyDeletedFilter);
+			this.messages = (await this.currentList.readMore(10)).map(this.wrapMessage);
+		}
+	}
+
+	async markMessageAsDeleted(m: ILinkedMessage) {
+		if (this.deletedMessageIds[m.recipient?.account.address || 'null']) {
+			this.deletedMessageIds[m.recipient?.account.address || 'null'].add(m.id);
+		} else {
+			this.deletedMessageIds[m.recipient?.account.address || 'null'] = new Set([m.id]);
+		}
+		await messagesDB.saveMessageDeleted(m.id, m.recipient?.account.address || 'null');
+		await this.deletedWasUpdated();
+	}
+
+	async markMessagesAsDeleted(ms: ILinkedMessage[]) {
+		ms.forEach(m => {
+			if (this.deletedMessageIds[m.recipient?.account.address || 'null']) {
+				this.deletedMessageIds[m.recipient?.account.address || 'null'].add(m.id);
+			} else {
+				this.deletedMessageIds[m.recipient?.account.address || 'null'] = new Set([m.id]);
+			}
+		});
+		await messagesDB.saveMessagesDeleted(
+			ms.map(m => ({
+				id: m.id,
+				accountAddress: m.recipient?.account.address || 'null',
+			})),
+		);
+		await this.deletedWasUpdated();
+	}
+
+	async markAsDeleted() {
+		await this.markMessagesAsDeleted(this.messages.filter(t => this.checkedMessageIds.includes(t.id)));
+		this.checkedMessageIds = [];
 	}
 
 	async fetchMessageContent(pushMsg: ILinkedMessage) {
@@ -120,29 +222,12 @@ export class MailList {
 		}
 	}
 
-	setSaveDecodedSetting(flag: boolean) {
+	async setSaveDecodedSetting(flag: boolean) {
 		this.saveDecodedMessages = flag;
 		localStorage.setItem('saveDecodedMessages', flag ? 'true' : 'false');
 		if (!flag) {
-			messagesDB.clearAllDecodedMessages();
+			await messagesDB.clearAllDecodedMessages();
 		}
-	}
-
-	async init() {
-		const dmsgs = await messagesDB.retrieveAllDecodedMessages();
-		this.decodedMessagesById = dmsgs.reduce(
-			(p, c) => ({
-				...p,
-				[c.msgId]: c,
-			}),
-			{},
-		);
-		const deletedMessageIds = await messagesDB.retrieveAllDeletedMessages();
-		for (const acc in deletedMessageIds) {
-			this.deletedMessageIds[acc] = new Set(deletedMessageIds[acc]);
-		}
-		const readMessageIds = await messagesDB.getReadMessages();
-		this.readMessageIds = new Set(readMessageIds);
 	}
 
 	@autobind
@@ -150,11 +235,6 @@ export class MailList {
 		this.loading = true;
 		this.messages = (await this.currentList.readMore(10)).map(this.wrapMessage);
 		this.isNextPageAvailable = !this.currentList.drained;
-		// const result = await this.listById[this.activeFolderId!].goNextPage();
-		// if (result.type === 'success' && result.result) {
-		// 	this.messages = result.result.map(this.wrapMessage);
-		// 	this.isNextPageAvailable = this.listById[this.activeFolderId!].isNextPageAvailable();
-		// }
 		this.loading = false;
 		this.firstLoading = false;
 	}
@@ -170,34 +250,60 @@ export class MailList {
 	}
 
 	@autobind
+	private wrapId(p: IMessageWithSource) {
+		return `${p.msg.msgId}:${this.accountSourceMatch.get(p.source)?.account.account.address}`;
+	}
+
+	@autobind
 	private wrapMessage(p: IMessageWithSource) {
 		return {
-			id: `${p.msg.msgId}:${p.source instanceof BlockchainSource ? p.source.meta.account.account.address : ''}`,
+			id: this.wrapId(p),
 			msgId: p.msg.msgId,
 			msg: p.msg,
-			recipient: p.source instanceof BlockchainSource ? p.source.meta.account : null,
-			reader: p.source instanceof BlockchainSource ? p.source.meta.reader : null,
+			recipient: this.accountSourceMatch.get(p.source)?.account || null,
+			reader: this.accountSourceMatch.get(p.source)!.reader,
 		};
 	}
 
 	buildSourcesByFolder(folderId: string): IListSource[] {
-		if (folderId === 'inbox') {
+		if (folderId === 'inbox' || folderId === 'archive') {
 			return domain.accounts.accounts
-				.map(acc => {
+				.map(account => {
 					const res: IListSource[] = [];
 					for (const blockchain of Object.keys(domain.blockchains)) {
 						const reader = domain.blockchains[blockchain];
-						res.push(
-							this.readingSession.listSource(
-								{
-									blockchain,
-									type: BlockchainSourceType.DIRECT,
-									recipient: acc.uint256Address,
-									sender: null,
-								},
-								reader,
-							),
+						const ls = this.readingSession.listSource(
+							{
+								blockchain,
+								type: BlockchainSourceType.DIRECT,
+								recipient: account.uint256Address,
+								sender: null,
+							},
+							reader,
 						);
+						this.accountSourceMatch.set(ls, { account, reader });
+						res.push(ls);
+					}
+					return res;
+				})
+				.flat();
+		} else if (folderId === 'sent') {
+			return domain.accounts.accounts
+				.map(account => {
+					const res: IListSource[] = [];
+					for (const blockchain of Object.keys(domain.blockchains)) {
+						const reader = domain.blockchains[blockchain];
+						const ls = this.readingSession.listSource(
+							{
+								blockchain,
+								type: BlockchainSourceType.DIRECT,
+								recipient: account.sentAddress,
+								sender: null,
+							},
+							reader,
+						);
+						this.accountSourceMatch.set(ls, { account, reader });
+						res.push(ls);
 					}
 					return res;
 				})
@@ -207,15 +313,35 @@ export class MailList {
 		}
 	}
 
+	@autobind
+	async handleNewMessages({ messages }: { messages: IMessageWithSource[] }) {
+		this.messages = messages.map(this.wrapMessage);
+	}
+
 	async openFolder(folderId: string) {
 		if (this.activeFolderId === folderId) {
-			this.currentList.resetFilter(null);
+			if (this.activeFolderId === 'inbox') {
+				this.currentList.resetFilter(this.deletedFilter);
+			} else if (this.activeFolderId === 'archive') {
+				this.currentList.resetFilter(this.onlyDeletedFilter);
+			} else {
+				this.currentList.resetFilter(null);
+			}
 			await this.nextPage();
 		} else {
 			if (this.activeFolderId) {
 				this.currentList.pause();
+				this.currentList.off('messages', this.handleNewMessages);
 			}
+			this.activeFolderId = folderId;
 			this.currentList = new ListSourceDrainer(new ListSourceMultiplexer(this.buildSourcesByFolder(folderId)));
+			this.currentList.on('messages', this.handleNewMessages);
+			if (folderId === 'inbox') {
+				this.currentList.resetFilter(this.deletedFilter);
+			} else if (folderId === 'archive') {
+				this.currentList.resetFilter(this.onlyDeletedFilter);
+			}
+			this.firstLoading = true;
 			await this.currentList.resume();
 			await this.nextPage();
 		}
@@ -330,4 +456,6 @@ export class MailList {
 }
 
 const mailList = new MailList();
+// @ts-ignore
+window.mailList = mailList;
 export default mailList;

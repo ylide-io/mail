@@ -2,17 +2,14 @@ import React, { useMemo } from 'react';
 import LinkButton from './LinkButton';
 import TagsList from './Categories/TagsList';
 import { useLocation } from 'react-router-dom';
-import mailer from '../../stores/Mailer';
-import { useNav } from '../../utils/navigate';
-import PermanentTag from './Categories/PermanentTag';
 import PermanentTagList from './Categories/PermanentTagList';
+import mailList from '../../stores/MailList';
 
 const SidebarMenu = () => {
 	const location = useLocation();
-	const navigate = useNav();
 
 	const linkButtonProps = useMemo(() => {
-		if (location.pathname === '/mailbox') {
+		if (location.pathname === '/' + mailList.activeFolderId) {
 			return {
 				text: 'Compose Mail',
 				link: '/compose',
@@ -20,21 +17,11 @@ const SidebarMenu = () => {
 		} else {
 			return {
 				text: 'Return to Mailbox',
-				link: '/mailbox',
+				link: `/${mailList.activeFolderId}`,
 			};
 		}
-	}, [location]);
-
-	const viewFolder = (folder: 'Inbox' | 'Archive') => {
-		if (location.pathname !== 'mailbox') {
-			navigate('/mailbox');
-		}
-		// if (folder === "Inbox") {
-		//     mailer.filterByFolder(null)
-		// } else {
-		//     mailer.filterByArchived()
-		// }
-	};
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [location, mailList.activeFolderId]);
 
 	return (
 		<div className="sidebar">
@@ -44,7 +31,7 @@ const SidebarMenu = () => {
 						<LinkButton text={linkButtonProps.text} link={linkButtonProps.link} />
 						<div className="space-25"></div>
 						<h5>Default folders</h5>
-						<PermanentTagList viewFolder={viewFolder} />
+						<PermanentTagList />
 						<h5>Folders</h5>
 						<TagsList />
 						<div className="clearfix"></div>

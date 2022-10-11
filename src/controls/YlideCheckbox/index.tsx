@@ -1,10 +1,22 @@
 import cn from 'classnames';
+import { MouseEvent } from 'react';
 
 import './style.scss';
 
-export const YlideCheckbox = ({ checked, onCheck }: { checked?: boolean; onCheck: (val: boolean) => void }) => {
+export const YlideCheckbox = ({
+	checked,
+	onCheck,
+}: {
+	checked?: boolean;
+	onCheck: (val: boolean, e: MouseEvent) => void;
+}) => {
 	return (
-		<div className={cn('ylide-checkbox', { checked })}>
+		<div
+			className={cn('ylide-checkbox', { checked })}
+			onClick={e => {
+				onCheck(!checked, e);
+			}}
+		>
 			{checked ? (
 				<div
 					style={{

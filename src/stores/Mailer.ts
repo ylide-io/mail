@@ -75,17 +75,25 @@ class Mailer {
 		// );
 	}
 
-	async sendMail(sender: DomainAccount, subject: string, text: string, recipients: string[]): Promise<string | null> {
+	async sendMail(
+		sender: DomainAccount,
+		subject: string,
+		text: string,
+		recipients: string[],
+		network?: EVMNetwork,
+	): Promise<string | null> {
 		try {
 			this.sending = true;
 			const content = MessageContentV3.plain(subject, text);
 
-			const evmNetworks = (Object.keys(EVM_NAMES) as unknown as EVMNetwork[]).map((network: EVMNetwork) => ({
-				name: EVM_NAMES[network],
-				network: Number(network) as EVMNetwork,
-			}));
-			const blockchainName = await sender.wallet.controller.getCurrentBlockchain();
-			const network = evmNetworks.find(n => n.name === blockchainName)?.network;
+			if (!network && sender.wallet.factory.blockchainGroup === 'evm') {
+				const evmNetworks = (Object.keys(EVM_NAMES) as unknown as EVMNetwork[]).map((network: EVMNetwork) => ({
+					name: EVM_NAMES[network],
+					network: Number(network) as EVMNetwork,
+				}));
+				const blockchainName = await sender.wallet.controller.getCurrentBlockchain();
+				network = evmNetworks.find(n => n.name === blockchainName)?.network;
+			}
 
 			return await domain.ylide.sendMessage(
 				{

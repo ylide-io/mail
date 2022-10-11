@@ -17,7 +17,9 @@ const MailboxEmpty = observer(() => {
 			<div style={{ marginTop: 6 }}>
 				<span>Share your addresses: </span>
 				{domain.accounts.accounts.map(acc => (
-					<ClickToCopy dataToCopy={acc.account.address}>{acc.account.address}</ClickToCopy>
+					<div>
+						<ClickToCopy dataToCopy={acc.account.address}>{acc.account.address}</ClickToCopy>
+					</div>
 				))}
 
 				<span> with your friends to receive the first one!</span>
