@@ -17,6 +17,6 @@ module.exports = function override(config) {
 			Buffer: ['buffer', 'Buffer'],
 		}),
 	]);
-	config.target.target = 'es2022';
+	// config.target.target = 'es2022';
 	return config;
 };

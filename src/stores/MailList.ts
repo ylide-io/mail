@@ -1,6 +1,7 @@
 import { EthereumBlockchainController, EthereumBlockchainSource, EthereumListSource } from '@ylide/ethereum';
 import {
 	AbstractBlockchainController,
+	BlockchainListSource,
 	IListSource,
 	IMessageWithSource,
 	ListSourceDrainer,
@@ -16,6 +17,7 @@ import {
 	IMessagesListConfigurationManager,
 	ISourceSubject,
 	MessagesList,
+	CriticalSection,
 } from '@ylide/sdk';
 import { autobind } from 'core-decorators';
 import { makeObservable, observable } from 'mobx';
@@ -68,6 +70,8 @@ export class MailList {
 	@observable activeFolderId: string | null = null;
 	@observable globalSubscriptions: string[] = [];
 
+	folderChangeCriticalSection = new CriticalSection();
+
 	accountSourceMatch: Map<IListSource, { account: DomainAccount; reader: AbstractBlockchainController }> = new Map();
 
 	constructor() {
@@ -75,9 +79,11 @@ export class MailList {
 
 		this.readingSession.sourceOptimizer = (subject, reader) => {
 			if (reader instanceof EthereumBlockchainController) {
-				return new EthereumListSource(reader, subject);
+				return new EthereumListSource(reader, subject, 30000);
+			} else {
+				return new BlockchainListSource(reader, subject, 10000);
 			}
-			return null;
+			// return null;
 		};
 	}
 
@@ -247,8 +253,10 @@ export class MailList {
 	@autobind
 	async nextPage() {
 		this.loading = true;
+		await this.folderChangeCriticalSection.enter();
 		this.messages = (await this.currentList.readMore(10)).map(this.wrapMessage);
 		this.isNextPageAvailable = !this.currentList.drained;
+		await this.folderChangeCriticalSection.leave();
 		this.loading = false;
 		this.firstLoading = false;
 	}
@@ -371,8 +379,10 @@ export class MailList {
 			await this.nextPage();
 		} else {
 			if (this.activeFolderId) {
+				await this.folderChangeCriticalSection.enter();
 				this.currentList.pause();
 				this.currentList.off('messages', this.handleNewMessages);
+				await this.folderChangeCriticalSection.leave();
 			}
 			this.activeFolderId = folderId;
 			this.currentList = new ListSourceDrainer(new ListSourceMultiplexer(this.buildSourcesByFolder(folderId)));
@@ -385,7 +395,9 @@ export class MailList {
 				this.currentList.resetFilter(this.deletedFilter);
 			}
 			this.firstLoading = true;
+			await this.folderChangeCriticalSection.enter();
 			await this.currentList.resume();
+			await this.folderChangeCriticalSection.leave();
 			await this.nextPage();
 		}
 

@@ -1,7 +1,6 @@
 import React from 'react';
 import classNames from 'classnames';
 import { colors } from '../../../utils/colors';
-import mailer from '../../../stores/Mailer';
 import { useLocation } from 'react-router-dom';
 import { useNav } from '../../../utils/navigate';
 

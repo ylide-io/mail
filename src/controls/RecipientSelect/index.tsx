@@ -82,6 +82,11 @@ export class RecipientsSelect extends PureComponent<RecipientsSelectProps> {
 	}
 
 	componentDidMount() {
+		this.props.mutableValues.forEach(v => {
+			if (v.isAchievable === null) {
+				this.loadRecipient(v);
+			}
+		});
 		this.updateOptions();
 	}
 

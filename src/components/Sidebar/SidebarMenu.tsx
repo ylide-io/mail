@@ -4,8 +4,9 @@ import TagsList from './Categories/TagsList';
 import { useLocation } from 'react-router-dom';
 import PermanentTagList from './Categories/PermanentTagList';
 import mailList from '../../stores/MailList';
+import { observer } from 'mobx-react';
 
-const SidebarMenu = () => {
+const SidebarMenu = observer(() => {
 	const location = useLocation();
 
 	const linkButtonProps = useMemo(() => {
@@ -40,6 +41,6 @@ const SidebarMenu = () => {
 			</div>
 		</div>
 	);
-};
+});
 
 export default SidebarMenu;

@@ -75,7 +75,7 @@ const MailDetail = observer(() => {
 	const deleteHandler = () => {
 		if (message) {
 			mailList.markMessageAsDeleted(message);
-			navigate('/');
+			navigate(`/${mailList.activeFolderId}`);
 		}
 	};
 

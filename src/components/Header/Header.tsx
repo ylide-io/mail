@@ -1,5 +1,5 @@
 import React from 'react';
-import Searcher from '../../layouts/components/searcher';
+// import Searcher from '../../layouts/components/searcher';
 import domain from '../../stores/Domain';
 import { useNav } from '../../utils/navigate';
 import { Dropdown, Menu } from 'antd';
@@ -70,7 +70,16 @@ const Header = observer(() => {
 				style={{ paddingLeft: 30, paddingRight: 30 }}
 			>
 				<div className="navbar-header">
-					<Searcher />
+					<img
+						src="https://ylide.io/images/logo-medium-p-500.png"
+						alt="Logo"
+						style={{
+							width: 80,
+							marginTop: 9,
+							marginLeft: 10,
+						}}
+					/>
+					{/* <Searcher /> */}
 				</div>
 				<ul className="nav navbar-top-links navbar-right">
 					<li>

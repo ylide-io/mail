@@ -17,5 +17,5 @@
 		"noEmit": true,
 		"jsx": "react-jsx"
 	},
-	"include": ["src", "node_modules/@ylide/sdk"]
+	"include": ["src"]
 }
