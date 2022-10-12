@@ -1,0 +1,32 @@
+.main-layout {
+	display: flex;
+	flex-direction: column;
+	align-items: stretch;
+	justify-content: flex-start;
+
+	flex-grow: 1;
+	flex-shrink: 1;
+}
+
+.main-wrapper {
+	margin-top: 15px;
+
+	display: flex;
+	flex-direction: row;
+	align-items: stretch;
+	justify-content: flex-start;
+
+	flex-grow: 1;
+	flex-shrink: 1;
+	margin: 15px;
+}
+
+.sidebar {
+	display: flex;
+	flex-direction: column;
+	align-items: stretch;
+	justify-content: flex-start;
+
+	width: 16.66666%;
+	margin-right: 15px;
+}

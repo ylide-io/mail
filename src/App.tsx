@@ -17,6 +17,7 @@ import ConnectWalletsPage from './pages/ConnectWalletsPage/ConnectWalletsPage';
 import './modals/style.scss';
 import { PasswordModal } from './modals/PasswordModal';
 import modals from './stores/Modals';
+import { Loader } from './controls/Loader';
 
 const App = observer(() => {
 	const location = useLocation();
@@ -34,16 +35,34 @@ const App = observer(() => {
 		} else {
 			document.body.classList.remove('modal-body-catch');
 		}
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [modals.anyModalVisible]);
 
 	if (!domain.initialized) {
-		return <>Loading...</>;
+		return (
+			<div
+				style={{
+					display: 'flex',
+					flexDirection: 'column',
+					flexGrow: 1,
+					width: '100vw',
+					height: '100vh',
+					alignItems: 'stretch',
+				}}
+			>
+				<Loader reason="Loading your accounts data from blockchain..." />
+			</div>
+		);
 	}
 
-	console.log('domain.isFirstTime: ', domain.isFirstTime);
+	console.log('domain.isFirstTime: ', domain.accounts.isFirstTime);
 	console.log('location.pathname: ', location.pathname);
 
-	if (domain.isFirstTime && location.pathname !== '/first-time' && location.pathname !== '/connect-wallets') {
+	if (
+		domain.accounts.isFirstTime &&
+		location.pathname !== '/first-time' &&
+		location.pathname !== '/connect-wallets'
+	) {
 		return <Navigate to="/first-time" state={{ from: location }} replace />;
 	}
 
@@ -51,17 +70,18 @@ const App = observer(() => {
 		<>
 			<Routes>
 				<>
+					<Route path={'/'} element={<Navigate replace to="/inbox" />} />
 					<Route path={'/first-time'} element={<FirstTimePage />} />
 					<Route path={'/connect-wallets'} element={<ConnectWalletsPage />} />
 					<Route path={'/compose'} element={<ComposePage />} />
-					<Route path={'/mailbox'} element={<MailboxPage />} />
-					<Route path={'/mailbox/:id'} element={<MailDetail />} />
 					<Route path={'/contacts'} element={<ContactsPage />}>
 						<Route index element={<ContactsTab />} />
 						<Route path={'folders'} element={<TagsTab />} />
 					</Route>
 					<Route path={'/settings'} element={<SettingsPage />} />
-					<Route path={'/*'} element={<Navigate replace to="/mailbox" />} />
+					<Route path={'/:folderId'} element={<MailboxPage />} />
+					<Route path={'/:folderId/:id'} element={<MailDetail />} />
+					<Route path={'/*'} element={<Navigate replace to="/inbox" />} />
 				</>
 			</Routes>
 			<PasswordModal
@@ -72,6 +92,7 @@ const App = observer(() => {
 					modals.passwordModalHandler(val);
 				}}
 			/>
+			{modals.render()}
 		</>
 	);
 });

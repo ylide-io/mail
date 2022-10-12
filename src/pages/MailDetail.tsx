@@ -1,8 +1,7 @@
 import React, { useEffect } from 'react';
-import MainLayout from '../layouts/mainLayout';
+import MainLayout from '../layouts/MainLayout';
 import SmallButton, { smallButtonColors, smallButtonIcons } from '../components/smallButton/smallButton';
 import { useParams } from 'react-router-dom';
-import mailer from '../stores/Mailer';
 import { observer } from 'mobx-react';
 import { createReactEditorJS } from 'react-editor-js';
 import { toJS } from 'mobx';
@@ -10,43 +9,59 @@ import { EDITOR_JS_TOOLS } from '../utils/editorJs';
 import mailbox from '../stores/Mailbox';
 import contacts from '../stores/Contacts';
 import { useNav } from '../utils/navigate';
+import moment from 'moment';
+import mailList from '../stores/MailList';
+import { IMessageDecodedContent } from '../indexedDB/MessagesDB';
 
 const ReactEditorJS = createReactEditorJS();
 
 const MailDetail = observer(() => {
 	const navigate = useNav();
 	const { id } = useParams();
-	const message = mailer.inboxMessages.find(m => m.link.msgId === id!)!;
-	const decoded = mailer.decodedMessagesById[id!];
-	const contact = contacts.contactsByAddress[message?.link.senderAddress || '-1'];
+	const message = mailList.messages.find(m => m.id === id!)!;
+	const decoded: IMessageDecodedContent | undefined = mailList.decodedMessagesById[message.msgId];
+	const contact = contacts.contactsByAddress[message.msg.senderAddress || '-1'];
+
+	console.log('decoded: ', decoded);
+	console.log('message: ', message);
 
 	useEffect(() => {
 		if (!message) return;
 		(async () => {
 			if (!decoded) {
-				await mailer.decodeMessage(message);
+				await mailList.decodeMessage(message);
 			}
-			await mailer.readMessage(message.link.msgId);
+			await mailList.markMessageAsReaded(message.id);
 		})();
 	}, [decoded, message]);
 
 	const encodedMessageClickHandler = () => {
-		mailer.decodeMessage(message);
+		mailList.decodeMessage(message);
 	};
 
 	const data = (() => {
-		console.log('decoded.decodedTextData: ', decoded.decodedTextData);
-		if (typeof decoded.decodedTextData === 'string') {
+		// console.log('decoded.decodedTextData: ', decoded.decodedTextData);
+		if (typeof decoded?.decodedTextData === 'string') {
 			return {
 				blocks: JSON.parse(decoded.decodedTextData).blocks,
 			};
 		} else {
-			return { blocks: toJS(decoded.decodedTextData?.blocks) };
+			return { blocks: toJS(decoded?.decodedTextData?.blocks) };
 		}
 	})();
 
 	const replyClickHandler = () => {
-		mailbox.recipients = [message.link.senderAddress || ''];
+		mailbox.to = message.msg.senderAddress
+			? [
+					{
+						type: 'address',
+						loading: false,
+						isAchievable: null,
+						input: message.msg.senderAddress,
+						address: message.msg.senderAddress,
+					},
+			  ]
+			: [];
 		mailbox.subject = decoded?.decodedSubject || '';
 		navigate('/compose');
 	};
@@ -59,7 +74,8 @@ const MailDetail = observer(() => {
 
 	const deleteHandler = () => {
 		if (message) {
-			mailer.deleteMessage(message.link.msgId);
+			mailList.markMessageAsDeleted(message);
+			navigate(`/${mailList.activeFolderId}`);
 		}
 	};
 
@@ -82,7 +98,7 @@ const MailDetail = observer(() => {
 							title={'Move to trash'}
 						/>
 					</div>
-					<h2>View Message</h2>
+					<h2>{decoded ? decoded.decodedSubject || 'View Message' : 'View Message'}</h2>
 					<div className="mail-tools tooltip-demo m-t-md">
 						<h3>
 							<span className="font-normal">Subject: </span>
@@ -104,26 +120,14 @@ const MailDetail = observer(() => {
 							<span className="float-right font-normal">
 								{message && (
 									<div>
-										<span>
-											{new Date(message.link.createdAt).toLocaleTimeString('en-us', {
-												hour12: false,
-											})}
-										</span>
 										<span style={{ marginLeft: 6 }}>
-											{new Date(message.link.createdAt)
-												.toLocaleDateString('en-us', {
-													day: '2-digit',
-													month: '2-digit',
-													year: 'numeric',
-												})
-												.split('/')
-												.join('.')}
+											{moment.unix(message.msg.createdAt).format('HH:mm DD.MM.YYYY')}
 										</span>
 									</div>
 								)}
 							</span>
 							<span className="font-normal">From: </span>
-							<span>{contact ? contact.name : message.link.senderAddress}</span>
+							<span>{contact ? contact.name : message.msg.senderAddress}</span>
 						</h5>
 					</div>
 				</div>

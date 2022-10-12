@@ -1,23 +1,8 @@
-import React, { useState } from 'react';
 import { observer } from 'mobx-react';
-import CopyTooltip from './CopyTooltip';
+import ClickToCopy from '../../../controls/ClickToCopy';
 import domain from '../../../stores/Domain';
 
 const MailboxEmpty = observer(() => {
-	const [copied, setCopied] = useState<'None' | 'Copied' | 'Hover'>('None');
-
-	const copyHandler = async (address: string) => {
-		try {
-			await navigator.clipboard.writeText(address);
-			setCopied('Copied');
-			setTimeout(() => {
-				setCopied('None');
-			}, 1500);
-		} catch (e) {
-			console.log('Error copying');
-		}
-	};
-
 	return (
 		<div
 			style={{
@@ -31,30 +16,10 @@ const MailboxEmpty = observer(() => {
 			<h3>Your mailbox is empty yet.</h3>
 			<div style={{ marginTop: 6 }}>
 				<span>Share your addresses: </span>
-				{domain.accounts.map(acc => (
-					<span
-						style={{
-							position: 'relative',
-							wordBreak: 'break-word',
-							backgroundColor: 'rgba(136,136,136,0.26)',
-							fontWeight: 'bold',
-							cursor: 'pointer',
-						}}
-						onMouseEnter={() => {
-							if (copied !== 'Copied') {
-								setCopied('Hover');
-							}
-						}}
-						onMouseLeave={() => {
-							if (copied !== 'Copied') {
-								setCopied('None');
-							}
-						}}
-						onClick={() => copyHandler(acc.account.address)}
-					>
-						{acc.account.address}
-						<CopyTooltip status={copied !== 'None' ? copied : undefined} />
-					</span>
+				{domain.accounts.accounts.map(acc => (
+					<div>
+						<ClickToCopy dataToCopy={acc.account.address}>{acc.account.address}</ClickToCopy>
+					</div>
 				))}
 
 				<span> with your friends to receive the first one!</span>

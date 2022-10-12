@@ -1,32 +1,44 @@
-import { makeAutoObservable } from "mobx";
+import { EVMNetwork } from '@ylide/ethereum';
+import { makeObservable, observable } from 'mobx';
+import domain from './Domain';
+import { DomainAccount } from './models/DomainAccount';
+
+export interface IRecipient {
+	loading: boolean;
+	input: string;
+	type: 'contact' | 'ns' | 'address' | 'invalid';
+	address: string | null;
+	isAchievable:
+		| null
+		| false
+		| {
+				type: string;
+				blockchain: string | null;
+		  };
+	comment?: string;
+}
 
 class Mailbox {
-    recipients: string[] = [];
-    subject: string = "";
+	@observable from?: DomainAccount;
+	@observable to: IRecipient[] = [];
+	@observable bcc: IRecipient[] = [];
+	@observable network?: EVMNetwork;
 
-    textEditorData: any | null = null;
+	@observable subject: string = '';
 
-    constructor() {
-        makeAutoObservable(this);
-    }
+	@observable textEditorData: any | null = null;
 
-    setRecipients(addresses: string[]) {
-        this.recipients = addresses;
-    }
+	constructor() {
+		makeObservable(this);
+	}
 
-    setSubject(str: string) {
-        this.subject = str;
-    }
-
-    saveEditorData(data: any) {
-        this.textEditorData = data;
-    }
-
-    resetData() {
-        this.setRecipients([]);
-        this.setSubject("");
-        this.saveEditorData("");
-    }
+	resetData() {
+		this.network = undefined;
+		this.from = domain.accounts.accounts[0];
+		this.to = [];
+		this.subject = '';
+		this.textEditorData = '';
+	}
 }
 
 const mailbox = new Mailbox();

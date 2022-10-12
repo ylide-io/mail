@@ -3,7 +3,7 @@
 	flex-direction: row;
 	justify-content: space-around;
 	flex-wrap: wrap;
-	width: 800px;
+	width: 850px;
 	margin-top: 50px;
 }
 
@@ -18,7 +18,7 @@
 	border: 1px solid black;
 	box-shadow: 5px 5px 0px black;
 	border-radius: 30px;
-	width: 350px;
+	width: 400px;
 	margin-left: 10px;
 	margin-right: 10px;
 	margin-bottom: 20px;
@@ -62,6 +62,56 @@
 			margin-bottom: 10px;
 			margin-top: 10px;
 			font-weight: 300;
+		}
+		.wb-accounts-list {
+			display: flex;
+			flex-direction: column;
+			align-items: stretch;
+			justify-content: flex-start;
+			flex-wrap: nowrap;
+			margin-bottom: 10px;
+			margin-left: -10px;
+			.wb-account {
+				display: flex;
+				flex-direction: row;
+				align-items: center;
+				justify-content: space-between;
+				margin-left: 10px;
+				margin-bottom: 4px;
+				.wb-account-title {
+					display: block;
+					max-width: 100%;
+					overflow: hidden;
+					text-overflow: ellipsis;
+					font-family: monospace;
+				}
+				.wb-account-actions {
+					display: flex;
+					flex-direction: row;
+					align-items: center;
+					justify-content: flex-end;
+					margin-left: 20px;
+				}
+				.wb-action-icon {
+					display: flex;
+					flex-direction: row;
+					align-items: center;
+					justify-content: center;
+
+					width: 20px;
+					height: 20px;
+					line-height: 100%;
+					border: 1px solid black;
+					border-radius: 50%;
+					cursor: pointer;
+					transition: color 0.2s, background-color 0.2s;
+
+					&:hover {
+						background-color: black;
+						color: white;
+					}
+				}
+			}
 		}
 		.wb-chains-list {
 			display: flex;

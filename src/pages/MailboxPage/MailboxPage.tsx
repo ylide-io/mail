@@ -1,23 +1,27 @@
-import React from 'react';
-import MainLayout from "../../layouts/mainLayout";
-import MailsList from "./components/MailsList";
-import MailsCounter from "./components/MailsCounter";
-import MailsSearcher from "./components/MailsSearcher";
-import MailsListTooltips from "./components/MailsListTooltips";
+import React, { useEffect } from 'react';
+import MainLayout from '../../layouts/MainLayout';
+import MailboxList from './components/MailboxList';
+import { MailboxHeader } from './components/MailboxHeader';
+
+import './style.scss';
+import mailList from '../../stores/MailList';
+import { useParams } from 'react-router-dom';
 
 const MailboxPage = () => {
-    return (
-        <MainLayout>
-            <div className="col-lg-10 animated fadeInRight">
-                <div className="mail-box-header">
-                    <MailsSearcher />
-                    <MailsCounter />
-                    <MailsListTooltips />
-                </div>
-                <MailsList />
-            </div>
-        </MainLayout>
-    );
+	const { folderId } = useParams();
+
+	useEffect(() => {
+		mailList.openFolder(folderId!);
+	}, [folderId]);
+
+	return (
+		<MainLayout>
+			<div className="mailbox-page animated fadeInRight">
+				<MailboxHeader />
+				<MailboxList />
+			</div>
+		</MainLayout>
+	);
 };
 
 export default MailboxPage;

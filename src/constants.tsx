@@ -19,6 +19,7 @@ import { OptimismLogo } from './icons/OptimismLogo';
 import { PhantomLogo } from './icons/PhantomLogo';
 import { PolygonLogo } from './icons/PolygonLogo';
 import { SolanaLogo } from './icons/SolanaLogo';
+import { WalletConnectLogo } from './icons/WalletConnectLogo';
 
 export const blockchainsMap: Record<string, { title: string; logo: (s?: number) => JSX.Element }> = {
 	everscale: {
@@ -101,6 +102,11 @@ export const walletsMap: Record<string, { title: string; link: string; logo: JSX
 		logo: <MetaMaskLogo size={30} />,
 		link: 'https://metamask.io/',
 	},
+	walletconnect: {
+		title: 'Wallet Connect',
+		logo: <WalletConnectLogo size={30} />,
+		link: 'https://metamask.io/',
+	},
 	everwallet: {
 		title: 'EverWallet',
 		logo: <EverscaleLogo size={30} />,
@@ -112,3 +118,34 @@ export const walletsMap: Record<string, { title: string; link: string; logo: JSX
 		link: 'https://l1.broxus.com/freeton/wallet',
 	},
 };
+
+export const supportedWallets: { wallet: string; blockchains: string[] }[] = [
+	{
+		wallet: 'everwallet',
+		blockchains: ['everscale'],
+	},
+	{
+		wallet: 'web3',
+		blockchains: [
+			EVM_NAMES[EVMNetwork.ETHEREUM],
+			EVM_NAMES[EVMNetwork.BNBCHAIN],
+			EVM_NAMES[EVMNetwork.POLYGON],
+			EVM_NAMES[EVMNetwork.AVALANCHE],
+			EVM_NAMES[EVMNetwork.OPTIMISM],
+			EVM_NAMES[EVMNetwork.ARBITRUM],
+			EVM_NAMES[EVMNetwork.FANTOM],
+			EVM_NAMES[EVMNetwork.KLAYTN],
+			EVM_NAMES[EVMNetwork.GNOSIS],
+			EVM_NAMES[EVMNetwork.AURORA],
+			EVM_NAMES[EVMNetwork.CELO],
+			EVM_NAMES[EVMNetwork.MOONBEAM],
+			EVM_NAMES[EVMNetwork.MOONRIVER],
+			EVM_NAMES[EVMNetwork.METIS],
+			EVM_NAMES[EVMNetwork.ASTAR],
+		],
+	},
+	{
+		wallet: 'phantom',
+		blockchains: ['solana'],
+	},
+];

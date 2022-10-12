@@ -21,12 +21,12 @@ export enum smallButtonIcons {
 }
 
 interface SmallButtonProps {
-	text?: string;
+	text?: React.ReactNode;
 	color: smallButtonColors;
 	title?: string;
 	icon?: smallButtonIcons;
 	onClick?: (arg1: any) => void;
-	additionalClass?: any;
+	additionalClass?: classNames.Argument;
 	disabled?: boolean;
 }
 
@@ -35,8 +35,6 @@ const SmallButton: React.FC<SmallButtonProps> = ({ text, color, title, icon, onC
 		<button
 			disabled={disabled}
 			className={classNames('btn btn-sm', color, additionalClass)}
-			data-toggle="tooltip"
-			data-placement="top"
 			title={title}
 			onClick={onClick}
 		>

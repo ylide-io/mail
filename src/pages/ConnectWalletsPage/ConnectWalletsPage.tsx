@@ -1,219 +1,112 @@
-import React, { useCallback } from 'react';
+import React from 'react';
 import { observer } from 'mobx-react';
-import cn from 'classnames';
 import { YlideButton } from '../../controls/YlideButton';
 import { ArrowRight } from '../../icons/ArrowRight';
 import { useNavigate } from 'react-router-dom';
 
 import './style.scss';
-import domain, { DomainAccount } from '../../stores/Domain';
-import { useState } from 'react';
-import { Spin } from 'antd';
-import { EVMNetwork, EVM_NAMES } from '@ylide/ethereum';
-import { blockchainsMap, walletsMap } from '../../constants';
+import domain from '../../stores/Domain';
+import { supportedWallets } from '../../constants';
+import { WalletBlock } from './WalletBlock';
 
 const ConnectWalletsPage = observer(() => {
 	const navigate = useNavigate();
-	const [helperModal, setHelperModal] = useState<string | null>(null);
-	const [loading, setLoading] = useState(false);
+	// const [helperModal, setHelperModal] = useState<string | null>(null);
+	// const [loading, setLoading] = useState(false);
 
 	let titleText = 'Connect your wallets';
 	let subtitleText = 'We found some wallets in your browser which you can use with Ylide';
 
-	const firstTime = document.location.search.includes('firstTime=true');
+	// const firstTime = document.location.search.includes('firstTime=true');
 
-	const topWallets: { wallet: string; blockchains: string[] }[] = [
-		{
-			wallet: 'everwallet',
-			blockchains: ['everscale'],
-		},
-		{
-			wallet: 'web3',
-			blockchains: [
-				EVM_NAMES[EVMNetwork.ETHEREUM],
-				EVM_NAMES[EVMNetwork.BNBCHAIN],
-				EVM_NAMES[EVMNetwork.AVALANCHE],
-				EVM_NAMES[EVMNetwork.ARBITRUM],
-				EVM_NAMES[EVMNetwork.OPTIMISM],
-				EVM_NAMES[EVMNetwork.POLYGON],
+	// const publishKey = useCallback(async (account: DomainAccount) => {
+	// 	setLoading(true);
+	// 	setHelperModal('publish');
+	// 	await account.attachRemoteKey();
+	// 	setHelperModal(null);
+	// 	setLoading(false);
+	// }, []);
 
-				EVM_NAMES[EVMNetwork.FANTOM],
-				EVM_NAMES[EVMNetwork.KLAYTN],
-				EVM_NAMES[EVMNetwork.GNOSIS],
-				EVM_NAMES[EVMNetwork.AURORA],
-				EVM_NAMES[EVMNetwork.CELO],
-				EVM_NAMES[EVMNetwork.MOONBEAM],
-				EVM_NAMES[EVMNetwork.MOONRIVER],
-				EVM_NAMES[EVMNetwork.METIS],
-				EVM_NAMES[EVMNetwork.ASTAR],
-			],
-		},
-		{
-			wallet: 'phantom',
-			blockchains: ['solana'],
-		},
-	];
+	// const instantiateKey = useCallback(
+	// 	async (wallet: string) => {
+	// 		const walletFactory = domain.availableWallets.find(w => w.wallet === wallet);
+	// 		if (!walletFactory) {
+	// 			console.error('!walletFactory');
+	// 			return;
+	// 		}
+	// 		const domainAccount = domain.accounts.find(a => a._wallet === wallet);
+	// 		if (!domainAccount) {
+	// 			console.error('!domainAccount');
+	// 			return;
+	// 		}
+	// 		const account = await domainAccount.wallet.getAuthenticatedAccount();
+	// 		if (!account || account.address !== domainAccount.account.address) {
+	// 			alert(`Please, select account ${domainAccount.account.address} in your wallet`);
+	// 		}
+	// 		const password = await domain.handlePasswordRequest(`connect ${wallet}`);
+	// 		if (!password) {
+	// 			return;
+	// 		}
+	// 		setHelperModal('sign');
+	// 		try {
+	// 			await domainAccount.createLocalKey(password);
+	// 		} catch (err: any) {
+	// 			if (
+	// 				err &&
+	// 				(err.message === 'Rejected by user' ||
+	// 					err.message === 'MetaMask Message Signature: User denied message signature.')
+	// 			) {
+	// 				// do nothing, user manually cancelled signing
+	// 				return;
+	// 			} else {
+	// 				console.error('Unknown error: ', err);
+	// 				return;
+	// 			}
+	// 		} finally {
+	// 			setHelperModal(null);
+	// 		}
 
-	const installWallet = useCallback((wallet: string) => {
-		const wData = walletsMap[wallet];
-		window.open(wData.link, '_blank');
-	}, []);
+	// 		const blockchainName = await domainAccount.wallet.getCurrentBlockchain();
+	// 		const blockchain = domain.blockchains[blockchainName];
+	// 		if (!blockchain) {
+	// 			return;
+	// 		}
+	// 		await domainAccount.readRemoteKey();
+	// 		if (!domainAccount.remoteKey) {
+	// 			publishKey(domainAccount);
+	// 		} else {
+	// 			if (!domainAccount.isKeysEqual) {
+	// 				alert('Wrong password. Please, try again');
+	// 				await domainAccount.destroyLocalKey();
+	// 			}
+	// 		}
+	// 	},
+	// 	[publishKey],
+	// );
 
-	const connectAccount = useCallback(async (wallet: string) => {
-		const walletFactory = domain.availableWallets.find(w => w.wallet === wallet);
-		if (!walletFactory) {
-			console.error('!walletFactory');
-			return;
-		}
-		const domainAccount = await domain.addAccount(walletFactory.blockchainGroup, walletFactory.wallet);
+	// const connectAccount = useCallback(
+	// 	async (wallet: string) => {
+	// 		const walletFactory = domain.availableWallets.find(w => w.wallet === wallet);
+	// 		if (!walletFactory) {
+	// 			return;
+	// 		}
 
-		return domainAccount;
-	}, []);
+	// 		await domain.addAccount(walletFactory.blockchainGroup, walletFactory.wallet);
 
-	const publishKey = useCallback(async (account: DomainAccount) => {
-		setLoading(true);
-		setHelperModal('publish');
-		await account.attachRemoteKey();
-		setHelperModal(null);
-		setLoading(false);
-	}, []);
-
-	const generateKey = useCallback(
-		async (wallet: string) => {
-			const walletFactory = domain.availableWallets.find(w => w.wallet === wallet);
-			if (!walletFactory) {
-				console.error('!walletFactory');
-				return;
-			}
-			const domainAccount = await domain.accounts.find(a => a._wallet === wallet);
-			if (!domainAccount || domainAccount.localKey) {
-				console.error('!domainAccount || domainAccount.localKey');
-				return;
-			}
-			const password = await domain.handlePasswordRequest(`connect ${wallet}`);
-			if (!password) {
-				return;
-			}
-			setHelperModal('sign');
-			await domainAccount.createLocalKey(password);
-			setHelperModal(null);
-			if (!firstTime) {
-				const blockchainName = await domainAccount.wallet.getCurrentBlockchain();
-				const blockchain = domain.blockchains[blockchainName];
-				if (!blockchain) {
-					return;
-				}
-				await domainAccount.readRemoteKey();
-				if (!domainAccount.remoteKey) {
-					setLoading(true);
-					setHelperModal('publish');
-					await domainAccount.attachRemoteKey();
-					setHelperModal(null);
-					setLoading(false);
-				} else {
-					if (!domainAccount.isKeysEqual) {
-						alert('Wrong password. Please, try again');
-						await domainAccount.destroyLocalKey();
-					}
-				}
-			} else {
-				await publishKey(domainAccount);
-			}
-		},
-		[firstTime, publishKey],
-	);
+	// 		await instantiateKey(wallet);
+	// 	},
+	// 	[instantiateKey],
+	// );
 
 	let content = (
 		<div className="wallets-block">
-			{topWallets.map(({ blockchains, wallet }) => {
-				const wData = walletsMap[wallet];
-				const isWalletSupported = domain.registeredWallets.find(t => t.wallet === wallet);
-				const isWalletAvailable = domain.availableWallets.find(t => t.wallet === wallet);
-				const isWalletConnected = domain.accounts.find(t => t._wallet === wallet);
-				const isKeyDerived = !isWalletConnected ? null : isWalletConnected.localKey;
-				return (
-					<div
-						key={wallet}
-						className={cn('wallet-block', {
-							'not-available': !isWalletSupported,
-							'ready': !!isKeyDerived,
-						})}
-					>
-						<div className="wb-head">
-							<div className="wb-head-left">
-								<div className="wb-logo">{wData.logo}</div>
-								<div className="wb-title">{wData.title}</div>
-							</div>
-							<div className="wb-head-right">
-								{isKeyDerived ? (
-									<div
-										style={{
-											padding: '12px 20px',
-											fontSize: 14,
-										}}
-									>
-										<b>Ready</b>
-									</div>
-								) : (
-									<YlideButton
-										onClick={async () => {
-											console.log('a');
-											if (!isWalletAvailable) {
-												console.log('b');
-												installWallet(wallet);
-											} else if (!isWalletConnected) {
-												console.log('c');
-												connectAccount(wallet);
-											} else if (!isKeyDerived) {
-												console.log('d');
-												generateKey(wallet);
-											}
-										}}
-									>
-										{loading ? (
-											<Spin />
-										) : isWalletAvailable ? (
-											isWalletConnected ? (
-												`Activate`
-											) : (
-												'Connect'
-											)
-										) : (
-											'Install'
-										)}
-									</YlideButton>
-								)}
-							</div>
-						</div>
-						<div className="wb-body">
-							<div className="wb-title">Blockchains:</div>
-							<div className="wb-chains-list">
-								{blockchains.map(blockchain => {
-									const bData = blockchainsMap[blockchain];
-									const isChainSupported = domain.registeredBlockchains.find(
-										t => t.blockchain === blockchain,
-									);
-									return (
-										<div
-											key={blockchain}
-											className="wb-chain"
-											style={{
-												opacity: isChainSupported ? 1 : 0.6,
-											}}
-										>
-											<div className="wb-chain-logo">{bData.logo()}</div>
-											<div className="wb-chain-title">{bData.title}</div>
-										</div>
-									);
-								})}
-							</div>
-						</div>
-						{!isWalletSupported ? <div className="wb-not-available">Coming soon, stay tuned</div> : null}
-					</div>
-				);
-			})}
+			{supportedWallets.map(({ blockchains, wallet }) => (
+				<WalletBlock key={wallet} wallet={wallet} blockchains={blockchains} />
+			))}
 		</div>
 	);
+
+	console.log('e');
 
 	return (
 		<div
@@ -228,7 +121,7 @@ const ConnectWalletsPage = observer(() => {
 				position: 'relative',
 			}}
 		>
-			{helperModal !== null ? (
+			{/* {helperModal !== null ? (
 				<div
 					style={{
 						position: 'absolute',
@@ -327,8 +220,8 @@ const ConnectWalletsPage = observer(() => {
 						)}
 					</div>
 				</div>
-			) : null}
-			<div style={{ width: 300 }}>
+			) : null} */}
+			<div style={{ width: 350, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
 				<h3
 					style={{
 						fontFamily: 'Lexend Exa',
@@ -351,14 +244,14 @@ const ConnectWalletsPage = observer(() => {
 				>
 					{subtitleText}
 				</p>
-				{domain.areThereAccounts ? (
+				{domain.accounts.areThereAccounts ? (
 					<div style={{ marginTop: 20 }}>
 						<YlideButton
 							onClick={() => {
-								navigate('/mailbox');
+								navigate(`/inbox`);
 							}}
 						>
-							Continue with connected wallets <ArrowRight style={{ marginLeft: 10 }} />
+							Continue with connected accounts <ArrowRight style={{ marginLeft: 10 }} />
 						</YlideButton>
 					</div>
 				) : null}

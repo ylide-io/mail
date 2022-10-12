@@ -1,5 +1,5 @@
 import React from 'react';
-import Searcher from '../../layouts/components/searcher';
+// import Searcher from '../../layouts/components/searcher';
 import domain from '../../stores/Domain';
 import { useNav } from '../../utils/navigate';
 import { Dropdown, Menu } from 'antd';
@@ -27,8 +27,8 @@ const Header = observer(() => {
 						</div>
 					),
 				},
-				...domain.accounts.map(acc => ({
-					key: `${acc._wallet}:${acc.account.address}`,
+				...domain.accounts.accounts.map(acc => ({
+					key: `${acc.wallet.factory.wallet}:${acc.account.address}`,
 					label: (
 						<div
 							style={{
@@ -38,24 +38,26 @@ const Header = observer(() => {
 							}}
 						>
 							<LogoutOutlined style={{ marginTop: 0, marginRight: 10 }} />{' '}
-							{acc.account.address.substr(0, 10)}
-							... ({acc._wallet})
+							{acc.account.address.substring(0, 10)}
+							... ({acc.wallet.factory.wallet})
 						</div>
 					),
 				})),
 			]}
 			onClick={async info => {
 				if (info.key === 'add') {
-					document.location.href = '/connect-wallets';
+					nav('/connect-wallets');
 					return;
 				}
-				const account = domain.accounts.find(acc => info.key === `${acc._wallet}:${acc.account.address}`);
+				const account = domain.accounts.accounts.find(
+					acc => info.key === `${acc.wallet.factory.wallet}:${acc.account.address}`,
+				);
 				if (!account) {
 					return;
 				}
-				await account.wallet.disconnectAccount(account.account);
-				await domain.removeAccount(account);
-				document.location.href = '/first-time';
+				await account.wallet.disconnectAccount(account);
+				await domain.accounts.removeAccount(account);
+				nav('/connect-wallets');
 			}}
 		/>
 	);
@@ -65,10 +67,19 @@ const Header = observer(() => {
 			<nav
 				className="navbar navbar-static-top white-bg mb-0"
 				role="navigation"
-				style={{ paddingLeft: 20, paddingRight: 20 }}
+				style={{ paddingLeft: 30, paddingRight: 30 }}
 			>
 				<div className="navbar-header">
-					<Searcher />
+					<img
+						src="https://ylide.io/images/logo-medium-p-500.png"
+						alt="Logo"
+						style={{
+							width: 80,
+							marginTop: 9,
+							marginLeft: 10,
+						}}
+					/>
+					{/* <Searcher /> */}
 				</div>
 				<ul className="nav navbar-top-links navbar-right">
 					<li>
@@ -108,7 +119,9 @@ const Header = observer(() => {
 									cursor: 'pointer',
 								}}
 							>
-								{`Connected ${domain.accounts.length} account${domain.accounts.length > 1 ? 's' : ''}`}
+								{`Connected ${domain.accounts.accounts.length} account${
+									domain.accounts.accounts.length > 1 ? 's' : ''
+								}`}
 								<DownOutlined size={16} style={{ marginLeft: 5 }} />
 							</div>
 						</Dropdown>

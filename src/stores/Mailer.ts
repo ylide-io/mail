@@ -3,92 +3,101 @@ import messagesDB, { IMessageDecodedContent } from '../indexedDB/MessagesDB';
 import contacts from './Contacts';
 import fuzzysort from 'fuzzysort';
 import { filterAsync } from '../utils/asyncFilter';
-import { BlockchainSource, GenericEntry, IMessage, MessageContentV3, ServiceCode, Ylide } from '@ylide/sdk';
-import domain, { DomainAccount } from './Domain';
+import {
+	BlockchainSource,
+	GenericEntry,
+	IMessage,
+	IMessageContent,
+	ISourceSubject,
+	MessageContentV3,
+	ServiceCode,
+	Ylide,
+} from '@ylide/sdk';
+import domain from './Domain';
+import { DomainAccount } from './models/DomainAccount';
 import { EVM_NAMES, EVMNetwork } from '@ylide/ethereum';
+import { MessagesList } from '@ylide/sdk';
 
-interface filteringTypesInterface {
-	unread: (arg1: IMessage) => Promise<boolean>;
-	read: (arg1: IMessage) => Promise<boolean>;
-	notArchived: (arg1: IMessage) => Promise<boolean>;
-	archived: (arg1: IMessage) => Promise<boolean>;
-	byFolder: (arg1: IMessage) => Promise<boolean>;
-}
+// interface filteringTypesInterface {
+// 	unread: (arg1: IMessage) => Promise<boolean>;
+// 	read: (arg1: IMessage) => Promise<boolean>;
+// 	notArchived: (arg1: IMessage) => Promise<boolean>;
+// 	archived: (arg1: IMessage) => Promise<boolean>;
+// 	byFolder: (arg1: IMessage) => Promise<boolean>;
+// }
 
 class Mailer {
+	saveDecodedMessages = false;
 	sending: boolean = false;
 	loading: boolean = false;
+
 	pageSwitchLoading: boolean = false;
 
-	saveDecodedMessages = false;
+	// searchingText: string = '';
+	// readonly messagesOnPage = 10;
+	// isNextPage: boolean = false;
+	// page: number = 1;
 
-	messagesById: Record<string, IMessage> = {};
-	decodedMessagesById: Record<string, IMessageDecodedContent> = {};
+	// readonly filteringTypes: filteringTypesInterface = {
+	// 	unread: async message => !(await messagesDB.isMessageRead(message.msgId)),
+	// 	read: message => messagesDB.isMessageRead(message.msgId),
+	// 	notArchived: async message => !(await messagesDB.isMessageDeleted(message.msgId)),
+	// 	archived: async message => messagesDB.isMessageDeleted(message.msgId),
+	// 	byFolder: async message => {
+	// 		const contact = contacts.contactsByAddress[message.senderAddress];
+	// 		if (!contact) {
+	// 			return false;
+	// 		}
 
-	messageIds: string[] = [];
-	checkedMessageIds: string[] = [];
+	// 		const foundTag = contact.tags.find(tagId => tagId === this.activeFolderId);
 
-	activeFolderId: number | null = null;
-	searchingText: string = '';
+	// 		return !!foundTag;
+	// 	},
+	// };
 
-	readonly messagesOnPage = 10;
-	isNextPage: boolean = false;
-	page: number = 1;
+	// filteringMethod: keyof filteringTypesInterface = 'notArchived';
 
-	readonly filteringTypes: filteringTypesInterface = {
-		unread: async message => !(await messagesDB.isMessageRead(message.msgId)),
-		read: message => messagesDB.isMessageRead(message.msgId),
-		notArchived: async message => !(await messagesDB.isMessageDeleted(message.msgId)),
-		archived: async message => messagesDB.isMessageDeleted(message.msgId),
-		byFolder: async message => {
-			const contact = contacts.contactsByAddress[message.senderAddress];
-			if (!contact) {
-				return false;
-			}
-
-			const foundTag = contact.tags.find(tagId => tagId === this.activeFolderId);
-
-			return !!foundTag;
-		},
-	};
-
-	filteringMethod: keyof filteringTypesInterface = 'notArchived';
-
-	@observable inboxMessages: GenericEntry<IMessage, BlockchainSource>[] = [];
-	@observable sentMessages: GenericEntry<IMessage, BlockchainSource>[] = [];
+	// @observable inboxMessages: GenericEntry<IMessage, BlockchainSource>[] = [];
+	// @observable sentMessages: GenericEntry<IMessage, BlockchainSource>[] = [];
 
 	constructor() {
 		makeAutoObservable(this);
 	}
 
 	async init() {
-		const dmsgs = await messagesDB.retrieveAllDecodedMessages();
-		this.decodedMessagesById = dmsgs.reduce(
-			(p, c) => ({
-				...p,
-				[c.msgId]: c,
-			}),
-			{},
-		);
-		domain.inbox.on('windowUpdate', () => (this.inboxMessages = domain.inbox.getWindow()));
-		domain.sent.on('windowUpdate', () => (this.sentMessages = domain.sent.getWindow()));
+		// const dmsgs = await messagesDB.retrieveAllDecodedMessages();
+		// this.decodedMessagesById = dmsgs.reduce(
+		// 	(p, c) => ({
+		// 		...p,
+		// 		[c.msgId]: c,
+		// 	}),
+		// 	{},
+		// );
 	}
 
-	async sendMail(sender: DomainAccount, subject: string, text: string, recipients: string[]): Promise<string | null> {
+	async sendMail(
+		sender: DomainAccount,
+		subject: string,
+		text: string,
+		recipients: string[],
+		network?: EVMNetwork,
+	): Promise<string | null> {
 		try {
 			this.sending = true;
 			const content = MessageContentV3.plain(subject, text);
 
-			const evmNetworks = (Object.keys(EVM_NAMES) as unknown as EVMNetwork[]).map((network: EVMNetwork) => ({
-				name: EVM_NAMES[network],
-				network: Number(network) as EVMNetwork,
-			}));
-			const blockchainName = await sender.wallet.getCurrentBlockchain();
-			const network = evmNetworks.find(n => n.name === blockchainName)?.network;
+			if (!network && sender.wallet.factory.blockchainGroup === 'evm') {
+				const evmNetworks = (Object.keys(EVM_NAMES) as unknown as EVMNetwork[]).map((network: EVMNetwork) => ({
+					name: EVM_NAMES[network],
+					network: Number(network) as EVMNetwork,
+				}));
+				const blockchainName = await sender.wallet.controller.getCurrentBlockchain();
+				network = evmNetworks.find(n => n.name === blockchainName)?.network;
+			}
 
 			return await domain.ylide.sendMessage(
 				{
-					wallet: sender.wallet,
+					wallet: sender.wallet.controller,
 					sender: sender.account,
 					content,
 					recipients,
@@ -314,22 +323,22 @@ class Mailer {
 	// 	this.pageSwitchLoading = false;
 	// }
 
-	filterByFolder(folderId: number | null) {
-		if (!folderId) {
-			this.filteringMethod = 'notArchived';
-			this.activeFolderId = null;
-		} else {
-			this.filteringMethod = 'byFolder';
-			this.activeFolderId = folderId;
-		}
-		// this.retrieveFirstPage();
-	}
+	// filterByFolder(folderId: number | null) {
+	// 	if (!folderId) {
+	// 		this.filteringMethod = 'notArchived';
+	// 		this.activeFolderId = null;
+	// 	} else {
+	// 		this.filteringMethod = 'byFolder';
+	// 		this.activeFolderId = folderId;
+	// 	}
+	// 	// this.retrieveFirstPage();
+	// }
 
-	filterByArchived() {
-		this.filteringMethod = 'archived';
-		this.activeFolderId = null;
-		// this.retrieveFirstPage();
-	}
+	// filterByArchived() {
+	// 	this.filteringMethod = 'archived';
+	// 	this.activeFolderId = null;
+	// 	// this.retrieveFirstPage();
+	// }
 
 	// private static async checkIsNextPage(lastMessage: IMessage): Promise<boolean> {
 	// 	const message = await domain.readers.everscale.retrieveMessageHistoryByDates(domain.everscaleKey.address, {
@@ -345,145 +354,144 @@ class Mailer {
 	// 	return isNextPage;
 	// }
 
-	fuzzyFilterMessages(searchingText: string, messages: IMessage[]): IMessage[] {
-		const decodedMessages = messages.filter(msg => !!this.decodedMessagesById[msg.msgId]);
-		const preparedMessages = decodedMessages.map(message => this.prepareMessagesText(message.msgId));
-		const results = fuzzysort.go(searchingText, preparedMessages, {
-			keys: ['text', 'subject'],
-		});
-		return results.map(res => this.messagesById[res.obj.msgId]);
-	}
+	// fuzzyFilterMessages(searchingText: string, messages: IMessage[]): IMessage[] {
+	// 	const decodedMessages = messages.filter(msg => !!this.decodedMessagesById[msg.msgId]);
+	// 	const preparedMessages = decodedMessages.map(message => this.prepareMessagesText(message.msgId));
+	// 	const results = fuzzysort.go(searchingText, preparedMessages, {
+	// 		keys: ['text', 'subject'],
+	// 	});
+	// 	return results.map(res => this.messagesById[res.obj.msgId]);
+	// }
 
-	private prepareMessagesText = (msgId: string) => {
-		const textArr: string[] = [];
-		const decoded = this.decodedMessagesById[msgId];
-		decoded.decodedTextData.blocks.forEach((block: any) => {
-			const filteredText = block?.data?.text?.split('<br>').join(' ');
-			textArr.push(filteredText);
-		});
-		return {
-			msgId,
-			text: textArr.join(' '),
-			subject: decoded.decodedSubject,
-		};
-	};
+	// private prepareMessagesText = (msgId: string) => {
+	// 	const textArr: string[] = [];
+	// 	const decoded = this.decodedMessagesById[msgId];
+	// 	decoded.decodedTextData.blocks.forEach((block: any) => {
+	// 		const filteredText = block?.data?.text?.split('<br>').join(' ');
+	// 		textArr.push(filteredText);
+	// 	});
+	// 	return {
+	// 		msgId,
+	// 		text: textArr.join(' '),
+	// 		subject: decoded.decodedSubject,
+	// 	};
+	// };
 
-	async readAndDecodeMessage(message: GenericEntry<IMessage, BlockchainSource>): Promise<void> {
-		await this.decodeMessage(message);
-	}
+	// async readAndDecodeMessage(message: GenericEntry<IMessage, BlockchainSource>): Promise<void> {
+	// 	await this.decodeMessage(message);
+	// }
 
-	async decodeMessage(pushMsg: GenericEntry<IMessage, BlockchainSource>): Promise<void> {
-		const reader = pushMsg.source.reader;
-		const recipient = domain.accounts.find(
-			acc =>
-				acc.wallet.addressToUint256(acc.account.address) === pushMsg.source.subject.address ||
-				Ylide.getSentAddress(acc.wallet.addressToUint256(acc.account.address)) ===
-					pushMsg.source.subject.address,
-		);
-		if (!recipient) {
-			return;
-		}
+	// async decodeMessage(pushMsg: GenericEntry<IMessage, BlockchainSource>): Promise<void> {
+	// 	const reader = pushMsg.source.reader;
+	// 	const recipient = domain.accounts.accounts.find(
+	// 		acc =>
+	// 			acc.uint256Address === pushMsg.source.subject.address ||
+	// 			acc.sentAddress === pushMsg.source.subject.address,
+	// 	);
+	// 	if (!recipient) {
+	// 		return;
+	// 	}
 
-		if (!pushMsg.link.contentLink) {
-			const content = await reader.retrieveMessageContentByMsgId(pushMsg.link.msgId);
-			if (!content || content.corrupted) {
-				throw new Error('Content is not available or corrupted');
-			}
-			pushMsg.link.isContentLoaded = true;
-			pushMsg.link.contentLink = content;
-		}
-		if (!pushMsg.link.contentLink) {
-			throw new Error('Content not retrievable');
-		}
+	// 	if (!pushMsg.link.contentLink) {
+	// 		const content = await reader.retrieveMessageContentByMsgId(pushMsg.link.msgId);
+	// 		if (!content || content.corrupted) {
+	// 			throw new Error('Content is not available or corrupted');
+	// 		}
+	// 		pushMsg.link.isContentLoaded = true;
+	// 		pushMsg.link.contentLink = content;
+	// 	}
+	// 	if (!pushMsg.link.contentLink) {
+	// 		throw new Error('Content not retrievable');
+	// 	}
 
-		const result = await domain.ylide.decryptMessageContent(
-			recipient.account,
-			pushMsg.link,
-			pushMsg.link.contentLink,
-		);
-		// const key = domain.connectedKeys.find(t => t.address === pushMsg.recipientAddress);
-		// if (!key) {
-		// 	throw new Error('Decryption key is not available');
-		// }
-		// const me = await key.wallet.getAuthenticatedAccount();
-		// if (!me) {
-		// 	throw new Error('Account is not connected');
-		// }
+	// 	const result = await domain.ylide.decryptMessageContent(
+	// 		recipient.account,
+	// 		pushMsg.link,
+	// 		pushMsg.link.contentLink,
+	// 	);
+	// 	// const key = domain.connectedKeys.find(t => t.address === pushMsg.recipientAddress);
+	// 	// if (!key) {
+	// 	// 	throw new Error('Decryption key is not available');
+	// 	// }
+	// 	// const me = await key.wallet.getAuthenticatedAccount();
+	// 	// if (!me) {
+	// 	// 	throw new Error('Account is not connected');
+	// 	// }
 
-		pushMsg.link.isContentDecrypted = true;
-		pushMsg.link.decryptedContent = result.decryptedContent;
+	// 	pushMsg.link.isContentDecrypted = true;
+	// 	pushMsg.link.decryptedContent = result.decryptedContent;
 
-		this.decodedMessagesById[pushMsg.link.msgId] = {
-			msgId: pushMsg.link.msgId,
-			decodedSubject: result.subject,
-			decodedTextData: result.content,
-		};
+	// 	this.decodedMessagesById[pushMsg.link.msgId] = {
+	// 		msgId: pushMsg.link.msgId,
+	// 		decodedSubject: result.subject,
+	// 		decodedTextData: result.content,
+	// 	};
 
-		if (this.getSaveDecodedSetting()) {
-			console.log('msg saved: ', pushMsg.link.msgId);
-			await messagesDB.saveDecodedMessage(this.decodedMessagesById[pushMsg.link.msgId]);
-		}
-	}
+	// 	if (this.getSaveDecodedSetting()) {
+	// 		console.log('msg saved: ', pushMsg.link.msgId);
+	// 		await messagesDB.saveDecodedMessage(this.decodedMessagesById[pushMsg.link.msgId]);
+	// 	}
+	// }
 
-	async readMessage(msgId: string) {
-		await messagesDB.saveMessageRead(msgId);
-	}
+	// async readMessage(msgId: string) {
+	// 	await messagesDB.saveMessageRead(msgId);
+	// }
 
-	async readCheckedMessage() {
-		const readPromises = this.checkedMessageIds.map(msgId => this.readMessage(msgId));
-		await Promise.all(readPromises);
-		this.checkedMessageIds = [];
-	}
+	// async readCheckedMessage() {
+	// 	const readPromises = this.checkedMessageIds.map(msgId => this.readMessage(msgId));
+	// 	await Promise.all(readPromises);
+	// 	this.checkedMessageIds = [];
+	// }
 
-	async deleteMessage(msgId: string) {
-		await messagesDB.saveMessageDeleted(msgId);
-	}
+	// async deleteMessage(msgId: string) {
+	// 	await messagesDB.saveMessageDeleted(msgId);
+	// }
 
-	async deleteCheckedMessages() {
-		const deletePromises = this.checkedMessageIds.map(msgId => this.deleteMessage(msgId));
-		await Promise.all(deletePromises);
-		this.checkedMessageIds = [];
-	}
+	// async deleteCheckedMessages() {
+	// 	const deletePromises = this.checkedMessageIds.map(msgId => this.deleteMessage(msgId));
+	// 	await Promise.all(deletePromises);
+	// 	this.checkedMessageIds = [];
+	// }
 
-	checkMessage(message: IMessage, flag: boolean) {
-		if (flag) {
-			this.checkedMessageIds.push(message.msgId);
-		} else {
-			this.checkedMessageIds = this.checkedMessageIds.filter(msgId => msgId !== message.msgId);
-		}
-	}
+	// checkMessage(message: IMessage, flag: boolean) {
+	// 	if (flag) {
+	// 		this.checkedMessageIds.push(message.msgId);
+	// 	} else {
+	// 		this.checkedMessageIds = this.checkedMessageIds.filter(msgId => msgId !== message.msgId);
+	// 	}
+	// }
 
-	isMessageChecked(msgId: string) {
-		return !!this.checkedMessageIds.includes(msgId);
-	}
+	// isMessageChecked(msgId: string) {
+	// 	return !!this.checkedMessageIds.includes(msgId);
+	// }
 
-	async clearMessagesDB() {
-		await messagesDB.clearAllMessages();
-	}
+	// async clearMessagesDB() {
+	// 	await messagesDB.clearAllMessages();
+	// }
 
-	getSaveDecodedSetting() {
-		this.saveDecodedMessages = localStorage.getItem('saveDecodedMessages') === 'true';
-		return this.saveDecodedMessages;
-	}
+	// getSaveDecodedSetting() {
+	// 	this.saveDecodedMessages = localStorage.getItem('saveDecodedMessages') === 'true';
+	// 	return this.saveDecodedMessages;
+	// }
 
-	setSearchingText(text: string) {
-		this.searchingText = text;
-	}
+	// setSearchingText(text: string) {
+	// 	this.searchingText = text;
+	// }
 
-	setSaveDecodedSetting(flag: boolean) {
-		this.saveDecodedMessages = flag;
-		localStorage.setItem('saveDecodedMessages', flag ? 'true' : 'false');
-		if (!flag) {
-			messagesDB.clearAllDecodedMessages();
-		}
-	}
+	// setSaveDecodedSetting(flag: boolean) {
+	// 	this.saveDecodedMessages = flag;
+	// 	localStorage.setItem('saveDecodedMessages', flag ? 'true' : 'false');
+	// 	if (!flag) {
+	// 		messagesDB.clearAllDecodedMessages();
+	// 	}
+	// }
 
-	resetAllMessages() {
-		this.messageIds = [];
-		this.checkedMessageIds = [];
-		this.messagesById = {};
-		this.decodedMessagesById = {};
-	}
+	// resetAllMessages() {
+	// 	this.messageIds = [];
+	// 	this.checkedMessageIds = [];
+	// 	this.messagesById = {};
+	// 	this.decodedMessagesById = {};
+	// }
 
 	async wipeOffDecodedMessagesFromDB() {
 		await messagesDB.clearAllDecodedMessages();
