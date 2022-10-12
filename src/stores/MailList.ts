@@ -1,4 +1,4 @@
-import { EthereumBlockchainController, EthereumBlockchainSource } from '@ylide/ethereum';
+import { EthereumBlockchainController, EthereumBlockchainSource, EthereumListSource } from '@ylide/ethereum';
 import {
 	AbstractBlockchainController,
 	IListSource,
@@ -20,8 +20,10 @@ import {
 import { autobind } from 'core-decorators';
 import { makeObservable, observable } from 'mobx';
 import messagesDB, { IMessageDecodedContent } from '../indexedDB/MessagesDB';
+import contacts from './Contacts';
 import domain from './Domain';
 import { DomainAccount } from './models/DomainAccount';
+import tags from './Tags';
 
 export interface IFolder {
 	id: string;
@@ -70,6 +72,13 @@ export class MailList {
 
 	constructor() {
 		makeObservable(this);
+
+		this.readingSession.sourceOptimizer = (subject, reader) => {
+			if (reader instanceof EthereumBlockchainController) {
+				return new EthereumListSource(reader, subject);
+			}
+			return null;
+		};
 	}
 
 	async init() {
@@ -99,7 +108,12 @@ export class MailList {
 		} else if (folderId === 'archive') {
 			return 'Archive';
 		} else {
-			return this.folderById[folderId].title;
+			const tag = tags.tags.find(t => String(t.id) === folderId);
+			if (!tag) {
+				return this.folderById[folderId].title;
+			} else {
+				return tag.name;
+			}
 		}
 	}
 
@@ -309,7 +323,34 @@ export class MailList {
 				})
 				.flat();
 		} else {
-			return [];
+			const tag = tags.tags.find(t => String(t.id) === folderId);
+			if (!tag) {
+				return [];
+			}
+			const contactsV = contacts.contacts.filter(c => c.tags.includes(tag.id));
+			return contactsV
+				.map(v =>
+					domain.accounts.accounts.map(account => {
+						const res: IListSource[] = [];
+						for (const blockchain of Object.keys(domain.blockchains)) {
+							const reader = domain.blockchains[blockchain];
+							const ls = this.readingSession.listSource(
+								{
+									blockchain,
+									type: BlockchainSourceType.DIRECT,
+									recipient: account.uint256Address,
+									sender: v.address,
+								},
+								reader,
+							);
+							this.accountSourceMatch.set(ls, { account, reader });
+							res.push(ls);
+						}
+						return res;
+					}),
+				)
+				.flat()
+				.flat();
 		}
 	}
 
@@ -320,12 +361,12 @@ export class MailList {
 
 	async openFolder(folderId: string) {
 		if (this.activeFolderId === folderId) {
-			if (this.activeFolderId === 'inbox') {
-				this.currentList.resetFilter(this.deletedFilter);
-			} else if (this.activeFolderId === 'archive') {
+			if (this.activeFolderId === 'archive') {
 				this.currentList.resetFilter(this.onlyDeletedFilter);
-			} else {
+			} else if (this.activeFolderId === 'sent') {
 				this.currentList.resetFilter(null);
+			} else {
+				this.currentList.resetFilter(this.deletedFilter);
 			}
 			await this.nextPage();
 		} else {
@@ -336,10 +377,12 @@ export class MailList {
 			this.activeFolderId = folderId;
 			this.currentList = new ListSourceDrainer(new ListSourceMultiplexer(this.buildSourcesByFolder(folderId)));
 			this.currentList.on('messages', this.handleNewMessages);
-			if (folderId === 'inbox') {
-				this.currentList.resetFilter(this.deletedFilter);
-			} else if (folderId === 'archive') {
+			if (this.activeFolderId === 'archive') {
 				this.currentList.resetFilter(this.onlyDeletedFilter);
+			} else if (this.activeFolderId === 'sent') {
+				this.currentList.resetFilter(null);
+			} else {
+				this.currentList.resetFilter(this.deletedFilter);
 			}
 			this.firstLoading = true;
 			await this.currentList.resume();

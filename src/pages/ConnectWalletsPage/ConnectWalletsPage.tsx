@@ -248,7 +248,7 @@ const ConnectWalletsPage = observer(() => {
 					<div style={{ marginTop: 20 }}>
 						<YlideButton
 							onClick={() => {
-								navigate('/mailbox');
+								navigate(`/inbox`);
 							}}
 						>
 							Continue with connected accounts <ArrowRight style={{ marginLeft: 10 }} />

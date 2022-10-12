@@ -10,6 +10,7 @@ import { EVM_NAMES, EVMNetwork } from '@ylide/ethereum';
 import { blockchainsMap } from '../../../../constants';
 import classNames from 'classnames';
 import { Dropdown, Menu } from 'antd';
+import mailList from '../../../../stores/MailList';
 
 const Tooltip = observer(() => {
 	const navigate = useNav();
@@ -96,7 +97,7 @@ const Tooltip = observer(() => {
 			await AlertModal.show('Message sent', 'Your message was successfully sent');
 			console.log('id: ', msgId);
 
-			navigate('/mailbox');
+			navigate(`/${mailList.activeFolderId}`);
 		} catch (e) {
 			console.log('Error sending message', e);
 		}

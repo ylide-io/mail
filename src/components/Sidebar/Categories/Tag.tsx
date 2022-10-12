@@ -24,8 +24,8 @@ const Tag: React.FC<TagProps> = ({ circleColor, text, isActive, tagId }) => {
 	};
 
 	const clickHandler = () => {
-		if (location.pathname !== 'mailbox') {
-			navigate('/mailbox');
+		if (location.pathname !== `/${tagId}`) {
+			navigate(`/${tagId}`);
 		}
 		// mailer.filterByFolder(tagId || null);
 	};

@@ -7,6 +7,7 @@ import { useNav } from '../../utils/navigate';
 import mailer from '../../stores/Mailer';
 import { observer } from 'mobx-react';
 import { Loader } from '../../controls/Loader';
+import mailList from '../../stores/MailList';
 
 const ComposePage = observer(() => {
 	const navigate = useNav();
@@ -18,7 +19,7 @@ const ComposePage = observer(() => {
 					<div className="float-right tooltip-demo">
 						<SmallButton
 							onClick={() => {
-								navigate('/mailbox');
+								navigate(`/${mailList.activeFolderId}`);
 							}}
 							text={'Discard'}
 							color={smallButtonColors.red}
