@@ -1,4 +1,6 @@
 import ReactDOM from 'react-dom';
+import * as Sentry from '@sentry/react';
+import { BrowserTracing } from '@sentry/tracing';
 import App from './App';
 import { configure } from 'mobx';
 
@@ -10,6 +12,19 @@ import 'antd/dist/antd.min.css';
 import './index.scss';
 
 import { BrowserRouter } from 'react-router-dom';
+import packageJson from '../package.json';
+
+Sentry.init({
+	dsn: 'https://4c4f62731ece4b1e9373a5ef48e6ff9b@o4504063808110592.ingest.sentry.io/4504063811452929',
+	integrations: [new BrowserTracing()],
+	release: packageJson.version,
+	environment: document.location.hostname === 'mail.ylide.io' ? 'production' : 'local',
+
+	// Set tracesSampleRate to 1.0 to capture 100%
+	// of transactions for performance monitoring.
+	// We recommend adjusting this value in production
+	tracesSampleRate: 1.0,
+});
 
 configure({
 	enforceActions: 'never',

@@ -65,8 +65,56 @@
 		font-weight: bold;
 	}
 
-	&:hover {
+	&:hover:not(.loading) {
 		background-color: #1ab39412;
+		&.error {
+			background-color: #d647473a;
+		}
+	}
+
+	&.error {
+		background-color: rgb(252, 234, 234);
+	}
+
+	&.loading {
+		position: relative;
+		overflow: hidden;
+		&::after {
+			content: ' ';
+			position: absolute;
+			left: -46px;
+			right: 0;
+			top: 0;
+			bottom: 0;
+			z-index: -1;
+
+			background: -webkit-repeating-linear-gradient(
+				145deg,
+				#dbf8f4 1px,
+				#edfffd 2px,
+				#dbf8f4 11px,
+				#dbf8f4 12px,
+				#dbf8f4 20px
+			);
+			background: repeating-linear-gradient(
+				-55deg,
+				#edfffd 1px,
+				#dbf8f4 2px,
+				#dbf8f4 11px,
+				#edfffd 12px,
+				#edfffd 20px
+			);
+
+			-webkit-animation-name: MOVE-BG;
+			-webkit-animation-duration: 0.6s;
+			-webkit-animation-timing-function: linear;
+			-webkit-animation-iteration-count: infinite;
+
+			animation-name: MOVE-BG;
+			animation-duration: 0.6s;
+			animation-timing-function: linear;
+			animation-iteration-count: infinite;
+		}
 	}
 }
 

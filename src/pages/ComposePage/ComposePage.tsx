@@ -1,5 +1,5 @@
 import React from 'react';
-import MainLayout from '../../layouts/MainLayout';
+import GenericLayout from '../../layouts/GenericLayout';
 import SmallButton, { smallButtonColors, smallButtonIcons } from '../../components/smallButton/smallButton';
 import MailboxBody from './components/Mailbox/MailboxBody';
 import Tooltip from './components/Mailbox/tooltip';
@@ -13,7 +13,7 @@ const ComposePage = observer(() => {
 	const navigate = useNav();
 
 	return (
-		<MainLayout>
+		<GenericLayout>
 			<div className="col-lg-10 animated fadeInRight">
 				<div className="mail-box-header">
 					<div className="float-right tooltip-demo">
@@ -70,7 +70,7 @@ const ComposePage = observer(() => {
 					) : null}
 				</div>
 			</div>
-		</MainLayout>
+		</GenericLayout>
 	);
 });
 

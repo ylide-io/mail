@@ -11,6 +11,9 @@ import {
 	IGenericAccount,
 	DynamicEncryptionRouter,
 	AbstractNameService,
+	IndexerListSource,
+	BlockchainListSource,
+	BlockchainSourceType,
 } from '@ylide/sdk';
 import { everscaleBlockchainFactory, everscaleWalletFactory } from '@ylide/everscale';
 import { ethereumWalletFactory, evmFactories, EVMNetwork, EVM_CHAINS, EVM_NAMES } from '@ylide/ethereum';
@@ -18,10 +21,11 @@ import { makeObservable, observable } from 'mobx';
 import contacts from './Contacts';
 import { Wallet } from './models/Wallet';
 import { Accounts } from './Accounts';
-import { supportedWallets, walletsMap } from '../constants';
+import { blockchainsMap, supportedWallets, walletsMap } from '../constants';
 import SwitchModal from '../modals/SwitchModal';
 import PasswordNewModal from '../modals/PasswordModalNew';
 import mailList from './MailList';
+import tags from './Tags';
 
 Ylide.registerBlockchainFactory(everscaleBlockchainFactory);
 // Ylide.registerBlockchainFactory(evmFactories[EVMNetwork.LOCAL_HARDHAT]);
@@ -36,6 +40,7 @@ Ylide.registerBlockchainFactory(evmFactories[EVMNetwork.KLAYTN]);
 Ylide.registerBlockchainFactory(evmFactories[EVMNetwork.GNOSIS]);
 Ylide.registerBlockchainFactory(evmFactories[EVMNetwork.AURORA]);
 Ylide.registerBlockchainFactory(evmFactories[EVMNetwork.CELO]);
+Ylide.registerBlockchainFactory(evmFactories[EVMNetwork.CRONOS]);
 Ylide.registerBlockchainFactory(evmFactories[EVMNetwork.MOONBEAM]);
 Ylide.registerBlockchainFactory(evmFactories[EVMNetwork.MOONRIVER]);
 Ylide.registerBlockchainFactory(evmFactories[EVMNetwork.METIS]);
@@ -81,6 +86,26 @@ export class Domain {
 		});
 	}
 
+	getRegisteredBlockchains() {
+		return Object.keys(this.blockchains).map(blockchain => ({
+			blockchain,
+			reader: this.blockchains[blockchain],
+		}));
+	}
+
+	requestPolygonMails() {
+		const reader = this.blockchains.POLYGON;
+		const subject = {
+			type: BlockchainSourceType.DIRECT,
+			sender: null,
+			recipient: this.walletControllers.evm.web3.addressToUint256(this.accounts.accounts[0].account.address),
+		};
+		const origSource = new BlockchainListSource(reader, subject, 10000);
+		const tempSource = new IndexerListSource(origSource, mailList.readingSession.indexerHub, reader, subject);
+
+		return { origSource, tempSource };
+	}
+
 	getBlockchainsForAddress(address: string): { blockchain: string; reader: AbstractBlockchainController }[] {
 		return Object.keys(this.blockchains)
 			.filter(bc => this.blockchains[bc].isAddressValid(address))
@@ -106,6 +131,24 @@ export class Domain {
 					reader: this.blockchains[blockchain],
 				};
 			});
+	}
+
+	async identifyRouteToAddresses(addresses: string[]) {
+		const actualRecipients = [];
+		for (const address of addresses) {
+			const blockchains = this.getBlockchainsForAddress(address);
+			if (blockchains.length) {
+				actualRecipients.push({
+					keyAddress: blockchains[0].reader.addressToUint256(address),
+					keyAddressOriginal: address,
+					address: blockchains[0].reader.addressToUint256(address),
+				});
+			}
+		}
+		return await DynamicEncryptionRouter.findEncyptionRoute(
+			actualRecipients,
+			this.getRegisteredBlockchains().map(b => b.reader),
+		);
 	}
 
 	async identifyAddressAchievability(address: string) {
@@ -188,6 +231,28 @@ export class Domain {
 		}
 	}
 
+	async switchEVMChain(needNetwork: EVMNetwork) {
+		try {
+			const bData = blockchainsMap[EVM_NAMES[needNetwork]];
+			// @ts-ignore
+			await window.ethereum.request({
+				method: 'wallet_addEthereumChain',
+				params: [bData.ethNetwork!],
+			});
+		} catch (error) {
+			console.log('error: ', error);
+		}
+		try {
+			// @ts-ignore
+			await window.ethereum.request({
+				method: 'wallet_switchEthereumChain',
+				params: [{ chainId: '0x' + Number(EVM_CHAINS[needNetwork]).toString(16) }], // chainId must be in hexadecimal numbers
+			});
+		} catch (err) {
+			throw err;
+		}
+	}
+
 	async extractWalletsData() {
 		this.registeredWallets = Ylide.walletsList.map(w => w.factory);
 		this.registeredBlockchains = Ylide.blockchainsList.map(b => b.factory);
@@ -211,11 +276,7 @@ export class Domain {
 							needChainId: number,
 						) => {
 							try {
-								// @ts-ignore
-								await window.ethereum.request({
-									method: 'wallet_switchEthereumChain',
-									params: [{ chainId: '0x' + Number(EVM_CHAINS[needNetwork]).toString(16) }], // chainId must be in hexadecimal numbers
-								});
+								await this.switchEVMChain(needNetwork);
 							} catch (err) {
 								alert(
 									'Wrong network (' +
@@ -241,7 +302,9 @@ export class Domain {
 			if (!factory) {
 				continue;
 			}
-			const controller = this.walletControllers[factory.blockchainGroup][factory.wallet];
+			const controller = this.walletControllers[factory.blockchainGroup]
+				? this.walletControllers[factory.blockchainGroup][factory.wallet]
+				: null;
 			if (!controller) {
 				continue;
 			}
@@ -301,6 +364,7 @@ export class Domain {
 		await this.accounts.accountsProcessed;
 
 		await contacts.init();
+		await tags.getTags();
 		await mailList.init();
 
 		this.initialized = true;

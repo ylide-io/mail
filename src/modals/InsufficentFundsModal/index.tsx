@@ -1,10 +1,6 @@
-import Modal from 'antd/lib/modal/Modal';
 import { observer } from 'mobx-react';
 import { PureComponent } from 'react';
 import modals from '../../stores/Modals';
-import metamaskSwitchVideo from '../../assets/video/metamask-switch.mp4';
-import { IGenericAccount } from '@ylide/sdk';
-import { Wallet } from '../../stores/models/Wallet';
 import { autobind } from 'core-decorators';
 import { makeObservable, observable } from 'mobx';
 import { DomainAccount } from '../../stores/models/DomainAccount';
@@ -78,8 +74,6 @@ export default class InsufficentFundsModal extends PureComponent<InsufficentFund
 	}
 
 	render() {
-		const wallet = this.props.account.wallet;
-
 		return (
 			<YlideModal>
 				<div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%' }}>

@@ -18,6 +18,7 @@ import './modals/style.scss';
 import { PasswordModal } from './modals/PasswordModal';
 import modals from './stores/Modals';
 import { Loader } from './controls/Loader';
+import { AdminPage } from './pages/AdminPage';
 
 const App = observer(() => {
 	const location = useLocation();
@@ -61,6 +62,7 @@ const App = observer(() => {
 	if (
 		domain.accounts.isFirstTime &&
 		location.pathname !== '/first-time' &&
+		location.pathname !== '/admin' &&
 		location.pathname !== '/connect-wallets'
 	) {
 		return <Navigate to="/first-time" state={{ from: location }} replace />;
@@ -79,6 +81,7 @@ const App = observer(() => {
 						<Route path={'folders'} element={<TagsTab />} />
 					</Route>
 					<Route path={'/settings'} element={<SettingsPage />} />
+					<Route path={'/admin'} element={<AdminPage />} />
 					<Route path={'/:folderId'} element={<MailboxPage />} />
 					<Route path={'/:folderId/:id'} element={<MailDetail />} />
 					<Route path={'/*'} element={<Navigate replace to="/inbox" />} />

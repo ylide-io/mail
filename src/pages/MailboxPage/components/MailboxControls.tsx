@@ -11,6 +11,10 @@ const MailboxControls = observer(() => {
 		mailList.markAsDeleted();
 	};
 
+	const restoreHandler = () => {
+		mailList.markAsNotDeleted();
+	};
+
 	// const pagesCount =
 	// 	Math.floor(mailer.messageIds.length / mailer.messagesOnPage) +
 	// 	(mailer.messageIds.length % mailer.messagesOnPage ? 1 : 0);
@@ -25,12 +29,21 @@ const MailboxControls = observer(() => {
 					icon={smallButtonIcons.eye}
 					title={'Mark as read'}
 				/>
-				<SmallButton
-					onClick={deleteHandler}
-					color={smallButtonColors.white}
-					icon={smallButtonIcons.trash}
-					title={'Archive mails'}
-				/>
+				{mailList.activeFolderId === 'archive' ? (
+					<SmallButton
+						onClick={restoreHandler}
+						color={smallButtonColors.white}
+						icon={smallButtonIcons.restore}
+						title={'Restore mails'}
+					/>
+				) : mailList.activeFolderId === 'sent' ? null : (
+					<SmallButton
+						onClick={deleteHandler}
+						color={smallButtonColors.white}
+						icon={smallButtonIcons.trash}
+						title={'Archive mails'}
+					/>
+				)}
 			</div>
 		</div>
 	);

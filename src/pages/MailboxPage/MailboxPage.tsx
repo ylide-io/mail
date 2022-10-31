@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import MainLayout from '../../layouts/MainLayout';
+import GenericLayout from '../../layouts/GenericLayout';
 import MailboxList from './components/MailboxList';
 import { MailboxHeader } from './components/MailboxHeader';
 
@@ -15,12 +15,12 @@ const MailboxPage = () => {
 	}, [folderId]);
 
 	return (
-		<MainLayout>
+		<GenericLayout>
 			<div className="mailbox-page animated fadeInRight">
 				<MailboxHeader />
 				<MailboxList />
 			</div>
-		</MainLayout>
+		</GenericLayout>
 	);
 };
 

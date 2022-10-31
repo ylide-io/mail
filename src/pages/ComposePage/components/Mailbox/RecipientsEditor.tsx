@@ -152,7 +152,7 @@ export class Recipients extends PureComponent {
 					<label className="col-sm-1 col-form-label">From:</label>
 					<div className="col-sm-11" style={{ position: 'relative', zIndex: 2 }}>
 						<Select style={{ width: '100%' }} value={'0'}>
-							{domain.accounts.accounts.map((acc, idx) => (
+							{domain.accounts.activeAccounts.map((acc, idx) => (
 								<Select.Option value={String(idx)}>
 									{acc.account.address} [
 									{acc.wallet.factory.wallet === 'web3' ? 'MetaMask' : 'EverWallet'}]

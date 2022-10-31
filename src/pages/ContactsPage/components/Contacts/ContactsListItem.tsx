@@ -200,17 +200,24 @@ const ContactsListItem: React.FC<ContactsListItemProps> = ({ contact, isNew }) =
 					/>
 				</td>
 				{!isNew ? (
-					<td onClick={deleteClickHandler} style={{ cursor: 'pointer', textAlign: 'center' }}>
-						<i className="fa fa-trash" />
+					<td style={{ cursor: 'pointer', textAlign: 'center' }}>
+						<i className="fa fa-trash" onClick={deleteClickHandler} />
+						<i
+							className="fa fa-check"
+							style={{ marginLeft: 15, marginRight: 10 }}
+							onClick={saveClickHandler}
+						/>
 					</td>
 				) : (
-					<td onClick={deleteClickHandler} style={{ cursor: 'pointer', textAlign: 'center' }}>
-						<i className="fa fa-times" />
+					<td style={{ cursor: 'pointer', textAlign: 'center' }}>
+						<i className="fa fa-times" onClick={deleteClickHandler} />
+						<i
+							className="fa fa-check"
+							style={{ marginLeft: 15, marginRight: 10 }}
+							onClick={saveClickHandler}
+						/>
 					</td>
 				)}
-				<td onClick={saveClickHandler} style={{ cursor: 'pointer', textAlign: 'center' }}>
-					<i className="fa fa-check" />
-				</td>
 			</tr>
 		);
 	}

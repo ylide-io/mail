@@ -12,25 +12,44 @@ import classNames from 'classnames';
 import { Dropdown, Menu } from 'antd';
 import mailList from '../../../../stores/MailList';
 
+const evmNetworks = (Object.keys(EVM_NAMES) as unknown as EVMNetwork[]).map((network: EVMNetwork) => ({
+	name: EVM_NAMES[network],
+	network: Number(network) as EVMNetwork,
+}));
+
+function evmNameToNetwork(name: string) {
+	return evmNetworks.find(n => n.name === name)?.network;
+}
+
 const Tooltip = observer(() => {
 	const navigate = useNav();
 
 	useEffect(() => {
 		(async () => {
 			if (mailbox.from?.wallet.factory.blockchainGroup === 'evm') {
-				const evmNetworks = (Object.keys(EVM_NAMES) as unknown as EVMNetwork[]).map((network: EVMNetwork) => ({
-					name: EVM_NAMES[network],
-					network: Number(network) as EVMNetwork,
-				}));
 				const blockchainName = await mailbox.from.wallet.controller.getCurrentBlockchain();
-				mailbox.network = evmNetworks.find(n => n.name === blockchainName)?.network;
+				mailbox.network = evmNameToNetwork(blockchainName);
+				const balances = await mailbox.from.getBalances();
+				for (const bcName of Object.keys(balances)) {
+					const network = evmNameToNetwork(bcName);
+					if (network) {
+						mailbox.evmBalances[network] = balances[bcName].number;
+					}
+				}
 			}
 		})();
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [mailbox.from]);
 
 	let text: ReactNode = 'Send';
-	if (mailbox.from?.wallet.factory.blockchainGroup === 'evm' && mailbox.network !== undefined) {
+	if (mailbox.from?.wallet.factory.blockchainGroup === 'everscale') {
+		const bData = blockchainsMap.everscale;
+		text = (
+			<>
+				Send via {bData.logo(14)} {bData.title}
+			</>
+		);
+	} else if (mailbox.from?.wallet.factory.blockchainGroup === 'evm' && mailbox.network !== undefined) {
 		const bData = blockchainsMap[EVM_NAMES[mailbox.network]];
 		if (bData) {
 			text = (
@@ -56,26 +75,24 @@ const Tooltip = observer(() => {
 				.filter(v => !!v.address)
 				.filter((value, index, array) => array.indexOf(value) === index)
 				.map(v => v.address!);
-			const recipientKeys = await Promise.all(
-				recipients.map(async r => {
-					const blockchains = domain.getBlockchainsForAddress(r);
-					const keys = await Promise.all(
-						blockchains.map(async bc => {
-							try {
-								return await bc.reader.extractPublicKeyFromAddress(r);
-							} catch (err) {
-								return null;
-							}
-						}),
-					);
-					return keys.some(k => !!k);
+
+			// identifyRouteToAddresses
+			const notFoundRecipients: Record<string, boolean> = recipients.reduce(
+				(p, c) => ({
+					...p,
+					[c]: true,
 				}),
+				{},
 			);
+			const route = await domain.identifyRouteToAddresses(recipients);
+			route.forEach(r => {
+				notFoundRecipients[r.recipients[0].keyAddressOriginal] = false;
+			});
 
-			const recs = recipients.filter((e, i) => recipientKeys[i]);
+			const leftNotFound = Object.keys(notFoundRecipients).filter(k => notFoundRecipients[k]);
 
-			if (!recs.length) {
-				alert('For your recipients we found no keys on the blockchain');
+			if (leftNotFound.length) {
+				alert(`For some of your recipients we didn't find keys on the blockchain`);
 				mailer.sending = false;
 				return;
 			}
@@ -90,14 +107,14 @@ const Tooltip = observer(() => {
 				acc,
 				mailbox.subject,
 				JSON.stringify(mailbox.textEditorData),
-				recs,
+				recipients,
 				mailbox.network,
 			);
 
 			await AlertModal.show('Message sent', 'Your message was successfully sent');
 			console.log('id: ', msgId);
 
-			navigate(`/${mailList.activeFolderId}`);
+			navigate(`/${mailList.activeFolderId || 'inbox'}`);
 		} catch (e) {
 			console.log('Error sending message', e);
 		}
@@ -115,7 +132,12 @@ const Tooltip = observer(() => {
 		>
 			<div
 				className={classNames('send-btn', {
-					disabled: !mailbox.from || mailer.sending || !mailbox.to.some(r => r.isAchievable),
+					disabled:
+						!mailbox.from ||
+						mailer.sending ||
+						!mailbox.to.some(r => r.isAchievable) ||
+						!mailbox.textEditorData?.blocks?.length ||
+						!mailbox.to.length,
 					withDropdown: mailbox.from?.wallet.factory.blockchainGroup === 'evm',
 				})}
 			>
@@ -127,7 +149,7 @@ const Tooltip = observer(() => {
 					<Dropdown
 						overlay={
 							<Menu
-								onClick={info => {
+								onClick={async info => {
 									const evmNetworks = (Object.keys(EVM_NAMES) as unknown as EVMNetwork[]).map(
 										(network: EVMNetwork) => ({
 											name: EVM_NAMES[network],
@@ -135,7 +157,13 @@ const Tooltip = observer(() => {
 										}),
 									);
 									const blockchainName = info.key;
-									mailbox.network = evmNetworks.find(n => n.name === blockchainName)?.network;
+									const newNetwork = evmNetworks.find(n => n.name === blockchainName)?.network;
+									const currentBlockchainName =
+										await mailbox.from!.wallet.controller.getCurrentBlockchain();
+									if (currentBlockchainName !== blockchainName) {
+										await domain.switchEVMChain(newNetwork!);
+										mailbox.network = newNetwork;
+									}
 								}}
 								items={domain.registeredBlockchains
 									.filter(f => f.blockchainGroup === 'evm')
@@ -143,7 +171,21 @@ const Tooltip = observer(() => {
 										const bData = blockchainsMap[bc.blockchain];
 										return {
 											key: bc.blockchain,
-											label: bData.title,
+											disabled:
+												Number(
+													mailbox.evmBalances[evmNameToNetwork(bc.blockchain)!].toFixed(3),
+												) === 0,
+											label: (
+												<>
+													{bData.title} [
+													{Number(
+														mailbox.evmBalances[evmNameToNetwork(bc.blockchain)!].toFixed(
+															3,
+														),
+													)}{' '}
+													{bData.ethNetwork!.nativeCurrency.symbol}]
+												</>
+											),
 											icon: <div style={{ marginRight: 7 }}>{bData.logo(16)}</div>,
 										};
 									})}

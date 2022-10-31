@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import MainLayout from '../../layouts/MainLayout';
+import React from 'react';
+import GenericLayout from '../../layouts/GenericLayout';
 import SmallButton, { smallButtonColors } from '../../components/smallButton/smallButton';
 import TabSwitcher from './components/TabSwitcher';
 import contacts from '../../stores/Contacts';
@@ -23,8 +23,8 @@ const ContactsPage = observer(() => {
 	};
 
 	return (
-		<MainLayout>
-			<div className="col-lg-9">
+		<GenericLayout>
+			<div className="mailbox-page">
 				<div className="ibox">
 					<div className="ibox-content">
 						<div
@@ -90,7 +90,7 @@ const ContactsPage = observer(() => {
 					</div>
 				</div>
 			</div>
-		</MainLayout>
+		</GenericLayout>
 	);
 });
 

@@ -56,6 +56,7 @@ export class RecipientsSelect extends PureComponent<RecipientsSelectProps> {
 			} else {
 				rec.isAchievable = false;
 			}
+			console.log('rec: ', JSON.stringify(rec));
 			rec.address = address;
 			if (address) {
 				const ach = await domain.identifyAddressAchievability(address);
@@ -161,6 +162,7 @@ export class RecipientsSelect extends PureComponent<RecipientsSelectProps> {
 						address: null,
 						isAchievable: null,
 					});
+					this.loadRecipient(this.values.at(-1)!);
 				}
 			}
 		}

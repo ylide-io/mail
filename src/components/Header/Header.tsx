@@ -27,7 +27,7 @@ const Header = observer(() => {
 						</div>
 					),
 				},
-				...domain.accounts.accounts.map(acc => ({
+				...domain.accounts.activeAccounts.map(acc => ({
 					key: `${acc.wallet.factory.wallet}:${acc.account.address}`,
 					label: (
 						<div
@@ -49,7 +49,7 @@ const Header = observer(() => {
 					nav('/connect-wallets');
 					return;
 				}
-				const account = domain.accounts.accounts.find(
+				const account = domain.accounts.activeAccounts.find(
 					acc => info.key === `${acc.wallet.factory.wallet}:${acc.account.address}`,
 				);
 				if (!account) {
@@ -119,8 +119,8 @@ const Header = observer(() => {
 									cursor: 'pointer',
 								}}
 							>
-								{`Connected ${domain.accounts.accounts.length} account${
-									domain.accounts.accounts.length > 1 ? 's' : ''
+								{`Connected ${domain.accounts.activeAccounts.length} account${
+									domain.accounts.activeAccounts.length > 1 ? 's' : ''
 								}`}
 								<DownOutlined size={16} style={{ marginLeft: 5 }} />
 							</div>

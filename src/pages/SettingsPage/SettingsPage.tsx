@@ -1,12 +1,12 @@
 import React from 'react';
-import MainLayout from '../../layouts/MainLayout';
+import GenericLayout from '../../layouts/GenericLayout';
 import { observer } from 'mobx-react';
 import mailList from '../../stores/MailList';
 
 const SettingsPage = observer(() => {
 	return (
-		<MainLayout>
-			<div className="col-lg-9">
+		<GenericLayout>
+			<div className="mailbox-page">
 				<div className="ibox">
 					<div className="ibox-content">
 						<div style={{ display: 'flex', justifyContent: 'space-between' }}>
@@ -24,7 +24,7 @@ const SettingsPage = observer(() => {
 					</div>
 				</div>
 			</div>
-		</MainLayout>
+		</GenericLayout>
 	);
 });
 

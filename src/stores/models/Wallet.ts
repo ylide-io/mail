@@ -11,6 +11,7 @@ import {
 } from '@ylide/sdk';
 import { Domain } from '../Domain';
 import { DomainAccount } from './DomainAccount';
+import mailList from '../MailList';
 
 export class Wallet extends EventEmitter {
 	wallet: string;
@@ -41,7 +42,11 @@ export class Wallet extends EventEmitter {
 	async init() {
 		await this.checkAvailability();
 
-		this.currentBlockchain = await this.controller.getCurrentBlockchain();
+		try {
+			this.currentBlockchain = await this.controller.getCurrentBlockchain();
+		} catch (err) {
+			this.currentBlockchain = 'unknown';
+		}
 		this.currentWalletAccount = await this.controller.getAuthenticatedAccount();
 
 		this.controller.on(WalletEvent.ACCOUNT_CHANGED, this.handleAccountChanged);
@@ -90,10 +95,6 @@ export class Wallet extends EventEmitter {
 		return this._isAvailable;
 	}
 
-	redirectToInstall() {
-		window.open(this.installLink, '_blank');
-	}
-
 	@computed get accounts(): DomainAccount[] {
 		return this._accounts;
 	}
@@ -129,23 +130,54 @@ export class Wallet extends EventEmitter {
 			factory,
 			controller: this.domain.blockchains[factory.blockchain],
 		}));
-		let remoteKey: Uint8Array | null = null;
-		const remoteKeys: Record<string, Uint8Array> = {};
-		for (const { factory, controller } of blockchains) {
-			try {
-				const key = (await controller.extractPublicKeyFromAddress(account.address))?.bytes || null;
-				if (key) {
-					remoteKeys[factory.blockchain] = key;
-					remoteKey = key;
-				}
-			} catch (err) {
-				// so sad :(
-			}
-		}
-		return {
-			remoteKey,
-			remoteKeys,
+		const rawKeysRequest = async () => {
+			let remoteKey: Uint8Array | null = null;
+			const remoteKeys: Record<string, Uint8Array> = {};
+			await Promise.all(
+				blockchains.map(async ({ factory, controller }) => {
+					try {
+						const key = (await controller.extractPublicKeyFromAddress(account.address))?.bytes || null;
+						if (key) {
+							remoteKeys[factory.blockchain] = key;
+							remoteKey = key;
+						}
+					} catch (err) {
+						// so sad :(
+					}
+				}),
+			);
+			return {
+				remoteKey,
+				remoteKeys,
+			};
 		};
+		if (this.factory.blockchainGroup === 'evm') {
+			return await mailList.readingSession.indexerHub.retryingOperation(
+				async () => {
+					let remoteKey: Uint8Array | null = null;
+					const remoteKeys: Record<string, Uint8Array> = {};
+					const rawRemoteKeys = await mailList.readingSession.indexerHub.requestKeys(account.address);
+					const bcs = Object.keys(rawRemoteKeys);
+					let timestamp = -1;
+					for (const bc of bcs) {
+						remoteKeys[bc] = rawRemoteKeys[bc].publicKey;
+						if (timestamp === -1 || rawRemoteKeys[bc].timestamp > timestamp) {
+							timestamp = rawRemoteKeys[bc].timestamp;
+							remoteKey = rawRemoteKeys[bc].publicKey;
+						}
+					}
+					return {
+						remoteKey,
+						remoteKeys,
+					};
+				},
+				async () => {
+					return rawKeysRequest();
+				},
+			);
+		} else {
+			return rawKeysRequest();
+		}
 	}
 
 	async getCurrentAccount(): Promise<IGenericAccount | null> {

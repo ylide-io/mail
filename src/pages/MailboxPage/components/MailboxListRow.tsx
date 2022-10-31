@@ -1,4 +1,4 @@
-import React, { CSSProperties } from 'react';
+import React, { CSSProperties, useEffect, useState } from 'react';
 import { observer } from 'mobx-react';
 import classNames from 'classnames';
 
@@ -17,6 +17,8 @@ interface MailboxListRowProps {
 
 const MailboxListRow: React.FC<MailboxListRowProps> = observer(({ style, message }) => {
 	const navigate = useNav();
+	const [loading, setLoading] = useState(false);
+	const [error, setError] = useState('');
 	const contact = contacts.contactsByAddress[message.msg.senderAddress];
 	const sender = contact ? contact.name : message.msg.senderAddress;
 	const checked = mailList.isMessageChecked(message.id);
@@ -28,10 +30,23 @@ const MailboxListRow: React.FC<MailboxListRowProps> = observer(({ style, message
 		if (decoded) {
 			navigate(message.id);
 		} else {
-			await mailList.decodeMessage(message);
+			setLoading(true);
+			try {
+				await mailList.decodeMessage(message);
+			} catch (err) {
+				console.log('decode err: ', err);
+				setError(`Decoding error. Please, double check your Ylide password`);
+				return;
+			} finally {
+				setLoading(false);
+			}
 			navigate(message.id);
 		}
 	};
+
+	useEffect(() => {
+		setError('');
+	}, [message.id]);
 
 	const date = (() => {
 		const fullDate = new Date(message.msg.createdAt * 1000);
@@ -54,16 +69,12 @@ const MailboxListRow: React.FC<MailboxListRowProps> = observer(({ style, message
 			className={classNames('mailbox-list-row', {
 				unread: isUnread,
 				read: !isUnread,
+				loading,
+				error: !!error,
 			})}
 		>
 			<div onClick={e => e.stopPropagation()} className="check-mail" style={{ cursor: 'pointer' }}>
-				<YlideCheckbox
-					checked={checked}
-					onCheck={val => {
-						console.log('new val: ', val);
-						mailList.checkMessage(message, val);
-					}}
-				/>
+				<YlideCheckbox checked={checked} onCheck={val => mailList.checkMessage(message, val)} />
 			</div>
 			<div className="mail-contact">
 				{sender.slice(0, 12)}
@@ -78,7 +89,12 @@ const MailboxListRow: React.FC<MailboxListRowProps> = observer(({ style, message
 				<span style={!decoded ? { filter: 'blur(5px)' } : {}}>
 					{decoded ? decoded.decodedSubject || 'No subject' : 'Message is not decoded'}
 				</span>
-				{!decoded && <span style={{ marginLeft: 7 }}>[Not decoded]</span>}
+				{!decoded &&
+					(error ? (
+						<span style={{ marginLeft: 7, color: 'red' }}>{error}</span>
+					) : (
+						<span style={{ marginLeft: 7 }}>[Not decoded]</span>
+					))}
 
 				<span
 					className="label label-info"

@@ -18,7 +18,7 @@ const SidebarMenu = observer(() => {
 		} else {
 			return {
 				text: 'Return to Mailbox',
-				link: `/${mailList.activeFolderId}`,
+				link: `/${mailList.activeFolderId || 'inbox'}`,
 			};
 		}
 		// eslint-disable-next-line react-hooks/exhaustive-deps

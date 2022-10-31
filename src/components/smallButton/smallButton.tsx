@@ -16,6 +16,7 @@ export enum smallButtonIcons {
 	exclamation = 'fa-exclamation',
 	print = 'fa-print',
 	trash = 'fa-trash-o',
+	restore = 'fa-rotate-left',
 	forward = 'fa-arrow-right',
 	arrowLeft = 'fa-arrow-left',
 }
