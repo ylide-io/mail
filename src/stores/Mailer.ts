@@ -1,22 +1,9 @@
-import { makeAutoObservable, observable, toJS } from 'mobx';
-import messagesDB, { IMessageDecodedContent } from '../indexedDB/MessagesDB';
-import contacts from './Contacts';
-import fuzzysort from 'fuzzysort';
-import { filterAsync } from '../utils/asyncFilter';
-import {
-	BlockchainSource,
-	GenericEntry,
-	IMessage,
-	IMessageContent,
-	ISourceSubject,
-	MessageContentV3,
-	ServiceCode,
-	Ylide,
-} from '@ylide/sdk';
+import { makeAutoObservable } from 'mobx';
+import messagesDB from '../indexedDB/MessagesDB';
+import { MessageContentV3, ServiceCode } from '@ylide/sdk';
 import domain from './Domain';
 import { DomainAccount } from './models/DomainAccount';
 import { EVM_NAMES, EVMNetwork } from '@ylide/ethereum';
-import { MessagesList } from '@ylide/sdk';
 
 // interface filteringTypesInterface {
 // 	unread: (arg1: IMessage) => Promise<boolean>;
@@ -383,7 +370,7 @@ class Mailer {
 
 	// async decodeMessage(pushMsg: GenericEntry<IMessage, BlockchainSource>): Promise<void> {
 	// 	const reader = pushMsg.source.reader;
-	// 	const recipient = domain.accounts.accounts.find(
+	// 	const recipient = domain.accounts.activeAccounts.find(
 	// 		acc =>
 	// 			acc.uint256Address === pushMsg.source.subject.address ||
 	// 			acc.sentAddress === pushMsg.source.subject.address,

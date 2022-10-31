@@ -14,9 +14,8 @@ import { autobind } from 'core-decorators';
 import { Wallet } from '../../stores/models/Wallet';
 import PasswordNewModal from '../../modals/PasswordModalNew';
 import SignatureModal from '../../modals/SignatureModal';
-import { IGenericAccount } from '@ylide/sdk';
+import { asyncDelay, IGenericAccount } from '@ylide/sdk';
 import { isBytesEqual } from '../../utils/isBytesEqual';
-import InsufficentFundsModal from '../../modals/InsufficentFundsModal';
 import PublishKeyModal from '../../modals/PublishKeyModal';
 
 export interface WalletBlockProps {
@@ -120,19 +119,22 @@ export class WalletBlock extends PureComponent<WalletBlockProps> {
 	}
 
 	async publishLocalKey(account: DomainAccount) {
-		try {
-			const balances = await account.getBalances();
-			console.log('balances: ', balances);
-			const chain = await account.wallet.controller.getCurrentBlockchain();
-			if (Number(balances[chain]) === 0) {
-				await InsufficentFundsModal.show(account, 'to publish key');
-			}
-		} catch (err) {
-			console.log('balances err: ', err);
-		}
-		const publishCtrl = PublishKeyModal.view(account.wallet);
+		// try {
+		// 	const balances = await account.getBalances();
+		// 	console.log('balances: ', balances);
+		// 	const chain = await account.wallet.controller.getCurrentBlockchain();
+		// 	// if (balances[chain].number === 0) {
+		// 	// 	await InsufficentFundsModal.show(account, 'to publish key');
+		// 	// }
+		// } catch (err) {
+		// 	console.log('balances err: ', err);
+		// }
+		let publishCtrl = PublishKeyModal.view(account.wallet, false);
 		try {
 			await account.attachRemoteKey();
+			publishCtrl.hide();
+			publishCtrl = PublishKeyModal.view(account.wallet, true);
+			await asyncDelay(7000);
 			await account.init();
 		} catch (err) {
 			alert('Transaction was not published. Please, try again');
@@ -226,7 +228,7 @@ export class WalletBlock extends PureComponent<WalletBlockProps> {
 					fontSize: 14,
 				}}
 			>
-				<b>Coming</b>
+				<b>Install</b>
 			</div>
 		);
 
@@ -257,42 +259,37 @@ export class WalletBlock extends PureComponent<WalletBlockProps> {
 		let accountsBlock: JSX.Element | null = null;
 
 		const isWalletSupported = domain.registeredWallets.find(t => t.wallet === this.props.wallet);
-		const isWalletAvailable = domain.availableWallets.find(t => t.wallet === this.props.wallet);
+		// const isWalletAvailable = domain.availableWallets.find(t => t.wallet === this.props.wallet);
 
 		const wallet = domain.wallets.find(w => w.factory.wallet === this.props.wallet);
 		let ready = !!wallet?.accounts.length;
 
 		let buttonHandler: React.MouseEventHandler<HTMLButtonElement> | undefined;
-		let buttonContent: JSX.Element = <>Coming</>;
+		let buttonContent: JSX.Element = <>Coming soon</>;
 
 		// loading
 
 		if (wallet) {
 			const accounts = wallet.accounts;
-			if (!isWalletAvailable) {
-				buttonHandler = () => wallet.redirectToInstall();
-				buttonContent = <>Install</>;
-			} else {
-				if (wallet.currentWalletAccount || accounts.length) {
-					if (wallet.currentWalletAccount && wallet.isAccountRegistered(wallet.currentWalletAccount)) {
-						ready = true;
-						buttonHandler = () => this.connectAccount();
-						buttonContent = <>Add new account</>;
-					} else {
-						buttonHandler = () => this.connectAccount();
-						buttonContent = (
-							<>
-								Add{' '}
-								{wallet.currentWalletAccount
-									? shrinkAddress(wallet.currentWalletAccount.address, 14)
-									: 'new account'}
-							</>
-						);
-					}
+			if (wallet.currentWalletAccount || accounts.length) {
+				if (wallet.currentWalletAccount && wallet.isAccountRegistered(wallet.currentWalletAccount)) {
+					ready = true;
+					buttonHandler = () => this.connectAccount();
+					buttonContent = <>Add new account</>;
 				} else {
 					buttonHandler = () => this.connectAccount();
-					buttonContent = <>Connect</>;
+					buttonContent = (
+						<>
+							Add{' '}
+							{wallet.currentWalletAccount
+								? shrinkAddress(wallet.currentWalletAccount.address, 14)
+								: 'new account'}
+						</>
+					);
 				}
+			} else {
+				buttonHandler = () => this.connectAccount();
+				buttonContent = <>Connect</>;
 			}
 			if (accounts.length) {
 				accountsBlock = (
@@ -305,6 +302,19 @@ export class WalletBlock extends PureComponent<WalletBlockProps> {
 						</div>
 					</div>
 				);
+			}
+		} else {
+			//walletsMap[this.props.wallet].link
+			const w = walletsMap[this.props.wallet];
+			if (w) {
+				buttonHandler = () => {
+					if (w) {
+						window.open(w.link, '_blank');
+					}
+				};
+				buttonContent = <>Install</>;
+			} else {
+				buttonContent = <>Coming soon</>;
 			}
 		}
 

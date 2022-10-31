@@ -8,8 +8,8 @@ import mailbox from '../../../stores/Mailbox';
 @observer
 export class MailMeta extends PureComponent {
 	componentDidMount(): void {
-		if (!mailbox.from && domain.accounts.accounts.length) {
-			mailbox.from = domain.accounts.accounts[0];
+		if (!mailbox.from && domain.accounts.activeAccounts.length) {
+			mailbox.from = domain.accounts.activeAccounts[0];
 		}
 	}
 
@@ -21,12 +21,12 @@ export class MailMeta extends PureComponent {
 					<div className="col-sm-11" style={{ position: 'relative', zIndex: 2 }}>
 						<Select
 							style={{ width: '100%' }}
-							value={mailbox.from ? String(domain.accounts.accounts.indexOf(mailbox.from)) : ''}
+							value={mailbox.from ? String(domain.accounts.activeAccounts.indexOf(mailbox.from)) : ''}
 							onSelect={(val: string) => {
-								mailbox.from = domain.accounts.accounts[Number(val)];
+								mailbox.from = domain.accounts.activeAccounts[Number(val)];
 							}}
 						>
-							{domain.accounts.accounts.map((acc, idx) => (
+							{domain.accounts.activeAccounts.map((acc, idx) => (
 								<Select.Option key={idx} value={String(idx)}>
 									{acc.account.address} [
 									{acc.wallet.factory.wallet === 'web3' ? 'MetaMask' : 'EverWallet'}]

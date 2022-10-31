@@ -4,6 +4,7 @@ import {
 	BlockchainListSource,
 	IListSource,
 	IMessageWithSource,
+	IndexerListSource,
 	ListSourceDrainer,
 	ListSourceMultiplexer,
 	SourceReadingSession,
@@ -20,7 +21,7 @@ import {
 	CriticalSection,
 } from '@ylide/sdk';
 import { autobind } from 'core-decorators';
-import { makeObservable, observable } from 'mobx';
+import { makeObservable, observable, reaction } from 'mobx';
 import messagesDB, { IMessageDecodedContent } from '../indexedDB/MessagesDB';
 import contacts from './Contacts';
 import domain from './Domain';
@@ -79,10 +80,20 @@ export class MailList {
 
 		this.readingSession.sourceOptimizer = (subject, reader) => {
 			if (reader instanceof EthereumBlockchainController) {
-				return new EthereumListSource(reader, subject, 30000);
+				return new IndexerListSource(
+					new EthereumListSource(reader, subject, 30000),
+					this.readingSession.indexerHub,
+					reader,
+					subject,
+				);
 			} else {
 				return new BlockchainListSource(reader, subject, 10000);
 			}
+			// if (reader instanceof EthereumBlockchainController) {
+			// 	return new EthereumListSource(reader, subject, 30000);
+			// } else {
+			// 	return ;
+			// }
 			// return null;
 		};
 	}
@@ -102,6 +113,15 @@ export class MailList {
 		}
 		const readMessageIds = await messagesDB.getReadMessages();
 		this.readMessageIds = new Set(readMessageIds);
+
+		reaction(
+			() => domain.accounts.activeAccounts,
+			actAccs => {
+				if (this.activeFolderId) {
+					this.openFolder(this.activeFolderId);
+				}
+			},
+		);
 	}
 
 	getFolderName(folderId: string) {
@@ -182,6 +202,21 @@ export class MailList {
 		await this.deletedWasUpdated();
 	}
 
+	async markMessagesAsNotDeleted(ms: ILinkedMessage[]) {
+		ms.forEach(m => {
+			if (this.deletedMessageIds[m.recipient?.account.address || 'null']) {
+				this.deletedMessageIds[m.recipient?.account.address || 'null'].delete(m.id);
+			}
+		});
+		await messagesDB.saveMessagesNotDeleted(
+			ms.map(m => ({
+				id: m.id,
+				accountAddress: m.recipient?.account.address || 'null',
+			})),
+		);
+		await this.deletedWasUpdated();
+	}
+
 	async markMessagesAsDeleted(ms: ILinkedMessage[]) {
 		ms.forEach(m => {
 			if (this.deletedMessageIds[m.recipient?.account.address || 'null']) {
@@ -201,6 +236,11 @@ export class MailList {
 
 	async markAsDeleted() {
 		await this.markMessagesAsDeleted(this.messages.filter(t => this.checkedMessageIds.includes(t.id)));
+		this.checkedMessageIds = [];
+	}
+
+	async markAsNotDeleted() {
+		await this.markMessagesAsNotDeleted(this.messages.filter(t => this.checkedMessageIds.includes(t.id)));
 		this.checkedMessageIds = [];
 	}
 
@@ -289,7 +329,7 @@ export class MailList {
 
 	buildSourcesByFolder(folderId: string): IListSource[] {
 		if (folderId === 'inbox' || folderId === 'archive') {
-			return domain.accounts.accounts
+			return domain.accounts.activeAccounts
 				.map(account => {
 					const res: IListSource[] = [];
 					for (const blockchain of Object.keys(domain.blockchains)) {
@@ -310,14 +350,14 @@ export class MailList {
 				})
 				.flat();
 		} else if (folderId === 'sent') {
-			return domain.accounts.accounts
+			return domain.accounts.activeAccounts
 				.map(account => {
 					const res: IListSource[] = [];
-					for (const blockchain of Object.keys(domain.blockchains)) {
-						const reader = domain.blockchains[blockchain];
+					for (const blockchain of account.appropriateBlockchains()) {
+						const reader = blockchain.reader;
 						const ls = this.readingSession.listSource(
 							{
-								blockchain,
+								blockchain: blockchain.factory.blockchain,
 								type: BlockchainSourceType.DIRECT,
 								recipient: account.sentAddress,
 								sender: null,
@@ -338,7 +378,7 @@ export class MailList {
 			const contactsV = contacts.contacts.filter(c => c.tags.includes(tag.id));
 			return contactsV
 				.map(v =>
-					domain.accounts.accounts.map(account => {
+					domain.accounts.activeAccounts.map(account => {
 						const res: IListSource[] = [];
 						for (const blockchain of Object.keys(domain.blockchains)) {
 							const reader = domain.blockchains[blockchain];
@@ -368,38 +408,38 @@ export class MailList {
 	}
 
 	async openFolder(folderId: string) {
-		if (this.activeFolderId === folderId) {
-			if (this.activeFolderId === 'archive') {
-				this.currentList.resetFilter(this.onlyDeletedFilter);
-			} else if (this.activeFolderId === 'sent') {
-				this.currentList.resetFilter(null);
-			} else {
-				this.currentList.resetFilter(this.deletedFilter);
-			}
-			await this.nextPage();
-		} else {
-			if (this.activeFolderId) {
-				await this.folderChangeCriticalSection.enter();
-				this.currentList.pause();
-				this.currentList.off('messages', this.handleNewMessages);
-				await this.folderChangeCriticalSection.leave();
-			}
-			this.activeFolderId = folderId;
-			this.currentList = new ListSourceDrainer(new ListSourceMultiplexer(this.buildSourcesByFolder(folderId)));
-			this.currentList.on('messages', this.handleNewMessages);
-			if (this.activeFolderId === 'archive') {
-				this.currentList.resetFilter(this.onlyDeletedFilter);
-			} else if (this.activeFolderId === 'sent') {
-				this.currentList.resetFilter(null);
-			} else {
-				this.currentList.resetFilter(this.deletedFilter);
-			}
-			this.firstLoading = true;
+		// if (this.activeFolderId === folderId) {
+		// 	if (this.activeFolderId === 'archive') {
+		// 		this.currentList.resetFilter(this.onlyDeletedFilter);
+		// 	} else if (this.activeFolderId === 'sent') {
+		// 		this.currentList.resetFilter(null);
+		// 	} else {
+		// 		this.currentList.resetFilter(this.deletedFilter);
+		// 	}
+		// 	await this.nextPage();
+		// } else {
+		if (this.activeFolderId) {
 			await this.folderChangeCriticalSection.enter();
-			await this.currentList.resume();
+			this.currentList.pause();
+			this.currentList.off('messages', this.handleNewMessages);
 			await this.folderChangeCriticalSection.leave();
-			await this.nextPage();
 		}
+		this.activeFolderId = folderId;
+		this.currentList = new ListSourceDrainer(new ListSourceMultiplexer(this.buildSourcesByFolder(folderId)));
+		this.currentList.on('messages', this.handleNewMessages);
+		if (this.activeFolderId === 'archive') {
+			this.currentList.resetFilter(this.onlyDeletedFilter);
+		} else if (this.activeFolderId === 'sent') {
+			this.currentList.resetFilter(null);
+		} else {
+			this.currentList.resetFilter(this.deletedFilter);
+		}
+		this.firstLoading = true;
+		await this.folderChangeCriticalSection.enter();
+		await this.currentList.resume();
+		await this.folderChangeCriticalSection.leave();
+		await this.nextPage();
+		// }
 
 		// this.activeFolderId = folderId;
 		// if (this.initedById[folderId]) {
@@ -414,12 +454,12 @@ export class MailList {
 		// 	this.loading = true;
 		// 	const result = await this.listById[folderId].configure(manager => {
 		// 		manager.setFilter(entry => {
-		// 			return !domain.accounts.accounts.some(acc =>
+		// 			return !domain.accounts.activeAccounts.some(acc =>
 		// 				this.deletedMessageIds[acc.account.address]?.has(entry.link.msgId),
 		// 			);
 		// 		});
 		// 		this.buildFolderBasement(folderId, manager);
-		// 		for (const account of domain.accounts.accounts) {
+		// 		for (const account of domain.accounts.activeAccounts) {
 		// 			this.inflateFolderByAccount(folderId, manager, account);
 		// 			this.inflateFolderByAccount(folderId, manager, account);
 		// 			this.inflateFolderByAccount(folderId, manager, account);

@@ -117,6 +117,13 @@ class MessagesDB extends IndexedDB {
 		await tx.done;
 	}
 
+	async saveMessagesNotDeleted(ids: { id: string; accountAddress: string }[]) {
+		const db = await this.getDB();
+		const tx = db.transaction('deletedMessages', 'readwrite');
+		await Promise.all(ids.map(v => tx.store.delete(v.id)));
+		await tx.done;
+	}
+
 	async saveMessageDeleted(id: string, accountAddress: string) {
 		const db = await this.getDB();
 		await db.put('deletedMessages', {

@@ -5,15 +5,16 @@ import { Wallet } from '../../stores/models/Wallet';
 
 export interface PublishKeyModalProps {
 	wallet: Wallet;
+	waitingForTx: boolean;
 }
 
 @observer
 export default class PublishKeyModal extends PureComponent<PublishKeyModalProps> {
-	static view(wallet: Wallet) {
+	static view(wallet: Wallet, waitingForTx: boolean) {
 		let hide = () => {};
 		modals.show((close: () => void) => {
 			hide = close;
-			return <PublishKeyModal wallet={wallet} />;
+			return <PublishKeyModal waitingForTx={waitingForTx} wallet={wallet} />;
 		});
 		return { hide };
 	}
@@ -61,18 +62,25 @@ export default class PublishKeyModal extends PureComponent<PublishKeyModalProps>
 						>
 							📡
 						</h2>
-						<h3 style={{ fontSize: 22, fontWeight: '400' }}>
-							To receive messages from other people we need you to
-							<br />
-							<div
-								style={{
-									marginTop: 20,
-									fontWeight: 'bold',
-								}}
-							>
-								publish your public key
-							</div>
-						</h3>
+						{this.props.waitingForTx ? (
+							<h3 style={{ fontSize: 22, fontWeight: '400' }}>
+								Waiting for transaction to be processed...
+							</h3>
+						) : (
+							<h3 style={{ fontSize: 22, fontWeight: '400' }}>
+								To receive messages from other people we need you to
+								<br />
+								<div
+									style={{
+										marginTop: 20,
+										fontWeight: 'bold',
+									}}
+								>
+									publish your public key
+								</div>
+							</h3>
+						)}
+
 						<img
 							alt=""
 							style={{

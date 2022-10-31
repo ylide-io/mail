@@ -134,10 +134,14 @@ export class Accounts {
 	// }
 
 	@computed get areThereAccounts() {
-		return !!this.accounts.length;
+		return !!this.activeAccounts.length;
 	}
 
 	@computed get isFirstTime() {
-		return this.accounts.length === 0;
+		return this.activeAccounts.length === 0;
+	}
+
+	@computed get activeAccounts() {
+		return this.accounts.filter(a => a.isLocalKeyRegistered);
 	}
 }

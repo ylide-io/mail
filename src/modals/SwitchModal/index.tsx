@@ -149,7 +149,9 @@ export default class SwitchModal extends PureComponent<SwitchModalProps> {
 				visible={true}
 				closable={false}
 				okButtonProps={{ style: { display: 'none' } }}
-				title={`Please, switch ${this.props.type} in ${wallet.factory.wallet}`}
+				title={`Please, switch ${this.props.type} in ${
+					wallet.factory.wallet === 'web3' ? 'MetaMask' : wallet.factory.wallet
+				}`}
 				onCancel={() => {
 					this.props.onConfirm(false);
 				}}

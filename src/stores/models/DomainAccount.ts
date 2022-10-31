@@ -22,7 +22,16 @@ export class DomainAccount {
 		this.key = key;
 	}
 
-	async getBalances(): Promise<Record<string, string>> {
+	appropriateBlockchains() {
+		return this.wallet.domain.registeredBlockchains
+			.filter(bc => bc.blockchainGroup === this.wallet.factory.blockchainGroup)
+			.map(factory => ({
+				factory,
+				reader: this.wallet.domain.blockchains[factory.blockchain],
+			}));
+	}
+
+	async getBalances(): Promise<Record<string, { original: string; number: number; e18: string }>> {
 		const chains = this.wallet.domain.registeredBlockchains.filter(
 			bc => bc.blockchainGroup === this.wallet.factory.blockchainGroup,
 		);
@@ -36,7 +45,7 @@ export class DomainAccount {
 				...p,
 				[c.blockchain]: balances[i],
 			}),
-			{},
+			{} as Record<string, { original: string; number: number; e18: string }>,
 		);
 	}
 

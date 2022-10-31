@@ -81,7 +81,7 @@ const MailDetail = observer(() => {
 
 	return (
 		<GenericLayout>
-			<div className="col-lg-9 animated fadeInRight">
+			<div className="mailbox-page animated fadeInRight">
 				<div className="mail-box-header">
 					<div className="float-right tooltip-demo tooltip-buttons-space">
 						<SmallButton

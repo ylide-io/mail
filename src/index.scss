@@ -91,3 +91,21 @@ body.modal-body-catch {
 		background-color: #000000;
 	}
 }
+
+@-webkit-keyframes MOVE-BG {
+	from {
+		-webkit-transform: translateX(0);
+	}
+	to {
+		-webkit-transform: translateX(46px);
+	}
+}
+
+@keyframes MOVE-BG {
+	from {
+		transform: translateX(0);
+	}
+	to {
+		transform: translateX(46px);
+	}
+}

@@ -24,7 +24,7 @@ const ContactsPage = observer(() => {
 
 	return (
 		<GenericLayout>
-			<div className="col-lg-9">
+			<div className="mailbox-page">
 				<div className="ibox">
 					<div className="ibox-content">
 						<div
