@@ -1,5 +1,5 @@
 import React from 'react';
-import MainLayout from '../../layouts/MainLayout';
+import GenericLayout from '../../layouts/GenericLayout';
 import SmallButton, { smallButtonColors } from '../../components/smallButton/smallButton';
 import TabSwitcher from './components/TabSwitcher';
 import contacts from '../../stores/Contacts';
@@ -23,7 +23,7 @@ const ContactsPage = observer(() => {
 	};
 
 	return (
-		<MainLayout>
+		<GenericLayout>
 			<div className="col-lg-9">
 				<div className="ibox">
 					<div className="ibox-content">
@@ -90,7 +90,7 @@ const ContactsPage = observer(() => {
 					</div>
 				</div>
 			</div>
-		</MainLayout>
+		</GenericLayout>
 	);
 });
 

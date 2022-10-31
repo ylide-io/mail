@@ -4,11 +4,11 @@ import SidebarMenu from '../components/Sidebar/SidebarMenu';
 
 import './style.scss';
 
-interface MainLayoutProps {
+interface GenericLayoutProps {
 	children: ReactNode;
 }
 
-const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
+const GenericLayout: React.FC<GenericLayoutProps> = ({ children }) => {
 	return (
 		<div className="main-layout">
 			<Header />
@@ -20,4 +20,4 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
 	);
 };
 
-export default MainLayout;
+export default GenericLayout;

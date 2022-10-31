@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import MainLayout from '../layouts/MainLayout';
+import GenericLayout from '../layouts/GenericLayout';
 import SmallButton, { smallButtonColors, smallButtonIcons } from '../components/smallButton/smallButton';
 import { useParams } from 'react-router-dom';
 import { observer } from 'mobx-react';
@@ -80,7 +80,7 @@ const MailDetail = observer(() => {
 	};
 
 	return (
-		<MainLayout>
+		<GenericLayout>
 			<div className="col-lg-9 animated fadeInRight">
 				<div className="mail-box-header">
 					<div className="float-right tooltip-demo tooltip-buttons-space">
@@ -175,7 +175,7 @@ const MailDetail = observer(() => {
 					<div className="clearfix"></div>
 				</div>
 			</div>
-		</MainLayout>
+		</GenericLayout>
 	);
 });
 
