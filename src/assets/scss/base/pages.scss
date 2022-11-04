@@ -614,6 +614,45 @@ a.compose-mail {
 	margin-right: 5px;
 }
 
+/* EVENTBOX */
+
+.event-box {
+	background-color: #ffffff;
+	border: 1px solid $border-color;
+	padding: 20px;
+	border-bottom: 0;
+}
+
+.event-box-details {
+	display: flex;
+	flex-direction: row;
+	gap: 20px;
+	padding-top: 12px;
+}
+
+.event-box-details-part {
+	display: flex;
+	flex-direction: row;
+	gap: 10px;
+}
+
+.event-box-details-labels {
+	display: flex;
+	flex-direction: column;
+	gap: 5px;
+	opacity: 0.6;
+}
+
+.event-box-details-values {
+	display: flex;
+	flex-direction: column;
+	gap: 5px;
+}
+
+.event-box-description {
+	padding-top: 5px;
+}
+
 /* MAILBOX */
 
 .mail-box {

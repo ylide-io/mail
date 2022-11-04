@@ -131,6 +131,41 @@ const MailDetail = observer(() => {
 						</h5>
 					</div>
 				</div>
+				<div className='event-box'>
+					<h3 className='font-bold'>
+						Event Name
+					</h3>
+					<div className='event-box-details'>
+						<div className='event-box-details-part'>
+							<div className='event-box-details-labels font-bold'>
+								<div>Start</div>
+								<div>End</div>
+							</div>
+							<div className='event-box-details-values'>
+								<div>Tue Nov 1 3am - Tue Nov 01, 2022 2:45am (AST)</div>
+								<div>Tue Nov 1 3am - Tue Nov 01, 2022 2:45am (AST)</div>
+							</div>
+						</div>
+						<div className='event-box-details-part'>
+							<div className='event-box-details-labels font-bold'>
+								<div>Where</div>
+								<div>Who</div>
+							</div>
+							<div className='event-box-details-values'>
+								<div>Somewhere</div>
+								<div>Someone</div>
+							</div>
+						</div>
+					</div>
+					<div className='event-box-details-part event-box-description'>
+						<div className='event-box-details-labels font-bold'>
+							<div>Description</div>
+						</div>
+						<div className='event-box-details-values'>
+							<div>This is another desc.</div>
+						</div>
+					</div>
+				</div>
 				<div className="mail-box">
 					<div className="mail-body" style={{ minHeight: 370 }}>
 						{data.blocks ? (
