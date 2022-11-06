@@ -12,6 +12,7 @@ import { useNav } from '../utils/navigate';
 import moment from 'moment';
 import mailList from '../stores/MailList';
 import { IMessageDecodedContent } from '../indexedDB/MessagesDB';
+import { CalendarOutlined } from '@ant-design/icons';
 
 const ReactEditorJS = createReactEditorJS();
 
@@ -137,7 +138,9 @@ const MailDetail = observer(() => {
 				</div>
 				<div className='event-box'>
 					<h3 className='font-bold'>
-						Event Name
+						<span style={{ verticalAlign: 'bottom' }}>
+							<CalendarOutlined style={{ fontSize: '22px' }} />
+						</span> Event Name
 					</h3>
 					<div className='event-box-details'>
 						<table>
