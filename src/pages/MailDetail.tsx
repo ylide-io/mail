@@ -136,34 +136,30 @@ const MailDetail = observer(() => {
 						Event Name
 					</h3>
 					<div className='event-box-details'>
-						<div className='event-box-details-part'>
-							<div className='event-box-details-labels font-bold'>
-								<div>Start</div>
-								<div>End</div>
-							</div>
-							<div className='event-box-details-values'>
-								<div>Tue Nov 1 3am - Tue Nov 01, 2022 2:45am (AST)</div>
-								<div>Tue Nov 1 3am - Tue Nov 01, 2022 2:45am (AST)</div>
-							</div>
-						</div>
-						<div className='event-box-details-part'>
-							<div className='event-box-details-labels font-bold'>
-								<div>Where</div>
-								<div>Who</div>
-							</div>
-							<div className='event-box-details-values'>
-								<div>Somewhere</div>
-								<div>Someone</div>
-							</div>
-						</div>
-					</div>
-					<div className='event-box-details-part event-box-description'>
-						<div className='event-box-details-labels font-bold'>
-							<div>Description</div>
-						</div>
-						<div className='event-box-details-values'>
-							<div>This is another desc.</div>
-						</div>
+						<table>
+							<tbody>
+								<tr>
+									<td className='event-box-label font-bold'>Start</td>
+									<td>Tue Nov 1 3am - Tue Nov 01, 2022 2:45am (AST)</td>
+									<td className='event-box-label font-bold'>End</td>
+									<td>Tue Nov 1 3am - Tue Nov 01, 2022 2:45am (AST)</td>
+								</tr>
+								<tr>
+									<td className='event-box-label font-bold'>Where</td>
+									<td>Somewhere</td>
+									<td className='event-box-label font-bold'>Who</td>
+									<td>Someone</td>
+								</tr>
+								<tr>
+									<td className='event-box-label font-bold'>Event File</td>
+									<td colSpan={3}>filename.ics</td>
+								</tr>
+								<tr>
+									<td className='event-box-label font-bold'>Description</td>
+									<td colSpan={3}>This is another desc. This is another desc.This is another desc.This is another desc.This is another desc.This is another desc.This is another desc.This is another desc.This is another desc.This is another desc.This is another desc.</td>
+								</tr>
+							</tbody>
+						</table>
 					</div>
 				</div>
 				<div className="mail-box">
