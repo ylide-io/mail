@@ -50,6 +50,10 @@ const MailDetail = observer(() => {
 		}
 	})();
 
+	const downloadUrl = URL.createObjectURL(new Blob(["My amazing file!!"], {
+        type: "text/plain;charset=utf-8"
+    }));
+
 	const replyClickHandler = () => {
 		mailbox.to = message.msg.senderAddress
 			? [
@@ -152,7 +156,9 @@ const MailDetail = observer(() => {
 								</tr>
 								<tr>
 									<td className='event-box-label font-bold'>Event File</td>
-									<td colSpan={3}>filename.ics</td>
+									<td colSpan={3}>
+										<a href={downloadUrl} target={'_blank'} download={'my-file.txt'}>filename.ics</a>
+									</td>
 								</tr>
 								<tr>
 									<td className='event-box-label font-bold'>Description</td>
