@@ -13,6 +13,7 @@ import moment from 'moment';
 import mailList from '../stores/MailList';
 import { IMessageDecodedContent } from '../indexedDB/MessagesDB';
 import { CalendarOutlined } from '@ant-design/icons';
+import { isEventFileString, parseEventFileString } from '../utils/eventFileString';
 
 const ReactEditorJS = createReactEditorJS();
 
@@ -40,7 +41,7 @@ const MailDetail = observer(() => {
 		mailList.decodeMessage(message);
 	};
 
-	const data = (() => {
+	const rawData = (() => {
 		// console.log('decoded.decodedTextData: ', decoded.decodedTextData);
 		if (typeof decoded?.decodedTextData === 'string') {
 			return {
@@ -51,9 +52,33 @@ const MailDetail = observer(() => {
 		}
 	})();
 
+	const { data, eventData } = (() => {
+		if (!Array.isArray(rawData.blocks)) {
+			return { data: rawData, eventData: undefined };
+		}
+
+		const eventFileBlockIndex = rawData.blocks.findIndex((item: { data: { text: string }, type: string }) => {
+			if (item.type !== "paragraph") return false;
+			return isEventFileString(item.data.text);
+		});
+
+		if (eventFileBlockIndex < 0) {
+			return { data: rawData, eventData: undefined };
+		}
+
+		const eventFileData = parseEventFileString(rawData.blocks[eventFileBlockIndex].data.text);
+		rawData.blocks.splice(eventFileBlockIndex, 1);
+
+
+		return {
+			data: rawData, eventData: eventFileData
+		};
+
+	})();
+
 	const downloadUrl = URL.createObjectURL(new Blob(["My amazing file!!"], {
-        type: "text/plain;charset=utf-8"
-    }));
+		type: "text/plain;charset=utf-8"
+	}));
 
 	const replyClickHandler = () => {
 		mailbox.to = message.msg.senderAddress
@@ -136,7 +161,7 @@ const MailDetail = observer(() => {
 						</h5>
 					</div>
 				</div>
-				<div className='event-box'>
+				{eventData && <div className='event-box'>
 					<h3 className='font-bold'>
 						<span style={{ verticalAlign: 'bottom' }}>
 							<CalendarOutlined style={{ fontSize: '22px' }} />
@@ -147,15 +172,15 @@ const MailDetail = observer(() => {
 							<tbody>
 								<tr>
 									<td className='event-box-label font-bold'>Start</td>
-									<td>Tue Nov 1 3am - Tue Nov 01, 2022 2:45am (AST)</td>
+									<td>{eventData?.events[0].dtstart.value}</td>
 									<td className='event-box-label font-bold'>End</td>
-									<td>Tue Nov 1 3am - Tue Nov 01, 2022 2:45am (AST)</td>
+									<td>{eventData?.events[0].dtend.value}</td>
 								</tr>
 								<tr>
 									<td className='event-box-label font-bold'>Where</td>
-									<td>Somewhere</td>
+									<td>{eventData?.events[0].location}</td>
 									<td className='event-box-label font-bold'>Who</td>
-									<td>Someone</td>
+									<td>{eventData?.events[0].attendee?.map(person => person.EMAIL).join(', ')}</td>
 								</tr>
 								<tr>
 									<td className='event-box-label font-bold'>Event File</td>
@@ -165,12 +190,12 @@ const MailDetail = observer(() => {
 								</tr>
 								<tr>
 									<td className='event-box-label font-bold'>Description</td>
-									<td colSpan={3}>This is another desc. This is another desc.This is another desc.This is another desc.This is another desc.This is another desc.This is another desc.This is another desc.This is another desc.This is another desc.This is another desc.</td>
+									<td colSpan={3}>{eventData?.events[0].description}</td>
 								</tr>
 							</tbody>
 						</table>
 					</div>
-				</div>
+				</div>}
 				<div className="mail-box">
 					<div className="mail-body" style={{ minHeight: 370 }}>
 						{data.blocks ? (
