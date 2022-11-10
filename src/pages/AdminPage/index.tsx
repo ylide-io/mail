@@ -22,7 +22,7 @@ export class AdminPage extends PureComponent {
 	async deployRegistryV3() {
 		this.deployingRegistryV3 = true;
 		this.registryV3Address = await (
-			domain.walletControllers.evm.web3 as EthereumWalletController
+			domain.walletControllers.evm.metamask as EthereumWalletController
 		).deployRegistryV3();
 		this.deployingRegistryV3 = false;
 	}
@@ -33,7 +33,9 @@ export class AdminPage extends PureComponent {
 	@autobind
 	async deployMailerV6() {
 		this.deployingMailerV6 = true;
-		this.mailerV6Address = await (domain.walletControllers.evm.web3 as EthereumWalletController).deployMailerV6();
+		this.mailerV6Address = await (
+			domain.walletControllers.evm.metamask as EthereumWalletController
+		).deployMailerV6();
 		this.deployingMailerV6 = false;
 	}
 

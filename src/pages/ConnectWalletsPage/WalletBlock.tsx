@@ -17,6 +17,7 @@ import SignatureModal from '../../modals/SignatureModal';
 import { asyncDelay, IGenericAccount } from '@ylide/sdk';
 import { isBytesEqual } from '../../utils/isBytesEqual';
 import PublishKeyModal from '../../modals/PublishKeyModal';
+import WalletConnectQRCodeModal from '@walletconnect/qrcode-modal';
 
 export interface WalletBlockProps {
 	wallet: string;
@@ -304,17 +305,35 @@ export class WalletBlock extends PureComponent<WalletBlockProps> {
 				);
 			}
 		} else {
-			//walletsMap[this.props.wallet].link
-			const w = walletsMap[this.props.wallet];
-			if (w) {
-				buttonHandler = () => {
-					if (w) {
-						window.open(w.link, '_blank');
+			if (this.props.wallet === 'walletconnect') {
+				buttonHandler = async () => {
+					const factory = domain.registeredWallets.find(w => w.wallet === 'walletconnect')!;
+					const result = await domain.initWallet(
+						factory,
+						(url, close) => {
+							WalletConnectQRCodeModal.open(url, close);
+						},
+						() => {
+							WalletConnectQRCodeModal.close();
+						},
+					);
+					if (result) {
+						await domain.extractWalletsData();
 					}
 				};
-				buttonContent = <>Install</>;
+				buttonContent = <>Show QR</>;
 			} else {
-				buttonContent = <>Coming soon</>;
+				const w = walletsMap[this.props.wallet];
+				if (w) {
+					buttonHandler = () => {
+						if (w) {
+							window.open(w.link, '_blank');
+						}
+					};
+					buttonContent = <>Install</>;
+				} else {
+					buttonContent = <>Coming soon</>;
+				}
 			}
 		}
 

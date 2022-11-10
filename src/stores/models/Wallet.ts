@@ -122,6 +122,7 @@ export class Wallet extends EventEmitter {
 	}
 
 	async readRemoteKeys(account: IGenericAccount) {
+		//
 		const blockchainGroup = this.factory.blockchainGroup;
 		const blockchainFactories = this.domain.registeredBlockchains.filter(
 			b => b.blockchainGroup === blockchainGroup,
@@ -156,6 +157,8 @@ export class Wallet extends EventEmitter {
 				async () => {
 					let remoteKey: Uint8Array | null = null;
 					const remoteKeys: Record<string, Uint8Array> = {};
+					const results = await mailList.readingSession.indexerHub.requestMultipleKeys([account.address]);
+					console.log('results: ', results);
 					const rawRemoteKeys = await mailList.readingSession.indexerHub.requestKeys(account.address);
 					const bcs = Object.keys(rawRemoteKeys);
 					let timestamp = -1;

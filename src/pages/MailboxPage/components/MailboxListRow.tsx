@@ -9,6 +9,7 @@ import { blockchainsMap } from '../../../constants';
 import mailList, { ILinkedMessage } from '../../../stores/MailList';
 import { YlideCheckbox } from '../../../controls/YlideCheckbox';
 import domain from '../../../stores/Domain';
+import { shrinkAddress } from '../../../utils/shrinkAddress';
 
 interface MailboxListRowProps {
 	message: ILinkedMessage;
@@ -20,7 +21,6 @@ const MailboxListRow: React.FC<MailboxListRowProps> = observer(({ style, message
 	const [loading, setLoading] = useState(false);
 	const [error, setError] = useState('');
 	const contact = contacts.contactsByAddress[message.msg.senderAddress];
-	const sender = contact ? contact.name : message.msg.senderAddress;
 	const checked = mailList.isMessageChecked(message.id);
 	const decoded = mailList.decodedMessagesById[message.msgId];
 	const isUnread = !mailList.readMessageIds.has(message.id);
@@ -76,10 +76,7 @@ const MailboxListRow: React.FC<MailboxListRowProps> = observer(({ style, message
 			<div onClick={e => e.stopPropagation()} className="check-mail" style={{ cursor: 'pointer' }}>
 				<YlideCheckbox checked={checked} onCheck={val => mailList.checkMessage(message, val)} />
 			</div>
-			<div className="mail-contact">
-				{sender.slice(0, 12)}
-				{sender.length > 12 && '...'}
-			</div>
+			<div className="mail-contact">{contact ? contact.name : shrinkAddress(message.msg.senderAddress, 16)}</div>
 			{domain.devMode ? (
 				<div className="mail-id">
 					{message.msgId.substring(0, 4)}...{message.msgId.substring(message.msgId.length - 4)}

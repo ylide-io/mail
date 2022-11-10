@@ -3,8 +3,10 @@ import { ArbitrumLogo } from './icons/ArbitrumLogo';
 import { AstarLogo } from './icons/AstarLogo';
 import { AuroraLogo } from './icons/AuroraLogo';
 import { AvalancheLogo } from './icons/AvalancheLogo';
+import { BinanceWalletLogo } from './icons/BinanceWalletLogo';
 import { BNBChainLogo } from './icons/BNBChainLogo';
 import { CeloLogo } from './icons/CeloLogo';
+import { CoinbaseWalletLogo } from './icons/CoinbaseWalletLogo';
 import { CronosLogo } from './icons/CronosLogo';
 import { EthereumLogo } from './icons/EthereumLogo';
 import EverscaleLogo from './icons/EverscaleLogo';
@@ -20,6 +22,7 @@ import { OptimismLogo } from './icons/OptimismLogo';
 import { PhantomLogo } from './icons/PhantomLogo';
 import { PolygonLogo } from './icons/PolygonLogo';
 import { SolanaLogo } from './icons/SolanaLogo';
+import { TrustWalletLogo } from './icons/TrustWalletLogo';
 import { WalletConnectLogo } from './icons/WalletConnectLogo';
 
 export interface IEthereumNetworkDescriptor {
@@ -435,7 +438,7 @@ export const blockchainsMap: Record<
 };
 
 export const walletsMap: Record<string, { title: string; link: string; logo: JSX.Element }> = {
-	web3: {
+	metamask: {
 		title: 'MetaMask',
 		logo: <MetaMaskLogo size={30} />,
 		link: 'https://metamask.io/',
@@ -443,7 +446,22 @@ export const walletsMap: Record<string, { title: string; link: string; logo: JSX
 	walletconnect: {
 		title: 'Wallet Connect',
 		logo: <WalletConnectLogo size={30} />,
-		link: 'https://metamask.io/',
+		link: 'https://walletconnect.com/',
+	},
+	coinbase: {
+		title: 'Coinbase',
+		logo: <CoinbaseWalletLogo size={30} />,
+		link: 'https://www.coinbase.com/wallet',
+	},
+	trustwallet: {
+		title: 'TrustWallet',
+		logo: <TrustWalletLogo size={30} />,
+		link: 'https://trustwallet.com/',
+	},
+	binance: {
+		title: 'BinanceWallet',
+		logo: <BinanceWalletLogo size={30} />,
+		link: 'https://chrome.google.com/webstore/detail/binance-wallet/fhbohimaelbohpjbbldcngcnapndodjp',
 	},
 	everwallet: {
 		title: 'EverWallet',
@@ -459,11 +477,7 @@ export const walletsMap: Record<string, { title: string; link: string; logo: JSX
 
 export const supportedWallets: { wallet: string; blockchains: string[] }[] = [
 	{
-		wallet: 'everwallet',
-		blockchains: ['everscale'],
-	},
-	{
-		wallet: 'web3',
+		wallet: 'metamask',
 		blockchains: [
 			EVM_NAMES[EVMNetwork.ETHEREUM],
 			EVM_NAMES[EVMNetwork.BNBCHAIN],
@@ -481,6 +495,90 @@ export const supportedWallets: { wallet: string; blockchains: string[] }[] = [
 			EVM_NAMES[EVMNetwork.METIS],
 			EVM_NAMES[EVMNetwork.ASTAR],
 		],
+	},
+	{
+		wallet: 'walletconnect',
+		blockchains: [
+			EVM_NAMES[EVMNetwork.ETHEREUM],
+			EVM_NAMES[EVMNetwork.BNBCHAIN],
+			EVM_NAMES[EVMNetwork.POLYGON],
+			EVM_NAMES[EVMNetwork.AVALANCHE],
+			EVM_NAMES[EVMNetwork.OPTIMISM],
+			EVM_NAMES[EVMNetwork.ARBITRUM],
+			EVM_NAMES[EVMNetwork.FANTOM],
+			EVM_NAMES[EVMNetwork.KLAYTN],
+			EVM_NAMES[EVMNetwork.GNOSIS],
+			EVM_NAMES[EVMNetwork.AURORA],
+			EVM_NAMES[EVMNetwork.CELO],
+			EVM_NAMES[EVMNetwork.MOONBEAM],
+			EVM_NAMES[EVMNetwork.MOONRIVER],
+			EVM_NAMES[EVMNetwork.METIS],
+			EVM_NAMES[EVMNetwork.ASTAR],
+		],
+	},
+	{
+		wallet: 'coinbase',
+		blockchains: [
+			EVM_NAMES[EVMNetwork.ETHEREUM],
+			EVM_NAMES[EVMNetwork.BNBCHAIN],
+			EVM_NAMES[EVMNetwork.POLYGON],
+			EVM_NAMES[EVMNetwork.AVALANCHE],
+			EVM_NAMES[EVMNetwork.OPTIMISM],
+			EVM_NAMES[EVMNetwork.ARBITRUM],
+			EVM_NAMES[EVMNetwork.FANTOM],
+			EVM_NAMES[EVMNetwork.KLAYTN],
+			EVM_NAMES[EVMNetwork.GNOSIS],
+			EVM_NAMES[EVMNetwork.AURORA],
+			EVM_NAMES[EVMNetwork.CELO],
+			EVM_NAMES[EVMNetwork.MOONBEAM],
+			EVM_NAMES[EVMNetwork.MOONRIVER],
+			EVM_NAMES[EVMNetwork.METIS],
+			EVM_NAMES[EVMNetwork.ASTAR],
+		],
+	},
+	{
+		wallet: 'trustwallet',
+		blockchains: [
+			EVM_NAMES[EVMNetwork.ETHEREUM],
+			EVM_NAMES[EVMNetwork.BNBCHAIN],
+			EVM_NAMES[EVMNetwork.POLYGON],
+			EVM_NAMES[EVMNetwork.AVALANCHE],
+			EVM_NAMES[EVMNetwork.OPTIMISM],
+			EVM_NAMES[EVMNetwork.ARBITRUM],
+			EVM_NAMES[EVMNetwork.FANTOM],
+			EVM_NAMES[EVMNetwork.KLAYTN],
+			EVM_NAMES[EVMNetwork.GNOSIS],
+			EVM_NAMES[EVMNetwork.AURORA],
+			EVM_NAMES[EVMNetwork.CELO],
+			EVM_NAMES[EVMNetwork.MOONBEAM],
+			EVM_NAMES[EVMNetwork.MOONRIVER],
+			EVM_NAMES[EVMNetwork.METIS],
+			EVM_NAMES[EVMNetwork.ASTAR],
+		],
+	},
+	{
+		wallet: 'binance',
+		blockchains: [
+			EVM_NAMES[EVMNetwork.ETHEREUM],
+			EVM_NAMES[EVMNetwork.BNBCHAIN],
+			EVM_NAMES[EVMNetwork.POLYGON],
+			EVM_NAMES[EVMNetwork.AVALANCHE],
+			EVM_NAMES[EVMNetwork.OPTIMISM],
+			EVM_NAMES[EVMNetwork.ARBITRUM],
+			EVM_NAMES[EVMNetwork.FANTOM],
+			EVM_NAMES[EVMNetwork.KLAYTN],
+			EVM_NAMES[EVMNetwork.GNOSIS],
+			EVM_NAMES[EVMNetwork.AURORA],
+			EVM_NAMES[EVMNetwork.CELO],
+			EVM_NAMES[EVMNetwork.MOONBEAM],
+			EVM_NAMES[EVMNetwork.MOONRIVER],
+			EVM_NAMES[EVMNetwork.METIS],
+			EVM_NAMES[EVMNetwork.ASTAR],
+		],
+	},
+	{
+		wallet: 'everwallet',
+		blockchains: ['everscale'],
 	},
 	{
 		wallet: 'phantom',

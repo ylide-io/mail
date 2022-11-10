@@ -17,6 +17,11 @@ module.exports = function override(config) {
 			Buffer: ['buffer', 'Buffer'],
 		}),
 	]);
+	config.module.rules.push({
+		test: /\.(js|mjs|jsx|ts|tsx)$/,
+		use: ['source-map-loader'],
+		enforce: 'pre',
+	});
 	// config.target.target = 'es2022';
 	return config;
 };
