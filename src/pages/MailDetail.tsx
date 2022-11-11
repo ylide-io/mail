@@ -14,7 +14,6 @@ import mailList from '../stores/MailList';
 import { IMessageDecodedContent } from '../indexedDB/MessagesDB';
 import { CalendarOutlined } from '@ant-design/icons';
 import { isEventFileString, parseEventFileString } from '../utils/eventFileString';
-import { formatCalendarEventDateString } from '../utils/calendarEventDate';
 
 const ReactEditorJS = createReactEditorJS();
 
@@ -77,7 +76,7 @@ const MailDetail = observer(() => {
 
 	})();
 
-	const downloadUrl = URL.createObjectURL(new Blob(["My amazing file!!"], {
+	const downloadUrl = URL.createObjectURL(new Blob([eventData?.originalFile || ''], {
 		type: "text/plain;charset=utf-8"
 	}));
 
@@ -166,32 +165,27 @@ const MailDetail = observer(() => {
 					<h3 className='font-bold'>
 						<span style={{ verticalAlign: 'bottom' }}>
 							<CalendarOutlined style={{ fontSize: '22px' }} />
-						</span> {eventData?.events[0].summary}
+						</span> {eventData?.summary}
 					</h3>
+					<a href={downloadUrl} target={'_blank'} download={'invite.ics'}>Download invite</a>
 					<div className='event-box-details'>
 						<table>
 							<tbody>
 								<tr>
 									<td className='event-box-label font-bold'>Start</td>
-									<td>{formatCalendarEventDateString(eventData?.events[0].dtstart.value)}</td>
+									<td>{eventData?.start}</td>
 									<td className='event-box-label font-bold'>End</td>
-									<td>{formatCalendarEventDateString(eventData?.events[0].dtend.value)}</td>
+									<td>{eventData?.end}</td>
 								</tr>
 								<tr>
 									<td className='event-box-label font-bold'>Where</td>
-									<td>{eventData?.events[0].location}</td>
+									<td>{eventData?.location}</td>
 									<td className='event-box-label font-bold'>Who</td>
-									<td>{eventData?.events[0].attendee?.map(person => person.EMAIL).join(', ')}</td>
-								</tr>
-								<tr>
-									<td className='event-box-label font-bold'>Event File</td>
-									<td colSpan={3}>
-										<a href={downloadUrl} target={'_blank'} download={'my-file.txt'}>filename.ics</a>
-									</td>
+									<td>{eventData?.attendees}</td>
 								</tr>
 								<tr>
 									<td className='event-box-label font-bold'>Description</td>
-									<td colSpan={3}>{eventData?.events[0].description}</td>
+									<td colSpan={3}>{eventData?.description}</td>
 								</tr>
 							</tbody>
 						</table>

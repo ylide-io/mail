@@ -1,5 +1,5 @@
 import ICalParser from "ical-js-parser";
-import { createCalendarEventDateString } from "./calendarEventDate";
+import { createCalendarEventDateString, formatCalendarEventDateString } from "./calendarEventDate";
 
 const separator = "===~~~===EVENTFILE===~~~===";
 
@@ -8,9 +8,18 @@ export const isEventFileString = (text: string) => {
 }
 
 export const parseEventFileString = (text: string) => {
-    const eventString = text.replaceAll(separator, '').replaceAll('<br>', '\n').trim();
+    const eventString = text.replaceAll(separator, '').trim();
+    const result = ICalParser.toJSON(eventString);
 
-    return ICalParser.toJSON(eventString);
+    return {
+        originalFile: eventString,
+        summary: result.events[0].summary,
+        description: result.events[0].description,
+        location: result.events[0].location,
+        start: formatCalendarEventDateString(result.events[0].dtstart.value),
+        end: formatCalendarEventDateString(result.events[0].dtend.value),
+        attendees: result.events[0].attendee?.map(person => person.EMAIL).join(', '),
+    }
 }
 
 export const createEventFileString = ({
