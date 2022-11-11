@@ -9,12 +9,12 @@ export interface IRecipient {
 	type: 'contact' | 'ns' | 'address' | 'invalid';
 	address: string | null;
 	isAchievable:
-		| null
-		| false
-		| {
-				type: string;
-				blockchain: string | null;
-		  };
+	| null
+	| false
+	| {
+		type: string;
+		blockchain: string | null;
+	};
 	comment?: string;
 }
 
@@ -46,6 +46,13 @@ class Mailbox {
 
 	@observable subject: string = '';
 
+	@observable event: Partial<{
+		summary: string,
+		description: string,
+		startDateTime: string,
+		endDateTime: string,
+	}> = {};
+
 	@observable textEditorData: any | null = null;
 
 	constructor() {
@@ -58,6 +65,7 @@ class Mailbox {
 		this.to = [];
 		this.subject = '';
 		this.textEditorData = '';
+		this.event = {};
 	}
 }
 
