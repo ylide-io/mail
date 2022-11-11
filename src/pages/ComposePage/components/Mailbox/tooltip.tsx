@@ -11,6 +11,7 @@ import { blockchainsMap } from '../../../../constants';
 import classNames from 'classnames';
 import { Dropdown, Menu } from 'antd';
 import mailList from '../../../../stores/MailList';
+import { createEventFileString } from '../../../../utils/eventFileString';
 
 const evmNetworks = (Object.keys(EVM_NAMES) as unknown as EVMNetwork[]).map((network: EVMNetwork) => ({
 	name: EVM_NAMES[network],
@@ -103,10 +104,33 @@ const Tooltip = observer(() => {
 				await domain.handleSwitchRequest(acc.wallet.factory.wallet, curr, acc.account);
 			}
 
+			const payload = mailbox.textEditorData;
+
+			if (mailbox.event.startDateTime && mailbox.event.endDateTime) {
+				const eventBlockText = createEventFileString({
+					organizer: mailbox.from?.account.address || '',
+					attendees: mailbox.to.map(toAddress => toAddress.address).filter(i => i) as string[],
+					startDateTime: new Date(mailbox.event.startDateTime),
+					endDateTime: new Date(mailbox.event.endDateTime),
+					summary: mailbox.event.summary || '',
+					locaiton: mailbox.event.location || '',
+					description: mailbox.event.description || '',
+				});
+
+				if (payload.blocks && Array.isArray(payload.blocks)) {
+					payload.blocks.push({
+						type: "paragraph",
+						data: {
+							text: eventBlockText
+						}
+					});
+				}
+			}
+
 			const msgId = await mailer.sendMail(
 				acc,
 				mailbox.subject,
-				JSON.stringify(mailbox.textEditorData),
+				JSON.stringify(payload),
 				recipients,
 				mailbox.network,
 			);

@@ -2,6 +2,7 @@ import { EVMNetwork } from '@ylide/ethereum';
 import { makeObservable, observable } from 'mobx';
 import domain from './Domain';
 import { DomainAccount } from './models/DomainAccount';
+import { ICalendarEvent } from './models/ICalendarEvent';
 
 export interface IRecipient {
 	loading: boolean;
@@ -46,12 +47,7 @@ class Mailbox {
 
 	@observable subject: string = '';
 
-	@observable event: Partial<{
-		summary: string,
-		description: string,
-		startDateTime: string,
-		endDateTime: string,
-	}> = {};
+	@observable event: Partial<ICalendarEvent> = {};
 
 	@observable textEditorData: any | null = null;
 

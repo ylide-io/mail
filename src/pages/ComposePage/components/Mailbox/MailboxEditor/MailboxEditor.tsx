@@ -46,10 +46,21 @@ const MailboxEditor = () => {
 					</div>
 				</div>
 				<div className="form-group row">
-					<label className="col-sm-1 col-form-label">Start:</label>
+					<label className="col-sm-1 col-form-label">Location:</label>
 					<div className="col-sm-11">
 						<input
 							type="text"
+							className="form-control"
+							value={mailbox.event.location}
+							onChange={e => (mailbox.event.location = e.target.value)}
+						/>
+					</div>
+				</div>
+				<div className="form-group row">
+					<label className="col-sm-1 col-form-label">Start:</label>
+					<div className="col-sm-11">
+						<input
+							type="datetime-local"
 							className="form-control"
 							value={mailbox.event.startDateTime}
 							onChange={e => (mailbox.event.startDateTime = e.target.value)}
@@ -60,7 +71,7 @@ const MailboxEditor = () => {
 					<label className="col-sm-1 col-form-label">End:</label>
 					<div className="col-sm-11">
 						<input
-							type="text"
+							type="datetime-local"
 							className="form-control"
 							value={mailbox.event.endDateTime}
 							onChange={e => (mailbox.event.endDateTime = e.target.value)}

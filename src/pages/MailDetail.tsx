@@ -165,7 +165,7 @@ const MailDetail = observer(() => {
 					<h3 className='font-bold'>
 						<span style={{ verticalAlign: 'bottom' }}>
 							<CalendarOutlined style={{ fontSize: '22px' }} />
-						</span> Event Name
+						</span> {eventData?.events[0].summary}
 					</h3>
 					<div className='event-box-details'>
 						<table>
