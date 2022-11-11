@@ -14,6 +14,7 @@ import mailList from '../stores/MailList';
 import { IMessageDecodedContent } from '../indexedDB/MessagesDB';
 import { CalendarOutlined } from '@ant-design/icons';
 import { isEventFileString, parseEventFileString } from '../utils/eventFileString';
+import { formatCalendarEventDateString } from '../utils/calendarEventDate';
 
 const ReactEditorJS = createReactEditorJS();
 
@@ -172,9 +173,9 @@ const MailDetail = observer(() => {
 							<tbody>
 								<tr>
 									<td className='event-box-label font-bold'>Start</td>
-									<td>{eventData?.events[0].dtstart.value}</td>
+									<td>{formatCalendarEventDateString(eventData?.events[0].dtstart.value)}</td>
 									<td className='event-box-label font-bold'>End</td>
-									<td>{eventData?.events[0].dtend.value}</td>
+									<td>{formatCalendarEventDateString(eventData?.events[0].dtend.value)}</td>
 								</tr>
 								<tr>
 									<td className='event-box-label font-bold'>Where</td>

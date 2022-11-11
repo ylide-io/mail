@@ -634,6 +634,10 @@ a.compose-mail {
 		padding-bottom: 5px;
 		padding-right: 5px;
 	}
+	
+	td:nth-child(even) {
+		padding-right: 15px;
+	}
 }
 
 .event-box-label {

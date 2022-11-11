@@ -4,6 +4,6 @@ export const createCalendarEventDateString = (date: Date) => {
     return moment.utc(date).format('YYYYMMDDTHHmmss[Z]');
 }
 
-export const parseCalendarEventDateString = (date: string) => {
-    return moment(date);
+export const formatCalendarEventDateString = (date: string) => {
+    return moment(date).format('dddd MMM DD, YYYY ⋅ HH:mma');
 }
