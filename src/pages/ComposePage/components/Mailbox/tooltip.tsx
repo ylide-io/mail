@@ -106,7 +106,7 @@ const Tooltip = observer(() => {
 
 			const payload = mailbox.textEditorData;
 
-			if (mailbox.event.startDateTime && mailbox.event.endDateTime) {
+			if (mailbox.event.active && mailbox.event.startDateTime && mailbox.event.endDateTime) {
 				const eventBlockText = createEventFileString({
 					organizer: mailbox.from?.account.address || '',
 					attendees: mailbox.to.map(toAddress => toAddress.address).filter(i => i) as string[],

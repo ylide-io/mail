@@ -1,0 +1,26 @@
+button span {
+    margin-left: 3px;
+}
+
+.add-event-btn {
+    position: absolute;
+    transform: translateY(-50%);
+    margin-left: 15px;
+}
+
+.mailbox-editor-secion {
+    padding: 0px;
+}
+
+.add-event-section {
+    transition: height 0.2s linear;
+    overflow: hidden;
+
+    &.inactive {
+        border: none;
+    }
+
+    .add-event-section-content {
+        padding: 35px 15px;
+    }
+}

@@ -4,6 +4,7 @@ import { PureComponent } from 'react';
 import { RecipientsSelect } from '../../../controls/RecipientSelect';
 import domain from '../../../stores/Domain';
 import mailbox from '../../../stores/Mailbox';
+import './MailMeta.scss'
 
 @observer
 export class MailMeta extends PureComponent {
@@ -15,7 +16,7 @@ export class MailMeta extends PureComponent {
 
 	render() {
 		return (
-			<>
+			<div className='mail-meta'>
 				<div className="form-group row">
 					<label className="col-sm-1 col-form-label">From:</label>
 					<div className="col-sm-11" style={{ position: 'relative', zIndex: 2 }}>
@@ -52,7 +53,7 @@ export class MailMeta extends PureComponent {
 						/>
 					</div>
 				</div>
-			</>
+			</div>
 		);
 	}
 }
