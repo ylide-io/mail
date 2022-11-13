@@ -14,6 +14,7 @@ import mailList from '../stores/MailList';
 import { IMessageDecodedContent } from '../indexedDB/MessagesDB';
 import { CalendarOutlined } from '@ant-design/icons';
 import { parseEventFileString } from '../utils/eventFileString';
+import CollapsedText from '../components/CollapsedText/CollapsedText';
 
 const ReactEditorJS = createReactEditorJS();
 
@@ -59,8 +60,6 @@ const MailDetail = observer(() => {
 
 		const eventFileBlockIndex = rawData.blocks.findIndex((item: { data: { text: string }, type: string }) => {
 			return item.type === 'calendarEvent';
-			// if (item.type !== "paragraph") return false;
-			// return isEventFileString(item.data.text);
 		});
 
 		if (eventFileBlockIndex < 0) {
@@ -186,7 +185,9 @@ const MailDetail = observer(() => {
 								</tr>
 								<tr>
 									<td className='event-box-label font-bold'>Description</td>
-									<td colSpan={3}>{eventData?.description}</td>
+									<td style={{whiteSpace: 'pre-line'}} colSpan={3}>
+										<CollapsedText text={eventData?.description || ''} collapseCount={250} />
+									</td>
 								</tr>
 							</tbody>
 						</table>

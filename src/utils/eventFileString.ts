@@ -7,7 +7,7 @@ export const parseEventFileString = (text: string) => {
     return {
         originalFile: text,
         summary: result.events[0].summary,
-        description: result.events[0].description,
+        description: result.events[0].description?.replaceAll('\\n', '\n'),
         location: result.events[0].location,
         start: formatCalendarEventDateString(result.events[0].dtstart.value),
         end: formatCalendarEventDateString(result.events[0].dtend.value),
