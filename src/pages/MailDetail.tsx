@@ -13,7 +13,7 @@ import moment from 'moment';
 import mailList from '../stores/MailList';
 import { IMessageDecodedContent } from '../indexedDB/MessagesDB';
 import { CalendarOutlined } from '@ant-design/icons';
-import { isEventFileString, parseEventFileString } from '../utils/eventFileString';
+import { parseEventFileString } from '../utils/eventFileString';
 
 const ReactEditorJS = createReactEditorJS();
 
@@ -58,8 +58,9 @@ const MailDetail = observer(() => {
 		}
 
 		const eventFileBlockIndex = rawData.blocks.findIndex((item: { data: { text: string }, type: string }) => {
-			if (item.type !== "paragraph") return false;
-			return isEventFileString(item.data.text);
+			return item.type === 'calendarEvent';
+			// if (item.type !== "paragraph") return false;
+			// return isEventFileString(item.data.text);
 		});
 
 		if (eventFileBlockIndex < 0) {
@@ -167,7 +168,7 @@ const MailDetail = observer(() => {
 							<CalendarOutlined style={{ fontSize: '22px' }} />
 						</span> {eventData?.summary}
 					</h3>
-					<a href={downloadUrl} target={'_blank'} download={'invite.ics'}>Download invite</a>
+					<a href={downloadUrl} rel="noreferrer noopener" target={'_blank'} download={'invite.ics'}>Download invite</a>
 					<div className='event-box-details'>
 						<table>
 							<tbody>

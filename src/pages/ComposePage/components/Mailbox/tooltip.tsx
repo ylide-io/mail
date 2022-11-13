@@ -120,7 +120,7 @@ const Tooltip = observer(() => {
 
 				if (payload.blocks && Array.isArray(payload.blocks)) {
 					payload.blocks.push({
-						type: "paragraph",
+						type: "calendarEvent",
 						data: {
 							text: eventBlockText
 						}
