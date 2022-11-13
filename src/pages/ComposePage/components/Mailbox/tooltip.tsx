@@ -12,6 +12,7 @@ import classNames from 'classnames';
 import { Dropdown, Menu } from 'antd';
 import mailList from '../../../../stores/MailList';
 import { createEventFileString } from '../../../../utils/eventFileString';
+import { isValidCalendarEventDates } from '../../../../utils/calendarEventDate';
 
 const evmNetworks = (Object.keys(EVM_NAMES) as unknown as EVMNetwork[]).map((network: EVMNetwork) => ({
 	name: EVM_NAMES[network],
@@ -144,6 +145,8 @@ const Tooltip = observer(() => {
 		}
 	};
 
+	const validCalendarEvent = !mailbox.event.active || isValidCalendarEventDates(mailbox.event.startDateTime, mailbox.event.endDateTime);
+
 	return (
 		<div
 			className="mail-body text-right tooltip-demo"
@@ -161,7 +164,8 @@ const Tooltip = observer(() => {
 						mailer.sending ||
 						!mailbox.to.some(r => r.isAchievable) ||
 						!mailbox.textEditorData?.blocks?.length ||
-						!mailbox.to.length,
+						!mailbox.to.length ||
+						!validCalendarEvent,
 					withDropdown: mailbox.from?.wallet.factory.blockchainGroup === 'evm',
 				})}
 			>

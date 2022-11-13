@@ -54,6 +54,7 @@ const MailboxCalendarEventEditor = observer(() => {
                                 className="form-control"
                                 value={mailbox.event.startDateTime}
                                 onChange={e => (mailbox.event.startDateTime = e.target.value)}
+                                max={mailbox.event.endDateTime}
                             />
                         </div>
                     </div>
@@ -65,6 +66,7 @@ const MailboxCalendarEventEditor = observer(() => {
                                 className="form-control"
                                 value={mailbox.event.endDateTime}
                                 onChange={e => (mailbox.event.endDateTime = e.target.value)}
+                                min={mailbox.event.startDateTime}
                             />
                         </div>
                     </div>
