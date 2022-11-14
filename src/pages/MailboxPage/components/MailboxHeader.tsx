@@ -5,7 +5,7 @@ import MailsCounter from './MailsCounter';
 export class MailboxHeader extends PureComponent {
 	render() {
 		return (
-			<div className="mail-box-header">
+			<div className="mailbox-header">
 				{/* <MailsSearcher /> */}
 				<MailsCounter />
 				<MailboxControls />

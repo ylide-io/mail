@@ -1,121 +1,99 @@
-import React, { useState } from "react";
-import { ITag } from "../../../../stores/models/ITag";
-import classNames from "classnames";
-import { allColors, colors } from "../../../../utils/colors";
-import tags from "../../../../stores/Tags";
-import ColorPicker from "./ColorPicker";
+import React, { useState } from 'react';
+import { ITag } from '../../../../stores/models/ITag';
+import { allColors } from '../../../../utils/colors';
+import tags from '../../../../stores/Tags';
+import ColorPicker from './ColorPicker';
+import { DeleteOutlined, EditOutlined, SaveOutlined } from '@ant-design/icons';
+import { Button, Input } from 'antd';
 
 interface TagsListItemProps {
-    tag: ITag;
-    isNew?: boolean;
+	tag: ITag;
+	isNew?: boolean;
 }
 
 export interface IColor {
-    value: number;
-    name: string;
+	value: number;
+	name: string;
 }
 
 const TagsListItem: React.FC<TagsListItemProps> = ({ tag, isNew }) => {
-    const [editing, setEditing] = useState(isNew || false);
-    const [name, setName] = useState(tag.name);
-    const [color, setColor] = useState<colors>(tag.color);
+	const [editing, setEditing] = useState(isNew || false);
+	const [name, setName] = useState(tag.name);
+	const [color, setColor] = useState<string>(tag.color);
 
-    const editClickHandler = () => {
-        setEditing(true);
-    };
+	const editClickHandler = () => {
+		setEditing(true);
+	};
 
-    const saveClickHandler = () => {
-        const newTag: ITag = {
-            id: tag.id,
-            name,
-            color: color,
-        };
-        if (isNew) {
-            tags.resetNewTag();
-            tags.saveTag(newTag);
-        } else {
-            tags.updateTag(newTag);
-        }
-        setEditing(false);
-    };
+	const saveClickHandler = () => {
+		const newTag: ITag = {
+			id: tag.id,
+			name,
+			color,
+		};
+		if (isNew) {
+			tags.resetNewTag();
+			tags.saveTag(newTag);
+		} else {
+			tags.updateTag(newTag);
+		}
+		setEditing(false);
+	};
 
-    const deleteClickHandler = async () => {
-        await tags.deleteTag(tag.id);
-    };
+	const deleteClickHandler = async () => {
+		await tags.deleteTag(tag.id);
+	};
 
-    if (editing) {
-        return (
-            <tr>
-                <td style={{ textAlign: "left", width: "40%" }}>
-                    <input
-                        type="text"
-                        className="input form-control"
-                        placeholder={"Type folder name"}
-                        value={name}
-                        onChange={(e) => setName(e.target.value)}
-                    />
-                </td>
-                <td style={{ textAlign: "center" }} className="client-status">
-                    <div style={{ display: "inline-flex" }}>
-                        {allColors.map((c) => (
-                            <ColorPicker
-                                key={c}
-                                onClick={setColor}
-                                active={c === color}
-                                color={c}
-                            />
-                        ))}
-                    </div>
-                </td>
-                <>
-                    {!isNew ? (
-                        <td
-                            onClick={deleteClickHandler}
-                            style={{
-                                cursor: "pointer",
-                                textAlign: "center",
-                                width: "5%",
-                            }}
-                        >
-                            <i className="fa fa-trash"></i>
-                        </td>
-                    ) : (
-                        <td></td>
-                    )}
-                    <td
-                        onClick={saveClickHandler}
-                        style={{
-                            cursor: "pointer",
-                            textAlign: "center",
-                            width: "5%",
-                        }}
-                    >
-                        <i className="fa fa-check"></i>
-                    </td>
-                </>
-            </tr>
-        );
-    }
+	if (editing) {
+		return (
+			<div className="contacts-list-item">
+				<div className="contact-folders">
+					<div style={{ display: 'inline-flex' }}>
+						{allColors.map(c => (
+							<ColorPicker key={c} onClick={setColor} active={c === color} color={c} />
+						))}
+					</div>
+				</div>
+				<div className="contact-name">
+					<Input
+						type="text"
+						placeholder="Type new folder name"
+						value={name}
+						style={{ width: '100%' }}
+						onChange={e => setName(e.target.value)}
+					/>
+				</div>
+				<div className="contact-actions small-actions">
+					{!isNew ? (
+						<>
+							<Button type="primary" size="small" onClick={saveClickHandler} icon={<SaveOutlined />} />
+							<Button
+								danger
+								type="dashed"
+								size="small"
+								onClick={deleteClickHandler}
+								icon={<DeleteOutlined />}
+							/>
+						</>
+					) : (
+						<Button type="primary" size="small" onClick={saveClickHandler} icon={<SaveOutlined />} />
+					)}
+				</div>
+			</div>
+		);
+	}
 
-    return (
-        <tr>
-            <td style={{ textAlign: "left", width: "40%", paddingLeft: 15 }}>
-                <span className="client-link">{tag.name}</span>
-            </td>
-            <td style={{ textAlign: "center" }} className="client-status">
-                <span className={classNames(["label", `label-${tag.color}`])}>
-                    {tag.name}
-                </span>
-            </td>
-            <td></td>
-            <td
-                onClick={editClickHandler}
-                style={{ cursor: "pointer", width: "5%" }}
-            >
-                <i className="fa fa-gear"></i>
-            </td>
-        </tr>
-    );
+	return (
+		<div className="contacts-list-item">
+			<div className="contact-folders">
+				<div style={{ width: 20, height: 20, borderRadius: 10, backgroundColor: tag.color }} />
+			</div>
+			<div className="contact-name">{tag.name}</div>
+			<div className="contact-actions small-actions">
+				<Button type="dashed" size="small" onClick={editClickHandler} icon={<EditOutlined />} />
+			</div>
+		</div>
+	);
 };
 
 export default TagsListItem;

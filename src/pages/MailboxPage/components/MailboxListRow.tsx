@@ -83,7 +83,7 @@ const MailboxListRow: React.FC<MailboxListRowProps> = observer(({ style, message
 				</div>
 			) : null}
 			<div className="mail-subject">
-				<span style={!decoded ? { filter: 'blur(5px)' } : {}}>
+				<span className="mail-subject-title" style={!decoded ? { filter: 'blur(5px)' } : {}}>
 					{decoded ? decoded.decodedSubject || 'No subject' : 'Message is not decoded'}
 				</span>
 				{!decoded &&
@@ -93,11 +93,9 @@ const MailboxListRow: React.FC<MailboxListRowProps> = observer(({ style, message
 						<span style={{ marginLeft: 7 }}>[Not decoded]</span>
 					))}
 
-				<span
-					className="label label-info"
-					style={{ float: 'right', fontSize: '80%', background: 'rgb(221, 241, 255)', color: 'black' }}
-				>
-					{blockchainsMap[message.msg.blockchain].logo(12)} {message.msg.blockchain}
+				<span className="label mail-label">
+					<span className="mail-label-icon">{blockchainsMap[message.msg.blockchain].logo(12)}</span>
+					<span className="mail-label-title">{message.msg.blockchain.toUpperCase()}</span>
 				</span>
 			</div>
 			<div className="text-right mail-date">{date}</div>

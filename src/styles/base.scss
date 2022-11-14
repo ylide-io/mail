@@ -1,0 +1,56 @@
+@mixin flex-row($align-items, $justify-content) {
+	display: flex;
+	flex-direction: row;
+	align-items: $align-items;
+	justify-content: $justify-content;
+}
+
+@mixin flex-column($align-items, $justify-content) {
+	display: flex;
+	flex-direction: column;
+	align-items: $align-items;
+	justify-content: $justify-content;
+}
+
+body {
+	margin: 0;
+	font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans',
+		'Droid Sans', 'Helvetica Neue', sans-serif;
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+
+	font-family: 'Open Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+	background-image: url(../assets/img/background-desktop.svg);
+	background-size: cover;
+	background-position: center;
+	background-attachment: fixed;
+	background-repeat: no-repeat;
+	font-size: 13px;
+	color: #111111;
+	overflow-x: hidden;
+
+	min-width: 100vw;
+	min-height: 100vh;
+
+	@include flex-column(stretch, flex-start);
+}
+
+#root {
+	@include flex-column(stretch, flex-start);
+
+	min-width: 100vw;
+	min-height: 100vh;
+
+	flex-grow: 1;
+	flex-shrink: 1;
+}
+
+code {
+	font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace;
+}
+
+body.modal-body-catch {
+	width: 100vw;
+	height: 100vh;
+	overflow: hidden;
+}

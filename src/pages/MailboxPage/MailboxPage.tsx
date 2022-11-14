@@ -3,7 +3,6 @@ import GenericLayout from '../../layouts/GenericLayout';
 import MailboxList from './components/MailboxList';
 import { MailboxHeader } from './components/MailboxHeader';
 
-import './style.scss';
 import mailList from '../../stores/MailList';
 import { useParams } from 'react-router-dom';
 

@@ -1,3 +1,4 @@
+import { Input } from 'antd';
 import React, { useEffect, useState } from 'react';
 import contacts from '../../../stores/Contacts';
 
@@ -11,19 +12,16 @@ const ContactsSearcher = () => {
 
 	return (
 		<>
-			<input
+			<Input.Search
 				value={contactsSearchText}
 				onChange={e => setContactsSearchText(e.target.value)}
 				type="text"
-				placeholder="Search contact "
-				className="input form-control"
+				placeholder="Search contact"
+				enterButton="Search"
+				onSearch={() => {
+					//
+				}}
 			/>
-			<span className="input-group-append">
-				<button type="button" className="btn btn btn-primary">
-					{' '}
-					<i className="fa fa-search" /> Search
-				</button>
-			</span>
 		</>
 	);
 };

@@ -10,7 +10,7 @@ const PermanentTagList: React.FC<PermanentTagListProps> = observer(() => {
 	const navigate = useNavigate();
 
 	return (
-		<ul className="folder-list m-b-md" style={{ padding: 0 }}>
+		<div className="tag-list">
 			<PermanentTag
 				active={mailList.activeFolderId === 'inbox'}
 				text={'Inbox'}
@@ -23,7 +23,7 @@ const PermanentTagList: React.FC<PermanentTagListProps> = observer(() => {
 				onClick={() => navigate('/archive')}
 			/>
 			{/* <PermanentTag active={false} text={"Archive"} onClick={() => viewFolder("Archive")} /> */}
-		</ul>
+		</div>
 	);
 });
 

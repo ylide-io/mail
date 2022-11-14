@@ -1,93 +1,60 @@
 import React from 'react';
 import GenericLayout from '../../layouts/GenericLayout';
-import SmallButton, { smallButtonColors } from '../../components/smallButton/smallButton';
-import TabSwitcher from './components/TabSwitcher';
 import contacts from '../../stores/Contacts';
 import tags from '../../stores/Tags';
 import { observer } from 'mobx-react';
 import { Outlet, useLocation } from 'react-router-dom';
-import TagsFilter from './components/TagsFilter';
 import ContactsSearcher from './components/ContactsSearcher';
 import { useNav } from '../../utils/navigate';
+import { Button, Tabs } from 'antd';
+import TagsFilter from './components/TagsFilter';
+import { PlusOutlined } from '@ant-design/icons';
 
 const ContactsPage = observer(() => {
 	const location = useLocation();
-	const navigate = useNav();
+	const nav = useNav();
 
 	const addHandler = () => {
 		if (location.pathname === '/contacts') {
 			contacts.generateNewContact();
-		} else if (location.pathname === '/contacts/folders') {
+		} else if (location.pathname === '/folders') {
 			tags.generateNewTag();
 		}
 	};
 
 	return (
 		<GenericLayout>
-			<div className="mailbox-page">
-				<div className="ibox">
-					<div className="ibox-content">
-						<div
-							style={{
-								display: 'flex',
-								justifyContent: 'space-between',
-							}}
-						>
-							<h2>{location.pathname === '/contacts' ? 'Contacts' : 'Folders'}</h2>
-						</div>
-						<p>
-							{location.pathname === '/contacts'
-								? 'Match an address with the owner name for more convenience usage.'
-								: 'Create your tags for sorting messages.'}
-						</p>
-						<div
-							style={location.pathname === '/contacts/folders' ? { opacity: 0 } : {}}
-							className="input-group"
-						>
-							<ContactsSearcher />
-						</div>
-						<div className="clients-list">
+			<div className="mail-page animated fadeInRight">
+				<div className="mail-top contacts-mail-top">
+					<div className="mail-header">
+						<h2 className="mailbox-title">{location.pathname === '/contacts' ? 'Contacts' : 'Folders'}</h2>
+						<div className="mail-actions">
 							<div
-								style={{
-									display: 'flex',
-									justifyContent: 'space-between',
-									flexDirection: 'row',
-								}}
+								style={location.pathname === '/contacts/folders' ? { opacity: 0 } : {}}
+								className="input-group"
 							>
-								<ul className="nav nav-tabs" style={{ flexGrow: 1 }}>
-									<TabSwitcher
-										onClick={() => navigate('/contacts')}
-										active={location.pathname === '/contacts'}
-										text={'Contacts'}
-										icon={'fa-user'}
-									/>
-									<TabSwitcher
-										onClick={() => navigate('/contacts/folders')}
-										active={location.pathname === '/contacts/folders'}
-										text={'Folders'}
-										icon={'fa-tags'}
-									/>
-								</ul>
-								<div
-									style={{
-										display: 'flex',
-										alignItems: 'center',
-									}}
-									className="small text-muted"
-								>
-									{location.pathname === '/contacts' && <TagsFilter />}
-									<SmallButton
-										color={smallButtonColors.green}
-										onClick={addHandler}
-										text={location.pathname === '/contacts' ? '+ Add contact' : '+ Add folder'}
-									/>
-								</div>
-							</div>
-							<div className="tab-content">
-								<Outlet />
+								<ContactsSearcher />
 							</div>
 						</div>
 					</div>
+				</div>
+				<div className="page-body">
+					<Tabs
+						activeKey={location.pathname.split('/')[1]}
+						onTabClick={key => nav(`/${key}`)}
+						tabBarExtraContent={
+							<>
+								{location.pathname === '/contacts' && <TagsFilter />}
+								<Button onClick={addHandler} style={{ marginLeft: 10 }} icon={<PlusOutlined />}>
+									{location.pathname === '/contacts' ? 'Add contact' : 'Add folder'}
+								</Button>
+							</>
+						}
+					>
+						<Tabs.TabPane tab="Contacts" key="contacts" />
+						<Tabs.TabPane tab="Folders" key="folders" />
+					</Tabs>
+					<Outlet />
 				</div>
 			</div>
 		</GenericLayout>

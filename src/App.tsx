@@ -14,8 +14,6 @@ import TagsTab from './pages/ContactsPage/components/Tags/TagsTab';
 import FirstTimePage from './pages/FirstTimePage/FirstTimePage';
 import ConnectWalletsPage from './pages/ConnectWalletsPage/ConnectWalletsPage';
 
-import './modals/style.scss';
-import { PasswordModal } from './modals/PasswordModal';
 import modals from './stores/Modals';
 import { Loader } from './controls/Loader';
 import { AdminPage } from './pages/AdminPage';
@@ -31,13 +29,13 @@ const App = observer(() => {
 	}, []);
 
 	useEffect(() => {
-		if (modals.anyModalVisible) {
+		if (modals.anythingVisible) {
 			document.body.classList.add('modal-body-catch');
 		} else {
 			document.body.classList.remove('modal-body-catch');
 		}
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [modals.anyModalVisible]);
+	}, [modals.anythingVisible]);
 
 	if (!domain.initialized) {
 		return (
@@ -78,7 +76,9 @@ const App = observer(() => {
 					<Route path={'/compose'} element={<ComposePage />} />
 					<Route path={'/contacts'} element={<ContactsPage />}>
 						<Route index element={<ContactsTab />} />
-						<Route path={'folders'} element={<TagsTab />} />
+					</Route>
+					<Route path={'/folders'} element={<ContactsPage />}>
+						<Route index element={<TagsTab />} />
 					</Route>
 					<Route path={'/settings'} element={<SettingsPage />} />
 					<Route path={'/admin'} element={<AdminPage />} />
@@ -87,14 +87,6 @@ const App = observer(() => {
 					<Route path={'/*'} element={<Navigate replace to="/inbox" />} />
 				</>
 			</Routes>
-			<PasswordModal
-				reason={modals.passwordModalReason}
-				visible={modals.passwordModalVisible}
-				onResolve={val => {
-					modals.passwordModalVisible = false;
-					modals.passwordModalHandler(val);
-				}}
-			/>
 			{modals.render()}
 		</>
 	);

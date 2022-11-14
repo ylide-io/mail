@@ -21,7 +21,7 @@ function evmNameToNetwork(name: string) {
 	return evmNetworks.find(n => n.name === name)?.network;
 }
 
-const Tooltip = observer(() => {
+const ComposeMailFooter = observer(() => {
 	const navigate = useNav();
 
 	useEffect(() => {
@@ -121,15 +121,7 @@ const Tooltip = observer(() => {
 	};
 
 	return (
-		<div
-			className="mail-body text-right tooltip-demo"
-			style={{
-				display: 'flex',
-				flexDirection: 'row',
-				alignItems: 'center',
-				justifyContent: 'flex-end',
-			}}
-		>
+		<div className="mail-footer compose-mail-footer">
 			<div
 				className={classNames('send-btn', {
 					disabled:
@@ -143,7 +135,7 @@ const Tooltip = observer(() => {
 			>
 				<div className="send-btn-text" onClick={sendMailHandler}>
 					<i style={{ marginRight: 6 }} className={classNames('fa', smallButtonIcons.reply)}></i>
-					{text && <span>{text}</span>}
+					{text && <span className="send-btn-title">{text}</span>}
 				</div>
 				{mailbox.from?.wallet.factory.blockchainGroup === 'evm' ? (
 					<Dropdown
@@ -202,4 +194,4 @@ const Tooltip = observer(() => {
 	);
 });
 
-export default Tooltip;
+export default ComposeMailFooter;

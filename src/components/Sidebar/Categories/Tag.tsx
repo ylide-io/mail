@@ -1,11 +1,10 @@
 import React from 'react';
 import classNames from 'classnames';
-import { colors } from '../../../utils/colors';
 import { useLocation } from 'react-router-dom';
 import { useNav } from '../../../utils/navigate';
 
 interface TagProps {
-	circleColor: colors;
+	circleColor: string;
 	text: string;
 	tagId?: number;
 	isActive?: boolean;
@@ -15,7 +14,7 @@ const Tag: React.FC<TagProps> = ({ circleColor, text, isActive, tagId }) => {
 	const location = useLocation();
 	const navigate = useNav();
 
-	const styles = { cursor: 'pointer', padding: '5px 10px' };
+	const styles = { cursor: 'pointer' };
 
 	const activeStyles = {
 		fontWeight: 'bold',
@@ -30,12 +29,11 @@ const Tag: React.FC<TagProps> = ({ circleColor, text, isActive, tagId }) => {
 	};
 
 	return (
-		<li onClick={clickHandler} style={isActive ? { ...activeStyles, ...styles } : styles}>
-			<div>
-				<i className={classNames('fa fa-circle text-navy', `text-${circleColor}`)} />
-				<span>{text}</span>
+		<div className="tag-list-item" onClick={clickHandler}>
+			<div className="tag-list-item-title" style={isActive ? { ...styles, ...activeStyles } : styles}>
+				<i className={classNames('fa fa-circle text-navy')} style={{ color: circleColor }} /> {text}
 			</div>
-		</li>
+		</div>
 	);
 };
 

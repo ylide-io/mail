@@ -11,23 +11,21 @@ const TagsList = observer(() => {
 	}, []);
 
 	return (
-		<>
+		<div className="tag-list">
 			{tags.tags.length ? (
-				<ul className="folder-list m-b-md p-0">
-					{tags.tags.map(elem => (
-						<Tag
-							key={elem.id}
-							isActive={mailList.activeFolderId === String(elem.id)}
-							tagId={elem.id}
-							circleColor={elem.color}
-							text={elem.name}
-						/>
-					))}
-				</ul>
+				tags.tags.map(elem => (
+					<Tag
+						key={elem.id}
+						isActive={mailList.activeFolderId === String(elem.id)}
+						tagId={elem.id}
+						circleColor={elem.color}
+						text={elem.name}
+					/>
+				))
 			) : (
 				<TagsEmpty />
 			)}
-		</>
+		</div>
 	);
 });
 

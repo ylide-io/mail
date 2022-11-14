@@ -2,8 +2,6 @@ import React, { ReactNode } from 'react';
 import Header from '../components/Header/Header';
 import SidebarMenu from '../components/Sidebar/SidebarMenu';
 
-import './style.scss';
-
 interface GenericLayoutProps {
 	children: ReactNode;
 }
@@ -14,7 +12,7 @@ const GenericLayout: React.FC<GenericLayoutProps> = ({ children }) => {
 			<Header />
 			<div className="main-wrapper">
 				<SidebarMenu />
-				{children}
+				<div className="main-block main-content">{children}</div>
 			</div>
 		</div>
 	);

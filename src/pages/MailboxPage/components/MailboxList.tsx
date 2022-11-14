@@ -28,7 +28,7 @@ const MailboxList = observer(() => {
 	}, [scrollParams, isLoading, messagesCount, pageAvailable]);
 
 	return (
-		<div className="mail-box">
+		<div className="mailbox">
 			{mailList.firstLoading ? (
 				<div style={{ height: 400 }}>
 					{mailList.loading}

@@ -1,52 +1,30 @@
-import React from "react";
-import contacts from "../../../../stores/Contacts";
-import ContactsListItem from "./ContactsListItem";
-import { observer } from "mobx-react";
-import ContactsEmpty from "./ContactsEmpty";
+import React from 'react';
+import contacts from '../../../../stores/Contacts';
+import ContactsListItem from './ContactsListItem';
+import { observer } from 'mobx-react';
+import ContactsEmpty from './ContactsEmpty';
 
 const ContactsList = observer(() => {
-    const contactsList = (() => {
-        if (contacts.filteredContacts?.length) {
-            return contacts.filteredContacts;
-        } else if (contacts.filteredContacts === null) {
-            return [];
-        } else {
-            return contacts.contacts;
-        }
-    })();
+	const contactsList = contacts.contacts.filter(
+		c => !contacts.filterByTag || c.tags.includes(contacts.filterByTag.id),
+	);
 
-    return (
-        <>
-            {!contacts.contacts.length && !contacts.newContact ? (
-                <ContactsEmpty />
-            ) : (
-                <table className="table table-striped table-hover">
-                    <tbody>
-                        {contacts.newContact && (
-                            <ContactsListItem
-                                isNew={true}
-                                contact={{ ...contacts.newContact }}
-                            />
-                        )}
-                        {contactsList
-                            .filter((elem) => {
-                                if (!contacts.filterByTag) return true;
+	console.log('!contactsList.length && !contacts.newContact: ', contactsList.length, contacts.newContact);
 
-                                return elem.tags.includes(
-                                    contacts.filterByTag.id
-                                );
-                            })
-                            .map((contact) => (
-                                <ContactsListItem
-                                    key={contact.address}
-                                    contact={{ ...contact }}
-                                />
-                            ))}
-                    </tbody>
-                </table>
-            )}
-        </>
-    );
+	return (
+		<div className="main-page">
+			{!contactsList.length && !contacts.newContact ? (
+				<ContactsEmpty isTagFilter={!!contacts.contacts.length} />
+			) : (
+				<div className="contacts-list">
+					{contacts.newContact && <ContactsListItem isNew={true} contact={{ ...contacts.newContact }} />}
+					{contactsList.map(contact => (
+						<ContactsListItem key={contact.address} contact={{ ...contact }} />
+					))}
+				</div>
+			)}
+		</div>
+	);
 });
 
 export default ContactsList;

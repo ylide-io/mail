@@ -28,7 +28,7 @@ import { Wallet } from './models/Wallet';
 import { Accounts } from './Accounts';
 import { blockchainsMap, supportedWallets, walletsMap } from '../constants';
 import SwitchModal from '../modals/SwitchModal';
-import PasswordNewModal from '../modals/PasswordModalNew';
+import PasswordModal from '../modals/PasswordModal';
 import mailList from './MailList';
 import tags from './Tags';
 
@@ -194,12 +194,8 @@ export class Domain {
 			if (domain.savedPassword) {
 				return resolve(domain.savedPassword);
 			}
-			const result = await PasswordNewModal.show(reason);
+			const result = await PasswordModal.show(reason);
 			resolve(result ? result.value : null);
-
-			// modals.passwordModalVisible = true;
-			// modals.passwordModalReason = reason;
-			// modals.passwordModalHandler = resolve;
 		});
 	}
 

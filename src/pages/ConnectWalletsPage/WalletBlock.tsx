@@ -12,7 +12,7 @@ import { makeObservable, observable } from 'mobx';
 import { DomainAccount } from '../../stores/models/DomainAccount';
 import { autobind } from 'core-decorators';
 import { Wallet } from '../../stores/models/Wallet';
-import PasswordNewModal from '../../modals/PasswordModalNew';
+import PasswordModal from '../../modals/PasswordModal';
 import SignatureModal from '../../modals/SignatureModal';
 import { asyncDelay, IGenericAccount } from '@ylide/sdk';
 import { isBytesEqual } from '../../utils/isBytesEqual';
@@ -33,36 +33,6 @@ export class AccountBlock extends PureComponent<{ account: DomainAccount }> {
 
 		makeObservable(this);
 	}
-
-	// {!account.localKey ? (
-	// 	<YlideButton
-	// 		small
-	// 		style={{ marginRight: 8 }}
-	// 		onClick={async () => {
-	// 			this.loading = true;
-	// 			try {
-	// 				const password = await domain.handlePasswordRequest(
-	// 					`retrieve key for ${account.account.address}`,
-	// 				);
-	// 				if (!password) {
-	// 					return;
-	// 				}
-	// 				try {
-	// 					await account.createLocalKey(password);
-	// 				} catch (err: any) {
-	// 					console.error('err: ', err);
-	// 					return;
-	// 				}
-	// 			} catch (err) {
-	// 				console.error('err: ', err);
-	// 			} finally {
-	// 				this.loading = false;
-	// 			}
-	// 		}}
-	// 	>
-	// 		{this.loading ? <Spin size="small" /> : 'Unlock'}
-	// 	</YlideButton>
-	// ) :
 
 	render() {
 		const account = this.props.account;
@@ -120,16 +90,6 @@ export class WalletBlock extends PureComponent<WalletBlockProps> {
 	}
 
 	async publishLocalKey(account: DomainAccount) {
-		// try {
-		// 	const balances = await account.getBalances();
-		// 	console.log('balances: ', balances);
-		// 	const chain = await account.wallet.controller.getCurrentBlockchain();
-		// 	// if (balances[chain].number === 0) {
-		// 	// 	await InsufficentFundsModal.show(account, 'to publish key');
-		// 	// }
-		// } catch (err) {
-		// 	console.log('balances err: ', err);
-		// }
 		let publishCtrl = PublishKeyModal.view(account.wallet, false);
 		try {
 			await account.attachRemoteKey();
@@ -145,7 +105,7 @@ export class WalletBlock extends PureComponent<WalletBlockProps> {
 	}
 
 	async createLocalKey(wallet: Wallet, account: IGenericAccount) {
-		const result = await PasswordNewModal.show('to activate new account');
+		const result = await PasswordModal.show('to activate new account');
 		if (!result) {
 			return;
 		}
@@ -260,15 +220,12 @@ export class WalletBlock extends PureComponent<WalletBlockProps> {
 		let accountsBlock: JSX.Element | null = null;
 
 		const isWalletSupported = domain.registeredWallets.find(t => t.wallet === this.props.wallet);
-		// const isWalletAvailable = domain.availableWallets.find(t => t.wallet === this.props.wallet);
 
 		const wallet = domain.wallets.find(w => w.factory.wallet === this.props.wallet);
 		let ready = !!wallet?.accounts.length;
 
 		let buttonHandler: React.MouseEventHandler<HTMLButtonElement> | undefined;
 		let buttonContent: JSX.Element = <>Coming soon</>;
-
-		// loading
 
 		if (wallet) {
 			const accounts = wallet.accounts;
@@ -346,34 +303,11 @@ export class WalletBlock extends PureComponent<WalletBlockProps> {
 			'ready': ready,
 		});
 
-		// {loading ? (
-		// 	<YlideButton>
-		// 		<Spin />
-		// 	</YlideButton>
-		// ) : !isWalletAvailable ? (
-		// 	<YlideButton onClick={() => installWallet(wallet)}>Install</YlideButton>
-		// ) : !account ? (
-		// 	<YlideButton onClick={() => connectAccount(wallet)}>Connect</YlideButton>
-		// ) : !isKeysEqual ? (
-		// 	<YlideButton onClick={() => instantiateKey(wallet)}>
-		// 		{isSomeKeyPublished ? 'Sign in' : 'Sign up'}
-		// 	</YlideButton>
-		// ) : (
-		// 	<div
-		// 		style={{
-		// 			padding: '12px 20px',
-		// 			fontSize: 14,
-		// 		}}
-		// 	>
-		// 		<b>Ready</b>
-		// 	</div>
-		// )}
-
 		return (
 			<div className={wrapperClass}>
 				<div className="wb-head">
 					<div className="wb-head-left">
-						<div className="wb-logo">{wData.logo}</div>
+						<div className="wb-logo">{wData.logo()}</div>
 						<div className="wb-title">{wData.title}</div>
 					</div>
 					<div className="wb-head-right">{headRight}</div>

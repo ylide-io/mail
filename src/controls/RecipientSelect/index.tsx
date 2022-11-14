@@ -9,7 +9,6 @@ import contacts from '../../stores/Contacts';
 import domain from '../../stores/Domain';
 import { IRecipient } from '../../stores/Mailbox';
 
-import './style.scss';
 import { CheckOutlined } from '@ant-design/icons';
 
 export interface IRecipientOption {

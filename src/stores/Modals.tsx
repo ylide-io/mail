@@ -1,21 +1,17 @@
-import { makeAutoObservable, observable } from 'mobx';
+import { computed, makeAutoObservable, observable } from 'mobx';
 import { Fragment } from 'react';
 
 export type ModalRenderingFunction = (close: () => void) => JSX.Element;
 
 class Modals {
-	passwordModalVisible: boolean = false;
-	passwordModalReason: string = '';
-	passwordModalHandler: (password: string | null) => void = () => {};
-
 	@observable elements: Set<ModalRenderingFunction> = new Set();
-
-	get anyModalVisible() {
-		return this.passwordModalVisible;
-	}
 
 	constructor() {
 		makeAutoObservable(this);
+	}
+
+	@computed get anythingVisible() {
+		return this.elements.size > 0;
 	}
 
 	show(fn: ModalRenderingFunction) {

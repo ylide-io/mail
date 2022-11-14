@@ -25,18 +25,16 @@ const SidebarMenu = observer(() => {
 	}, [location, mailList.activeFolderId]);
 
 	return (
-		<div className="sidebar">
-			<div className="ibox ">
-				<div className="ibox-content mailbox-content">
-					<div className="file-manager">
-						<LinkButton text={linkButtonProps.text} link={linkButtonProps.link} />
-						<div className="space-25"></div>
-						<h5>Default folders</h5>
-						<PermanentTagList />
-						<h5>Folders</h5>
-						<TagsList />
-						<div className="clearfix"></div>
-					</div>
+		<div className="side-block">
+			<div className="sidebar-container">
+				<LinkButton text={linkButtonProps.text} link={linkButtonProps.link} />
+				<div className="sidebar-block">
+					<h5 className="tag-list-title">Default folders</h5>
+					<PermanentTagList />
+				</div>
+				<div className="sidebar-block">
+					<h5 className="tag-list-title">Folders</h5>
+					<TagsList />
 				</div>
 			</div>
 		</div>

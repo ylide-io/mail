@@ -30,7 +30,7 @@ const MailsCounter = observer(() => {
 	const folderName = mailList.activeFolderId ? mailList.getFolderName(mailList.activeFolderId) : 'Loading...';
 	// const folderLength = mailList.messages.length;
 
-	return <h2>{folderName}</h2>;
+	return <h2 className="mailbox-title">{folderName}</h2>;
 });
 
 export default MailsCounter;

@@ -437,40 +437,40 @@ export const blockchainsMap: Record<
 	},
 };
 
-export const walletsMap: Record<string, { title: string; link: string; logo: JSX.Element }> = {
+export const walletsMap: Record<string, { title: string; link: string; logo: (size?: number) => JSX.Element }> = {
 	metamask: {
 		title: 'MetaMask',
-		logo: <MetaMaskLogo size={30} />,
+		logo: (s = 30) => <MetaMaskLogo size={s} />,
 		link: 'https://metamask.io/',
 	},
 	walletconnect: {
 		title: 'Wallet Connect',
-		logo: <WalletConnectLogo size={30} />,
+		logo: (s = 30) => <WalletConnectLogo size={s} />,
 		link: 'https://walletconnect.com/',
 	},
 	coinbase: {
 		title: 'Coinbase',
-		logo: <CoinbaseWalletLogo size={30} />,
+		logo: (s = 30) => <CoinbaseWalletLogo size={s} />,
 		link: 'https://www.coinbase.com/wallet',
 	},
 	trustwallet: {
 		title: 'TrustWallet',
-		logo: <TrustWalletLogo size={30} />,
+		logo: (s = 30) => <TrustWalletLogo size={s} />,
 		link: 'https://trustwallet.com/',
 	},
 	binance: {
 		title: 'BinanceWallet',
-		logo: <BinanceWalletLogo size={30} />,
+		logo: (s = 30) => <BinanceWalletLogo size={s} />,
 		link: 'https://chrome.google.com/webstore/detail/binance-wallet/fhbohimaelbohpjbbldcngcnapndodjp',
 	},
 	everwallet: {
 		title: 'EverWallet',
-		logo: <EverscaleLogo size={30} />,
+		logo: (s = 30) => <EverscaleLogo size={s} />,
 		link: 'https://everwallet.net/',
 	},
 	phantom: {
 		title: 'Phantom',
-		logo: <PhantomLogo size={30} />,
+		logo: (s = 30) => <PhantomLogo size={s} />,
 		link: 'https://l1.broxus.com/freeton/wallet',
 	},
 };

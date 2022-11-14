@@ -1,8 +1,6 @@
 import React, { ButtonHTMLAttributes, CSSProperties, FC, PropsWithChildren } from 'react';
 import cn from 'classnames';
 
-import './style.scss';
-
 export const YlideButton: FC<
 	PropsWithChildren<{
 		small?: boolean;

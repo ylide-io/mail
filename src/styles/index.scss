@@ -1,0 +1,22 @@
+@import './base.scss';
+
+// controls
+@import './controls/loader.scss';
+@import './controls/label.scss';
+@import './controls/modal.scss';
+@import './controls/input.scss';
+@import './controls/button.scss';
+@import './controls/recipients-select.scss';
+@import './controls/checkbox.scss';
+
+// blocks
+@import './blocks/index.scss';
+@import './blocks/header.scss';
+@import './blocks/sidebar.scss';
+@import './blocks/mailbox.scss';
+@import './blocks/settings.scss';
+@import './blocks/wallets.scss';
+
+// pages
+@import './pages/intro.scss';
+@import './pages/connect-wallet.scss';

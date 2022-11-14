@@ -22,6 +22,7 @@
 		"antd": "^4.21.5",
 		"classnames": "^2.3.1",
 		"core-decorators": "^0.20.0",
+		"ethereum-blockies-base64": "^1.0.2",
 		"eventemitter3": "^4.0.7",
 		"fuzzysort": "^2.0.1",
 		"mobx": "^6.5.0",
