@@ -107,12 +107,12 @@ const Tooltip = observer(() => {
 
 			const payload = mailbox.textEditorData;
 
-			if (mailbox.event.active && mailbox.event.startDateTime && mailbox.event.endDateTime) {
+			if (mailbox.event.active && mailbox.event.start && mailbox.event.end) {
 				const eventBlockText = createEventFileString({
 					organizer: mailbox.from?.account.address || '',
 					attendees: mailbox.to.map(toAddress => toAddress.address).filter(i => i) as string[],
-					startDateTime: new Date(mailbox.event.startDateTime),
-					endDateTime: new Date(mailbox.event.endDateTime),
+					start: mailbox.event.start,
+					end: mailbox.event.end,
 					summary: mailbox.event.summary || '',
 					locaiton: mailbox.event.location || '',
 					description: mailbox.event.description || '',
@@ -145,7 +145,7 @@ const Tooltip = observer(() => {
 		}
 	};
 
-	const validCalendarEvent = !mailbox.event.active || isValidCalendarEventDates(mailbox.event.startDateTime, mailbox.event.endDateTime);
+	const validCalendarEvent = !mailbox.event.active || isValidCalendarEventDates(mailbox.event.start, mailbox.event.end);
 
 	return (
 		<div

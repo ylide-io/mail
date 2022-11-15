@@ -3,10 +3,22 @@ import './MailboxCalendarEventEditor.scss';
 import SmallButton, { smallButtonColors, smallButtonIcons } from '../../../../../components/smallButton/smallButton';
 import { observer } from 'mobx-react';
 import { useRef } from 'react';
+import { DatePicker } from 'antd';
+import { RangePickerProps } from 'antd/lib/date-picker';
 
 const MailboxCalendarEventEditor = observer(() => {
     const eventSectionRef = useRef<HTMLDivElement>(null);
     const calculatedHeight = useRef(0);
+
+    const onOk = (value: RangePickerProps['value']) => {
+        if (value) {
+            const [start, end] = value;
+            if (start && end) {
+                mailbox.event.start = start.toDate();
+                mailbox.event.end = end.toDate();
+            }
+        }
+    }
 
     return (
         <>
@@ -36,6 +48,17 @@ const MailboxCalendarEventEditor = observer(() => {
                         </div>
                     </div>
                     <div className="form-group row">
+                        <label className="col-sm-1 col-form-label">When:</label>
+                        <div className="col-sm-11">
+                            <DatePicker.RangePicker
+                                showTime={{ format: 'HH:mm' }}
+                                format="YYYY-MM-DD HH:mm"
+                                minuteStep={5}
+                                onOk={onOk}
+                            />
+                        </div>
+                    </div>
+                    <div className="form-group row">
                         <label className="col-sm-1 col-form-label">Location:</label>
                         <div className="col-sm-11">
                             <input
@@ -43,30 +66,6 @@ const MailboxCalendarEventEditor = observer(() => {
                                 className="form-control"
                                 value={mailbox.event.location}
                                 onChange={e => (mailbox.event.location = e.target.value)}
-                            />
-                        </div>
-                    </div>
-                    <div className="form-group row">
-                        <label className="col-sm-1 col-form-label">Start:</label>
-                        <div className="col-sm-11">
-                            <input
-                                type="datetime-local"
-                                className="form-control"
-                                value={mailbox.event.startDateTime}
-                                onChange={e => (mailbox.event.startDateTime = e.target.value)}
-                                max={mailbox.event.endDateTime}
-                            />
-                        </div>
-                    </div>
-                    <div className="form-group row">
-                        <label className="col-sm-1 col-form-label">End:</label>
-                        <div className="col-sm-11">
-                            <input
-                                type="datetime-local"
-                                className="form-control"
-                                value={mailbox.event.endDateTime}
-                                onChange={e => (mailbox.event.endDateTime = e.target.value)}
-                                min={mailbox.event.startDateTime}
                             />
                         </div>
                     </div>

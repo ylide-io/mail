@@ -1,7 +1,7 @@
 export interface ICalendarEvent {
     active: boolean;
-    startDateTime: string;
-    endDateTime: string;
+    start: Date;
+    end: Date;
     location: string;
     summary?: string;
     description?: string;

@@ -18,16 +18,16 @@ export const parseEventFileString = (text: string) => {
 export const createEventFileString = ({
     organizer,
     attendees,
-    startDateTime,
-    endDateTime,
+    start,
+    end,
     summary,
     description,
     locaiton
 }: {
     organizer: string,
     attendees: string[],
-    startDateTime: Date,
-    endDateTime: Date,
+    start: Date,
+    end: Date,
     summary: string,
     description: string,
     locaiton: string,
@@ -53,10 +53,10 @@ export const createEventFileString = ({
                     description: description,
                     locaiton: locaiton,
                     dtstart: {
-                        value: createCalendarEventDateString(startDateTime)
+                        value: createCalendarEventDateString(start)
                     },
                     dtend: {
-                        value: createCalendarEventDateString(endDateTime)
+                        value: createCalendarEventDateString(end)
                     },
                     organizer: {
                         EMAIL: organizer,
