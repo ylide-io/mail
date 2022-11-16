@@ -9,8 +9,6 @@ const ContactsList = observer(() => {
 		c => !contacts.filterByTag || c.tags.includes(contacts.filterByTag.id),
 	);
 
-	console.log('!contactsList.length && !contacts.newContact: ', contactsList.length, contacts.newContact);
-
 	return (
 		<div className="main-page">
 			{!contactsList.length && !contacts.newContact ? (

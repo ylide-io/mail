@@ -5,9 +5,15 @@ import { useLocation } from 'react-router-dom';
 import PermanentTagList from './Categories/PermanentTagList';
 import mailList from '../../stores/MailList';
 import { observer } from 'mobx-react';
+import cn from 'classnames';
+import modals from '../../stores/Modals';
+import { useWindowSize } from '../../utils/useWindowSize';
+import { Button } from 'antd';
+import { MenuFoldOutlined, MenuUnfoldOutlined } from '@ant-design/icons';
 
 const SidebarMenu = observer(() => {
 	const location = useLocation();
+	const { windowWidth } = useWindowSize();
 
 	const linkButtonProps = useMemo(() => {
 		if (location.pathname === '/' + mailList.activeFolderId) {
@@ -25,9 +31,21 @@ const SidebarMenu = observer(() => {
 	}, [location, mailList.activeFolderId]);
 
 	return (
-		<div className="side-block">
+		<div className={cn('side-block', { open: modals.sidebarOpen })}>
 			<div className="sidebar-container">
-				<LinkButton text={linkButtonProps.text} link={linkButtonProps.link} />
+				{windowWidth < 920 ? (
+					<div className="sidebar-mobile-header">
+						<div className="header-burger">
+							<Button
+								onClick={() => {
+									modals.sidebarOpen = !modals.sidebarOpen;
+								}}
+								icon={modals.sidebarOpen ? <MenuFoldOutlined /> : <MenuUnfoldOutlined />}
+							/>
+						</div>
+					</div>
+				) : null}
+				{windowWidth < 920 ? null : <LinkButton text={linkButtonProps.text} link={linkButtonProps.link} />}
 				<div className="sidebar-block">
 					<h5 className="tag-list-title">Default folders</h5>
 					<PermanentTagList />

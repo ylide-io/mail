@@ -10,6 +10,7 @@ import domain from '../../../../stores/Domain';
 import { Avatar, Button, Input, Select } from 'antd';
 import { Blockie } from '../../../../controls/Blockie';
 import { DeleteOutlined, EditOutlined, MailOutlined, SaveOutlined } from '@ant-design/icons';
+import { AdaptiveAddress } from '../../../../controls/AdaptiveAddress';
 
 interface ContactsListItemProps {
 	contact: IContact;
@@ -194,7 +195,9 @@ const ContactsListItem: React.FC<ContactsListItemProps> = ({ contact, isNew }) =
 				)}
 			</div>
 			<div className="contact-name">{name}</div>
-			<div className="contact-address">{address}</div>
+			<div className="contact-address">
+				<AdaptiveAddress address={address} />
+			</div>
 			<div style={{ textAlign: 'center' }} className="contact-folders">
 				{tags.map((tag, index) => (
 					<span

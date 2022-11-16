@@ -5,6 +5,7 @@ export type ModalRenderingFunction = (close: () => void) => JSX.Element;
 
 class Modals {
 	@observable elements: Set<ModalRenderingFunction> = new Set();
+	@observable sidebarOpen = false;
 
 	constructor() {
 		makeAutoObservable(this);

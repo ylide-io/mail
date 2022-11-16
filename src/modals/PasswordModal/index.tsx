@@ -131,17 +131,7 @@ export default class PasswordModal extends PureComponent<PasswordModalProps> {
 							noValidate
 						>
 							<input
-								style={{
-									fontFamily: 'Lexend',
-									fontSize: 16,
-									borderRadius: 40,
-									height: 50,
-									border: '1px solid #000000',
-									padding: '10px 25px',
-									marginLeft: 20,
-									marginRight: 20,
-									marginTop: 20,
-								}}
+								className="ylide-input ylide-password-input"
 								type="password"
 								autoComplete="new-password"
 								name="password"
@@ -151,17 +141,7 @@ export default class PasswordModal extends PureComponent<PasswordModalProps> {
 								onChange={e => (this.value = e.target.value)}
 							/>
 							<input
-								style={{
-									fontFamily: 'Lexend',
-									fontSize: 16,
-									borderRadius: 40,
-									height: 50,
-									border: '1px solid #000000',
-									padding: '10px 25px',
-									marginLeft: 20,
-									marginRight: 20,
-									marginTop: 20,
-								}}
+								className="ylide-input ylide-password-input"
 								type="password"
 								autoComplete="new-password"
 								name="repeat-password"

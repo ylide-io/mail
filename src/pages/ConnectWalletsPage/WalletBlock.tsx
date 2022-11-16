@@ -240,7 +240,7 @@ export class WalletBlock extends PureComponent<WalletBlockProps> {
 						<>
 							Add{' '}
 							{wallet.currentWalletAccount
-								? shrinkAddress(wallet.currentWalletAccount.address, 14)
+								? shrinkAddress(wallet.currentWalletAccount.address, 8)
 								: 'new account'}
 						</>
 					);

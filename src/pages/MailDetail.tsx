@@ -14,6 +14,7 @@ import mailList from '../stores/MailList';
 import { IMessageDecodedContent } from '../indexedDB/MessagesDB';
 import { Button } from 'antd';
 import { Blockie } from '../controls/Blockie';
+import { AdaptiveAddress } from '../controls/AdaptiveAddress';
 
 const ReactEditorJS = createReactEditorJS();
 
@@ -125,7 +126,9 @@ const MailDetail = observer(() => {
 												className="mail-sender-blockie"
 												address={message.msg.senderAddress}
 											/>{' '}
-											<div className="mail-sender-address">{message.msg.senderAddress}</div>
+											<div className="mail-sender-address">
+												<AdaptiveAddress address={message.msg.senderAddress} />
+											</div>
 										</div>
 									)}
 								</div>

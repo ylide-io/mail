@@ -4,6 +4,7 @@ import { PureComponent } from 'react';
 import { RecipientsSelect } from '../../../controls/RecipientSelect';
 import domain from '../../../stores/Domain';
 import mailbox from '../../../stores/Mailbox';
+import { shrinkAddress } from '../../../utils/shrinkAddress';
 
 @observer
 export class MailComposeMeta extends PureComponent {
@@ -29,7 +30,7 @@ export class MailComposeMeta extends PureComponent {
 							>
 								{domain.accounts.activeAccounts.map((acc, idx) => (
 									<Select.Option key={idx} value={String(idx)}>
-										{acc.account.address} [via{' '}
+										{(acc.name || 'No name') + ` (${shrinkAddress(acc.account.address, 10)})`} [
 										{acc.wallet.factory.wallet === 'metamask' ? 'MetaMask' : 'EverWallet'}]
 									</Select.Option>
 								))}
@@ -47,6 +48,7 @@ export class MailComposeMeta extends PureComponent {
 						<div className="mmp-row-value">
 							<Input
 								type="text"
+								style={{ width: '100%' }}
 								value={mailbox.subject}
 								onChange={e => (mailbox.subject = e.target.value)}
 							/>

@@ -167,7 +167,6 @@ export class Recipients extends PureComponent {
 						<Select
 							tagRender={props => {
 								const rec = this.recipients.find(r => r.input === props.value);
-								console.log('rec render: ', rec);
 								const content = (
 									<Tag
 										className={cn('recipient-tag', {

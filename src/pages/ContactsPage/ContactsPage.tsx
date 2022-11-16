@@ -9,10 +9,12 @@ import { useNav } from '../../utils/navigate';
 import { Button, Tabs } from 'antd';
 import TagsFilter from './components/TagsFilter';
 import { PlusOutlined } from '@ant-design/icons';
+import { useWindowSize } from '../../utils/useWindowSize';
 
 const ContactsPage = observer(() => {
 	const location = useLocation();
 	const nav = useNav();
+	const { windowWidth } = useWindowSize();
 
 	const addHandler = () => {
 		if (location.pathname === '/contacts') {
@@ -21,6 +23,19 @@ const ContactsPage = observer(() => {
 			tags.generateNewTag();
 		}
 	};
+
+	const extraContent = (
+		<>
+			{location.pathname === '/contacts' && <TagsFilter />}
+			<Button
+				onClick={addHandler}
+				style={{ marginLeft: location.pathname === '/contacts' ? 10 : 0 }}
+				icon={<PlusOutlined />}
+			>
+				{location.pathname === '/contacts' ? 'Add contact' : 'Add folder'}
+			</Button>
+		</>
+	);
 
 	return (
 		<GenericLayout>
@@ -37,19 +52,21 @@ const ContactsPage = observer(() => {
 							</div>
 						</div>
 					</div>
+					{windowWidth <= 480 ? (
+						<div
+							style={{
+								marginLeft: 10,
+							}}
+						>
+							{extraContent}
+						</div>
+					) : null}
 				</div>
 				<div className="page-body">
 					<Tabs
 						activeKey={location.pathname.split('/')[1]}
 						onTabClick={key => nav(`/${key}`)}
-						tabBarExtraContent={
-							<>
-								{location.pathname === '/contacts' && <TagsFilter />}
-								<Button onClick={addHandler} style={{ marginLeft: 10 }} icon={<PlusOutlined />}>
-									{location.pathname === '/contacts' ? 'Add contact' : 'Add folder'}
-								</Button>
-							</>
-						}
+						tabBarExtraContent={windowWidth > 480 ? extraContent : null}
 					>
 						<Tabs.TabPane tab="Contacts" key="contacts" />
 						<Tabs.TabPane tab="Folders" key="folders" />

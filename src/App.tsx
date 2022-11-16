@@ -17,16 +17,19 @@ import ConnectWalletsPage from './pages/ConnectWalletsPage/ConnectWalletsPage';
 import modals from './stores/Modals';
 import { Loader } from './controls/Loader';
 import { AdminPage } from './pages/AdminPage';
+import TestPage from './pages/TestPage/TestPage';
 
 const App = observer(() => {
 	const location = useLocation();
 
 	useEffect(() => {
-		domain
-			.init()
-			.catch(err => console.log('err: ', err))
-			.then(res => console.log('done'));
-	}, []);
+		if (location.pathname !== '/test') {
+			domain
+				.init()
+				.catch(err => console.log('err: ', err))
+				.then(res => console.log('done'));
+		}
+	}, [location.pathname]);
 
 	useEffect(() => {
 		if (modals.anythingVisible) {
@@ -37,7 +40,7 @@ const App = observer(() => {
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [modals.anythingVisible]);
 
-	if (!domain.initialized) {
+	if (location.pathname !== '/test' && !domain.initialized) {
 		return (
 			<div
 				style={{
@@ -47,6 +50,7 @@ const App = observer(() => {
 					width: '100vw',
 					height: '100vh',
 					alignItems: 'stretch',
+					textAlign: 'center',
 				}}
 			>
 				<Loader reason="Loading your accounts data from blockchain..." />
@@ -54,10 +58,8 @@ const App = observer(() => {
 		);
 	}
 
-	console.log('domain.isFirstTime: ', domain.accounts.isFirstTime);
-	console.log('location.pathname: ', location.pathname);
-
 	if (
+		location.pathname !== '/test' &&
 		domain.accounts.isFirstTime &&
 		location.pathname !== '/first-time' &&
 		location.pathname !== '/admin' &&
@@ -71,6 +73,7 @@ const App = observer(() => {
 			<Routes>
 				<>
 					<Route path={'/'} element={<Navigate replace to="/inbox" />} />
+					<Route path={'/test'} element={<TestPage />} />
 					<Route path={'/first-time'} element={<FirstTimePage />} />
 					<Route path={'/connect-wallets'} element={<ConnectWalletsPage />} />
 					<Route path={'/compose'} element={<ComposePage />} />

@@ -201,10 +201,6 @@ export class RecipientsSelect extends PureComponent<RecipientsSelectProps> {
 						<Menu
 							onClick={item => {
 								const opt = options[Number(item.key)];
-								console.log('options: ', options);
-								console.log('item click: ', opt);
-								console.log('search: ', search);
-								console.log('this.value: ', values);
 								if (opt.id === 'search:null' && search === opt.name) {
 									this.search = '';
 									// this.selectRef.current?.focus();

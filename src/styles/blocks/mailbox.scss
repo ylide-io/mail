@@ -10,12 +10,21 @@
 	margin-left: 20px;
 	margin-right: 20px;
 	margin-bottom: 10px;
+
+	@include less720px {
+		margin-left: 15px;
+		margin-right: 15px;
+	}
 }
 
 .mailbox-title {
 	margin-top: 0px;
 	font-size: 32px;
 	margin-bottom: 0;
+
+	@include less720px {
+		font-size: 28px;
+	}
 }
 
 .mailbox-tools {
@@ -58,15 +67,43 @@
 		margin-left: 20px;
 		flex-grow: 0;
 		flex-shrink: 0;
+
+		@include less720px {
+			flex-basis: 20px;
+			margin-left: 15px;
+		}
+
+		@include less630px {
+			margin-right: 15px;
+		}
 	}
 
 	.mail-contact {
 		@include flex-row(center, flex-start);
 
 		padding-left: 10px;
+		padding-right: 20px;
 		flex-basis: 160px;
 		flex-grow: 0;
 		flex-shrink: 0;
+
+		.mail-contact-inner {
+			flex-basis: 340px;
+
+			@include less480px {
+				flex-basis: 200px;
+			}
+		}
+
+		@include less630px {
+			flex-basis: 340px;
+			padding-left: 0;
+			padding-right: 0;
+		}
+
+		@include less480px {
+			flex-basis: 200px;
+		}
 	}
 
 	.mail-id {
@@ -81,15 +118,23 @@
 		@include flex-row(center, space-between);
 
 		flex: 1;
+		min-width: 300px;
 
 		.mail-subject-title {
 			@include flex-row(center, flex-start);
+		}
+		.mail-subject-inner {
+			@include flex-row(center, flex-start);
+		}
+
+		@include less480px {
+			min-width: 280px;
 		}
 	}
 
 	.mail-date {
 		flex: 0 0 120px;
-		padding-right: 20px;
+		padding-right: 15px;
 
 		text-align: right;
 	}
@@ -151,6 +196,11 @@
 
 		.send-btn-title {
 			@include flex-row(center, flex-start);
+
+			svg {
+				margin-left: 6px;
+				margin-right: 4px;
+			}
 		}
 	}
 	.send-btn-dropdown-icon {
@@ -191,6 +241,10 @@
 	padding-bottom: 20px;
 	margin-bottom: 20px;
 
+	@include less480px {
+		max-width: 98vw;
+	}
+
 	&.compose-mail-top,
 	&.contacts-mail-top {
 		border-bottom: 0;
@@ -199,6 +253,10 @@
 
 		.mail-header {
 			margin-bottom: 20px;
+
+			@include less480px {
+				margin-bottom: 10px;
+			}
 		}
 	}
 
@@ -216,6 +274,13 @@
 	margin-left: 20px;
 	margin-right: 20px;
 	margin-bottom: 10px;
+
+	@include less480px {
+		@include flex-column(stretch, flex-start);
+
+		margin-left: 10px;
+		margin-right: 10px;
+	}
 }
 
 .mail-actions,
@@ -229,11 +294,29 @@
 	}
 }
 
+.mail-actions {
+	@include less480px {
+		margin-top: 10px;
+		margin-bottom: 10px;
+		.ant-btn:not(.ant-input-search-button) {
+			margin-right: 8px;
+			margin-left: 0;
+		}
+	}
+}
+
 .mail-meta {
 	@include flex-row(flex-start, space-between);
 
 	padding-left: 22px;
 	padding-right: 20px;
+
+	@include less480px {
+		@include flex-column(stretch, flex-start);
+
+		padding-left: 12px;
+		padding-right: 10px;
+	}
 
 	.mail-params {
 		@include flex-column(stretch, flex-start);
@@ -249,6 +332,12 @@
 
 			font-size: 15px;
 
+			@include less480px {
+				@include flex-column(stretch, flex-start);
+
+				margin-bottom: 20px;
+			}
+
 			.mmp-row-title {
 				font-weight: 400;
 				color: #777;
@@ -262,6 +351,12 @@
 				margin-left: 8px;
 				font-weight: 500;
 				color: #111111;
+
+				@include less480px {
+					margin-left: 0;
+					margin-top: 5px;
+					flex: 0 auto;
+				}
 			}
 		}
 	}
@@ -274,6 +369,10 @@
 					flex-basis: 100px;
 					flex-shrink: 0;
 					flex-grow: 0;
+
+					@include less480px {
+						flex-basis: auto;
+					}
 				}
 			}
 		}
@@ -282,6 +381,8 @@
 	.mail-date {
 		font-size: 16px;
 		color: #111111;
+
+		text-align: right;
 	}
 
 	.mail-sender {
@@ -292,7 +393,13 @@
 			height: 20px;
 		}
 		.mail-sender-address {
+			@include flex-row(center, flex-start);
+
 			margin-left: 5px;
+
+			.ylide-address {
+				min-width: 254px;
+			}
 		}
 	}
 }
@@ -316,9 +423,38 @@
 .mail-body {
 	font-size: 16px;
 	line-height: 140%;
+
+	max-width: 98vw;
 }
 
 .page-body {
 	padding: 22px;
 	padding-top: 0px;
+
+	@include less480px {
+		padding: 12px;
+		padding-top: 0px;
+	}
+}
+
+.mailbox-list-highrow {
+	@include flex-column(stretch, flex-start);
+	flex-grow: 1;
+	flex-shrink: 1;
+	.mlhr-header {
+		@include flex-row(center, space-between);
+	}
+	.mail-row-content {
+		@include flex-row(flex-end, space-between);
+		.mail-row-inner-content {
+			@include flex-column(stretch, flex-start);
+		}
+		.label {
+			margin-right: 15px;
+		}
+	}
+
+	.mail-preview {
+		opacity: 0.5;
+	}
 }

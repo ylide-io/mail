@@ -2,6 +2,7 @@ import React from 'react';
 import classNames from 'classnames';
 import { useLocation } from 'react-router-dom';
 import { useNav } from '../../../utils/navigate';
+import modals from '../../../stores/Modals';
 
 interface TagProps {
 	circleColor: string;
@@ -24,6 +25,7 @@ const Tag: React.FC<TagProps> = ({ circleColor, text, isActive, tagId }) => {
 	const clickHandler = () => {
 		if (location.pathname !== `/${tagId}`) {
 			navigate(`/${tagId}`);
+			modals.sidebarOpen = false;
 		}
 		// mailer.filterByFolder(tagId || null);
 	};

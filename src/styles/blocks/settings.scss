@@ -9,6 +9,13 @@
 		height: 50px;
 		flex-basis: 50px;
 
+		@include less480px {
+			@include flex-column(stretch, flex-start);
+
+			height: auto;
+			flex-basis: auto;
+		}
+
 		border-bottom: 1px solid #f3f3f3;
 
 		.contact-avatar {
@@ -22,6 +29,10 @@
 				width: 30px;
 				height: 30px;
 			}
+
+			@include less480px {
+				display: none;
+			}
 		}
 
 		.contact-name {
@@ -33,6 +44,13 @@
 
 			font-size: 14px;
 			font-weight: 500;
+
+			@include less480px {
+				font-size: 18px;
+
+				flex-basis: auto;
+				flex-grow: 0;
+			}
 		}
 
 		.contact-address {
@@ -44,6 +62,11 @@
 
 			font-size: 14px;
 			font-family: monospace;
+
+			@include less480px {
+				flex-basis: auto;
+				margin-top: 10px;
+			}
 		}
 
 		.contact-folders {
@@ -53,6 +76,11 @@
 			flex-shrink: 0;
 			padding-left: 10px;
 			padding-right: 20px;
+
+			@include less480px {
+				padding: 0;
+				margin-top: 10px;
+			}
 		}
 
 		.contact-actions {
@@ -66,8 +94,14 @@
 				flex-basis: 20px;
 			}
 
-			.ant-btn {
+			.ant-btn:not(:first-child) {
 				margin-left: 8px;
+			}
+
+			@include less480px {
+				flex-basis: auto;
+				margin-top: 10px;
+				margin-bottom: 20px;
 			}
 		}
 	}

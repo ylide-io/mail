@@ -1,18 +1,25 @@
 .wallets-block {
-	display: flex;
-	flex-direction: row;
-	justify-content: space-around;
+	@include flex-row(flex-start, space-around);
+
 	flex-wrap: wrap;
 	width: 850px;
 	margin-top: 50px;
+
+	@include less480px {
+		@include flex-column(center, flex-start);
+
+		width: 100%;
+		margin-top: 30px;
+		flex-wrap: nowrap;
+		padding-left: 10px;
+		padding-right: 10px;
+	}
 }
 
 .wallet-block {
+	@include flex-column(stretch, flex-start);
+
 	position: relative;
-	display: flex;
-	flex-direction: column;
-	justify-content: flex-start;
-	align-items: stretch;
 	padding: 10px 20px;
 	background: #ffffff;
 	border: 1px solid black;
@@ -23,6 +30,11 @@
 	margin-right: 10px;
 	margin-bottom: 20px;
 	overflow: hidden;
+
+	@include less480px {
+		width: 100%;
+	}
+
 	&.ready {
 		background-color: rgb(228, 255, 228);
 	}

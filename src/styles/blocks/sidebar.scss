@@ -1,4 +1,10 @@
 .sidebar-button {
+	@include less480px {
+		margin-bottom: 5px;
+		margin-left: 10px;
+		margin-right: 10px;
+	}
+
 	&.ant-btn-primary {
 		background-color: rgba(26, 179, 148, 1);
 		border-color: rgba(26, 179, 148, 1);
@@ -10,15 +16,15 @@
 		}
 	}
 	&.ant-btn-default {
-		color: #ff4d4f;
+		color: #606060;
 		background-color: white;
-		border-color: #ff4d4f;
+		border-color: #606060;
 		border-radius: 5px;
 
 		&:hover {
-			color: #c72225;
+			color: #929292;
 
-			border-color: #c72225;
+			border-color: #929292;
 		}
 	}
 }
@@ -27,6 +33,10 @@
 	@include flex-column(stretch, flex-start);
 
 	padding-top: 5px;
+
+	@include less920px {
+		padding: 15px;
+	}
 }
 
 .sidebar-block {
@@ -62,4 +72,15 @@
 		border-top-right-radius: 15px;
 		border-bottom-right-radius: 15px;
 	}
+}
+
+.header-burger {
+	margin-right: 20px;
+}
+
+.sidebar-mobile-header {
+	@include flex-row(center, space-between);
+
+	margin-top: 3.5px;
+	margin-bottom: 10px;
 }

@@ -1,3 +1,4 @@
+@import './colors.scss';
 @import './base.scss';
 
 // controls
@@ -8,6 +9,7 @@
 @import './controls/button.scss';
 @import './controls/recipients-select.scss';
 @import './controls/checkbox.scss';
+@import './controls/address.scss';
 
 // blocks
 @import './blocks/index.scss';

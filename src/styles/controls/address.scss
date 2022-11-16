@@ -1,0 +1,16 @@
+.ylide-address {
+	@include flex-row(flex-start, flex-start);
+	overflow: hidden;
+	height: 1rem;
+	line-height: 100%;
+	position: relative;
+	flex-grow: 1;
+	flex-shrink: 1;
+	.ylide-address-value {
+		height: 1rem;
+		line-height: 100%;
+		position: absolute;
+		left: 0;
+		font-family: monospace;
+	}
+}

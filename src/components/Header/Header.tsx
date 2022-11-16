@@ -2,12 +2,23 @@ import React from 'react';
 import domain from '../../stores/Domain';
 import { useNav } from '../../utils/navigate';
 import { Avatar, Button, Dropdown } from 'antd';
-import { DownOutlined, EditOutlined, LogoutOutlined, PlusOutlined, UsergroupAddOutlined } from '@ant-design/icons';
+import {
+	DownOutlined,
+	EditOutlined,
+	LogoutOutlined,
+	MenuFoldOutlined,
+	MenuUnfoldOutlined,
+	PlusOutlined,
+	UsergroupAddOutlined,
+} from '@ant-design/icons';
 import { observer } from 'mobx-react';
 import Tooltip from 'antd/es/tooltip';
 import { DomainAccount } from '../../stores/models/DomainAccount';
 import { Blockie } from '../../controls/Blockie';
 import { walletsMap } from '../../constants';
+import { useWindowSize } from '../../utils/useWindowSize';
+import modals from '../../stores/Modals';
+import { AdaptiveAddress } from '../../controls/AdaptiveAddress';
 
 const AccountItem = observer(({ account }: { account: DomainAccount }) => {
 	const nav = useNav();
@@ -20,7 +31,7 @@ const AccountItem = observer(({ account }: { account: DomainAccount }) => {
 			<div className="ali-body">
 				<div className="ali-title">
 					<div className="ali-title-name">
-						<div>{account.name}</div>
+						<div className="ali-name-inner">{account.name}</div>
 						<Tooltip title="Rename">
 							<Button
 								onClick={async () => {
@@ -40,7 +51,9 @@ const AccountItem = observer(({ account }: { account: DomainAccount }) => {
 						{walletsMap[account.wallet.wallet].logo(12)} {walletsMap[account.wallet.wallet].title}
 					</div>
 				</div>
-				<div className="ali-address">{account.account.address}</div>
+				<div className="ali-address">
+					<AdaptiveAddress address={account.account.address} />
+				</div>
 			</div>
 			<div className="ali-actions">
 				<Tooltip title="Logout">
@@ -63,6 +76,9 @@ const AccountItem = observer(({ account }: { account: DomainAccount }) => {
 
 const Header = observer(() => {
 	const nav = useNav();
+	const { windowWidth } = useWindowSize();
+
+	console.log('Header.windowWidth: ', windowWidth);
 
 	const newMenu = (
 		<div className="accounts-list">
@@ -79,7 +95,17 @@ const Header = observer(() => {
 
 	return (
 		<div className="header">
-			<div className="side-block header-logo">
+			{windowWidth < 920 ? (
+				<div className="header-burger">
+					<Button
+						onClick={() => {
+							modals.sidebarOpen = !modals.sidebarOpen;
+						}}
+						icon={modals.sidebarOpen ? <MenuFoldOutlined /> : <MenuUnfoldOutlined />}
+					/>
+				</div>
+			) : null}
+			<div className="side-block open header-logo">
 				<img src="https://ylide.io/images/logo-medium-p-500.png" alt="Logo" className="header-logo-image" />
 			</div>
 			<div className="main-block header-main">

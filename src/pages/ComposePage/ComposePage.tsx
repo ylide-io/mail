@@ -26,7 +26,7 @@ const ComposePage = observer(() => {
 								type="dashed"
 								danger
 								onClick={() => {
-									navigate(`/${mailList.activeFolderId || 'index'}`);
+									navigate(`/${mailList.activeFolderId || 'inbox'}`);
 								}}
 								color={smallButtonColors.white}
 								icon={<i className={`fa ${smallButtonIcons.cross}`} />}

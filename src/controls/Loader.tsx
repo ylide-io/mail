@@ -9,6 +9,7 @@ export const Loader = ({ reason }: { reason?: string }) => {
 				flexDirection: 'column',
 				alignItems: 'center',
 				justifyContent: 'center',
+				textAlign: 'center',
 			}}
 		>
 			<div className="loader-back" style={{ transform: 'scale(1.2)' }}>
@@ -34,7 +35,9 @@ export const Loader = ({ reason }: { reason?: string }) => {
 					{(() => [...new Array(9)].map((_, i) => <div key={i} />))()}
 				</div>
 			</div>
-			{reason ? <div style={{ fontSize: 20, marginTop: 60 }}>{reason}</div> : null}
+			{reason ? (
+				<div style={{ fontSize: 20, marginTop: 60, paddingLeft: 20, paddingRight: 20 }}>{reason}</div>
+			) : null}
 		</div>
 	);
 };
