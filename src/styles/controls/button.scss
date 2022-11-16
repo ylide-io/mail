@@ -21,9 +21,14 @@
 		border: 0;
 		font-weight: 300;
 	}
-	&.small {
+	&.size-small {
 		font-size: 12px;
 		padding: 3px 12px;
+	}
+	&.size-tiny {
+		font-size: 11px;
+		padding: 0px 8px;
+		border: 1px solid black;
 	}
 	&.centered {
 		padding: 3px;

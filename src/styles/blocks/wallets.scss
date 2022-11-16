@@ -1,5 +1,5 @@
 .wallets-block {
-	@include flex-row(flex-start, space-around);
+	@include flex-row(stretch, space-around);
 
 	flex-wrap: wrap;
 	width: 850px;
@@ -39,21 +39,31 @@
 		background-color: rgb(228, 255, 228);
 	}
 	.wb-head {
-		display: flex;
-		flex-direction: row;
-		align-items: center;
-		justify-content: space-between;
+		@include flex-row(center, space-between);
 		.wb-head-left {
-			display: flex;
-			flex-direction: row;
-			align-items: center;
-			justify-content: flex-start;
+			@include flex-row(center, flex-start);
 			flex-grow: 1;
 			.wb-logo {
+				@include flex-row(center, flex-start);
 				margin-right: 10px;
 			}
 			.wb-title {
-				font-size: 18px;
+				@include flex-column(stretch, flex-start);
+
+				.wb-title-name {
+					font-size: 18px;
+				}
+
+				.wb-via {
+					@include flex-row(center, flex-start);
+
+					margin-top: 4px;
+					font-size: 12px;
+
+					.wb-via-name {
+						margin-right: 4px;
+					}
+				}
 			}
 		}
 		.wb-head-right {

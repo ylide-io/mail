@@ -85,6 +85,8 @@ export class Domain {
 	@observable wallets: Wallet[] = [];
 	@observable accounts: Accounts = new Accounts(this);
 
+	@observable walletConnectWalletName = '';
+
 	constructor() {
 		makeObservable(this);
 
@@ -258,8 +260,17 @@ export class Domain {
 		}
 	}
 
+	async disconnectWalletConnect() {
+		if (this.walletControllers.evm?.walletconnect) {
+			await (domain.walletControllers.evm.walletconnect as any).writeWeb3.currentProvider.disconnect();
+			// TODO: pizdec
+			document.location.reload();
+		}
+	}
+
 	async initWalletConnect(callback?: (url: string, close: () => void) => void, connectSuccessful?: () => void) {
 		let isInitialized = true;
+		let peerName = null;
 		const wc = new WalletConnectProvider({
 			rpc: {
 				[EVM_CHAINS[EVMNetwork.ETHEREUM]]: EVM_RPCS[EVMNetwork.ETHEREUM].find(r => !r.rpc.startsWith('ws'))!
@@ -310,9 +321,14 @@ export class Domain {
 			}
 		}
 
+		if (isInitialized) {
+			peerName = wc.wc.peerMeta?.name || null;
+		}
+
 		return {
 			walletConnectProvider: wc,
 			isInitialized,
+			peerName,
 		};
 	}
 
@@ -326,6 +342,8 @@ export class Domain {
 			wc = await this.initWalletConnect(wcCallback, wcConnectSuccessful);
 			if (!wc.isInitialized) {
 				return false;
+			} else {
+				this.walletConnectWalletName = wc.peerName || '';
 			}
 		}
 		this.walletControllers[factory.blockchainGroup] = {
@@ -371,10 +389,12 @@ export class Domain {
 			}
 		}
 		for (const factory of this.registeredBlockchains) {
-			this.blockchains[factory.blockchain] = await this.ylide.addBlockchain(factory.blockchain, {
-				dev: false, //document.location.hostname === 'localhost',
-				endpoints: ['https://mainnet.evercloud.dev/695e40eeac6b4e3fa4a11666f6e0d6af/graphql'],
-			});
+			if (!this.blockchains[factory.blockchain]) {
+				this.blockchains[factory.blockchain] = await this.ylide.addBlockchain(factory.blockchain, {
+					dev: false, //document.location.hostname === 'localhost',
+					endpoints: ['https://mainnet.evercloud.dev/695e40eeac6b4e3fa4a11666f6e0d6af/graphql'],
+				});
+			}
 		}
 
 		for (const supportedWallet of supportedWallets) {

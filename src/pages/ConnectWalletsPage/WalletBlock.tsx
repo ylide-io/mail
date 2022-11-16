@@ -42,7 +42,7 @@ export class AccountBlock extends PureComponent<{ account: DomainAccount }> {
 				<div className="wb-account-actions">
 					{!account.isLocalKeyRegistered ? (
 						<YlideButton
-							small
+							size="small"
 							style={{ marginRight: 8 }}
 							onClick={async () => {
 								this.loading = true;
@@ -58,7 +58,7 @@ export class AccountBlock extends PureComponent<{ account: DomainAccount }> {
 					) : null}
 					<Tooltip title="Disconnect account" placement="bottom">
 						<YlideButton
-							small
+							size="small"
 							centered
 							onClick={async () => {
 								this.loading = true;
@@ -308,7 +308,17 @@ export class WalletBlock extends PureComponent<WalletBlockProps> {
 				<div className="wb-head">
 					<div className="wb-head-left">
 						<div className="wb-logo">{wData.logo()}</div>
-						<div className="wb-title">{wData.title}</div>
+						<div className="wb-title">
+							<div className="wb-title-name">{wData.title}</div>
+							{this.props.wallet === 'walletconnect' && wallet ? (
+								<div className="wb-via">
+									<div className="wb-via-name">{domain.walletConnectWalletName}</div>
+									<YlideButton size="tiny" onClick={() => domain.disconnectWalletConnect()}>
+										Disconnect
+									</YlideButton>
+								</div>
+							) : null}
+						</div>
 					</div>
 					<div className="wb-head-right">{headRight}</div>
 				</div>
