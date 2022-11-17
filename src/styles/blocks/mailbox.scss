@@ -414,13 +414,33 @@
 	padding-bottom: 20px;
 
 	&.compose-mail-footer {
-		border-top: 0;
 		padding-top: 20px;
 		margin-top: 0;
+
+		// position: fixed;
+		// bottom: 15px;
+		// right: 15px;
+		// left: 240px;
+
+		// background-color: red;
+		// border-bottom-left-radius: 10px;
+		// border-bottom-right-radius: 10px;
 	}
 }
 
+.mail-page {
+	@include flex-column(stretch, flex-start);
+
+	flex-grow: 1;
+	flex-shrink: 1;
+}
+
 .mail-body {
+	@include flex-column(stretch, flex-start);
+
+	flex-grow: 1;
+	flex-shrink: 1;
+
 	font-size: 16px;
 	line-height: 140%;
 
@@ -457,4 +477,14 @@
 	.mail-preview {
 		opacity: 0.5;
 	}
+}
+
+.mail-text {
+	@include flex-column(stretch, flex-start);
+
+	flex-grow: 1;
+	flex-shrink: 1;
+	flex-basis: 200px;
+
+	overflow: auto;
 }

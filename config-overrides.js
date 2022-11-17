@@ -1,4 +1,6 @@
 const webpack = require('webpack');
+const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
+
 module.exports = function override(config) {
 	const fallback = config.resolve.fallback || {};
 	Object.assign(fallback, {
@@ -12,6 +14,7 @@ module.exports = function override(config) {
 	});
 	config.resolve.fallback = fallback;
 	config.plugins = (config.plugins || []).concat([
+		new BundleAnalyzerPlugin(),
 		new webpack.ProvidePlugin({
 			process: 'process/browser',
 			Buffer: ['buffer', 'Buffer'],

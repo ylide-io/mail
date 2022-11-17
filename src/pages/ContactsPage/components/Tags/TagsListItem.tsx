@@ -30,6 +30,7 @@ const TagsListItem: React.FC<TagsListItemProps> = ({ tag, isNew }) => {
 			id: tag.id,
 			name,
 			color,
+			icon: '',
 		};
 		if (isNew) {
 			tags.resetNewTag();

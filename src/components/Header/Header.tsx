@@ -106,7 +106,15 @@ const Header = observer(() => {
 				</div>
 			) : null}
 			<div className="side-block open header-logo">
-				<img src="https://ylide.io/images/logo-medium-p-500.png" alt="Logo" className="header-logo-image" />
+				<a
+					href="/inbox"
+					onClick={e => {
+						e.preventDefault();
+						nav('/inbox');
+					}}
+				>
+					<img src="https://ylide.io/images/logo-medium-p-500.png" alt="Logo" className="header-logo-image" />
+				</a>
 			</div>
 			<div className="main-block header-main">
 				<div className="header-block">

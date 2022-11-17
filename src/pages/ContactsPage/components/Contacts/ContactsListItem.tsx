@@ -28,6 +28,7 @@ const ContactsListItem: React.FC<ContactsListItemProps> = ({ contact, isNew }) =
 	const [editing, setEditing] = useState(isNew || false);
 	const [name, setName] = useState(contact.name);
 	const [address, setAddress] = useState(contact.address);
+	const [description, setDescription] = useState(contact.description);
 
 	const [nameError, setNameError] = useState(false);
 	const [addressError, setAddressError] = useState(false);
@@ -53,6 +54,7 @@ const ContactsListItem: React.FC<ContactsListItemProps> = ({ contact, isNew }) =
 			tags: tags.map(tag => tag.id),
 			name,
 			address,
+			description,
 		};
 
 		if (checkNewContactErrors(newContact)) return;

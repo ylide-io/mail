@@ -51,12 +51,11 @@
 }
 
 .tag-list {
-	margin-left: -15px;
-
 	@include flex-column(stretch, flex-start);
 
 	.tag-list-item {
 		@include flex-column(stretch, flex-start);
+		margin-left: -15px;
 	}
 	.tag-list-item-title {
 		@include flex-row(center, flex-start);

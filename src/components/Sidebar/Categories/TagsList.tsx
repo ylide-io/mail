@@ -20,6 +20,7 @@ const TagsList = observer(() => {
 						tagId={elem.id}
 						circleColor={elem.color}
 						text={elem.name}
+						icon={elem.icon}
 					/>
 				))
 			) : (

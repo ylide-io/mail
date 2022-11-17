@@ -9,9 +9,10 @@ interface TagProps {
 	text: string;
 	tagId?: number;
 	isActive?: boolean;
+	icon: string;
 }
 
-const Tag: React.FC<TagProps> = ({ circleColor, text, isActive, tagId }) => {
+const Tag: React.FC<TagProps> = ({ icon, circleColor, text, isActive, tagId }) => {
 	const location = useLocation();
 	const navigate = useNav();
 

@@ -265,6 +265,7 @@ export class RecipientsSelect extends PureComponent<RecipientsSelectProps> {
 				searchValue={this.search}
 				onSearch={this.handleSearch}
 				onChange={this.handleChange}
+				placeholder="Enter address or ENS domain here"
 			/>
 		);
 	}

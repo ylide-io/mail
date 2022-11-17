@@ -46,7 +46,7 @@ export class IndexedDB {
 	db: IDBPDatabase<DBInterface> | null = null;
 
 	private async openDB() {
-		return await openDB<DBInterface>('mail', 1, {
+		return await openDB<DBInterface>('mail-1', 1, {
 			upgrade(db) {
 				const messagesStore = db.createObjectStore('messages', {
 					keyPath: 'msgId',
@@ -62,17 +62,20 @@ export class IndexedDB {
 				contactsStore.add({
 					name: 'ignat.ylide',
 					address: '0:9ee55e89c3b48603d34d65f67e4c638863a1a3920b79dd662d7cd8c484f77445',
-					tags: [],
+					description: 'Ylide CEO',
+					tags: [1],
 				});
 				contactsStore.add({
 					name: 'danila.ylide',
 					address: '0:81f452f5aec2263ab10116f7108a20209d5051081bb3caed34f139f976a0e279',
-					tags: [],
+					description: 'Ylide CTO',
+					tags: [1],
 				});
 				contactsStore.add({
 					name: 'kirill.ylide',
 					address: '0:9308bdf06ed5839075da88a3c86a2273075969b18e6b8ea2d120b8aed427ccf7',
-					tags: [],
+					description: 'Ylide COO',
+					tags: [1],
 				});
 
 				// ----------------------
@@ -82,6 +85,12 @@ export class IndexedDB {
 				});
 
 				tagsStore.createIndex('name', 'name');
+				tagsStore.add({
+					id: 1,
+					name: 'Ylide Team',
+					color: '#f0f0f0',
+					icon: '#ylide',
+				});
 
 				// ----------------------
 
