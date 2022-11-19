@@ -44,6 +44,7 @@ export class Accounts {
 								blockchain: key.blockchainGroup,
 							},
 							key,
+							(await this.domain.storage.readString('yld1_accName_' + key.address)) || 'New Account',
 						);
 					}
 				}
@@ -59,13 +60,13 @@ export class Accounts {
 		});
 	}
 
-	async addAccount(account: IGenericAccount, key: YlideKey) {
+	async addAccount(account: IGenericAccount, key: YlideKey, name: string) {
 		const wallet = this.domain.wallets.find(w => w.factory.wallet === key.wallet);
 		if (!wallet) {
 			return;
 		}
 
-		const domainAccount = new DomainAccount(wallet, account, key);
+		const domainAccount = new DomainAccount(wallet, account, key, name);
 		await domainAccount.init();
 
 		wallet.accounts.push(domainAccount);
@@ -94,44 +95,6 @@ export class Accounts {
 		}
 		await this.domain.keystore.delete(account.key);
 	}
-
-	// async loadAccounts() {
-	// 	const accs = await this.domain.storage.readJSON<
-	// 		{ accountAddress: string; blockchainGroup: string; wallet: string }[]
-	// 	>('N4_accounts');
-	// 	if (accs) {
-	// 		await Promise.all(
-	// 			accs.map(async acc => {
-	// 				const wallet = this.domain.wallets.find(w => w.factory.wallet === acc.wallet);
-	// 				if (!wallet) {
-	// 					return;
-	// 				}
-	// 				const domainAccount = new DomainAccount(wallet, {
-	// 					address: acc.accountAddress,
-	// 					blockchain: acc.blockchainGroup,
-	// 					publicKey: null,
-	// 				});
-	// 				await domainAccount.init();
-
-	// 				wallet.accounts.push(domainAccount);
-	// 				this.accounts.push(domainAccount);
-
-	// 				await this.domain.activateAccountReading(domainAccount);
-	// 			}),
-	// 		);
-	// 	}
-	// }
-
-	// async saveAccounts() {
-	// 	await this.domain.storage.storeJSON(
-	// 		'N4_accounts',
-	// 		this.accounts.map<{ accountAddress: string; blockchainGroup: string; wallet: string }>(acc => ({
-	// 			accountAddress: acc.account.address,
-	// 			blockchainGroup: acc.wallet.factory.blockchainGroup,
-	// 			wallet: acc.wallet.factory.wallet,
-	// 		})),
-	// 	);
-	// }
 
 	@computed get areThereAccounts() {
 		return !!this.activeAccounts.length;

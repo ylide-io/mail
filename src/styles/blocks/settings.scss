@@ -1,0 +1,108 @@
+.contacts-list {
+	@include flex-column(stretch, flex-start);
+
+	margin-top: 10px;
+
+	.contacts-list-item {
+		@include flex-row(center, flex-start);
+
+		height: 50px;
+		flex-basis: 50px;
+
+		@include less480px {
+			@include flex-column(stretch, flex-start);
+
+			height: auto;
+			flex-basis: auto;
+		}
+
+		border-bottom: 1px solid #f3f3f3;
+
+		.contact-avatar {
+			@include flex-row(center, flex-start);
+
+			flex-basis: 50px;
+			flex-grow: 0;
+			flex-shrink: 0;
+
+			.contact-blockie {
+				width: 30px;
+				height: 30px;
+			}
+
+			@include less480px {
+				display: none;
+			}
+		}
+
+		.contact-name {
+			@include flex-row(center, flex-start);
+
+			flex-basis: 150px;
+			flex-grow: 1;
+			flex-shrink: 0;
+
+			font-size: 14px;
+			font-weight: 500;
+
+			@include less480px {
+				font-size: 18px;
+
+				flex-basis: auto;
+				flex-grow: 0;
+			}
+		}
+
+		.contact-address {
+			@include flex-row(center, flex-start);
+
+			flex-basis: 400px;
+			flex-grow: 10;
+			flex-shrink: 0;
+
+			font-size: 14px;
+			font-family: monospace;
+
+			@include less480px {
+				flex-basis: auto;
+				margin-top: 10px;
+			}
+		}
+
+		.contact-folders {
+			@include flex-row(center, flex-start);
+
+			flex-grow: 0;
+			flex-shrink: 0;
+			padding-left: 10px;
+			padding-right: 20px;
+
+			@include less480px {
+				padding: 0;
+				margin-top: 10px;
+			}
+		}
+
+		.contact-actions {
+			@include flex-row(center, flex-end);
+
+			flex-basis: 100px;
+			flex-grow: 0;
+			flex-shrink: 0;
+
+			&.small-actions {
+				flex-basis: 20px;
+			}
+
+			.ant-btn:not(:first-child) {
+				margin-left: 8px;
+			}
+
+			@include less480px {
+				flex-basis: auto;
+				margin-top: 10px;
+				margin-bottom: 20px;
+			}
+		}
+	}
+}

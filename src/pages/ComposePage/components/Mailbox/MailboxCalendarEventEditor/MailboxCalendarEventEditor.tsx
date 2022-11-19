@@ -1,9 +1,9 @@
 import mailbox from '../../../../../stores/Mailbox';
 import './MailboxCalendarEventEditor.scss';
-import SmallButton, { smallButtonColors, smallButtonIcons } from '../../../../../components/smallButton/smallButton';
+import { smallButtonIcons } from '../../../../../components/smallButton/smallButton';
 import { observer } from 'mobx-react';
 import { useRef } from 'react';
-import { DatePicker } from 'antd';
+import { Button, DatePicker, Input } from 'antd';
 import { RangePickerProps } from 'antd/lib/date-picker';
 
 const MailboxCalendarEventEditor = observer(() => {
@@ -20,63 +20,68 @@ const MailboxCalendarEventEditor = observer(() => {
         }
     }
 
+    const height = mailbox.event.active ? `${calculatedHeight.current}px` : '0px';
     return (
         <>
-            <div className='add-event-btn'>
-                <SmallButton
+            <div className='add-event-btn-wrapper'>
+                <Button
+                    type='primary'
+                    className='add-event-btn'
                     onClick={() => {
                         calculatedHeight.current = eventSectionRef.current?.clientHeight || 0;
                         mailbox.event.active = !mailbox.event.active
                     }}
-                    text={mailbox.event.active ? 'Remove Event' : 'Add Event'}
-                    color={smallButtonColors.green}
                     title={mailbox.event.active ? 'Remove Calendar Event' : 'Add Calendar Event'}
-                    icon={mailbox.event.active ? smallButtonIcons.cross : smallButtonIcons.calendar}
-                />
+                    icon={<i className={`fa ${mailbox.event.active ? smallButtonIcons.cross : smallButtonIcons.calendar}`} />}
+                >
+                    {mailbox.event.active ? 'Remove Event' : 'Add Event'}
+                </Button>
             </div>
-            <div style={{ height: mailbox.event.active ? `${calculatedHeight.current}px` : '0px' }} className={`add-event-section ${!mailbox.event.active && 'inactive'}`}>
+            <div style={{ height: height, minHeight: height }} className={`mail-meta compose-meta add-event-section ${!mailbox.event.active && 'inactive'}`}>
                 <div className='add-event-section-content' ref={eventSectionRef}>
-                    <div className="form-group row">
-                        <label className="col-sm-1 col-form-label">Summary:</label>
-                        <div className="col-sm-11">
-                            <input
-                                type="text"
-                                className="form-control"
-                                value={mailbox.event.summary}
-                                onChange={e => (mailbox.event.summary = e.target.value)}
-                            />
+                    <div className="mail-params">
+                        <div className="mmp-row">
+                            <label className="mmp-row-title">Summary:</label>
+                            <div className="mmp-row-value">
+                                <Input
+                                    type="text"
+                                    style={{ width: '100%' }}
+                                    value={mailbox.event.summary}
+                                    onChange={e => (mailbox.event.summary = e.target.value)}
+                                />
+                            </div>
                         </div>
-                    </div>
-                    <div className="form-group row">
-                        <label className="col-sm-1 col-form-label">When:</label>
-                        <div className="col-sm-11">
-                            <DatePicker.RangePicker
-                                showTime={{ format: 'HH:mm' }}
-                                format="YYYY-MM-DD HH:mm"
-                                minuteStep={5}
-                                onOk={onOk}
-                            />
+                        <div className="mmp-row">
+                            <label className="mmp-row-title">When:</label>
+                            <div className="mmp-row-value">
+                                <DatePicker.RangePicker
+                                    showTime={{ format: 'HH:mm' }}
+                                    format="YYYY-MM-DD HH:mm"
+                                    minuteStep={5}
+                                    onOk={onOk}
+                                />
+                            </div>
                         </div>
-                    </div>
-                    <div className="form-group row">
-                        <label className="col-sm-1 col-form-label">Location:</label>
-                        <div className="col-sm-11">
-                            <input
-                                type="text"
-                                className="form-control"
-                                value={mailbox.event.location}
-                                onChange={e => (mailbox.event.location = e.target.value)}
-                            />
+                        <div className="mmp-row">
+                            <label className="mmp-row-title">Location:</label>
+                            <div className="mmp-row-value">
+                                <Input
+                                    type="text"
+                                    style={{ width: '100%' }}
+                                    value={mailbox.event.location}
+                                    onChange={e => (mailbox.event.location = e.target.value)}
+                                />
+                            </div>
                         </div>
-                    </div>
-                    <div className="form-group row">
-                        <label className="col-sm-1 col-form-label">Description:</label>
-                        <div className="col-sm-11">
-                            <textarea
-                                className="form-control"
-                                value={mailbox.event.description}
-                                onChange={e => (mailbox.event.description = e.target.value)}
-                            />
+                        <div className="mmp-row">
+                            <label className="mmp-row-title">Description:</label>
+                            <div className="mmp-row-value">
+                                <Input.TextArea
+                                    rows={4}
+                                    value={mailbox.event.description}
+                                    onChange={e => (mailbox.event.description = e.target.value)}
+                                />
+                            </div>
                         </div>
                     </div>
                 </div>

@@ -1,3 +1,4 @@
+import { Button } from "antd";
 import { useState } from "react";
 
 const CollapsedText = ({ text, collapseCount }: { text: string, collapseCount: number }) => {
@@ -17,9 +18,9 @@ const CollapsedText = ({ text, collapseCount }: { text: string, collapseCount: n
     return (
         <p>
             {displayText}
-            <button style={{ padding: '0 3px' }} type="button" className="btn btn-link" onClick={handleAction}>
+            <Button type="link" style={{ padding: '0 3px' }} onClick={handleAction}>
                 {actionText}
-            </button>
+            </Button>
         </p>
     );
 };

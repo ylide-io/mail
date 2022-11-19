@@ -21,19 +21,19 @@ const PermanentTag: React.FC<PermanentTagInterface> = ({ onClick, text, active }
 		}
 	})();
 
-	const styles = { cursor: 'pointer', padding: '5px 10px' };
+	const styles = { cursor: 'pointer' };
 
 	const activeStyles = {
 		fontWeight: 'bold',
-		backgroundColor: 'rgba(26,179,148,0.15)',
+		backgroundColor: 'rgba(26,179,148,0.3)',
 	};
 
 	return (
-		<li onClick={onClick}>
-			<div style={active ? { ...styles, ...activeStyles } : styles}>
+		<div className="tag-list-item" onClick={onClick}>
+			<div className="tag-list-item-title" style={active ? { ...styles, ...activeStyles } : styles}>
 				<i className={classNames('fa', icon)} /> {text}
 			</div>
-		</li>
+		</div>
 	);
 };
 

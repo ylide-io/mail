@@ -22,7 +22,7 @@ export const createEventFileString = ({
     end,
     summary,
     description,
-    locaiton
+    location
 }: {
     organizer: string,
     attendees: string[],
@@ -30,7 +30,7 @@ export const createEventFileString = ({
     end: Date,
     summary: string,
     description: string,
-    locaiton: string,
+    location: string,
 }) => {
     const eventData = {
         calendar:
@@ -51,7 +51,7 @@ export const createEventFileString = ({
                     uid: `ylide-${Date.now()}-${Math.round(Math.random() * 10000)}`,
                     summary: summary,
                     description: description,
-                    locaiton: locaiton,
+                    location: location,
                     dtstart: {
                         value: createCalendarEventDateString(start)
                     },

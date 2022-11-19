@@ -1,133 +1,165 @@
 import React from 'react';
-// import Searcher from '../../layouts/components/searcher';
 import domain from '../../stores/Domain';
 import { useNav } from '../../utils/navigate';
-import { Dropdown, Menu } from 'antd';
-import { DownOutlined, LogoutOutlined, PlusOutlined } from '@ant-design/icons';
+import { Avatar, Button, Dropdown } from 'antd';
+import {
+	DownOutlined,
+	EditOutlined,
+	LogoutOutlined,
+	MenuFoldOutlined,
+	MenuUnfoldOutlined,
+	PlusOutlined,
+	UsergroupAddOutlined,
+} from '@ant-design/icons';
 import { observer } from 'mobx-react';
+import Tooltip from 'antd/es/tooltip';
+import { DomainAccount } from '../../stores/models/DomainAccount';
+import { Blockie } from '../../controls/Blockie';
+import { walletsMap } from '../../constants';
+import { useWindowSize } from '../../utils/useWindowSize';
+import modals from '../../stores/Modals';
+import { AdaptiveAddress } from '../../controls/AdaptiveAddress';
+
+const AccountItem = observer(({ account }: { account: DomainAccount }) => {
+	const nav = useNav();
+
+	return (
+		<div className="accounts-list-item" key={account.account.address}>
+			<div className="ali-icon">
+				<Blockie address={account.account.address} />
+			</div>
+			<div className="ali-body">
+				<div className="ali-title">
+					<div className="ali-title-name">
+						<div className="ali-name-inner">{account.name}</div>
+						<Tooltip title="Rename">
+							<Button
+								onClick={async () => {
+									const newName = prompt('Enter new account name: ', account.name);
+									if (newName) {
+										await account.rename(newName);
+									}
+								}}
+								style={{ marginLeft: 2, marginTop: 1, color: '#808080' }}
+								type="text"
+								size="small"
+								icon={<EditOutlined />}
+							/>
+						</Tooltip>
+					</div>
+					<div className="via-wallet">
+						{walletsMap[account.wallet.wallet].logo(12)} {walletsMap[account.wallet.wallet].title}
+					</div>
+				</div>
+				<div className="ali-address">
+					<AdaptiveAddress address={account.account.address} />
+				</div>
+			</div>
+			<div className="ali-actions">
+				<Tooltip title="Logout">
+					<Button
+						danger
+						icon={<LogoutOutlined />}
+						onClick={async () => {
+							await account.wallet.disconnectAccount(account);
+							await domain.accounts.removeAccount(account);
+							if (domain.accounts.activeAccounts.length === 0) {
+								nav('/connect-wallets');
+							}
+						}}
+					/>
+				</Tooltip>
+			</div>
+		</div>
+	);
+});
 
 const Header = observer(() => {
 	const nav = useNav();
+	const { windowWidth } = useWindowSize();
 
-	const menu = (
-		<Menu
-			items={[
-				{
-					key: 'add',
-					label: (
-						<div
-							style={{
-								display: 'flex',
-								flexDirection: 'row',
-								alignItems: 'center',
-							}}
-						>
-							<PlusOutlined style={{ marginTop: 0, marginRight: 10 }} />
-							Add account
-						</div>
-					),
-				},
-				...domain.accounts.activeAccounts.map(acc => ({
-					key: `${acc.wallet.factory.wallet}:${acc.account.address}`,
-					label: (
-						<div
-							style={{
-								display: 'flex',
-								flexDirection: 'row',
-								alignItems: 'center',
-							}}
-						>
-							<LogoutOutlined style={{ marginTop: 0, marginRight: 10 }} />{' '}
-							{acc.account.address.substring(0, 10)}
-							... ({acc.wallet.factory.wallet})
-						</div>
-					),
-				})),
-			]}
-			onClick={async info => {
-				if (info.key === 'add') {
-					nav('/connect-wallets');
-					return;
-				}
-				const account = domain.accounts.activeAccounts.find(
-					acc => info.key === `${acc.wallet.factory.wallet}:${acc.account.address}`,
-				);
-				if (!account) {
-					return;
-				}
-				await account.wallet.disconnectAccount(account);
-				await domain.accounts.removeAccount(account);
-				nav('/connect-wallets');
-			}}
-		/>
+	console.log('Header.windowWidth: ', windowWidth);
+
+	const newMenu = (
+		<div className="accounts-list">
+			{domain.accounts.accounts.map(acc => (
+				<AccountItem key={acc.account.address} account={acc} />
+			))}
+			<div className="accounts-list-item add-account-item">
+				<Button type="primary" icon={<PlusOutlined />} onClick={() => nav('/connect-wallets')}>
+					Connect account
+				</Button>
+			</div>
+		</div>
 	);
 
 	return (
-		<div className="row border-bottom">
-			<nav
-				className="navbar navbar-static-top white-bg mb-0"
-				role="navigation"
-				style={{ paddingLeft: 30, paddingRight: 30 }}
-			>
-				<div className="navbar-header">
-					<img
-						src="https://ylide.io/images/logo-medium-p-500.png"
-						alt="Logo"
-						style={{
-							width: 80,
-							marginTop: 9,
-							marginLeft: 10,
+		<div className="header">
+			{windowWidth < 920 ? (
+				<div className="header-burger">
+					<Button
+						onClick={() => {
+							modals.sidebarOpen = !modals.sidebarOpen;
 						}}
+						icon={modals.sidebarOpen ? <MenuFoldOutlined /> : <MenuUnfoldOutlined />}
 					/>
-					{/* <Searcher /> */}
 				</div>
-				<ul className="nav navbar-top-links navbar-right">
-					<li>
-						<a
+			) : null}
+			<div className="side-block open header-logo">
+				<a
+					href="/inbox"
+					onClick={e => {
+						e.preventDefault();
+						nav('/inbox');
+					}}
+				>
+					<img src="https://ylide.io/images/logo-medium-p-500.png" alt="Logo" className="header-logo-image" />
+				</a>
+			</div>
+			<div className="main-block header-main">
+				<div className="header-block">
+					<Tooltip title="Manage contacts and folders">
+						<UsergroupAddOutlined
 							onClick={e => {
 								e.preventDefault();
 								nav('/contacts');
 							}}
-							style={{ cursor: 'pointer' }}
-							className="m-r-sm text-muted welcome-message"
-							href="_none"
-						>
-							<i className="fa fa-users"></i>
-						</a>
-					</li>
-					<li>
-						<a
+							style={{ fontSize: 20 }}
+						/>
+					</Tooltip>
+				</div>
+				{/* <div className="header-block">
+					<Tooltip title="Settings">
+						<SettingFilled
 							onClick={e => {
 								e.preventDefault();
 								nav('/settings');
 							}}
-							style={{ cursor: 'pointer' }}
-							className="m-r-sm text-muted welcome-message"
-							href="_none"
-						>
-							<i className="fa fa-gear"></i>
-						</a>
-					</li>
-					<li>
-						<Dropdown overlay={menu}>
-							<div
-								style={{
-									display: 'flex',
-									flexDirection: 'row',
-									alignItems: 'center',
-									color: '#707070',
-									cursor: 'pointer',
-								}}
-							>
-								{`Connected ${domain.accounts.activeAccounts.length} account${
-									domain.accounts.activeAccounts.length > 1 ? 's' : ''
-								}`}
-								<DownOutlined size={16} style={{ marginLeft: 5 }} />
+							style={{ fontSize: 20 }}
+						/>
+					</Tooltip>
+				</div> */}
+				<div className="header-block">
+					<Dropdown overlay={newMenu}>
+						<div className="users-block">
+							<div className="users-block-avatars">
+								{domain.accounts.activeAccounts.map(acc => (
+									<Avatar
+										key={acc.account.address}
+										icon={<Blockie address={acc.account.address} />}
+									/>
+								))}
 							</div>
-						</Dropdown>
-					</li>
-				</ul>
-			</nav>
+							<div className="users-block-text">{`Connected ${
+								domain.accounts.activeAccounts.length
+							} account${domain.accounts.activeAccounts.length > 1 ? 's' : ''}`}</div>
+							<div className="users-block-icon">
+								<DownOutlined size={16} />
+							</div>
+						</div>
+					</Dropdown>
+				</div>
+			</div>
 		</div>
 	);
 });

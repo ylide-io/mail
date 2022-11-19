@@ -1,6 +1,7 @@
 export interface IContact {
-    name: string;
-    address: string;
-    tags: number[];
-    img?: string;
+	name: string;
+	address: string;
+	description: string;
+	tags: number[];
+	img?: string;
 }

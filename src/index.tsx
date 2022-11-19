@@ -4,12 +4,11 @@ import { BrowserTracing } from '@sentry/tracing';
 import App from './App';
 import { configure } from 'mobx';
 
-import './assets/scss/style.scss';
+// import './assets/scss/style.scss';
 import './assets/scss/font-awesome/font-awesome.scss';
-
 import 'antd/dist/antd.min.css';
 
-import './index.scss';
+import './styles/index.scss';
 
 import { BrowserRouter } from 'react-router-dom';
 import packageJson from '../package.json';

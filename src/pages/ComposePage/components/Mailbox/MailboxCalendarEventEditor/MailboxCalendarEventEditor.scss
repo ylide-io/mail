@@ -2,25 +2,42 @@ button span {
     margin-left: 3px;
 }
 
-.add-event-btn {
+.add-event-btn-wrapper {
+    z-index: 5;
     position: absolute;
     transform: translateY(-50%);
     margin-left: 15px;
-}
 
-.mailbox-editor-secion {
-    padding: 0px;
+    .ant-btn-primary {
+        background-color: rgba(26, 179, 148, 1);
+        border-color: rgba(26, 179, 148, 1);
+        border-radius: 5px;
+
+        &:hover,
+        &:focus {
+            background-color: rgb(22, 147, 122);
+            border-color: rgb(22, 147, 122);
+        }
+    }
 }
 
 .add-event-section {
-    transition: height 0.2s linear;
+    transition-property: height, min-height;
+    transition-duration: 0.2s;
+    transition-timing-function: linear;
     overflow: hidden;
+    border: 1px solid #e0e0e0;
 
     &.inactive {
-        border: none;
+        border-bottom: none;
     }
 
     .add-event-section-content {
+        width: 100%;
         padding: 35px 15px;
+
+        .mail-params {
+            padding: 0px !important;
+        }
     }
 }

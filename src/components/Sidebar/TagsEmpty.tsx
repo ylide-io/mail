@@ -5,7 +5,7 @@ const TagsEmpty = () => {
 	const navigate = useNav();
 
 	const gotoFolders = () => {
-		navigate('/contacts/folders');
+		navigate('/folders');
 	};
 
 	return (

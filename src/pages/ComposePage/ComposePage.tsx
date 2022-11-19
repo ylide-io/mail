@@ -1,73 +1,48 @@
 import React from 'react';
 import GenericLayout from '../../layouts/GenericLayout';
-import SmallButton, { smallButtonColors, smallButtonIcons } from '../../components/smallButton/smallButton';
-import MailboxBody from './components/Mailbox/MailboxBody';
-import Tooltip from './components/Mailbox/tooltip';
+import { smallButtonColors, smallButtonIcons } from '../../components/smallButton/smallButton';
 import { useNav } from '../../utils/navigate';
 import mailer from '../../stores/Mailer';
 import { observer } from 'mobx-react';
-import { Loader } from '../../controls/Loader';
 import mailList from '../../stores/MailList';
+import { OverlappingLoader } from '../../controls/OverlappingLoader';
+import { Button } from 'antd';
+import ComposeMailFooter from './components/Mailbox/ComposeMailFooter';
+import ComposeMailBody from './components/Mailbox/ComposeMailBody';
+import { MailComposeMeta } from './components/MailComposeMeta';
+import MailboxCalendarEventEditor from './components/Mailbox/MailboxCalendarEventEditor/MailboxCalendarEventEditor';
 
 const ComposePage = observer(() => {
 	const navigate = useNav();
 
 	return (
 		<GenericLayout>
-			<div className="col-lg-10 animated fadeInRight">
-				<div className="mail-box-header">
-					<div className="float-right tooltip-demo">
-						<SmallButton
-							onClick={() => {
-								navigate(`/${mailList.activeFolderId}`);
-							}}
-							text={'Discard'}
-							color={smallButtonColors.red}
-							title={'Discard email'}
-							icon={smallButtonIcons.cross}
-						/>
-					</div>
-					<h2>Compose mail</h2>
-				</div>
-				<div className="mail-box" style={{ position: 'relative' }}>
-					<MailboxBody />
-					<Tooltip />
-					<div className="clearfix"></div>
-					{mailer.sending ? (
-						<div
-							style={{
-								position: 'absolute',
-								left: 0,
-								right: 0,
-								top: 0,
-								bottom: 0,
-								zIndex: 200,
-								backdropFilter: 'blur(10px)',
-							}}
-						>
-							<Loader />
-							<br />
-							<div
-								style={{
-									display: 'flex',
-									alignItems: 'center',
-									justifyContent: 'center',
-									paddingTop: 200,
-									position: 'absolute',
-									left: 0,
-									right: 0,
-									top: 0,
-									bottom: 0,
-									zIndex: 201,
-									color: 'black',
-									fontSize: 20,
-									fontWeight: 'bold',
+			<div className="mail-page animated fadeInRight">
+				<div className="mail-top compose-mail-top">
+					<div className="mail-header">
+						<h2 className="mailbox-title">Compose mail</h2>
+						<div className="mail-actions">
+							<Button
+								size="small"
+								type="dashed"
+								danger
+								onClick={() => {
+									navigate(`/${mailList.activeFolderId || 'inbox'}`);
 								}}
+								color={smallButtonColors.white}
+								icon={<i className={`fa ${smallButtonIcons.cross}`} />}
 							>
-								Broadcasting your message to blockchain...
-							</div>
+								Discard
+							</Button>
 						</div>
-					) : null}
+					</div>
+					<MailComposeMeta />
+					<MailboxCalendarEventEditor />
+				</div>
+				<div className="mail-body" style={{ position: 'relative' }}>
+					<ComposeMailBody />
+					<ComposeMailFooter />
+					{mailer.sending ? <OverlappingLoader text="Broadcasting your message to blockchain..." /> : null}
 				</div>
 			</div>
 		</GenericLayout>

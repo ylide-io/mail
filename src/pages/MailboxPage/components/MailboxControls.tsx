@@ -1,6 +1,8 @@
-import SmallButton, { smallButtonColors, smallButtonIcons } from '../../../components/smallButton/smallButton';
+import { smallButtonColors, smallButtonIcons } from '../../../components/smallButton/smallButton';
 import { observer } from 'mobx-react';
 import mailList from '../../../stores/MailList';
+import { Button, Tooltip } from 'antd';
+import { YlideCheckbox } from '../../../controls/YlideCheckbox';
 
 const MailboxControls = observer(() => {
 	const readHandler = () => {
@@ -20,31 +22,54 @@ const MailboxControls = observer(() => {
 	// 	(mailer.messageIds.length % mailer.messagesOnPage ? 1 : 0);
 	// const isNextPageAvailable = domain.inbox.isNextPageAvailable;
 
+	const isAllSelected = mailList.messages.every(m => mailList.checkedMessageIds.includes(m.id));
+
 	return (
-		<div className="mail-tools tooltip-demo m-t-md">
-			<div className="tooltip-buttons-space">
-				<SmallButton
+		<div className="mailbox-tools">
+			<Tooltip title={isAllSelected ? 'Deselect all' : 'Select all'}>
+				<div className="global-checkbox-wrapper">
+					<YlideCheckbox
+						checked={isAllSelected}
+						onCheck={value => {
+							if (value) {
+								mailList.checkedMessageIds = mailList.messages.map(m => m.id);
+							} else {
+								mailList.checkedMessageIds = [];
+							}
+						}}
+					/>
+				</div>
+			</Tooltip>
+			<Tooltip title="Mark as read">
+				<Button
+					size="small"
+					type="dashed"
 					onClick={readHandler}
 					color={smallButtonColors.white}
-					icon={smallButtonIcons.eye}
-					title={'Mark as read'}
+					icon={<i className={`fa ${smallButtonIcons.eye}`} />}
 				/>
-				{mailList.activeFolderId === 'archive' ? (
-					<SmallButton
+			</Tooltip>
+			{mailList.activeFolderId === 'archive' ? (
+				<Tooltip title="Restore mails">
+					<Button
+						size="small"
+						type="dashed"
 						onClick={restoreHandler}
 						color={smallButtonColors.white}
-						icon={smallButtonIcons.restore}
-						title={'Restore mails'}
+						icon={<i className={`fa ${smallButtonIcons.restore}`} />}
 					/>
-				) : mailList.activeFolderId === 'sent' ? null : (
-					<SmallButton
+				</Tooltip>
+			) : mailList.activeFolderId === 'sent' ? null : (
+				<Tooltip title="Archive mails">
+					<Button
+						size="small"
+						type="dashed"
 						onClick={deleteHandler}
 						color={smallButtonColors.white}
-						icon={smallButtonIcons.trash}
-						title={'Archive mails'}
+						icon={<i className={`fa ${smallButtonIcons.trash}`} />}
 					/>
-				)}
-			</div>
+				</Tooltip>
+			)}
 		</div>
 	);
 });

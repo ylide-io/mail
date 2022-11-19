@@ -1,6 +1,5 @@
 import React, { ChangeEvent, useMemo, useState } from 'react';
 import { ITag } from '../../../../stores/models/ITag';
-import Select from 'react-select';
 import classNames from 'classnames';
 import contacts from '../../../../stores/Contacts';
 import { IContact } from '../../../../stores/models/IContact';
@@ -8,6 +7,10 @@ import TagsStore from '../../../../stores/Tags';
 import mailbox from '../../../../stores/Mailbox';
 import { useNav } from '../../../../utils/navigate';
 import domain from '../../../../stores/Domain';
+import { Avatar, Button, Input, Select } from 'antd';
+import { Blockie } from '../../../../controls/Blockie';
+import { DeleteOutlined, EditOutlined, MailOutlined, SaveOutlined } from '@ant-design/icons';
+import { AdaptiveAddress } from '../../../../controls/AdaptiveAddress';
 
 interface ContactsListItemProps {
 	contact: IContact;
@@ -25,6 +28,7 @@ const ContactsListItem: React.FC<ContactsListItemProps> = ({ contact, isNew }) =
 	const [editing, setEditing] = useState(isNew || false);
 	const [name, setName] = useState(contact.name);
 	const [address, setAddress] = useState(contact.address);
+	const [description, setDescription] = useState(contact.description);
 
 	const [nameError, setNameError] = useState(false);
 	const [addressError, setAddressError] = useState(false);
@@ -50,6 +54,7 @@ const ContactsListItem: React.FC<ContactsListItemProps> = ({ contact, isNew }) =
 			tags: tags.map(tag => tag.id),
 			name,
 			address,
+			description,
 		};
 
 		if (checkNewContactErrors(newContact)) return;
@@ -96,18 +101,14 @@ const ContactsListItem: React.FC<ContactsListItemProps> = ({ contact, isNew }) =
 		}
 	};
 
-	const makeOption = (tag: ITag) => {
-		return { value: tag.id, label: tag.name };
-	};
-
 	const fromOption = (option: Option) => {
-		return TagsStore.tags.find(tag => tag.id === +option.value);
+		return TagsStore.tags.find(tag => tag.id === +option);
 	};
 
-	const options = TagsStore.tags.map(tag => makeOption(tag));
+	const options = TagsStore.tags.map(tag => ({ value: tag.id, label: tag.name }));
 
 	const defaultOptions = useMemo(() => {
-		return tags.map(tag => makeOption(tag));
+		return tags.map(tag => ({ value: tag.id, label: tag.name }));
 	}, [tags]);
 
 	const selectHandler = (options: readonly Option[]) => {
@@ -138,118 +139,68 @@ const ContactsListItem: React.FC<ContactsListItemProps> = ({ contact, isNew }) =
 
 	if (editing) {
 		return (
-			<tr>
-				<td className="client-avatar">
-					{contact.img ? (
-						<img alt="Avatar" src={contact.img} />
-					) : (
-						<i
-							style={{
-								width: '100%',
-								height: '100%',
-								display: 'flex',
-								alignItems: 'center',
-								justifyContent: 'center',
-							}}
-							className="fa fa-user"
-						/>
-					)}
-				</td>
-				<td>
-					<input
+			<div className="contacts-list-item">
+				<div className="contact-avatar">
+					{contact.img ? <img alt="Avatar" src={contact.img} /> : <Avatar />}
+				</div>
+				<div className="contact-name">
+					<Input
 						type="text"
-						style={nameError ? { border: '1px solid red', width: '80%' } : { width: '80%' }}
+						style={nameError ? { border: '1px solid red', width: '890%' } : { width: '90%' }}
 						value={name}
-						className="input form-control"
 						placeholder={'Type contact name'}
 						onChange={onNameEdit}
 					/>
-				</td>
-				<td className="contact-type">
-					<i className="fa fa-location-arrow" />
-				</td>
-				<td>
-					<input
-						style={addressError ? { border: '1px solid red', width: '100%' } : { width: '100%' }}
-						className="input form-control"
+				</div>
+				<div className="contact-address">
+					<Input
+						style={addressError ? { border: '1px solid red', width: '90%' } : { width: '90%' }}
 						placeholder={'Type contact address'}
 						type="text"
 						value={address}
 						onChange={onAddressEdit}
 					/>
-				</td>
-				<td></td>
-				<td style={{ textAlign: 'center' }} className="client-status">
+				</div>
+				<div className="contact-folders">
 					<Select
-						isMulti={true}
+						style={{ width: '100%', minWidth: 200 }}
+						mode="tags"
 						options={options}
 						defaultValue={defaultOptions}
 						onChange={selectHandler}
-						placeholder={'Select folders'}
-						styles={{
-							control: style => ({
-								...style,
-								minHeight: 0,
-								// width: 200,
-							}),
-							dropdownIndicator: style => ({
-								...style,
-								padding: '5px 8px',
-							}),
-						}}
+						placeholder="Select folders"
 					/>
-				</td>
-				{!isNew ? (
-					<td style={{ cursor: 'pointer', textAlign: 'center' }}>
-						<i className="fa fa-trash" onClick={deleteClickHandler} />
-						<i
-							className="fa fa-check"
-							style={{ marginLeft: 15, marginRight: 10 }}
-							onClick={saveClickHandler}
+				</div>
+				<div className="contact-actions">
+					<Button type="primary" size="small" onClick={saveClickHandler} icon={<SaveOutlined />} />
+					{!isNew ? (
+						<Button
+							type="dashed"
+							size="small"
+							danger
+							onClick={deleteClickHandler}
+							icon={<DeleteOutlined />}
 						/>
-					</td>
-				) : (
-					<td style={{ cursor: 'pointer', textAlign: 'center' }}>
-						<i className="fa fa-times" onClick={deleteClickHandler} />
-						<i
-							className="fa fa-check"
-							style={{ marginLeft: 15, marginRight: 10 }}
-							onClick={saveClickHandler}
-						/>
-					</td>
-				)}
-			</tr>
+					) : null}
+				</div>
+			</div>
 		);
 	}
 
 	return (
-		<tr>
-			<td className="client-avatar">
+		<div className="contacts-list-item">
+			<div className="contact-avatar">
 				{contact.img ? (
-					<img alt="Avatar" src={contact.img} />
+					<Avatar src={contact.img} />
 				) : (
-					<i
-						style={{
-							width: '100%',
-							height: '100%',
-							display: 'flex',
-							alignItems: 'center',
-							justifyContent: 'center',
-						}}
-						className="fa fa-user"
-					/>
+					<Blockie className="contact-blockie" address={contact.address} />
 				)}
-			</td>
-			<td>
-				<span className="client-link">{name}</span>
-			</td>
-			<td className="contact-type">
-				<i className="fa fa-location-arrow" />
-			</td>
-			<td>
-				<span>{address}</span>
-			</td>
-			<td style={{ textAlign: 'center' }} className="client-status">
+			</div>
+			<div className="contact-name">{name}</div>
+			<div className="contact-address">
+				<AdaptiveAddress address={address} />
+			</div>
+			<div style={{ textAlign: 'center' }} className="contact-folders">
 				{tags.map((tag, index) => (
 					<span
 						key={index}
@@ -259,14 +210,16 @@ const ContactsListItem: React.FC<ContactsListItemProps> = ({ contact, isNew }) =
 						{tag.name}
 					</span>
 				))}
-			</td>
-			<td onClick={mailThisContact} style={{ cursor: 'pointer', textAlign: 'center' }}>
-				<i className="fa fa-envelope" />
-			</td>
-			<td onClick={editClickHandler} style={{ cursor: 'pointer', textAlign: 'center' }}>
-				<i className="fa fa-gear" />
-			</td>
-		</tr>
+			</div>
+			<div className="contact-actions">
+				<Button type="dashed" size="small" onClick={mailThisContact} icon={<MailOutlined />}>
+					Compose
+				</Button>
+				<Button type="dashed" size="small" onClick={editClickHandler} icon={<EditOutlined />}>
+					Edit
+				</Button>
+			</div>
+		</div>
 	);
 };
 

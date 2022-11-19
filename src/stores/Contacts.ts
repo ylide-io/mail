@@ -79,6 +79,7 @@ class Contacts {
 		this.newContact = {
 			name: '',
 			address: '',
+			description: '',
 			tags: [],
 		};
 	}

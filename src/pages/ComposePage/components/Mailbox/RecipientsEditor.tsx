@@ -155,7 +155,7 @@ export class Recipients extends PureComponent {
 							{domain.accounts.activeAccounts.map((acc, idx) => (
 								<Select.Option value={String(idx)}>
 									{acc.account.address} [
-									{acc.wallet.factory.wallet === 'web3' ? 'MetaMask' : 'EverWallet'}]
+									{acc.wallet.factory.wallet === 'metamask' ? 'MetaMask' : 'EverWallet'}]
 								</Select.Option>
 							))}
 						</Select>
@@ -167,7 +167,6 @@ export class Recipients extends PureComponent {
 						<Select
 							tagRender={props => {
 								const rec = this.recipients.find(r => r.input === props.value);
-								console.log('rec render: ', rec);
 								const content = (
 									<Tag
 										className={cn('recipient-tag', {

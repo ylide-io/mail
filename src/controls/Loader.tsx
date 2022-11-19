@@ -9,6 +9,7 @@ export const Loader = ({ reason }: { reason?: string }) => {
 				flexDirection: 'column',
 				alignItems: 'center',
 				justifyContent: 'center',
+				textAlign: 'center',
 			}}
 		>
 			<div className="loader-back" style={{ transform: 'scale(1.2)' }}>
@@ -30,11 +31,13 @@ export const Loader = ({ reason }: { reason?: string }) => {
 					<path d="M233.279 118.899V119.962C230.482 114.519 226.062 110.048 220.658 107.188H221.57L253.887 74.8664C256.752 79.7902 260.986 83.8194 266.067 86.4332H265.74L233.279 118.899Z" />
 				</svg>
 
-				<div className="loader" style={{ marginLeft: 3, marginTop: -68 }}>
+				<div className="loader" style={{ marginLeft: 3, marginTop: -74 }}>
 					{(() => [...new Array(9)].map((_, i) => <div key={i} />))()}
 				</div>
 			</div>
-			{reason ? <div style={{ fontSize: 20, marginTop: 60 }}>{reason}</div> : null}
+			{reason ? (
+				<div style={{ fontSize: 20, marginTop: 60, paddingLeft: 20, paddingRight: 20 }}>{reason}</div>
+			) : null}
 		</div>
 	);
 };

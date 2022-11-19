@@ -3,6 +3,7 @@ import PermanentTag from './PermanentTag';
 import { observer } from 'mobx-react';
 import mailList from '../../../stores/MailList';
 import { useNavigate } from 'react-router-dom';
+import modals from '../../../stores/Modals';
 
 interface PermanentTagListProps {}
 
@@ -10,20 +11,33 @@ const PermanentTagList: React.FC<PermanentTagListProps> = observer(() => {
 	const navigate = useNavigate();
 
 	return (
-		<ul className="folder-list m-b-md" style={{ padding: 0 }}>
+		<div className="tag-list">
 			<PermanentTag
 				active={mailList.activeFolderId === 'inbox'}
 				text={'Inbox'}
-				onClick={() => navigate('/inbox')}
+				onClick={() => {
+					navigate('/inbox');
+					modals.sidebarOpen = false;
+				}}
 			/>
-			<PermanentTag active={mailList.activeFolderId === 'sent'} text={'Sent'} onClick={() => navigate('/sent')} />
+			<PermanentTag
+				active={mailList.activeFolderId === 'sent'}
+				text={'Sent'}
+				onClick={() => {
+					navigate('/sent');
+					modals.sidebarOpen = false;
+				}}
+			/>
 			<PermanentTag
 				active={mailList.activeFolderId === 'archive'}
 				text={'Archive'}
-				onClick={() => navigate('/archive')}
+				onClick={() => {
+					navigate('/archive');
+					modals.sidebarOpen = false;
+				}}
 			/>
 			{/* <PermanentTag active={false} text={"Archive"} onClick={() => viewFolder("Archive")} /> */}
-		</ul>
+		</div>
 	);
 });
 

@@ -1,8 +1,6 @@
 import cn from 'classnames';
 import { MouseEvent } from 'react';
 
-import './style.scss';
-
 export const YlideCheckbox = ({
 	checked,
 	onCheck,

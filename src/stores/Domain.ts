@@ -11,42 +11,51 @@ import {
 	IGenericAccount,
 	DynamicEncryptionRouter,
 	AbstractNameService,
-	IndexerListSource,
-	BlockchainListSource,
-	BlockchainSourceType,
 } from '@ylide/sdk';
 import { everscaleBlockchainFactory, everscaleWalletFactory } from '@ylide/everscale';
-import { ethereumWalletFactory, evmFactories, EVMNetwork, EVM_CHAINS, EVM_NAMES } from '@ylide/ethereum';
+import {
+	evmWalletFactories,
+	evmBlockchainFactories,
+	EVMNetwork,
+	EVM_CHAINS,
+	EVM_NAMES,
+	EVM_RPCS,
+} from '@ylide/ethereum';
 import { makeObservable, observable } from 'mobx';
+import WalletConnectProvider from '@walletconnect/web3-provider';
 import contacts from './Contacts';
 import { Wallet } from './models/Wallet';
 import { Accounts } from './Accounts';
 import { blockchainsMap, supportedWallets, walletsMap } from '../constants';
 import SwitchModal from '../modals/SwitchModal';
-import PasswordNewModal from '../modals/PasswordModalNew';
+import PasswordModal from '../modals/PasswordModal';
 import mailList from './MailList';
 import tags from './Tags';
 
 Ylide.registerBlockchainFactory(everscaleBlockchainFactory);
-// Ylide.registerBlockchainFactory(evmFactories[EVMNetwork.LOCAL_HARDHAT]);
-Ylide.registerBlockchainFactory(evmFactories[EVMNetwork.ETHEREUM]);
-Ylide.registerBlockchainFactory(evmFactories[EVMNetwork.AVALANCHE]);
-Ylide.registerBlockchainFactory(evmFactories[EVMNetwork.ARBITRUM]);
-Ylide.registerBlockchainFactory(evmFactories[EVMNetwork.BNBCHAIN]);
-Ylide.registerBlockchainFactory(evmFactories[EVMNetwork.OPTIMISM]);
-Ylide.registerBlockchainFactory(evmFactories[EVMNetwork.POLYGON]);
-Ylide.registerBlockchainFactory(evmFactories[EVMNetwork.FANTOM]);
-Ylide.registerBlockchainFactory(evmFactories[EVMNetwork.KLAYTN]);
-Ylide.registerBlockchainFactory(evmFactories[EVMNetwork.GNOSIS]);
-Ylide.registerBlockchainFactory(evmFactories[EVMNetwork.AURORA]);
-Ylide.registerBlockchainFactory(evmFactories[EVMNetwork.CELO]);
-Ylide.registerBlockchainFactory(evmFactories[EVMNetwork.CRONOS]);
-Ylide.registerBlockchainFactory(evmFactories[EVMNetwork.MOONBEAM]);
-Ylide.registerBlockchainFactory(evmFactories[EVMNetwork.MOONRIVER]);
-Ylide.registerBlockchainFactory(evmFactories[EVMNetwork.METIS]);
-Ylide.registerBlockchainFactory(evmFactories[EVMNetwork.ASTAR]);
+// Ylide.registerBlockchainFactory(evmBlockchainFactories[EVMNetwork.LOCAL_HARDHAT]);
+Ylide.registerBlockchainFactory(evmBlockchainFactories[EVMNetwork.ETHEREUM]);
+Ylide.registerBlockchainFactory(evmBlockchainFactories[EVMNetwork.AVALANCHE]);
+Ylide.registerBlockchainFactory(evmBlockchainFactories[EVMNetwork.ARBITRUM]);
+Ylide.registerBlockchainFactory(evmBlockchainFactories[EVMNetwork.BNBCHAIN]);
+Ylide.registerBlockchainFactory(evmBlockchainFactories[EVMNetwork.OPTIMISM]);
+Ylide.registerBlockchainFactory(evmBlockchainFactories[EVMNetwork.POLYGON]);
+Ylide.registerBlockchainFactory(evmBlockchainFactories[EVMNetwork.FANTOM]);
+Ylide.registerBlockchainFactory(evmBlockchainFactories[EVMNetwork.KLAYTN]);
+Ylide.registerBlockchainFactory(evmBlockchainFactories[EVMNetwork.GNOSIS]);
+Ylide.registerBlockchainFactory(evmBlockchainFactories[EVMNetwork.AURORA]);
+Ylide.registerBlockchainFactory(evmBlockchainFactories[EVMNetwork.CELO]);
+Ylide.registerBlockchainFactory(evmBlockchainFactories[EVMNetwork.CRONOS]);
+Ylide.registerBlockchainFactory(evmBlockchainFactories[EVMNetwork.MOONBEAM]);
+Ylide.registerBlockchainFactory(evmBlockchainFactories[EVMNetwork.MOONRIVER]);
+Ylide.registerBlockchainFactory(evmBlockchainFactories[EVMNetwork.METIS]);
+Ylide.registerBlockchainFactory(evmBlockchainFactories[EVMNetwork.ASTAR]);
 Ylide.registerWalletFactory(everscaleWalletFactory);
-Ylide.registerWalletFactory(ethereumWalletFactory);
+Ylide.registerWalletFactory(evmWalletFactories.metamask);
+Ylide.registerWalletFactory(evmWalletFactories.coinbase);
+Ylide.registerWalletFactory(evmWalletFactories.trustwallet);
+Ylide.registerWalletFactory(evmWalletFactories.binance);
+Ylide.registerWalletFactory(evmWalletFactories.walletconnect);
 
 export class Domain {
 	savedPassword: string | null = null;
@@ -61,7 +70,7 @@ export class Domain {
 
 	ylide: Ylide = new Ylide(this.keystore);
 
-	@observable devMode = document.location.href.includes('localhost');
+	@observable devMode = false; //document.location.href.includes('localhost');
 
 	@observable security: 'none' | 'encrypted' = 'none';
 
@@ -71,10 +80,12 @@ export class Domain {
 	@observable availableWallets: WalletControllerFactory[] = [];
 
 	@observable blockchains: BlockchainMap<AbstractBlockchainController> = {};
-	@observable walletControllers: BlockchainWalletMap<AbstractWalletController> = {};
+	@observable walletControllers: BlockchainWalletMap<AbstractWalletController | null> = {};
 
 	@observable wallets: Wallet[] = [];
 	@observable accounts: Accounts = new Accounts(this);
+
+	@observable walletConnectWalletName = '';
 
 	constructor() {
 		makeObservable(this);
@@ -93,18 +104,18 @@ export class Domain {
 		}));
 	}
 
-	requestPolygonMails() {
-		const reader = this.blockchains.POLYGON;
-		const subject = {
-			type: BlockchainSourceType.DIRECT,
-			sender: null,
-			recipient: this.walletControllers.evm.web3.addressToUint256(this.accounts.accounts[0].account.address),
-		};
-		const origSource = new BlockchainListSource(reader, subject, 10000);
-		const tempSource = new IndexerListSource(origSource, mailList.readingSession.indexerHub, reader, subject);
+	// requestPolygonMails() {
+	// 	const reader = this.blockchains.POLYGON;
+	// 	const subject = {
+	// 		type: BlockchainSourceType.DIRECT,
+	// 		sender: null,
+	// 		recipient: this.walletControllers.evm.metamask.addressToUint256(this.accounts.accounts[0].account.address),
+	// 	};
+	// 	const origSource = new BlockchainListSource(reader, subject, 10000);
+	// 	const tempSource = new IndexerListSource(origSource, mailList.readingSession.indexerHub, reader, subject);
 
-		return { origSource, tempSource };
-	}
+	// 	return { origSource, tempSource };
+	// }
 
 	getBlockchainsForAddress(address: string): { blockchain: string; reader: AbstractBlockchainController }[] {
 		return Object.keys(this.blockchains)
@@ -185,12 +196,8 @@ export class Domain {
 			if (domain.savedPassword) {
 				return resolve(domain.savedPassword);
 			}
-			const result = await PasswordNewModal.show(reason);
+			const result = await PasswordModal.show(reason);
 			resolve(result ? result.value : null);
-
-			// modals.passwordModalVisible = true;
-			// modals.passwordModalReason = reason;
-			// modals.passwordModalHandler = resolve;
 		});
 	}
 
@@ -253,6 +260,120 @@ export class Domain {
 		}
 	}
 
+	async disconnectWalletConnect() {
+		if (this.walletControllers.evm?.walletconnect) {
+			await (domain.walletControllers.evm.walletconnect as any).writeWeb3.currentProvider.disconnect();
+			// TODO: pizdec
+			document.location.reload();
+		}
+	}
+
+	async initWalletConnect(callback?: (url: string, close: () => void) => void, connectSuccessful?: () => void) {
+		let isInitialized = true;
+		let peerName = null;
+		const wc = new WalletConnectProvider({
+			rpc: {
+				[EVM_CHAINS[EVMNetwork.ETHEREUM]]: EVM_RPCS[EVMNetwork.ETHEREUM].find(r => !r.rpc.startsWith('ws'))!
+					.rpc,
+				[EVM_CHAINS[EVMNetwork.AVALANCHE]]: EVM_RPCS[EVMNetwork.AVALANCHE].find(r => !r.rpc.startsWith('ws'))!
+					.rpc,
+				[EVM_CHAINS[EVMNetwork.ARBITRUM]]: EVM_RPCS[EVMNetwork.ARBITRUM].find(r => !r.rpc.startsWith('ws'))!
+					.rpc,
+				[EVM_CHAINS[EVMNetwork.BNBCHAIN]]: EVM_RPCS[EVMNetwork.BNBCHAIN].find(r => !r.rpc.startsWith('ws'))!
+					.rpc,
+				[EVM_CHAINS[EVMNetwork.OPTIMISM]]: EVM_RPCS[EVMNetwork.OPTIMISM].find(r => !r.rpc.startsWith('ws'))!
+					.rpc,
+				[EVM_CHAINS[EVMNetwork.POLYGON]]: EVM_RPCS[EVMNetwork.POLYGON].find(r => !r.rpc.startsWith('ws'))!.rpc,
+				[EVM_CHAINS[EVMNetwork.FANTOM]]: EVM_RPCS[EVMNetwork.FANTOM].find(r => !r.rpc.startsWith('ws'))!.rpc,
+				[EVM_CHAINS[EVMNetwork.KLAYTN]]: EVM_RPCS[EVMNetwork.KLAYTN].find(r => !r.rpc.startsWith('ws'))!.rpc,
+				[EVM_CHAINS[EVMNetwork.GNOSIS]]: EVM_RPCS[EVMNetwork.GNOSIS].find(r => !r.rpc.startsWith('ws'))!.rpc,
+				[EVM_CHAINS[EVMNetwork.AURORA]]: EVM_RPCS[EVMNetwork.AURORA].find(r => !r.rpc.startsWith('ws'))!.rpc,
+				[EVM_CHAINS[EVMNetwork.CELO]]: EVM_RPCS[EVMNetwork.CELO].find(r => !r.rpc.startsWith('ws'))!.rpc,
+				[EVM_CHAINS[EVMNetwork.CRONOS]]: EVM_RPCS[EVMNetwork.CRONOS].find(r => !r.rpc.startsWith('ws'))!.rpc,
+				[EVM_CHAINS[EVMNetwork.MOONBEAM]]: EVM_RPCS[EVMNetwork.MOONBEAM].find(r => !r.rpc.startsWith('ws'))!
+					.rpc,
+				[EVM_CHAINS[EVMNetwork.MOONRIVER]]: EVM_RPCS[EVMNetwork.MOONRIVER].find(r => !r.rpc.startsWith('ws'))!
+					.rpc,
+				[EVM_CHAINS[EVMNetwork.METIS]]: EVM_RPCS[EVMNetwork.METIS].find(r => !r.rpc.startsWith('ws'))!.rpc,
+				[EVM_CHAINS[EVMNetwork.ASTAR]]: EVM_RPCS[EVMNetwork.ASTAR].find(r => !r.rpc.startsWith('ws'))!.rpc,
+			},
+			qrcodeModal: {
+				async open(uri, cb, opts?) {
+					if (callback) {
+						callback(uri, cb);
+					} else {
+						isInitialized = false;
+						cb();
+					}
+				},
+				close() {
+					if (connectSuccessful) {
+						connectSuccessful();
+					}
+				},
+			},
+		});
+		try {
+			await wc.enable();
+		} catch (err: any) {
+			if (err?.message !== 'User closed modal') {
+				throw err;
+			}
+		}
+
+		if (isInitialized) {
+			peerName = wc.wc.peerMeta?.name || null;
+		}
+
+		return {
+			walletConnectProvider: wc,
+			isInitialized,
+			peerName,
+		};
+	}
+
+	async initWallet(
+		factory: WalletControllerFactory,
+		wcCallback?: (url: string, close: () => void) => void,
+		wcConnectSuccessful?: () => void,
+	) {
+		let wc;
+		if (factory.wallet === 'walletconnect') {
+			wc = await this.initWalletConnect(wcCallback, wcConnectSuccessful);
+			if (!wc.isInitialized) {
+				return false;
+			} else {
+				this.walletConnectWalletName = wc.peerName || '';
+			}
+		}
+		this.walletControllers[factory.blockchainGroup] = {
+			...(this.walletControllers[factory.blockchainGroup] || {}),
+			[factory.wallet]: await this.ylide.addWallet(factory.blockchainGroup, factory.wallet, {
+				dev: false, //document.location.hostname === 'localhost',
+				onSwitchAccountRequest: this.handleSwitchRequest.bind(this, factory.wallet),
+				onNetworkSwitchRequest: async (
+					reason: string,
+					currentNetwork: EVMNetwork | undefined,
+					needNetwork: EVMNetwork,
+					needChainId: number,
+				) => {
+					try {
+						await this.switchEVMChain(needNetwork);
+					} catch (err) {
+						alert(
+							'Wrong network (' +
+								(currentNetwork ? EVM_NAMES[currentNetwork] : 'undefined') +
+								'), switch to ' +
+								EVM_NAMES[needNetwork],
+						);
+					}
+				},
+				walletConnectProvider: factory.wallet === 'walletconnect' ? wc?.walletConnectProvider : null,
+			}),
+		};
+		return true;
+	}
+
 	async extractWalletsData() {
 		this.registeredWallets = Ylide.walletsList.map(w => w.factory);
 		this.registeredBlockchains = Ylide.blockchainsList.map(b => b.factory);
@@ -264,37 +385,16 @@ export class Domain {
 				!this.walletControllers[factory.blockchainGroup] ||
 				!this.walletControllers[factory.blockchainGroup][factory.wallet]
 			) {
-				this.walletControllers[factory.blockchainGroup] = {
-					...(this.walletControllers[factory.blockchainGroup] || {}),
-					[factory.wallet]: await this.ylide.addWallet(factory.blockchainGroup, factory.wallet, {
-						dev: false, //document.location.hostname === 'localhost',
-						onSwitchAccountRequest: this.handleSwitchRequest.bind(this, factory.wallet),
-						onNetworkSwitchRequest: async (
-							reason: string,
-							currentNetwork: EVMNetwork | undefined,
-							needNetwork: EVMNetwork,
-							needChainId: number,
-						) => {
-							try {
-								await this.switchEVMChain(needNetwork);
-							} catch (err) {
-								alert(
-									'Wrong network (' +
-										(currentNetwork ? EVM_NAMES[currentNetwork] : 'undefined') +
-										'), switch to ' +
-										EVM_NAMES[needNetwork],
-								);
-							}
-						},
-					}),
-				};
+				await this.initWallet(factory);
 			}
 		}
 		for (const factory of this.registeredBlockchains) {
-			this.blockchains[factory.blockchain] = await this.ylide.addBlockchain(factory.blockchain, {
-				dev: false, //document.location.hostname === 'localhost',
-				endpoints: ['https://mainnet.evercloud.dev/695e40eeac6b4e3fa4a11666f6e0d6af/graphql'],
-			});
+			if (!this.blockchains[factory.blockchain]) {
+				this.blockchains[factory.blockchain] = await this.ylide.addBlockchain(factory.blockchain, {
+					dev: false, //document.location.hostname === 'localhost',
+					endpoints: ['https://mainnet.evercloud.dev/695e40eeac6b4e3fa4a11666f6e0d6af/graphql'],
+				});
+			}
 		}
 
 		for (const supportedWallet of supportedWallets) {

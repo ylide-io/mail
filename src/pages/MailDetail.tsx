@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import GenericLayout from '../layouts/GenericLayout';
-import SmallButton, { smallButtonColors, smallButtonIcons } from '../components/smallButton/smallButton';
+import { smallButtonColors, smallButtonIcons } from '../components/smallButton/smallButton';
 import { useParams } from 'react-router-dom';
 import { observer } from 'mobx-react';
 import { createReactEditorJS } from 'react-editor-js';
@@ -15,6 +15,9 @@ import { IMessageDecodedContent } from '../indexedDB/MessagesDB';
 import { CalendarOutlined } from '@ant-design/icons';
 import { parseEventFileString } from '../utils/eventFileString';
 import CollapsedText from '../components/CollapsedText/CollapsedText';
+import { Button } from 'antd';
+import { Blockie } from '../controls/Blockie';
+import { AdaptiveAddress } from '../controls/AdaptiveAddress';
 
 const ReactEditorJS = createReactEditorJS();
 
@@ -111,54 +114,57 @@ const MailDetail = observer(() => {
 
 	return (
 		<GenericLayout>
-			<div className="mailbox-page animated fadeInRight">
-				<div className="mail-box-header">
-					<div className="float-right tooltip-demo tooltip-buttons-space">
-						<SmallButton
-							onClick={replyClickHandler}
-							color={smallButtonColors.white}
-							icon={smallButtonIcons.reply}
-							title={'Reply'}
-							text={'Reply'}
-						/>
-						<SmallButton
-							onClick={deleteHandler}
-							color={smallButtonColors.white}
-							icon={smallButtonIcons.trash}
-							title={'Move to trash'}
-						/>
-					</div>
-					<h2>{decoded ? decoded.decodedSubject || 'View Message' : 'View Message'}</h2>
-					<div className="mail-tools tooltip-demo m-t-md">
-						<h3>
-							<span className="font-normal">Subject: </span>
-							<span
-								onClick={encodedMessageClickHandler}
-								style={
-									!decoded
-										? {
-												filter: 'blur(5px)',
-												cursor: 'pointer',
-										  }
-										: {}
-								}
+			<div className="mail-page animated fadeInRight">
+				<div className="mail-top">
+					<div className="mail-header">
+						<h2 className="mailbox-title">
+							{decoded ? decoded.decodedSubject || 'View Message' : 'View Message'}
+						</h2>
+						<div className="mail-actions">
+							<Button
+								size="small"
+								type="dashed"
+								onClick={replyClickHandler}
+								color={smallButtonColors.white}
+								icon={<i className={`fa ${smallButtonIcons.reply}`} />}
 							>
-								{decoded ? decoded.decodedSubject || 'No subject' : 'Message is not decoded'}
-							</span>
-						</h3>
-						<h5>
-							<span className="float-right font-normal">
-								{message && (
-									<div>
-										<span style={{ marginLeft: 6 }}>
-											{moment.unix(message.msg.createdAt).format('HH:mm DD.MM.YYYY')}
-										</span>
-									</div>
-								)}
-							</span>
-							<span className="font-normal">From: </span>
-							<span>{contact ? contact.name : message.msg.senderAddress}</span>
-						</h5>
+								Reply
+							</Button>
+
+							<Button
+								size="small"
+								type="dashed"
+								danger
+								onClick={deleteHandler}
+								color={smallButtonColors.white}
+								icon={<i className={`fa ${smallButtonIcons.trash}`} />}
+							>
+								Archive
+							</Button>
+						</div>
+					</div>
+					<div className="mail-meta">
+						<div className="mail-params">
+							<div className="mmp-row">
+								<div className="mmp-row-title mmp-from">Sender:</div>
+								<div className="mmp-row-value">
+									{contact ? (
+										<div className="mail-contact-name">{contact.name}</div>
+									) : (
+										<div className="mail-sender">
+											<Blockie
+												className="mail-sender-blockie"
+												address={message.msg.senderAddress}
+											/>{' '}
+											<div className="mail-sender-address">
+												<AdaptiveAddress address={message.msg.senderAddress} />
+											</div>
+										</div>
+									)}
+								</div>
+							</div>
+						</div>
+						<div className="mail-date">{moment.unix(message.msg.createdAt).format('HH:mm DD.MM.YYYY')}</div>
 					</div>
 				</div>
 				{eventData && <div className='event-box'>
@@ -193,48 +199,49 @@ const MailDetail = observer(() => {
 						</table>
 					</div>
 				</div>}
-				<div className="mail-box">
-					<div className="mail-body" style={{ minHeight: 370 }}>
-						{data.blocks ? (
-							<ReactEditorJS
-								tools={EDITOR_JS_TOOLS}
-								readOnly={true}
-								//@ts-ignore
-								data={data}
-							/>
-						) : (
-							<div
-								onClick={encodedMessageClickHandler}
-								style={
-									!decoded
-										? {
-												filter: 'blur(5px)',
-												cursor: 'pointer',
-										  }
-										: {}
-								}
-							>
-								Message is not decoded yet
-							</div>
-						)}
-					</div>
-					<div className="mail-body text-right tooltip-demo tooltip-buttons-space">
-						<SmallButton
-							onClick={replyClickHandler}
-							color={smallButtonColors.white}
-							icon={smallButtonIcons.reply}
-							title={'Reply'}
-							text={'Reply'}
+				<div className="mail-body" style={{ minHeight: 370 }}>
+					{data.blocks ? (
+						<ReactEditorJS
+							tools={EDITOR_JS_TOOLS}
+							readOnly={true}
+							//@ts-ignore
+							data={data}
 						/>
-						<SmallButton
-							onClick={forwardClickHandler}
-							color={smallButtonColors.white}
-							icon={smallButtonIcons.forward}
-							title={'Forward'}
-							text={'Forward'}
-						/>
-					</div>
-					<div className="clearfix"></div>
+					) : (
+						<div
+							onClick={encodedMessageClickHandler}
+							style={
+								!decoded
+									? {
+											filter: 'blur(5px)',
+											cursor: 'pointer',
+									  }
+									: {}
+							}
+						>
+							Message is not decoded yet
+						</div>
+					)}
+				</div>
+				<div className="mail-footer">
+					<Button
+						size="small"
+						type="dashed"
+						onClick={replyClickHandler}
+						color={smallButtonColors.white}
+						icon={<i className={`fa ${smallButtonIcons.reply}`} />}
+					>
+						Reply
+					</Button>
+					<Button
+						size="small"
+						type="dashed"
+						onClick={forwardClickHandler}
+						color={smallButtonColors.white}
+						icon={<i className={`fa ${smallButtonIcons.forward}`} />}
+					>
+						Forward
+					</Button>
 				</div>
 			</div>
 		</GenericLayout>

@@ -1,23 +1,26 @@
 import MailboxListRow from './MailboxListRow';
 import { observer } from 'mobx-react';
-import mailList from '../../../stores/MailList';
+import mailList, { ILinkedMessage } from '../../../stores/MailList';
 import { Loader } from '../../../controls/Loader';
-import { FixedSizeList } from 'react-window';
+import { FixedSizeList, ListChildComponentProps } from 'react-window';
 import AutoSizer from 'react-virtualized-auto-sizer';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import MailboxEmpty from './MailboxEmpty';
 import domain from '../../../stores/Domain';
+import { useWindowSize } from '../../../utils/useWindowSize';
 
-const MailboxList = observer(() => {
+const MailboxListInner = observer(({ width, height }: { width: number; height: number }) => {
 	const [scrollParams, setScrollParams] = useState({
 		offset: 0,
 		height: 0,
 	});
+	const { windowWidth } = useWindowSize();
 
 	const messagesCount = mailList.messages.length;
 	const isLoading = mailList.loading;
 	const pageAvailable = mailList.isNextPageAvailable;
-	const itemSize = 40;
+	const isHighRow = windowWidth <= 630;
+	const itemSize = isHighRow ? 80 : 40;
 
 	useEffect(() => {
 		const itemsHeight = itemSize * messagesCount;
@@ -25,10 +28,41 @@ const MailboxList = observer(() => {
 		if (offsetToEnd < itemSize && pageAvailable && !isLoading) {
 			mailList.nextPage();
 		}
-	}, [scrollParams, isLoading, messagesCount, pageAvailable]);
+	}, [itemSize, scrollParams, isLoading, messagesCount, pageAvailable]);
+
+	const renderItem = useCallback(
+		({ index, style, data }: ListChildComponentProps<ILinkedMessage[]>) => {
+			return index === messagesCount ? (
+				<div style={Object.assign({ height: itemSize, textAlign: 'center' }, style)}>Loading...</div>
+			) : (
+				<MailboxListRow isHighRow={isHighRow} style={style} message={data[index]} key={index} />
+			);
+		},
+		[isHighRow, itemSize, messagesCount],
+	);
 
 	return (
-		<div className="mail-box">
+		<FixedSizeList
+			itemSize={itemSize}
+			width={width}
+			height={height}
+			itemData={mailList.messages}
+			onScroll={props => {
+				setScrollParams({
+					offset: props.scrollOffset,
+					height,
+				});
+			}}
+			itemCount={messagesCount + (pageAvailable ? 1 : 0)}
+		>
+			{renderItem}
+		</FixedSizeList>
+	);
+});
+
+const MailboxList = observer(() => {
+	return (
+		<div className="mailbox">
 			{mailList.firstLoading ? (
 				<div style={{ height: 400 }}>
 					{mailList.loading}
@@ -37,33 +71,7 @@ const MailboxList = observer(() => {
 					/>
 				</div>
 			) : mailList.messages.length ? (
-				<AutoSizer>
-					{({ width, height }) => (
-						<FixedSizeList
-							itemSize={itemSize}
-							width={width}
-							height={height}
-							itemData={mailList.messages}
-							onScroll={props => {
-								setScrollParams({
-									offset: props.scrollOffset,
-									height,
-								});
-							}}
-							itemCount={messagesCount + (pageAvailable ? 1 : 0)}
-						>
-							{({ index, style, data, isScrolling }) =>
-								index === messagesCount ? (
-									<div style={Object.assign({ height: itemSize, textAlign: 'center' }, style)}>
-										Loading...
-									</div>
-								) : (
-									<MailboxListRow style={style} message={data[index]} key={index} />
-								)
-							}
-						</FixedSizeList>
-					)}
-				</AutoSizer>
+				<AutoSizer>{({ width, height }) => <MailboxListInner width={width} height={height} />}</AutoSizer>
 			) : (
 				<MailboxEmpty />
 			)}

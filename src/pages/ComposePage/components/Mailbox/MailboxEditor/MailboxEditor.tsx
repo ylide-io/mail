@@ -3,7 +3,6 @@ import { createReactEditorJS } from 'react-editor-js';
 import mailbox from '../../../../../stores/Mailbox';
 import './MailboxEditor.scss';
 import { EDITOR_JS_TOOLS } from '../../../../../utils/editorJs';
-import MailboxCalendarEventEditor from '../MailboxCalendarEventEditor/MailboxCalendarEventEditor';
 
 const ReactEditorJS = createReactEditorJS();
 
@@ -28,21 +27,22 @@ const MailboxEditor = () => {
 	}
 
 	return (
-		<div className='mailbox-editor'>
-			
-			<MailboxCalendarEventEditor />
-			<div className='mailbox-editor-secion'>
-				<ReactEditorJS
-					tools={EDITOR_JS_TOOLS}
-					//@ts-ignore
-					data={initialTextData}
-					onChange={handleSave}
-					instanceRef={(instance: any) => (instanceRef.current = instance)}
-					onInitialize={(instance: any) => {
-						instanceRef.current = instance;
-					}}
-				/>
-			</div>
+		<div
+			style={{
+				padding: '25px 15px 0',
+				flexGrow: 1,
+			}}
+		>
+			<ReactEditorJS
+				tools={EDITOR_JS_TOOLS}
+				//@ts-ignore
+				data={initialTextData}
+				onChange={handleSave}
+				instanceRef={(instance: any) => (instanceRef.current = instance)}
+				onInitialize={(instance: any) => {
+					instanceRef.current = instance;
+				}}
+			/>
 		</div>
 	);
 };

@@ -9,17 +9,31 @@ export class DomainAccount {
 	readonly wallet: Wallet;
 	readonly account: IGenericAccount;
 	readonly key: YlideKey;
+	private _name: string;
 
 	@observable remoteKey: Uint8Array | null = null;
 
 	@observable remoteKeys: Record<string, Uint8Array | null> = {};
 
-	constructor(wallet: Wallet, account: IGenericAccount, key: YlideKey) {
+	constructor(wallet: Wallet, account: IGenericAccount, key: YlideKey, name: string) {
 		makeAutoObservable(this);
 
 		this.wallet = wallet;
 		this.account = account;
 		this.key = key;
+		this._name = name;
+	}
+
+	get name() {
+		return this._name;
+	}
+
+	async rename(newName: string) {
+		if (newName.length > 255) {
+			throw new Error('Max account length is 255');
+		}
+		this._name = newName;
+		await this.wallet.domain.storage.storeString('yld1_accName_' + this.key.address, this._name);
 	}
 
 	appropriateBlockchains() {
@@ -50,31 +64,8 @@ export class DomainAccount {
 	}
 
 	async init() {
-		// this.readLocalKey();
 		await this.readRemoteKeys();
 	}
-
-	// private readLocalKey() {
-	// 	const keystoreAccount = this.wallet.domain.keystore.get(this.account.address);
-	// 	this.localKey = keystoreAccount?.publicKey || null;
-	// }
-
-	// async destroyLocalKey() {
-	// 	const key = this.wallet.domain.keystore.keys.find(k => k.address === this.account.address);
-	// 	if (key) {
-	// 		await this.wallet.domain.keystore.delete(key);
-	// 	}
-	// 	this.localKey = null;
-	// }
-
-	// private async readRemoteKey() {
-	// 	const blockchainName = await this.wallet.controller.getCurrentBlockchain();
-	// 	const blockchain = this.wallet.domain.blockchains[blockchainName];
-	// 	const pk = await blockchain.extractPublicKeyFromAddress(this.account.address);
-	// 	if (pk) {
-	// 		this.remoteKey = pk.bytes;
-	// 	}
-	// }
 
 	private async readRemoteKeys() {
 		const { remoteKeys, remoteKey } = await this.wallet.readRemoteKeys(this.account);
