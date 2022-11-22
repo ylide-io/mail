@@ -9,6 +9,7 @@ import {
 	MenuFoldOutlined,
 	MenuUnfoldOutlined,
 	PlusOutlined,
+	QrcodeOutlined,
 	UsergroupAddOutlined,
 } from '@ant-design/icons';
 import { observer } from 'mobx-react';
@@ -19,6 +20,7 @@ import { walletsMap } from '../../constants';
 import { useWindowSize } from '../../utils/useWindowSize';
 import modals from '../../stores/Modals';
 import { AdaptiveAddress } from '../../controls/AdaptiveAddress';
+import QrModal from '../../modals/QrModal';
 
 const AccountItem = observer(({ account }: { account: DomainAccount }) => {
 	const nav = useNav();
@@ -56,6 +58,14 @@ const AccountItem = observer(({ account }: { account: DomainAccount }) => {
 				</div>
 			</div>
 			<div className="ali-actions">
+				<Tooltip title="Share your Ylide!">
+					<Button
+						icon={<QrcodeOutlined />}
+						onClick={() => {
+							QrModal.show(account.account.address);
+						}}
+					/>
+				</Tooltip>
 				<Tooltip title="Logout">
 					<Button
 						danger
