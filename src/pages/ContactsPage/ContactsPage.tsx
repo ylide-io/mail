@@ -1,9 +1,9 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import GenericLayout from '../../layouts/GenericLayout';
 import contacts from '../../stores/Contacts';
 import tags from '../../stores/Tags';
 import { observer } from 'mobx-react';
-import { Outlet, useLocation } from 'react-router-dom';
+import { Outlet, useLocation, useSearchParams } from 'react-router-dom';
 import ContactsSearcher from './components/ContactsSearcher';
 import { useNav } from '../../utils/navigate';
 import { Button, Tabs } from 'antd';
@@ -15,6 +15,16 @@ const ContactsPage = observer(() => {
 	const location = useLocation();
 	const nav = useNav();
 	const { windowWidth } = useWindowSize();
+
+	const [searchParams] = useSearchParams();
+
+	useEffect(() => {
+		const name = searchParams.get('name');
+		const address = searchParams.get('address');
+		if (address) {
+			contacts.generateNewContactFromParams(name || '', address);
+		}
+	}, []);
 
 	const addHandler = () => {
 		if (location.pathname === '/contacts') {
