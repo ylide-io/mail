@@ -1,3 +1,4 @@
+import classNames from 'classnames';
 import { observer } from 'mobx-react';
 import React, { ReactNode, useMemo } from 'react';
 import { useLocation } from 'react-router-dom';
@@ -9,9 +10,10 @@ import { useWindowSize } from '../utils/useWindowSize';
 
 interface GenericLayoutProps {
 	children: ReactNode;
+	mainClass?: string;
 }
 
-const GenericLayout: React.FC<GenericLayoutProps> = observer(({ children }) => {
+const GenericLayout: React.FC<GenericLayoutProps> = observer(({ children, mainClass }) => {
 	const location = useLocation();
 	const { windowWidth } = useWindowSize();
 
@@ -35,7 +37,7 @@ const GenericLayout: React.FC<GenericLayoutProps> = observer(({ children }) => {
 			<Header />
 			<div className="main-wrapper">
 				<SidebarMenu />
-				<div className="main-block main-content">
+				<div className={classNames('main-block main-content', mainClass)}>
 					{windowWidth >= 920 ? null : <LinkButton text={linkButtonProps.text} link={linkButtonProps.link} />}
 					{children}
 				</div>

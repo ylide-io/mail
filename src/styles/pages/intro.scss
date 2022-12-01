@@ -1,16 +1,68 @@
 .intro-page {
-	@include flex-column(center, flex-start);
+	@include flex-column(stretch, flex-start);
 
-	padding-top: 5%;
-	height: 100vh;
 	width: 100vw;
 	flex-grow: 1;
 	position: relative;
+
+	background-color: white;
+}
+
+.intro-header {
+	@include flex-row(center, flex-start);
+
+	border-bottom: 1px solid #d3d4db;
+	height: 64px;
+	flex-basis: 64px;
+	flex-grow: 0;
+	flex-shrink: 0;
+
+	padding-left: 16px;
+	padding-right: 16px;
+
+	margin-bottom: 60px;
+}
+
+.intro-body {
+	@include flex-column(center, flex-start);
+}
+
+.intro-main-title {
+	font-family: 'Lexend Exa';
+	font-style: normal;
+	font-weight: 400;
+	font-size: 44px;
+	line-height: 130%;
+	/* or 57px */
+
+	text-align: center;
+	letter-spacing: -0.09em;
+
+	color: #202020;
+
+	margin-bottom: 20px;
+}
+
+.intro-main-subtitle {
+	font-family: 'Lexend';
+	font-style: normal;
+	font-weight: 300;
+	font-size: 20px;
+	line-height: 28px;
+	/* or 140% */
+
+	text-align: center;
+
+	color: #000000;
+
+	max-width: 762px;
 }
 
 .intro-inner-block {
 	@include flex-column(center, flex-start);
 
+	align-self: center;
+	padding-top: 5%;
 	width: 350px;
 }
 
@@ -42,5 +94,148 @@
 	button {
 		margin-left: 10px;
 		margin-right: 10px;
+	}
+}
+
+.connected-wallets {
+	@include flex-row(center, center);
+
+	margin-top: 40px;
+
+	.cw-block {
+		@include flex-column(center, center);
+		width: 260px;
+		height: 120px;
+
+		position: relative;
+
+		border: 1px solid #000000;
+		border-radius: 22px;
+
+		margin-left: 20px;
+		margin-right: 20px;
+
+		&.emphaized {
+			background: #9747ff;
+			border: 1px dashed white;
+			color: white;
+
+			.cw-title {
+				color: white;
+				font-family: 'Lexend';
+				font-style: normal;
+				font-weight: 400;
+				font-size: 16px;
+				line-height: 24px;
+			}
+		}
+
+		.cw-logo {
+			@include flex-row(center, center);
+			width: 32px;
+			height: 32px;
+			position: relative;
+
+			margin-bottom: 10px;
+
+			.cw-blockchain {
+				@include flex-row(center, center);
+
+				width: 22px;
+				height: 22px;
+				flex-basis: 22px;
+				flex-grow: 0;
+				flex-shrink: 0;
+				border-radius: 11px;
+				border: 1px solid black;
+
+				position: absolute;
+				right: -10px;
+				bottom: -10px;
+
+				background-color: white;
+			}
+		}
+
+		.cw-title {
+			font-family: 'Lexend';
+			font-style: normal;
+			font-weight: 400;
+			font-size: 16px;
+			line-height: 24px;
+			text-align: center;
+
+			margin-bottom: 1px;
+
+			color: #000000;
+		}
+
+		.cw-subtitle {
+			font-family: 'Lexend';
+			font-style: normal;
+			font-weight: 300;
+			font-size: 14px;
+			line-height: 16px;
+			text-align: center;
+
+			color: rgba(0, 0, 0, 0.4);
+		}
+
+		.cw-delete {
+			@include flex-row(center, center);
+
+			position: absolute;
+			right: -5px;
+			top: -5px;
+			width: 20px;
+			height: 20px;
+			border-radius: 10px;
+			background-color: black;
+			cursor: pointer;
+			&:hover {
+				background-color: #404040;
+			}
+		}
+	}
+}
+
+.intro-wallets-subtitle {
+	font-family: 'Lexend Exa';
+	font-style: normal;
+	font-weight: 400;
+	font-size: 32px;
+	line-height: 40px;
+	text-align: center;
+	letter-spacing: -0.09em;
+	margin-top: 40px;
+	margin-bottom: 30px;
+
+	color: #202020;
+}
+
+.intro-blockchains-list {
+	@include flex-row(center, center);
+	flex-wrap: wrap;
+
+	padding-left: 30px;
+	padding-right: 30px;
+
+	margin-bottom: 100px;
+
+	.bc-block {
+		@include flex-column(center, flex-start);
+
+		width: 100px;
+		height: 100px;
+
+		padding-top: 15px;
+
+		position: relative;
+
+		// border: 1px solid #e0e0e0;
+		border-radius: 22px;
+
+		margin-left: 20px;
+		margin-right: 20px;
 	}
 }

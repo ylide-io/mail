@@ -18,6 +18,9 @@ import modals from './stores/Modals';
 import { Loader } from './controls/Loader';
 import { AdminPage } from './pages/AdminPage';
 import TestPage from './pages/TestPage/TestPage';
+import walletConnect from './stores/WalletConnect';
+import NewWalletsPage from './pages/NewWalletsPage';
+import FeedPage from './pages/FeedPage';
 
 const App = observer(() => {
 	const location = useLocation();
@@ -39,6 +42,13 @@ const App = observer(() => {
 		}
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [modals.anythingVisible]);
+
+	useEffect(() => {
+		if (domain.accounts.isFirstTime) {
+			walletConnect.load();
+		}
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [domain.accounts.isFirstTime]);
 
 	if (location.pathname !== '/test' && !domain.initialized) {
 		return (
@@ -76,6 +86,7 @@ const App = observer(() => {
 					<Route path={'/test'} element={<TestPage />} />
 					<Route path={'/first-time'} element={<FirstTimePage />} />
 					<Route path={'/connect-wallets'} element={<ConnectWalletsPage />} />
+					<Route path={'/wallets'} element={<NewWalletsPage />} />
 					<Route path={'/compose'} element={<ComposePage />} />
 					<Route path={'/contacts'} element={<ContactsPage />}>
 						<Route index element={<ContactsTab />} />
@@ -85,6 +96,7 @@ const App = observer(() => {
 					</Route>
 					<Route path={'/settings'} element={<SettingsPage />} />
 					<Route path={'/admin'} element={<AdminPage />} />
+					<Route path={'/feed'} element={<FeedPage />} />
 					<Route path={'/:folderId'} element={<MailboxPage />} />
 					<Route path={'/:folderId/:id'} element={<MailDetail />} />
 					<Route path={'/*'} element={<Navigate replace to="/inbox" />} />

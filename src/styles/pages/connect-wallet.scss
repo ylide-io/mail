@@ -13,3 +13,282 @@
 	margin-top: 40px;
 	width: 200px;
 }
+
+.wallet-modal {
+	@include flex-column(stretch, flex-start);
+
+	.wm-title {
+		font-weight: 400;
+		font-size: 24px;
+		font-family: Lexend Exa;
+		text-align: center;
+		letter-spacing: -0.09em;
+		color: #202020;
+
+		margin-bottom: 24px;
+	}
+}
+
+.available-wallets {
+	@include flex-column(center, flex-start);
+
+	border: 0.5px solid rgba(0, 0, 0, 0.2);
+	border-radius: 16px;
+	padding: 12px;
+	padding-left: 0;
+	padding-right: 0;
+
+	.aw-title {
+		margin-top: -24px;
+		margin-bottom: 12px;
+		background: #f3f4f7;
+		border-radius: 100px;
+
+		display: flex;
+		flex-direction: row;
+		justify-content: center;
+		align-items: flex-start;
+		padding: 3px 12px 5px;
+
+		font-family: 'Lexend Exa';
+		font-style: normal;
+		font-weight: 400;
+		font-size: 12px;
+		line-height: 16px;
+
+		text-align: center;
+		letter-spacing: -0.09em;
+
+		color: #808080;
+	}
+
+	.wallet-icon {
+		padding-left: 8px;
+		padding-right: 8px;
+	}
+}
+
+.wallets-container {
+	@include flex-row(center, space-evenly);
+
+	width: 100%;
+}
+
+.wallets-list {
+	@include flex-row(center, flex-start);
+	flex-wrap: wrap;
+
+	padding-top: 8px;
+	margin-top: 8px;
+	width: 100%;
+	max-height: 240px;
+	overflow-y: scroll;
+
+	.wallet-icon {
+		margin-bottom: 12px;
+		width: 94px;
+		flex-basis: 94px;
+	}
+}
+
+.wallet-icon {
+	@include flex-column(center, flex-start);
+
+	border-radius: 10px;
+	padding-top: 6px;
+	padding-bottom: 6px;
+
+	.wallet-icon-block {
+		@include flex-row(center, center);
+		width: 48px;
+		height: 48px;
+		padding: 8px;
+
+		background: rgba(246, 133, 27, 0.12);
+		border-radius: 12px;
+		margin-bottom: 8px;
+
+		.wallet-icon-image {
+			@include flex-row(center, center);
+			width: 32px;
+			height: 32px;
+		}
+	}
+	.wallet-icon-title {
+		font-family: 'Lexend';
+		font-style: normal;
+		font-weight: 300;
+		font-size: 12px;
+		line-height: 16px;
+		text-align: center;
+
+		color: #000000;
+	}
+
+	&:hover {
+		cursor: pointer;
+		background: rgba(246, 133, 27, 0.12);
+	}
+}
+
+.wm-tabs {
+	@include flex-row(center, flex-start);
+
+	margin-top: 24px;
+
+	.wm-tab {
+		@include flex-row(center, center);
+
+		position: relative;
+
+		flex-grow: 1;
+		flex-shrink: 1;
+		flex-basis: 0;
+
+		height: 32px;
+		padding-bottom: 12px;
+		font-size: 14px;
+		line-height: 20px;
+		font-family: 'Lexend';
+		font-style: normal;
+		font-weight: 400;
+		overflow: hidden;
+
+		color: rgba(0, 0, 0, 0.32);
+		cursor: pointer;
+
+		&:not(.active) {
+			&::after {
+				position: absolute;
+				bottom: 0px;
+				content: ' ';
+				width: 100%;
+				height: 0.5px;
+				background: rgba(0, 0, 0, 0.2);
+			}
+		}
+
+		&.active {
+			color: #9747ff;
+			&::after {
+				position: absolute;
+				bottom: -3px;
+				content: ' ';
+				width: 100%;
+				height: 6px;
+				border-top-left-radius: 3px;
+				border-top-right-radius: 3px;
+				background: #9747ff;
+			}
+		}
+
+		&:hover {
+			color: rgba(0, 0, 0, 0.6);
+		}
+	}
+}
+
+.wm-tab-content {
+	@include flex-column(stretch, flex-start);
+
+	padding-top: 16px;
+
+	.qr-content {
+		margin-top: 4px;
+		@include flex-column(center, flex-start);
+	}
+
+	.qr-text {
+		margin-top: 10px;
+		font-family: 'Lexend Exa';
+		font-style: normal;
+		font-weight: 300;
+		font-size: 12px;
+		line-height: 16px;
+
+		text-align: center;
+		letter-spacing: -0.09em;
+
+		color: #000000;
+	}
+
+	.qr-link {
+		margin-top: 8px;
+		margin-bottom: 8px;
+
+		font-family: 'Lexend Exa';
+		font-style: normal;
+		font-weight: 400;
+		font-size: 12px;
+		line-height: 16px;
+
+		text-align: center;
+		letter-spacing: -0.09em;
+
+		color: #9747ff;
+	}
+}
+
+.wallets-search {
+	height: 28px;
+
+	font-family: 'Lexend';
+	font-style: normal;
+	font-weight: 300;
+	font-size: 14px;
+	line-height: 20px;
+
+	background: #f3f4f7;
+	border: 0;
+	border-radius: 100px;
+	padding: 4px 20px;
+	text-align: center;
+}
+
+.cross-button {
+	@include flex-row(center, center);
+
+	position: absolute;
+	right: -10px;
+	top: -10px;
+	width: 28px;
+	height: 28px;
+	border-radius: 14px;
+	background-color: black;
+	cursor: pointer;
+	&:hover {
+		background-color: #404040;
+	}
+}
+
+.svg-background {
+	position: relative;
+	padding: 10px;
+	width: 276px;
+	height: 276px;
+
+	.left-top {
+		position: absolute;
+		z-index: 0;
+		left: 0;
+		top: 0;
+	}
+	.left-bottom {
+		position: absolute;
+		z-index: 0;
+		left: 0;
+		bottom: 0;
+	}
+	.right-top {
+		position: absolute;
+		z-index: 0;
+		right: 0;
+		top: 0;
+	}
+	.right-bottom {
+		position: absolute;
+		z-index: 0;
+		right: 0;
+		bottom: 0;
+	}
+}

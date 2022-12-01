@@ -29,7 +29,6 @@
 
 	position: absolute;
 	z-index: 2041;
-	display: flex;
 	padding: 30px;
 	border-radius: 20px;
 	background-color: white;
@@ -42,6 +41,11 @@
 
 		padding: 15px;
 		padding-top: 30px;
+	}
+
+	&.wallet-modal {
+		width: 400px;
+		padding: 12px;
 	}
 }
 

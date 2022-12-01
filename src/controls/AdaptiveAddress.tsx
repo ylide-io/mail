@@ -3,16 +3,27 @@ import useResizeObserver from '@react-hook/resize-observer';
 import { Tooltip } from 'antd';
 
 const useSize = (target: React.RefObject<HTMLElement>) => {
-	const [size, setSize] = useState(new DOMRect(0, 0, 0, 0));
+	const [size, setSize] = useState({
+		width: target.current ? target.current.offsetWidth : 0,
+		height: target.current ? target.current.offsetHeight : 0,
+	});
 
 	useLayoutEffect(() => {
 		if (target.current) {
-			setSize(target.current.getBoundingClientRect());
+			setSize({
+				width: target.current ? target.current.offsetWidth : 0,
+				height: target.current ? target.current.offsetHeight : 0,
+			});
 		}
 	}, [target]);
 
 	// Where the magic happens
-	useResizeObserver(target, entry => setSize(entry.contentRect));
+	useResizeObserver(target, entry =>
+		setSize({
+			width: target.current ? target.current.offsetWidth : 0,
+			height: target.current ? target.current.offsetHeight : 0,
+		}),
+	);
 	return size;
 };
 
@@ -41,6 +52,8 @@ export function AdaptiveAddress({ address }: { address: string }) {
 				// console.log('Something goes wrong in AdaptiveAddress: ', address);
 			} else {
 				const addressSize = addressLength * letterSize;
+				console.log('addressSize: ', addressSize);
+				console.log('parentSize.width: ', parentSize.width);
 				if (addressSize <= parentSize.width) {
 					setPrefixLength(0);
 					setVisibleLength(addressLength);
@@ -68,8 +81,19 @@ export function AdaptiveAddress({ address }: { address: string }) {
 		<Tooltip
 			title={<div style={{ fontFamily: 'monospace', textAlign: 'center', whiteSpace: 'nowrap' }}>{address}</div>}
 		>
-			<div className="ylide-address" ref={parentRef}>
-				<span ref={childRef} className="ylide-address-value">
+			<div
+				className="ylide-address"
+				ref={parentRef}
+				style={{
+					flexBasis: letterSize * addressLength + 1,
+					maxWidth: letterSize ? letterSize * addressLength + 1 : 'none',
+				}}
+			>
+				<span ref={childRef} className="ylide-address-background">
+					{address}
+				</span>
+				<span className="ylide-address-value">
+					{/* {address} */}
 					{calculated
 						? `${address.substring(0, prefixLength)}${address.substring(
 								prefixLength,

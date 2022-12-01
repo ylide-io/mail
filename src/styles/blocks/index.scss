@@ -72,3 +72,163 @@
 
 	padding-top: 10px;
 }
+
+.feed-container {
+	@include flex-column(center, flex-start);
+
+	background-color: transparent;
+	box-shadow: unset;
+
+	padding-right: 240px;
+}
+
+.feed {
+	@include flex-column(stretch, flex-start);
+
+	width: 656px;
+
+	.feed-title {
+		@include flex-row(center, space-between);
+
+		padding-left: 12px;
+		padding-right: 12px;
+
+		.feed-title-text {
+			font-family: 'Lexend Exa';
+			font-style: normal;
+			font-weight: 400;
+			font-size: 24px;
+			line-height: 32px;
+			letter-spacing: -0.09em;
+
+			color: #202020;
+		}
+	}
+}
+
+.feed-body {
+	@include flex-column(stretch, flex-start);
+}
+
+.post-desktop {
+	@include flex-row(stretch, flex-start);
+
+	background: #ffffff;
+	border: 0.5px solid #caccd3;
+	border-radius: 12px;
+
+	padding: 12px;
+
+	margin-bottom: 12px;
+
+	.post-ava {
+		@include flex-column(center, flex-start);
+
+		margin-right: 12px;
+
+		.post-ava-image {
+			position: relative;
+			width: 48px;
+			height: 48px;
+			.post-ava-source {
+				position: absolute;
+				right: -8px;
+				bottom: -8px;
+				width: 26px;
+				height: 26px;
+				border-radius: 50%;
+				border: 2px solid white;
+				z-index: 1;
+			}
+		}
+	}
+
+	.post-content {
+		@include flex-column(stretch, flex-start);
+
+		flex-grow: 1;
+	}
+
+	.post-meta {
+		@include flex-row(center, space-between);
+
+		margin-top: 2px;
+		margin-bottom: 6px;
+
+		.post-source-left {
+			@include flex-row(center, flex-start);
+			font-family: 'Lexend';
+			font-style: normal;
+			font-weight: 400;
+			font-size: 15px;
+			line-height: 22px;
+			color: #000000;
+
+			.post-source-name {
+				margin-right: 5px;
+			}
+			.post-source-username {
+				color: #a5a8b4;
+				margin-right: 5px;
+			}
+			.post-source-in {
+				margin-right: 5px;
+			}
+			.post-source-data {
+				@include flex-row(center, flex-start);
+				.post-source-channel-icon {
+					@include flex-row(center, flex-start);
+					margin-right: 5px;
+				}
+				.post-source-channel-name {
+					//
+				}
+			}
+		}
+
+		.post-source-right {
+			@include flex-row(center, flex-end);
+			.post-source-date {
+				font-family: 'Lexend';
+				font-style: normal;
+				font-weight: 300;
+				font-size: 13px;
+				line-height: 20px;
+				/* identical to box height, or 154% */
+
+				text-align: right;
+
+				color: #a5a8b4;
+			}
+			.post-source-link {
+				margin-bottom: -3px;
+				margin-left: 6px;
+			}
+		}
+	}
+
+	.post-title {
+		font-family: 'Lexend';
+		font-style: normal;
+		font-weight: 500;
+		font-size: 20px;
+		line-height: 26px;
+		/* or 130% */
+
+		color: #000000;
+		margin-bottom: 6px;
+		padding-right: 10px;
+	}
+
+	.post-subtitle {
+		font-family: 'Lexend';
+		font-style: normal;
+		font-weight: 300;
+		font-size: 15px;
+		line-height: 22px;
+		/* identical to box height, or 147% */
+
+		color: #a5a8b4;
+		margin-bottom: 6px;
+	}
+}

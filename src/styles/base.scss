@@ -50,7 +50,9 @@ body {
 	-moz-osx-font-smoothing: grayscale;
 
 	font-family: 'Open Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif;
-	background-image: url(../assets/img/background-desktop.svg);
+	// background-image: url(../assets/img/background-desktop.svg);
+	background: linear-gradient(0deg, #f7f7ee, #f7f7ee), #ffffff;
+	background-image: url(../assets/img/background-desktop-2.svg);
 	background-size: cover;
 	background-position: center;
 	background-attachment: fixed;

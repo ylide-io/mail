@@ -1,16 +1,28 @@
 .ylide-address {
 	@include flex-row(flex-start, flex-start);
-	overflow: hidden;
 	height: 1rem;
 	line-height: 100%;
-	position: relative;
+	// position: relative;
 	flex-grow: 1;
 	flex-shrink: 1;
-	.ylide-address-value {
+	justify-content: inherit;
+	.ylide-address-background {
+		position: absolute;
 		height: 1rem;
 		line-height: 100%;
-		position: absolute;
-		left: 0;
+		opacity: 0;
 		font-family: monospace;
+	}
+	.ylide-address-value {
+		display: flex;
+		flex-direction: row;
+		box-sizing: content-box;
+		height: 1rem;
+		line-height: 100%;
+		font-family: monospace;
+		flex-shrink: 1;
+		text-align: inherit;
+		justify-content: inherit;
+		width: 0;
 	}
 }
