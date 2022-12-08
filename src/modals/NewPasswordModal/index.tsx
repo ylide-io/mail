@@ -15,6 +15,7 @@ import cn from 'classnames';
 import { Loader } from '../../controls/Loader';
 import { DomainAccount } from '../../stores/models/DomainAccount';
 import { isBytesEqual } from '../../utils/isBytesEqual';
+import { useNavigate } from 'react-router-dom';
 
 const txPrices: Record<EVMNetwork, number> = {
 	[EVMNetwork.LOCAL_HARDHAT]: 0.001,
@@ -273,7 +274,7 @@ export default class NewPasswordModal extends PureComponent<NewPasswordModalProp
 										type="password"
 										placeholder="Enter your Ylide password"
 									/>
-									<div style={{ textAlign: 'center' }}>
+									{/* <div style={{ textAlign: 'center' }}>
 										<a
 											href="#forgot"
 											style={{
@@ -290,7 +291,7 @@ export default class NewPasswordModal extends PureComponent<NewPasswordModalProp
 										>
 											Forgot password?
 										</a>
-									</div>
+									</div> */}
 								</div>
 							)}
 							<div className="wm-footer">
@@ -519,14 +520,36 @@ export default class NewPasswordModal extends PureComponent<NewPasswordModalProp
 									style={{ marginLeft: -24, marginRight: -24, marginBottom: 14 }}
 								/>
 							</div>
-							<div className="wm-footer-vertical">
-								<YlideButton primary>Go to inbox</YlideButton>
-								<YlideButton nice>Add one more account</YlideButton>
-							</div>
+							<PasswordModalFooter
+								close={() => {
+									this.props.onResolve('', false, false);
+								}}
+							/>
 						</>
 					) : null}
 				</div>
 			</div>
 		);
 	}
+}
+
+function PasswordModalFooter({ close }: { close: () => void }) {
+	const nav = useNavigate();
+
+	return (
+		<div className="wm-footer-vertical">
+			<YlideButton
+				primary
+				onClick={() => {
+					nav('/feed/main');
+					close();
+				}}
+			>
+				Go to inbox
+			</YlideButton>
+			<YlideButton nice onClick={close}>
+				Add one more account
+			</YlideButton>
+		</div>
+	);
 }

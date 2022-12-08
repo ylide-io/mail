@@ -64,7 +64,7 @@ const AccountItem = observer(({ account }: { account: DomainAccount }) => {
 							await account.wallet.disconnectAccount(account);
 							await domain.accounts.removeAccount(account);
 							if (domain.accounts.activeAccounts.length === 0) {
-								nav('/connect-wallets');
+								nav('/wallets');
 							}
 						}}
 					/>
@@ -86,7 +86,7 @@ const Header = observer(() => {
 				<AccountItem key={acc.account.address} account={acc} />
 			))}
 			<div className="accounts-list-item add-account-item">
-				<Button type="primary" icon={<PlusOutlined />} onClick={() => nav('/connect-wallets')}>
+				<Button type="primary" icon={<PlusOutlined />} onClick={() => nav('/wallets')}>
 					Connect account
 				</Button>
 			</div>

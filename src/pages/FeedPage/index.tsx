@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import GenericLayout from '../../layouts/GenericLayout';
 
 import { YlideButton } from '../../controls/YlideButton';
@@ -16,6 +16,7 @@ import GalleryModal from '../../modals/GalleryModal';
 import { Loader } from '../../controls/Loader';
 import { observer } from 'mobx-react';
 import { useParams } from 'react-router-dom';
+import { CaretDown } from '../../icons/CaretDown';
 
 const sourceIcon: Record<LinkType, JSX.Element> = {
 	[LinkType.TWITTER]: twitterSourceIcon,
@@ -32,6 +33,8 @@ function isInViewport(element: HTMLDivElement) {
 
 const FeedPage = observer(() => {
 	const lastPostView = useRef<HTMLDivElement>(null);
+	const feedBodyRef = useRef<HTMLDivElement>(null);
+	const [newPostsVisible, setNewPostsVisible] = useState(false);
 	const { category } = useParams();
 
 	useEffect(() => {
@@ -43,12 +46,29 @@ const FeedPage = observer(() => {
 			if (lastPostView.current && isInViewport(lastPostView.current) && !feed.loading && feed.moreAvailable) {
 				await feed.loadMore(10);
 			}
-		}, 500);
+			if (feedBodyRef.current && feedBodyRef.current.getBoundingClientRect().top < 0) {
+				setNewPostsVisible(true);
+			} else {
+				setNewPostsVisible(false);
+			}
+		}, 300);
 		return () => {
 			clearInterval(timer);
 		};
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [feed.loading, feed.moreAvailable]);
+
+	const scrollToTop = useCallback(() => {
+		window.scrollTo({
+			top: 0,
+			behavior: 'smooth',
+		});
+	}, []);
+
+	const showNewPosts = useCallback(async () => {
+		scrollToTop();
+		feed.loadNew();
+	}, [scrollToTop]);
 
 	return (
 		<GenericLayout mainClass="feed-container">
@@ -57,13 +77,25 @@ const FeedPage = observer(() => {
 					<h3 className="feed-title-text">My feed</h3>
 					<h3 className="feed-title-actions">
 						{feed.newPosts ? (
-							<YlideButton size="small" nice>
+							<YlideButton size="small" nice onClick={showNewPosts}>
 								Show {feed.newPosts} new posts
 							</YlideButton>
 						) : null}
 					</h3>
 				</div>
-				<div className="feed-body">
+				{newPostsVisible ? (
+					<div className="feed-scroll-to-top" onClick={scrollToTop}>
+						<CaretDown color="black" style={{ width: 40, height: 40 }} />
+					</div>
+				) : null}
+				<div className="feed-body" ref={feedBodyRef}>
+					{newPostsVisible && feed.newPosts ? (
+						<div className="feed-new-posts">
+							<YlideButton size="small" nice onClick={showNewPosts}>
+								Show {feed.newPosts} new posts
+							</YlideButton>
+						</div>
+					) : null}
 					{feed.loaded ? (
 						<>
 							{feed.posts.map(post => {
@@ -72,11 +104,6 @@ const FeedPage = observer(() => {
 										<div className="post-ava">
 											<div className="post-ava-image">
 												<Avatar size={48} src={post.authorAvatar} icon={<UserOutlined />} />
-												{/* <img
-											src={}
-											alt="malt"
-											style={{ width: 48, height: 48, borderRadius: '50%' }}
-										/> */}
 												<div className="post-ava-source">{sourceIcon[post.sourceType]}</div>
 											</div>
 										</div>
@@ -107,7 +134,7 @@ const FeedPage = observer(() => {
 												</div>
 												<div className="post-source-right">
 													<div className="post-source-date">
-														{moment(post.date).format('MMM D, YYYY, HH:mm')}
+														{moment.utc(post.date).local().format('MMM D, YYYY, HH:mm')}
 													</div>
 													{post.sourceLink ? (
 														<a

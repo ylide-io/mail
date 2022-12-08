@@ -75,6 +75,7 @@ class Feed {
 		lastPostId: string | null,
 		firstPostId: string | null,
 		length: number,
+		needOld: boolean = true,
 	): Promise<{ result: boolean; data: null | { moreAvailable: boolean; newPosts: number; items: FeedPost[] } }> {
 		this.loading = true;
 		try {
@@ -90,11 +91,11 @@ class Feed {
 							'https://fd5.ylide.io',
 					  ][Math.floor(Math.random() * 5)];
 			const response = await fetch(
-				`${feedEndpoint}/post?categories=${encodeURIComponent(categories.join(','))}&lastPostId=${
-					lastPostId ? encodeURIComponent(lastPostId) : 'null'
-				}&firstPostId=${firstPostId ? encodeURIComponent(firstPostId) : 'null'}&length=${encodeURIComponent(
-					String(length),
-				)}`,
+				`${feedEndpoint}/${needOld ? 'post' : 'new-post'}?categories=${encodeURIComponent(
+					categories.join(','),
+				)}&lastPostId=${lastPostId ? encodeURIComponent(lastPostId) : 'null'}&firstPostId=${
+					firstPostId ? encodeURIComponent(firstPostId) : 'null'
+				}&length=${encodeURIComponent(String(length))}`,
 				{
 					method: 'GET',
 				},
@@ -117,6 +118,7 @@ class Feed {
 			null, // '1599259863087190016',
 			null, // '1599259863087190016',
 			10,
+			true,
 		);
 		if (result.result && result.data) {
 			this.loaded = true;
@@ -132,6 +134,7 @@ class Feed {
 			this.posts.at(-1)?.id || null, // '1599259863087190016',
 			this.posts.at(0)?.id || null, // '1599259863087190016',
 			length,
+			true,
 		);
 		if (result.result && result.data) {
 			this.loaded = true;
@@ -142,7 +145,18 @@ class Feed {
 	}
 
 	async loadNew() {
-		//
+		const result = await this.genericLoad(
+			this.getCategories(this.selectedCategory),
+			this.posts.at(-1)?.id || null, // '1599259863087190016',
+			this.posts.at(0)?.id || null, // '1599259863087190016',
+			10,
+			false,
+		);
+		if (result.result && result.data) {
+			this.loaded = true;
+			this.posts.unshift(...result.data.items);
+			this.newPosts = 0;
+		}
 	}
 
 	constructor() {

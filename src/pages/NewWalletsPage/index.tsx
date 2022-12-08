@@ -7,7 +7,6 @@ import { YlideButton } from '../../controls/YlideButton';
 import { ArrowRight } from '../../icons/ArrowRight';
 import { CrossIcon } from '../../icons/CrossIcon';
 import { YlideLargeLogo } from '../../icons/YlideLargeLogo';
-import NewPasswordModal from '../../modals/NewPasswordModal';
 import SelectWalletModal from '../../modals/SelectWalletModal';
 import domain from '../../stores/Domain';
 
@@ -35,26 +34,12 @@ export default class NewWalletsPage extends PureComponent {
 					<YlideLargeLogo />
 				</div>
 				<div className="intro-body">
-					<h2 className="intro-main-title">
-						Connect your wallets{' '}
-						<a
-							href="#test"
-							onClick={async () => {
-								const wallet = domain.wallets.find(w => w.wallet === 'metamask')!;
-								const account = domain.accounts.accounts[0].account;
-								const remoteKeys = await wallet.readRemoteKeys(account);
-								const fixedRemoteKeys = remoteKeys.remoteKeys;
-								NewPasswordModal.show(wallet, account, fixedRemoteKeys);
-							}}
-						>
-							test
-						</a>
-					</h2>
+					<h2 className="intro-main-title">Connect your wallets</h2>
 					<h3 className="intro-main-subtitle">
 						Ylide Social Hub supports multiple accounts being connected at once. Connect one by one the
 						accounts you want to aggregate and continue when done.
 					</h3>
-					<NextButton />
+					{domain.accounts.activeAccounts.length ? <NextButton /> : null}
 					<div className="connected-wallets">
 						{domain.accounts.accounts.map(acc => {
 							console.log('acc.wallet.wallet: ', acc.wallet.wallet);
