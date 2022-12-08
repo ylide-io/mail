@@ -119,6 +119,7 @@
 			background: #9747ff;
 			border: 1px dashed white;
 			color: white;
+			cursor: pointer;
 
 			.cw-title {
 				color: white;
@@ -127,6 +128,10 @@
 				font-weight: 400;
 				font-size: 16px;
 				line-height: 24px;
+			}
+
+			&:hover {
+				background: #a661ff;
 			}
 		}
 
@@ -171,6 +176,10 @@
 		}
 
 		.cw-subtitle {
+			@include flex-row(center, center);
+
+			width: 120px;
+
 			font-family: 'Lexend';
 			font-style: normal;
 			font-weight: 300;
@@ -238,4 +247,21 @@
 		margin-left: 20px;
 		margin-right: 20px;
 	}
+}
+
+.overall {
+	@include flex-column(center, center);
+	position: absolute;
+	left: 0;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	z-index: 10;
+	background-color: rgba(0, 0, 0, 0.9);
+	color: white;
+	font-size: 18px;
+	text-align: center;
+	padding: 20px;
+	line-height: 140%;
+	border-radius: 10px;
 }

@@ -5,6 +5,7 @@
 	// position: relative;
 	flex-grow: 1;
 	flex-shrink: 1;
+	align-items: center;
 	justify-content: inherit;
 	.ylide-address-background {
 		position: absolute;
@@ -23,6 +24,7 @@
 		flex-shrink: 1;
 		text-align: inherit;
 		justify-content: inherit;
+		align-items: inherit;
 		width: 0;
 	}
 }

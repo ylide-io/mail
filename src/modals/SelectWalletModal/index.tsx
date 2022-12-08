@@ -10,6 +10,11 @@ import walletConnect from '../../stores/WalletConnect';
 import { Loader } from '../../controls/Loader';
 import { CrossIcon } from '../../icons/CrossIcon';
 import QRCode from 'react-qr-code';
+import { YlideButton } from '../../controls/YlideButton';
+import { autobind } from 'core-decorators';
+import { Wallet } from '../../stores/models/Wallet';
+import SwitchModal from '../SwitchModal';
+import NewPasswordModal from '../NewPasswordModal';
 
 export interface SelectWalletModalProps {
 	onResolve: () => void;
@@ -36,22 +41,121 @@ export default class SelectWalletModal extends PureComponent<SelectWalletModalPr
 		makeObservable(this);
 	}
 
+	@autobind
+	async disconnectWalletConnect() {
+		if (domain.walletConnectState.loading || !domain.walletConnectState.connected) {
+			return;
+		}
+
+		await (domain.walletControllers.evm.walletconnect as any).writeWeb3.currentProvider.disconnect();
+		// TODO: pizdec
+		document.location.reload();
+	}
+
 	async componentDidMount() {
-		const result = await domain.initWalletConnect(
-			(url, close) => {
-				this.wcUrl = url;
-			},
-			() => {
-				console.log('TODO: handle properly');
-				this.props.onResolve();
-			},
-		);
+		//
+	}
+
+	@observable loading = false;
+
+	// async publishLocalKey(account: DomainAccount) {
+	// 	let publishCtrl = PublishKeyModal.view(account.wallet, false);
+	// 	try {
+	// 		await account.attachRemoteKey();
+	// 		publishCtrl.hide();
+	// 		publishCtrl = PublishKeyModal.view(account.wallet, true);
+	// 		await asyncDelay(7000);
+	// 		await account.init();
+	// 	} catch (err) {
+	// 		alert('Transaction was not published. Please, try again');
+	// 	} finally {
+	// 		publishCtrl.hide();
+	// 	}
+	// }
+
+	// async createLocalKey(wallet: Wallet, account: IGenericAccount) {
+	// 	const result = await PasswordModal.show('to activate new account');
+	// 	if (!result) {
+	// 		return;
+	// 	}
+	// 	let tempLocalKey;
+	// 	const signatureCtrl = SignatureModal.view(wallet);
+	// 	try {
+	// 		tempLocalKey = await wallet.constructLocalKey(account, result.value);
+	// 	} finally {
+	// 		signatureCtrl.hide();
+	// 	}
+	// 	let remoteKey;
+	// 	try {
+	// 		const { remoteKey: remoteKeyInst } = await wallet.readRemoteKeys(account);
+	// 		remoteKey = remoteKeyInst;
+	// 	} catch (err) {
+	// 		alert('Retrieving blockchain keys failed, please, try again');
+	// 	}
+	// 	if (!remoteKey) {
+	// 		const domainAccount = await wallet.instantiateNewAccount(account, tempLocalKey);
+	// 		return await this.publishLocalKey(domainAccount);
+	// 	} else if (isBytesEqual(remoteKey.publicKey.bytes, tempLocalKey.publicKey)) {
+	// 		return await wallet.instantiateNewAccount(account, tempLocalKey);
+	// 	} else if (result.forceNew) {
+	// 		const domainAccount = await wallet.instantiateNewAccount(account, tempLocalKey);
+	// 		return await this.publishLocalKey(domainAccount);
+	// 	} else {
+	// 		alert('Ylide password was wrong, please, try again');
+	// 		return;
+	// 	}
+	// }
+
+	async connectWalletAccount(wallet: Wallet) {
+		let currentAccount = await wallet.getCurrentAccount();
+		// to fix everwallet stuck in auth state without registered key
+		if (
+			currentAccount &&
+			!wallet.isAccountRegistered(currentAccount) &&
+			!wallet.controller.isMultipleAccountsSupported()
+		) {
+			await wallet.controller.disconnectAccount(currentAccount);
+		}
+		currentAccount = await wallet.getCurrentAccount();
+		if (currentAccount && wallet.isAccountRegistered(currentAccount)) {
+			const result = await SwitchModal.show('account', wallet);
+			if (!result) {
+				return null;
+			}
+		}
+		currentAccount = await wallet.getCurrentAccount();
+		if (currentAccount && wallet.isAccountRegistered(currentAccount)) {
+			alert('This account is already registered. Please, chose a different one');
+			return null;
+		} else {
+			return await wallet.connectAccount();
+		}
+	}
+
+	@observable wallet = '';
+
+	@autobind
+	async connectAccount() {
+		const wallet = domain.wallets.find(w => w.factory.wallet === this.wallet)!;
+
+		this.loading = true;
+		try {
+			const account = await this.connectWalletAccount(wallet);
+			if (!account) {
+				return;
+			}
+			const remoteKeys = await wallet.readRemoteKeys(account);
+			this.props.onResolve();
+			await NewPasswordModal.show(wallet, account, remoteKeys.remoteKeys);
+		} finally {
+			this.loading = false;
+		}
 	}
 
 	@observable copy = false;
-	@observable wcUrl: string = '';
 	@observable title: string = '123';
-	@observable activeTab: 'qr' | 'desktop' | 'install' = 'qr';
+	@observable activeTab: 'qr' | 'desktop' | 'install' =
+		!domain.walletConnectState.loading && domain.walletConnectState.connected ? 'install' : 'qr';
 	@observable search = '';
 
 	@computed get availableBrowserWallets() {
@@ -96,7 +200,15 @@ export default class SelectWalletModal extends PureComponent<SelectWalletModalPr
 							{this.availableBrowserWallets.map(w => {
 								const wData = walletsMap[w];
 								return (
-									<div className="wallet-icon" key={w}>
+									<div
+										className="wallet-icon"
+										key={w}
+										onClick={async () => {
+											console.log('ajajasdnsadfaskfneaofg');
+											this.wallet = w;
+											await this.connectAccount();
+										}}
+									>
 										<div className="wallet-icon-block">
 											<div className="wallet-icon-image">{wData.logo(32)}</div>
 										</div>
@@ -134,7 +246,22 @@ export default class SelectWalletModal extends PureComponent<SelectWalletModalPr
 					</div>
 					<div className="wm-tab-content">
 						{this.activeTab === 'qr' ? (
-							<div className="qr-content">
+							<div className="qr-content" style={{ position: 'relative' }}>
+								{!domain.walletConnectState.loading && domain.walletConnectState.connected ? (
+									<div className="overall">
+										WalletConnect can be used to connect only one account.
+										<br />
+										<br />
+										Please, use native browser extensions to connect more wallets or disconnect
+										current WalletConnect connection.
+										<br />
+										<br />
+										<YlideButton onClick={this.disconnectWalletConnect}>
+											Disconnect WalletConnect ({domain.walletConnectState.walletName})
+										</YlideButton>
+									</div>
+								) : null}
+
 								<div className="svg-background">
 									<svg
 										className="left-top"
@@ -196,7 +323,13 @@ export default class SelectWalletModal extends PureComponent<SelectWalletModalPr
 											fill="#CFCFDF"
 										/>
 									</svg>
-									<QRCode value={this.wcUrl} />
+									<QRCode
+										value={
+											!domain.walletConnectState.loading && !domain.walletConnectState.connected
+												? domain.walletConnectState.url
+												: ''
+										}
+									/>
 								</div>
 								<div className="qr-text">
 									Scan QR code with
@@ -205,7 +338,11 @@ export default class SelectWalletModal extends PureComponent<SelectWalletModalPr
 								<a
 									href="#copy-link"
 									onClick={() => {
-										navigator.clipboard.writeText(this.wcUrl);
+										navigator.clipboard.writeText(
+											!domain.walletConnectState.loading && !domain.walletConnectState.connected
+												? domain.walletConnectState.url
+												: '',
+										);
 										this.copy = true;
 										setTimeout(() => (this.copy = false), 1000);
 									}}
@@ -215,7 +352,28 @@ export default class SelectWalletModal extends PureComponent<SelectWalletModalPr
 								</a>
 							</div>
 						) : this.activeTab === 'desktop' ? (
-							<>
+							<div
+								style={{
+									display: 'flex',
+									flexDirection: 'column',
+									alignItems: 'stretch',
+									position: 'relative',
+								}}
+							>
+								{!domain.walletConnectState.loading && domain.walletConnectState.connected ? (
+									<div className="overall">
+										WalletConnect can be used to connect only one account.
+										<br />
+										<br />
+										Please, use native browser extensions to connect more wallets or disconnect
+										current WalletConnect connection.
+										<br />
+										<br />
+										<YlideButton onClick={this.disconnectWalletConnect}>
+											Disconnect WalletConnect ({domain.walletConnectState.walletName})
+										</YlideButton>
+									</div>
+								) : null}
 								<input className="wallets-search" placeholder="Search" type="text" />
 								<div className="wallets-list">
 									{walletConnect.loading ? (
@@ -241,7 +399,7 @@ export default class SelectWalletModal extends PureComponent<SelectWalletModalPr
 										})
 									)}
 								</div>
-							</>
+							</div>
 						) : this.activeTab === 'install' ? (
 							<>
 								<input className="wallets-search" placeholder="Search" type="text" />

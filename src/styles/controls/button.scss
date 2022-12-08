@@ -18,7 +18,7 @@
 		transition: all 0.2s;
 	}
 	&.ghost {
-		border: 0;
+		border-color: transparent;
 		font-weight: 300;
 	}
 	&.size-small {
@@ -33,11 +33,28 @@
 	&.centered {
 		padding: 3px;
 	}
+	&.nice {
+		border: 1px solid black;
+		background-color: transparent;
+	}
+	&.primary {
+		background: black;
+		color: white;
+	}
 	&:hover {
 		background: black;
 		color: white;
 		.y-icon {
 			stroke: white;
+		}
+		&.primary {
+			background: white;
+			color: black;
+		}
+		&.ghost {
+			border-color: black;
+			background: white;
+			color: black;
 		}
 	}
 }

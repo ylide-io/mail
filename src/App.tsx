@@ -11,8 +11,6 @@ import ContactsPage from './pages/ContactsPage/ContactsPage';
 import SettingsPage from './pages/SettingsPage/SettingsPage';
 import ContactsTab from './pages/ContactsPage/components/Contacts/ContactsTab';
 import TagsTab from './pages/ContactsPage/components/Tags/TagsTab';
-import FirstTimePage from './pages/FirstTimePage/FirstTimePage';
-import ConnectWalletsPage from './pages/ConnectWalletsPage/ConnectWalletsPage';
 
 import modals from './stores/Modals';
 import { Loader } from './controls/Loader';
@@ -71,11 +69,10 @@ const App = observer(() => {
 	if (
 		location.pathname !== '/test' &&
 		domain.accounts.isFirstTime &&
-		location.pathname !== '/first-time' &&
-		location.pathname !== '/admin' &&
-		location.pathname !== '/connect-wallets'
+		location.pathname !== '/wallets' &&
+		location.pathname !== '/admin'
 	) {
-		return <Navigate to="/first-time" state={{ from: location }} replace />;
+		return <Navigate to="/wallets" state={{ from: location }} replace />;
 	}
 
 	return (
@@ -84,8 +81,8 @@ const App = observer(() => {
 				<>
 					<Route path={'/'} element={<Navigate replace to="/inbox" />} />
 					<Route path={'/test'} element={<TestPage />} />
-					<Route path={'/first-time'} element={<FirstTimePage />} />
-					<Route path={'/connect-wallets'} element={<ConnectWalletsPage />} />
+					{/* <Route path={'/first-time'} element={<FirstTimePage />} /> */}
+					{/* <Route path={'/connect-wallets'} element={<ConnectWalletsPage />} /> */}
 					<Route path={'/wallets'} element={<NewWalletsPage />} />
 					<Route path={'/compose'} element={<ComposePage />} />
 					<Route path={'/contacts'} element={<ContactsPage />}>
@@ -97,6 +94,7 @@ const App = observer(() => {
 					<Route path={'/settings'} element={<SettingsPage />} />
 					<Route path={'/admin'} element={<AdminPage />} />
 					<Route path={'/feed'} element={<FeedPage />} />
+					<Route path={'/feed/:category'} element={<FeedPage />} />
 					<Route path={'/:folderId'} element={<MailboxPage />} />
 					<Route path={'/:folderId/:id'} element={<MailDetail />} />
 					<Route path={'/*'} element={<Navigate replace to="/inbox" />} />

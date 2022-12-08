@@ -8,6 +8,9 @@ import {
 	AbstractWalletController,
 	WalletEvent,
 	YlideKeyPair,
+	ExternalYlidePublicKey,
+	PublicKey,
+	PublicKeyType,
 } from '@ylide/sdk';
 import { Domain } from '../Domain';
 import { DomainAccount } from './DomainAccount';
@@ -132,12 +135,12 @@ export class Wallet extends EventEmitter {
 			controller: this.domain.blockchains[factory.blockchain],
 		}));
 		const rawKeysRequest = async () => {
-			let remoteKey: Uint8Array | null = null;
-			const remoteKeys: Record<string, Uint8Array> = {};
+			let remoteKey: ExternalYlidePublicKey | null = null;
+			const remoteKeys: Record<string, ExternalYlidePublicKey | null> = {};
 			await Promise.all(
 				blockchains.map(async ({ factory, controller }) => {
 					try {
-						const key = (await controller.extractPublicKeyFromAddress(account.address))?.bytes || null;
+						const key = (await controller.extractPublicKeyFromAddress(account.address)) || null;
 						if (key) {
 							remoteKeys[factory.blockchain] = key;
 							remoteKey = key;
@@ -155,18 +158,21 @@ export class Wallet extends EventEmitter {
 		if (this.factory.blockchainGroup === 'evm') {
 			return await mailList.readingSession.indexerHub.retryingOperation(
 				async () => {
-					let remoteKey: Uint8Array | null = null;
-					const remoteKeys: Record<string, Uint8Array> = {};
+					let remoteKey: ExternalYlidePublicKey | null = null;
+					const remoteKeys: Record<string, ExternalYlidePublicKey | null> = {};
 					const results = await mailList.readingSession.indexerHub.requestMultipleKeys([account.address]);
 					console.log('results: ', results);
 					const rawRemoteKeys = await mailList.readingSession.indexerHub.requestKeys(account.address);
 					const bcs = Object.keys(rawRemoteKeys);
 					let timestamp = -1;
 					for (const bc of bcs) {
-						remoteKeys[bc] = rawRemoteKeys[bc].publicKey;
+						remoteKeys[bc] = {
+							...rawRemoteKeys[bc],
+							publicKey: PublicKey.fromBytes(PublicKeyType.YLIDE, rawRemoteKeys[bc].publicKey),
+						};
 						if (timestamp === -1 || rawRemoteKeys[bc].timestamp > timestamp) {
 							timestamp = rawRemoteKeys[bc].timestamp;
-							remoteKey = rawRemoteKeys[bc].publicKey;
+							remoteKey = remoteKeys[bc];
 						}
 					}
 					return {
@@ -208,6 +214,24 @@ export class Wallet extends EventEmitter {
 			});
 			await this.domain.keystore.storeKey(keypair, this.factory.blockchainGroup, this.factory.wallet);
 		});
+	}
+
+	async getBalancesOf(address: string): Promise<Record<string, { original: string; number: number; e18: string }>> {
+		const chains = this.domain.registeredBlockchains.filter(
+			bc => bc.blockchainGroup === this.factory.blockchainGroup,
+		);
+		const balances = await Promise.all(
+			chains.map(async chain => {
+				return this.domain.blockchains[chain.blockchain].getBalance(address);
+			}),
+		);
+		return chains.reduce(
+			(p, c, i) => ({
+				...p,
+				[c.blockchain]: balances[i],
+			}),
+			{} as Record<string, { original: string; number: number; e18: string }>,
+		);
 	}
 
 	// async connectNonCurrentAccount() {

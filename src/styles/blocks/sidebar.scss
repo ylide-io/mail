@@ -32,6 +32,9 @@
 .sidebar-container {
 	@include flex-column(stretch, flex-start);
 
+	position: sticky;
+	top: 0;
+
 	padding-top: 25px;
 
 	@include less920px {
@@ -130,6 +133,18 @@
 
 		margin-bottom: 18px;
 
+		overflow: hidden;
+
+		transition: max-height 0.2s;
+
+		&.open {
+			max-height: 600px;
+		}
+
+		&:not(.open) {
+			max-height: 0px;
+		}
+
 		.sidebar-section-link {
 			@include flex-row(center, flex-start);
 
@@ -160,8 +175,18 @@
 				background: rgba(151, 71, 255, 0.08);
 				border-radius: 0px 30px 30px 0px;
 
+				// .sidebar-link-title {
+				color: #9747ff;
+
 				.sidebar-link-title {
 					color: #9747ff;
+				}
+				// }
+			}
+			&:hover {
+				cursor: pointer;
+				.sidebar-link-title {
+					color: #606060;
 				}
 			}
 		}

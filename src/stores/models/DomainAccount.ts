@@ -1,5 +1,5 @@
 import { EVM_NAMES, EVMNetwork } from '@ylide/ethereum';
-import { Ylide, YlideKey } from '@ylide/sdk';
+import { ExternalYlidePublicKey, Ylide, YlideKey } from '@ylide/sdk';
 import { IGenericAccount } from '@ylide/sdk';
 import { observable, computed, makeAutoObservable } from 'mobx';
 import { isBytesEqual } from '../../utils/isBytesEqual';
@@ -11,9 +11,9 @@ export class DomainAccount {
 	readonly key: YlideKey;
 	private _name: string;
 
-	@observable remoteKey: Uint8Array | null = null;
+	@observable remoteKey: ExternalYlidePublicKey | null = null;
 
-	@observable remoteKeys: Record<string, Uint8Array | null> = {};
+	@observable remoteKeys: Record<string, ExternalYlidePublicKey | null> = {};
 
 	constructor(wallet: Wallet, account: IGenericAccount, key: YlideKey, name: string) {
 		makeAutoObservable(this);
@@ -46,21 +46,7 @@ export class DomainAccount {
 	}
 
 	async getBalances(): Promise<Record<string, { original: string; number: number; e18: string }>> {
-		const chains = this.wallet.domain.registeredBlockchains.filter(
-			bc => bc.blockchainGroup === this.wallet.factory.blockchainGroup,
-		);
-		const balances = await Promise.all(
-			chains.map(async chain => {
-				return this.wallet.domain.blockchains[chain.blockchain].getBalance(this.account.address);
-			}),
-		);
-		return chains.reduce(
-			(p, c, i) => ({
-				...p,
-				[c.blockchain]: balances[i],
-			}),
-			{} as Record<string, { original: string; number: number; e18: string }>,
-		);
+		return await this.wallet.getBalancesOf(this.account.address);
 	}
 
 	async init() {
@@ -90,7 +76,7 @@ export class DomainAccount {
 	}
 
 	@computed get isLocalKeyRegistered() {
-		return this.remoteKey && isBytesEqual(this.key.keypair.publicKey, this.remoteKey);
+		return this.remoteKey && isBytesEqual(this.key.keypair.publicKey, this.remoteKey.publicKey.bytes);
 	}
 
 	async attachRemoteKey() {

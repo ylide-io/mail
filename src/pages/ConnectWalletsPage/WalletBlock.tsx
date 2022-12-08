@@ -17,7 +17,6 @@ import SignatureModal from '../../modals/SignatureModal';
 import { asyncDelay, IGenericAccount } from '@ylide/sdk';
 import { isBytesEqual } from '../../utils/isBytesEqual';
 import PublishKeyModal from '../../modals/PublishKeyModal';
-import WalletConnectQRCodeModal from '@walletconnect/qrcode-modal';
 
 export interface WalletBlockProps {
 	wallet: string;
@@ -126,7 +125,7 @@ export class WalletBlock extends PureComponent<WalletBlockProps> {
 		if (!remoteKey) {
 			const domainAccount = await wallet.instantiateNewAccount(account, tempLocalKey);
 			return await this.publishLocalKey(domainAccount);
-		} else if (isBytesEqual(remoteKey, tempLocalKey.publicKey)) {
+		} else if (isBytesEqual(remoteKey.publicKey.bytes, tempLocalKey.publicKey)) {
 			return await wallet.instantiateNewAccount(account, tempLocalKey);
 		} else if (result.forceNew) {
 			const domainAccount = await wallet.instantiateNewAccount(account, tempLocalKey);
@@ -264,19 +263,19 @@ export class WalletBlock extends PureComponent<WalletBlockProps> {
 		} else {
 			if (this.props.wallet === 'walletconnect') {
 				buttonHandler = async () => {
-					const factory = domain.registeredWallets.find(w => w.wallet === 'walletconnect')!;
-					const result = await domain.initWallet(
-						factory,
-						(url, close) => {
-							WalletConnectQRCodeModal.open(url, close);
-						},
-						() => {
-							WalletConnectQRCodeModal.close();
-						},
-					);
-					if (result) {
-						await domain.extractWalletsData();
-					}
+					// const factory = domain.registeredWallets.find(w => w.wallet === 'walletconnect')!;
+					// const result = await domain.initWallet(
+					// 	factory,
+					// 	(url, close) => {
+					// 		WalletConnectQRCodeModal.open(url, close);
+					// 	},
+					// 	() => {
+					// 		WalletConnectQRCodeModal.close();
+					// 	},
+					// );
+					// if (result) {
+					// 	await domain.extractWalletsData();
+					// }
 				};
 				buttonContent = <>Show QR</>;
 			} else {
@@ -312,7 +311,7 @@ export class WalletBlock extends PureComponent<WalletBlockProps> {
 							<div className="wb-title-name">{wData.title}</div>
 							{this.props.wallet === 'walletconnect' && wallet ? (
 								<div className="wb-via">
-									<div className="wb-via-name">{domain.walletConnectWalletName}</div>
+									<div className="wb-via-name">{'null'}</div>
 									<YlideButton size="tiny" onClick={() => domain.disconnectWalletConnect()}>
 										Disconnect
 									</YlideButton>

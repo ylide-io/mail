@@ -7,19 +7,10 @@ import { useNav } from '../../../../utils/navigate';
 import domain from '../../../../stores/Domain';
 import AlertModal from '../../../../modals/AlertModal';
 import { EVM_NAMES, EVMNetwork } from '@ylide/ethereum';
-import { blockchainsMap } from '../../../../constants';
+import { blockchainsMap, evmNameToNetwork } from '../../../../constants';
 import classNames from 'classnames';
 import { Dropdown, Menu } from 'antd';
 import mailList from '../../../../stores/MailList';
-
-const evmNetworks = (Object.keys(EVM_NAMES) as unknown as EVMNetwork[]).map((network: EVMNetwork) => ({
-	name: EVM_NAMES[network],
-	network: Number(network) as EVMNetwork,
-}));
-
-function evmNameToNetwork(name: string) {
-	return evmNetworks.find(n => n.name === name)?.network;
-}
 
 const ComposeMailFooter = observer(() => {
 	const navigate = useNav();

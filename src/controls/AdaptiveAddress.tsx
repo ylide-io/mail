@@ -52,8 +52,6 @@ export function AdaptiveAddress({ address }: { address: string }) {
 				// console.log('Something goes wrong in AdaptiveAddress: ', address);
 			} else {
 				const addressSize = addressLength * letterSize;
-				console.log('addressSize: ', addressSize);
-				console.log('parentSize.width: ', parentSize.width);
 				if (addressSize <= parentSize.width) {
 					setPrefixLength(0);
 					setVisibleLength(addressLength);

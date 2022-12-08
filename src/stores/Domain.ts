@@ -85,7 +85,13 @@ export class Domain {
 	@observable wallets: Wallet[] = [];
 	@observable accounts: Accounts = new Accounts(this);
 
-	@observable walletConnectWalletName = '';
+	@observable walletConnectState:
+		| { loading: true }
+		| { loading: false; connected: true; walletName: string; provider: any }
+		| { loading: false; connected: false; url: string; onConnect: Promise<{ walletName: string; provider: any }> } =
+		{
+			loading: true,
+		};
 
 	constructor() {
 		makeObservable(this);
@@ -268,82 +274,88 @@ export class Domain {
 		}
 	}
 
-	async initWalletConnect(callback?: (url: string, close: () => void) => void, connectSuccessful?: () => void) {
-		let isInitialized = true;
-		let peerName = null;
-		const wc = new WalletConnectProvider({
-			rpc: {
-				[EVM_CHAINS[EVMNetwork.ETHEREUM]]: EVM_RPCS[EVMNetwork.ETHEREUM].find(r => !r.rpc.startsWith('ws'))!
-					.rpc,
-				[EVM_CHAINS[EVMNetwork.AVALANCHE]]: EVM_RPCS[EVMNetwork.AVALANCHE].find(r => !r.rpc.startsWith('ws'))!
-					.rpc,
-				[EVM_CHAINS[EVMNetwork.ARBITRUM]]: EVM_RPCS[EVMNetwork.ARBITRUM].find(r => !r.rpc.startsWith('ws'))!
-					.rpc,
-				[EVM_CHAINS[EVMNetwork.BNBCHAIN]]: EVM_RPCS[EVMNetwork.BNBCHAIN].find(r => !r.rpc.startsWith('ws'))!
-					.rpc,
-				[EVM_CHAINS[EVMNetwork.OPTIMISM]]: EVM_RPCS[EVMNetwork.OPTIMISM].find(r => !r.rpc.startsWith('ws'))!
-					.rpc,
-				[EVM_CHAINS[EVMNetwork.POLYGON]]: EVM_RPCS[EVMNetwork.POLYGON].find(r => !r.rpc.startsWith('ws'))!.rpc,
-				[EVM_CHAINS[EVMNetwork.FANTOM]]: EVM_RPCS[EVMNetwork.FANTOM].find(r => !r.rpc.startsWith('ws'))!.rpc,
-				[EVM_CHAINS[EVMNetwork.KLAYTN]]: EVM_RPCS[EVMNetwork.KLAYTN].find(r => !r.rpc.startsWith('ws'))!.rpc,
-				[EVM_CHAINS[EVMNetwork.GNOSIS]]: EVM_RPCS[EVMNetwork.GNOSIS].find(r => !r.rpc.startsWith('ws'))!.rpc,
-				[EVM_CHAINS[EVMNetwork.AURORA]]: EVM_RPCS[EVMNetwork.AURORA].find(r => !r.rpc.startsWith('ws'))!.rpc,
-				[EVM_CHAINS[EVMNetwork.CELO]]: EVM_RPCS[EVMNetwork.CELO].find(r => !r.rpc.startsWith('ws'))!.rpc,
-				[EVM_CHAINS[EVMNetwork.CRONOS]]: EVM_RPCS[EVMNetwork.CRONOS].find(r => !r.rpc.startsWith('ws'))!.rpc,
-				[EVM_CHAINS[EVMNetwork.MOONBEAM]]: EVM_RPCS[EVMNetwork.MOONBEAM].find(r => !r.rpc.startsWith('ws'))!
-					.rpc,
-				[EVM_CHAINS[EVMNetwork.MOONRIVER]]: EVM_RPCS[EVMNetwork.MOONRIVER].find(r => !r.rpc.startsWith('ws'))!
-					.rpc,
-				[EVM_CHAINS[EVMNetwork.METIS]]: EVM_RPCS[EVMNetwork.METIS].find(r => !r.rpc.startsWith('ws'))!.rpc,
-				[EVM_CHAINS[EVMNetwork.ASTAR]]: EVM_RPCS[EVMNetwork.ASTAR].find(r => !r.rpc.startsWith('ws'))!.rpc,
-			},
+	async initWalletConnect() {
+		if (!this.walletConnectState.loading) {
+			return;
+		}
+
+		const rpcsData = {
+			[EVM_CHAINS[EVMNetwork.ETHEREUM]]: EVM_RPCS[EVMNetwork.ETHEREUM].find(r => !r.rpc.startsWith('ws'))!.rpc,
+			[EVM_CHAINS[EVMNetwork.AVALANCHE]]: EVM_RPCS[EVMNetwork.AVALANCHE].find(r => !r.rpc.startsWith('ws'))!.rpc,
+			[EVM_CHAINS[EVMNetwork.ARBITRUM]]: EVM_RPCS[EVMNetwork.ARBITRUM].find(r => !r.rpc.startsWith('ws'))!.rpc,
+			[EVM_CHAINS[EVMNetwork.BNBCHAIN]]: EVM_RPCS[EVMNetwork.BNBCHAIN].find(r => !r.rpc.startsWith('ws'))!.rpc,
+			[EVM_CHAINS[EVMNetwork.OPTIMISM]]: EVM_RPCS[EVMNetwork.OPTIMISM].find(r => !r.rpc.startsWith('ws'))!.rpc,
+			[EVM_CHAINS[EVMNetwork.POLYGON]]: EVM_RPCS[EVMNetwork.POLYGON].find(r => !r.rpc.startsWith('ws'))!.rpc,
+			[EVM_CHAINS[EVMNetwork.FANTOM]]: EVM_RPCS[EVMNetwork.FANTOM].find(r => !r.rpc.startsWith('ws'))!.rpc,
+			[EVM_CHAINS[EVMNetwork.KLAYTN]]: EVM_RPCS[EVMNetwork.KLAYTN].find(r => !r.rpc.startsWith('ws'))!.rpc,
+			[EVM_CHAINS[EVMNetwork.GNOSIS]]: EVM_RPCS[EVMNetwork.GNOSIS].find(r => !r.rpc.startsWith('ws'))!.rpc,
+			[EVM_CHAINS[EVMNetwork.AURORA]]: EVM_RPCS[EVMNetwork.AURORA].find(r => !r.rpc.startsWith('ws'))!.rpc,
+			[EVM_CHAINS[EVMNetwork.CELO]]: EVM_RPCS[EVMNetwork.CELO].find(r => !r.rpc.startsWith('ws'))!.rpc,
+			[EVM_CHAINS[EVMNetwork.CRONOS]]: EVM_RPCS[EVMNetwork.CRONOS].find(r => !r.rpc.startsWith('ws'))!.rpc,
+			[EVM_CHAINS[EVMNetwork.MOONBEAM]]: EVM_RPCS[EVMNetwork.MOONBEAM].find(r => !r.rpc.startsWith('ws'))!.rpc,
+			[EVM_CHAINS[EVMNetwork.MOONRIVER]]: EVM_RPCS[EVMNetwork.MOONRIVER].find(r => !r.rpc.startsWith('ws'))!.rpc,
+			[EVM_CHAINS[EVMNetwork.METIS]]: EVM_RPCS[EVMNetwork.METIS].find(r => !r.rpc.startsWith('ws'))!.rpc,
+			[EVM_CHAINS[EVMNetwork.ASTAR]]: EVM_RPCS[EVMNetwork.ASTAR].find(r => !r.rpc.startsWith('ws'))!.rpc,
+		};
+
+		let isAvailable = true;
+
+		const wcTest = new WalletConnectProvider({
+			rpc: rpcsData,
 			qrcodeModal: {
 				async open(uri, cb, opts?) {
-					if (callback) {
-						callback(uri, cb);
-					} else {
-						isInitialized = false;
-						cb();
-					}
+					// fired this method? means disconnected
+					isAvailable = false;
+					cb();
 				},
 				close() {
-					if (connectSuccessful) {
-						connectSuccessful();
-					}
+					// will not be fired in test mode
 				},
 			},
 		});
+
 		try {
-			await wc.enable();
-		} catch (err: any) {
-			if (err?.message !== 'User closed modal') {
-				throw err;
-			}
+			await wcTest.enable();
+		} catch (err) {
+			// no-op
 		}
 
-		if (isInitialized) {
-			peerName = wc.wc.peerMeta?.name || null;
-		}
+		if (isAvailable) {
+			domain.walletConnectState = {
+				loading: false,
+				connected: true,
+				walletName: wcTest.wc.peerMeta?.name || '',
+				provider: wcTest,
+			};
+		} else {
+			let resolve = (val: { walletName: string; provider: any }) => {};
+			const wcReal = new WalletConnectProvider({
+				rpc: rpcsData,
+				qrcodeModal: {
+					async open(uri, cb, opts?) {
+						domain.walletConnectState = {
+							loading: false,
+							connected: false,
+							url: uri,
+							onConnect: new Promise<{ walletName: string; provider: any }>(_resolve => {
+								resolve = _resolve;
+							}),
+						};
+					},
+					close() {
+						resolve({ walletName: wcReal.wc.peerMeta?.name || '', provider: wcReal });
+					},
+				},
+			});
 
-		return {
-			walletConnectProvider: wc,
-			isInitialized,
-			peerName,
-		};
+			wcReal.enable();
+		}
 	}
 
-	async initWallet(
-		factory: WalletControllerFactory,
-		wcCallback?: (url: string, close: () => void) => void,
-		wcConnectSuccessful?: () => void,
-	) {
-		let wc;
+	async initWallet(factory: WalletControllerFactory) {
 		if (factory.wallet === 'walletconnect') {
-			wc = await this.initWalletConnect(wcCallback, wcConnectSuccessful);
-			if (!wc.isInitialized) {
+			if (this.walletConnectState.loading || !this.walletConnectState.connected) {
 				return false;
-			} else {
-				this.walletConnectWalletName = wc.peerName || '';
 			}
 		}
 		this.walletControllers[factory.blockchainGroup] = {
@@ -368,7 +380,12 @@ export class Domain {
 						);
 					}
 				},
-				walletConnectProvider: factory.wallet === 'walletconnect' ? wc?.walletConnectProvider : null,
+				walletConnectProvider:
+					factory.wallet === 'walletconnect' &&
+					!this.walletConnectState.loading &&
+					this.walletConnectState.connected
+						? this.walletConnectState.provider
+						: null,
 			}),
 		};
 		return true;
@@ -456,6 +473,8 @@ export class Domain {
 		if (this.initialized) {
 			return;
 		}
+
+		await this.initWalletConnect();
 
 		await this.extractWalletsData();
 
