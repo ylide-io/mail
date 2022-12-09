@@ -17,7 +17,7 @@ function NextButton() {
 		<YlideButton
 			style={{ marginTop: 20 }}
 			onClick={() => {
-				navigate(`/inbox`);
+				navigate(`/feed/main`);
 			}}
 		>
 			Continue with connected accounts <ArrowRight style={{ marginLeft: 10 }} />
@@ -42,7 +42,6 @@ export default class NewWalletsPage extends PureComponent {
 					{domain.accounts.activeAccounts.length ? <NextButton /> : null}
 					<div className="connected-wallets">
 						{domain.accounts.accounts.map(acc => {
-							console.log('acc.wallet.wallet: ', acc.wallet.wallet);
 							return (
 								<div className="cw-block" key={acc.account.address}>
 									<div className="cw-logo">

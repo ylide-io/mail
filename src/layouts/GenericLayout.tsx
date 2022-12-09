@@ -23,6 +23,8 @@ const GenericLayout: React.FC<GenericLayoutProps> = observer(({ children, mainCl
 				text: 'Compose Mail',
 				link: '/compose',
 			};
+		} else if (location.pathname.startsWith('/feed/')) {
+			return null;
 		} else {
 			return {
 				text: 'Return to Mailbox',
@@ -38,7 +40,9 @@ const GenericLayout: React.FC<GenericLayoutProps> = observer(({ children, mainCl
 			<div className="main-wrapper">
 				<SidebarMenu />
 				<div className={classNames('main-block main-content', mainClass)}>
-					{windowWidth >= 920 ? null : <LinkButton text={linkButtonProps.text} link={linkButtonProps.link} />}
+					{windowWidth >= 920 || !linkButtonProps ? null : (
+						<LinkButton text={linkButtonProps.text} link={linkButtonProps.link} />
+					)}
 					{children}
 				</div>
 			</div>

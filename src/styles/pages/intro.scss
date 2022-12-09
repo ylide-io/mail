@@ -100,6 +100,8 @@
 .connected-wallets {
 	@include flex-row(center, center);
 
+	flex-wrap: wrap;
+
 	margin-top: 40px;
 
 	.cw-block {
@@ -114,6 +116,13 @@
 
 		margin-left: 20px;
 		margin-right: 20px;
+
+		@include less480px {
+			width: 180px;
+
+			margin-left: 6px;
+			margin-right: 6px;
+		}
 
 		&.emphaized {
 			background: #9747ff;

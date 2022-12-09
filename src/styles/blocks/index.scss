@@ -80,12 +80,21 @@
 	box-shadow: unset;
 
 	padding-right: 240px;
+
+	@include less920px {
+		padding-right: 0px;
+		width: 100%;
+	}
 }
 
 .feed {
 	@include flex-column(stretch, flex-start);
 
 	width: 656px;
+
+	@include less670px {
+		width: 100%;
+	}
 
 	.feed-title {
 		@include flex-row(center, space-between);
@@ -133,7 +142,8 @@
 	height: 250px;
 }
 
-.post-desktop {
+.post-desktop,
+.post-mobile {
 	@include flex-row(stretch, flex-start);
 
 	background: #ffffff;
@@ -371,6 +381,52 @@
 				p:last-child {
 					margin-bottom: 0;
 				}
+			}
+		}
+	}
+
+	&.post-mobile {
+		@include flex-column(stretch, flex-start);
+
+		.post-header {
+			@include flex-row(flex-start, flex-start);
+
+			margin-bottom: 15px;
+
+			.post-meta {
+				flex-grow: 1;
+			}
+		}
+
+		.post-meta {
+			@include flex-column(stretch, flex-start);
+
+			.post-source-left {
+				flex-wrap: wrap;
+				overflow: hidden;
+
+				.post-source-name {
+					flex-shrink: 0;
+				}
+				.post-source-username {
+					flex-shrink: 0;
+				}
+				.post-source-in {
+					flex-shrink: 0;
+				}
+				.post-source-data {
+					flex-shrink: 0;
+
+					.post-source-channel-name {
+						flex-shrink: 1;
+						overflow: hidden;
+						text-overflow: ellipsis;
+					}
+				}
+			}
+
+			.post-source-right {
+				@include flex-row(flex-end, flex-start);
 			}
 		}
 	}

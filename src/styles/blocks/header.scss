@@ -20,7 +20,9 @@
 		.header-block {
 			@include flex-row(center, flex-end);
 
-			margin-left: 30px;
+			&:not(:first-child) {
+				margin-left: 30px;
+			}
 
 			.anticon {
 				color: rgba(0, 0, 0, 0.65);

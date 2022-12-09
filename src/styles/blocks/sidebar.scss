@@ -38,6 +38,7 @@
 	padding-top: 25px;
 
 	@include less920px {
+		position: static;
 		padding: 15px;
 	}
 }

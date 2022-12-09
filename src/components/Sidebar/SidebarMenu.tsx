@@ -1,6 +1,5 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import mailList from '../../stores/MailList';
 import { observer } from 'mobx-react';
 import cn from 'classnames';
 import modals from '../../stores/Modals';
@@ -10,16 +9,18 @@ import { allTopicsIcon } from '../../icons/static/allTopicsIcon';
 import { mainTopicIcon } from '../../icons/static/mainTopicIcon';
 import { topicSettingsIcon } from '../../icons/static/topicSettingsIcon';
 import { CaretUp } from '../../icons/CaretUp';
-import { Dropdown } from 'antd';
+import { Button, Dropdown } from 'antd';
 import { checkboxCheckIcon } from '../../icons/static/checkboxCheckIcon';
 import { YlideButton } from '../../controls/YlideButton';
 import feed from '../../stores/Feed';
+import { MenuFoldOutlined, MenuUnfoldOutlined } from '@ant-design/icons';
 
 const FeedSettings = observer(() => {
 	const [newValues, setNewValues] = useState(feed.mainCategories);
 
 	useEffect(() => {
 		setNewValues(feed.mainCategories);
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [feed.mainCategories]);
 
 	return (
@@ -189,24 +190,24 @@ const SidebarMenu = observer(() => {
 		localStorage.setItem('tv1_mailOpen', JSON.stringify(mailOpen));
 	}, [mailOpen]);
 
-	const linkButtonProps = useMemo(() => {
-		if (location.pathname === '/' + mailList.activeFolderId) {
-			return {
-				text: 'Compose Mail',
-				link: '/compose',
-			};
-		} else {
-			return {
-				text: 'Return to Mailbox',
-				link: `/${mailList.activeFolderId || 'inbox'}`,
-			};
-		}
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [location, mailList.activeFolderId]);
-
 	return (
 		<div className={cn('side-block', { open: modals.sidebarOpen })}>
 			<div className="sidebar-container">
+				{windowWidth < 920 ? (
+					<div className="sidebar-mobile-header" style={{ alignSelf: 'center', marginBottom: 30 }}>
+						<div className="header-burger" style={{ marginRight: 0 }}>
+							<Button
+								onClick={() => {
+									modals.sidebarOpen = !modals.sidebarOpen;
+								}}
+								style={{ borderRadius: 8 }}
+								icon={modals.sidebarOpen ? <MenuFoldOutlined /> : <MenuUnfoldOutlined />}
+							>
+								Hide sidebar
+							</Button>
+						</div>
+					</div>
+				) : null}
 				<div className="sidebar-section">
 					<div className="sidebar-section-title">
 						Feed{' '}
@@ -225,7 +226,10 @@ const SidebarMenu = observer(() => {
 					<div className={cn('sidebar-section-content', { open: feedOpen })}>
 						<div
 							className={cn('sidebar-section-link', { active: location.pathname === '/feed/main' })}
-							onClick={() => navigate('/feed/main')}
+							onClick={() => {
+								modals.sidebarOpen = false;
+								navigate('/feed/main');
+							}}
 						>
 							<div className="sidebar-link-icon-left">{mainTopicIcon}</div>
 							<div className="sidebar-link-title">My feed</div>
@@ -235,63 +239,90 @@ const SidebarMenu = observer(() => {
 						</div>
 						<div
 							className={cn('sidebar-section-link', { active: location.pathname === '/feed/all' })}
-							onClick={() => navigate('/feed/all')}
+							onClick={() => {
+								modals.sidebarOpen = false;
+								navigate('/feed/all');
+							}}
 						>
 							<div className="sidebar-link-icon-left">{allTopicsIcon}</div>
 							<div className="sidebar-link-title">All topics</div>
 						</div>
 						<div
 							className={cn('sidebar-section-link', { active: location.pathname === '/feed/Markets' })}
-							onClick={() => navigate('/feed/Markets')}
+							onClick={() => {
+								modals.sidebarOpen = false;
+								navigate('/feed/Markets');
+							}}
 						>
 							<div className="sidebar-link-icon-left">{allTopicsIcon}</div>
 							<div className="sidebar-link-title">Markets</div>
 						</div>
 						<div
 							className={cn('sidebar-section-link', { active: location.pathname === '/feed/Analytics' })}
-							onClick={() => navigate('/feed/Analytics')}
+							onClick={() => {
+								modals.sidebarOpen = false;
+								navigate('/feed/Analytics');
+							}}
 						>
 							<div className="sidebar-link-icon-left">{allTopicsIcon}</div>
 							<div className="sidebar-link-title">Analytics</div>
 						</div>
 						<div
 							className={cn('sidebar-section-link', { active: location.pathname === '/feed/Projects' })}
-							onClick={() => navigate('/feed/Projects')}
+							onClick={() => {
+								modals.sidebarOpen = false;
+								navigate('/feed/Projects');
+							}}
 						>
 							<div className="sidebar-link-icon-left">{allTopicsIcon}</div>
 							<div className="sidebar-link-title">Projects</div>
 						</div>
 						<div
 							className={cn('sidebar-section-link', { active: location.pathname === '/feed/Policy' })}
-							onClick={() => navigate('/feed/Policy')}
+							onClick={() => {
+								modals.sidebarOpen = false;
+								navigate('/feed/Policy');
+							}}
 						>
 							<div className="sidebar-link-icon-left">{allTopicsIcon}</div>
 							<div className="sidebar-link-title">Policy</div>
 						</div>
 						<div
 							className={cn('sidebar-section-link', { active: location.pathname === '/feed/Security' })}
-							onClick={() => navigate('/feed/Security')}
+							onClick={() => {
+								modals.sidebarOpen = false;
+								navigate('/feed/Security');
+							}}
 						>
 							<div className="sidebar-link-icon-left">{allTopicsIcon}</div>
 							<div className="sidebar-link-title">Security</div>
 						</div>
 						<div
 							className={cn('sidebar-section-link', { active: location.pathname === '/feed/Technology' })}
-							onClick={() => navigate('/feed/Technology')}
+							onClick={() => {
+								modals.sidebarOpen = false;
+								navigate('/feed/Technology');
+							}}
 						>
 							<div className="sidebar-link-icon-left">{allTopicsIcon}</div>
 							<div className="sidebar-link-title">Technology</div>
 						</div>
 						<div
 							className={cn('sidebar-section-link', { active: location.pathname === '/feed/Culture' })}
-							onClick={() => navigate('/feed/Culture')}
+							onClick={() => {
+								modals.sidebarOpen = false;
+								navigate('/feed/Culture');
+							}}
 						>
 							<div className="sidebar-link-icon-left">{allTopicsIcon}</div>
 							<div className="sidebar-link-title">Culture</div>
 						</div>
 						<div
 							className={cn('sidebar-section-link', { active: location.pathname === '/feed/Education' })}
-							onClick={() => navigate('/feed/Education')}
+							onClick={() => {
+								modals.sidebarOpen = false;
+								navigate('/feed/Education');
+							}}
 						>
 							<div className="sidebar-link-icon-left">{allTopicsIcon}</div>
 							<div className="sidebar-link-title">Education</div>
@@ -314,12 +345,21 @@ const SidebarMenu = observer(() => {
 						</div>
 					</div>
 					<div className={cn('sidebar-section-content', { open: mailOpen })}>
-						<div className="sidebar-section-button" onClick={() => navigate('/compose')}>
+						<div
+							className="sidebar-section-button"
+							onClick={() => {
+								modals.sidebarOpen = false;
+								navigate('/compose');
+							}}
+						>
 							Compose mail
 						</div>
 						<div
 							className={cn('sidebar-section-link', { active: location.pathname === '/inbox' })}
-							onClick={() => navigate('/inbox')}
+							onClick={() => {
+								modals.sidebarOpen = false;
+								navigate('/inbox');
+							}}
 						>
 							<div className="sidebar-link-icon-left">
 								<i className="fa fa-inbox" />
@@ -347,7 +387,10 @@ const SidebarMenu = observer(() => {
 						</div>
 						<div
 							className={cn('sidebar-section-link', { active: location.pathname === '/sent' })}
-							onClick={() => navigate('/sent')}
+							onClick={() => {
+								modals.sidebarOpen = false;
+								navigate('/sent');
+							}}
 						>
 							<div className="sidebar-link-icon-left">
 								<i className="fa fa-share" />
@@ -356,7 +399,10 @@ const SidebarMenu = observer(() => {
 						</div>
 						<div
 							className={cn('sidebar-section-link', { active: location.pathname === '/archive' })}
-							onClick={() => navigate('/archive')}
+							onClick={() => {
+								modals.sidebarOpen = false;
+								navigate('/archive');
+							}}
 						>
 							<div className="sidebar-link-icon-left">
 								<i className="fa fa-trash-o" />

@@ -222,6 +222,7 @@ export default class SelectWalletModal extends PureComponent<SelectWalletModalPr
 						<div
 							onClick={() => {
 								this.activeTab = 'qr';
+								this.search = '';
 							}}
 							className={classNames('wm-tab', { active: this.activeTab === 'qr' })}
 						>
@@ -230,6 +231,7 @@ export default class SelectWalletModal extends PureComponent<SelectWalletModalPr
 						<div
 							onClick={() => {
 								this.activeTab = 'desktop';
+								this.search = '';
 							}}
 							className={classNames('wm-tab', { active: this.activeTab === 'desktop' })}
 						>
@@ -238,6 +240,7 @@ export default class SelectWalletModal extends PureComponent<SelectWalletModalPr
 						<div
 							onClick={() => {
 								this.activeTab = 'install';
+								this.search = '';
 							}}
 							className={classNames('wm-tab', { active: this.activeTab === 'install' })}
 						>
@@ -374,29 +377,52 @@ export default class SelectWalletModal extends PureComponent<SelectWalletModalPr
 										</YlideButton>
 									</div>
 								) : null}
-								<input className="wallets-search" placeholder="Search" type="text" />
+								<input
+									className="wallets-search"
+									value={this.search}
+									onChange={e => (this.search = e.target.value)}
+									placeholder="Search"
+									type="text"
+								/>
 								<div className="wallets-list">
 									{walletConnect.loading ? (
 										<>
 											<Loader />
 										</>
 									) : (
-										walletConnect.desktopWallets.map(w => {
-											return (
-												<div className="wallet-icon">
-													<div className="wallet-icon-block">
-														<div className="wallet-icon-image">
-															<img
-																src={w.image_url.md}
-																alt="Wallet Logo"
-																style={{ width: 32, height: 32, borderRadius: 6 }}
-															/>
+										walletConnect.desktopWallets
+											.filter(d => d.name.toLowerCase().includes(this.search.toLowerCase()))
+											.map(w => {
+												return (
+													<div
+														className="wallet-icon"
+														onClick={() => {
+															window.open(
+																`${
+																	w.desktop.universal || w.desktop.native
+																}/wc?uri=${encodeURIComponent(
+																	!domain.walletConnectState.loading &&
+																		!domain.walletConnectState.connected
+																		? domain.walletConnectState.url
+																		: '',
+																)}`,
+																'_blank',
+															);
+														}}
+													>
+														<div className="wallet-icon-block">
+															<div className="wallet-icon-image">
+																<img
+																	src={w.image_url.md}
+																	alt="Wallet Logo"
+																	style={{ width: 32, height: 32, borderRadius: 6 }}
+																/>
+															</div>
 														</div>
+														<div className="wallet-icon-title">{w.name}</div>
 													</div>
-													<div className="wallet-icon-title">{w.name}</div>
-												</div>
-											);
-										})
+												);
+											})
 									)}
 								</div>
 							</div>
