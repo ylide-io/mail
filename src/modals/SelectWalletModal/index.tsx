@@ -192,8 +192,8 @@ export default class SelectWalletModal extends PureComponent<SelectWalletModalPr
 	// supportedWallets
 
 	render() {
-		const isAndroid = browserUtils.isAndroid();
-		const isIOS = !isAndroid;
+		// const isAndroid = browserUtils.isAndroid();
+		// const isIOS = !isAndroid;
 		const isMobile = browserUtils.isMobile();
 		const isDesktop = !isMobile;
 

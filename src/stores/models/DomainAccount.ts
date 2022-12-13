@@ -79,13 +79,13 @@ export class DomainAccount {
 		return this.remoteKey && isBytesEqual(this.key.keypair.publicKey, this.remoteKey.publicKey.bytes);
 	}
 
-	async attachRemoteKey() {
+	async attachRemoteKey(preferredNetwork?: EVMNetwork) {
 		const evmNetworks = (Object.keys(EVM_NAMES) as unknown as EVMNetwork[]).map((network: EVMNetwork) => ({
 			name: EVM_NAMES[network],
 			network: Number(network) as EVMNetwork,
 		}));
 		const blockchainName = await this.wallet.controller.getCurrentBlockchain();
-		const network = evmNetworks.find(n => n.name === blockchainName)?.network;
+		const network = preferredNetwork || evmNetworks.find(n => n.name === blockchainName)?.network;
 		await this.wallet.controller.attachPublicKey(this.account, this.key.keypair.publicKey, {
 			network,
 		});

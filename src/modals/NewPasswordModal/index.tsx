@@ -125,7 +125,7 @@ export default class NewPasswordModal extends PureComponent<NewPasswordModalProp
 	async publishLocalKey(account: DomainAccount) {
 		this.step = 3;
 		try {
-			await account.attachRemoteKey();
+			await account.attachRemoteKey(this.network);
 			await asyncDelay(7000);
 			await account.init();
 			this.step = 5;
