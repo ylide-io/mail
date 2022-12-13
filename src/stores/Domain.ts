@@ -327,8 +327,10 @@ export class Domain {
 				walletName: wcTest.wc.peerMeta?.name || '',
 				provider: wcTest,
 			};
+			await this.extractWalletsData();
 		} else {
 			let resolve = (val: { walletName: string; provider: any }) => {};
+			const self = this;
 			const wcReal = new WalletConnectProvider({
 				rpc: rpcsData,
 				qrcodeModal: {
@@ -342,7 +344,14 @@ export class Domain {
 							}),
 						};
 					},
-					close() {
+					async close() {
+						domain.walletConnectState = {
+							loading: false,
+							connected: true,
+							walletName: wcReal.wc.peerMeta?.name || '',
+							provider: wcReal,
+						};
+						await self.extractWalletsData();
 						resolve({ walletName: wcReal.wc.peerMeta?.name || '', provider: wcReal });
 					},
 				},
@@ -395,8 +404,6 @@ export class Domain {
 		this.registeredWallets = Ylide.walletsList.map(w => w.factory);
 		this.registeredBlockchains = Ylide.blockchainsList.map(b => b.factory);
 
-		this.availableWallets = await Ylide.getAvailableWallets();
-
 		for (const factory of this.availableWallets) {
 			if (
 				!this.walletControllers[factory.blockchainGroup] ||
@@ -425,9 +432,17 @@ export class Domain {
 			if (!controller) {
 				continue;
 			}
-			const newWallet = new Wallet(this, factory.wallet, factory, controller, walletsMap[factory.wallet].link);
-			await newWallet.init();
-			this.wallets.push(newWallet);
+			if (!this.wallets.find(w => w.factory.wallet === factory.wallet)) {
+				const newWallet = new Wallet(
+					this,
+					factory.wallet,
+					factory,
+					controller,
+					walletsMap[factory.wallet].link,
+				);
+				await newWallet.init();
+				this.wallets.push(newWallet);
+			}
 		}
 
 		// for (const blockchain of Object.keys(this.walletControllers)) {
@@ -473,6 +488,8 @@ export class Domain {
 		if (this.initialized) {
 			return;
 		}
+
+		this.availableWallets = await Ylide.getAvailableWallets();
 
 		await this.initWalletConnect();
 

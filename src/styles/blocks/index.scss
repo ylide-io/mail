@@ -156,6 +156,56 @@
 
 	margin-bottom: 12px;
 
+	position: relative;
+
+	.post-collapser {
+		display: none;
+
+		flex-direction: column;
+		justify-content: flex-end;
+
+		position: absolute;
+		z-index: 1;
+		left: 0;
+		right: 0;
+		bottom: 0;
+		background-color: red;
+		height: 70px;
+		background: rgb(255, 255, 255);
+		background: linear-gradient(0deg, rgba(255, 255, 255, 1) 80%, rgba(0, 212, 255, 0) 100%);
+		padding-bottom: 20px;
+
+		border-bottom-left-radius: 12px;
+		border-bottom-right-radius: 12px;
+
+		.rm-expander {
+			font-family: 'Lexend';
+			font-style: normal;
+			font-weight: 400;
+			font-size: 15px;
+			line-height: 22px;
+			color: #1d9bf0;
+			cursor: pointer;
+
+			&:hover {
+				opacity: 0.8;
+			}
+		}
+	}
+
+	&.post-desktop .post-collapser {
+		padding-left: 72px;
+	}
+
+	&.collapsed {
+		max-height: 600px;
+		overflow: hidden;
+
+		.post-collapser {
+			display: flex;
+		}
+	}
+
 	.post-ava {
 		@include flex-column(center, flex-start);
 

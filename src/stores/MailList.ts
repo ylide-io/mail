@@ -425,6 +425,7 @@ export class MailList {
 			await this.folderChangeCriticalSection.leave();
 		}
 		this.activeFolderId = folderId;
+
 		this.currentList = new ListSourceDrainer(new ListSourceMultiplexer(this.buildSourcesByFolder(folderId)));
 		this.currentList.on('messages', this.handleNewMessages);
 		if (this.activeFolderId === 'archive') {
@@ -434,10 +435,12 @@ export class MailList {
 		} else {
 			this.currentList.resetFilter(this.deletedFilter);
 		}
+
 		this.firstLoading = true;
 		await this.folderChangeCriticalSection.enter();
 		await this.currentList.resume();
 		await this.folderChangeCriticalSection.leave();
+
 		await this.nextPage();
 		// }
 

@@ -124,6 +124,22 @@
 			margin-right: 6px;
 		}
 
+		&.notActive {
+			background-color: rgba(255, 0, 0, 0.03);
+			.cw-logo {
+				margin-bottom: 0px;
+			}
+
+			.ylide-button {
+				margin-top: 4px;
+				background-color: white;
+				line-height: 110%;
+				&:hover {
+					color: black;
+				}
+			}
+		}
+
 		&.emphaized {
 			background: #9747ff;
 			border: 1px dashed white;
@@ -131,6 +147,8 @@
 			cursor: pointer;
 
 			.cw-title {
+				@include flex-row(center, flex-start);
+
 				color: white;
 				font-family: 'Lexend';
 				font-style: normal;

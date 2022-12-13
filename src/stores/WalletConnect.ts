@@ -1,4 +1,5 @@
 import { computed, observable } from 'mobx';
+import { IAppRegistry } from '@walletconnect/types';
 
 export interface WalletInterface {
 	id: string;
@@ -41,11 +42,17 @@ export interface WalletInterface {
 }
 
 class WalletConnectStore {
+	registry: IAppRegistry = {};
+
 	@observable wallets: WalletInterface[] = [];
 	@observable loaded = false;
 	@observable loading = false;
 
 	@computed get desktopWallets(): WalletInterface[] {
+		return this.wallets.filter(w => w.desktop.universal || w.desktop.native);
+	}
+
+	@computed get mobileWallets(): WalletInterface[] {
 		return this.wallets.filter(w => w.desktop.universal || w.desktop.native);
 	}
 
@@ -59,6 +66,7 @@ class WalletConnectStore {
 			const response = await fetch(url);
 			const data = await response.json();
 
+			this.registry = data.listings;
 			this.wallets = Object.keys(data.listings).map(id => data.listings[id]);
 
 			this.loaded = true;

@@ -109,7 +109,7 @@ const MailboxListRow: React.FC<MailboxListRowProps> = observer(({ style, message
 									</div>
 								</>
 							) : (
-								<div className="decode-button">Not decoded</div>
+								<div className="decode-button">Encrypted</div>
 							)}
 						</div>
 						<span className="label mail-label">
@@ -137,7 +137,7 @@ const MailboxListRow: React.FC<MailboxListRowProps> = observer(({ style, message
 								(error ? (
 									<span style={{ marginLeft: 7, color: 'red' }}>{error}</span>
 								) : (
-									<span style={{ marginLeft: 7 }}>[Not decoded]</span>
+									<span style={{ marginLeft: 7 }}>[Encrypted]</span>
 								))}
 						</span>
 

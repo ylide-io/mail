@@ -5,8 +5,6 @@ import cn from 'classnames';
 import modals from '../../stores/Modals';
 import { useWindowSize } from '../../utils/useWindowSize';
 import { CaretDown } from '../../icons/CaretDown';
-import { allTopicsIcon } from '../../icons/static/allTopicsIcon';
-import { mainTopicIcon } from '../../icons/static/mainTopicIcon';
 import { topicSettingsIcon } from '../../icons/static/topicSettingsIcon';
 import { CaretUp } from '../../icons/CaretUp';
 import { Button, Dropdown } from 'antd';
@@ -14,6 +12,16 @@ import { checkboxCheckIcon } from '../../icons/static/checkboxCheckIcon';
 import { YlideButton } from '../../controls/YlideButton';
 import feed from '../../stores/Feed';
 import { MenuFoldOutlined, MenuUnfoldOutlined } from '@ant-design/icons';
+import { sideFeedIcon } from '../../icons/static/sideFeedIcon';
+import { sideAllTopicsIcon } from '../../icons/static/sideAllTopicsIcon';
+import { sideMarketsIcon } from '../../icons/static/sideMarketsIcon';
+import { sideAnalyticsIcon } from '../../icons/static/sideAnalyticsIcon';
+import { sideProjectsIcon } from '../../icons/static/sideProjectsIcon';
+import { sidePolicyIcon } from '../../icons/static/sidePolicyIcon';
+import { sideSecurityIcon } from '../../icons/static/sideSecurityIcon';
+import { sideTechnologyIcon } from '../../icons/static/sideTechnologyIcon';
+import { sideCultureIcon } from '../../icons/static/sideCultureIcon';
+import { sideEducationIcon } from '../../icons/static/sideEducationIcon';
 
 const FeedSettings = observer(() => {
 	const [newValues, setNewValues] = useState(feed.mainCategories);
@@ -231,7 +239,7 @@ const SidebarMenu = observer(() => {
 								navigate('/feed/main');
 							}}
 						>
-							<div className="sidebar-link-icon-left">{mainTopicIcon}</div>
+							<div className="sidebar-link-icon-left">{sideFeedIcon(14)}</div>
 							<div className="sidebar-link-title">My feed</div>
 							<div className="sidebar-link-icon-right">
 								<Dropdown overlay={<FeedSettings />}>{topicSettingsIcon}</Dropdown>
@@ -244,7 +252,7 @@ const SidebarMenu = observer(() => {
 								navigate('/feed/all');
 							}}
 						>
-							<div className="sidebar-link-icon-left">{allTopicsIcon}</div>
+							<div className="sidebar-link-icon-left">{sideAllTopicsIcon(15)}</div>
 							<div className="sidebar-link-title">All topics</div>
 						</div>
 						<div
@@ -254,7 +262,7 @@ const SidebarMenu = observer(() => {
 								navigate('/feed/Markets');
 							}}
 						>
-							<div className="sidebar-link-icon-left">{allTopicsIcon}</div>
+							<div className="sidebar-link-icon-left">{sideMarketsIcon(15)}</div>
 							<div className="sidebar-link-title">Markets</div>
 						</div>
 						<div
@@ -264,7 +272,7 @@ const SidebarMenu = observer(() => {
 								navigate('/feed/Analytics');
 							}}
 						>
-							<div className="sidebar-link-icon-left">{allTopicsIcon}</div>
+							<div className="sidebar-link-icon-left">{sideAnalyticsIcon(15)}</div>
 							<div className="sidebar-link-title">Analytics</div>
 						</div>
 						<div
@@ -274,7 +282,7 @@ const SidebarMenu = observer(() => {
 								navigate('/feed/Projects');
 							}}
 						>
-							<div className="sidebar-link-icon-left">{allTopicsIcon}</div>
+							<div className="sidebar-link-icon-left">{sideProjectsIcon(15)}</div>
 							<div className="sidebar-link-title">Projects</div>
 						</div>
 						<div
@@ -284,7 +292,7 @@ const SidebarMenu = observer(() => {
 								navigate('/feed/Policy');
 							}}
 						>
-							<div className="sidebar-link-icon-left">{allTopicsIcon}</div>
+							<div className="sidebar-link-icon-left">{sidePolicyIcon(15)}</div>
 							<div className="sidebar-link-title">Policy</div>
 						</div>
 						<div
@@ -294,7 +302,7 @@ const SidebarMenu = observer(() => {
 								navigate('/feed/Security');
 							}}
 						>
-							<div className="sidebar-link-icon-left">{allTopicsIcon}</div>
+							<div className="sidebar-link-icon-left">{sideSecurityIcon(15)}</div>
 							<div className="sidebar-link-title">Security</div>
 						</div>
 						<div
@@ -304,7 +312,7 @@ const SidebarMenu = observer(() => {
 								navigate('/feed/Technology');
 							}}
 						>
-							<div className="sidebar-link-icon-left">{allTopicsIcon}</div>
+							<div className="sidebar-link-icon-left">{sideTechnologyIcon(15)}</div>
 							<div className="sidebar-link-title">Technology</div>
 						</div>
 						<div
@@ -314,7 +322,7 @@ const SidebarMenu = observer(() => {
 								navigate('/feed/Culture');
 							}}
 						>
-							<div className="sidebar-link-icon-left">{allTopicsIcon}</div>
+							<div className="sidebar-link-icon-left">{sideCultureIcon(15)}</div>
 							<div className="sidebar-link-title">Culture</div>
 						</div>
 						<div
@@ -324,7 +332,7 @@ const SidebarMenu = observer(() => {
 								navigate('/feed/Education');
 							}}
 						>
-							<div className="sidebar-link-icon-left">{allTopicsIcon}</div>
+							<div className="sidebar-link-icon-left">{sideEducationIcon(18)}</div>
 							<div className="sidebar-link-title">Education</div>
 						</div>
 					</div>

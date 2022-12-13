@@ -162,7 +162,8 @@
 			height: 32px;
 
 			.sidebar-link-icon-left {
-				@include flex-row(center, flex-start);
+				@include flex-row(center, center);
+				width: 18px;
 				margin-right: 9px;
 			}
 			.sidebar-link-title {

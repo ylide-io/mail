@@ -123,19 +123,20 @@ export default class NewPasswordModal extends PureComponent<NewPasswordModalProp
 			.find(t => true) || null;
 
 	async publishLocalKey(account: DomainAccount) {
-		this.step = 2;
+		this.step = 3;
 		try {
 			await account.attachRemoteKey();
 			await asyncDelay(7000);
 			await account.init();
+			this.step = 5;
 		} catch (err) {
+			this.step = 2;
 			alert('Transaction was not published. Please, try again');
-		} finally {
-			this.step = 4;
 		}
 	}
 
 	@observable forceNew = false;
+	@observable account!: DomainAccount;
 
 	async createLocalKey() {
 		this.step = 1;
@@ -148,16 +149,19 @@ export default class NewPasswordModal extends PureComponent<NewPasswordModalProp
 			return;
 		}
 		if (!this.freshestKey) {
-			const domainAccount = await this.props.wallet.instantiateNewAccount(this.props.account, tempLocalKey);
-			return await this.publishLocalKey(domainAccount);
+			this.account = await this.props.wallet.instantiateNewAccount(this.props.account, tempLocalKey);
+			this.step = 2;
+			// return await this.publishLocalKey(domainAccount);
 		} else if (isBytesEqual(this.freshestKey.key.publicKey.bytes, tempLocalKey.publicKey)) {
 			await this.props.wallet.instantiateNewAccount(this.props.account, tempLocalKey);
 			this.step = 5;
 		} else if (this.forceNew) {
-			const domainAccount = await this.props.wallet.instantiateNewAccount(this.props.account, tempLocalKey);
-			return await this.publishLocalKey(domainAccount);
+			this.account = await this.props.wallet.instantiateNewAccount(this.props.account, tempLocalKey);
+			this.step = 2;
+			// return await this.publishLocalKey(domainAccount);
 		} else {
 			alert('Ylide password was wrong, please, try again');
+			this.step = 0;
 			return;
 		}
 	}
@@ -165,6 +169,11 @@ export default class NewPasswordModal extends PureComponent<NewPasswordModalProp
 	async networkSelect(network: EVMNetwork) {
 		this.network = network;
 		this.step = 3;
+		try {
+			await this.publishLocalKey(this.account);
+		} catch (err) {
+			this.step = 2;
+		}
 	}
 
 	@observable password: string = '';
@@ -200,7 +209,7 @@ export default class NewPasswordModal extends PureComponent<NewPasswordModalProp
 							justifyContent: 'center',
 						}}
 					>
-						<WalletTag wallet="metamask" address="0x15a33D60283e3D20751D6740162D1212c1ad2a2d" />
+						<WalletTag wallet={this.props.wallet.factory.wallet} address={this.props.account.address} />
 					</div>
 					{this.step === 0 ? (
 						<>
@@ -295,7 +304,13 @@ export default class NewPasswordModal extends PureComponent<NewPasswordModalProp
 								</div>
 							)}
 							<div className="wm-footer">
-								<YlideButton ghost style={{ width: 128 }}>
+								<YlideButton
+									ghost
+									style={{ width: 128 }}
+									onClick={() => {
+										this.props.onResolve('', false, false);
+									}}
+								>
 									Back
 								</YlideButton>
 								<YlideButton
@@ -357,7 +372,13 @@ export default class NewPasswordModal extends PureComponent<NewPasswordModalProp
 								</h4>
 							</div>
 							<div className="wm-footer" style={{ justifyContent: 'center' }}>
-								<YlideButton ghost style={{ width: 128 }}>
+								<YlideButton
+									ghost
+									style={{ width: 128 }}
+									onClick={() => {
+										this.step = 0;
+									}}
+								>
 									Back
 								</YlideButton>
 							</div>
@@ -485,7 +506,13 @@ export default class NewPasswordModal extends PureComponent<NewPasswordModalProp
 								</h4>
 							</div>
 							<div className="wm-footer" style={{ justifyContent: 'center' }}>
-								<YlideButton ghost style={{ width: 128 }}>
+								<YlideButton
+									ghost
+									style={{ width: 128 }}
+									onClick={() => {
+										this.step = 2;
+									}}
+								>
 									Back
 								</YlideButton>
 							</div>

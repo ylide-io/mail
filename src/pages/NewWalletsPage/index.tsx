@@ -1,3 +1,4 @@
+import classNames from 'classnames';
 import { observer } from 'mobx-react';
 import { PureComponent } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -7,6 +8,7 @@ import { YlideButton } from '../../controls/YlideButton';
 import { ArrowRight } from '../../icons/ArrowRight';
 import { CrossIcon } from '../../icons/CrossIcon';
 import { YlideLargeLogo } from '../../icons/YlideLargeLogo';
+import NewPasswordModal from '../../modals/NewPasswordModal';
 import SelectWalletModal from '../../modals/SelectWalletModal';
 import domain from '../../stores/Domain';
 
@@ -42,15 +44,24 @@ export default class NewWalletsPage extends PureComponent {
 					{domain.accounts.activeAccounts.length ? <NextButton /> : null}
 					<div className="connected-wallets">
 						{domain.accounts.accounts.map(acc => {
+							const isActive = domain.accounts.activeAccounts.find(
+								a => a.account.address === acc.account.address,
+							);
 							return (
-								<div className="cw-block" key={acc.account.address}>
+								<div
+									className={classNames('cw-block', { notActive: !isActive })}
+									key={acc.account.address}
+								>
 									<div className="cw-logo">
-										{walletsMap[acc.wallet.wallet].logo(32)}
+										{walletsMap[acc.wallet.wallet].logo(isActive ? 32 : 24)}
 										{/* <div className="cw-blockchain">
 											{blockchainsMap[acc.account.blockchain].logo(16)}
 										</div> */}
 									</div>
-									<div className="cw-title">{walletsMap[acc.wallet.wallet].title}</div>
+									<div className="cw-title">
+										<span>{walletsMap[acc.wallet.wallet].title}</span>
+										{!isActive && <span style={{ fontSize: 12, marginLeft: 4 }}>[not active]</span>}
+									</div>
 									<div className="cw-subtitle">
 										<div
 											style={{
@@ -64,11 +75,38 @@ export default class NewWalletsPage extends PureComponent {
 											<AdaptiveAddress address={acc.account.address} />
 										</div>
 									</div>
+									{!isActive ? (
+										<div>
+											<YlideButton
+												size="small"
+												nice
+												onClick={async () => {
+													const wallet = acc.wallet;
+													const remoteKeys = await wallet.readRemoteKeys(acc.account);
+													await NewPasswordModal.show(
+														wallet,
+														acc.account,
+														remoteKeys.remoteKeys,
+													);
+												}}
+											>
+												Activate
+											</YlideButton>
+										</div>
+									) : null}
 									<div
 										className="cw-delete"
 										onClick={async () => {
+											if (acc.wallet.factory.wallet === 'walletconnect') {
+												await (
+													domain.walletControllers.evm.walletconnect as any
+												)?.writeWeb3.currentProvider.disconnect();
+											}
 											await acc.wallet.disconnectAccount(acc);
 											await domain.accounts.removeAccount(acc);
+											if (acc.wallet.factory.wallet === 'walletconnect') {
+												document.location.reload();
+											}
 										}}
 									>
 										<CrossIcon size={9} />

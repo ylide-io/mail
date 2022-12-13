@@ -14,7 +14,7 @@ module.exports = function override(config) {
 	});
 	config.resolve.fallback = fallback;
 	config.plugins = (config.plugins || []).concat([
-		new BundleAnalyzerPlugin(),
+		// new BundleAnalyzerPlugin(),
 		new webpack.ProvidePlugin({
 			process: 'process/browser',
 			Buffer: ['buffer', 'Buffer'],
