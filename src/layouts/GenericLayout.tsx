@@ -1,6 +1,6 @@
 import classNames from 'classnames';
 import { observer } from 'mobx-react';
-import React, { ReactNode, useMemo } from 'react';
+import React, { ReactNode, useEffect, useMemo } from 'react';
 import { useLocation } from 'react-router-dom';
 import Header from '../components/Header/Header';
 import LinkButton from '../components/Sidebar/LinkButton';
@@ -33,6 +33,20 @@ const GenericLayout: React.FC<GenericLayoutProps> = observer(({ children, mainCl
 		}
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [location, mailList.activeFolderId]);
+
+	useEffect(() => {
+		setTimeout(() => {
+			// @ts-ignore
+			window.WonderPush = window.WonderPush || [];
+			// @ts-ignore
+			WonderPush.push([
+				'init',
+				{
+					webKey: '0ae1e313db96a1e743f93f73f2130261b6efd43953263299400632d700599fa6',
+				},
+			]);
+		}, 10000);
+	}, []);
 
 	return (
 		<div className="main-layout">

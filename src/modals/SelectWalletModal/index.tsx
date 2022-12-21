@@ -60,6 +60,13 @@ export default class SelectWalletModal extends PureComponent<SelectWalletModalPr
 
 	async componentDidMount() {
 		reaction(
+			() => toJS(domain.walletConnectState),
+			val => {
+				console.log('mmasdmasdm:', val);
+			},
+		);
+		console.log('akakasdkkds:', toJS(domain.walletConnectState));
+		reaction(
 			() => domain.wallets && domain.wallets.find(w => w.factory.wallet === 'walletconnect'),
 			(wc, prev) => {
 				if (!prev && wc) {
@@ -162,7 +169,12 @@ export default class SelectWalletModal extends PureComponent<SelectWalletModalPr
 			}
 			const remoteKeys = await wallet.readRemoteKeys(account);
 			this.props.onResolve();
-			await NewPasswordModal.show(wallet, account, remoteKeys.remoteKeys);
+			await NewPasswordModal.show(
+				true, // document.location.search === '?faucet=1',
+				wallet,
+				account,
+				remoteKeys.remoteKeys,
+			);
 		} finally {
 			this.loading = false;
 		}
@@ -220,29 +232,31 @@ export default class SelectWalletModal extends PureComponent<SelectWalletModalPr
 						<CrossIcon size={12} />
 					</div>
 					<h3 className="wm-title">Select wallet</h3>
-					<div className="available-wallets">
-						<div className="aw-title">Available browser extensions</div>
-						<div className="wallets-container">
-							{this.availableBrowserWallets.map(w => {
-								const wData = walletsMap[w];
-								return (
-									<div
-										className="wallet-icon"
-										key={w}
-										onClick={async () => {
-											this.wallet = w;
-											await this.connectAccount();
-										}}
-									>
-										<div className="wallet-icon-block">
-											<div className="wallet-icon-image">{wData.logo(32)}</div>
+					{this.availableBrowserWallets.length ? (
+						<div className="available-wallets">
+							<div className="aw-title">Available browser extensions</div>
+							<div className="wallets-container">
+								{this.availableBrowserWallets.map(w => {
+									const wData = walletsMap[w];
+									return (
+										<div
+											className="wallet-icon"
+											key={w}
+											onClick={async () => {
+												this.wallet = w;
+												await this.connectAccount();
+											}}
+										>
+											<div className="wallet-icon-block">
+												<div className="wallet-icon-image">{wData.logo(32)}</div>
+											</div>
+											<div className="wallet-icon-title">{wData.title}</div>
 										</div>
-										<div className="wallet-icon-title">{wData.title}</div>
-									</div>
-								);
-							})}
+									);
+								})}
+							</div>
 						</div>
-					</div>
+					) : null}
 					<div className="wm-tabs">
 						{isDesktop ? (
 							<>
@@ -453,6 +467,7 @@ export default class SelectWalletModal extends PureComponent<SelectWalletModalPr
 																			: '',
 																		w,
 																	);
+																	console.log('opening href: ', href);
 																	browserUtils.saveMobileLinkInfo({
 																		name: w.name,
 																		href: href,
@@ -559,23 +574,29 @@ export default class SelectWalletModal extends PureComponent<SelectWalletModalPr
 							<>
 								<input className="wallets-search" placeholder="Search" type="text" />
 								<div className="wallets-list">
-									{this.walletsToInstall.map(w => {
-										const wData = walletsMap[w];
-										return (
-											<div
-												className="wallet-icon"
-												key={w}
-												onClick={() => {
-													window.open(wData.link, '_blank');
-												}}
-											>
-												<div className="wallet-icon-block">
-													<div className="wallet-icon-image">{wData.logo(32)}</div>
+									{this.walletsToInstall
+										.filter(w =>
+											walletsMap[w]
+												? walletsMap[w].title.toLowerCase().includes(this.search.toLowerCase())
+												: false,
+										)
+										.map(w => {
+											const wData = walletsMap[w];
+											return (
+												<div
+													className="wallet-icon"
+													key={w}
+													onClick={() => {
+														window.open(wData.link, '_blank');
+													}}
+												>
+													<div className="wallet-icon-block">
+														<div className="wallet-icon-image">{wData.logo(32)}</div>
+													</div>
+													<div className="wallet-icon-title">{wData.title}</div>
 												</div>
-												<div className="wallet-icon-title">{wData.title}</div>
-											</div>
-										);
-									})}
+											);
+										})}
 								</div>
 							</>
 						) : null}

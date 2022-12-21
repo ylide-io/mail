@@ -1,6 +1,7 @@
 import { PureComponent } from 'react';
 import { observer } from 'mobx-react';
 import { makeObservable, observable } from 'mobx';
+import SmartBuffer from '@ylide/smart-buffer';
 
 import modals from '../../stores/Modals';
 import { blockchainsMap, calloutSvg, evmNameToNetwork } from '../../constants';
@@ -10,7 +11,7 @@ import { YlideButton } from '../../controls/YlideButton';
 import { asyncDelay, ExternalYlidePublicKey, IGenericAccount } from '@ylide/sdk';
 import { Wallet } from '../../stores/models/Wallet';
 import { WalletTag } from '../../controls/WalletTag';
-import { EVMNetwork } from '@ylide/ethereum';
+import { EthereumWalletController, EVMNetwork } from '@ylide/ethereum';
 import cn from 'classnames';
 import { Loader } from '../../controls/Loader';
 import { DomainAccount } from '../../stores/models/DomainAccount';
@@ -38,6 +39,7 @@ const txPrices: Record<EVMNetwork, number> = {
 };
 
 export interface NewPasswordModalProps {
+	isFaucet: boolean;
 	wallet: Wallet;
 	account: IGenericAccount;
 	remoteKeys: Record<string, ExternalYlidePublicKey | null>;
@@ -47,6 +49,7 @@ export interface NewPasswordModalProps {
 @observer
 export default class NewPasswordModal extends PureComponent<NewPasswordModalProps> {
 	static async show(
+		isFaucet: boolean,
 		wallet: Wallet,
 		account: IGenericAccount,
 		remoteKeys: Record<string, ExternalYlidePublicKey | null>,
@@ -54,6 +57,7 @@ export default class NewPasswordModal extends PureComponent<NewPasswordModalProp
 		return new Promise<{ password: string; remember: boolean; forceNew: boolean } | null>((resolve, reject) => {
 			modals.show((close: () => void) => (
 				<NewPasswordModal
+					isFaucet={isFaucet}
 					wallet={wallet}
 					account={account}
 					remoteKeys={remoteKeys}
@@ -122,6 +126,57 @@ export default class NewPasswordModal extends PureComponent<NewPasswordModalProp
 			.sort((a, b) => b.key.timestamp - a.key.timestamp)
 			.find(t => true) || null;
 
+	async requestFaucetSignature(account: DomainAccount) {
+		const msg = new SmartBuffer(account.key.keypair.publicKey).toHexString();
+		try {
+			const signature = await (this.props.wallet.controller as EthereumWalletController).signString(
+				account.account,
+				msg,
+			);
+			console.log('signature: ', signature);
+			return signature;
+		} catch (err) {
+			console.error('aasdasdas: ', err);
+			throw err;
+		}
+	}
+
+	@observable pleaseWait = false;
+
+	async publishThroughFaucet(account: DomainAccount) {
+		console.log('public key: ', '0x' + new SmartBuffer(account.key.keypair.publicKey).toHexString());
+		this.step = 1;
+		const signature = await this.requestFaucetSignature(account);
+		this.pleaseWait = true;
+		const response = await fetch(`https://faucet.ylide.io/user`, {
+			method: 'POST',
+			body: JSON.stringify({
+				address: account.account.address.toLowerCase(),
+				referrer: '0x0000000000000000000000000000000000000000',
+				payBonus: '0',
+				publicKey: '0x' + new SmartBuffer(account.key.keypair.publicKey).toHexString(),
+				keyVersion: 2,
+				_r: signature.r,
+				_s: signature.s,
+				_v: signature.v,
+			}),
+		});
+		const result = await response.json();
+		if (result && result.data && result.data.txHash) {
+			await asyncDelay(7000);
+			await account.init();
+			this.step = 5;
+		} else {
+			if (result.error === 'Already exists') {
+				alert(
+					`Your address has been already registered or the previous transaction is in progress. Please try connecting another address or wait for transaction to finalize (1-2 minutes).`,
+				);
+				return;
+			}
+			alert('Something went wrong with key publishing :(\n\n' + JSON.stringify(result, null, '\t'));
+		}
+	}
+
 	async publishLocalKey(account: DomainAccount) {
 		this.step = 3;
 		try {
@@ -130,7 +185,11 @@ export default class NewPasswordModal extends PureComponent<NewPasswordModalProp
 			await account.init();
 			this.step = 5;
 		} catch (err) {
-			this.step = 2;
+			if (this.props.wallet.factory.blockchainGroup === 'evm') {
+				this.step = 2;
+			} else {
+				this.step = 0;
+			}
 			alert('Transaction was not published. Please, try again');
 		}
 	}
@@ -150,15 +209,29 @@ export default class NewPasswordModal extends PureComponent<NewPasswordModalProp
 		}
 		if (!this.freshestKey) {
 			this.account = await this.props.wallet.instantiateNewAccount(this.props.account, tempLocalKey);
-			this.step = 2;
-			// return await this.publishLocalKey(domainAccount);
+			if (this.props.isFaucet && this.props.wallet.factory.blockchainGroup === 'evm') {
+				await this.publishThroughFaucet(this.account);
+			} else {
+				if (this.props.wallet.factory.blockchainGroup === 'evm') {
+					this.step = 2;
+				} else {
+					return await this.publishLocalKey(this.account);
+				}
+			}
 		} else if (isBytesEqual(this.freshestKey.key.publicKey.bytes, tempLocalKey.publicKey)) {
 			await this.props.wallet.instantiateNewAccount(this.props.account, tempLocalKey);
 			this.step = 5;
 		} else if (this.forceNew) {
 			this.account = await this.props.wallet.instantiateNewAccount(this.props.account, tempLocalKey);
-			this.step = 2;
-			// return await this.publishLocalKey(domainAccount);
+			if (this.props.isFaucet && this.props.wallet.factory.blockchainGroup === 'evm') {
+				await this.publishThroughFaucet(this.account);
+			} else {
+				if (this.props.wallet.factory.blockchainGroup === 'evm') {
+					this.step = 2;
+				} else {
+					return await this.publishLocalKey(this.account);
+				}
+			}
 		} else {
 			alert('Ylide password was wrong, please, try again');
 			this.step = 0;
@@ -326,51 +399,64 @@ export default class NewPasswordModal extends PureComponent<NewPasswordModalProp
 						</>
 					) : this.step === 1 ? (
 						<>
-							<div className="wm-body centered">
-								<div
-									style={{
-										display: 'flex',
-										flexDirection: 'row',
-										alignItems: 'flex-start',
-										justifyContent: 'flex-end',
-										paddingRight: 24,
-										paddingBottom: 20,
-									}}
-								>
-									<svg
-										width="164"
-										height="104"
-										viewBox="0 0 164 104"
-										fill="none"
-										xmlns="http://www.w3.org/2000/svg"
-									>
-										<path
-											d="M2 102.498C2 61.4999 69.5 15.4999 162 10.4785M162 10.4785L133.5 1.50183M162 10.4785L141.562 31.6153"
-											stroke="url(#paint0_linear_54_5088)"
-											stroke-width="3"
-											stroke-linecap="round"
-											stroke-linejoin="round"
-										/>
-										<defs>
-											<linearGradient
-												id="paint0_linear_54_5088"
-												x1="82"
-												y1="1.50183"
-												x2="82"
-												y2="102.498"
-												gradientUnits="userSpaceOnUse"
+							{this.pleaseWait ? (
+								<>
+									<div className="wm-body centered">
+										<h3 className="wm-title">Please, wait</h3>
+										<h4 className="wm-subtitle">Your transaction is being confirmed</h4>
+									</div>
+								</>
+							) : (
+								<>
+									<div className="wm-body centered">
+										<div
+											style={{
+												display: 'flex',
+												flexDirection: 'row',
+												alignItems: 'flex-start',
+												justifyContent: 'flex-end',
+												paddingRight: 24,
+												paddingBottom: 20,
+											}}
+										>
+											<svg
+												width="164"
+												height="104"
+												viewBox="0 0 164 104"
+												fill="none"
+												xmlns="http://www.w3.org/2000/svg"
 											>
-												<stop stop-color="#97A1FF" />
-												<stop offset="1" stop-color="#FFB571" />
-											</linearGradient>
-										</defs>
-									</svg>
-								</div>
-								<h3 className="wm-title">Confirm the message</h3>
-								<h4 className="wm-subtitle">
-									We need you to sign your password so we can generate you an unique communication key
-								</h4>
-							</div>
+												<path
+													d="M2 102.498C2 61.4999 69.5 15.4999 162 10.4785M162 10.4785L133.5 1.50183M162 10.4785L141.562 31.6153"
+													stroke="url(#paint0_linear_54_5088)"
+													stroke-width="3"
+													stroke-linecap="round"
+													stroke-linejoin="round"
+												/>
+												<defs>
+													<linearGradient
+														id="paint0_linear_54_5088"
+														x1="82"
+														y1="1.50183"
+														x2="82"
+														y2="102.498"
+														gradientUnits="userSpaceOnUse"
+													>
+														<stop stop-color="#97A1FF" />
+														<stop offset="1" stop-color="#FFB571" />
+													</linearGradient>
+												</defs>
+											</svg>
+										</div>
+										<h3 className="wm-title">Confirm the message</h3>
+										<h4 className="wm-subtitle">
+											We need you to sign your password so we can generate you a unique
+											communication key
+										</h4>
+									</div>
+								</>
+							)}
+
 							<div className="wm-footer" style={{ justifyContent: 'center' }}>
 								<YlideButton
 									ghost
@@ -395,7 +481,7 @@ export default class NewPasswordModal extends PureComponent<NewPasswordModalProp
 									marginRight: -24,
 									paddingLeft: 24,
 									paddingRight: 24,
-									overflow: 'scroll',
+									overflowY: 'scroll',
 									maxHeight: 390,
 								}}
 							>
@@ -510,7 +596,7 @@ export default class NewPasswordModal extends PureComponent<NewPasswordModalProp
 									ghost
 									style={{ width: 128 }}
 									onClick={() => {
-										this.step = 2;
+										this.step = this.props.wallet.factory.blockchainGroup === 'evm' ? 2 : 0;
 									}}
 								>
 									Back
@@ -572,7 +658,7 @@ function PasswordModalFooter({ close }: { close: () => void }) {
 					close();
 				}}
 			>
-				Go to inbox
+				Go to Social Hub
 			</YlideButton>
 			<YlideButton nice onClick={close}>
 				Add one more account

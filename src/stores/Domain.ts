@@ -21,7 +21,7 @@ import {
 	EVM_NAMES,
 	EVM_RPCS,
 } from '@ylide/ethereum';
-import { makeObservable, observable } from 'mobx';
+import { makeObservable, observable, toJS } from 'mobx';
 import WalletConnectProvider from '@walletconnect/web3-provider';
 import contacts from './Contacts';
 import { Wallet } from './models/Wallet';
@@ -48,7 +48,7 @@ Ylide.registerBlockchainFactory(evmBlockchainFactories[EVMNetwork.CRONOS]);
 Ylide.registerBlockchainFactory(evmBlockchainFactories[EVMNetwork.MOONBEAM]);
 Ylide.registerBlockchainFactory(evmBlockchainFactories[EVMNetwork.MOONRIVER]);
 Ylide.registerBlockchainFactory(evmBlockchainFactories[EVMNetwork.METIS]);
-Ylide.registerBlockchainFactory(evmBlockchainFactories[EVMNetwork.ASTAR]);
+// Ylide.registerBlockchainFactory(evmBlockchainFactories[EVMNetwork.ASTAR]);
 Ylide.registerBlockchainFactory(everscaleBlockchainFactory);
 Ylide.registerWalletFactory(everscaleWalletFactory);
 Ylide.registerWalletFactory(evmWalletFactories.metamask);
@@ -306,6 +306,7 @@ export class Domain {
 				async open(uri, cb, opts?) {
 					// fired this method? means disconnected
 					isAvailable = false;
+					console.log('a1');
 					cb();
 				},
 				close() {
@@ -313,10 +314,12 @@ export class Domain {
 				},
 			},
 		});
-
+		console.log('a2');
 		try {
 			await wcTest.enable();
+			console.log('a3');
 		} catch (err) {
+			console.log('a4: ', err);
 			// no-op
 		}
 
@@ -327,6 +330,7 @@ export class Domain {
 				walletName: wcTest.wc.peerMeta?.name || '',
 				provider: wcTest,
 			};
+			console.log('wallet connect available on start: ', wcTest);
 			await this.extractWalletsData();
 		} else {
 			let resolve = (val: { walletName: string; provider: any }) => {};
@@ -343,6 +347,7 @@ export class Domain {
 								resolve = _resolve;
 							}),
 						};
+						console.log('a5: ', toJS(domain.walletConnectState));
 					},
 					async close() {
 						domain.walletConnectState = {
@@ -351,13 +356,21 @@ export class Domain {
 							walletName: wcReal.wc.peerMeta?.name || '',
 							provider: wcReal,
 						};
+						console.log('wallet connect close (good close): ', wcReal);
 						await self.extractWalletsData();
 						resolve({ walletName: wcReal.wc.peerMeta?.name || '', provider: wcReal });
 					},
 				},
 			});
 
-			wcReal.enable();
+			wcReal
+				.enable()
+				.then(result => {
+					console.log('wccReal enabled: ', result);
+				})
+				.catch(err => {
+					console.log('wcc error: ', err);
+				});
 		}
 	}
 
@@ -488,21 +501,23 @@ export class Domain {
 		if (this.initialized) {
 			return;
 		}
-
+		console.log('d1');
 		this.availableWallets = await Ylide.getAvailableWallets();
-
+		console.log('d2');
 		await this.initWalletConnect();
-
+		console.log('d3');
 		await this.extractWalletsData();
-
+		console.log('d4');
 		await this.keystore.init();
-
+		console.log('d5');
 		await this.accounts.accountsProcessed;
-
+		console.log('d6');
 		await contacts.init();
+		console.log('d7');
 		await tags.getTags();
+		console.log('d8');
 		await mailList.init();
-
+		console.log('d9');
 		this.initialized = true;
 	}
 

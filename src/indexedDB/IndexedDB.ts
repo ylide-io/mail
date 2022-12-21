@@ -61,19 +61,19 @@ export class IndexedDB {
 				contactsStore.createIndex('name', 'name');
 				contactsStore.add({
 					name: 'ignat.ylide',
-					address: '0:9ee55e89c3b48603d34d65f67e4c638863a1a3920b79dd662d7cd8c484f77445',
+					address: '0x9B44ed2A5de91f4E9109453434825a32FF2fD6e7',
 					description: 'Ylide CEO',
 					tags: [1],
 				});
 				contactsStore.add({
 					name: 'danila.ylide',
-					address: '0:81f452f5aec2263ab10116f7108a20209d5051081bb3caed34f139f976a0e279',
+					address: '0x15a33D60283e3D20751D6740162D1212c1ad2a2d',
 					description: 'Ylide CTO',
 					tags: [1],
 				});
 				contactsStore.add({
 					name: 'kirill.ylide',
-					address: '0:9308bdf06ed5839075da88a3c86a2273075969b18e6b8ea2d120b8aed427ccf7',
+					address: '0x0962C57d9e451df7905d40cb1b33F179d75f6Af0',
 					description: 'Ylide COO',
 					tags: [1],
 				});

@@ -1,4 +1,4 @@
-import { EthereumWalletController } from '@ylide/ethereum';
+import { EthereumWalletController, EVMNetwork } from '@ylide/ethereum';
 import { Spin } from 'antd';
 import { autobind } from 'core-decorators';
 import { makeObservable, observable } from 'mobx';
@@ -15,28 +15,44 @@ export class AdminPage extends PureComponent {
 		makeObservable(this);
 	}
 
-	@observable deployingRegistryV3 = false;
-	@observable registryV3Address = '';
+	@observable deployingRegistryV4 = false;
+	@observable changingBonucerRegistryV4 = false;
+	@observable registryV4Address = '';
 
 	@autobind
-	async deployRegistryV3() {
-		this.deployingRegistryV3 = true;
-		this.registryV3Address = await (
+	async deployRegistryV4() {
+		this.deployingRegistryV4 = true;
+		this.registryV4Address = await (
 			domain.walletControllers.evm.metamask as EthereumWalletController
-		).deployRegistryV3();
-		this.deployingRegistryV3 = false;
+		).deployRegistryV4();
+		this.deployingRegistryV4 = false;
 	}
 
-	@observable deployingMailerV6 = false;
-	@observable mailerV6Address = '';
+	@observable deployingMailerV7 = false;
+	@observable mailerV7Address = '';
 
 	@autobind
-	async deployMailerV6() {
-		this.deployingMailerV6 = true;
-		this.mailerV6Address = await (
+	async deployMailerV7() {
+		this.deployingMailerV7 = true;
+		this.mailerV7Address = await (
 			domain.walletControllers.evm.metamask as EthereumWalletController
-		).deployMailerV6();
-		this.deployingMailerV6 = false;
+		).deployMailerV7();
+		this.deployingMailerV7 = false;
+	}
+
+	@autobind
+	async changeBonucerRegistryV4() {
+		this.changingBonucerRegistryV4 = true;
+		debugger;
+		console.log(
+			'result: ',
+			await (domain.walletControllers.evm.metamask as EthereumWalletController).changeBonucer(
+				EVMNetwork.GNOSIS,
+				'0x15a33D60283e3D20751D6740162D1212c1ad2a2d'.toLowerCase(),
+				'0xEbe8aab1C6d379D566e28fE4bC3fafcA79Ba3cFF'.toLowerCase(),
+			),
+		);
+		this.changingBonucerRegistryV4 = false;
 	}
 
 	render() {
@@ -63,11 +79,14 @@ export class AdminPage extends PureComponent {
 						borderRadius: 10,
 					}}
 				>
-					<YlideButton onClick={this.deployRegistryV3}>
-						{this.deployingRegistryV3 ? <Spin /> : 'Deploy Regsitry V3'}
+					<YlideButton onClick={this.deployRegistryV4}>
+						{this.deployingRegistryV4 ? <Spin /> : 'Deploy Regsitry V4'}
+					</YlideButton>
+					<YlideButton onClick={this.changeBonucerRegistryV4}>
+						{this.changingBonucerRegistryV4 ? <Spin /> : 'Change Bonucer Regsitry V4'}
 					</YlideButton>
 					<br />
-					New contract address: {this.registryV3Address}
+					New contract address: {this.registryV4Address}
 				</div>
 				<div
 					style={{
@@ -82,11 +101,11 @@ export class AdminPage extends PureComponent {
 						borderRadius: 10,
 					}}
 				>
-					<YlideButton onClick={this.deployMailerV6}>
-						{this.deployingMailerV6 ? <Spin /> : 'Deploy Mailer V6'}
+					<YlideButton onClick={this.deployMailerV7}>
+						{this.deployingMailerV7 ? <Spin /> : 'Deploy Mailer V7'}
 					</YlideButton>
 					<br />
-					New contract address: {this.mailerV6Address}
+					New contract address: {this.mailerV7Address}
 				</div>
 			</div>
 		);

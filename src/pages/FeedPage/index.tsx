@@ -292,11 +292,21 @@ const FeedPage = observer(() => {
 		feed.loadNew();
 	}, [scrollToTop]);
 
+	let title = 'My feed';
+
+	if (feed.selectedCategory === 'main') {
+		title = 'My feed';
+	} else if (feed.selectedCategory === 'all') {
+		title = 'All topics';
+	} else {
+		title = feed.selectedCategory;
+	}
+
 	return (
 		<GenericLayout mainClass="feed-container">
 			<div className="feed">
 				<div className="feed-title">
-					<h3 className="feed-title-text">My feed</h3>
+					<h3 className="feed-title-text">{title}</h3>
 					<h3 className="feed-title-actions">
 						{feed.newPosts ? (
 							<YlideButton size="small" nice onClick={showNewPosts}>
