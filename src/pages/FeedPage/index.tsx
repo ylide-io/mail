@@ -49,6 +49,64 @@ const FeedPostControl = observer(({ post }: { post: FeedPost }) => {
 		setCollapsed(false);
 	}, []);
 
+	const renderPostContent = () => {
+		return <>
+			{post.title ? <div className="post-title">{post.title}</div> : null}
+			{post.subtitle ? <div className="post-subtitle">{post.subtitle}</div> : null}
+			{post.picrel ? (
+				<div className="post-picrel">
+					{post.picrel.endsWith('.mp4') ? (
+						<video loop className="post-picrel-image" controls>
+							<source src={post.picrel} type="video/mp4" />
+						</video>
+					) : (
+						<div
+							style={{ backgroundImage: `url("${post.picrel}")` }}
+							className="post-picrel-image"
+							onClick={() => {
+								GalleryModal.view([post.picrel]);
+							}}
+						/>
+					)}
+				</div>
+			) : null}
+			<div className="post-text" dangerouslySetInnerHTML={{ __html: post.content }}/>
+			{post.embeds.length ? (
+				<div className="post-embeds">
+					{post.embeds.map((e, idx) => (
+						<a
+							target="_blank"
+							rel="noreferrer"
+							href={e.link || ''}
+							key={idx}
+							className={classNames('post-embed', {
+								'with-link': !!e.link,
+							})}
+						>
+							{e.previewImageUrl ? (
+								<div
+									className="post-embed-image"
+									style={{
+										backgroundImage: `url("${e.previewImageUrl}")`,
+									}}
+								/>
+							) : null}
+							{e.link ? (
+								<div className="post-embed-link">
+									{e.link.length > 60 ? `${e.link.substring(0, 60)}...` : e.link}
+								</div>
+							) : null}
+							{e.title ? <div className="post-embed-title">{e.title}</div> : null}
+							{e.text ? (
+								<div className="post-embed-text" dangerouslySetInnerHTML={{ __html: e.text }} />
+							) : null}
+						</a>
+					))}
+				</div>
+			) : null}
+		</>
+	}
+
 	if (windowWidth <= 670) {
 		return (
 			<div className={classNames('post-mobile', { collapsed })} ref={selfRef}>
@@ -88,59 +146,7 @@ const FeedPostControl = observer(({ post }: { post: FeedPost }) => {
 					) : null}
 				</div>
 				<div className="post-content">
-					{post.title ? <div className="post-title">{post.title}</div> : null}
-					{post.subtitle ? <div className="post-subtitle">{post.subtitle}</div> : null}
-					{post.picrel ? (
-						<div className="post-picrel">
-							{post.picrel.endsWith('.mp4') ? (
-								<video loop className="post-picrel-image" controls>
-									<source src={post.picrel} type="video/mp4" />
-								</video>
-							) : (
-								<div
-									style={{ backgroundImage: `url("${post.picrel}")` }}
-									className="post-picrel-image"
-									onClick={() => {
-										GalleryModal.view([post.picrel]);
-									}}
-								/>
-							)}
-						</div>
-					) : null}
-					<div className="post-text" dangerouslySetInnerHTML={{ __html: post.content }}/>
-					{post.embeds.length ? (
-						<div className="post-embeds">
-							{post.embeds.map((e, idx) => (
-								<a
-									target="_blank"
-									rel="noreferrer"
-									href={e.link || ''}
-									key={idx}
-									className={classNames('post-embed', {
-										'with-link': !!e.link,
-									})}
-								>
-									{e.previewImageUrl ? (
-										<div
-											className="post-embed-image"
-											style={{
-												backgroundImage: `url("${e.previewImageUrl}")`,
-											}}
-										/>
-									) : null}
-									{e.link ? (
-										<div className="post-embed-link">
-											{e.link.length > 60 ? `${e.link.substring(0, 60)}...` : e.link}
-										</div>
-									) : null}
-									{e.title ? <div className="post-embed-title">{e.title}</div> : null}
-									{e.text ? (
-										<div className="post-embed-text" dangerouslySetInnerHTML={{ __html: e.text }} />
-									) : null}
-								</a>
-							))}
-						</div>
-					) : null}
+					{renderPostContent()}
 				</div>
 				<div className="post-collapser" onClick={readMore}>
 					<span className="rm-expander">Read more</span>
@@ -184,59 +190,7 @@ const FeedPostControl = observer(({ post }: { post: FeedPost }) => {
 							) : null}
 						</div>
 					</div>
-					{post.title ? <div className="post-title">{post.title}</div> : null}
-					{post.subtitle ? <div className="post-subtitle">{post.subtitle}</div> : null}
-					{post.picrel ? (
-						<div className="post-picrel">
-							{post.picrel.endsWith('.mp4') ? (
-								<video loop className="post-picrel-image" controls>
-									<source src={post.picrel} type="video/mp4" />
-								</video>
-							) : (
-								<div
-									style={{ backgroundImage: `url("${post.picrel}")` }}
-									className="post-picrel-image"
-									onClick={() => {
-										GalleryModal.view([post.picrel]);
-									}}
-								/>
-							)}
-						</div>
-					) : null}
-					<div className="post-text" dangerouslySetInnerHTML={{ __html: post.content }}/>
-					{post.embeds.length ? (
-						<div className="post-embeds">
-							{post.embeds.map((e, idx) => (
-								<a
-									target="_blank"
-									rel="noreferrer"
-									href={e.link || ''}
-									key={idx}
-									className={classNames('post-embed', {
-										'with-link': !!e.link,
-									})}
-								>
-									{e.previewImageUrl ? (
-										<div
-											className="post-embed-image"
-											style={{
-												backgroundImage: `url("${e.previewImageUrl}")`,
-											}}
-										/>
-									) : null}
-									{e.link ? (
-										<div className="post-embed-link">
-											{e.link.length > 60 ? `${e.link.substring(0, 60)}...` : e.link}
-										</div>
-									) : null}
-									{e.title ? <div className="post-embed-title">{e.title}</div> : null}
-									{e.text ? (
-										<div className="post-embed-text" dangerouslySetInnerHTML={{ __html: e.text }} />
-									) : null}
-								</a>
-							))}
-						</div>
-					) : null}
+					{renderPostContent()}
 				</div>
 				<div className="post-collapser" onClick={readMore}>
 					<span className="rm-expander">Read more</span>
