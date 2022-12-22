@@ -105,16 +105,9 @@ const FeedPostControl = observer(({ post }: { post: FeedPost }) => {
 									}}
 								/>
 							)}
-							<div
-								style={{ backgroundImage: `url("${post.picrel}")` }}
-								className="post-picrel-image"
-								onClick={() => {
-									GalleryModal.view([post.picrel]);
-								}}
-							/>
 						</div>
 					) : null}
-					<div className="post-text" dangerouslySetInnerHTML={{ __html: post.content }}></div>
+					<div className="post-text" dangerouslySetInnerHTML={{ __html: post.content }}/>
 					{post.embeds.length ? (
 						<div className="post-embeds">
 							{post.embeds.map((e, idx) => (
@@ -210,7 +203,7 @@ const FeedPostControl = observer(({ post }: { post: FeedPost }) => {
 							)}
 						</div>
 					) : null}
-					<div className="post-text" dangerouslySetInnerHTML={{ __html: post.content }}></div>
+					<div className="post-text" dangerouslySetInnerHTML={{ __html: post.content }}/>
 					{post.embeds.length ? (
 						<div className="post-embeds">
 							{post.embeds.map((e, idx) => (
