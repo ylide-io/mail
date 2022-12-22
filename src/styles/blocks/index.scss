@@ -52,7 +52,7 @@
 	}
 
 	&.header-logo {
-		@include less480px {
+		@include less630px {
 			display: none;
 		}
 	}

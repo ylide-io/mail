@@ -19,6 +19,7 @@ import { walletsMap } from '../../constants';
 import { useWindowSize } from '../../utils/useWindowSize';
 import modals from '../../stores/Modals';
 import { AdaptiveAddress } from '../../controls/AdaptiveAddress';
+import { YlideLargeLogo } from '../../icons/YlideLargeLogo';
 
 const AccountItem = observer(({ account }: { account: DomainAccount }) => {
 	const nav = useNav();
@@ -113,7 +114,7 @@ const Header = observer(() => {
 						nav('/inbox');
 					}}
 				>
-					<img src="https://ylide.io/images/logo-medium-p-500.png" alt="Logo" className="header-logo-image" />
+					<YlideLargeLogo className="header-logo-image"/>
 				</a>
 			</div>
 			<div className="main-block header-main">
