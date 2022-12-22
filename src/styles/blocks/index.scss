@@ -228,7 +228,7 @@
 		}
 	}
 
-	.post-content {
+	.post-body {
 		@include flex-column(stretch, flex-start);
 
 		flex-grow: 1;
@@ -297,6 +297,11 @@
 		}
 	}
 
+	.post-content {
+		display: grid;
+		grid-gap: 12px;
+	}
+
 	.post-title {
 		font-family: 'Lexend';
 		font-style: normal;
@@ -306,7 +311,6 @@
 		/* or 130% */
 
 		color: #000000;
-		margin-bottom: 6px;
 		padding-right: 10px;
 	}
 
@@ -319,21 +323,16 @@
 		/* identical to box height, or 147% */
 
 		color: #a5a8b4;
-		margin-bottom: 6px;
 	}
 
 	.post-picrel {
-		margin-top: 5px;
-		margin-bottom: 15px;
-		.post-picrel-image {
-			background-size: cover;
-			background-position: center center;
-			background-repeat: no-repeat;
-			width: 100%;
-			height: 240px;
-			border-radius: 10px;
-			cursor: pointer;
-		}
+		background-size: cover;
+		background-position: center center;
+		background-repeat: no-repeat;
+		width: 100%;
+		height: 240px;
+		border-radius: 10px;
+		cursor: pointer;
 	}
 
 	.post-text {
@@ -369,7 +368,6 @@
 	}
 
 	.post-embeds {
-		margin-top: 10px;
 		@include flex-column(stretch, flex-start);
 		.post-embed {
 			@include flex-column(stretch, flex-start);

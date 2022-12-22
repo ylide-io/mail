@@ -50,27 +50,25 @@ const FeedPostControl = observer(({ post }: { post: FeedPost }) => {
 	}, []);
 
 	const renderPostContent = () => {
-		return <>
+		return <div className="post-content">
 			{post.title ? <div className="post-title">{post.title}</div> : null}
 			{post.subtitle ? <div className="post-subtitle">{post.subtitle}</div> : null}
-			{post.picrel ? (
-				<div className="post-picrel">
-					{post.picrel.endsWith('.mp4') ? (
-						<video loop className="post-picrel-image" controls>
-							<source src={post.picrel} type="video/mp4" />
-						</video>
-					) : (
-						<div
-							style={{ backgroundImage: `url("${post.picrel}")` }}
-							className="post-picrel-image"
-							onClick={() => {
-								GalleryModal.view([post.picrel]);
-							}}
-						/>
-					)}
-				</div>
-			) : null}
 			<div className="post-text" dangerouslySetInnerHTML={{ __html: post.content }}/>
+			{post.picrel ? (
+				post.picrel.endsWith('.mp4') ? (
+					<video loop className="post-picrel" controls>
+						<source src={post.picrel} type="video/mp4" />
+					</video>
+				) : (
+					<div
+						style={{ backgroundImage: `url("${post.picrel}")` }}
+						className="post-picrel"
+						onClick={() => {
+							GalleryModal.view([post.picrel]);
+						}}
+					/>
+				)
+			) : null}
 			{post.embeds.length ? (
 				<div className="post-embeds">
 					{post.embeds.map((e, idx) => (
@@ -104,7 +102,7 @@ const FeedPostControl = observer(({ post }: { post: FeedPost }) => {
 					))}
 				</div>
 			) : null}
-		</>
+		</div>
 	}
 
 	if (windowWidth <= 670) {
@@ -145,9 +143,7 @@ const FeedPostControl = observer(({ post }: { post: FeedPost }) => {
 						</a>
 					) : null}
 				</div>
-				<div className="post-content">
-					{renderPostContent()}
-				</div>
+				{renderPostContent()}
 				<div className="post-collapser" onClick={readMore}>
 					<span className="rm-expander">Read more</span>
 				</div>
@@ -162,7 +158,7 @@ const FeedPostControl = observer(({ post }: { post: FeedPost }) => {
 						<div className="post-ava-source">{sourceIcon[post.sourceType]}</div>
 					</div>
 				</div>
-				<div className="post-content">
+				<div className="post-body">
 					<div className="post-meta">
 						<div className="post-source-left">
 							{post.authorName ? <div className="post-source-name">{post.authorName}</div> : null}
