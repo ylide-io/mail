@@ -114,7 +114,7 @@ const Header = observer(() => {
 						nav('/inbox');
 					}}
 				>
-					<YlideLargeLogo className="header-logo-image"/>
+					<YlideLargeLogo className="header-logo-image" />
 				</a>
 			</div>
 			<div className="main-block header-main">
@@ -151,9 +151,11 @@ const Header = observer(() => {
 									/>
 								))}
 							</div>
-							<div className="users-block-text"><span>Connected&nbsp;</span>{
-								domain.accounts.activeAccounts.length
-							} account{domain.accounts.activeAccounts.length > 1 ? 's' : ''}</div>
+							<div className="users-block-text">
+								<span>Connected&nbsp;</span>
+								{domain.accounts.activeAccounts.length} account
+								{domain.accounts.activeAccounts.length > 1 ? 's' : ''}
+							</div>
 							<div className="users-block-icon">
 								<DownOutlined size={16} />
 							</div>

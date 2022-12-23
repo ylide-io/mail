@@ -18,26 +18,33 @@ const MailboxEmpty = observer(() => {
 				padding: '100px 20px 150px',
 			}}
 		>
-			{activeFolderId === 'inbox' ? <>
-				<h3>Your mailbox is empty yet.</h3>
-				<div style={{ marginTop: 6 }}>
-					<span>Share your addresses: </span>
-					{domain.accounts.activeAccounts.map(acc => (
-						<div>
-							<ClickToCopy
-								dataToCopy={acc.account.address}>{acc.account.address}</ClickToCopy>
-						</div>
-					))}
+			{activeFolderId === 'inbox' ? (
+				<>
+					<h3>Your mailbox is empty yet.</h3>
+					<div style={{ marginTop: 6 }}>
+						<span>Share your addresses: </span>
+						{domain.accounts.activeAccounts.map(acc => (
+							<div>
+								<ClickToCopy dataToCopy={acc.account.address}>{acc.account.address}</ClickToCopy>
+							</div>
+						))}
 
-					<span> with your friends to receive the first message.</span>
-				</div>
-			</> : activeFolderId === 'sent' ? <>
-				<h3 style={{ marginBottom: 16 }}>
-					You haven't sent any message yet.<br/>Send a message to your friend now.
-				</h3>
+						<span> with your friends to receive the first message.</span>
+					</div>
+				</>
+			) : activeFolderId === 'sent' ? (
+				<>
+					<h3 style={{ marginBottom: 16 }}>
+						You haven't sent any message yet.
+						<br />
+						Send a message to your friend now.
+					</h3>
 
-				<LinkButton text='Compose Mail' link='/compose' />
-			</> : <h3>No messages here.</h3>}
+					<LinkButton text="Compose Mail" link="/compose" />
+				</>
+			) : (
+				<h3>No messages here.</h3>
+			)}
 		</div>
 	);
 });

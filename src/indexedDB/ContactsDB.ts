@@ -1,37 +1,37 @@
-import { IndexedDB } from "./IndexedDB";
-import { IContact } from "../stores/models/IContact";
-import { toJS } from "mobx";
+import { IndexedDB } from './IndexedDB';
+import { IContact } from '../stores/models/IContact';
+import { toJS } from 'mobx';
 
 class ContactsDB extends IndexedDB {
-    async saveContact(contact: IContact): Promise<void> {
-        const db = await this.getDB();
+	async saveContact(contact: IContact): Promise<void> {
+		const db = await this.getDB();
 
-        await db.put(
-            "contacts",
-            toJS({
-                ...contact,
-                tags: toJS(contact.tags),
-            })
-        );
-    }
+		await db.put(
+			'contacts',
+			toJS({
+				...contact,
+				tags: toJS(contact.tags),
+			}),
+		);
+	}
 
-    async retrieveAllContacts(): Promise<IContact[]> {
-        const db = await this.getDB();
+	async retrieveAllContacts(): Promise<IContact[]> {
+		const db = await this.getDB();
 
-        return await db.getAll("contacts");
-    }
+		return await db.getAll('contacts');
+	}
 
-    async deleteContact(id: string): Promise<void> {
-        const db = await this.getDB();
+	async deleteContact(id: string): Promise<void> {
+		const db = await this.getDB();
 
-        await db.delete("contacts", id);
-    }
+		await db.delete('contacts', id);
+	}
 
-    async clearAllContacts(): Promise<void> {
-        const db = await this.getDB();
+	async clearAllContacts(): Promise<void> {
+		const db = await this.getDB();
 
-        await db.clear("contacts");
-    }
+		await db.clear('contacts');
+	}
 }
 
 const contactsDB = new ContactsDB();

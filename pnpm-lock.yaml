@@ -42,6 +42,7 @@ specifiers:
   mobx-react: ^7.4.0
   moment: ^2.29.4
   os-browserify: ^0.3.0
+  prettier: ^2.8.1
   process: ^0.11.10
   react: ^17.0.2
   react-app-rewired: ^2.2.1
@@ -129,6 +130,7 @@ devDependencies:
   crypto-browserify: 3.12.0
   https-browserify: 1.0.0
   os-browserify: 0.3.0
+  prettier: 2.8.1
   process: 0.11.10
   react-app-rewired: 2.2.1_react-scripts@5.0.1
   react-scripts: 5.0.1_tdcy4ojt3lieiemdvpcflph7ca
@@ -10866,6 +10868,12 @@ packages:
     engines: {node: '>= 0.8.0'}
     dev: true
 
+  /prettier/2.8.1:
+    resolution: {integrity: sha512-lqGoSJBQNJidqCHE80vqZJHWHRFoNYsSpP9AjFhlhi9ODCJA541svILes/+/1GM3VaL/abZi7cpFzOpdR9UPKg==}
+    engines: {node: '>=10.13.0'}
+    hasBin: true
+    dev: true
+
   /pretty-bytes/5.6.0:
     resolution: {integrity: sha512-FFw039TmrBqFK8ma/7OL3sDz/VytdtJr044/QUJtH0wK9lb9jLq9tJyIxUwtQJHwar2BqtiA4iCWSwo9JLkzFg==}
     engines: {node: '>=6'}
@@ -15043,6 +15051,10 @@ packages:
       eventemitter3: 4.0.7
       semaphore-promise: 1.4.1
       web3: 1.8.0
+      web3-core: 1.8.0
+      web3-eth: 1.8.0
+      web3-eth-contract: 1.8.0
+      web3-utils: 1.8.0
     transitivePeerDependencies:
       - bufferutil
       - encoding

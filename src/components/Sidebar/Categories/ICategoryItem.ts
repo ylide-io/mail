@@ -1,8 +1,8 @@
-import {colors} from "../../../utils/colors";
+import { colors } from '../../../utils/colors';
 
 export interface ICategoryItem {
-    circleColor: colors
-    text: string
-    link: string
-    unreadNum?: number
+	circleColor: colors;
+	text: string;
+	link: string;
+	unreadNum?: number;
 }
