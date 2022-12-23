@@ -4,21 +4,21 @@ import { Navigate, Route, Routes, useLocation } from 'react-router-dom';
 
 import domain from './stores/Domain';
 
-import ComposePage from './pages/ComposePage/ComposePage';
-import MailboxPage from './pages/MailboxPage/MailboxPage';
-import MailDetail from './pages/MailDetail';
-import ContactsPage from './pages/ContactsPage/ContactsPage';
-import SettingsPage from './pages/SettingsPage/SettingsPage';
-import ContactsTab from './pages/ContactsPage/components/Contacts/ContactsTab';
-import TagsTab from './pages/ContactsPage/components/Tags/TagsTab';
+import { ComposePage } from './pages/ComposePage/ComposePage';
+import { MailboxPage } from './pages/MailboxPage/MailboxPage';
+import { MailDetailsPage } from './pages/MailDetailsPage/MailDetailsPage';
+import { ContactsPage } from './pages/ContactsPage/ContactsPage';
+import { SettingsPage } from './pages/SettingsPage/SettingsPage';
+import { ContactsTab } from './pages/ContactsPage/components/Contacts/ContactsTab';
+import { TagsTab } from './pages/ContactsPage/components/Tags/TagsTab';
 
 import modals from './stores/Modals';
 import { Loader } from './controls/Loader';
 import { AdminPage } from './pages/AdminPage';
-import TestPage from './pages/TestPage/TestPage';
+import { TestPage } from './pages/TestPage/TestPage';
 import walletConnect from './stores/WalletConnect';
-import NewWalletsPage from './pages/NewWalletsPage';
-import FeedPage from './pages/FeedPage';
+import { NewWalletsPage } from './pages/NewWalletsPage';
+import { FeedPage } from './pages/FeedPage/FeedPage';
 
 const App = observer(() => {
 	const location = useLocation();
@@ -96,7 +96,7 @@ const App = observer(() => {
 					<Route path={'/feed'} element={<FeedPage />} />
 					<Route path={'/feed/:category'} element={<FeedPage />} />
 					<Route path={'/:folderId'} element={<MailboxPage />} />
-					<Route path={'/:folderId/:id'} element={<MailDetail />} />
+					<Route path={'/:folderId/:id'} element={<MailDetailsPage />} />
 					<Route path={'/*'} element={<Navigate replace to="/inbox" />} />
 				</>
 			</Routes>

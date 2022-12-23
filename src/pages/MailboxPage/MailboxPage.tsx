@@ -6,7 +6,7 @@ import { MailboxHeader } from './components/MailboxHeader';
 import mailList from '../../stores/MailList';
 import { useParams } from 'react-router-dom';
 
-const MailboxPage = () => {
+export const MailboxPage = () => {
 	const { folderId } = useParams();
 
 	useEffect(() => {
@@ -22,5 +22,3 @@ const MailboxPage = () => {
 		</GenericLayout>
 	);
 };
-
-export default MailboxPage;

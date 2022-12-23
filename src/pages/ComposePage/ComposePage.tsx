@@ -11,7 +11,7 @@ import ComposeMailFooter from './components/Mailbox/ComposeMailFooter';
 import ComposeMailBody from './components/Mailbox/ComposeMailBody';
 import { MailComposeMeta } from './components/MailComposeMeta';
 
-const ComposePage = observer(() => {
+export const ComposePage = observer(() => {
 	const navigate = useNav();
 
 	return (
@@ -46,5 +46,3 @@ const ComposePage = observer(() => {
 		</GenericLayout>
 	);
 });
-
-export default ComposePage;

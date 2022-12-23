@@ -1,24 +1,24 @@
 import React, { useEffect } from 'react';
-import GenericLayout from '../layouts/GenericLayout';
-import { smallButtonColors, smallButtonIcons } from '../components/smallButton/smallButton';
+import GenericLayout from '../../layouts/GenericLayout';
+import { smallButtonColors, smallButtonIcons } from '../../components/smallButton/smallButton';
 import { useParams } from 'react-router-dom';
 import { observer } from 'mobx-react';
 import { createReactEditorJS } from 'react-editor-js';
 import { toJS } from 'mobx';
-import { EDITOR_JS_TOOLS } from '../utils/editorJs';
-import mailbox from '../stores/Mailbox';
-import contacts from '../stores/Contacts';
-import { useNav } from '../utils/navigate';
+import { EDITOR_JS_TOOLS } from '../../utils/editorJs';
+import mailbox from '../../stores/Mailbox';
+import contacts from '../../stores/Contacts';
+import { useNav } from '../../utils/navigate';
 import moment from 'moment';
-import mailList from '../stores/MailList';
-import { IMessageDecodedContent } from '../indexedDB/MessagesDB';
+import mailList from '../../stores/MailList';
+import { IMessageDecodedContent } from '../../indexedDB/MessagesDB';
 import { Button } from 'antd';
-import { Blockie } from '../controls/Blockie';
-import { AdaptiveAddress } from '../controls/AdaptiveAddress';
+import { Blockie } from '../../controls/Blockie';
+import { AdaptiveAddress } from '../../controls/AdaptiveAddress';
 
 const ReactEditorJS = createReactEditorJS();
 
-const MailDetail = observer(() => {
+export const MailDetailsPage = observer(() => {
 	const navigate = useNav();
 	const { id } = useParams();
 	const message = mailList.messages.find(m => m.id === id!)!;
@@ -185,5 +185,3 @@ const MailDetail = observer(() => {
 		</GenericLayout>
 	);
 });
-
-export default MailDetail;

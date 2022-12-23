@@ -208,7 +208,7 @@ const FeedPostControl = observer(({ post }: { post: FeedPost }) => {
 	}
 });
 
-const FeedPage = observer(() => {
+export const FeedPage = observer(() => {
 	const lastPostView = useRef<HTMLDivElement>(null);
 	const feedBodyRef = useRef<HTMLDivElement>(null);
 	const [newPostsVisible, setNewPostsVisible] = useState(false);
@@ -305,5 +305,3 @@ const FeedPage = observer(() => {
 		</GenericLayout>
 	);
 });
-
-export default FeedPage;

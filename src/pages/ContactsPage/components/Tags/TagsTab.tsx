@@ -1,8 +1,6 @@
 import React from 'react';
 import TagsList from './TagsList';
 
-const TagsTab = () => {
+export const TagsTab = () => {
 	return <TagsList />;
 };
-
-export default TagsTab;

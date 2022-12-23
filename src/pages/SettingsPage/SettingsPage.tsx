@@ -3,7 +3,7 @@ import GenericLayout from '../../layouts/GenericLayout';
 import { observer } from 'mobx-react';
 import mailList from '../../stores/MailList';
 
-const SettingsPage = observer(() => {
+export const SettingsPage = observer(() => {
 	return (
 		<GenericLayout>
 			<div className="mail-page animated fadeInRight">
@@ -26,5 +26,3 @@ const SettingsPage = observer(() => {
 		</GenericLayout>
 	);
 });
-
-export default SettingsPage;

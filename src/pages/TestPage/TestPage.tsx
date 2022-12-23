@@ -2,7 +2,7 @@ import React from 'react';
 import { observer } from 'mobx-react';
 import { AdaptiveAddress } from '../../controls/AdaptiveAddress';
 
-const TestPage = observer(() => {
+export const TestPage = observer(() => {
 	return (
 		<div>
 			<h1>test page</h1>
@@ -64,5 +64,3 @@ const TestPage = observer(() => {
 		</div>
 	);
 });
-
-export default TestPage;

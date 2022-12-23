@@ -60,7 +60,7 @@ function NextButton() {
 }
 
 @observer
-export default class NewWalletsPage extends PureComponent {
+export class NewWalletsPage extends PureComponent {
 	render() {
 		return (
 			<div className="intro-page">

@@ -11,7 +11,7 @@ import TagsFilter from './components/TagsFilter';
 import { PlusOutlined } from '@ant-design/icons';
 import { useWindowSize } from '../../utils/useWindowSize';
 
-const ContactsPage = observer(() => {
+export const ContactsPage = observer(() => {
 	const location = useLocation();
 	const nav = useNav();
 	const { windowWidth } = useWindowSize();
@@ -77,5 +77,3 @@ const ContactsPage = observer(() => {
 		</GenericLayout>
 	);
 });
-
-export default ContactsPage;
