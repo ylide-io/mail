@@ -1,7 +1,6 @@
 import { observer } from 'mobx-react';
 import { PureComponent } from 'react';
-import cn from 'classnames';
-import { walletsMap, blockchainsMap } from '../../constants';
+import { blockchainsMap, walletsMap } from '../../constants';
 import domain from '../../stores/Domain';
 import { YlideButton } from '../../controls/YlideButton';
 import { CloseOutlined } from '@ant-design/icons';
@@ -17,6 +16,7 @@ import SignatureModal from '../../modals/SignatureModal';
 import { asyncDelay, IGenericAccount } from '@ylide/sdk';
 import { isBytesEqual } from '../../utils/isBytesEqual';
 import PublishKeyModal from '../../modals/PublishKeyModal';
+import clsx from 'clsx';
 
 export interface WalletBlockProps {
 	wallet: string;
@@ -297,7 +297,7 @@ export class WalletBlock extends PureComponent<WalletBlockProps> {
 			<YlideButton onClick={buttonHandler}>{this.loading ? <Spin size="small" /> : buttonContent}</YlideButton>
 		);
 
-		const wrapperClass = cn('wallet-block', {
+		const wrapperClass = clsx('wallet-block', {
 			'not-available': !isWalletSupported,
 			'ready': ready,
 		});

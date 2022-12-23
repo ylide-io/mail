@@ -3,7 +3,6 @@ import { observer } from 'mobx-react';
 import { computed, makeObservable, observable, reaction, toJS } from 'mobx';
 
 import modals from '../../stores/Modals';
-import classNames from 'classnames';
 import * as browserUtils from '@walletconnect/browser-utils';
 import { supportedWallets, walletsMap } from '../../constants';
 import domain from '../../stores/Domain';
@@ -16,6 +15,7 @@ import { autobind } from 'core-decorators';
 import { Wallet } from '../../stores/models/Wallet';
 import SwitchModal from '../SwitchModal';
 import NewPasswordModal from '../NewPasswordModal';
+import clsx from 'clsx';
 
 export interface SelectWalletModalProps {
 	onResolve: () => void;
@@ -265,7 +265,7 @@ export default class SelectWalletModal extends PureComponent<SelectWalletModalPr
 										this.activeTab = 'qr';
 										this.search = '';
 									}}
-									className={classNames('wm-tab', { active: this.activeTab === 'qr' })}
+									className={clsx('wm-tab', { active: this.activeTab === 'qr' })}
 								>
 									QR code
 								</div>
@@ -274,7 +274,7 @@ export default class SelectWalletModal extends PureComponent<SelectWalletModalPr
 										this.activeTab = 'desktop';
 										this.search = '';
 									}}
-									className={classNames('wm-tab', { active: this.activeTab === 'desktop' })}
+									className={clsx('wm-tab', { active: this.activeTab === 'desktop' })}
 								>
 									Desktop
 								</div>
@@ -283,7 +283,7 @@ export default class SelectWalletModal extends PureComponent<SelectWalletModalPr
 										this.activeTab = 'install';
 										this.search = '';
 									}}
-									className={classNames('wm-tab', { active: this.activeTab === 'install' })}
+									className={clsx('wm-tab', { active: this.activeTab === 'install' })}
 								>
 									Install
 								</div>
@@ -295,7 +295,7 @@ export default class SelectWalletModal extends PureComponent<SelectWalletModalPr
 										this.activeTab = 'qr';
 										this.search = '';
 									}}
-									className={classNames('wm-tab', { active: this.activeTab === 'qr' })}
+									className={clsx('wm-tab', { active: this.activeTab === 'qr' })}
 								>
 									Mobile
 								</div>

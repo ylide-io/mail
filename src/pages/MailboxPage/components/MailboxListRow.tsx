@@ -1,6 +1,5 @@
 import React, { CSSProperties, useEffect, useState } from 'react';
 import { observer } from 'mobx-react';
-import classNames from 'classnames';
 
 import contacts from '../../../stores/Contacts';
 import { isToday } from '../../../utils/date';
@@ -11,6 +10,7 @@ import { YlideCheckbox } from '../../../controls/YlideCheckbox';
 import domain from '../../../stores/Domain';
 import { AdaptiveAddress } from '../../../controls/AdaptiveAddress';
 import { safeJson } from '../../../utils/safeJson';
+import clsx from 'clsx';
 
 interface MailboxListRowProps {
 	message: ILinkedMessage;
@@ -68,7 +68,7 @@ const MailboxListRow: React.FC<MailboxListRowProps> = observer(({ style, message
 		<div
 			style={style}
 			onClick={messageClickHandler}
-			className={classNames('mailbox-list-row', {
+			className={clsx('mailbox-list-row', {
 				unread: isUnread,
 				read: !isUnread,
 				loading,

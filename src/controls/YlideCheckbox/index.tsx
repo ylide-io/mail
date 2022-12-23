@@ -1,5 +1,5 @@
-import cn from 'classnames';
 import { MouseEvent } from 'react';
+import clsx from 'clsx';
 
 export const YlideCheckbox = ({
 	checked,
@@ -10,7 +10,7 @@ export const YlideCheckbox = ({
 }) => {
 	return (
 		<div
-			className={cn('ylide-checkbox', { checked })}
+			className={clsx('ylide-checkbox', { checked })}
 			onClick={e => {
 				onCheck(!checked, e);
 			}}

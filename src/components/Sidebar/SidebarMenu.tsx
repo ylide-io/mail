@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { observer } from 'mobx-react';
-import cn from 'classnames';
 import modals from '../../stores/Modals';
 import { useWindowSize } from '../../utils/useWindowSize';
 import { CaretDown } from '../../icons/CaretDown';
@@ -22,6 +21,7 @@ import { sideSecurityIcon } from '../../icons/static/sideSecurityIcon';
 import { sideTechnologyIcon } from '../../icons/static/sideTechnologyIcon';
 import { sideCultureIcon } from '../../icons/static/sideCultureIcon';
 import { sideEducationIcon } from '../../icons/static/sideEducationIcon';
+import clsx from 'clsx';
 
 const FeedSettings = observer(() => {
 	const [newValues, setNewValues] = useState(feed.mainCategories);
@@ -43,7 +43,7 @@ const FeedSettings = observer(() => {
 							setNewValues([...newValues, 'Markets']);
 						}
 					}}
-					className={cn('fsp-checkbox', { checked: newValues.includes('Markets') })}
+					className={clsx('fsp-checkbox', { checked: newValues.includes('Markets') })}
 				>
 					{newValues.includes('Markets') ? checkboxCheckIcon : null}
 				</div>
@@ -58,7 +58,7 @@ const FeedSettings = observer(() => {
 							setNewValues([...newValues, 'Analytics']);
 						}
 					}}
-					className={cn('fsp-checkbox', { checked: newValues.includes('Analytics') })}
+					className={clsx('fsp-checkbox', { checked: newValues.includes('Analytics') })}
 				>
 					{newValues.includes('Analytics') ? checkboxCheckIcon : null}
 				</div>
@@ -73,7 +73,7 @@ const FeedSettings = observer(() => {
 							setNewValues([...newValues, 'Projects']);
 						}
 					}}
-					className={cn('fsp-checkbox', { checked: newValues.includes('Projects') })}
+					className={clsx('fsp-checkbox', { checked: newValues.includes('Projects') })}
 				>
 					{newValues.includes('Projects') ? checkboxCheckIcon : null}
 				</div>
@@ -88,7 +88,7 @@ const FeedSettings = observer(() => {
 							setNewValues([...newValues, 'Policy']);
 						}
 					}}
-					className={cn('fsp-checkbox', { checked: newValues.includes('Policy') })}
+					className={clsx('fsp-checkbox', { checked: newValues.includes('Policy') })}
 				>
 					{newValues.includes('Policy') ? checkboxCheckIcon : null}
 				</div>
@@ -103,7 +103,7 @@ const FeedSettings = observer(() => {
 							setNewValues([...newValues, 'Security']);
 						}
 					}}
-					className={cn('fsp-checkbox', { checked: newValues.includes('Security') })}
+					className={clsx('fsp-checkbox', { checked: newValues.includes('Security') })}
 				>
 					{newValues.includes('Security') ? checkboxCheckIcon : null}
 				</div>
@@ -118,7 +118,7 @@ const FeedSettings = observer(() => {
 							setNewValues([...newValues, 'Technology']);
 						}
 					}}
-					className={cn('fsp-checkbox', { checked: newValues.includes('Technology') })}
+					className={clsx('fsp-checkbox', { checked: newValues.includes('Technology') })}
 				>
 					{newValues.includes('Technology') ? checkboxCheckIcon : null}
 				</div>
@@ -133,7 +133,7 @@ const FeedSettings = observer(() => {
 							setNewValues([...newValues, 'Culture']);
 						}
 					}}
-					className={cn('fsp-checkbox', { checked: newValues.includes('Culture') })}
+					className={clsx('fsp-checkbox', { checked: newValues.includes('Culture') })}
 				>
 					{newValues.includes('Culture') ? checkboxCheckIcon : null}
 				</div>
@@ -148,7 +148,7 @@ const FeedSettings = observer(() => {
 							setNewValues([...newValues, 'Education']);
 						}
 					}}
-					className={cn('fsp-checkbox', { checked: newValues.includes('Education') })}
+					className={clsx('fsp-checkbox', { checked: newValues.includes('Education') })}
 				>
 					{newValues.includes('Education') ? checkboxCheckIcon : null}
 				</div>
@@ -199,7 +199,7 @@ const SidebarMenu = observer(() => {
 	}, [mailOpen]);
 
 	return (
-		<div className={cn('side-block', { open: modals.sidebarOpen })}>
+		<div className={clsx('side-block', { open: modals.sidebarOpen })}>
 			<div className="sidebar-container">
 				{windowWidth < 920 ? (
 					<div className="sidebar-mobile-header" style={{ alignSelf: 'center', marginBottom: 30 }}>
@@ -231,9 +231,9 @@ const SidebarMenu = observer(() => {
 							{feedOpen ? <CaretDown /> : <CaretUp />}
 						</div>
 					</div>
-					<div className={cn('sidebar-section-content', { open: feedOpen })}>
+					<div className={clsx('sidebar-section-content', { open: feedOpen })}>
 						<div
-							className={cn('sidebar-section-link', { active: location.pathname === '/feed/main' })}
+							className={clsx('sidebar-section-link', { active: location.pathname === '/feed/main' })}
 							onClick={() => {
 								modals.sidebarOpen = false;
 								navigate('/feed/main');
@@ -246,7 +246,7 @@ const SidebarMenu = observer(() => {
 							</div>
 						</div>
 						<div
-							className={cn('sidebar-section-link', { active: location.pathname === '/feed/all' })}
+							className={clsx('sidebar-section-link', { active: location.pathname === '/feed/all' })}
 							onClick={() => {
 								modals.sidebarOpen = false;
 								navigate('/feed/all');
@@ -256,7 +256,7 @@ const SidebarMenu = observer(() => {
 							<div className="sidebar-link-title">All topics</div>
 						</div>
 						<div
-							className={cn('sidebar-section-link', { active: location.pathname === '/feed/Markets' })}
+							className={clsx('sidebar-section-link', { active: location.pathname === '/feed/Markets' })}
 							onClick={() => {
 								modals.sidebarOpen = false;
 								navigate('/feed/Markets');
@@ -266,7 +266,9 @@ const SidebarMenu = observer(() => {
 							<div className="sidebar-link-title">Markets</div>
 						</div>
 						<div
-							className={cn('sidebar-section-link', { active: location.pathname === '/feed/Analytics' })}
+							className={clsx('sidebar-section-link', {
+								active: location.pathname === '/feed/Analytics',
+							})}
 							onClick={() => {
 								modals.sidebarOpen = false;
 								navigate('/feed/Analytics');
@@ -276,7 +278,7 @@ const SidebarMenu = observer(() => {
 							<div className="sidebar-link-title">Analytics</div>
 						</div>
 						<div
-							className={cn('sidebar-section-link', { active: location.pathname === '/feed/Projects' })}
+							className={clsx('sidebar-section-link', { active: location.pathname === '/feed/Projects' })}
 							onClick={() => {
 								modals.sidebarOpen = false;
 								navigate('/feed/Projects');
@@ -286,7 +288,7 @@ const SidebarMenu = observer(() => {
 							<div className="sidebar-link-title">Projects</div>
 						</div>
 						<div
-							className={cn('sidebar-section-link', { active: location.pathname === '/feed/Policy' })}
+							className={clsx('sidebar-section-link', { active: location.pathname === '/feed/Policy' })}
 							onClick={() => {
 								modals.sidebarOpen = false;
 								navigate('/feed/Policy');
@@ -296,7 +298,7 @@ const SidebarMenu = observer(() => {
 							<div className="sidebar-link-title">Policy</div>
 						</div>
 						<div
-							className={cn('sidebar-section-link', { active: location.pathname === '/feed/Security' })}
+							className={clsx('sidebar-section-link', { active: location.pathname === '/feed/Security' })}
 							onClick={() => {
 								modals.sidebarOpen = false;
 								navigate('/feed/Security');
@@ -306,7 +308,9 @@ const SidebarMenu = observer(() => {
 							<div className="sidebar-link-title">Security</div>
 						</div>
 						<div
-							className={cn('sidebar-section-link', { active: location.pathname === '/feed/Technology' })}
+							className={clsx('sidebar-section-link', {
+								active: location.pathname === '/feed/Technology',
+							})}
 							onClick={() => {
 								modals.sidebarOpen = false;
 								navigate('/feed/Technology');
@@ -316,7 +320,7 @@ const SidebarMenu = observer(() => {
 							<div className="sidebar-link-title">Technology</div>
 						</div>
 						<div
-							className={cn('sidebar-section-link', { active: location.pathname === '/feed/Culture' })}
+							className={clsx('sidebar-section-link', { active: location.pathname === '/feed/Culture' })}
 							onClick={() => {
 								modals.sidebarOpen = false;
 								navigate('/feed/Culture');
@@ -326,7 +330,9 @@ const SidebarMenu = observer(() => {
 							<div className="sidebar-link-title">Culture</div>
 						</div>
 						<div
-							className={cn('sidebar-section-link', { active: location.pathname === '/feed/Education' })}
+							className={clsx('sidebar-section-link', {
+								active: location.pathname === '/feed/Education',
+							})}
 							onClick={() => {
 								modals.sidebarOpen = false;
 								navigate('/feed/Education');
@@ -352,7 +358,7 @@ const SidebarMenu = observer(() => {
 							{mailOpen ? <CaretDown /> : <CaretUp />}
 						</div>
 					</div>
-					<div className={cn('sidebar-section-content', { open: mailOpen })}>
+					<div className={clsx('sidebar-section-content', { open: mailOpen })}>
 						<div
 							className="sidebar-section-button"
 							onClick={() => {
@@ -363,7 +369,7 @@ const SidebarMenu = observer(() => {
 							Compose mail
 						</div>
 						<div
-							className={cn('sidebar-section-link', { active: location.pathname === '/inbox' })}
+							className={clsx('sidebar-section-link', { active: location.pathname === '/inbox' })}
 							onClick={() => {
 								modals.sidebarOpen = false;
 								navigate('/inbox');
@@ -394,7 +400,7 @@ const SidebarMenu = observer(() => {
 							</div>
 						</div>
 						<div
-							className={cn('sidebar-section-link', { active: location.pathname === '/sent' })}
+							className={clsx('sidebar-section-link', { active: location.pathname === '/sent' })}
 							onClick={() => {
 								modals.sidebarOpen = false;
 								navigate('/sent');
@@ -406,7 +412,7 @@ const SidebarMenu = observer(() => {
 							<div className="sidebar-link-title">Sent</div>
 						</div>
 						<div
-							className={cn('sidebar-section-link', { active: location.pathname === '/archive' })}
+							className={clsx('sidebar-section-link', { active: location.pathname === '/archive' })}
 							onClick={() => {
 								modals.sidebarOpen = false;
 								navigate('/archive');

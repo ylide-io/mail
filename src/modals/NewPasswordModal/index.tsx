@@ -12,11 +12,11 @@ import { asyncDelay, ExternalYlidePublicKey, IGenericAccount } from '@ylide/sdk'
 import { Wallet } from '../../stores/models/Wallet';
 import { WalletTag } from '../../controls/WalletTag';
 import { EthereumWalletController, EVMNetwork } from '@ylide/ethereum';
-import cn from 'classnames';
 import { Loader } from '../../controls/Loader';
 import { DomainAccount } from '../../stores/models/DomainAccount';
 import { isBytesEqual } from '../../utils/isBytesEqual';
 import { useNavigate } from 'react-router-dom';
+import clsx from 'clsx';
 
 const txPrices: Record<EVMNetwork, number> = {
 	[EVMNetwork.LOCAL_HARDHAT]: 0.001,
@@ -504,7 +504,7 @@ export default class NewPasswordModal extends PureComponent<NewPasswordModalProp
 										const bData = blockchainsMap[bc.blockchain];
 										return (
 											<div
-												className={cn('wmn-plate', {
+												className={clsx('wmn-plate', {
 													disabled:
 														Number(
 															this.evmBalances[evmNameToNetwork(bc.blockchain)!].toFixed(

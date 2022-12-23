@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef, useState, MouseEvent } from 'react';
+import React, { MouseEvent, useCallback, useEffect, useRef, useState } from 'react';
 import GenericLayout from '../../layouts/GenericLayout';
 
 import { YlideButton } from '../../controls/YlideButton';
@@ -11,13 +11,13 @@ import { twitterSourceIcon } from '../../icons/static/twitterSourceIcon';
 import { mirrorSourceIcon } from '../../icons/static/mirrorSourceIcon';
 import { telegramSourceIcon } from '../../icons/static/telegramSourceIcon';
 import { linkIcon } from '../../icons/static/linkIcon';
-import classNames from 'classnames';
 import GalleryModal from '../../modals/GalleryModal';
 import { Loader } from '../../controls/Loader';
 import { observer } from 'mobx-react';
 import { useParams } from 'react-router-dom';
 import { CaretDown } from '../../icons/CaretDown';
 import { useWindowSize } from '../../utils/useWindowSize';
+import clsx from 'clsx';
 
 const sourceIcon: Record<LinkType, JSX.Element> = {
 	[LinkType.TWITTER]: twitterSourceIcon,
@@ -88,7 +88,7 @@ const FeedPostControl = observer(({ post }: { post: FeedPost }) => {
 								rel="noreferrer"
 								href={e.link || ''}
 								key={idx}
-								className={classNames('post-embed', {
+								className={clsx('post-embed', {
 									'with-link': !!e.link,
 								})}
 							>
@@ -119,7 +119,7 @@ const FeedPostControl = observer(({ post }: { post: FeedPost }) => {
 
 	if (windowWidth <= 670) {
 		return (
-			<div className={classNames('post-mobile', { collapsed })} ref={selfRef}>
+			<div className={clsx('post-mobile', { collapsed })} ref={selfRef}>
 				<div className="post-header">
 					<div className="post-ava">
 						<div className="post-ava-image">
@@ -163,7 +163,7 @@ const FeedPostControl = observer(({ post }: { post: FeedPost }) => {
 		);
 	} else {
 		return (
-			<div className={classNames('post-desktop', { collapsed })} ref={selfRef}>
+			<div className={clsx('post-desktop', { collapsed })} ref={selfRef}>
 				<div className="post-ava">
 					<div className="post-ava-image">
 						<Avatar size={48} src={post.authorAvatar} icon={<UserOutlined />} />

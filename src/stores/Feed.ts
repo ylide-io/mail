@@ -22,6 +22,7 @@ export interface FeedPost {
 	subtitle: string;
 	content: string;
 	picrel: string;
+	sourceId: string;
 	sourceName: string;
 	sourceNickname: string;
 	serverName: string;

@@ -1,6 +1,5 @@
 import React, { ChangeEvent, useMemo, useState } from 'react';
 import { ITag } from '../../../../stores/models/ITag';
-import classNames from 'classnames';
 import contacts from '../../../../stores/Contacts';
 import { IContact } from '../../../../stores/models/IContact';
 import TagsStore from '../../../../stores/Tags';
@@ -11,6 +10,7 @@ import { Avatar, Button, Input, Select } from 'antd';
 import { Blockie } from '../../../../controls/Blockie';
 import { DeleteOutlined, EditOutlined, MailOutlined, SaveOutlined } from '@ant-design/icons';
 import { AdaptiveAddress } from '../../../../controls/AdaptiveAddress';
+import clsx from 'clsx';
 
 interface ContactsListItemProps {
 	contact: IContact;
@@ -202,11 +202,7 @@ const ContactsListItem: React.FC<ContactsListItemProps> = ({ contact, isNew }) =
 			</div>
 			<div style={{ textAlign: 'center' }} className="contact-folders">
 				{tags.map((tag, index) => (
-					<span
-						key={index}
-						style={{ marginLeft: '3px' }}
-						className={classNames(['label', `label-${tag.color}`])}
-					>
+					<span key={index} style={{ marginLeft: '3px' }} className={clsx(['label', `label-${tag.color}`])}>
 						{tag.name}
 					</span>
 				))}

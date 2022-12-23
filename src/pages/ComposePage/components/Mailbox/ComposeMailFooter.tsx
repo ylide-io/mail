@@ -8,9 +8,9 @@ import domain from '../../../../stores/Domain';
 import AlertModal from '../../../../modals/AlertModal';
 import { EVM_NAMES, EVMNetwork } from '@ylide/ethereum';
 import { blockchainsMap, evmNameToNetwork } from '../../../../constants';
-import classNames from 'classnames';
 import { Dropdown, Menu } from 'antd';
 import mailList from '../../../../stores/MailList';
+import clsx from 'clsx';
 
 const ComposeMailFooter = observer(() => {
 	const navigate = useNav();
@@ -114,7 +114,7 @@ const ComposeMailFooter = observer(() => {
 	return (
 		<div className="mail-footer compose-mail-footer">
 			<div
-				className={classNames('send-btn', {
+				className={clsx('send-btn', {
 					disabled:
 						!mailbox.from ||
 						mailer.sending ||
@@ -125,7 +125,7 @@ const ComposeMailFooter = observer(() => {
 				})}
 			>
 				<div className="send-btn-text" onClick={sendMailHandler}>
-					<i style={{ marginRight: 6 }} className={classNames('fa', smallButtonIcons.reply)}></i>
+					<i style={{ marginRight: 6 }} className={clsx('fa', smallButtonIcons.reply)}></i>
 					{text && <span className="send-btn-title">{text}</span>}
 				</div>
 				{mailbox.from?.wallet.factory.blockchainGroup === 'evm' ? (

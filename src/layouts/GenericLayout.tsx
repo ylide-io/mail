@@ -1,4 +1,3 @@
-import classNames from 'classnames';
 import { observer } from 'mobx-react';
 import React, { ReactNode, useEffect, useMemo } from 'react';
 import { useLocation } from 'react-router-dom';
@@ -7,6 +6,7 @@ import LinkButton from '../components/Sidebar/LinkButton';
 import SidebarMenu from '../components/Sidebar/SidebarMenu';
 import mailList from '../stores/MailList';
 import { useWindowSize } from '../utils/useWindowSize';
+import clsx from 'clsx';
 
 interface GenericLayoutProps {
 	children: ReactNode;
@@ -53,7 +53,7 @@ const GenericLayout: React.FC<GenericLayoutProps> = observer(({ children, mainCl
 			<Header />
 			<div className="main-wrapper">
 				<SidebarMenu />
-				<div className={classNames('main-block main-content', mainClass)}>
+				<div className={clsx('main-block main-content', mainClass)}>
 					{windowWidth >= 920 || !linkButtonProps ? null : (
 						<LinkButton text={linkButtonProps.text} link={linkButtonProps.link} />
 					)}

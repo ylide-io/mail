@@ -1,4 +1,3 @@
-import classNames from 'classnames';
 import { observer } from 'mobx-react';
 import { PureComponent } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -11,6 +10,7 @@ import { YlideLargeLogo } from '../../icons/YlideLargeLogo';
 import NewPasswordModal from '../../modals/NewPasswordModal';
 import SelectWalletModal from '../../modals/SelectWalletModal';
 import domain from '../../stores/Domain';
+import clsx from 'clsx';
 // import Web3 from 'web3';
 // import * as utils from 'ethereumjs-util';
 // import SmartBuffer from '@ylide/smart-buffer';
@@ -80,10 +80,7 @@ export default class NewWalletsPage extends PureComponent {
 								a => a.account.address === acc.account.address,
 							);
 							return (
-								<div
-									className={classNames('cw-block', { notActive: !isActive })}
-									key={acc.account.address}
-								>
+								<div className={clsx('cw-block', { notActive: !isActive })} key={acc.account.address}>
 									<div className="cw-logo">
 										{walletsMap[acc.wallet.wallet].logo(isActive ? 32 : 24)}
 										{/* <div className="cw-blockchain">

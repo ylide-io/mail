@@ -25,7 +25,7 @@
 		"@ylide/sdk": "0.7.6",
 		"@ylide/smart-buffer": "0.0.9",
 		"antd": "^4.21.5",
-		"classnames": "^2.3.1",
+		"clsx": "^1.2.1",
 		"core-decorators": "^0.20.0",
 		"ethereum-blockies-base64": "^1.0.2",
 		"eventemitter3": "^4.0.7",

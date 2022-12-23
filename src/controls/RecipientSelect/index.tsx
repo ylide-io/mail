@@ -1,15 +1,14 @@
-import React from 'react';
-import { Select, Tag, Spin, Tooltip, Menu, RefSelectProps } from 'antd';
+import React, { PureComponent } from 'react';
+import { Menu, RefSelectProps, Select, Spin, Tag, Tooltip } from 'antd';
 import { autobind } from 'core-decorators';
-import { observable, makeObservable, action } from 'mobx';
+import { action, makeObservable, observable } from 'mobx';
 import { observer } from 'mobx-react';
-import { PureComponent } from 'react';
-import cn from 'classnames';
 import contacts from '../../stores/Contacts';
 import domain from '../../stores/Domain';
 import { IRecipient } from '../../stores/Mailbox';
 
 import { CheckOutlined } from '@ant-design/icons';
+import clsx from 'clsx';
 
 export interface IRecipientOption {
 	id: string;
@@ -227,7 +226,7 @@ export class RecipientsSelect extends PureComponent<RecipientsSelectProps> {
 					const rec = values.find(r => r.input === props.value);
 					const content = (
 						<Tag
-							className={cn('recipient-tag', {
+							className={clsx('recipient-tag', {
 								'achievable': !!rec?.isAchievable,
 								'not-achievable': rec?.isAchievable === false,
 							})}

@@ -1,5 +1,5 @@
 import React, { ButtonHTMLAttributes, CSSProperties, FC, PropsWithChildren } from 'react';
-import cn from 'classnames';
+import clsx from 'clsx';
 
 export const YlideButton: FC<
 	PropsWithChildren<{
@@ -17,7 +17,7 @@ export const YlideButton: FC<
 	return (
 		<button
 			type={type}
-			className={cn('ylide-button', className, { centered, ghost, nice, primary }, `size-${size}`)}
+			className={clsx('ylide-button', className, { centered, ghost, nice, primary }, `size-${size}`)}
 			style={style}
 			onClick={onClick}
 		>

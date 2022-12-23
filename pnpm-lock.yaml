@@ -30,7 +30,7 @@ specifiers:
   antd: ^4.21.5
   assert: ^2.0.0
   buffer: ^6.0.3
-  classnames: ^2.3.1
+  clsx: ^1.2.1
   core-decorators: ^0.20.0
   crypto-browserify: ^3.12.0
   ethereum-blockies-base64: ^1.0.2
@@ -92,7 +92,7 @@ dependencies:
   '@ylide/sdk': 0.7.6
   '@ylide/smart-buffer': 0.0.9
   antd: 4.24.5_sfoxds7t5ydpegc3knd667wn6m
-  classnames: 2.3.2
+  clsx: 1.2.1
   core-decorators: 0.20.0
   ethereum-blockies-base64: 1.0.2
   eventemitter3: 4.0.7
@@ -5101,6 +5101,11 @@ packages:
   /clone/2.1.2:
     resolution: {integrity: sha512-3Pe/CF1Nn94hyhIYpjtiLhdCoEoz0DqQ+988E9gmeEdQZlojxnOb74wctFyuwWQHzqyf9X7C7MG8juUpqBJT8w==}
     engines: {node: '>=0.8'}
+    dev: false
+
+  /clsx/1.2.1:
+    resolution: {integrity: sha512-EcR6r5a8bj6pu3ycsa/E/cKVGuTgZJZdsyUYHOksG/UHIiKfjxzRxYJpyVBwYaQeOvghal9fcc4PidlgzugAQg==}
+    engines: {node: '>=6'}
     dev: false
 
   /co/4.6.0:

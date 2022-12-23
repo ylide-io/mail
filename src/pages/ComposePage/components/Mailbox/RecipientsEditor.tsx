@@ -1,7 +1,6 @@
 import React, { PureComponent } from 'react';
 import { observer } from 'mobx-react';
 import contacts from '../../../../stores/Contacts';
-import cn from 'classnames';
 // import { IContact } from '../../../../stores/models/IContact';
 // import CreatableSelect from 'react-select/creatable';
 // import mailbox from '../../../../stores/Mailbox';
@@ -11,6 +10,7 @@ import { Select, Spin, Tag, Tooltip } from 'antd';
 import { autobind } from 'core-decorators';
 import domain from '../../../../stores/Domain';
 import mailbox from '../../../../stores/Mailbox';
+import clsx from 'clsx';
 
 export interface IRecipient {
 	loading: boolean;
@@ -169,7 +169,7 @@ export class Recipients extends PureComponent {
 								const rec = this.recipients.find(r => r.input === props.value);
 								const content = (
 									<Tag
-										className={cn('recipient-tag', {
+										className={clsx('recipient-tag', {
 											'achievable': rec?.isAchievable === true,
 											'not-achievable': rec?.isAchievable === false,
 										})}

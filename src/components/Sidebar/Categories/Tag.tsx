@@ -1,8 +1,8 @@
 import React from 'react';
-import classNames from 'classnames';
 import { useLocation } from 'react-router-dom';
 import { useNav } from '../../../utils/navigate';
 import modals from '../../../stores/Modals';
+import clsx from 'clsx';
 
 interface TagProps {
 	circleColor: string;
@@ -34,7 +34,7 @@ const Tag: React.FC<TagProps> = ({ icon, circleColor, text, isActive, tagId }) =
 	return (
 		<div className="tag-list-item" onClick={clickHandler}>
 			<div className="tag-list-item-title" style={isActive ? { ...styles, ...activeStyles } : styles}>
-				<i className={classNames('fa fa-circle text-navy')} style={{ color: circleColor }} /> {text}
+				<i className={clsx('fa fa-circle text-navy')} style={{ color: circleColor }} /> {text}
 			</div>
 		</div>
 	);

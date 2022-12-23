@@ -1,5 +1,5 @@
 import React from 'react';
-import classNames from 'classnames';
+import clsx from 'clsx';
 
 interface PermanentTagInterface {
 	onClick: () => void;
@@ -31,7 +31,7 @@ const PermanentTag: React.FC<PermanentTagInterface> = ({ onClick, text, active }
 	return (
 		<div className="tag-list-item" onClick={onClick}>
 			<div className="tag-list-item-title" style={active ? { ...styles, ...activeStyles } : styles}>
-				<i className={classNames('fa', icon)} /> {text}
+				<i className={clsx('fa', icon)} /> {text}
 			</div>
 		</div>
 	);
