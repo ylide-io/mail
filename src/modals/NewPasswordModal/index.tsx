@@ -339,7 +339,6 @@ export default class NewPasswordModal extends PureComponent<NewPasswordModalProp
 								<div className="wm-body centered">
 									<input
 										style={{
-											fontFamily: 'Lexend',
 											fontSize: 16,
 											borderRadius: 40,
 											textAlign: 'center',
@@ -360,7 +359,6 @@ export default class NewPasswordModal extends PureComponent<NewPasswordModalProp
 										<a
 											href="#forgot"
 											style={{
-												fontFamily: 'Lexend',
 												fontStyle: 'normal',
 												fontWeight: '400',
 												fontSize: '14px',

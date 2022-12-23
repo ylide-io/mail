@@ -156,7 +156,6 @@ export default class PasswordModal extends PureComponent<PasswordModalProps> {
 					<>
 						<input
 							style={{
-								fontFamily: 'Lexend',
 								fontSize: 16,
 								borderRadius: 40,
 								height: 36,

@@ -28,7 +28,7 @@
 }
 
 .intro-main-title {
-	font-family: 'Lexend Exa';
+	font-family: $font-family_wide;
 	font-style: normal;
 	font-weight: 400;
 	font-size: 44px;
@@ -44,7 +44,6 @@
 }
 
 .intro-main-subtitle {
-	font-family: 'Lexend';
 	font-style: normal;
 	font-weight: 300;
 	font-size: 20px;
@@ -67,7 +66,7 @@
 }
 
 .intro-title {
-	font-family: Lexend Exa;
+	font-family: $font-family_wide;
 	letter-spacing: -0.06em;
 	font-weight: 400;
 	text-align: center;
@@ -76,7 +75,6 @@
 }
 
 .intro-subtitle {
-	font-family: Lexend;
 	font-weight: 300;
 	text-align: center;
 	font-size: 16px;
@@ -152,7 +150,6 @@
 				@include flex-row(center, flex-start);
 
 				color: white;
-				font-family: 'Lexend';
 				font-style: normal;
 				font-weight: 400;
 				font-size: 16px;
@@ -192,7 +189,6 @@
 		}
 
 		.cw-title {
-			font-family: 'Lexend';
 			font-style: normal;
 			font-weight: 400;
 			font-size: 16px;
@@ -209,7 +205,6 @@
 
 			width: 120px;
 
-			font-family: 'Lexend';
 			font-style: normal;
 			font-weight: 300;
 			font-size: 14px;
@@ -238,7 +233,7 @@
 }
 
 .intro-wallets-subtitle {
-	font-family: 'Lexend Exa';
+	font-family: $font-family_wide;
 	font-style: normal;
 	font-weight: 400;
 	font-size: 32px;

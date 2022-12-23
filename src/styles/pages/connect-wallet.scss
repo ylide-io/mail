@@ -20,7 +20,7 @@
 	.wm-title {
 		font-weight: 400;
 		font-size: 24px;
-		font-family: Lexend Exa;
+		font-family: $font-family_wide;
 		text-align: center;
 		letter-spacing: -0.09em;
 		color: #202020;
@@ -30,7 +30,6 @@
 
 	.wm-subtitle {
 		margin-top: -16px;
-		font-family: 'Lexend';
 		font-style: normal;
 		font-weight: 300;
 		font-size: 14px;
@@ -62,7 +61,7 @@
 		align-items: flex-start;
 		padding: 3px 12px 5px;
 
-		font-family: 'Lexend Exa';
+		font-family: $font-family_wide;
 		font-style: normal;
 		font-weight: 400;
 		font-size: 12px;
@@ -127,7 +126,6 @@
 		}
 	}
 	.wallet-icon-title {
-		font-family: 'Lexend';
 		font-style: normal;
 		font-weight: 300;
 		font-size: 12px;
@@ -161,7 +159,6 @@
 		padding-bottom: 12px;
 		font-size: 14px;
 		line-height: 20px;
-		font-family: 'Lexend';
 		font-style: normal;
 		font-weight: 400;
 		overflow: hidden;
@@ -212,7 +209,7 @@
 
 	.qr-text {
 		margin-top: 10px;
-		font-family: 'Lexend Exa';
+		font-family: $font-family_wide;
 		font-style: normal;
 		font-weight: 300;
 		font-size: 12px;
@@ -228,7 +225,7 @@
 		margin-top: 8px;
 		margin-bottom: 8px;
 
-		font-family: 'Lexend Exa';
+		font-family: $font-family_wide;
 		font-style: normal;
 		font-weight: 400;
 		font-size: 12px;
@@ -244,7 +241,6 @@
 .wallets-search {
 	height: 28px;
 
-	font-family: 'Lexend';
 	font-style: normal;
 	font-weight: 300;
 	font-size: 14px;
@@ -335,7 +331,6 @@
 		@include flex-column(flex-start, space-evenly);
 		flex-grow: 1;
 		.wmn-blockchain {
-			font-family: 'Lexend';
 			font-style: normal;
 			font-weight: 400;
 			font-size: 16px;
@@ -343,7 +338,6 @@
 			color: #000000;
 		}
 		.wmn-optimal {
-			font-family: 'Lexend';
 			font-style: normal;
 			font-weight: 400;
 			font-size: 11px;
@@ -358,7 +352,6 @@
 	.wmn-balance {
 		@include flex-column(flex-end, space-between);
 		.wmn-wallet-balance {
-			font-family: 'Lexend';
 			font-style: normal;
 			font-weight: 300;
 			font-size: 14px;
@@ -368,7 +361,6 @@
 			color: #000000;
 		}
 		.wmn-transaction-price {
-			font-family: 'Lexend';
 			font-style: normal;
 			font-weight: 300;
 			font-size: 12px;

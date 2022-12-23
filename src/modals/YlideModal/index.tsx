@@ -29,7 +29,6 @@ export default class YlideModal extends PureComponent<YlideModalProps> {
 						>
 							<h3
 								style={{
-									fontFamily: 'Lexend',
 									fontSize: 24,
 									textAlign: 'center',
 								}}
@@ -42,7 +41,6 @@ export default class YlideModal extends PureComponent<YlideModalProps> {
 						<div
 							className="modal-subtitle"
 							style={{
-								fontFamily: 'Lexend',
 								fontSize: 16,
 								textAlign: 'center',
 								marginTop: 20,

@@ -1,3 +1,7 @@
+$font-family_main: Lexend, Verdana, Geneva, sans-serif;
+$font-family_wide: 'Lexend Exa', Verdana, Geneva, sans-serif;
+$font-family_code: source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace;
+
 @mixin flex-row($align-items, $justify-content) {
 	display: flex;
 	flex-direction: row;
@@ -48,14 +52,25 @@
 	}
 }
 
-body {
-	margin: 0;
-	font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans',
-		'Droid Sans', 'Helvetica Neue', sans-serif;
+body,
+input,
+textarea,
+select,
+button {
+	// 1.25 - default Figma line-height for Lexend font
+	font: 13px/1.25 $font-family_main;
+	color: #111;
 	-webkit-font-smoothing: antialiased;
 	-moz-osx-font-smoothing: grayscale;
+}
 
-	font-family: 'Open Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+body {
+	@include flex-column(stretch, flex-start);
+	margin: 0;
+	min-width: 100vw;
+	min-height: 100vh;
+	overflow-x: hidden;
+
 	// background-image: url(../assets/img/background-desktop.svg);
 	background: linear-gradient(0deg, #f7f7ee, #f7f7ee), #ffffff;
 	background-image: url(../assets/img/background-desktop-2.svg);
@@ -63,14 +78,6 @@ body {
 	background-position: center;
 	background-attachment: fixed;
 	background-repeat: no-repeat;
-	font-size: 13px;
-	color: #111111;
-	overflow-x: hidden;
-
-	min-width: 100vw;
-	min-height: 100vh;
-
-	@include flex-column(stretch, flex-start);
 }
 
 #root {
@@ -84,7 +91,7 @@ body {
 }
 
 code {
-	font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace;
+	font-family: $font-family_code;
 }
 
 body.modal-body-catch {

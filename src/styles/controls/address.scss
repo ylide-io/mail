@@ -12,7 +12,7 @@
 		height: 1rem;
 		line-height: 100%;
 		opacity: 0;
-		font-family: monospace;
+		font-family: $font-family_code;
 		pointer-events: none;
 	}
 	.ylide-address-value {
@@ -21,7 +21,7 @@
 		box-sizing: content-box;
 		height: 1rem;
 		line-height: 100%;
-		font-family: monospace;
+		font-family: $font-family_code;
 		flex-shrink: 1;
 		text-align: inherit;
 		justify-content: inherit;

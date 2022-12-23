@@ -61,7 +61,7 @@
 			flex-shrink: 0;
 
 			font-size: 14px;
-			font-family: monospace;
+			font-family: $font-family_code;
 
 			@include less480px {
 				flex-basis: auto;
