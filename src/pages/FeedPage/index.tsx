@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState, MouseEvent } from 'react';
 import GenericLayout from '../../layouts/GenericLayout';
 
 import { YlideButton } from '../../controls/YlideButton';
@@ -49,11 +49,17 @@ const FeedPostControl = observer(({ post }: { post: FeedPost }) => {
 		setCollapsed(false);
 	}, []);
 
+	const onPostTextClick = (e: MouseEvent) => {
+		if ((e.target as Element).tagName.toUpperCase() === 'IMG') {
+			GalleryModal.view([(e.target as HTMLImageElement).src]);
+		}
+	}
+
 	const renderPostContent = () => {
 		return <div className="post-content">
 			{post.title ? <div className="post-title">{post.title}</div> : null}
 			{post.subtitle ? <div className="post-subtitle">{post.subtitle}</div> : null}
-			<div className="post-text" dangerouslySetInnerHTML={{ __html: post.content }}/>
+			<div className="post-text" dangerouslySetInnerHTML={{ __html: post.content }} onClick={onPostTextClick}/>
 			{post.picrel && post.sourceType !== LinkType.MIRROR ? (
 				post.picrel.endsWith('.mp4') ? (
 					<video loop className="post-picrel" controls>
