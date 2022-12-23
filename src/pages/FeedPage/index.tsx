@@ -54,7 +54,7 @@ const FeedPostControl = observer(({ post }: { post: FeedPost }) => {
 			{post.title ? <div className="post-title">{post.title}</div> : null}
 			{post.subtitle ? <div className="post-subtitle">{post.subtitle}</div> : null}
 			<div className="post-text" dangerouslySetInnerHTML={{ __html: post.content }}/>
-			{post.picrel ? (
+			{post.picrel && post.sourceType !== LinkType.MIRROR ? (
 				post.picrel.endsWith('.mp4') ? (
 					<video loop className="post-picrel" controls>
 						<source src={post.picrel} type="video/mp4" />
