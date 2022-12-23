@@ -60,6 +60,13 @@
 		@include flex-row(center, flex-start);
 		margin-left: 10px;
 		margin-right: 0px;
+		white-space: nowrap;
+
+		@include less480px {
+			span {
+				display: none;
+			}
+		}
 	}
 
 	.users-block-icon {
