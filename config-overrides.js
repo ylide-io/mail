@@ -25,6 +25,20 @@ module.exports = function override(config) {
 		use: ['source-map-loader'],
 		enforce: 'pre',
 	});
+	config.module.rules.push({
+		test: /\.(css|scss|sass)$/,
+		use: [
+			{
+				loader: 'sass-loader',
+				options: {
+					additionalData: "@import 'mixins.scss';",
+					sassOptions: {
+						includePaths: ['src/styles'],
+					},
+				},
+			},
+		],
+	});
 	// config.target.target = 'es2022';
 	return config;
 };

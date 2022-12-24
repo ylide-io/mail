@@ -1,0 +1,53 @@
+$font-family_main: Lexend, Verdana, Geneva, sans-serif;
+$font-family_wide: 'Lexend Exa', Verdana, Geneva, sans-serif;
+$font-family_code: source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace;
+
+@mixin flex-row($align-items, $justify-content) {
+	display: flex;
+	flex-direction: row;
+	align-items: $align-items;
+	justify-content: $justify-content;
+}
+
+@mixin flex-column($align-items, $justify-content) {
+	display: flex;
+	flex-direction: column;
+	align-items: $align-items;
+	justify-content: $justify-content;
+}
+
+@mixin less980px() {
+	@media (max-width: 980px) {
+		@content;
+	}
+}
+
+@mixin less920px() {
+	@media (max-width: 920px) {
+		@content;
+	}
+}
+
+@mixin less720px() {
+	@media (max-width: 720px) {
+		@content;
+	}
+}
+
+@mixin less670px() {
+	@media (max-width: 670px) {
+		@content;
+	}
+}
+
+@mixin less630px() {
+	@media (max-width: 630px) {
+		@content;
+	}
+}
+
+@mixin less480px() {
+	@media (max-width: 480px) {
+		@content;
+	}
+}
