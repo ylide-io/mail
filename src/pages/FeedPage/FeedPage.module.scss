@@ -157,12 +157,12 @@
 }
 
 .postSourceUser {
-	color: #a5a8b4;
+	color: var(--secondary-text-color);
 }
 
 .postDate {
 	grid-column: 2/3;
-	color: #a5a8b4;
+	color: var(--secondary-text-color);
 	font-weight: $font-weight_light;
 }
 
@@ -171,10 +171,10 @@
 	grid-column: 3/4;
 	width: 20px;
 	height: 20px;
-	color: #c9cacc;
+	color: var(--secondary-text-color);
 
 	&:hover {
-		color: #333;
+		color: var(--primary-text-color);
 	}
 }
 
@@ -290,7 +290,7 @@
 	height: 70px;
 	font-size: 15px;
 	text-align: center;
-	color: #1d9bf0;
+	color: var(--link-color);
 	background: rgb(255, 255, 255);
 	background: linear-gradient(0deg, rgba(255, 255, 255, 1) 80%, rgba(0, 212, 255, 0) 100%);
 	border-bottom-left-radius: 12px;
@@ -299,7 +299,7 @@
 
 	&:hover,
 	&:focus-visible {
-		color: #333;
+		color: var(--primary-text-color);
 	}
 }
 

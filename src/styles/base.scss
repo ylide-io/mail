@@ -1,3 +1,10 @@
+:root {
+	--primary-text-color: #111;
+	--secondary-text-color: #a5a8b4;
+
+	--link-color: #1d9bf0;
+}
+
 body,
 input,
 textarea,
@@ -5,7 +12,7 @@ select,
 button {
 	// 1.25 - default Figma line-height for Lexend font
 	font: 13px/1.25 $font-family_main;
-	color: #111;
+	color: var(--primary-text-color);
 	-webkit-font-smoothing: antialiased;
 	-moz-osx-font-smoothing: grayscale;
 }
@@ -44,7 +51,7 @@ button:focus {
 }
 
 ::placeholder {
-	color: #a5a8b4;
+	color: var(--secondary-text-color);
 }
 
 button,
