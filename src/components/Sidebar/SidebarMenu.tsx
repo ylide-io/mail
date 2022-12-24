@@ -163,7 +163,7 @@ const FeedSettings = observer(() => {
 						feed.mainCategories = [...newValues];
 						localStorage.setItem('t_main_categories', JSON.stringify(feed.mainCategories));
 						if (feed.selectedCategory === 'main') {
-							feed.loadCategory('main');
+							feed.loadCategory('main', null);
 						}
 					}}
 				>

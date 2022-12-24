@@ -135,10 +135,16 @@
 }
 
 .postSource {
+	justify-self: start;
 	display: flex;
 	flex-wrap: wrap;
 	align-items: center;
 	font-size: 15px;
+	cursor: pointer;
+
+	&:hover {
+		color: var(--link-color);
+	}
 
 	> * {
 		margin: 0 4px 0 0;

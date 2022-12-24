@@ -57,6 +57,8 @@ class Feed {
 			]),
 	);
 
+	@observable sourceId: string | null = null;
+
 	@observable newPosts: number = 0;
 	@observable moreAvailable = false;
 	@observable errorLoading = false;
@@ -73,6 +75,7 @@ class Feed {
 
 	async genericLoad(
 		categories: string[],
+		sourceId: string | null,
 		lastPostId: string | null,
 		firstPostId: string | null,
 		length: number,
@@ -94,9 +97,11 @@ class Feed {
 			const response = await fetch(
 				`${feedEndpoint}/${needOld ? 'post' : 'new-post'}?categories=${encodeURIComponent(
 					categories.join(','),
-				)}&lastPostId=${lastPostId ? encodeURIComponent(lastPostId) : 'null'}&firstPostId=${
-					firstPostId ? encodeURIComponent(firstPostId) : 'null'
-				}&length=${encodeURIComponent(String(length))}`,
+				)}&sourceId=${sourceId || ''}&lastPostId=${
+					lastPostId ? encodeURIComponent(lastPostId) : 'null'
+				}&firstPostId=${firstPostId ? encodeURIComponent(firstPostId) : 'null'}&length=${encodeURIComponent(
+					String(length),
+				)}`,
 				{
 					method: 'GET',
 				},
@@ -111,11 +116,13 @@ class Feed {
 		}
 	}
 
-	async loadCategory(id: string) {
+	async loadCategory(id: string, sourceId: string | null) {
 		this.selectedCategory = id;
+		this.sourceId = sourceId;
 		this.loaded = false;
 		const result = await this.genericLoad(
 			this.getCategories(this.selectedCategory),
+			this.sourceId,
 			null, // '1599259863087190016',
 			null, // '1599259863087190016',
 			10,
@@ -132,6 +139,7 @@ class Feed {
 	async loadMore(length: number) {
 		const result = await this.genericLoad(
 			this.getCategories(this.selectedCategory),
+			this.sourceId,
 			this.posts.at(-1)?.id || null, // '1599259863087190016',
 			this.posts.at(0)?.id || null, // '1599259863087190016',
 			length,
@@ -148,6 +156,7 @@ class Feed {
 	async loadNew() {
 		const result = await this.genericLoad(
 			this.getCategories(this.selectedCategory),
+			this.sourceId,
 			this.posts.at(-1)?.id || null, // '1599259863087190016',
 			this.posts.at(0)?.id || null, // '1599259863087190016',
 			10,
@@ -162,7 +171,7 @@ class Feed {
 
 	constructor() {
 		makeObservable(this);
-		this.loadCategory('main');
+		this.loadCategory('main', null);
 	}
 }
 

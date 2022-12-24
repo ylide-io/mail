@@ -14,7 +14,7 @@ import { linkIcon } from '../../icons/static/linkIcon';
 import GalleryModal from '../../modals/GalleryModal';
 import { Loader } from '../../controls/Loader';
 import { observer } from 'mobx-react';
-import { useParams } from 'react-router-dom';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { CaretDown } from '../../icons/CaretDown';
 import clsx from 'clsx';
 import css from './FeedPage.module.scss';
@@ -35,6 +35,8 @@ function isInViewport(element: HTMLDivElement) {
 const FeedPostControl = observer(({ post }: { post: FeedPost }) => {
 	const selfRef = useRef<HTMLDivElement>(null);
 	const [collapsed, setCollapsed] = useState(false);
+	const location = useLocation();
+	const navigate = useNavigate();
 
 	useEffect(() => {
 		if (selfRef.current && selfRef.current.getBoundingClientRect().height > 600) {
@@ -48,6 +50,10 @@ const FeedPostControl = observer(({ post }: { post: FeedPost }) => {
 		}
 	};
 
+	const onSourceIdClick = () => {
+		navigate(`${location.pathname}?sourceId=${post.sourceId}`);
+	};
+
 	return (
 		<div ref={selfRef} className={clsx(css.post, { [css.post_collapsed]: collapsed })}>
 			<div className={css.postAva}>
@@ -56,7 +62,7 @@ const FeedPostControl = observer(({ post }: { post: FeedPost }) => {
 			</div>
 
 			<div className={css.postMeta}>
-				<div className={css.postSource}>
+				<div className={css.postSource} onClick={onSourceIdClick}>
 					{!!post.authorName && <div>{post.authorName}</div>}
 					{!!post.authorNickname && <div className={css.postSourceUser}>{post.authorNickname}</div>}
 					{!!post.sourceName && (
@@ -155,11 +161,14 @@ export const FeedPage = observer(() => {
 	const feedBodyRef = useRef<HTMLDivElement>(null);
 	const [newPostsVisible, setNewPostsVisible] = useState(false);
 	const { category } = useParams();
+	const { search } = useLocation();
+	const searchParams = search.length > 1 ? new URLSearchParams(search.slice(1)) : undefined;
+	const sourceId = searchParams?.get('sourceId') || null;
 
 	useEffect(() => {
 		// noinspection JSIgnoredPromiseFromCall
-		feed.loadCategory(category!);
-	}, [category]);
+		feed.loadCategory(category!, sourceId);
+	}, [category, sourceId]);
 
 	useEffect(() => {
 		const timer = setInterval(async () => {
