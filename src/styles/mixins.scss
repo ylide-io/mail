@@ -2,19 +2,11 @@ $font-family_main: Lexend, Verdana, Geneva, sans-serif;
 $font-family_wide: 'Lexend Exa', Verdana, Geneva, sans-serif;
 $font-family_code: source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace;
 
-@mixin flex-row($align-items, $justify-content) {
-	display: flex;
-	flex-direction: row;
-	align-items: $align-items;
-	justify-content: $justify-content;
-}
+$font-weight_normal: 400;
+$font-weight_bold: 700;
+$font-weight_light: 300;
 
-@mixin flex-column($align-items, $justify-content) {
-	display: flex;
-	flex-direction: column;
-	align-items: $align-items;
-	justify-content: $justify-content;
-}
+// MEDIA RULES
 
 @mixin less980px() {
 	@media (max-width: 980px) {
@@ -50,4 +42,35 @@ $font-family_code: source-code-pro, Menlo, Monaco, Consolas, 'Courier New', mono
 	@media (max-width: 480px) {
 		@content;
 	}
+}
+
+// UTILS
+
+@mixin expand-click-area($size: 8px, $pseudo: before) {
+	position: relative;
+
+	&:#{$pseudo} {
+		content: '';
+		position: absolute;
+		top: -#{$size};
+		right: -#{$size};
+		bottom: -#{$size};
+		left: -#{$size};
+	}
+}
+
+// MISC
+
+@mixin flex-row($align-items, $justify-content) {
+	display: flex;
+	flex-direction: row;
+	align-items: $align-items;
+	justify-content: $justify-content;
+}
+
+@mixin flex-column($align-items, $justify-content) {
+	display: flex;
+	flex-direction: column;
+	align-items: $align-items;
+	justify-content: $justify-content;
 }

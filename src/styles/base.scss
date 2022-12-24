@@ -26,6 +26,45 @@ body {
 	background-repeat: no-repeat;
 }
 
+label {
+	cursor: inherit;
+}
+
+input,
+button {
+	appearance: none;
+	padding: 0;
+	background: none;
+	border: 0;
+}
+
+input:focus,
+button:focus {
+	outline: none;
+}
+
+::placeholder {
+	color: #a5a8b4;
+}
+
+button,
+[type='button'],
+[type='reset'],
+[type='submit'] {
+	cursor: pointer;
+}
+
+code {
+	font-family: $font-family_code;
+}
+
+svg {
+	display: block;
+	fill: currentColor;
+}
+
+//
+
 #root {
 	@include flex-column(stretch, flex-start);
 
@@ -34,10 +73,6 @@ body {
 
 	flex-grow: 1;
 	flex-shrink: 1;
-}
-
-code {
-	font-family: $font-family_code;
 }
 
 body.modal-body-catch {

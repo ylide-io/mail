@@ -16,8 +16,8 @@ import { Loader } from '../../controls/Loader';
 import { observer } from 'mobx-react';
 import { useParams } from 'react-router-dom';
 import { CaretDown } from '../../icons/CaretDown';
-import { useWindowSize } from '../../utils/useWindowSize';
 import clsx from 'clsx';
+import css from './FeedPage.module.scss';
 
 const sourceIcon: Record<LinkType, JSX.Element> = {
 	[LinkType.TWITTER]: twitterSourceIcon,
@@ -34,19 +34,12 @@ function isInViewport(element: HTMLDivElement) {
 
 const FeedPostControl = observer(({ post }: { post: FeedPost }) => {
 	const selfRef = useRef<HTMLDivElement>(null);
-	const { windowWidth } = useWindowSize();
 	const [collapsed, setCollapsed] = useState(false);
 
 	useEffect(() => {
-		if (selfRef.current) {
-			if (selfRef.current.getBoundingClientRect().height > 600) {
-				setCollapsed(true);
-			}
+		if (selfRef.current && selfRef.current.getBoundingClientRect().height > 600) {
+			setCollapsed(true);
 		}
-	}, []);
-
-	const readMore = useCallback(() => {
-		setCollapsed(false);
 	}, []);
 
 	const onPostTextClick = (e: MouseEvent) => {
@@ -55,157 +48,106 @@ const FeedPostControl = observer(({ post }: { post: FeedPost }) => {
 		}
 	};
 
-	const renderPostContent = () => {
-		return (
-			<div className="post-content">
-				{post.title ? <div className="post-title">{post.title}</div> : null}
-				{post.subtitle ? <div className="post-subtitle">{post.subtitle}</div> : null}
+	return (
+		<div ref={selfRef} className={clsx(css.post, { [css.post_collapsed]: collapsed })}>
+			<div className={css.postAva}>
+				<Avatar size={48} src={post.authorAvatar} icon={<UserOutlined />} />
+				<div className={css.postAvaSource}>{sourceIcon[post.sourceType]}</div>
+			</div>
+
+			<div className={css.postMeta}>
+				<div className={css.postSource}>
+					{!!post.authorName && <div>{post.authorName}</div>}
+					{!!post.authorNickname && <div className={css.postSourceUser}>{post.authorNickname}</div>}
+					{!!post.sourceName && (
+						<>
+							<div>in</div>
+							<div className={css.postSourceName}>
+								<div>{discordSourceIcon}</div>
+								<div>{post.sourceName}</div>
+							</div>
+						</>
+					)}
+				</div>
+				<div className={css.postDate}>{moment.utc(post.date).local().format('MMM D, YYYY, HH:mm')}</div>
+				{!!post.sourceLink && (
+					<a className={css.postExternalButton} href={post.sourceLink} target="_blank" rel="noreferrer">
+						{linkIcon}
+					</a>
+				)}
+			</div>
+
+			<div className={css.postContent}>
+				{!!post.title && <div className={css.postTitle}>{post.title}</div>}
+
+				{!!post.subtitle && <div className={css.postSubtitle}>{post.subtitle}</div>}
+
 				<div
-					className="post-text"
+					className={css.postText}
 					dangerouslySetInnerHTML={{ __html: post.content }}
 					onClick={onPostTextClick}
 				/>
-				{post.picrel && post.sourceType !== LinkType.MIRROR ? (
-					post.picrel.endsWith('.mp4') ? (
-						<video loop className="post-picrel" controls>
+
+				{!!post.picrel &&
+					post.sourceType !== LinkType.MIRROR &&
+					(post.picrel.endsWith('.mp4') ? (
+						<video loop className={css.postPicture} controls>
 							<source src={post.picrel} type="video/mp4" />
 						</video>
 					) : (
 						<div
 							style={{ backgroundImage: `url("${post.picrel}")` }}
-							className="post-picrel"
+							className={css.postPicture}
 							onClick={() => {
 								GalleryModal.view([post.picrel]);
 							}}
 						/>
-					)
-				) : null}
-				{post.embeds.length ? (
-					<div className="post-embeds">
+					))}
+
+				{!!post.embeds.length && (
+					<div className={css.postEmbeds}>
 						{post.embeds.map((e, idx) => (
 							<a
+								key={idx}
+								className={clsx(css.postEmbed, {
+									[css.postEmbed_withLink]: !!e.link,
+								})}
+								href={e.link}
 								target="_blank"
 								rel="noreferrer"
-								href={e.link || ''}
-								key={idx}
-								className={clsx('post-embed', {
-									'with-link': !!e.link,
-								})}
 							>
-								{e.previewImageUrl ? (
+								{!!e.previewImageUrl && (
 									<div
-										className="post-embed-image"
+										className={css.postEmbedImage}
 										style={{
 											backgroundImage: `url("${e.previewImageUrl}")`,
 										}}
 									/>
-								) : null}
-								{e.link ? (
-									<div className="post-embed-link">
+								)}
+
+								{!!e.link && (
+									<div className={css.postEmbedLink}>
 										{e.link.length > 60 ? `${e.link.substring(0, 60)}...` : e.link}
 									</div>
-								) : null}
-								{e.title ? <div className="post-embed-title">{e.title}</div> : null}
-								{e.text ? (
-									<div className="post-embed-text" dangerouslySetInnerHTML={{ __html: e.text }} />
-								) : null}
+								)}
+								{e.title ? <div className={css.postEmbedTitle}>{e.title}</div> : null}
+
+								{!!e.text && (
+									<div className={css.postEmbedText} dangerouslySetInnerHTML={{ __html: e.text }} />
+								)}
 							</a>
 						))}
 					</div>
-				) : null}
+				)}
 			</div>
-		);
-	};
 
-	if (windowWidth <= 670) {
-		return (
-			<div className={clsx('post-mobile', { collapsed })} ref={selfRef}>
-				<div className="post-header">
-					<div className="post-ava">
-						<div className="post-ava-image">
-							<Avatar size={48} src={post.authorAvatar} icon={<UserOutlined />} />
-							<div className="post-ava-source">{sourceIcon[post.sourceType]}</div>
-						</div>
-					</div>
-					<div className="post-meta">
-						<div className="post-source-left">
-							{post.authorName ? <div className="post-source-name">{post.authorName}</div> : null}
-							{post.authorNickname ? (
-								<div className="post-source-username">{post.authorNickname}</div>
-							) : null}
-							{post.sourceName ? (
-								<>
-									<div className="post-source-in">in</div>
-									<div className="post-source-data">
-										<div className="post-source-channel-icon">{discordSourceIcon}</div>
-										<div className="post-source-channel-name">{post.sourceName}</div>
-									</div>
-								</>
-							) : null}
-						</div>
-						<div className="post-source-right">
-							<div className="post-source-date">
-								{moment.utc(post.date).local().format('MMM D, YYYY, HH:mm')}
-							</div>
-						</div>
-					</div>
-					{post.sourceLink ? (
-						<a className="post-source-link" href={post.sourceLink} target="_blank" rel="noreferrer">
-							{linkIcon}
-						</a>
-					) : null}
-				</div>
-				{renderPostContent()}
-				<div className="post-collapser" onClick={readMore}>
-					<span className="rm-expander">Read more</span>
-				</div>
-			</div>
-		);
-	} else {
-		return (
-			<div className={clsx('post-desktop', { collapsed })} ref={selfRef}>
-				<div className="post-ava">
-					<div className="post-ava-image">
-						<Avatar size={48} src={post.authorAvatar} icon={<UserOutlined />} />
-						<div className="post-ava-source">{sourceIcon[post.sourceType]}</div>
-					</div>
-				</div>
-				<div className="post-body">
-					<div className="post-meta">
-						<div className="post-source-left">
-							{post.authorName ? <div className="post-source-name">{post.authorName}</div> : null}
-							{post.authorNickname ? (
-								<div className="post-source-username">{post.authorNickname}</div>
-							) : null}
-							{post.sourceName ? (
-								<>
-									<div className="post-source-in">in</div>
-									<div className="post-source-data">
-										<div className="post-source-channel-icon">{discordSourceIcon}</div>
-										<div className="post-source-channel-name">{post.sourceName}</div>
-									</div>
-								</>
-							) : null}
-						</div>
-						<div className="post-source-right">
-							<div className="post-source-date">
-								{moment.utc(post.date).local().format('MMM D, YYYY, HH:mm')}
-							</div>
-							{post.sourceLink ? (
-								<a className="post-source-link" href={post.sourceLink} target="_blank" rel="noreferrer">
-									{linkIcon}
-								</a>
-							) : null}
-						</div>
-					</div>
-					{renderPostContent()}
-				</div>
-				<div className="post-collapser" onClick={readMore}>
-					<span className="rm-expander">Read more</span>
-				</div>
-			</div>
-		);
-	}
+			{collapsed && (
+				<button className={css.postReadMore} onClick={() => setCollapsed(false)}>
+					Read more
+				</button>
+			)}
+		</div>
+	);
 });
 
 export const FeedPage = observer(() => {
@@ -215,6 +157,7 @@ export const FeedPage = observer(() => {
 	const { category } = useParams();
 
 	useEffect(() => {
+		// noinspection JSIgnoredPromiseFromCall
 		feed.loadCategory(category!);
 	}, [category]);
 
@@ -223,15 +166,15 @@ export const FeedPage = observer(() => {
 			if (lastPostView.current && isInViewport(lastPostView.current) && !feed.loading && feed.moreAvailable) {
 				await feed.loadMore(10);
 			}
+
 			if (feedBodyRef.current && feedBodyRef.current.getBoundingClientRect().top < 0) {
 				setNewPostsVisible(true);
 			} else {
 				setNewPostsVisible(false);
 			}
 		}, 300);
-		return () => {
-			clearInterval(timer);
-		};
+
+		return () => clearInterval(timer);
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [feed.loading, feed.moreAvailable]);
 
@@ -242,12 +185,14 @@ export const FeedPage = observer(() => {
 		});
 	}, []);
 
-	const showNewPosts = useCallback(async () => {
-		scrollToTop();
+	const showNewPosts = useCallback(() => {
+		// noinspection JSIgnoredPromiseFromCall
 		feed.loadNew();
+
+		scrollToTop();
 	}, [scrollToTop]);
 
-	let title = 'My feed';
+	let title;
 
 	if (feed.selectedCategory === 'main') {
 		title = 'My feed';
@@ -258,48 +203,53 @@ export const FeedPage = observer(() => {
 	}
 
 	return (
-		<GenericLayout mainClass="feed-container">
-			<div className="feed">
-				<div className="feed-title">
-					<h3 className="feed-title-text">{title}</h3>
-					<h3 className="feed-title-actions">
-						{feed.newPosts ? (
+		<GenericLayout mainClass={css.feedContainer}>
+			<div className={css.feed}>
+				<div className={css.feedTitle}>
+					<h3 className={css.feedTitleText}>{title}</h3>
+					<h3>
+						{!!feed.newPosts && (
 							<YlideButton size="small" nice onClick={showNewPosts}>
 								Show {feed.newPosts} new posts
 							</YlideButton>
-						) : null}
+						)}
 					</h3>
 				</div>
-				{newPostsVisible ? (
-					<div className="feed-scroll-to-top" onClick={scrollToTop}>
+
+				{newPostsVisible && (
+					<div className={css.feedScrollToTop} onClick={scrollToTop}>
 						<CaretDown color="black" style={{ width: 40, height: 40 }} />
 					</div>
-				) : null}
-				<div className="feed-body" ref={feedBodyRef}>
-					{newPostsVisible && feed.newPosts ? (
-						<div className="feed-new-posts">
-							<YlideButton size="small" nice onClick={showNewPosts}>
+				)}
+
+				<div className={css.feedBody} ref={feedBodyRef}>
+					{newPostsVisible && !!feed.newPosts && (
+						<div className={css.feedNewPosts}>
+							<YlideButton className={css.feedNewPostsButton} size="small" nice onClick={showNewPosts}>
 								Show {feed.newPosts} new posts
 							</YlideButton>
 						</div>
-					) : null}
+					)}
+
 					{feed.loaded ? (
 						<>
 							{feed.posts.map(post => {
 								return <FeedPostControl post={post} key={post.id} />;
 							})}
-							{feed.moreAvailable ? (
-								<div className="feed-last-post" ref={lastPostView}>
-									{feed.loading ? <Loader reason="Loading more posts..." /> : null}
+
+							{feed.moreAvailable && (
+								<div className={css.feedLastPost} ref={lastPostView}>
+									{feed.loading && <Loader reason="Loading more posts..." />}
 								</div>
-							) : null}
+							)}
 						</>
 					) : (
 						<div style={{ marginTop: 30 }}>
 							<Loader reason="Your feed is loading..." />
 						</div>
 					)}
-					{feed.errorLoading ? `Sorry, an error occured during feed loading. Please, try again later.` : null}
+
+					{feed.errorLoading && `Sorry, an error occured during feed loading. Please, try again later.`}
 				</div>
 			</div>
 		</GenericLayout>

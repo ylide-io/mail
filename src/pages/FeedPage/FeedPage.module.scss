@@ -1,0 +1,329 @@
+.feedContainer {
+	@include flex-column(center, flex-start);
+
+	// FIXME get rid of !important
+	background-color: transparent !important;
+	box-shadow: unset !important;
+
+	padding-right: 240px;
+
+	@include less920px {
+		padding-right: 0;
+		width: 100%;
+	}
+}
+
+.feed {
+	@include flex-column(stretch, flex-start);
+
+	width: 656px;
+
+	@include less670px {
+		width: 100%;
+	}
+
+	.feedTitle {
+		@include flex-row(center, space-between);
+
+		padding-left: 12px;
+		padding-right: 12px;
+
+		.feedTitleText {
+			font-family: $font-family_wide;
+			font-style: normal;
+			font-weight: 400;
+			font-size: 24px;
+			line-height: 32px;
+			letter-spacing: -0.09em;
+
+			color: #202020;
+		}
+	}
+}
+
+.feedBody {
+	@include flex-column(stretch, flex-start);
+}
+
+.feedNewPosts {
+	@include flex-row(center, center);
+	position: fixed;
+	top: 30px;
+	left: 50%;
+	width: 200px;
+	margin-left: -100px;
+	z-index: 20;
+
+	.feedNewPostsButton {
+		background-color: white;
+		box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+
+		&:hover {
+			color: black;
+		}
+	}
+}
+
+.feedLastPost {
+	height: 250px;
+}
+
+.feedScrollToTop {
+	@include flex-row(center, center);
+
+	width: 60px;
+	height: 60px;
+	border-radius: 50%;
+	background-color: white;
+	border: 1px solid black;
+	cursor: pointer;
+	box-shadow: 0px 0px 0px rgba(0, 0, 0, 0.2);
+
+	position: fixed;
+	right: 20px;
+	bottom: 20px;
+
+	transition: box-shadow 0.2s;
+
+	&:hover {
+		box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2);
+	}
+}
+
+//
+
+.post {
+	display: grid;
+	grid-template-columns: auto 1fr;
+	grid-template-rows: auto 1fr;
+	grid-gap: 12px;
+	position: relative;
+	margin: 0 0 12px;
+	padding: 12px;
+	background: #fff;
+	border: 0.5px solid #caccd3;
+	border-radius: 12px;
+}
+
+.post_collapsed {
+	max-height: 600px;
+	overflow: hidden;
+}
+
+.postAva {
+	grid-row: 1/3;
+	position: relative;
+	width: 48px;
+	height: 48px;
+}
+
+.postAvaSource {
+	position: absolute;
+	right: -8px;
+	bottom: -8px;
+	width: 26px;
+	height: 26px;
+	border-radius: 50%;
+}
+
+.postMeta {
+	grid-column: 2/3;
+	display: grid;
+	grid-template-columns: 1fr auto auto;
+	align-items: center;
+	grid-gap: 4px;
+}
+
+.postSource {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	font-size: 15px;
+
+	> * {
+		margin: 0 4px 0 0;
+	}
+
+	> :last-child {
+		margin: 0;
+	}
+}
+
+.postSourceName {
+	display: grid;
+	grid-auto-flow: column;
+	align-items: center;
+	grid-gap: 4px;
+}
+
+.postSourceUser {
+	color: #a5a8b4;
+}
+
+.postDate {
+	grid-column: 2/3;
+	color: #a5a8b4;
+	font-weight: $font-weight_light;
+}
+
+.postExternalButton {
+	@include expand-click-area(4px);
+	grid-column: 3/4;
+	width: 20px;
+	height: 20px;
+	color: #c9cacc;
+
+	&:hover {
+		color: #333;
+	}
+}
+
+.postContent {
+	grid-column: 2/3;
+	display: grid;
+	grid-gap: 12px;
+}
+
+.postTitle {
+	font-size: 20px;
+	font-weight: $font-weight_bold;
+}
+
+.postSubtitle {
+	font-size: 15px;
+}
+
+.postText {
+	font-size: 15px;
+	font-weight: $font-weight_light;
+	line-height: 1.5;
+	word-break: break-word;
+
+	> * {
+		margin: 0 0 0.8em;
+
+		&:last-child {
+			margin: 0;
+		}
+	}
+
+	img {
+		max-width: 100%;
+		cursor: pointer;
+	}
+}
+
+.postEmbeds {
+	display: grid;
+	grid-gap: 8px;
+}
+
+.postEmbed {
+	$padding: 15px;
+	padding-bottom: $padding;
+	background: #fafcf9;
+	border: 1px solid #e0e0e0;
+	border-radius: 10px;
+	overflow: hidden;
+	box-shadow: 0 0 0 rgba(0, 0, 0, 0.1);
+	transition: box-shadow 0.3s;
+
+	&_withLink:hover {
+		box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+	}
+
+	.postEmbedImage {
+		border-bottom: 1px solid #e0e0e0;
+		height: 200px;
+		background-size: cover;
+		background-position: center center;
+		background-repeat: no-repeat;
+	}
+
+	.postEmbedLink {
+		color: #707070;
+		margin-top: 8px;
+		padding-left: $padding;
+		padding-right: $padding;
+	}
+
+	.postEmbedTitle {
+		color: #202020;
+		font-size: 18px;
+		font-weight: bold;
+		margin-top: 8px;
+		padding-left: $padding;
+		padding-right: $padding;
+	}
+
+	.postEmbedText {
+		color: #404040;
+		font-size: 14px;
+		margin-top: 8px;
+		padding-left: $padding;
+		padding-right: $padding;
+
+		word-break: break-word;
+
+		p:last-child {
+			margin-bottom: 0;
+		}
+	}
+}
+
+.postPicture {
+	width: 100%;
+	height: 240px;
+	background-size: cover;
+	background-position: center center;
+	background-repeat: no-repeat;
+	border-radius: 10px;
+	cursor: pointer;
+}
+
+.postReadMore {
+	position: absolute;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	padding: 12px 0 0;
+	height: 70px;
+	font-size: 15px;
+	text-align: center;
+	color: #1d9bf0;
+	background: rgb(255, 255, 255);
+	background: linear-gradient(0deg, rgba(255, 255, 255, 1) 80%, rgba(0, 212, 255, 0) 100%);
+	border-bottom-left-radius: 12px;
+	border-bottom-right-radius: 12px;
+	cursor: pointer;
+
+	&:hover,
+	&:focus-visible {
+		color: #333;
+	}
+}
+
+@include less670px {
+	.postAva {
+		grid-row: 1/2;
+	}
+
+	.postMeta {
+		grid-template-columns: 1fr auto;
+		align-content: center;
+		grid-gap: 0 4px;
+	}
+
+	.postDate {
+		grid-column: 1/3;
+	}
+
+	.postExternalButton {
+		grid-column: 2/3;
+		grid-row: 1/2;
+	}
+
+	.postContent {
+		grid-column: 1/3;
+	}
+}
