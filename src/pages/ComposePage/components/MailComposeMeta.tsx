@@ -1,6 +1,7 @@
 import { Input, Select } from 'antd';
 import { observer } from 'mobx-react';
 import { PureComponent } from 'react';
+import { getNameOfJSDocTypedef } from 'typescript';
 import { RecipientsSelect } from '../../../controls/RecipientSelect';
 import domain from '../../../stores/Domain';
 import mailbox from '../../../stores/Mailbox';
@@ -8,10 +9,46 @@ import { shrinkAddress } from '../../../utils/shrinkAddress';
 
 @observer
 export class MailComposeMeta extends PureComponent {
+	state = {
+		loaded: false,
+	};
+
 	componentDidMount(): void {
 		if (!mailbox.from && domain.accounts.activeAccounts.length) {
 			mailbox.from = domain.accounts.activeAccounts[0];
 		}
+
+		const queryParams = () => {
+			const result: Record<string, string | undefined> = {};
+			new URLSearchParams(window.location.search).forEach((value, key) => {
+				result[key] = value;
+			});
+			return result;
+		};
+
+		const searchParams = queryParams();
+
+		const input = searchParams.input;
+		const type = searchParams.type as 'address' | 'contact' | 'ns' | 'invalid';
+		const address = searchParams.address;
+		const subject = searchParams.subject;
+
+		if ((type === 'address' && address !== undefined) || (type === 'ns' && address !== undefined)) {
+			mailbox.to = [
+				{
+					loading: true,
+					input: input || '',
+					type: type,
+					address: address || '',
+					isAchievable: null,
+					comment: '',
+				},
+			];
+		}
+
+		mailbox.subject = subject || '';
+
+		this.setState(state => ({ loaded: true }));
 	}
 
 	render() {
@@ -40,7 +77,7 @@ export class MailComposeMeta extends PureComponent {
 					<div className="mmp-row">
 						<label className="mmp-row-title">To:</label>
 						<div className="mmp-row-value" style={{ position: 'relative', zIndex: 2 }}>
-							<RecipientsSelect mutableValues={mailbox.to} />
+							{this.state.loaded && <RecipientsSelect mutableValues={mailbox.to} />}
 						</div>
 					</div>
 					<div className="mmp-row">

@@ -1,10 +1,9 @@
-import React from 'react';
-import { Select, Tag, Spin, Tooltip, Menu, RefSelectProps } from 'antd';
-import { autobind } from 'core-decorators';
-import { observable, makeObservable, action } from 'mobx';
-import { observer } from 'mobx-react';
-import { PureComponent } from 'react';
+import { Menu, RefSelectProps, Select, Spin, Tag, Tooltip } from 'antd';
 import cn from 'classnames';
+import { autobind } from 'core-decorators';
+import { action, makeObservable, observable } from 'mobx';
+import { observer } from 'mobx-react';
+import React, { PureComponent } from 'react';
 import contacts from '../../stores/Contacts';
 import domain from '../../stores/Domain';
 import { IRecipient } from '../../stores/Mailbox';

@@ -84,6 +84,15 @@ class Contacts {
 		};
 	}
 
+	generateNewContactFromParams(name: IContact['name'], address: IContact['address']) {
+		this.newContact = {
+			name,
+			address,
+			description: '',
+			tags: [],
+		};
+	}
+
 	resetNewContact() {
 		this.newContact = null;
 	}
