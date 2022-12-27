@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { GenericLayout } from '../../layouts/GenericLayout';
 import { smallButtonColors, smallButtonIcons } from '../../components/smallButton/smallButton';
 import { useNav } from '../../utils/navigate';
@@ -10,9 +10,14 @@ import { Button } from 'antd';
 import ComposeMailFooter from './components/Mailbox/ComposeMailFooter';
 import ComposeMailBody from './components/Mailbox/ComposeMailBody';
 import { MailComposeMeta } from './components/MailComposeMeta';
+import { analytics } from '../../stores/Analytics';
 
 export const ComposePage = observer(() => {
 	const navigate = useNav();
+
+	useEffect(() => {
+		analytics.composeOpened();
+	}, []);
 
 	return (
 		<GenericLayout>

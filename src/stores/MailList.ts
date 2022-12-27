@@ -23,6 +23,7 @@ import {
 import { autobind } from 'core-decorators';
 import { makeObservable, observable, reaction } from 'mobx';
 import messagesDB, { IMessageDecodedContent } from '../indexedDB/MessagesDB';
+import { analytics } from './Analytics';
 import contacts from './Contacts';
 import domain from './Domain';
 import { DomainAccount } from './models/DomainAccount';
@@ -260,6 +261,8 @@ export class MailList {
 	}
 
 	async decodeMessage(pushMsg: ILinkedMessage) {
+		analytics.mailOpened(this.activeFolderId || 'null');
+
 		if (this.decodedMessagesById[pushMsg.msgId]) {
 			return this.decodedMessagesById[pushMsg.msgId];
 		}
@@ -418,6 +421,7 @@ export class MailList {
 		// 	}
 		// 	await this.nextPage();
 		// } else {
+		analytics.mailFolderOpened(folderId);
 		if (this.activeFolderId) {
 			await this.folderChangeCriticalSection.enter();
 			this.currentList.pause();

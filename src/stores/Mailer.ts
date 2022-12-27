@@ -4,6 +4,7 @@ import { MessageContentV3, ServiceCode } from '@ylide/sdk';
 import domain from './Domain';
 import { DomainAccount } from './models/DomainAccount';
 import { EVM_NAMES, EVMNetwork } from '@ylide/ethereum';
+import { analytics } from './Analytics';
 
 // interface filteringTypesInterface {
 // 	unread: (arg1: IMessage) => Promise<boolean>;
@@ -69,6 +70,8 @@ class Mailer {
 		recipients: string[],
 		network?: EVMNetwork,
 	): Promise<string | null> {
+		let error = false;
+		analytics.mailSentAttempt();
 		try {
 			this.sending = true;
 			const content = MessageContentV3.plain(subject, text);
@@ -95,8 +98,12 @@ class Mailer {
 				},
 			);
 		} catch (e) {
+			error = true;
 			throw e;
 		} finally {
+			if (!error) {
+				analytics.mailSentSuccessful();
+			}
 			this.sending = false;
 		}
 	}

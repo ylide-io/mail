@@ -19,6 +19,7 @@ import { TestPage } from './pages/TestPage/TestPage';
 import walletConnect from './stores/WalletConnect';
 import { NewWalletsPage } from './pages/NewWalletsPage';
 import { FeedPage } from './pages/FeedPage/FeedPage';
+import { analytics } from './stores/Analytics';
 
 const App = observer(() => {
 	const location = useLocation();
@@ -47,6 +48,10 @@ const App = observer(() => {
 		}
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [domain.accounts.isFirstTime]);
+
+	useEffect(() => {
+		analytics.pageView(location.pathname);
+	}, [location.pathname]);
 
 	if (location.pathname !== '/test' && !domain.initialized) {
 		return (

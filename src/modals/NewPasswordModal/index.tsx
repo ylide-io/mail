@@ -17,6 +17,7 @@ import { DomainAccount } from '../../stores/models/DomainAccount';
 import { isBytesEqual } from '../../utils/isBytesEqual';
 import { useNavigate } from 'react-router-dom';
 import clsx from 'clsx';
+import { analytics } from '../../stores/Analytics';
 
 const txPrices: Record<EVMNetwork, number> = {
 	[EVMNetwork.LOCAL_HARDHAT]: 0.001,
@@ -165,6 +166,11 @@ export default class NewPasswordModal extends PureComponent<NewPasswordModalProp
 		if (result && result.data && result.data.txHash) {
 			await asyncDelay(7000);
 			await account.init();
+			analytics.walletRegistered(
+				this.props.wallet.factory.wallet,
+				account.account.address,
+				domain.accounts.accounts.length,
+			);
 			this.step = 5;
 		} else {
 			if (result.error === 'Already exists') {
@@ -183,6 +189,11 @@ export default class NewPasswordModal extends PureComponent<NewPasswordModalProp
 			await account.attachRemoteKey(this.network);
 			await asyncDelay(7000);
 			await account.init();
+			analytics.walletRegistered(
+				this.props.wallet.factory.wallet,
+				account.account.address,
+				domain.accounts.accounts.length,
+			);
 			this.step = 5;
 		} catch (err) {
 			if (this.props.wallet.factory.blockchainGroup === 'evm') {
@@ -220,6 +231,11 @@ export default class NewPasswordModal extends PureComponent<NewPasswordModalProp
 			}
 		} else if (isBytesEqual(this.freshestKey.key.publicKey.bytes, tempLocalKey.publicKey)) {
 			await this.props.wallet.instantiateNewAccount(this.props.account, tempLocalKey);
+			analytics.walletConnected(
+				this.props.wallet.factory.wallet,
+				this.props.account.address,
+				domain.accounts.accounts.length,
+			);
 			this.step = 5;
 		} else if (this.forceNew) {
 			this.account = await this.props.wallet.instantiateNewAccount(this.props.account, tempLocalKey);

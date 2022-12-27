@@ -1,4 +1,5 @@
 import { makeObservable, observable } from 'mobx';
+import { analytics } from './Analytics';
 
 export enum LinkType {
 	TELEGRAM = 'telegram',
@@ -85,7 +86,7 @@ class Feed {
 		try {
 			console.log('fetch start');
 			const feedEndpoint =
-				document.location.hostname === 'localhost'
+				false && document.location.hostname === 'localhost'
 					? 'http://localhost:8294'
 					: [
 							'https://fd1.ylide.io',
@@ -117,6 +118,7 @@ class Feed {
 	}
 
 	async loadCategory(id: string, sourceId: string | null) {
+		analytics.feedPageLoaded(id, 1);
 		this.selectedCategory = id;
 		this.sourceId = sourceId;
 		this.loaded = false;
@@ -137,6 +139,7 @@ class Feed {
 	}
 
 	async loadMore(length: number) {
+		analytics.feedPageLoaded(this.selectedCategory, Math.floor(this.posts.length / 10) + 1);
 		const result = await this.genericLoad(
 			this.getCategories(this.selectedCategory),
 			this.sourceId,
