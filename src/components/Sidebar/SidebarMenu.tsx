@@ -22,6 +22,7 @@ import { sideTechnologyIcon } from '../../icons/static/sideTechnologyIcon';
 import { sideCultureIcon } from '../../icons/static/sideCultureIcon';
 import { sideEducationIcon } from '../../icons/static/sideEducationIcon';
 import clsx from 'clsx';
+import css from './SidebarMenu.module.scss';
 
 const FeedSettings = observer(() => {
 	const [newValues, setNewValues] = useState(feed.mainCategories);
@@ -199,8 +200,8 @@ const SidebarMenu = observer(() => {
 	}, [mailOpen]);
 
 	return (
-		<div className={clsx('side-block', { open: modals.sidebarOpen })}>
-			<div className="sidebar-container">
+		<div className={clsx(css.root, { [css.root_open]: modals.sidebarOpen })}>
+			<div className={css.container}>
 				{windowWidth < 920 ? (
 					<div className="sidebar-mobile-header" style={{ alignSelf: 'center', marginBottom: 30 }}>
 						<div className="header-burger" style={{ marginRight: 0 }}>

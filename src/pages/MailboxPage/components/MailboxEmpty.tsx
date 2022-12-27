@@ -2,7 +2,7 @@ import { observer } from 'mobx-react';
 import ClickToCopy from '../../../controls/ClickToCopy';
 import domain from '../../../stores/Domain';
 import mailList from '../../../stores/MailList';
-import LinkButton from '../../../components/Sidebar/LinkButton';
+import { LinkButton, LinkButtonType } from '../../../components/Sidebar/LinkButton';
 import React from 'react';
 
 const MailboxEmpty = observer(() => {
@@ -40,7 +40,7 @@ const MailboxEmpty = observer(() => {
 						Send a message to your friend now.
 					</h3>
 
-					<LinkButton text="Compose Mail" link="/compose" />
+					<LinkButton type={LinkButtonType.PRIMARY} text="Compose Mail" link="/compose" />
 				</>
 			) : (
 				<h3>No messages here.</h3>

@@ -1,5 +1,5 @@
 import React, { MouseEvent, useCallback, useEffect, useRef, useState } from 'react';
-import GenericLayout from '../../layouts/GenericLayout';
+import { GenericLayout } from '../../layouts/GenericLayout';
 
 import { YlideButton } from '../../controls/YlideButton';
 import feed, { FeedPost, LinkType } from '../../stores/Feed';
@@ -212,53 +212,60 @@ export const FeedPage = observer(() => {
 	}
 
 	return (
-		<GenericLayout mainClass={css.feedContainer}>
-			<div className={css.feed}>
-				<div className={css.feedTitle}>
-					<h3 className={css.feedTitleText}>{title}</h3>
-					<h3>
-						{!!feed.newPosts && (
-							<YlideButton size="small" nice onClick={showNewPosts}>
-								Show {feed.newPosts} new posts
-							</YlideButton>
-						)}
-					</h3>
-				</div>
-
-				{newPostsVisible && (
-					<div className={css.feedScrollToTop} onClick={scrollToTop}>
-						<CaretDown color="black" style={{ width: 40, height: 40 }} />
-					</div>
-				)}
-
-				<div className={css.feedBody} ref={feedBodyRef}>
-					{newPostsVisible && !!feed.newPosts && (
-						<div className={css.feedNewPosts}>
-							<YlideButton className={css.feedNewPostsButton} size="small" nice onClick={showNewPosts}>
-								Show {feed.newPosts} new posts
-							</YlideButton>
-						</div>
-					)}
-
-					{feed.loaded ? (
-						<>
-							{feed.posts.map(post => {
-								return <FeedPostControl post={post} key={post.id} />;
-							})}
-
-							{feed.moreAvailable && (
-								<div className={css.feedLastPost} ref={lastPostView}>
-									{feed.loading && <Loader reason="Loading more posts..." />}
-								</div>
+		<GenericLayout isCustomContent>
+			<div className={css.root}>
+				<div className={css.feed}>
+					<div className={css.feedTitle}>
+						<h3 className={css.feedTitleText}>{title}</h3>
+						<h3>
+							{!!feed.newPosts && (
+								<YlideButton size="small" nice onClick={showNewPosts}>
+									Show {feed.newPosts} new posts
+								</YlideButton>
 							)}
-						</>
-					) : (
-						<div style={{ marginTop: 30 }}>
-							<Loader reason="Your feed is loading..." />
+						</h3>
+					</div>
+
+					{newPostsVisible && (
+						<div className={css.feedScrollToTop} onClick={scrollToTop}>
+							<CaretDown color="black" style={{ width: 40, height: 40 }} />
 						</div>
 					)}
 
-					{feed.errorLoading && `Sorry, an error occured during feed loading. Please, try again later.`}
+					<div className={css.feedBody} ref={feedBodyRef}>
+						{newPostsVisible && !!feed.newPosts && (
+							<div className={css.feedNewPosts}>
+								<YlideButton
+									className={css.feedNewPostsButton}
+									size="small"
+									nice
+									onClick={showNewPosts}
+								>
+									Show {feed.newPosts} new posts
+								</YlideButton>
+							</div>
+						)}
+
+						{feed.loaded ? (
+							<>
+								{feed.posts.map(post => {
+									return <FeedPostControl post={post} key={post.id} />;
+								})}
+
+								{feed.moreAvailable && (
+									<div className={css.feedLastPost} ref={lastPostView}>
+										{feed.loading && <Loader reason="Loading more posts..." />}
+									</div>
+								)}
+							</>
+						) : (
+							<div style={{ marginTop: 30 }}>
+								<Loader reason="Your feed is loading..." />
+							</div>
+						)}
+
+						{feed.errorLoading && `Sorry, an error occured during feed loading. Please, try again later.`}
+					</div>
 				</div>
 			</div>
 		</GenericLayout>

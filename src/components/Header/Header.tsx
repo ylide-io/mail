@@ -20,6 +20,7 @@ import { useWindowSize } from '../../utils/useWindowSize';
 import modals from '../../stores/Modals';
 import { AdaptiveAddress } from '../../controls/AdaptiveAddress';
 import { YlideLargeLogo } from '../../icons/YlideLargeLogo';
+import css from './Header.module.scss';
 
 const AccountItem = observer(({ account }: { account: DomainAccount }) => {
 	const nav = useNav();
@@ -106,7 +107,7 @@ const Header = observer(() => {
 					/>
 				</div>
 			) : null}
-			<div className="side-block open header-logo">
+			<div className={css.logo}>
 				<a
 					href="/inbox"
 					onClick={e => {
@@ -114,10 +115,10 @@ const Header = observer(() => {
 						nav('/inbox');
 					}}
 				>
-					<YlideLargeLogo className="header-logo-image" />
+					<YlideLargeLogo className={css.logoImage} />
 				</a>
 			</div>
-			<div className="main-block header-main">
+			<div className="header-main">
 				<div className="header-block">
 					<Tooltip title="Manage contacts and folders">
 						<UsergroupAddOutlined

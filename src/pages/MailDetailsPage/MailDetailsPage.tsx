@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import GenericLayout from '../../layouts/GenericLayout';
+import { GenericLayout } from '../../layouts/GenericLayout';
 import { smallButtonColors, smallButtonIcons } from '../../components/smallButton/smallButton';
 import { useParams } from 'react-router-dom';
 import { observer } from 'mobx-react';

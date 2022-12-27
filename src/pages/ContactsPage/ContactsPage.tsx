@@ -1,5 +1,5 @@
 import React from 'react';
-import GenericLayout from '../../layouts/GenericLayout';
+import { GenericLayout } from '../../layouts/GenericLayout';
 import contacts from '../../stores/Contacts';
 import tags from '../../stores/Tags';
 import { observer } from 'mobx-react';

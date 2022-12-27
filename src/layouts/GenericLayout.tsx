@@ -2,20 +2,20 @@ import { observer } from 'mobx-react';
 import React, { ReactNode, useEffect, useMemo } from 'react';
 import { useLocation } from 'react-router-dom';
 import Header from '../components/Header/Header';
-import LinkButton from '../components/Sidebar/LinkButton';
+import { LinkButton } from '../components/Sidebar/LinkButton';
 import SidebarMenu from '../components/Sidebar/SidebarMenu';
 import mailList from '../stores/MailList';
-import { useWindowSize } from '../utils/useWindowSize';
 import clsx from 'clsx';
+import css from './GenericLayout.module.scss';
 
 interface GenericLayoutProps {
 	children: ReactNode;
 	mainClass?: string;
+	isCustomContent?: boolean;
 }
 
-const GenericLayout: React.FC<GenericLayoutProps> = observer(({ children, mainClass }) => {
+export const GenericLayout: React.FC<GenericLayoutProps> = observer(({ children, mainClass, isCustomContent }) => {
 	const location = useLocation();
-	const { windowWidth } = useWindowSize();
 
 	const linkButtonProps = useMemo(() => {
 		if (location.pathname === '/' + mailList.activeFolderId) {
@@ -27,7 +27,7 @@ const GenericLayout: React.FC<GenericLayoutProps> = observer(({ children, mainCl
 			return null;
 		} else {
 			return {
-				text: 'Return to Mailbox',
+				text: '‹ Return to Mailbox',
 				link: `/${mailList.activeFolderId || 'inbox'}`,
 			};
 		}
@@ -49,19 +49,23 @@ const GenericLayout: React.FC<GenericLayoutProps> = observer(({ children, mainCl
 	}, []);
 
 	return (
-		<div className="main-layout">
+		<div className={css.root}>
 			<Header />
-			<div className="main-wrapper">
+			<div className={css.main}>
 				<SidebarMenu />
-				<div className={clsx('main-block main-content', mainClass)}>
-					{windowWidth >= 920 || !linkButtonProps ? null : (
-						<LinkButton text={linkButtonProps.text} link={linkButtonProps.link} />
+
+				<div className={clsx(css.content, isCustomContent && css.content_custom, mainClass)}>
+					{!!linkButtonProps && (
+						<LinkButton
+							className={css.linkButton}
+							text={linkButtonProps.text}
+							link={linkButtonProps.link}
+						/>
 					)}
+
 					{children}
 				</div>
 			</div>
 		</div>
 	);
 });
-
-export default GenericLayout;

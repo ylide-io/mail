@@ -1,0 +1,30 @@
+.root {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	font-size: 15px;
+	padding: 0 20px;
+	height: 40px;
+	border-radius: 20px;
+}
+
+.root_default {
+	background: #fff;
+	border: 1px solid #606060;
+
+	&:hover,
+	&:focus-visible {
+		background: #eee;
+	}
+}
+
+.root_primary {
+	color: #fff;
+	background: rgb(22, 147, 122);
+	border: 1px solid rgb(22, 147, 122);
+
+	&:hover,
+	&:focus-visible {
+		background: rgb(14, 122, 101);
+	}
+}

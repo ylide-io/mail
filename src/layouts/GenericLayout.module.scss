@@ -1,0 +1,42 @@
+.root {
+	display: grid;
+	grid-template-rows: auto 1fr;
+	min-height: 100%;
+}
+
+.main {
+	display: grid;
+	grid-template-columns: 210px 1fr;
+	grid-gap: 16px;
+	padding: 24px 16px;
+
+	@include less920px {
+		grid-template-columns: 1fr;
+	}
+
+	@include less720px {
+		padding: 16px 8px;
+	}
+}
+
+.content:not(.content_custom) {
+	@include flex-column(stretch, flex-start);
+
+	flex-grow: 1;
+	flex-shrink: 1;
+
+	background-color: white;
+	border-radius: 10px;
+	box-shadow: 0 0 30px rgba(0, 0, 0, 0.15);
+
+	padding: 12px 0 0;
+}
+
+.linkButton {
+	display: none;
+	margin: 0 12px 12px;
+
+	@include less920px {
+		display: block;
+	}
+}

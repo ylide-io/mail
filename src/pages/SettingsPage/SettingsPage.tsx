@@ -1,5 +1,5 @@
 import React from 'react';
-import GenericLayout from '../../layouts/GenericLayout';
+import { GenericLayout } from '../../layouts/GenericLayout';
 import { observer } from 'mobx-react';
 import mailList from '../../stores/MailList';
 

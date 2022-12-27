@@ -1,26 +1,31 @@
-import { ArrowLeftOutlined } from '@ant-design/icons';
-import { Button } from 'antd';
 import React from 'react';
 import { useNav } from '../../utils/navigate';
+import { WithClassNameProps } from '../WithClassNameProps';
+import clsx from 'clsx';
+import css from './LinkButton.module.scss';
 
-interface LinkButtonProps {
+export enum LinkButtonType {
+	DEFAULT,
+	PRIMARY,
+}
+
+interface LinkButtonProps extends WithClassNameProps {
+	type?: LinkButtonType;
 	text: string;
 	link: string;
 }
 
-const LinkButton: React.FC<LinkButtonProps> = ({ text, link }) => {
-	const nav = useNav();
+export const LinkButton = ({ className, type, text, link }: LinkButtonProps) => {
+	const navigate = useNav();
+
+	const typeClass = {
+		[LinkButtonType.DEFAULT]: css.root_default,
+		[LinkButtonType.PRIMARY]: css.root_primary,
+	}[type || LinkButtonType.DEFAULT];
+
 	return (
-		<Button
-			className="sidebar-button"
-			type={link !== `/compose` ? 'default' : 'primary'}
-			size="large"
-			icon={link !== `/compose` ? <ArrowLeftOutlined /> : null}
-			onClick={() => nav(link)}
-		>
+		<button className={clsx(css.root, typeClass, className)} onClick={() => navigate(link)}>
 			{text}
-		</Button>
+		</button>
 	);
 };
-
-export default LinkButton;

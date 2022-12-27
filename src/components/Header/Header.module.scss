@@ -1,0 +1,9 @@
+.logo {
+	@include less630px {
+		display: none;
+	}
+}
+
+.logoImage {
+	display: block;
+}

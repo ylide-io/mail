@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import GenericLayout from '../../layouts/GenericLayout';
+import { GenericLayout } from '../../layouts/GenericLayout';
 import MailboxList from './components/MailboxList';
 import { MailboxHeader } from './components/MailboxHeader';
 

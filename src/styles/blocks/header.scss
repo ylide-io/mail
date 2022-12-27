@@ -17,6 +17,9 @@
 	.header-main {
 		@include flex-row(center, flex-end);
 
+		flex-grow: 1;
+		flex-shrink: 1;
+
 		.header-block {
 			@include flex-row(center, flex-end);
 
@@ -32,10 +35,6 @@
 			}
 		}
 	}
-}
-
-.header-logo-image {
-	display: block;
 }
 
 .users-block {

@@ -1,5 +1,5 @@
 import React from 'react';
-import GenericLayout from '../../layouts/GenericLayout';
+import { GenericLayout } from '../../layouts/GenericLayout';
 import { smallButtonColors, smallButtonIcons } from '../../components/smallButton/smallButton';
 import { useNav } from '../../utils/navigate';
 import mailer from '../../stores/Mailer';

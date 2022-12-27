@@ -1,43 +1,31 @@
-.feedContainer {
-	@include flex-column(center, flex-start);
-
-	// FIXME get rid of !important
-	align-items: center !important;
-	background-color: transparent !important;
-	box-shadow: unset !important;
-
-	padding-right: 240px;
+.root {
+	display: grid;
+	grid-auto-flow: column;
+	grid-template-columns: 1fr 656px 3fr;
 
 	@include less920px {
-		padding-right: 0;
-		width: 100%;
+		grid-template-columns: 1fr 656px 1fr;
+	}
+
+	@include less720px {
+		grid-template-columns: 1fr;
 	}
 }
 
 .feed {
-	@include flex-column(stretch, flex-start);
+	grid-column: 2/3;
 
-	width: 656px;
-
-	@include less670px {
-		width: 100%;
+	@include less720px {
+		grid-column: 1/2;
 	}
 
 	.feedTitle {
 		@include flex-row(center, space-between);
 
-		padding-left: 12px;
-		padding-right: 12px;
+		padding: 0 12px;
 
 		.feedTitleText {
-			font-family: $font-family_wide;
-			font-style: normal;
-			font-weight: 400;
 			font-size: 24px;
-			line-height: 32px;
-			letter-spacing: -0.09em;
-
-			color: #202020;
 		}
 	}
 }
