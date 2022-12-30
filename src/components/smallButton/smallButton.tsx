@@ -1,9 +1,3 @@
-export enum smallButtonColors {
-	red = 'btn-danger',
-	green = 'btn-primary',
-	white = 'btn-white',
-}
-
 export enum smallButtonIcons {
 	reply = 'fa-reply',
 	cross = 'fa-times',

@@ -1,16 +1,16 @@
 import React, { useEffect } from 'react';
 import { GenericLayout } from '../../layouts/GenericLayout';
-import { smallButtonColors, smallButtonIcons } from '../../components/smallButton/smallButton';
+import { smallButtonIcons } from '../../components/smallButton/smallButton';
 import { useNav } from '../../utils/navigate';
 import mailer from '../../stores/Mailer';
 import { observer } from 'mobx-react';
 import mailList from '../../stores/MailList';
 import { OverlappingLoader } from '../../controls/OverlappingLoader';
-import { Button } from 'antd';
 import ComposeMailFooter from './components/Mailbox/ComposeMailFooter';
 import ComposeMailBody from './components/Mailbox/ComposeMailBody';
 import { MailComposeMeta } from './components/MailComposeMeta';
 import { analytics } from '../../stores/Analytics';
+import { ActionButton, ActionButtonStyle } from '../../components/ActionButton/ActionButton';
 
 export const ComposePage = observer(() => {
 	const navigate = useNav();
@@ -26,18 +26,15 @@ export const ComposePage = observer(() => {
 					<div className="mail-header">
 						<h2 className="mailbox-title">Compose mail</h2>
 						<div className="mail-actions">
-							<Button
-								size="small"
-								type="dashed"
-								danger
+							<ActionButton
+								style={ActionButtonStyle.Dengerous}
 								onClick={() => {
 									navigate(`/${mailList.activeFolderId || 'inbox'}`);
 								}}
-								color={smallButtonColors.white}
 								icon={<i className={`fa ${smallButtonIcons.cross}`} />}
 							>
 								Discard
-							</Button>
+							</ActionButton>
 						</div>
 					</div>
 					<MailComposeMeta />

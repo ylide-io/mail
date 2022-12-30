@@ -4,7 +4,8 @@ import { allColors } from '../../../../utils/colors';
 import tags from '../../../../stores/Tags';
 import ColorPicker from './ColorPicker';
 import { DeleteOutlined, EditOutlined, SaveOutlined } from '@ant-design/icons';
-import { Button, Input } from 'antd';
+import { Input } from 'antd';
+import { ActionButton, ActionButtonStyle } from '../../../../components/ActionButton/ActionButton';
 
 interface TagsListItemProps {
 	tag: ITag;
@@ -67,17 +68,23 @@ const TagsListItem: React.FC<TagsListItemProps> = ({ tag, isNew }) => {
 				<div className="contact-actions small-actions">
 					{!isNew ? (
 						<>
-							<Button type="primary" size="small" onClick={saveClickHandler} icon={<SaveOutlined />} />
-							<Button
-								danger
-								type="dashed"
-								size="small"
+							<ActionButton
+								style={ActionButtonStyle.Primary}
+								onClick={saveClickHandler}
+								icon={<SaveOutlined />}
+							/>
+							<ActionButton
+								style={ActionButtonStyle.Dengerous}
 								onClick={deleteClickHandler}
 								icon={<DeleteOutlined />}
 							/>
 						</>
 					) : (
-						<Button type="primary" size="small" onClick={saveClickHandler} icon={<SaveOutlined />} />
+						<ActionButton
+							style={ActionButtonStyle.Primary}
+							onClick={saveClickHandler}
+							icon={<SaveOutlined />}
+						/>
 					)}
 				</div>
 			</div>
@@ -91,7 +98,7 @@ const TagsListItem: React.FC<TagsListItemProps> = ({ tag, isNew }) => {
 			</div>
 			<div className="contact-name">{tag.name}</div>
 			<div className="contact-actions small-actions">
-				<Button type="dashed" size="small" onClick={editClickHandler} icon={<EditOutlined />} />
+				<ActionButton onClick={editClickHandler} icon={<EditOutlined />} />
 			</div>
 		</div>
 	);

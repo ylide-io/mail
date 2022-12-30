@@ -1,8 +1,9 @@
-import { smallButtonColors, smallButtonIcons } from '../../../components/smallButton/smallButton';
+import { smallButtonIcons } from '../../../components/smallButton/smallButton';
 import { observer } from 'mobx-react';
 import mailList from '../../../stores/MailList';
-import { Button, Tooltip } from 'antd';
+import { Tooltip } from 'antd';
 import { YlideCheckbox } from '../../../controls/YlideCheckbox';
+import { ActionButton } from '../../../components/ActionButton/ActionButton';
 
 const MailboxControls = observer(() => {
 	const readHandler = () => {
@@ -41,35 +42,18 @@ const MailboxControls = observer(() => {
 				</div>
 			</Tooltip>
 			<Tooltip title="Mark as read">
-				<Button
-					size="small"
-					type="dashed"
-					onClick={readHandler}
-					color={smallButtonColors.white}
-					icon={<i className={`fa ${smallButtonIcons.eye}`} />}
-				/>
+				<ActionButton onClick={readHandler} icon={<i className={`fa ${smallButtonIcons.eye}`} />} />
 			</Tooltip>
+
 			{mailList.activeFolderId === 'archive' ? (
 				<Tooltip title="Restore mails">
-					<Button
-						size="small"
-						type="dashed"
-						onClick={restoreHandler}
-						color={smallButtonColors.white}
-						icon={<i className={`fa ${smallButtonIcons.restore}`} />}
-					/>
+					<ActionButton onClick={restoreHandler} icon={<i className={`fa ${smallButtonIcons.restore}`} />} />
 				</Tooltip>
-			) : mailList.activeFolderId === 'sent' ? null : (
+			) : mailList.activeFolderId !== 'sent' ? (
 				<Tooltip title="Archive mails">
-					<Button
-						size="small"
-						type="dashed"
-						onClick={deleteHandler}
-						color={smallButtonColors.white}
-						icon={<i className={`fa ${smallButtonIcons.trash}`} />}
-					/>
+					<ActionButton onClick={deleteHandler} icon={<i className={`fa ${smallButtonIcons.trash}`} />} />
 				</Tooltip>
-			)}
+			) : null}
 		</div>
 	);
 });

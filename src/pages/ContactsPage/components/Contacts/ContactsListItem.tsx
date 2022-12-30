@@ -6,11 +6,12 @@ import TagsStore from '../../../../stores/Tags';
 import mailbox from '../../../../stores/Mailbox';
 import { useNav } from '../../../../utils/navigate';
 import domain from '../../../../stores/Domain';
-import { Avatar, Button, Input, Select } from 'antd';
+import { Avatar, Input, Select } from 'antd';
 import { Blockie } from '../../../../controls/Blockie';
 import { DeleteOutlined, EditOutlined, MailOutlined, SaveOutlined } from '@ant-design/icons';
 import { AdaptiveAddress } from '../../../../controls/AdaptiveAddress';
 import clsx from 'clsx';
+import { ActionButton, ActionButtonStyle } from '../../../../components/ActionButton/ActionButton';
 
 interface ContactsListItemProps {
 	contact: IContact;
@@ -172,12 +173,14 @@ const ContactsListItem: React.FC<ContactsListItemProps> = ({ contact, isNew }) =
 					/>
 				</div>
 				<div className="contact-actions">
-					<Button type="primary" size="small" onClick={saveClickHandler} icon={<SaveOutlined />} />
+					<ActionButton
+						style={ActionButtonStyle.Primary}
+						onClick={saveClickHandler}
+						icon={<SaveOutlined />}
+					/>
 					{!isNew ? (
-						<Button
-							type="dashed"
-							size="small"
-							danger
+						<ActionButton
+							style={ActionButtonStyle.Dengerous}
 							onClick={deleteClickHandler}
 							icon={<DeleteOutlined />}
 						/>
@@ -208,12 +211,12 @@ const ContactsListItem: React.FC<ContactsListItemProps> = ({ contact, isNew }) =
 				))}
 			</div>
 			<div className="contact-actions">
-				<Button type="dashed" size="small" onClick={mailThisContact} icon={<MailOutlined />}>
+				<ActionButton onClick={mailThisContact} icon={<MailOutlined />}>
 					Compose
-				</Button>
-				<Button type="dashed" size="small" onClick={editClickHandler} icon={<EditOutlined />}>
+				</ActionButton>
+				<ActionButton onClick={editClickHandler} icon={<EditOutlined />}>
 					Edit
-				</Button>
+				</ActionButton>
 			</div>
 		</div>
 	);

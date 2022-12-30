@@ -74,29 +74,19 @@
 
 			flex-grow: 0;
 			flex-shrink: 0;
-			padding-left: 10px;
-			padding-right: 20px;
+			padding: 0 10px;
 
 			@include less480px {
-				padding: 0;
-				margin-top: 10px;
+				padding: 10px 0;
 			}
 		}
 
 		.contact-actions {
-			@include flex-row(center, flex-end);
-
-			flex-basis: 100px;
-			flex-grow: 0;
-			flex-shrink: 0;
-
-			&.small-actions {
-				flex-basis: 20px;
-			}
-
-			.ant-btn:not(:first-child) {
-				margin-left: 8px;
-			}
+			display: grid;
+			grid-auto-flow: column;
+			grid-gap: 8px;
+			justify-content: end;
+			padding: 0 0 0 8px;
 
 			@include less480px {
 				flex-basis: auto;

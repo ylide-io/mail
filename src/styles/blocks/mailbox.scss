@@ -284,13 +284,11 @@
 
 .mail-actions,
 .mail-footer {
-	.ant-btn:not(.ant-input-search-button) {
-		margin-left: 8px;
-
-		.fa {
-			margin-right: 5px;
-		}
-	}
+	display: grid;
+	grid-auto-flow: column;
+	grid-gap: 8px;
+	align-items: center;
+	justify-content: end;
 }
 
 .mail-actions {
@@ -299,10 +297,6 @@
 	@include less480px {
 		margin-top: 10px;
 		margin-bottom: 10px;
-		.ant-btn:not(.ant-input-search-button) {
-			margin-right: 8px;
-			margin-left: 0;
-		}
 	}
 }
 
@@ -406,26 +400,12 @@
 }
 
 .mail-footer {
-	@include flex-row(center, flex-end);
-
-	border-top: 1px solid #e0e0e0;
-	padding-top: 20px;
 	margin-top: 20px;
-	padding-right: 20px;
-	padding-bottom: 20px;
+	padding: 20px;
+	border-top: 1px solid #e0e0e0;
 
 	&.compose-mail-footer {
-		padding-top: 20px;
 		margin-top: 0;
-
-		// position: fixed;
-		// bottom: 15px;
-		// right: 15px;
-		// left: 240px;
-
-		// background-color: red;
-		// border-bottom-left-radius: 10px;
-		// border-bottom-right-radius: 10px;
 	}
 }
 

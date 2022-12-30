@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { GenericLayout } from '../../layouts/GenericLayout';
-import { smallButtonColors, smallButtonIcons } from '../../components/smallButton/smallButton';
+import { smallButtonIcons } from '../../components/smallButton/smallButton';
 import { useParams } from 'react-router-dom';
 import { observer } from 'mobx-react';
 import { createReactEditorJS } from 'react-editor-js';
@@ -12,9 +12,9 @@ import { useNav } from '../../utils/navigate';
 import moment from 'moment';
 import mailList from '../../stores/MailList';
 import { IMessageDecodedContent } from '../../indexedDB/MessagesDB';
-import { Button } from 'antd';
 import { Blockie } from '../../controls/Blockie';
 import { AdaptiveAddress } from '../../controls/AdaptiveAddress';
+import { ActionButton, ActionButtonStyle } from '../../components/ActionButton/ActionButton';
 
 const ReactEditorJS = createReactEditorJS();
 
@@ -91,26 +91,20 @@ export const MailDetailsPage = observer(() => {
 							{decoded ? decoded.decodedSubject || 'View Message' : 'View Message'}
 						</h2>
 						<div className="mail-actions">
-							<Button
-								size="small"
-								type="dashed"
+							<ActionButton
 								onClick={replyClickHandler}
-								color={smallButtonColors.white}
 								icon={<i className={`fa ${smallButtonIcons.reply}`} />}
 							>
 								Reply
-							</Button>
+							</ActionButton>
 
-							<Button
-								size="small"
-								type="dashed"
-								danger
+							<ActionButton
+								style={ActionButtonStyle.Dengerous}
 								onClick={deleteHandler}
-								color={smallButtonColors.white}
 								icon={<i className={`fa ${smallButtonIcons.trash}`} />}
 							>
 								Archive
-							</Button>
+							</ActionButton>
 						</div>
 					</div>
 					<div className="mail-meta">
@@ -162,24 +156,16 @@ export const MailDetailsPage = observer(() => {
 					)}
 				</div>
 				<div className="mail-footer">
-					<Button
-						size="small"
-						type="dashed"
-						onClick={replyClickHandler}
-						color={smallButtonColors.white}
-						icon={<i className={`fa ${smallButtonIcons.reply}`} />}
-					>
+					<ActionButton onClick={replyClickHandler} icon={<i className={`fa ${smallButtonIcons.reply}`} />}>
 						Reply
-					</Button>
-					<Button
-						size="small"
-						type="dashed"
+					</ActionButton>
+
+					<ActionButton
 						onClick={forwardClickHandler}
-						color={smallButtonColors.white}
 						icon={<i className={`fa ${smallButtonIcons.forward}`} />}
 					>
 						Forward
-					</Button>
+					</ActionButton>
 				</div>
 			</div>
 		</GenericLayout>

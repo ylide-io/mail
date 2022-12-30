@@ -1,0 +1,44 @@
+.root {
+	display: inline-grid;
+	grid-auto-flow: column;
+	grid-gap: 8px;
+	align-items: center;
+	padding: 0 7px;
+	height: 28px;
+	white-space: nowrap;
+	border: 1px dashed;
+	border-radius: 4px;
+}
+
+.root_default {
+	background: #fff;
+	border-color: #d9d9d9;
+
+	&:hover,
+	&:focus-visible {
+		background: rgba(#d9d9d9, 0.25);
+	}
+}
+
+.root_primary {
+	color: #fff;
+	background: #1890ff;
+	border-color: #1890ff;
+
+	&:hover,
+	&:focus-visible {
+		background: darken(#1890ff, 15%);
+		border-color: darken(#1890ff, 15%);
+	}
+}
+
+.root_dangerous {
+	color: #ff4d4f;
+	background: #fff;
+	border-color: #ff4d4f;
+
+	&:hover,
+	&:focus-visible {
+		background: rgba(#ff4d4f, 0.1);
+	}
+}
