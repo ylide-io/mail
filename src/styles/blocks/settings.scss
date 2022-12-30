@@ -5,15 +5,11 @@
 
 	.contacts-list-item {
 		@include flex-row(center, flex-start);
+		flex-wrap: wrap;
+		padding: 8px 0;
 
-		height: 50px;
-		flex-basis: 50px;
-
-		@include less480px {
+		@include less920px {
 			@include flex-column(stretch, flex-start);
-
-			height: auto;
-			flex-basis: auto;
 		}
 
 		border-bottom: 1px solid #f3f3f3;
@@ -30,7 +26,7 @@
 				height: 30px;
 			}
 
-			@include less480px {
+			@include less920px {
 				display: none;
 			}
 		}
@@ -45,7 +41,7 @@
 			font-size: 14px;
 			font-weight: 500;
 
-			@include less480px {
+			@include less920px {
 				font-size: 18px;
 
 				flex-basis: auto;
@@ -63,7 +59,7 @@
 			font-size: 14px;
 			font-family: $font-family_code;
 
-			@include less480px {
+			@include less920px {
 				flex-basis: auto;
 				margin-top: 10px;
 			}
@@ -76,7 +72,7 @@
 			flex-shrink: 0;
 			padding: 0 10px;
 
-			@include less480px {
+			@include less920px {
 				padding: 10px 0;
 			}
 		}
@@ -88,7 +84,7 @@
 			justify-content: end;
 			padding: 0 0 0 8px;
 
-			@include less480px {
+			@include less920px {
 				flex-basis: auto;
 				margin-top: 10px;
 				margin-bottom: 20px;
