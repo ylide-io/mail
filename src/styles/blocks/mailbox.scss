@@ -18,9 +18,8 @@
 }
 
 .mailbox-title {
-	margin-top: 0px;
+	margin: 0;
 	font-size: 32px;
-	margin-bottom: 0;
 
 	@include less720px {
 		font-size: 28px;
@@ -295,6 +294,8 @@
 }
 
 .mail-actions {
+	flex-shrink: 0;
+
 	@include less480px {
 		margin-top: 10px;
 		margin-bottom: 10px;
