@@ -6,8 +6,8 @@ export const mirrorSourceIcon = (
 			fill="url(#paint0_linear_463_8427)"
 		/>
 		<path
-			fill-rule="evenodd"
-			clip-rule="evenodd"
+			fillRule="evenodd"
+			clipRule="evenodd"
 			d="M14.9008 16.1598V9.58676C14.9008 7.38376 13.1411 5.59788 10.9703 5.59788C8.79949 5.59788 7.03973 7.38376 7.03973 9.58676V16.1598C7.03973 16.1722 7.04961 16.1822 7.06181 16.1822H14.8787C14.891 16.1822 14.9008 16.1722 14.9008 16.1598ZM10.9703 5.06006C8.5068 5.06006 6.50977 7.08673 6.50977 9.58676V16.1598C6.50977 16.4692 6.75692 16.7201 7.06181 16.7201H14.8787C15.1836 16.7201 15.4308 16.4692 15.4308 16.1598V9.58676C15.4308 7.08673 13.4338 5.06006 10.9703 5.06006Z"
 			fill="#007AFF"
 		/>
@@ -20,8 +20,8 @@ export const mirrorSourceIcon = (
 				y2="18.1762"
 				gradientUnits="userSpaceOnUse"
 			>
-				<stop offset="0.265625" stop-color="white" />
-				<stop offset="0.734375" stop-color="#007AFF" />
+				<stop offset="0.265625" stopColor="white" />
+				<stop offset="0.734375" stopColor="#007AFF" />
 			</linearGradient>
 		</defs>
 	</svg>

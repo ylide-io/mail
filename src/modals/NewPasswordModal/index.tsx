@@ -443,9 +443,9 @@ export default class NewPasswordModal extends PureComponent<NewPasswordModalProp
 												<path
 													d="M2 102.498C2 61.4999 69.5 15.4999 162 10.4785M162 10.4785L133.5 1.50183M162 10.4785L141.562 31.6153"
 													stroke="url(#paint0_linear_54_5088)"
-													stroke-width="3"
-													stroke-linecap="round"
-													stroke-linejoin="round"
+													strokeWidth="3"
+													strokeLinecap="round"
+													strokeLinejoin="round"
 												/>
 												<defs>
 													<linearGradient
@@ -456,8 +456,8 @@ export default class NewPasswordModal extends PureComponent<NewPasswordModalProp
 														y2="102.498"
 														gradientUnits="userSpaceOnUse"
 													>
-														<stop stop-color="#97A1FF" />
-														<stop offset="1" stop-color="#FFB571" />
+														<stop stopColor="#97A1FF" />
+														<stop offset="1" stopColor="#FFB571" />
 													</linearGradient>
 												</defs>
 											</svg>
@@ -581,9 +581,9 @@ export default class NewPasswordModal extends PureComponent<NewPasswordModalProp
 										<path
 											d="M2 102.498C2 61.4999 69.5 15.4999 162 10.4785M162 10.4785L133.5 1.50183M162 10.4785L141.562 31.6153"
 											stroke="url(#paint0_linear_54_5088)"
-											stroke-width="3"
-											stroke-linecap="round"
-											stroke-linejoin="round"
+											strokeWidth="3"
+											strokeLinecap="round"
+											strokeLinejoin="round"
 										/>
 										<defs>
 											<linearGradient
@@ -594,8 +594,8 @@ export default class NewPasswordModal extends PureComponent<NewPasswordModalProp
 												y2="102.498"
 												gradientUnits="userSpaceOnUse"
 											>
-												<stop stop-color="#97A1FF" />
-												<stop offset="1" stop-color="#FFB571" />
+												<stop stopColor="#97A1FF" />
+												<stop offset="1" stopColor="#FFB571" />
 											</linearGradient>
 										</defs>
 									</svg>

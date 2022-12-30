@@ -654,9 +654,9 @@ export const successSvg = (
 				y2="260"
 				gradientUnits="userSpaceOnUse"
 			>
-				<stop offset="0.628984" stop-color="#D9D9D9" />
-				<stop offset="0.870962" stop-color="#D9D9D9" stop-opacity="0.191541" />
-				<stop offset="1" stop-color="#D9D9D9" stop-opacity="0" />
+				<stop offset="0.628984" stopColor="#D9D9D9" />
+				<stop offset="0.870962" stopColor="#D9D9D9" stop-opacity="0.191541" />
+				<stop offset="1" stopColor="#D9D9D9" stop-opacity="0" />
 			</linearGradient>
 			<linearGradient
 				id="paint1_linear_31_2140"
@@ -666,8 +666,8 @@ export const successSvg = (
 				y2="130.5"
 				gradientUnits="userSpaceOnUse"
 			>
-				<stop stop-color="#907EFF" />
-				<stop offset="1" stop-color="#FFBF85" />
+				<stop stopColor="#907EFF" />
+				<stop offset="1" stopColor="#FFBF85" />
 			</linearGradient>
 			<image
 				id="image0_31_2140"
