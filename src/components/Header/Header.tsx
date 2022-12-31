@@ -16,7 +16,6 @@ import Tooltip from 'antd/es/tooltip';
 import { DomainAccount } from '../../stores/models/DomainAccount';
 import { Blockie } from '../../controls/Blockie';
 import { walletsMap } from '../../constants';
-import { useWindowSize } from '../../utils/useWindowSize';
 import modals from '../../stores/Modals';
 import { AdaptiveAddress } from '../../controls/AdaptiveAddress';
 import { YlideLargeLogo } from '../../icons/YlideLargeLogo';
@@ -78,9 +77,6 @@ const AccountItem = observer(({ account }: { account: DomainAccount }) => {
 
 const Header = observer(() => {
 	const nav = useNav();
-	const { windowWidth } = useWindowSize();
-
-	console.log('Header.windowWidth: ', windowWidth);
 
 	const newMenu = (
 		<div className="accounts-list">
@@ -97,16 +93,15 @@ const Header = observer(() => {
 
 	return (
 		<div className="header">
-			{windowWidth < 920 ? (
-				<div className="header-burger">
-					<Button
-						onClick={() => {
-							modals.sidebarOpen = !modals.sidebarOpen;
-						}}
-						icon={modals.sidebarOpen ? <MenuFoldOutlined /> : <MenuUnfoldOutlined />}
-					/>
-				</div>
-			) : null}
+			<div className="header-burger">
+				<Button
+					onClick={() => {
+						modals.sidebarOpen = !modals.sidebarOpen;
+					}}
+					icon={modals.sidebarOpen ? <MenuFoldOutlined /> : <MenuUnfoldOutlined />}
+				/>
+			</div>
+
 			<div className={css.logo}>
 				<a
 					href="/inbox"

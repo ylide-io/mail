@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { observer } from 'mobx-react';
 import modals from '../../stores/Modals';
-import { useWindowSize } from '../../utils/useWindowSize';
 import { CaretDown } from '../../icons/CaretDown';
 import { topicSettingsIcon } from '../../icons/static/topicSettingsIcon';
 import { CaretUp } from '../../icons/CaretUp';
@@ -187,7 +186,6 @@ const FeedSettings = observer(() => {
 const SidebarMenu = observer(() => {
 	const location = useLocation();
 	const navigate = useNavigate();
-	const { windowWidth } = useWindowSize();
 	const [feedOpen, setFeedOpen] = useState<boolean>(JSON.parse(localStorage.getItem('tv1_feedOpen') || 'true'));
 	const [mailOpen, setMailOpen] = useState<boolean>(JSON.parse(localStorage.getItem('tv1_mailOpen') || 'true'));
 
@@ -202,21 +200,20 @@ const SidebarMenu = observer(() => {
 	return (
 		<div className={clsx(css.root, { [css.root_open]: modals.sidebarOpen })}>
 			<div className={css.container}>
-				{windowWidth < 920 ? (
-					<div className="sidebar-mobile-header" style={{ alignSelf: 'center', marginBottom: 30 }}>
-						<div className="header-burger" style={{ marginRight: 0 }}>
-							<Button
-								onClick={() => {
-									modals.sidebarOpen = !modals.sidebarOpen;
-								}}
-								style={{ borderRadius: 8 }}
-								icon={modals.sidebarOpen ? <MenuFoldOutlined /> : <MenuUnfoldOutlined />}
-							>
-								Hide sidebar
-							</Button>
-						</div>
+				<div className="sidebar-mobile-header" style={{ alignSelf: 'center', marginBottom: 30 }}>
+					<div className="header-burger" style={{ marginRight: 0 }}>
+						<Button
+							onClick={() => {
+								modals.sidebarOpen = !modals.sidebarOpen;
+							}}
+							style={{ borderRadius: 8 }}
+							icon={modals.sidebarOpen ? <MenuFoldOutlined /> : <MenuUnfoldOutlined />}
+						>
+							Hide sidebar
+						</Button>
 					</div>
-				) : null}
+				</div>
+
 				<div className="sidebar-section">
 					<div className="sidebar-section-title">
 						Feed{' '}
