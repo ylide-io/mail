@@ -295,13 +295,17 @@
 	flex-shrink: 0;
 
 	@include less480px {
+		justify-content: start;
 		margin-top: 10px;
 		margin-bottom: 10px;
 	}
 }
 
 .mail-meta {
-	@include flex-row(flex-start, space-between);
+	display: grid;
+	grid-auto-flow: column;
+	grid-gap: 8px;
+	align-items: center;
 
 	padding-left: 22px;
 	padding-right: 20px;
@@ -314,23 +318,19 @@
 	}
 
 	.mail-params {
-		@include flex-column(stretch, flex-start);
-
-		flex-grow: 1;
-		flex-shrink: 1;
+		display: grid;
+		grid-gap: 8px;
 
 		.mmp-row {
-			@include flex-row(center, flex-start);
-
-			flex-grow: 0;
-			flex-shrink: 0;
-
+			display: grid;
+			grid-template-columns: 100px 1fr;
+			grid-gap: 8px;
+			align-items: center;
 			font-size: 15px;
 
 			@include less480px {
-				@include flex-column(stretch, flex-start);
-
-				margin-bottom: 20px;
+				grid-template-columns: 1fr;
+				grid-gap: 4px;
 			}
 
 			.mmp-row-title {
@@ -340,34 +340,13 @@
 				// }
 			}
 			.mmp-row-value {
-				flex-grow: 1;
-				flex-shrink: 1;
-
-				margin-left: 8px;
 				font-weight: 500;
 				color: #111111;
+				word-break: break-word;
+				overflow: hidden;
 
 				@include less480px {
 					margin-left: 0;
-					margin-top: 5px;
-					flex: 0 auto;
-				}
-			}
-		}
-	}
-
-	&.compose-meta {
-		.mail-params {
-			.mmp-row {
-				margin-bottom: 8px;
-				.mmp-row-title {
-					flex-basis: 100px;
-					flex-shrink: 0;
-					flex-grow: 0;
-
-					@include less480px {
-						flex-basis: auto;
-					}
 				}
 			}
 		}
@@ -378,6 +357,10 @@
 		color: #111111;
 
 		text-align: right;
+
+		@include less480px {
+			text-align: left;
+		}
 	}
 
 	.mail-sender {

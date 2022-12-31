@@ -16,7 +16,7 @@ export class MailComposeMeta extends PureComponent {
 
 	render() {
 		return (
-			<div className="mail-meta compose-meta">
+			<div className="mail-meta">
 				<div className="mail-params">
 					<div className="mmp-row">
 						<label className="mmp-row-title">From:</label>
