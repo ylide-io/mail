@@ -1,5 +1,6 @@
 import { EVMNetwork } from '@ylide/ethereum';
 import { makeObservable, observable } from 'mobx';
+
 import domain from './Domain';
 import { DomainAccount } from './models/DomainAccount';
 

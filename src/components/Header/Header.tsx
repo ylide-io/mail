@@ -1,7 +1,3 @@
-import React from 'react';
-import domain from '../../stores/Domain';
-import { useNav } from '../../utils/navigate';
-import { Avatar, Button, Dropdown } from 'antd';
 import {
 	DownOutlined,
 	EditOutlined,
@@ -11,14 +7,19 @@ import {
 	PlusOutlined,
 	UsergroupAddOutlined,
 } from '@ant-design/icons';
-import { observer } from 'mobx-react';
+import { Avatar, Button, Dropdown } from 'antd';
 import Tooltip from 'antd/es/tooltip';
-import { DomainAccount } from '../../stores/models/DomainAccount';
-import { Blockie } from '../../controls/Blockie';
+import { observer } from 'mobx-react';
+import React from 'react';
+
 import { walletsMap } from '../../constants';
-import modals from '../../stores/Modals';
 import { AdaptiveAddress } from '../../controls/AdaptiveAddress';
+import { Blockie } from '../../controls/Blockie';
 import { YlideLargeLogo } from '../../icons/YlideLargeLogo';
+import domain from '../../stores/Domain';
+import modals from '../../stores/Modals';
+import { DomainAccount } from '../../stores/models/DomainAccount';
+import { useNav } from '../../utils/navigate';
 import css from './Header.module.scss';
 
 const AccountItem = observer(({ account }: { account: DomainAccount }) => {

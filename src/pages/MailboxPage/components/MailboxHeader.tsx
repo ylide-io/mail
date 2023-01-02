@@ -1,4 +1,5 @@
 import { PureComponent } from 'react';
+
 import MailboxControls from './MailboxControls';
 import MailsCounter from './MailsCounter';
 

@@ -1,23 +1,23 @@
-import { PureComponent } from 'react';
-import { observer } from 'mobx-react';
-import { makeObservable, observable } from 'mobx';
-import SmartBuffer from '@ylide/smart-buffer';
-
-import modals from '../../stores/Modals';
-import { blockchainsMap, calloutSvg, evmNameToNetwork } from '../../constants';
-import domain from '../../stores/Domain';
-import { CrossIcon } from '../../icons/CrossIcon';
-import { YlideButton } from '../../controls/YlideButton';
-import { asyncDelay, ExternalYlidePublicKey, IGenericAccount } from '@ylide/sdk';
-import { Wallet } from '../../stores/models/Wallet';
-import { WalletTag } from '../../controls/WalletTag';
 import { EthereumWalletController, EVMNetwork } from '@ylide/ethereum';
-import { Loader } from '../../controls/Loader';
-import { DomainAccount } from '../../stores/models/DomainAccount';
-import { isBytesEqual } from '../../utils/isBytesEqual';
-import { useNavigate } from 'react-router-dom';
+import { asyncDelay, ExternalYlidePublicKey, IGenericAccount } from '@ylide/sdk';
+import SmartBuffer from '@ylide/smart-buffer';
 import clsx from 'clsx';
+import { makeObservable, observable } from 'mobx';
+import { observer } from 'mobx-react';
+import { PureComponent } from 'react';
+import { useNavigate } from 'react-router-dom';
+
+import { blockchainsMap, calloutSvg, evmNameToNetwork } from '../../constants';
+import { Loader } from '../../controls/Loader';
+import { WalletTag } from '../../controls/WalletTag';
+import { YlideButton } from '../../controls/YlideButton';
+import { CrossIcon } from '../../icons/CrossIcon';
 import { analytics } from '../../stores/Analytics';
+import domain from '../../stores/Domain';
+import modals from '../../stores/Modals';
+import { DomainAccount } from '../../stores/models/DomainAccount';
+import { Wallet } from '../../stores/models/Wallet';
+import { isBytesEqual } from '../../utils/isBytesEqual';
 
 const txPrices: Record<EVMNetwork, number> = {
 	[EVMNetwork.LOCAL_HARDHAT]: 0.001,

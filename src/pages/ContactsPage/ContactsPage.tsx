@@ -1,15 +1,16 @@
+import { PlusOutlined } from '@ant-design/icons';
+import { Button, Tabs } from 'antd';
+import { observer } from 'mobx-react';
 import React from 'react';
+import { Outlet, useLocation } from 'react-router-dom';
+
 import { GenericLayout } from '../../layouts/GenericLayout';
 import contacts from '../../stores/Contacts';
 import tags from '../../stores/Tags';
-import { observer } from 'mobx-react';
-import { Outlet, useLocation } from 'react-router-dom';
-import ContactsSearcher from './components/ContactsSearcher';
 import { useNav } from '../../utils/navigate';
-import { Button, Tabs } from 'antd';
-import TagsFilter from './components/TagsFilter';
-import { PlusOutlined } from '@ant-design/icons';
 import { useWindowSize } from '../../utils/useWindowSize';
+import ContactsSearcher from './components/ContactsSearcher';
+import TagsFilter from './components/TagsFilter';
 
 export const ContactsPage = observer(() => {
 	const location = useLocation();

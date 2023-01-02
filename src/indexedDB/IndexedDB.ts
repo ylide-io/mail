@@ -1,5 +1,5 @@
-import { openDB, DBSchema, IDBPDatabase } from 'idb';
 import { IMessage } from '@ylide/sdk';
+import { DBSchema, IDBPDatabase, openDB } from 'idb';
 
 import { IContact } from '../stores/models/IContact';
 import { ITag } from '../stores/models/ITag';

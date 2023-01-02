@@ -4,6 +4,7 @@ import { autobind } from 'core-decorators';
 import { makeObservable, observable } from 'mobx';
 import { observer } from 'mobx-react';
 import { PureComponent } from 'react';
+
 import { YlideButton } from '../../controls/YlideButton';
 import domain from '../../stores/Domain';
 

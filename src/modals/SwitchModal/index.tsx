@@ -1,12 +1,13 @@
-import Modal from 'antd/lib/modal/Modal';
-import { observer } from 'mobx-react';
-import { PureComponent } from 'react';
-import modals from '../../stores/Modals';
-import metamaskSwitchVideo from '../../assets/video/metamask-switch.mp4';
 import { IGenericAccount } from '@ylide/sdk';
-import { Wallet } from '../../stores/models/Wallet';
+import Modal from 'antd/lib/modal/Modal';
 import { autobind } from 'core-decorators';
 import { makeObservable, observable } from 'mobx';
+import { observer } from 'mobx-react';
+import { PureComponent } from 'react';
+
+import metamaskSwitchVideo from '../../assets/video/metamask-switch.mp4';
+import modals from '../../stores/Modals';
+import { Wallet } from '../../stores/models/Wallet';
 
 export interface SwitchModalProps {
 	type: 'account' | 'network';

@@ -1,11 +1,12 @@
+import clsx from 'clsx';
 import { observer } from 'mobx-react';
 import React, { ReactNode, useEffect, useMemo } from 'react';
 import { useLocation } from 'react-router-dom';
+
 import Header from '../components/Header/Header';
 import { LinkButton } from '../components/Sidebar/LinkButton';
 import SidebarMenu from '../components/Sidebar/SidebarMenu';
 import mailList from '../stores/MailList';
-import clsx from 'clsx';
 import css from './GenericLayout.module.scss';
 
 interface GenericLayoutProps {

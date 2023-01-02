@@ -2,26 +2,25 @@ import { EthereumBlockchainController, EthereumBlockchainSource, EthereumListSou
 import {
 	AbstractBlockchainController,
 	BlockchainListSource,
+	BlockchainSourceType,
+	CriticalSection,
 	IListSource,
+	IMessage,
+	IMessageContent,
+	IMessagesListConfigurationManager,
 	IMessageWithSource,
 	IndexerListSource,
+	ISourceSubject,
 	ListSourceDrainer,
 	ListSourceMultiplexer,
+	MessagesList,
 	SourceReadingSession,
 	Uint256,
 	Ylide,
 } from '@ylide/sdk';
-import {
-	BlockchainSourceType,
-	IMessage,
-	IMessageContent,
-	IMessagesListConfigurationManager,
-	ISourceSubject,
-	MessagesList,
-	CriticalSection,
-} from '@ylide/sdk';
 import { autobind } from 'core-decorators';
 import { makeObservable, observable, reaction } from 'mobx';
+
 import messagesDB, { IMessageDecodedContent } from '../indexedDB/MessagesDB';
 import { analytics } from './Analytics';
 import contacts from './Contacts';

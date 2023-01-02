@@ -1,4 +1,5 @@
 import { observer } from 'mobx-react';
+
 import mailList from '../../../stores/MailList';
 
 const MailsCounter = observer(() => {

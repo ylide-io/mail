@@ -1,16 +1,17 @@
-import React, { ReactNode, useEffect } from 'react';
-import { smallButtonIcons } from '../../../../components/smallButton/smallButton';
-import mailer from '../../../../stores/Mailer';
-import { observer } from 'mobx-react';
-import mailbox from '../../../../stores/Mailbox';
-import { useNav } from '../../../../utils/navigate';
-import domain from '../../../../stores/Domain';
-import AlertModal from '../../../../modals/AlertModal';
 import { EVM_NAMES, EVMNetwork } from '@ylide/ethereum';
-import { blockchainsMap, evmNameToNetwork } from '../../../../constants';
 import { Dropdown, Menu } from 'antd';
-import mailList from '../../../../stores/MailList';
 import clsx from 'clsx';
+import { observer } from 'mobx-react';
+import React, { ReactNode, useEffect } from 'react';
+
+import { smallButtonIcons } from '../../../../components/smallButton/smallButton';
+import { blockchainsMap, evmNameToNetwork } from '../../../../constants';
+import AlertModal from '../../../../modals/AlertModal';
+import domain from '../../../../stores/Domain';
+import mailbox from '../../../../stores/Mailbox';
+import mailer from '../../../../stores/Mailer';
+import mailList from '../../../../stores/MailList';
+import { useNav } from '../../../../utils/navigate';
 
 const ComposeMailFooter = observer(() => {
 	const navigate = useNav();

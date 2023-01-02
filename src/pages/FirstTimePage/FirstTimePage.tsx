@@ -1,9 +1,10 @@
-import React, { useState } from 'react';
 import { observer } from 'mobx-react';
-import { Logo } from '../../icons/Logo';
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+
 import { YlideButton } from '../../controls/YlideButton';
 import { ArrowRight } from '../../icons/ArrowRight';
-import { useNavigate } from 'react-router-dom';
+import { Logo } from '../../icons/Logo';
 import domain from '../../stores/Domain';
 
 const FirstTimePage = observer(() => {

@@ -1,8 +1,9 @@
-import React from 'react';
-import contacts from '../../../../stores/Contacts';
-import ContactsListItem from './ContactsListItem';
 import { observer } from 'mobx-react';
+import React from 'react';
+
+import contacts from '../../../../stores/Contacts';
 import ContactsEmpty from './ContactsEmpty';
+import ContactsListItem from './ContactsListItem';
 
 const ContactsList = observer(() => {
 	const contactsList = contacts.contacts.filter(

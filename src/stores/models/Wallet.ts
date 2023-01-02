@@ -1,20 +1,20 @@
-import { computed, makeObservable, observable } from 'mobx';
-import { autobind } from 'core-decorators';
-import EventEmitter from 'eventemitter3';
-
 import {
-	IGenericAccount,
-	WalletControllerFactory,
 	AbstractWalletController,
-	WalletEvent,
-	YlideKeyPair,
 	ExternalYlidePublicKey,
+	IGenericAccount,
 	PublicKey,
 	PublicKeyType,
+	WalletControllerFactory,
+	WalletEvent,
+	YlideKeyPair,
 } from '@ylide/sdk';
+import { autobind } from 'core-decorators';
+import EventEmitter from 'eventemitter3';
+import { computed, makeObservable, observable } from 'mobx';
+
 import { Domain } from '../Domain';
-import { DomainAccount } from './DomainAccount';
 import mailList from '../MailList';
+import { DomainAccount } from './DomainAccount';
 
 export class Wallet extends EventEmitter {
 	wallet: string;

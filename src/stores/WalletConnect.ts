@@ -1,5 +1,5 @@
-import { computed, observable } from 'mobx';
 import { IAppRegistry } from '@walletconnect/types';
+import { computed, observable } from 'mobx';
 
 export interface WalletInterface {
 	id: string;

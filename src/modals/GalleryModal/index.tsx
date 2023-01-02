@@ -2,6 +2,7 @@ import { observer } from 'mobx-react';
 import { PureComponent } from 'react';
 //@ts-ignore
 import ImageGallery from 'react-image-gallery';
+
 import modals from '../../stores/Modals';
 
 export interface GalleryModalProps {

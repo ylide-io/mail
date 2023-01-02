@@ -1,11 +1,12 @@
-import React, { useState } from 'react';
-import { ITag } from '../../../../stores/models/ITag';
-import { allColors } from '../../../../utils/colors';
-import tags from '../../../../stores/Tags';
-import ColorPicker from './ColorPicker';
 import { DeleteOutlined, EditOutlined, SaveOutlined } from '@ant-design/icons';
 import { Input } from 'antd';
+import React, { useState } from 'react';
+
 import { ActionButton, ActionButtonStyle } from '../../../../components/ActionButton/ActionButton';
+import { ITag } from '../../../../stores/models/ITag';
+import tags from '../../../../stores/Tags';
+import { allColors } from '../../../../utils/colors';
+import ColorPicker from './ColorPicker';
 
 interface TagsListItemProps {
 	tag: ITag;

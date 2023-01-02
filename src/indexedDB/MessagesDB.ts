@@ -1,5 +1,6 @@
-import { toJS } from 'mobx';
 import { IMessage } from '@ylide/sdk';
+import { toJS } from 'mobx';
+
 import { IndexedDB } from './IndexedDB';
 
 export interface IMessageDecodedContent {

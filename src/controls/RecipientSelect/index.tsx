@@ -1,14 +1,14 @@
-import React, { PureComponent } from 'react';
+import { CheckOutlined } from '@ant-design/icons';
 import { Menu, RefSelectProps, Select, Spin, Tag, Tooltip } from 'antd';
+import clsx from 'clsx';
 import { autobind } from 'core-decorators';
 import { action, makeObservable, observable } from 'mobx';
 import { observer } from 'mobx-react';
+import React, { PureComponent } from 'react';
+
 import contacts from '../../stores/Contacts';
 import domain from '../../stores/Domain';
 import { IRecipient } from '../../stores/Mailbox';
-
-import { CheckOutlined } from '@ant-design/icons';
-import clsx from 'clsx';
 
 export interface IRecipientOption {
 	id: string;

@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react';
 import makeBlockie from 'ethereum-blockies-base64';
+import { useEffect, useState } from 'react';
 
 export function Blockie({ address, ...rest }: { address: string } & any) {
 	const [url, setUrl] = useState('');

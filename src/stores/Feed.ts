@@ -1,4 +1,5 @@
 import { makeObservable, observable } from 'mobx';
+
 import { analytics } from './Analytics';
 
 export enum LinkType {

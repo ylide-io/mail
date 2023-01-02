@@ -1,6 +1,6 @@
-import { PureComponent } from 'react';
-import { observer } from 'mobx-react';
 import { makeObservable, observable } from 'mobx';
+import { observer } from 'mobx-react';
+import { PureComponent } from 'react';
 
 import modals from '../../stores/Modals';
 import YlideModal from '../YlideModal';

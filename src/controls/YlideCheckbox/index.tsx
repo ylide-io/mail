@@ -1,5 +1,5 @@
-import { MouseEvent } from 'react';
 import clsx from 'clsx';
+import { MouseEvent } from 'react';
 
 export const YlideCheckbox = ({
 	checked,

@@ -1,26 +1,27 @@
+import { MenuFoldOutlined, MenuUnfoldOutlined } from '@ant-design/icons';
+import { Button, Dropdown } from 'antd';
+import clsx from 'clsx';
+import { observer } from 'mobx-react';
 import React, { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { observer } from 'mobx-react';
-import modals from '../../stores/Modals';
-import { CaretDown } from '../../icons/CaretDown';
-import { topicSettingsIcon } from '../../icons/static/topicSettingsIcon';
-import { CaretUp } from '../../icons/CaretUp';
-import { Button, Dropdown } from 'antd';
-import { checkboxCheckIcon } from '../../icons/static/checkboxCheckIcon';
+
 import { YlideButton } from '../../controls/YlideButton';
-import feed from '../../stores/Feed';
-import { MenuFoldOutlined, MenuUnfoldOutlined } from '@ant-design/icons';
-import { sideFeedIcon } from '../../icons/static/sideFeedIcon';
+import { CaretDown } from '../../icons/CaretDown';
+import { CaretUp } from '../../icons/CaretUp';
+import { checkboxCheckIcon } from '../../icons/static/checkboxCheckIcon';
 import { sideAllTopicsIcon } from '../../icons/static/sideAllTopicsIcon';
-import { sideMarketsIcon } from '../../icons/static/sideMarketsIcon';
 import { sideAnalyticsIcon } from '../../icons/static/sideAnalyticsIcon';
-import { sideProjectsIcon } from '../../icons/static/sideProjectsIcon';
-import { sidePolicyIcon } from '../../icons/static/sidePolicyIcon';
-import { sideSecurityIcon } from '../../icons/static/sideSecurityIcon';
-import { sideTechnologyIcon } from '../../icons/static/sideTechnologyIcon';
 import { sideCultureIcon } from '../../icons/static/sideCultureIcon';
 import { sideEducationIcon } from '../../icons/static/sideEducationIcon';
-import clsx from 'clsx';
+import { sideFeedIcon } from '../../icons/static/sideFeedIcon';
+import { sideMarketsIcon } from '../../icons/static/sideMarketsIcon';
+import { sidePolicyIcon } from '../../icons/static/sidePolicyIcon';
+import { sideProjectsIcon } from '../../icons/static/sideProjectsIcon';
+import { sideSecurityIcon } from '../../icons/static/sideSecurityIcon';
+import { sideTechnologyIcon } from '../../icons/static/sideTechnologyIcon';
+import { topicSettingsIcon } from '../../icons/static/topicSettingsIcon';
+import feed from '../../stores/Feed';
+import modals from '../../stores/Modals';
 import css from './SidebarMenu.module.scss';
 
 const FeedSettings = observer(() => {

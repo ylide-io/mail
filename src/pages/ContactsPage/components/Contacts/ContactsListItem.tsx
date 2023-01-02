@@ -1,17 +1,18 @@
-import React, { ChangeEvent, useMemo, useState } from 'react';
-import { ITag } from '../../../../stores/models/ITag';
-import contacts from '../../../../stores/Contacts';
-import { IContact } from '../../../../stores/models/IContact';
-import TagsStore from '../../../../stores/Tags';
-import mailbox from '../../../../stores/Mailbox';
-import { useNav } from '../../../../utils/navigate';
-import domain from '../../../../stores/Domain';
-import { Avatar, Input, Select } from 'antd';
-import { Blockie } from '../../../../controls/Blockie';
 import { DeleteOutlined, EditOutlined, MailOutlined, SaveOutlined } from '@ant-design/icons';
-import { AdaptiveAddress } from '../../../../controls/AdaptiveAddress';
+import { Avatar, Input, Select } from 'antd';
 import clsx from 'clsx';
+import React, { ChangeEvent, useMemo, useState } from 'react';
+
 import { ActionButton, ActionButtonStyle } from '../../../../components/ActionButton/ActionButton';
+import { AdaptiveAddress } from '../../../../controls/AdaptiveAddress';
+import { Blockie } from '../../../../controls/Blockie';
+import contacts from '../../../../stores/Contacts';
+import domain from '../../../../stores/Domain';
+import mailbox from '../../../../stores/Mailbox';
+import { IContact } from '../../../../stores/models/IContact';
+import { ITag } from '../../../../stores/models/ITag';
+import TagsStore from '../../../../stores/Tags';
+import { useNav } from '../../../../utils/navigate';
 
 interface ContactsListItemProps {
 	contact: IContact;

@@ -1,9 +1,10 @@
-import { smallButtonIcons } from '../../../components/smallButton/smallButton';
-import { observer } from 'mobx-react';
-import mailList from '../../../stores/MailList';
 import { Tooltip } from 'antd';
-import { YlideCheckbox } from '../../../controls/YlideCheckbox';
+import { observer } from 'mobx-react';
+
 import { ActionButton } from '../../../components/ActionButton/ActionButton';
+import { smallButtonIcons } from '../../../components/smallButton/smallButton';
+import { YlideCheckbox } from '../../../controls/YlideCheckbox';
+import mailList from '../../../stores/MailList';
 
 const MailboxControls = observer(() => {
 	const readHandler = () => {

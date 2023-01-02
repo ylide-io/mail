@@ -1,5 +1,5 @@
-import { PureComponent, ReactNode } from 'react';
 import { observer } from 'mobx-react';
+import { PureComponent, ReactNode } from 'react';
 
 import modals from '../../stores/Modals';
 import YlideModal from '../YlideModal';

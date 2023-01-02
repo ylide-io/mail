@@ -1,22 +1,23 @@
+import { CloseOutlined } from '@ant-design/icons';
+import { asyncDelay, IGenericAccount } from '@ylide/sdk';
+import { Spin, Tooltip } from 'antd';
+import clsx from 'clsx';
+import { autobind } from 'core-decorators';
+import { makeObservable, observable } from 'mobx';
 import { observer } from 'mobx-react';
 import { PureComponent } from 'react';
+
 import { blockchainsMap, walletsMap } from '../../constants';
-import domain from '../../stores/Domain';
 import { YlideButton } from '../../controls/YlideButton';
-import { CloseOutlined } from '@ant-design/icons';
-import { Spin, Tooltip } from 'antd';
-import SwitchModal from '../../modals/SwitchModal';
-import { shrinkAddress } from '../../utils/shrinkAddress';
-import { makeObservable, observable } from 'mobx';
-import { DomainAccount } from '../../stores/models/DomainAccount';
-import { autobind } from 'core-decorators';
-import { Wallet } from '../../stores/models/Wallet';
 import PasswordModal from '../../modals/PasswordModal';
-import SignatureModal from '../../modals/SignatureModal';
-import { asyncDelay, IGenericAccount } from '@ylide/sdk';
-import { isBytesEqual } from '../../utils/isBytesEqual';
 import PublishKeyModal from '../../modals/PublishKeyModal';
-import clsx from 'clsx';
+import SignatureModal from '../../modals/SignatureModal';
+import SwitchModal from '../../modals/SwitchModal';
+import domain from '../../stores/Domain';
+import { DomainAccount } from '../../stores/models/DomainAccount';
+import { Wallet } from '../../stores/models/Wallet';
+import { isBytesEqual } from '../../utils/isBytesEqual';
+import { shrinkAddress } from '../../utils/shrinkAddress';
 
 export interface WalletBlockProps {
 	wallet: string;

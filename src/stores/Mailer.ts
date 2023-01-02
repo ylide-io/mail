@@ -1,10 +1,11 @@
-import { makeAutoObservable } from 'mobx';
-import messagesDB from '../indexedDB/MessagesDB';
+import { EVM_NAMES, EVMNetwork } from '@ylide/ethereum';
 import { MessageContentV3, ServiceCode } from '@ylide/sdk';
+import { makeAutoObservable } from 'mobx';
+
+import messagesDB from '../indexedDB/MessagesDB';
+import { analytics } from './Analytics';
 import domain from './Domain';
 import { DomainAccount } from './models/DomainAccount';
-import { EVM_NAMES, EVMNetwork } from '@ylide/ethereum';
-import { analytics } from './Analytics';
 
 // interface filteringTypesInterface {
 // 	unread: (arg1: IMessage) => Promise<boolean>;

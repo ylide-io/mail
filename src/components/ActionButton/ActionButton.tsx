@@ -1,8 +1,9 @@
-import React, { ReactNode } from 'react';
-import { WithClassNameProps } from '../WithClassNameProps';
-import { WithChildrenProps } from '../WithChildrenProps';
-import css from './ActionButton.module.scss';
 import clsx from 'clsx';
+import React, { ReactNode } from 'react';
+
+import { WithChildrenProps } from '../WithChildrenProps';
+import { WithClassNameProps } from '../WithClassNameProps';
+import css from './ActionButton.module.scss';
 
 export enum ActionButtonStyle {
 	Default,

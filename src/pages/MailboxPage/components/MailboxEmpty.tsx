@@ -1,9 +1,10 @@
 import { observer } from 'mobx-react';
+import React from 'react';
+
+import { LinkButton, LinkButtonType } from '../../../components/Sidebar/LinkButton';
 import ClickToCopy from '../../../controls/ClickToCopy';
 import domain from '../../../stores/Domain';
 import mailList from '../../../stores/MailList';
-import { LinkButton, LinkButtonType } from '../../../components/Sidebar/LinkButton';
-import React from 'react';
 
 const MailboxEmpty = observer(() => {
 	const activeFolderId = mailList.activeFolderId;

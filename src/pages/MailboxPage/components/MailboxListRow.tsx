@@ -1,16 +1,16 @@
-import React, { CSSProperties, useEffect, useState } from 'react';
+import clsx from 'clsx';
 import { observer } from 'mobx-react';
+import React, { CSSProperties, useEffect, useState } from 'react';
 
+import { blockchainsMap } from '../../../constants';
+import { AdaptiveAddress } from '../../../controls/AdaptiveAddress';
+import { YlideCheckbox } from '../../../controls/YlideCheckbox';
 import contacts from '../../../stores/Contacts';
+import domain from '../../../stores/Domain';
+import mailList, { ILinkedMessage } from '../../../stores/MailList';
 import { isToday } from '../../../utils/date';
 import { useNav } from '../../../utils/navigate';
-import { blockchainsMap } from '../../../constants';
-import mailList, { ILinkedMessage } from '../../../stores/MailList';
-import { YlideCheckbox } from '../../../controls/YlideCheckbox';
-import domain from '../../../stores/Domain';
-import { AdaptiveAddress } from '../../../controls/AdaptiveAddress';
 import { safeJson } from '../../../utils/safeJson';
-import clsx from 'clsx';
 
 interface MailboxListRowProps {
 	message: ILinkedMessage;

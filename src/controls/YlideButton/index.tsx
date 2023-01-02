@@ -1,5 +1,5 @@
-import React, { ButtonHTMLAttributes, CSSProperties, FC, PropsWithChildren } from 'react';
 import clsx from 'clsx';
+import React, { ButtonHTMLAttributes, CSSProperties, FC, PropsWithChildren } from 'react';
 
 export const YlideButton: FC<
 	PropsWithChildren<{

@@ -1,6 +1,7 @@
 import { Input, Select } from 'antd';
 import { observer } from 'mobx-react';
 import { PureComponent } from 'react';
+
 import { RecipientsSelect } from '../../../controls/RecipientSelect';
 import domain from '../../../stores/Domain';
 import mailbox from '../../../stores/Mailbox';

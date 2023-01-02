@@ -1,25 +1,23 @@
-import React, { useEffect } from 'react';
 import { observer } from 'mobx-react';
+import React, { useEffect } from 'react';
 import { Navigate, Route, Routes, useLocation } from 'react-router-dom';
 
-import domain from './stores/Domain';
-
-import { ComposePage } from './pages/ComposePage/ComposePage';
-import { MailboxPage } from './pages/MailboxPage/MailboxPage';
-import { MailDetailsPage } from './pages/MailDetailsPage/MailDetailsPage';
-import { ContactsPage } from './pages/ContactsPage/ContactsPage';
-import { SettingsPage } from './pages/SettingsPage/SettingsPage';
-import { ContactsTab } from './pages/ContactsPage/components/Contacts/ContactsTab';
-import { TagsTab } from './pages/ContactsPage/components/Tags/TagsTab';
-
-import modals from './stores/Modals';
 import { Loader } from './controls/Loader';
 import { AdminPage } from './pages/AdminPage';
-import { TestPage } from './pages/TestPage/TestPage';
-import walletConnect from './stores/WalletConnect';
-import { NewWalletsPage } from './pages/NewWalletsPage';
+import { ComposePage } from './pages/ComposePage/ComposePage';
+import { ContactsTab } from './pages/ContactsPage/components/Contacts/ContactsTab';
+import { TagsTab } from './pages/ContactsPage/components/Tags/TagsTab';
+import { ContactsPage } from './pages/ContactsPage/ContactsPage';
 import { FeedPage } from './pages/FeedPage/FeedPage';
+import { MailboxPage } from './pages/MailboxPage/MailboxPage';
+import { MailDetailsPage } from './pages/MailDetailsPage/MailDetailsPage';
+import { NewWalletsPage } from './pages/NewWalletsPage';
+import { SettingsPage } from './pages/SettingsPage/SettingsPage';
+import { TestPage } from './pages/TestPage/TestPage';
 import { analytics } from './stores/Analytics';
+import domain from './stores/Domain';
+import modals from './stores/Modals';
+import walletConnect from './stores/WalletConnect';
 
 const App = observer(() => {
 	const location = useLocation();

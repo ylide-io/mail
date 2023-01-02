@@ -1,9 +1,10 @@
-import React, { useEffect } from 'react';
 import { observer } from 'mobx-react';
-import tags from '../../../stores/Tags';
-import Tag from './Tag';
-import TagsEmpty from '../TagsEmpty';
+import React, { useEffect } from 'react';
+
 import mailList from '../../../stores/MailList';
+import tags from '../../../stores/Tags';
+import TagsEmpty from '../TagsEmpty';
+import Tag from './Tag';
 
 const TagsList = observer(() => {
 	useEffect(() => {

@@ -1,6 +1,6 @@
-import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import useResizeObserver from '@react-hook/resize-observer';
 import { Tooltip } from 'antd';
+import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 
 const useSize = (target: React.RefObject<HTMLElement>) => {
 	const [size, setSize] = useState({

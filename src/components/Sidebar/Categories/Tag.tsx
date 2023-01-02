@@ -1,8 +1,9 @@
+import clsx from 'clsx';
 import React from 'react';
 import { useLocation } from 'react-router-dom';
-import { useNav } from '../../../utils/navigate';
+
 import modals from '../../../stores/Modals';
-import clsx from 'clsx';
+import { useNav } from '../../../utils/navigate';
 
 interface TagProps {
 	circleColor: string;

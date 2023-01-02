@@ -1,16 +1,17 @@
-import React, { PureComponent } from 'react';
-import { observer } from 'mobx-react';
-import contacts from '../../../../stores/Contacts';
+import { Select, Spin, Tag, Tooltip } from 'antd';
+import clsx from 'clsx';
+import { autobind } from 'core-decorators';
 // import { IContact } from '../../../../stores/models/IContact';
 // import CreatableSelect from 'react-select/creatable';
 // import mailbox from '../../../../stores/Mailbox';
 // import domain from '../../../../stores/Domain';
 import { makeObservable, observable } from 'mobx';
-import { Select, Spin, Tag, Tooltip } from 'antd';
-import { autobind } from 'core-decorators';
+import { observer } from 'mobx-react';
+import React, { PureComponent } from 'react';
+
+import contacts from '../../../../stores/Contacts';
 import domain from '../../../../stores/Domain';
 import mailbox from '../../../../stores/Mailbox';
-import clsx from 'clsx';
 
 export interface IRecipient {
 	loading: boolean;

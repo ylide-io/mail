@@ -1,22 +1,22 @@
-import React, { MouseEvent, useCallback, useEffect, useRef, useState } from 'react';
-import { GenericLayout } from '../../layouts/GenericLayout';
-
-import { YlideButton } from '../../controls/YlideButton';
-import feed, { FeedPost, LinkType } from '../../stores/Feed';
-import moment from 'moment';
-import Avatar from 'antd/lib/avatar/avatar';
 import { UserOutlined } from '@ant-design/icons';
+import Avatar from 'antd/lib/avatar/avatar';
+import clsx from 'clsx';
+import { observer } from 'mobx-react';
+import moment from 'moment';
+import React, { MouseEvent, useCallback, useEffect, useRef, useState } from 'react';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
+
+import { Loader } from '../../controls/Loader';
+import { YlideButton } from '../../controls/YlideButton';
+import { CaretDown } from '../../icons/CaretDown';
 import { discordSourceIcon } from '../../icons/static/discordSourceIcon';
-import { twitterSourceIcon } from '../../icons/static/twitterSourceIcon';
+import { linkIcon } from '../../icons/static/linkIcon';
 import { mirrorSourceIcon } from '../../icons/static/mirrorSourceIcon';
 import { telegramSourceIcon } from '../../icons/static/telegramSourceIcon';
-import { linkIcon } from '../../icons/static/linkIcon';
+import { twitterSourceIcon } from '../../icons/static/twitterSourceIcon';
+import { GenericLayout } from '../../layouts/GenericLayout';
 import GalleryModal from '../../modals/GalleryModal';
-import { Loader } from '../../controls/Loader';
-import { observer } from 'mobx-react';
-import { useLocation, useNavigate, useParams } from 'react-router-dom';
-import { CaretDown } from '../../icons/CaretDown';
-import clsx from 'clsx';
+import feed, { FeedPost, LinkType } from '../../stores/Feed';
 import css from './FeedPage.module.scss';
 
 const sourceIcon: Record<LinkType, JSX.Element> = {

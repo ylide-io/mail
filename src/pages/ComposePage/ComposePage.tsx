@@ -1,16 +1,17 @@
-import React, { useEffect } from 'react';
-import { GenericLayout } from '../../layouts/GenericLayout';
-import { smallButtonIcons } from '../../components/smallButton/smallButton';
-import { useNav } from '../../utils/navigate';
-import mailer from '../../stores/Mailer';
 import { observer } from 'mobx-react';
-import mailList from '../../stores/MailList';
-import { OverlappingLoader } from '../../controls/OverlappingLoader';
-import ComposeMailFooter from './components/Mailbox/ComposeMailFooter';
-import ComposeMailBody from './components/Mailbox/ComposeMailBody';
-import { MailComposeMeta } from './components/MailComposeMeta';
-import { analytics } from '../../stores/Analytics';
+import React, { useEffect } from 'react';
+
 import { ActionButton, ActionButtonStyle } from '../../components/ActionButton/ActionButton';
+import { smallButtonIcons } from '../../components/smallButton/smallButton';
+import { OverlappingLoader } from '../../controls/OverlappingLoader';
+import { GenericLayout } from '../../layouts/GenericLayout';
+import { analytics } from '../../stores/Analytics';
+import mailer from '../../stores/Mailer';
+import mailList from '../../stores/MailList';
+import { useNav } from '../../utils/navigate';
+import ComposeMailBody from './components/Mailbox/ComposeMailBody';
+import ComposeMailFooter from './components/Mailbox/ComposeMailFooter';
+import { MailComposeMeta } from './components/MailComposeMeta';
 
 export const ComposePage = observer(() => {
 	const navigate = useNav();

@@ -1,13 +1,14 @@
-import MailboxListRow from './MailboxListRow';
 import { observer } from 'mobx-react';
-import mailList, { ILinkedMessage } from '../../../stores/MailList';
-import { Loader } from '../../../controls/Loader';
-import { FixedSizeList, ListChildComponentProps } from 'react-window';
-import AutoSizer from 'react-virtualized-auto-sizer';
 import { useCallback, useEffect, useState } from 'react';
-import MailboxEmpty from './MailboxEmpty';
+import AutoSizer from 'react-virtualized-auto-sizer';
+import { FixedSizeList, ListChildComponentProps } from 'react-window';
+
+import { Loader } from '../../../controls/Loader';
 import domain from '../../../stores/Domain';
+import mailList, { ILinkedMessage } from '../../../stores/MailList';
 import { useWindowSize } from '../../../utils/useWindowSize';
+import MailboxEmpty from './MailboxEmpty';
+import MailboxListRow from './MailboxListRow';
 
 const MailboxListInner = observer(({ width, height }: { width: number; height: number }) => {
 	const [scrollParams, setScrollParams] = useState({

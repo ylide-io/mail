@@ -1,4 +1,5 @@
 import { PureComponent, ReactNode } from 'react';
+
 import { YlideButton } from '../../controls/YlideButton';
 
 export interface YlideModalProps {

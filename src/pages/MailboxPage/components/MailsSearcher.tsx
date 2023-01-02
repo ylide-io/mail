@@ -1,6 +1,5 @@
-import React, { FormEvent, useEffect, useState } from 'react';
 import { observer } from 'mobx-react';
-import mailer from '../../../stores/Mailer';
+import React, { FormEvent, useEffect, useState } from 'react';
 
 const MailsSearcher = observer(() => {
 	const [searchingText, setSearchingText] = useState('');

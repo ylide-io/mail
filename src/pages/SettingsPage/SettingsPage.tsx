@@ -1,6 +1,7 @@
-import React from 'react';
-import { GenericLayout } from '../../layouts/GenericLayout';
 import { observer } from 'mobx-react';
+import React from 'react';
+
+import { GenericLayout } from '../../layouts/GenericLayout';
 import mailList from '../../stores/MailList';
 
 export const SettingsPage = observer(() => {

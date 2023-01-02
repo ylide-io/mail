@@ -1,5 +1,6 @@
 import { Input } from 'antd';
 import React, { useEffect, useState } from 'react';
+
 import contacts from '../../../stores/Contacts';
 
 const ContactsSearcher = () => {

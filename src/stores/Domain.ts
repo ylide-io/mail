@@ -1,35 +1,36 @@
+import WalletConnectProvider from '@walletconnect/web3-provider';
 import {
-	Ylide,
-	BlockchainMap,
-	BlockchainWalletMap,
-	YlideKeyStore,
-	BrowserIframeStorage,
-	AbstractWalletController,
-	AbstractBlockchainController,
-	BlockchainControllerFactory,
-	WalletControllerFactory,
-	IGenericAccount,
-	DynamicEncryptionRouter,
-	AbstractNameService,
-} from '@ylide/sdk';
-import { everscaleBlockchainFactory, everscaleWalletFactory } from '@ylide/everscale';
-import {
-	evmWalletFactories,
-	evmBlockchainFactories,
-	EVMNetwork,
 	EVM_CHAINS,
 	EVM_NAMES,
 	EVM_RPCS,
+	evmBlockchainFactories,
+	EVMNetwork,
+	evmWalletFactories,
 } from '@ylide/ethereum';
+import { everscaleBlockchainFactory, everscaleWalletFactory } from '@ylide/everscale';
+import {
+	AbstractBlockchainController,
+	AbstractNameService,
+	AbstractWalletController,
+	BlockchainControllerFactory,
+	BlockchainMap,
+	BlockchainWalletMap,
+	BrowserIframeStorage,
+	DynamicEncryptionRouter,
+	IGenericAccount,
+	WalletControllerFactory,
+	Ylide,
+	YlideKeyStore,
+} from '@ylide/sdk';
 import { makeObservable, observable, toJS } from 'mobx';
-import WalletConnectProvider from '@walletconnect/web3-provider';
-import contacts from './Contacts';
-import { Wallet } from './models/Wallet';
-import { Accounts } from './Accounts';
+
 import { blockchainsMap, supportedWallets, walletsMap } from '../constants';
-import SwitchModal from '../modals/SwitchModal';
 import PasswordModal from '../modals/PasswordModal';
+import SwitchModal from '../modals/SwitchModal';
+import { Accounts } from './Accounts';
+import contacts from './Contacts';
 import mailList from './MailList';
+import { Wallet } from './models/Wallet';
 import tags from './Tags';
 
 // Ylide.registerBlockchainFactory(evmBlockchainFactories[EVMNetwork.LOCAL_HARDHAT]);

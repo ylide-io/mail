@@ -1,4 +1,5 @@
 import React from 'react';
+
 import tags from '../../../../stores/Tags';
 
 const TagsEmpty = () => {

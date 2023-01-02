@@ -1,4 +1,5 @@
 import { EVM_NAMES, EVMNetwork } from '@ylide/ethereum';
+
 import { ArbitrumLogo } from './icons/ArbitrumLogo';
 import { AstarLogo } from './icons/AstarLogo';
 import { AuroraLogo } from './icons/AuroraLogo';

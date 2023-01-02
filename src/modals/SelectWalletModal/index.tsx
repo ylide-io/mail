@@ -1,21 +1,21 @@
-import { PureComponent } from 'react';
-import { observer } from 'mobx-react';
-import { computed, makeObservable, observable, reaction, toJS } from 'mobx';
-
-import modals from '../../stores/Modals';
 import * as browserUtils from '@walletconnect/browser-utils';
-import { supportedWallets, walletsMap } from '../../constants';
-import domain from '../../stores/Domain';
-import walletConnect from '../../stores/WalletConnect';
-import { Loader } from '../../controls/Loader';
-import { CrossIcon } from '../../icons/CrossIcon';
-import QRCode from 'react-qr-code';
-import { YlideButton } from '../../controls/YlideButton';
-import { autobind } from 'core-decorators';
-import { Wallet } from '../../stores/models/Wallet';
-import SwitchModal from '../SwitchModal';
-import NewPasswordModal from '../NewPasswordModal';
 import clsx from 'clsx';
+import { autobind } from 'core-decorators';
+import { computed, makeObservable, observable, reaction, toJS } from 'mobx';
+import { observer } from 'mobx-react';
+import { PureComponent } from 'react';
+import QRCode from 'react-qr-code';
+
+import { supportedWallets, walletsMap } from '../../constants';
+import { Loader } from '../../controls/Loader';
+import { YlideButton } from '../../controls/YlideButton';
+import { CrossIcon } from '../../icons/CrossIcon';
+import domain from '../../stores/Domain';
+import modals from '../../stores/Modals';
+import { Wallet } from '../../stores/models/Wallet';
+import walletConnect from '../../stores/WalletConnect';
+import NewPasswordModal from '../NewPasswordModal';
+import SwitchModal from '../SwitchModal';
 
 export interface SelectWalletModalProps {
 	onResolve: () => void;

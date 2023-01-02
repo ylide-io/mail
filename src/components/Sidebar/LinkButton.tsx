@@ -1,7 +1,8 @@
+import clsx from 'clsx';
 import React from 'react';
+
 import { useNav } from '../../utils/navigate';
 import { WithClassNameProps } from '../WithClassNameProps';
-import clsx from 'clsx';
 import css from './LinkButton.module.scss';
 
 export enum LinkButtonType {
