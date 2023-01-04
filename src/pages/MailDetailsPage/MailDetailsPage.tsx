@@ -67,13 +67,13 @@ export const MailDetailsPage = observer(() => {
 			  ]
 			: [];
 		mailbox.subject = decoded?.decodedSubject || '';
-		navigate('/compose');
+		navigate('/mail/compose');
 	};
 
 	const forwardClickHandler = () => {
 		mailbox.textEditorData = decoded?.decodedTextData || '';
 		mailbox.subject = decoded?.decodedSubject || '';
-		navigate('/compose');
+		navigate('/mail/compose');
 	};
 
 	const deleteHandler = () => {

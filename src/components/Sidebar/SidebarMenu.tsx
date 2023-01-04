@@ -362,16 +362,16 @@ const SidebarMenu = observer(() => {
 							className="sidebar-section-button"
 							onClick={() => {
 								modals.sidebarOpen = false;
-								navigate('/compose');
+								navigate('/mail/compose');
 							}}
 						>
 							Compose mail
 						</div>
 						<div
-							className={clsx('sidebar-section-link', { active: location.pathname === '/inbox' })}
+							className={clsx('sidebar-section-link', { active: location.pathname === '/mail/inbox' })}
 							onClick={() => {
 								modals.sidebarOpen = false;
-								navigate('/inbox');
+								navigate('/mail/inbox');
 							}}
 						>
 							<div className="sidebar-link-icon-left">
@@ -399,10 +399,10 @@ const SidebarMenu = observer(() => {
 							</div>
 						</div>
 						<div
-							className={clsx('sidebar-section-link', { active: location.pathname === '/sent' })}
+							className={clsx('sidebar-section-link', { active: location.pathname === '/mail/sent' })}
 							onClick={() => {
 								modals.sidebarOpen = false;
-								navigate('/sent');
+								navigate('/mail/sent');
 							}}
 						>
 							<div className="sidebar-link-icon-left">
@@ -411,10 +411,10 @@ const SidebarMenu = observer(() => {
 							<div className="sidebar-link-title">Sent</div>
 						</div>
 						<div
-							className={clsx('sidebar-section-link', { active: location.pathname === '/archive' })}
+							className={clsx('sidebar-section-link', { active: location.pathname === '/mail/archive' })}
 							onClick={() => {
 								modals.sidebarOpen = false;
-								navigate('/archive');
+								navigate('/mail/archive');
 							}}
 						>
 							<div className="sidebar-link-icon-left">

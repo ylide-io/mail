@@ -136,7 +136,7 @@ const ContactsListItem: React.FC<ContactsListItemProps> = ({ contact, isNew }) =
 				address: contact.address,
 			},
 		];
-		navigate('/compose');
+		navigate('/mail/compose');
 	};
 
 	if (editing) {

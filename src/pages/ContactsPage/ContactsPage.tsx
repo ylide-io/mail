@@ -18,22 +18,22 @@ export const ContactsPage = observer(() => {
 	const { windowWidth } = useWindowSize();
 
 	const addHandler = () => {
-		if (location.pathname === '/contacts') {
+		if (location.pathname === '/mail/contacts') {
 			contacts.generateNewContact();
-		} else if (location.pathname === '/folders') {
+		} else if (location.pathname === '/mail/folders') {
 			tags.generateNewTag();
 		}
 	};
 
 	const extraContent = (
 		<>
-			{location.pathname === '/contacts' && <TagsFilter />}
+			{location.pathname === '/mail/contacts' && <TagsFilter />}
 			<Button
 				onClick={addHandler}
-				style={{ marginLeft: location.pathname === '/contacts' ? 10 : 0 }}
+				style={{ marginLeft: location.pathname === '/mail/contacts' ? 10 : 0 }}
 				icon={<PlusOutlined />}
 			>
-				{location.pathname === '/contacts' ? 'Add contact' : 'Add folder'}
+				{location.pathname === '/mail/contacts' ? 'Add contact' : 'Add folder'}
 			</Button>
 		</>
 	);
@@ -43,15 +43,16 @@ export const ContactsPage = observer(() => {
 			<div className="mail-page animated fadeInRight">
 				<div className="mail-top contacts-mail-top">
 					<div className="mail-header">
-						<h2 className="mailbox-title">{location.pathname === '/contacts' ? 'Contacts' : 'Folders'}</h2>
-						<div className="mail-actions">
-							<div
-								style={location.pathname === '/contacts/folders' ? { opacity: 0 } : {}}
-								className="input-group"
-							>
-								<ContactsSearcher />
+						<h2 className="mailbox-title">
+							{location.pathname === '/mail/contacts' ? 'Contacts' : 'Folders'}
+						</h2>
+						{location.pathname !== '/mail/folders' && (
+							<div className="mail-actions">
+								<div className="input-group">
+									<ContactsSearcher />
+								</div>
 							</div>
-						</div>
+						)}
 					</div>
 					{windowWidth <= 480 ? (
 						<div
@@ -69,8 +70,8 @@ export const ContactsPage = observer(() => {
 						onTabClick={key => nav(`/${key}`)}
 						tabBarExtraContent={windowWidth > 480 ? extraContent : null}
 					>
-						<Tabs.TabPane tab="Contacts" key="contacts" />
-						<Tabs.TabPane tab="Folders" key="folders" />
+						<Tabs.TabPane tab="Contacts" key="mail/contacts" />
+						<Tabs.TabPane tab="Folders" key="mail/folders" />
 					</Tabs>
 					<Outlet />
 				</div>

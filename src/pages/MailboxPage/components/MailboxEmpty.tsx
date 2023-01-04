@@ -41,7 +41,7 @@ const MailboxEmpty = observer(() => {
 						Send a message to your friend now.
 					</h3>
 
-					<LinkButton type={LinkButtonType.PRIMARY} text="Compose Mail" link="/compose" />
+					<LinkButton type={LinkButtonType.PRIMARY} text="Compose Mail" link="/mail/compose" />
 				</>
 			) : (
 				<h3>No messages here.</h3>

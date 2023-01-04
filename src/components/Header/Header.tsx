@@ -105,10 +105,10 @@ const Header = observer(() => {
 
 			<div className={css.logo}>
 				<a
-					href="/inbox"
+					href="/mail/inbox"
 					onClick={e => {
 						e.preventDefault();
-						nav('/inbox');
+						nav('/mail/inbox');
 					}}
 				>
 					<YlideLargeLogo className={css.logoImage} />
@@ -120,7 +120,7 @@ const Header = observer(() => {
 						<UsergroupAddOutlined
 							onClick={e => {
 								e.preventDefault();
-								nav('/contacts');
+								nav('/mail/contacts');
 							}}
 							style={{ fontSize: 20 }}
 						/>

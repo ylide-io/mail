@@ -82,25 +82,27 @@ const App = observer(() => {
 		<>
 			<Routes>
 				<>
-					<Route path={'/'} element={<Navigate replace to="/inbox" />} />
 					<Route path={'/test'} element={<TestPage />} />
 					{/* <Route path={'/first-time'} element={<FirstTimePage />} /> */}
 					{/* <Route path={'/connect-wallets'} element={<ConnectWalletsPage />} /> */}
 					<Route path={'/wallets'} element={<NewWalletsPage />} />
-					<Route path={'/compose'} element={<ComposePage />} />
-					<Route path={'/contacts'} element={<ContactsPage />}>
-						<Route index element={<ContactsTab />} />
-					</Route>
-					<Route path={'/folders'} element={<ContactsPage />}>
-						<Route index element={<TagsTab />} />
-					</Route>
 					<Route path={'/settings'} element={<SettingsPage />} />
 					<Route path={'/admin'} element={<AdminPage />} />
+
 					<Route path={'/feed'} element={<FeedPage />} />
 					<Route path={'/feed/:category'} element={<FeedPage />} />
-					<Route path={'/:folderId'} element={<MailboxPage />} />
-					<Route path={'/:folderId/:id'} element={<MailDetailsPage />} />
-					<Route path={'/*'} element={<Navigate replace to="/inbox" />} />
+
+					<Route path={'/mail/compose'} element={<ComposePage />} />
+					<Route path={'/mail/contacts'} element={<ContactsPage />}>
+						<Route index element={<ContactsTab />} />
+					</Route>
+					<Route path={'/mail/folders'} element={<ContactsPage />}>
+						<Route index element={<TagsTab />} />
+					</Route>
+					<Route path={'/mail/:folderId'} element={<MailboxPage />} />
+					<Route path={'/mail/:folderId/:id'} element={<MailDetailsPage />} />
+
+					<Route path={'/*'} element={<Navigate replace to="/mail/inbox" />} />
 				</>
 			</Routes>
 			{modals.render()}

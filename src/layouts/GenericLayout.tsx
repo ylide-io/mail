@@ -19,17 +19,17 @@ export const GenericLayout: React.FC<GenericLayoutProps> = observer(({ children,
 	const location = useLocation();
 
 	const linkButtonProps = useMemo(() => {
-		if (location.pathname === '/' + mailList.activeFolderId) {
+		if (location.pathname === '/mail/' + mailList.activeFolderId) {
 			return {
 				text: 'Compose Mail',
-				link: '/compose',
+				link: '/mail/compose',
 			};
 		} else if (location.pathname.startsWith('/feed/')) {
 			return null;
 		} else {
 			return {
 				text: '‹ Return to Mailbox',
-				link: `/${mailList.activeFolderId || 'inbox'}`,
+				link: `/mail/${mailList.activeFolderId || 'inbox'}`,
 			};
 		}
 		// eslint-disable-next-line react-hooks/exhaustive-deps

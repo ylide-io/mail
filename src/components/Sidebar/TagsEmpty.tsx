@@ -6,7 +6,7 @@ const TagsEmpty = () => {
 	const navigate = useNav();
 
 	const gotoFolders = () => {
-		navigate('/folders');
+		navigate('/mail/folders');
 	};
 
 	return (

@@ -17,7 +17,7 @@ const PermanentTagList: React.FC<PermanentTagListProps> = observer(() => {
 				active={mailList.activeFolderId === 'inbox'}
 				text={'Inbox'}
 				onClick={() => {
-					navigate('/inbox');
+					navigate('/mail/inbox');
 					modals.sidebarOpen = false;
 				}}
 			/>
@@ -25,7 +25,7 @@ const PermanentTagList: React.FC<PermanentTagListProps> = observer(() => {
 				active={mailList.activeFolderId === 'sent'}
 				text={'Sent'}
 				onClick={() => {
-					navigate('/sent');
+					navigate('/mail/sent');
 					modals.sidebarOpen = false;
 				}}
 			/>
@@ -33,7 +33,7 @@ const PermanentTagList: React.FC<PermanentTagListProps> = observer(() => {
 				active={mailList.activeFolderId === 'archive'}
 				text={'Archive'}
 				onClick={() => {
-					navigate('/archive');
+					navigate('/mail/archive');
 					modals.sidebarOpen = false;
 				}}
 			/>
