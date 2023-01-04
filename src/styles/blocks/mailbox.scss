@@ -27,16 +27,16 @@
 }
 
 .mailbox-tools {
-	@include flex-row(center, flex-start);
+	display: grid;
+	grid-auto-flow: column;
+	grid-gap: 8px;
+	align-items: center;
+	justify-content: start;
 
 	margin-top: 14px;
 
 	.global-checkbox-wrapper {
-		margin-right: 18px;
-	}
-
-	.ant-btn {
-		margin-right: 8px;
+		margin-right: 10px;
 	}
 }
 
