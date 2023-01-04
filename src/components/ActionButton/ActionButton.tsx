@@ -17,7 +17,8 @@ interface ActionButtonProps extends WithChildrenProps, WithClassNameProps {
 	onClick?: React.MouseEventHandler<HTMLElement>;
 }
 
-export function ActionButton({ children, className, icon, style, onClick }: ActionButtonProps) {
+// 'props' are needed to let AntD show Tooltips https://github.com/ant-design/ant-design/issues/15909
+export function ActionButton({ children, className, icon, style, onClick, ...props }: ActionButtonProps) {
 	const styleClass = {
 		[ActionButtonStyle.Default]: css.root_default,
 		[ActionButtonStyle.Primary]: css.root_primary,
@@ -25,7 +26,7 @@ export function ActionButton({ children, className, icon, style, onClick }: Acti
 	}[style || ActionButtonStyle.Default];
 
 	return (
-		<button className={clsx(css.root, styleClass, className)} onClick={onClick}>
+		<button className={clsx(css.root, styleClass, className)} onClick={onClick} {...props}>
 			{icon}
 			{children != null && <span>{children}</span>}
 		</button>
