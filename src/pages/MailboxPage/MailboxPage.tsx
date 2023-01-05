@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { useLocation, useParams } from 'react-router-dom';
 
 import { GenericLayout } from '../../layouts/GenericLayout';
 import mailList from '../../stores/MailList';
@@ -8,10 +8,14 @@ import MailboxList from './components/MailboxList';
 
 export const MailboxPage = () => {
 	const { folderId } = useParams();
+	const { search } = useLocation();
 
 	useEffect(() => {
+		const searchParams = new URLSearchParams(search);
+		mailList.filterBySender = searchParams.get('sender');
+
 		mailList.openFolder(folderId!);
-	}, [folderId]);
+	}, [folderId, search]);
 
 	return (
 		<GenericLayout>

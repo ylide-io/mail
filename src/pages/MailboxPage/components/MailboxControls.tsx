@@ -1,12 +1,15 @@
 import { Tooltip } from 'antd';
 import { observer } from 'mobx-react';
 
-import { ActionButton } from '../../../components/ActionButton/ActionButton';
+import { ActionButton, ActionButtonStyle } from '../../../components/ActionButton/ActionButton';
 import { smallButtonIcons } from '../../../components/smallButton/smallButton';
 import { YlideCheckbox } from '../../../controls/YlideCheckbox';
 import mailList from '../../../stores/MailList';
+import { useNav } from '../../../utils/navigate';
 
 const MailboxControls = observer(() => {
+	const navigate = useNav();
+
 	const readHandler = () => {
 		mailList.markAsReaded();
 	};
@@ -42,19 +45,32 @@ const MailboxControls = observer(() => {
 					/>
 				</div>
 			</Tooltip>
+
 			<Tooltip title="Mark as read">
 				<ActionButton onClick={readHandler} icon={<i className={`fa ${smallButtonIcons.eye}`} />} />
 			</Tooltip>
 
-			{mailList.activeFolderId === 'archive' ? (
+			{mailList.activeFolderId === 'archive' && (
 				<Tooltip title="Restore mails">
 					<ActionButton onClick={restoreHandler} icon={<i className={`fa ${smallButtonIcons.restore}`} />} />
 				</Tooltip>
-			) : mailList.activeFolderId !== 'sent' ? (
+			)}
+
+			{mailList.activeFolderId !== 'sent' && (
 				<Tooltip title="Archive mails">
 					<ActionButton onClick={deleteHandler} icon={<i className={`fa ${smallButtonIcons.trash}`} />} />
 				</Tooltip>
-			) : null}
+			)}
+
+			{!!mailList.filterBySender && (
+				<ActionButton
+					style={ActionButtonStyle.Primary}
+					icon={<i className={`fa ${smallButtonIcons.cross}`} />}
+					onClick={() => navigate({ search: {} })}
+				>
+					Clear filter
+				</ActionButton>
+			)}
 		</div>
 	);
 });

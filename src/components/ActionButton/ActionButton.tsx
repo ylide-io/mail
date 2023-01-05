@@ -12,7 +12,7 @@ export enum ActionButtonStyle {
 }
 
 interface ActionButtonProps extends WithChildrenProps, WithClassNameProps {
-	icon: ReactNode;
+	icon?: ReactNode;
 	style?: ActionButtonStyle;
 	onClick?: React.MouseEventHandler<HTMLElement>;
 }

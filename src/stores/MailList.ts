@@ -71,6 +71,8 @@ export class MailList {
 	@observable activeFolderId: string | null = null;
 	@observable globalSubscriptions: string[] = [];
 
+	@observable filterBySender: string | null = null;
+
 	folderChangeCriticalSection = new CriticalSection();
 
 	accountSourceMatch: Map<IListSource, { account: DomainAccount; reader: AbstractBlockchainController }> = new Map();
@@ -341,7 +343,7 @@ export class MailList {
 								blockchain,
 								type: BlockchainSourceType.DIRECT,
 								recipient: account.uint256Address,
-								sender: null,
+								sender: this.filterBySender,
 							},
 							reader,
 						);
