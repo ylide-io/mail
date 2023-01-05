@@ -15,12 +15,26 @@
 }
 
 .mailbox-title {
+	display: flex;
+	align-items: baseline;
 	margin: 0;
 	font-size: 32px;
+	white-space: nowrap;
 
 	@include less720px {
 		font-size: 28px;
 	}
+}
+
+.mailbox-title-secondary {
+	flex-grow: 1;
+	display: flex;
+	align-items: baseline;
+	margin: 0 0 0 0.5em;
+	color: var(--secondary-text-color);
+	font-size: 75%;
+	font-weight: $font-weight_light;
+	white-space: nowrap;
 }
 
 .mailbox-tools {
