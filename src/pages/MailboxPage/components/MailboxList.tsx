@@ -36,10 +36,10 @@ const MailboxListInner = observer(({ width, height }: { width: number; height: n
 			return index === messagesCount ? (
 				<div style={Object.assign({ height: itemSize, textAlign: 'center' }, style)}>Loading...</div>
 			) : (
-				<MailboxListRow isHighRow={isHighRow} style={style} message={data[index]} key={index} />
+				<MailboxListRow style={style} message={data[index]} key={index} />
 			);
 		},
-		[isHighRow, itemSize, messagesCount],
+		[itemSize, messagesCount],
 	);
 
 	return (

@@ -16,10 +16,9 @@ import css from './MailboxListRow.module.scss';
 interface MailboxListRowProps {
 	message: ILinkedMessage;
 	style: CSSProperties;
-	isHighRow: boolean;
 }
 
-const MailboxListRow: React.FC<MailboxListRowProps> = observer(({ style, message, isHighRow }) => {
+const MailboxListRow: React.FC<MailboxListRowProps> = observer(({ style, message }) => {
 	const navigate = useNav();
 	const [loading, setLoading] = useState(false);
 	const [error, setError] = useState('');
