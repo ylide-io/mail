@@ -47,6 +47,7 @@ const MailboxListInner = observer(({ width, height }: { width: number; height: n
 			itemSize={itemSize}
 			width={width}
 			height={height}
+			style={{ padding: '0 0 12px' }}
 			itemData={mailList.messages}
 			onScroll={props => {
 				setScrollParams({
