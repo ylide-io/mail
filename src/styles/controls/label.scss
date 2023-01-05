@@ -8,32 +8,3 @@
 	text-shadow: none;
 	white-space: nowrap;
 }
-
-.mail-label {
-	@include flex-row(center, flex-start);
-
-	font-size: 80%;
-	background: rgb(221, 241, 255);
-	color: black;
-
-	.mail-label-title {
-		font-weight: 500;
-		margin-left: 4px;
-
-		@include less720px {
-			display: none;
-		}
-
-		@include less630px {
-			display: block;
-		}
-
-		@include less480px {
-			display: none;
-		}
-	}
-
-	.mail-label-icon {
-		@include flex-row(center, flex-start);
-	}
-}

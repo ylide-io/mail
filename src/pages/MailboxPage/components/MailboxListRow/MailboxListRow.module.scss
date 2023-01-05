@@ -1,0 +1,95 @@
+.root {
+	display: grid;
+	grid-template-columns: auto 20% 5fr auto 80px;
+	align-items: center;
+	grid-gap: 8px;
+	padding: 0 20px;
+	cursor: pointer;
+	border-bottom: 1px solid #f3f3f3;
+
+	&:first-child {
+		border-top: 1px solid #f3f3f3;
+	}
+
+	&:hover:not(.root_loading) {
+		background: rgba(#d9d9d9, 0.25);
+
+		&.root_error {
+			background: #ffdcdc;
+		}
+	}
+}
+
+.root_unread {
+	font-weight: bold;
+}
+
+.root_loading {
+	@include stripes-animation;
+}
+
+.root_error {
+	background: #fceaea;
+}
+
+.checkbox {
+	display: grid;
+	justify-content: end;
+	margin: 0 8px 0 0;
+}
+
+.contact {
+	@include truncate-text;
+}
+
+.encrypted:before {
+	content: 'Message is not decoded ';
+	filter: blur(5px);
+}
+
+.error {
+	color: var(--error);
+}
+
+.subject {
+	@include truncate-text;
+}
+
+.preview {
+	display: none;
+}
+
+.date {
+	text-align: right;
+}
+
+@include less630px {
+	.root {
+		grid-template-columns: auto 1fr auto;
+		grid-gap: 4px;
+		align-content: center;
+		padding: 0 12px;
+	}
+
+	.checkbox {
+		grid-row: 1/4;
+		margin: 0 12px 0 0;
+	}
+
+	.date {
+		grid-column: 3/4;
+		grid-row: 1/2;
+	}
+
+	.blockchain {
+		grid-column: 3/4;
+		grid-row: 2/3;
+	}
+
+	.preview {
+		grid-column: 2/4;
+		display: block;
+		color: var(--secondary-text-color);
+		font-weight: $font-weight_light;
+	}
+}

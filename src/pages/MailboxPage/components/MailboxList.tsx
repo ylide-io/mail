@@ -8,7 +8,7 @@ import domain from '../../../stores/Domain';
 import mailList, { ILinkedMessage } from '../../../stores/MailList';
 import { useWindowSize } from '../../../utils/useWindowSize';
 import MailboxEmpty from './MailboxEmpty';
-import MailboxListRow from './MailboxListRow';
+import MailboxListRow from './MailboxListRow/MailboxListRow';
 
 const MailboxListInner = observer(({ width, height }: { width: number; height: number }) => {
 	const [scrollParams, setScrollParams] = useState({
