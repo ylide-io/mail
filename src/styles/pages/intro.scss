@@ -2,10 +2,10 @@
 	@include flex-column(stretch, flex-start);
 
 	width: 100vw;
-	flex-grow: 1;
+	min-height: 100%;
 	position: relative;
 
-	background-color: white;
+	background-color: #fff;
 }
 
 .intro-header {
@@ -249,27 +249,15 @@
 .intro-blockchains-list {
 	@include flex-row(center, center);
 	flex-wrap: wrap;
-
-	padding-left: 30px;
-	padding-right: 30px;
-
+	padding: 0 30px;
 	margin-bottom: 100px;
 
 	.bc-block {
-		@include flex-column(center, flex-start);
-
-		width: 100px;
-		height: 100px;
-
-		padding-top: 15px;
-
-		position: relative;
-
-		// border: 1px solid #e0e0e0;
-		border-radius: 22px;
-
-		margin-left: 20px;
-		margin-right: 20px;
+		display: grid;
+		justify-items: center;
+		grid-gap: 8px;
+		width: 140px;
+		padding: 20px;
 	}
 }
 
