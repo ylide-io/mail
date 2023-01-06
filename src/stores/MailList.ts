@@ -52,7 +52,6 @@ export class MailList {
 	@observable saveDecodedMessages = localStorage.getItem('saveDecodedMessages') === 'true';
 
 	@observable folderById: Record<string, IFolder> = {};
-	@observable folderIds: string[] = ['inbox', 'sent', 'archive'];
 
 	currentList!: ListSourceDrainer;
 
@@ -64,7 +63,6 @@ export class MailList {
 	deletedMessageIds: Record<string, Set<string>> = {};
 
 	@observable activeFolderId: string | null = null;
-	@observable globalSubscriptions: string[] = [];
 
 	@observable filterBySender: string | null = null;
 
