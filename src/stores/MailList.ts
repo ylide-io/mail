@@ -392,16 +392,6 @@ export class MailList {
 	}
 
 	async openFolder(folderId: FolderId) {
-		// if (this.activeFolderId === folderId) {
-		// 	if (this.activeFolderId === 'archive') {
-		// 		this.currentList.resetFilter(this.onlyDeletedFilter);
-		// 	} else if (this.activeFolderId === 'sent') {
-		// 		this.currentList.resetFilter(null);
-		// 	} else {
-		// 		this.currentList.resetFilter(this.deletedFilter);
-		// 	}
-		// 	await this.nextPage();
-		// } else {
 		analytics.mailFolderOpened(folderId);
 		if (this.activeFolderId) {
 			await this.folderChangeCriticalSection.enter();
