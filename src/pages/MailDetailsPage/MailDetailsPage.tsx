@@ -1,7 +1,7 @@
 import { toJS } from 'mobx';
 import { observer } from 'mobx-react';
 import moment from 'moment';
-import React, { useEffect } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import { createReactEditorJS } from 'react-editor-js';
 import { useParams } from 'react-router-dom';
 
@@ -44,16 +44,15 @@ const MailDetailsPageInner = observer(({ message }: MailDetailsPageInnerProps) =
 		mailList.decodeMessage(message);
 	};
 
-	const data = (() => {
-		// console.log('decoded.decodedTextData: ', decoded.decodedTextData);
-		if (typeof decoded?.decodedTextData === 'string') {
-			return {
-				blocks: JSON.parse(decoded.decodedTextData).blocks,
-			};
-		} else {
-			return { blocks: toJS(decoded?.decodedTextData?.blocks) };
-		}
-	})();
+	const data = useMemo(
+		() => ({
+			blocks:
+				typeof decoded?.decodedTextData === 'string'
+					? JSON.parse(decoded.decodedTextData).blocks
+					: toJS(decoded?.decodedTextData?.blocks),
+		}),
+		[decoded?.decodedTextData],
+	);
 
 	const replyClickHandler = () => {
 		mailbox.to = message.msg.senderAddress
