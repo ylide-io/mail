@@ -86,12 +86,6 @@ export class MailList {
 			} else {
 				return new BlockchainListSource(reader, subject, 10000);
 			}
-			// if (reader instanceof EthereumBlockchainController) {
-			// 	return new EthereumListSource(reader, subject, 30000);
-			// } else {
-			// 	return ;
-			// }
-			// return null;
 		};
 	}
 
@@ -113,7 +107,7 @@ export class MailList {
 
 		reaction(
 			() => domain.accounts.activeAccounts,
-			actAccs => {
+			() => {
 				if (this.activeFolderId) {
 					this.openFolder(this.activeFolderId);
 				}
