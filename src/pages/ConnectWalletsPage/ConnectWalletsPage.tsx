@@ -1,6 +1,5 @@
 import { observer } from 'mobx-react';
 import React, { useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 
 import { supportedWallets } from '../../constants';
 import { YlideButton } from '../../controls/YlideButton';
@@ -8,10 +7,11 @@ import { ArrowRight } from '../../icons/ArrowRight';
 import SelectWalletModal from '../../modals/SelectWalletModal';
 import domain from '../../stores/Domain';
 import walletConnect from '../../stores/WalletConnect';
+import { useNav } from '../../utils/navigate';
 import { WalletBlock } from './WalletBlock';
 
 const ConnectWalletsPage = observer(() => {
-	const navigate = useNavigate();
+	const navigate = useNav();
 
 	useEffect(() => {
 		walletConnect.load();

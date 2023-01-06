@@ -1,7 +1,6 @@
 import clsx from 'clsx';
 import { observer } from 'mobx-react';
 import { PureComponent } from 'react';
-import { useNavigate } from 'react-router-dom';
 
 import { blockchainsMap, walletsMap } from '../../constants';
 import { AdaptiveAddress } from '../../controls/AdaptiveAddress';
@@ -12,6 +11,7 @@ import { YlideLargeLogo } from '../../icons/YlideLargeLogo';
 import NewPasswordModal from '../../modals/NewPasswordModal';
 import SelectWalletModal from '../../modals/SelectWalletModal';
 import domain from '../../stores/Domain';
+import { useNav } from '../../utils/navigate';
 // import Web3 from 'web3';
 // import * as utils from 'ethereumjs-util';
 // import SmartBuffer from '@ylide/smart-buffer';
@@ -46,7 +46,7 @@ import domain from '../../stores/Domain';
 // })();
 
 function NextButton() {
-	const navigate = useNavigate();
+	const navigate = useNav();
 
 	return (
 		<YlideButton

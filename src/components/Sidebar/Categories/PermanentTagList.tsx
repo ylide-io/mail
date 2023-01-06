@@ -1,15 +1,15 @@
 import { observer } from 'mobx-react';
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
 
 import mailList from '../../../stores/MailList';
 import modals from '../../../stores/Modals';
+import { useNav } from '../../../utils/navigate';
 import PermanentTag from './PermanentTag';
 
 interface PermanentTagListProps {}
 
 const PermanentTagList: React.FC<PermanentTagListProps> = observer(() => {
-	const navigate = useNavigate();
+	const navigate = useNav();
 
 	return (
 		<div className="tag-list">

@@ -1,14 +1,14 @@
 import { observer } from 'mobx-react';
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 
 import { YlideButton } from '../../controls/YlideButton';
 import { ArrowRight } from '../../icons/ArrowRight';
 import { Logo } from '../../icons/Logo';
 import domain from '../../stores/Domain';
+import { useNav } from '../../utils/navigate';
 
 const FirstTimePage = observer(() => {
-	const navigate = useNavigate();
+	const navigate = useNav();
 	const [showPassword, setShowPassword] = useState(false);
 	const [password, setPassword] = useState('');
 	const [passwordRepeat, setPasswordRepeat] = useState('');
@@ -66,7 +66,10 @@ const FirstTimePage = observer(() => {
 								alert(`Passwords don't match`);
 							}
 							domain.savedPassword = password;
-							navigate('/connect-wallets?firstTime=true');
+							navigate({
+								path: '/connect-wallets',
+								search: { firstTime: 'true' },
+							});
 						}}
 						className="sign-up-submit-button"
 					>

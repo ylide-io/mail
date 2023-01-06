@@ -3,7 +3,7 @@ import { Button, Dropdown } from 'antd';
 import clsx from 'clsx';
 import { observer } from 'mobx-react';
 import React, { useEffect, useState } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 
 import { YlideButton } from '../../controls/YlideButton';
 import { CaretDown } from '../../icons/CaretDown';
@@ -22,6 +22,7 @@ import { sideTechnologyIcon } from '../../icons/static/sideTechnologyIcon';
 import { topicSettingsIcon } from '../../icons/static/topicSettingsIcon';
 import feed from '../../stores/Feed';
 import modals from '../../stores/Modals';
+import { useNav } from '../../utils/navigate';
 import css from './SidebarMenu.module.scss';
 
 const FeedSettings = observer(() => {
@@ -186,7 +187,7 @@ const FeedSettings = observer(() => {
 
 const SidebarMenu = observer(() => {
 	const location = useLocation();
-	const navigate = useNavigate();
+	const navigate = useNav();
 	const [feedOpen, setFeedOpen] = useState<boolean>(JSON.parse(localStorage.getItem('tv1_feedOpen') || 'true'));
 	const [mailOpen, setMailOpen] = useState<boolean>(JSON.parse(localStorage.getItem('tv1_mailOpen') || 'true'));
 
