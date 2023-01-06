@@ -18,16 +18,21 @@
 	@include less720px {
 		grid-column: 1/2;
 	}
+}
 
-	.feedTitle {
-		@include flex-row(center, space-between);
-
-		padding: 0 12px;
-
-		.feedTitleText {
-			font-size: 24px;
-		}
-	}
+.feedTitle {
+	@include flex-row(center, space-between);
+	padding: 0 0 12px 12px;
+}
+.feedTitleLeft {
+	display: grid;
+	grid-auto-flow: column;
+	align-items: center;
+	grid-gap: 12px;
+}
+.feedTitleText {
+	margin: 0;
+	font-size: 24px;
 }
 
 .feedBody {

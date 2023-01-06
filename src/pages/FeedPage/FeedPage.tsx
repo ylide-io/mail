@@ -4,8 +4,10 @@ import clsx from 'clsx';
 import { observer } from 'mobx-react';
 import moment from 'moment';
 import React, { MouseEvent, useCallback, useEffect, useRef, useState } from 'react';
-import { useLocation, useNavigate, useParams } from 'react-router-dom';
+import { useLocation, useParams } from 'react-router-dom';
 
+import { ActionButton, ActionButtonStyle } from '../../components/ActionButton/ActionButton';
+import { smallButtonIcons } from '../../components/smallButton/smallButton';
 import { Loader } from '../../controls/Loader';
 import { YlideButton } from '../../controls/YlideButton';
 import { CaretDown } from '../../icons/CaretDown';
@@ -17,6 +19,7 @@ import { twitterSourceIcon } from '../../icons/static/twitterSourceIcon';
 import { GenericLayout } from '../../layouts/GenericLayout';
 import GalleryModal from '../../modals/GalleryModal';
 import feed, { FeedPost, LinkType } from '../../stores/Feed';
+import { useNav } from '../../utils/navigate';
 import css from './FeedPage.module.scss';
 
 const sourceIcon: Record<LinkType, JSX.Element> = {
@@ -35,8 +38,7 @@ function isInViewport(element: HTMLDivElement) {
 const FeedPostControl = observer(({ post }: { post: FeedPost }) => {
 	const selfRef = useRef<HTMLDivElement>(null);
 	const [collapsed, setCollapsed] = useState(false);
-	const location = useLocation();
-	const navigate = useNavigate();
+	const navigate = useNav();
 
 	useEffect(() => {
 		if (selfRef.current && selfRef.current.getBoundingClientRect().height > 600) {
@@ -51,7 +53,9 @@ const FeedPostControl = observer(({ post }: { post: FeedPost }) => {
 	};
 
 	const onSourceIdClick = () => {
-		navigate(`${location.pathname}?sourceId=${post.sourceId}`);
+		navigate({
+			search: { sourceId: post.sourceId },
+		});
 	};
 
 	return (
@@ -164,6 +168,7 @@ export const FeedPage = observer(() => {
 	const { search } = useLocation();
 	const searchParams = search.length > 1 ? new URLSearchParams(search.slice(1)) : undefined;
 	const sourceId = searchParams?.get('sourceId') || null;
+	const navigate = useNav();
 
 	useEffect(() => {
 		// noinspection JSIgnoredPromiseFromCall
@@ -216,14 +221,25 @@ export const FeedPage = observer(() => {
 			<div className={css.root}>
 				<div className={css.feed}>
 					<div className={css.feedTitle}>
-						<h3 className={css.feedTitleText}>{title}</h3>
-						<h3>
-							{!!feed.newPosts && (
-								<YlideButton size="small" nice onClick={showNewPosts}>
-									Show {feed.newPosts} new posts
-								</YlideButton>
+						<div className={css.feedTitleLeft}>
+							<h3 className={css.feedTitleText}>{title}</h3>
+
+							{!!sourceId && (
+								<ActionButton
+									style={ActionButtonStyle.Primary}
+									icon={<i className={`fa ${smallButtonIcons.cross}`} />}
+									onClick={() => navigate({ search: {} })}
+								>
+									Clear filter
+								</ActionButton>
 							)}
-						</h3>
+						</div>
+
+						{!!feed.newPosts && (
+							<YlideButton size="small" nice onClick={showNewPosts}>
+								Show {feed.newPosts} new posts
+							</YlideButton>
+						)}
 					</div>
 
 					{newPostsVisible && (
