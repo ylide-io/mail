@@ -1,4 +1,4 @@
-import { EthereumBlockchainController, EthereumBlockchainSource, EthereumListSource } from '@ylide/ethereum';
+import { EthereumBlockchainController, EthereumListSource } from '@ylide/ethereum';
 import {
 	AbstractBlockchainController,
 	BlockchainListSource,
@@ -7,16 +7,13 @@ import {
 	IListSource,
 	IMessage,
 	IMessageContent,
-	IMessagesListConfigurationManager,
 	IMessageWithSource,
 	IndexerListSource,
 	ISourceSubject,
 	ListSourceDrainer,
 	ListSourceMultiplexer,
-	MessagesList,
 	SourceReadingSession,
 	Uint256,
-	Ylide,
 } from '@ylide/sdk';
 import { autobind } from 'core-decorators';
 import { makeObservable, observable, reaction } from 'mobx';
@@ -58,8 +55,6 @@ export class MailList {
 	@observable folderIds: string[] = ['inbox', 'sent', 'archive'];
 
 	currentList!: ListSourceDrainer;
-
-	initedById: Record<string, boolean> = {};
 
 	@observable messagesContentById: Record<string, IMessageContent> = {};
 	@observable decodedMessagesById: Record<string, IMessageDecodedContent> = {};
@@ -304,16 +299,6 @@ export class MailList {
 		this.loading = false;
 	}
 
-	buildFolderBasement(id: string, manager: IMessagesListConfigurationManager) {
-		if (id === 'inbox') {
-			//
-		} else if (id === 'sent') {
-			//
-		} else if (id === 'archive') {
-			//
-		}
-	}
-
 	@autobind
 	private wrapId(p: IMessageWithSource) {
 		return `${p.msg.msgId}:${this.accountSourceMatch.get(p.source)?.account.account.address}`;
@@ -447,114 +432,6 @@ export class MailList {
 
 		await this.nextPage();
 		this.firstLoading = false;
-		// }
-
-		// this.activeFolderId = folderId;
-		// if (this.initedById[folderId]) {
-		// 	const result = await this.listById[folderId].configure(() => {});
-		// 	if (result.type === 'success' && result.result) {
-		// 		this.messages = result.result.map(this.wrapMessage);
-		// 		this.isNextPageAvailable = this.listById[folderId].isNextPageAvailable();
-		// 	}
-		// } else {
-		// 	this.listById[folderId] = new MessagesList();
-		// 	this.firstLoading = true;
-		// 	this.loading = true;
-		// 	const result = await this.listById[folderId].configure(manager => {
-		// 		manager.setFilter(entry => {
-		// 			return !domain.accounts.activeAccounts.some(acc =>
-		// 				this.deletedMessageIds[acc.account.address]?.has(entry.link.msgId),
-		// 			);
-		// 		});
-		// 		this.buildFolderBasement(folderId, manager);
-		// 		for (const account of domain.accounts.activeAccounts) {
-		// 			this.inflateFolderByAccount(folderId, manager, account);
-		// 			this.inflateFolderByAccount(folderId, manager, account);
-		// 			this.inflateFolderByAccount(folderId, manager, account);
-		// 		}
-		// 	});
-		// 	this.loading = false;
-		// 	this.firstLoading = false;
-		// 	console.log('woppy: ', result);
-		// 	if (result.type === 'success' && result.result) {
-		// 		this.messages = result.result.map(this.wrapMessage);
-		// 		this.isNextPageAvailable = this.listById[folderId].isNextPageAvailable();
-		// 	}
-		// }
-	}
-
-	inflateFolderByAccount(id: string, manager: IMessagesListConfigurationManager, account: DomainAccount) {
-		if (id === 'inbox') {
-			for (const blockchain of Object.keys(domain.blockchains)) {
-				const reader = domain.blockchains[blockchain];
-				if (reader instanceof EthereumBlockchainController) {
-					console.log('evm-source added');
-					manager.addSource(
-						new EthereumBlockchainSource(
-							reader,
-							{
-								type: BlockchainSourceType.DIRECT,
-								recipient: account.uint256Address,
-								sender: null,
-							},
-							10000,
-							10,
-							{ reader, account, folderId: id },
-						),
-					);
-				} else {
-					console.log('non-source added');
-					manager.addReader(
-						reader,
-						{
-							type: BlockchainSourceType.DIRECT,
-							recipient: account.uint256Address,
-							sender: null,
-						},
-						20000,
-						10,
-						{ reader, account, folderId: id },
-					);
-				}
-			}
-		} else if (id === 'sent') {
-			for (const blockchain of Object.keys(domain.blockchains)) {
-				const reader = domain.blockchains[blockchain];
-				if (reader instanceof EthereumBlockchainController) {
-					manager.addSource(
-						new EthereumBlockchainSource(
-							reader,
-							{
-								type: BlockchainSourceType.DIRECT,
-								recipient: Ylide.getSentAddress(account.uint256Address),
-								sender: null,
-							},
-							10000,
-							10,
-							{ reader, account, folderId: id },
-						),
-					);
-				} else {
-					manager.addReader(
-						reader,
-						{
-							type: BlockchainSourceType.DIRECT,
-							recipient: Ylide.getSentAddress(account.uint256Address),
-							sender: null,
-						},
-						20000,
-						10,
-						{ reader, account, folderId: id },
-					);
-				}
-			}
-		} else if (id === 'archive') {
-			//
-		}
-	}
-
-	async deflateFolderByAccount(id: string, list: MessagesList, account: DomainAccount) {
-		//
 	}
 }
 
