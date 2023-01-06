@@ -302,7 +302,6 @@ export class MailList {
 		this.isNextPageAvailable = !this.currentList.drained;
 		await this.folderChangeCriticalSection.leave();
 		this.loading = false;
-		this.firstLoading = false;
 	}
 
 	buildFolderBasement(id: string, manager: IMessagesListConfigurationManager) {
@@ -447,6 +446,7 @@ export class MailList {
 		await this.folderChangeCriticalSection.leave();
 
 		await this.nextPage();
+		this.firstLoading = false;
 		// }
 
 		// this.activeFolderId = folderId;
