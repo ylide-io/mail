@@ -3,6 +3,7 @@ import React, { useEffect } from 'react';
 import { Navigate, Route, Routes, useLocation } from 'react-router-dom';
 
 import { Loader } from './controls/Loader';
+import AlertModal from './modals/AlertModal';
 import { AdminPage } from './pages/AdminPage';
 import { ComposePage } from './pages/ComposePage/ComposePage';
 import { ContactsTab } from './pages/ContactsPage/components/Contacts/ContactsTab';

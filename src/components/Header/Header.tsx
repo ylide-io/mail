@@ -9,13 +9,15 @@ import {
 } from '@ant-design/icons';
 import { Avatar, Button, Dropdown } from 'antd';
 import Tooltip from 'antd/es/tooltip';
+import clsx from 'clsx';
 import { observer } from 'mobx-react';
-import React from 'react';
+import React, { useState } from 'react';
 
 import { walletsMap } from '../../constants';
 import { AdaptiveAddress } from '../../controls/AdaptiveAddress';
 import { Blockie } from '../../controls/Blockie';
 import { YlideLargeLogo } from '../../icons/YlideLargeLogo';
+import AlertModal from '../../modals/AlertModal';
 import domain from '../../stores/Domain';
 import modals from '../../stores/Modals';
 import { DomainAccount } from '../../stores/models/DomainAccount';
@@ -78,6 +80,7 @@ const AccountItem = observer(({ account }: { account: DomainAccount }) => {
 
 const Header = observer(() => {
 	const nav = useNav();
+	const [showQuest3, setShowQuest3] = useState(localStorage.getItem('quest3') !== 'false');
 
 	const newMenu = (
 		<div className="accounts-list">
@@ -115,6 +118,62 @@ const Header = observer(() => {
 				</a>
 			</div>
 			<div className="header-main">
+				<div className="header-block">
+					<div
+						className={clsx(css.quest3Btn, { [css.shine]: showQuest3 })}
+						onClick={() => {
+							setShowQuest3(false);
+							localStorage.setItem('quest3', 'false');
+							AlertModal.show(
+								'Ylide $2,000 giveaway on Quest3',
+								'',
+								<div style={{ fontSize: 14, marginTop: 20 }}>
+									Hey there,
+									<br />
+									<br />
+									Thank you for registering in Ylide Social Hub!
+									<br />
+									<br />
+									Please use the code below to answer the question on Quest3:
+									<br />
+									<br />
+									<br />
+									<div
+										style={{
+											display: 'flex',
+											alignItems: 'center',
+											justifyContent: 'center',
+											fontSize: 32,
+											fontWeight: 'bold',
+											textAlign: 'center',
+										}}
+									>
+										ylide2023
+									</div>
+									<br />
+									<br />
+									More info about the quest available at our{' '}
+									<a href="https://discord.gg/ylide" target="_blank" rel="noreferrer">
+										Discord Community
+									</a>{' '}
+									or at Ylide's Quest profile:{' '}
+									<a href="https://app.quest3.xyz/ylide" target="_blank" rel="noreferrer">
+										https://app.quest3.xyz/ylide
+									</a>
+									<br />
+									<br />
+									<br />
+									Best regards,
+									<br />
+									Ylide Team
+									<br />
+								</div>,
+							);
+						}}
+					>
+						Quest3
+					</div>
+				</div>
 				<div className="header-block">
 					<Tooltip title="Manage contacts and folders">
 						<UsergroupAddOutlined
