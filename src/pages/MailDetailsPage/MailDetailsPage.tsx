@@ -13,16 +13,18 @@ import { IMessageDecodedContent } from '../../indexedDB/MessagesDB';
 import { GenericLayout } from '../../layouts/GenericLayout';
 import contacts from '../../stores/Contacts';
 import mailbox from '../../stores/Mailbox';
-import mailList from '../../stores/MailList';
+import mailList, { ILinkedMessage } from '../../stores/MailList';
 import { EDITOR_JS_TOOLS } from '../../utils/editorJs';
 import { useNav } from '../../utils/navigate';
 
 const ReactEditorJS = createReactEditorJS();
 
-export const MailDetailsPage = observer(() => {
+interface MailDetailsPageInnerProps {
+	message: ILinkedMessage;
+}
+
+const MailDetailsPageInner = observer(({ message }: MailDetailsPageInnerProps) => {
 	const navigate = useNav();
-	const { id } = useParams();
-	const message = mailList.messages.find(m => m.id === id!)!;
 	const decoded: IMessageDecodedContent | undefined = mailList.decodedMessagesById[message.msgId];
 	const contact = contacts.contactsByAddress[message.msg.senderAddress || '-1'];
 
@@ -30,7 +32,6 @@ export const MailDetailsPage = observer(() => {
 	console.log('message: ', message);
 
 	useEffect(() => {
-		if (!message) return;
 		(async () => {
 			if (!decoded) {
 				await mailList.decodeMessage(message);
@@ -77,10 +78,8 @@ export const MailDetailsPage = observer(() => {
 	};
 
 	const deleteHandler = () => {
-		if (message) {
-			mailList.markMessageAsDeleted(message);
-			navigate(`/${mailList.activeFolderId}`);
-		}
+		mailList.markMessageAsDeleted(message);
+		navigate(`/${mailList.activeFolderId}`);
 	};
 
 	return (
@@ -171,4 +170,18 @@ export const MailDetailsPage = observer(() => {
 			</div>
 		</GenericLayout>
 	);
+});
+
+export const MailDetailsPage = observer(() => {
+	const { id } = useParams();
+	const navigate = useNav();
+	const message = mailList.messages.find(m => m.id === id!);
+
+	useEffect(() => {
+		if (!message) {
+			navigate('/mail/inbox');
+		}
+	}, [message, navigate]);
+
+	return <>{message && <MailDetailsPageInner message={message} />}</>;
 });
