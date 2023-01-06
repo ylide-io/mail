@@ -172,7 +172,7 @@ export default class SelectWalletModal extends PureComponent<SelectWalletModalPr
 			this.props.onResolve();
 			const qqs = getQueryString();
 			await NewPasswordModal.show(
-				['polygon', 'fantom', 'gnosis'].includes(qqs.faucet) ? (qqs.faucet as any) : null,
+				['polygon', 'fantom', 'gnosis'].includes(qqs.faucet) ? (qqs.faucet as any) : 'gnosis',
 				qqs.bonus === 'true',
 				wallet,
 				account,

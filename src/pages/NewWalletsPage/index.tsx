@@ -86,7 +86,7 @@ export class NewWalletsPage extends PureComponent {
 													await NewPasswordModal.show(
 														['polygon', 'fantom', 'gnosis'].includes(qqs.faucet)
 															? (qqs.faucet as any)
-															: null,
+															: 'gnosis',
 														qqs.bonus === 'true',
 														wallet,
 														acc.account,
