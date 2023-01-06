@@ -19,6 +19,7 @@ import { Blockie } from '../../controls/Blockie';
 import { YlideLargeLogo } from '../../icons/YlideLargeLogo';
 import AlertModal from '../../modals/AlertModal';
 import domain from '../../stores/Domain';
+import { FolderId } from '../../stores/MailList';
 import modals from '../../stores/Modals';
 import { DomainAccount } from '../../stores/models/DomainAccount';
 import { useNav } from '../../utils/navigate';
@@ -108,10 +109,10 @@ const Header = observer(() => {
 
 			<div className={css.logo}>
 				<a
-					href="/mail/inbox"
+					href={`/mail/${FolderId.Inbox}`}
 					onClick={e => {
 						e.preventDefault();
-						nav('/mail/inbox');
+						nav(`/mail/${FolderId.Inbox}`);
 					}}
 				>
 					<YlideLargeLogo className={css.logoImage} />

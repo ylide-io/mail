@@ -7,7 +7,7 @@ import { OverlappingLoader } from '../../controls/OverlappingLoader';
 import { GenericLayout } from '../../layouts/GenericLayout';
 import { analytics } from '../../stores/Analytics';
 import mailer from '../../stores/Mailer';
-import mailList from '../../stores/MailList';
+import mailList, { FolderId } from '../../stores/MailList';
 import { useNav } from '../../utils/navigate';
 import ComposeMailBody from './components/Mailbox/ComposeMailBody';
 import ComposeMailFooter from './components/Mailbox/ComposeMailFooter';
@@ -30,7 +30,7 @@ export const ComposePage = observer(() => {
 							<ActionButton
 								style={ActionButtonStyle.Dengerous}
 								onClick={() => {
-									navigate(`/${mailList.activeFolderId || 'inbox'}`);
+									navigate(`/mail/${mailList.activeFolderId || FolderId.Inbox}`);
 								}}
 								icon={<i className={`fa ${smallButtonIcons.cross}`} />}
 							>

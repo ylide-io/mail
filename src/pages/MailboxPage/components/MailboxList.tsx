@@ -5,7 +5,7 @@ import { FixedSizeList, ListChildComponentProps } from 'react-window';
 
 import { Loader } from '../../../controls/Loader';
 import domain from '../../../stores/Domain';
-import mailList, { ILinkedMessage } from '../../../stores/MailList';
+import mailList, { FolderId, ILinkedMessage } from '../../../stores/MailList';
 import { useNav } from '../../../utils/navigate';
 import { useWindowSize } from '../../../utils/useWindowSize';
 import MailboxEmpty from './MailboxEmpty';
@@ -35,7 +35,7 @@ const MailboxListInner = observer(({ width, height }: { width: number; height: n
 	}, [itemSize, scrollParams, isLoading, messagesCount, pageAvailable]);
 
 	const onFilterBySenderClick =
-		mailList.activeFolderId === 'inbox' && !mailList.filterBySender
+		mailList.activeFolderId === FolderId.Inbox && !mailList.filterBySender
 			? (senderAddress: string) => {
 					navigate({
 						search: { sender: senderAddress },

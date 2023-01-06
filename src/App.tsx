@@ -17,6 +17,7 @@ import { SettingsPage } from './pages/SettingsPage/SettingsPage';
 import { TestPage } from './pages/TestPage/TestPage';
 import { analytics } from './stores/Analytics';
 import domain from './stores/Domain';
+import { FolderId } from './stores/MailList';
 import modals from './stores/Modals';
 import walletConnect from './stores/WalletConnect';
 
@@ -103,7 +104,7 @@ const App = observer(() => {
 					<Route path={'/mail/:folderId'} element={<MailboxPage />} />
 					<Route path={'/mail/:folderId/:id'} element={<MailDetailsPage />} />
 
-					<Route path={'/*'} element={<Navigate replace to="/mail/inbox" />} />
+					<Route path={'/*'} element={<Navigate replace to={`/mail/${FolderId.Inbox}`} />} />
 				</>
 			</Routes>
 			{modals.render()}

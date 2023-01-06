@@ -6,7 +6,7 @@ import { useLocation } from 'react-router-dom';
 import Header from '../components/Header/Header';
 import { LinkButton } from '../components/Sidebar/LinkButton';
 import SidebarMenu from '../components/Sidebar/SidebarMenu';
-import mailList from '../stores/MailList';
+import mailList, { FolderId } from '../stores/MailList';
 import css from './GenericLayout.module.scss';
 
 interface GenericLayoutProps {
@@ -29,7 +29,7 @@ export const GenericLayout: React.FC<GenericLayoutProps> = observer(({ children,
 		} else {
 			return {
 				text: '‹ Return to Mailbox',
-				link: `/mail/${mailList.activeFolderId || 'inbox'}`,
+				link: `/mail/${mailList.activeFolderId || FolderId.Inbox}`,
 			};
 		}
 		// eslint-disable-next-line react-hooks/exhaustive-deps

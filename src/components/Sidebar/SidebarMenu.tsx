@@ -21,6 +21,7 @@ import { sideSecurityIcon } from '../../icons/static/sideSecurityIcon';
 import { sideTechnologyIcon } from '../../icons/static/sideTechnologyIcon';
 import { topicSettingsIcon } from '../../icons/static/topicSettingsIcon';
 import feed from '../../stores/Feed';
+import { FolderId } from '../../stores/MailList';
 import modals from '../../stores/Modals';
 import { useNav } from '../../utils/navigate';
 import css from './SidebarMenu.module.scss';
@@ -369,10 +370,12 @@ const SidebarMenu = observer(() => {
 							Compose mail
 						</div>
 						<div
-							className={clsx('sidebar-section-link', { active: location.pathname === '/mail/inbox' })}
+							className={clsx('sidebar-section-link', {
+								active: location.pathname === `/mail/${FolderId.Inbox}`,
+							})}
 							onClick={() => {
 								modals.sidebarOpen = false;
-								navigate('/mail/inbox');
+								navigate(`/mail/${FolderId.Inbox}`);
 							}}
 						>
 							<div className="sidebar-link-icon-left">
@@ -400,10 +403,12 @@ const SidebarMenu = observer(() => {
 							</div>
 						</div>
 						<div
-							className={clsx('sidebar-section-link', { active: location.pathname === '/mail/sent' })}
+							className={clsx('sidebar-section-link', {
+								active: location.pathname === `/mail/${FolderId.Sent}`,
+							})}
 							onClick={() => {
 								modals.sidebarOpen = false;
-								navigate('/mail/sent');
+								navigate(`/mail/${FolderId.Sent}`);
 							}}
 						>
 							<div className="sidebar-link-icon-left">
@@ -412,10 +417,12 @@ const SidebarMenu = observer(() => {
 							<div className="sidebar-link-title">Sent</div>
 						</div>
 						<div
-							className={clsx('sidebar-section-link', { active: location.pathname === '/mail/archive' })}
+							className={clsx('sidebar-section-link', {
+								active: location.pathname === `/mail/${FolderId.Archive}`,
+							})}
 							onClick={() => {
 								modals.sidebarOpen = false;
-								navigate('/mail/archive');
+								navigate(`/mail/${FolderId.Archive}`);
 							}}
 						>
 							<div className="sidebar-link-icon-left">

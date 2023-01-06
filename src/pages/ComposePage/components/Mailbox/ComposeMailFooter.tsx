@@ -10,7 +10,7 @@ import AlertModal from '../../../../modals/AlertModal';
 import domain from '../../../../stores/Domain';
 import mailbox from '../../../../stores/Mailbox';
 import mailer from '../../../../stores/Mailer';
-import mailList from '../../../../stores/MailList';
+import mailList, { FolderId } from '../../../../stores/MailList';
 import { useNav } from '../../../../utils/navigate';
 
 const ComposeMailFooter = observer(() => {
@@ -106,7 +106,7 @@ const ComposeMailFooter = observer(() => {
 			await AlertModal.show('Message sent', 'Your message was successfully sent');
 			console.log('id: ', msgId);
 
-			navigate(`/${mailList.activeFolderId || 'inbox'}`);
+			navigate(`/mail/${mailList.activeFolderId || FolderId.Inbox}`);
 		} catch (e) {
 			console.log('Error sending message', e);
 		}

@@ -25,6 +25,12 @@ import domain from './Domain';
 import { DomainAccount } from './models/DomainAccount';
 import tags from './Tags';
 
+export enum FolderId {
+	Inbox = 'inbox',
+	Sent = 'sent',
+	Archive = 'archive',
+}
+
 export interface IFolder {
 	id: string;
 	title: string;
@@ -62,7 +68,7 @@ export class MailList {
 
 	deletedMessageIds: Record<string, Set<string>> = {};
 
-	@observable activeFolderId: string | null = null;
+	@observable activeFolderId: FolderId | null = null;
 
 	@observable filterBySender: string | null = null;
 
@@ -113,14 +119,12 @@ export class MailList {
 		);
 	}
 
-	getFolderName(folderId: string) {
-		if (folderId === 'inbox') {
+	getFolderName(folderId: FolderId) {
+		if (folderId === FolderId.Inbox) {
 			return 'Inbox';
-		} else if (folderId === 'sent') {
+		} else if (folderId === FolderId.Sent) {
 			return 'Sent';
-		} else if (folderId === 'subscriptions') {
-			return 'Subscription';
-		} else if (folderId === 'archive') {
+		} else if (folderId === FolderId.Archive) {
 			return 'Archive';
 		} else {
 			const tag = tags.tags.find(t => String(t.id) === folderId);
@@ -172,10 +176,10 @@ export class MailList {
 	}
 
 	async deletedWasUpdated() {
-		if (this.activeFolderId === 'inbox') {
+		if (this.activeFolderId === FolderId.Inbox) {
 			this.currentList.resetFilter(this.deletedFilter);
 			this.messages = (await this.currentList.readMore(10)).map(this.wrapMessage);
-		} else if (this.activeFolderId === 'archive') {
+		} else if (this.activeFolderId === FolderId.Archive) {
 			this.currentList.resetFilter(this.onlyDeletedFilter);
 			this.messages = (await this.currentList.readMore(10)).map(this.wrapMessage);
 		}
@@ -307,8 +311,8 @@ export class MailList {
 		};
 	}
 
-	buildSourcesByFolder(folderId: string): IListSource[] {
-		if (folderId === 'inbox' || folderId === 'archive') {
+	buildSourcesByFolder(folderId: FolderId): IListSource[] {
+		if (folderId === FolderId.Inbox || folderId === FolderId.Archive) {
 			return domain.accounts.activeAccounts
 				.map(account => {
 					const res: IListSource[] = [];
@@ -329,7 +333,7 @@ export class MailList {
 					return res;
 				})
 				.flat();
-		} else if (folderId === 'sent') {
+		} else if (folderId === FolderId.Sent) {
 			return domain.accounts.activeAccounts
 				.map(account => {
 					const res: IListSource[] = [];
@@ -387,7 +391,7 @@ export class MailList {
 		this.messages = messages.map(this.wrapMessage);
 	}
 
-	async openFolder(folderId: string) {
+	async openFolder(folderId: FolderId) {
 		// if (this.activeFolderId === folderId) {
 		// 	if (this.activeFolderId === 'archive') {
 		// 		this.currentList.resetFilter(this.onlyDeletedFilter);
@@ -409,9 +413,9 @@ export class MailList {
 
 		this.currentList = new ListSourceDrainer(new ListSourceMultiplexer(this.buildSourcesByFolder(folderId)));
 		this.currentList.on('messages', this.handleNewMessages);
-		if (this.activeFolderId === 'archive') {
+		if (this.activeFolderId === FolderId.Archive) {
 			this.currentList.resetFilter(this.onlyDeletedFilter);
-		} else if (this.activeFolderId === 'sent') {
+		} else if (this.activeFolderId === FolderId.Sent) {
 			this.currentList.resetFilter(null);
 		} else {
 			this.currentList.resetFilter(this.deletedFilter);

@@ -13,7 +13,7 @@ import { IMessageDecodedContent } from '../../indexedDB/MessagesDB';
 import { GenericLayout } from '../../layouts/GenericLayout';
 import contacts from '../../stores/Contacts';
 import mailbox from '../../stores/Mailbox';
-import mailList, { ILinkedMessage } from '../../stores/MailList';
+import mailList, { FolderId, ILinkedMessage } from '../../stores/MailList';
 import { EDITOR_JS_TOOLS } from '../../utils/editorJs';
 import { useNav } from '../../utils/navigate';
 
@@ -178,7 +178,7 @@ export const MailDetailsPage = observer(() => {
 
 	useEffect(() => {
 		if (!message) {
-			navigate('/mail/inbox');
+			navigate(`/mail/${FolderId.Inbox}`);
 		}
 	}, [message, navigate]);
 

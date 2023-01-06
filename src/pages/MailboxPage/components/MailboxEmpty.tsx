@@ -4,7 +4,7 @@ import React from 'react';
 import { LinkButton, LinkButtonType } from '../../../components/Sidebar/LinkButton';
 import ClickToCopy from '../../../controls/ClickToCopy';
 import domain from '../../../stores/Domain';
-import mailList from '../../../stores/MailList';
+import mailList, { FolderId } from '../../../stores/MailList';
 
 const MailboxEmpty = observer(() => {
 	const activeFolderId = mailList.activeFolderId;
@@ -19,7 +19,7 @@ const MailboxEmpty = observer(() => {
 				padding: '100px 20px 150px',
 			}}
 		>
-			{activeFolderId === 'inbox' ? (
+			{activeFolderId === FolderId.Inbox ? (
 				<>
 					<h3>Your mailbox is empty yet.</h3>
 					<div style={{ marginTop: 6 }}>
@@ -33,7 +33,7 @@ const MailboxEmpty = observer(() => {
 						<span> with your friends to receive the first message.</span>
 					</div>
 				</>
-			) : activeFolderId === 'sent' ? (
+			) : activeFolderId === FolderId.Sent ? (
 				<>
 					<h3 style={{ marginBottom: 16 }}>
 						You haven't sent any message yet.

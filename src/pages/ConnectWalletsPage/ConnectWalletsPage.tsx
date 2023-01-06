@@ -6,6 +6,7 @@ import { YlideButton } from '../../controls/YlideButton';
 import { ArrowRight } from '../../icons/ArrowRight';
 import SelectWalletModal from '../../modals/SelectWalletModal';
 import domain from '../../stores/Domain';
+import { FolderId } from '../../stores/MailList';
 import walletConnect from '../../stores/WalletConnect';
 import { useNav } from '../../utils/navigate';
 import { WalletBlock } from './WalletBlock';
@@ -37,7 +38,7 @@ const ConnectWalletsPage = observer(() => {
 					<div className="intro-buttons">
 						<YlideButton
 							onClick={() => {
-								navigate(`/mail/inbox`);
+								navigate(`/mail/${FolderId.Inbox}`);
 							}}
 						>
 							Continue with connected accounts <ArrowRight style={{ marginLeft: 10 }} />
