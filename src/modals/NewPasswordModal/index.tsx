@@ -40,7 +40,8 @@ const txPrices: Record<EVMNetwork, number> = {
 };
 
 export interface NewPasswordModalProps {
-	isFaucet: boolean;
+	faucetType: null | 'polygon' | 'gnosis' | 'fantom';
+	bonus: boolean;
 	wallet: Wallet;
 	account: IGenericAccount;
 	remoteKeys: Record<string, ExternalYlidePublicKey | null>;
@@ -50,7 +51,8 @@ export interface NewPasswordModalProps {
 @observer
 export default class NewPasswordModal extends PureComponent<NewPasswordModalProps> {
 	static async show(
-		isFaucet: boolean,
+		faucetType: null | 'polygon' | 'gnosis' | 'fantom',
+		bonus: boolean,
 		wallet: Wallet,
 		account: IGenericAccount,
 		remoteKeys: Record<string, ExternalYlidePublicKey | null>,
@@ -58,7 +60,8 @@ export default class NewPasswordModal extends PureComponent<NewPasswordModalProp
 		return new Promise<{ password: string; remember: boolean; forceNew: boolean } | null>((resolve, reject) => {
 			modals.show((close: () => void) => (
 				<NewPasswordModal
-					isFaucet={isFaucet}
+					faucetType={faucetType}
+					bonus={bonus}
 					wallet={wallet}
 					account={account}
 					remoteKeys={remoteKeys}
@@ -144,17 +147,17 @@ export default class NewPasswordModal extends PureComponent<NewPasswordModalProp
 
 	@observable pleaseWait = false;
 
-	async publishThroughFaucet(account: DomainAccount) {
+	async publishThroughFaucet(account: DomainAccount, faucetType: 'polygon' | 'gnosis' | 'fantom', bonus: boolean) {
 		console.log('public key: ', '0x' + new SmartBuffer(account.key.keypair.publicKey).toHexString());
 		this.step = 1;
 		const signature = await this.requestFaucetSignature(account);
 		this.pleaseWait = true;
-		const response = await fetch(`https://faucet.ylide.io/user`, {
+		const response = await fetch(`https://faucet.ylide.io/${faucetType}`, {
 			method: 'POST',
 			body: JSON.stringify({
 				address: account.account.address.toLowerCase(),
 				referrer: '0x0000000000000000000000000000000000000000',
-				payBonus: '0',
+				payBonus: bonus ? '1' : '0',
 				publicKey: '0x' + new SmartBuffer(account.key.keypair.publicKey).toHexString(),
 				keyVersion: 2,
 				_r: signature.r,
@@ -220,8 +223,8 @@ export default class NewPasswordModal extends PureComponent<NewPasswordModalProp
 		}
 		if (!this.freshestKey) {
 			this.account = await this.props.wallet.instantiateNewAccount(this.props.account, tempLocalKey);
-			if (this.props.isFaucet && this.props.wallet.factory.blockchainGroup === 'evm') {
-				await this.publishThroughFaucet(this.account);
+			if (this.props.faucetType && this.props.wallet.factory.blockchainGroup === 'evm') {
+				await this.publishThroughFaucet(this.account, this.props.faucetType, this.props.bonus);
 			} else {
 				if (this.props.wallet.factory.blockchainGroup === 'evm') {
 					this.step = 2;
@@ -239,8 +242,8 @@ export default class NewPasswordModal extends PureComponent<NewPasswordModalProp
 			this.step = 5;
 		} else if (this.forceNew) {
 			this.account = await this.props.wallet.instantiateNewAccount(this.props.account, tempLocalKey);
-			if (this.props.isFaucet && this.props.wallet.factory.blockchainGroup === 'evm') {
-				await this.publishThroughFaucet(this.account);
+			if (this.props.faucetType && this.props.wallet.factory.blockchainGroup === 'evm') {
+				await this.publishThroughFaucet(this.account, this.props.faucetType, this.props.bonus);
 			} else {
 				if (this.props.wallet.factory.blockchainGroup === 'evm') {
 					this.step = 2;

@@ -14,6 +14,7 @@ import domain from '../../stores/Domain';
 import modals from '../../stores/Modals';
 import { Wallet } from '../../stores/models/Wallet';
 import walletConnect from '../../stores/WalletConnect';
+import { getQueryString } from '../../utils/getQueryString';
 import NewPasswordModal from '../NewPasswordModal';
 import SwitchModal from '../SwitchModal';
 
@@ -169,8 +170,10 @@ export default class SelectWalletModal extends PureComponent<SelectWalletModalPr
 			}
 			const remoteKeys = await wallet.readRemoteKeys(account);
 			this.props.onResolve();
+			const qqs = getQueryString();
 			await NewPasswordModal.show(
-				true, // document.location.search === '?faucet=1',
+				['polygon', 'fantom', 'gnosis'].includes(qqs.faucet) ? (qqs.faucet as any) : null,
+				qqs.bonus === 'true',
 				wallet,
 				account,
 				remoteKeys.remoteKeys,

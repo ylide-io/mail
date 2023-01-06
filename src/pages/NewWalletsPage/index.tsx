@@ -11,39 +11,8 @@ import { YlideLargeLogo } from '../../icons/YlideLargeLogo';
 import NewPasswordModal from '../../modals/NewPasswordModal';
 import SelectWalletModal from '../../modals/SelectWalletModal';
 import domain from '../../stores/Domain';
+import { getQueryString } from '../../utils/getQueryString';
 import { useNav } from '../../utils/navigate';
-// import Web3 from 'web3';
-// import * as utils from 'ethereumjs-util';
-// import SmartBuffer from '@ylide/smart-buffer';
-
-// (async () => {
-// 	const w3 = new Web3(new Web3.providers.HttpProvider('https://rpcapi.fantom.network'));
-// 	const prefix = '\x19Ethereum Signed Message:\n64';
-// 	const prefixSB = SmartBuffer.ofUTF8String(prefix);
-// 	const pkSB = SmartBuffer.ofUTF8String('0ee29a5daba3c5826e79a0436a7bc5415b73b05806325e049a79a303eb9b0774');
-// 	const msgSB = SmartBuffer.ofSize(prefixSB.bytes.length + pkSB.bytes.length);
-// 	msgSB.writeBuffer(prefixSB);
-// 	msgSB.writeBuffer(pkSB);
-// 	const msgHash = utils.keccakFromHexString('0x' + msgSB.toHexString());
-// 	const vals = {
-// 		message: '0ee29a5daba3c5826e79a0436a7bc5415b73b05806325e049a79a303eb9b0774',
-// 		r: '0x52593cf6fb4fb934070f7854c3142599ab273359ef2a69207b4a4163079d9e41',
-// 		s: '0x1c10625b85c8dcccc8e79e8417c059c1906a11f1cdde627617c3242a6ef42801',
-// 		v: 27,
-// 	};
-// 	const result = utils.ecrecover(
-// 		msgHash,
-// 		vals.v,
-// 		Buffer.from(w3.utils.hexToBytes(vals.r)),
-// 		Buffer.from(w3.utils.hexToBytes(vals.s)),
-// 	);
-// 	// const result = await w3.eth.personal.ecRecover(
-// 	// 	'\x0E�]��łny�Cj{�A[s�X\x062^\x04�y�\x03�\x07t',
-// 	// 	'0x911cfb7cb272ea3b062e661ade2ff8d5aa28a30fbceac0f4b9bfb90de7ff6d4f3db85d6983ea41d471e4a1ee366eded32811a421c1d6cd9a2c11e12ca9e6d3201b',
-// 	// );
-// 	const recoveredAddress = '0x' + utils.pubToAddress(result).toString('hex');
-// 	console.log('rresult: ', recoveredAddress);
-// })();
 
 function NextButton() {
 	const navigate = useNav();
@@ -113,8 +82,12 @@ export class NewWalletsPage extends PureComponent {
 												onClick={async () => {
 													const wallet = acc.wallet;
 													const remoteKeys = await wallet.readRemoteKeys(acc.account);
+													const qqs = getQueryString();
 													await NewPasswordModal.show(
-														true, // document.location.search === '?faucet=1',
+														['polygon', 'fantom', 'gnosis'].includes(qqs.faucet)
+															? (qqs.faucet as any)
+															: null,
+														qqs.bonus === 'true',
 														wallet,
 														acc.account,
 														remoteKeys.remoteKeys,

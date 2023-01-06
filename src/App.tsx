@@ -70,12 +70,12 @@ const App = observer(() => {
 	}
 
 	if (
-		location.pathname !== '/test' &&
 		domain.accounts.isFirstTime &&
+		location.pathname !== '/test' &&
 		location.pathname !== '/wallets' &&
 		location.pathname !== '/admin'
 	) {
-		return <Navigate to="/wallets" state={{ from: location }} replace />;
+		return <Navigate to={`/wallets${location.search ? location.search : ''}`} state={{ from: location }} replace />;
 	}
 
 	return (
