@@ -1,11 +1,12 @@
-import { useNavigate } from 'react-router-dom';
+import { createSearchParams, useNavigate } from 'react-router-dom';
+import { URLSearchParamsInit } from 'react-router-dom/dist/dom';
 
 import AlertModal from '../modals/AlertModal';
 import domain from '../stores/Domain';
 
 interface UseNavParameters {
 	path?: string;
-	search?: Record<string, string>;
+	search?: URLSearchParamsInit;
 }
 
 export const useNav = () => {
@@ -33,7 +34,7 @@ export const useNav = () => {
 
 		navigate({
 			pathname: params.path,
-			search: params.search ? `?${new URLSearchParams(params.search).toString()}` : undefined,
+			search: params.search ? `?${createSearchParams(params.search).toString()}` : undefined,
 		});
 	};
 };
