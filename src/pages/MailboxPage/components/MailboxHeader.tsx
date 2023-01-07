@@ -1,37 +1,101 @@
+import { Tooltip } from 'antd';
 import { observer } from 'mobx-react';
 
+import { ActionButton, ActionButtonStyle } from '../../../components/ActionButton/ActionButton';
+import { smallButtonIcons } from '../../../components/smallButton/smallButton';
 import { AdaptiveAddress } from '../../../controls/AdaptiveAddress';
+import { YlideCheckbox } from '../../../controls/YlideCheckbox';
 import contacts from '../../../stores/Contacts';
-import mailList from '../../../stores/MailList';
-import MailboxControls from './MailboxControls';
+import { FolderId, getFolderName } from '../../../stores/MailList';
+import { useNav } from '../../../utils/navigate';
 
-export const MailboxHeader = observer(() => {
-	const contact = mailList.filterBySender ? contacts.contactsByAddress[mailList.filterBySender] : null;
+interface MailboxHeaderProps {
+	folderId: FolderId;
+	filterBySender?: string;
+	isAllSelected: boolean;
+	onSelectAllCheckBoxClick: (isChecked: boolean) => void;
+	onMarkReadClick: () => void;
+	onDeleteClick: () => void;
+	onRestoreClick: () => void;
+}
 
-	return (
-		<div className="mailbox-header">
-			{/* <MailsSearcher /> */}
+export const MailboxHeader = observer(
+	({
+		folderId,
+		filterBySender,
+		isAllSelected,
+		onSelectAllCheckBoxClick,
+		onMarkReadClick,
+		onDeleteClick,
+		onRestoreClick,
+	}: MailboxHeaderProps) => {
+		const navigate = useNav();
+		const contact = filterBySender ? contacts.contactsByAddress[filterBySender] : null;
 
-			<div className="mailbox-title">
-				{mailList.activeFolderId ? (
-					<>
-						{mailList.getFolderName(mailList.activeFolderId)}
+		return (
+			<div className="mailbox-header">
+				<div className="mailbox-title">
+					{folderId ? (
+						<>
+							{getFolderName(folderId)}
 
-						<div className="mailbox-title-secondary">
-							{!!mailList.filterBySender && (
-								<>
-									{'from '}
-									{contact ? contact.name : <AdaptiveAddress address={mailList.filterBySender} />}
-								</>
-							)}
+							<div className="mailbox-title-secondary">
+								{!!filterBySender && (
+									<>
+										{'from '}
+										{contact ? contact.name : <AdaptiveAddress address={filterBySender} />}
+									</>
+								)}
+							</div>
+						</>
+					) : (
+						'Loading...'
+					)}
+				</div>
+
+				<div className="mailbox-tools">
+					<Tooltip title={isAllSelected ? 'Deselect all' : 'Select all'}>
+						<div className="global-checkbox-wrapper">
+							<YlideCheckbox checked={isAllSelected} onCheck={onSelectAllCheckBoxClick} />
 						</div>
-					</>
-				) : (
-					'Loading...'
-				)}
-			</div>
+					</Tooltip>
 
-			<MailboxControls />
-		</div>
-	);
-});
+					<Tooltip title="Mark as read">
+						<ActionButton
+							onClick={() => onMarkReadClick()}
+							icon={<i className={`fa ${smallButtonIcons.eye}`} />}
+						/>
+					</Tooltip>
+
+					{folderId === FolderId.Archive && (
+						<Tooltip title="Restore mails">
+							<ActionButton
+								onClick={() => onRestoreClick()}
+								icon={<i className={`fa ${smallButtonIcons.restore}`} />}
+							/>
+						</Tooltip>
+					)}
+
+					{folderId !== FolderId.Sent && (
+						<Tooltip title="Archive mails">
+							<ActionButton
+								onClick={() => onDeleteClick()}
+								icon={<i className={`fa ${smallButtonIcons.trash}`} />}
+							/>
+						</Tooltip>
+					)}
+
+					{!!filterBySender && (
+						<ActionButton
+							style={ActionButtonStyle.Primary}
+							icon={<i className={`fa ${smallButtonIcons.cross}`} />}
+							onClick={() => navigate({ search: {} })}
+						>
+							Clear filter
+						</ActionButton>
+					)}
+				</div>
+			</div>
+		);
+	},
+);

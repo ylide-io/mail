@@ -1,12 +1,16 @@
 import { observer } from 'mobx-react';
 import React, { useEffect } from 'react';
 
-import mailList from '../../../stores/MailList';
+import { FolderId } from '../../../stores/MailList';
 import tags from '../../../stores/Tags';
 import TagsEmpty from '../TagsEmpty';
 import Tag from './Tag';
 
-const TagsList = observer(() => {
+interface TagsListProps {
+	folderId: FolderId;
+}
+
+const TagsList = observer(({ folderId }: TagsListProps) => {
 	useEffect(() => {
 		tags.getTags();
 	}, []);
@@ -17,7 +21,7 @@ const TagsList = observer(() => {
 				tags.tags.map(elem => (
 					<Tag
 						key={elem.id}
-						isActive={mailList.activeFolderId === String(elem.id)}
+						isActive={folderId === String(elem.id)}
 						tagId={elem.id}
 						circleColor={elem.color}
 						text={elem.name}

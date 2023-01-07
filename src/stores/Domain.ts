@@ -29,7 +29,7 @@ import PasswordModal from '../modals/PasswordModal';
 import SwitchModal from '../modals/SwitchModal';
 import { Accounts } from './Accounts';
 import contacts from './Contacts';
-import mailList from './MailList';
+import { useMailStore } from './MailList';
 import { Wallet } from './models/Wallet';
 import tags from './Tags';
 
@@ -523,7 +523,7 @@ export class Domain {
 		console.log('d7');
 		await tags.getTags();
 		console.log('d8');
-		await mailList.init();
+		await useMailStore.getState().init();
 		console.log('d9');
 		this.initialized = true;
 	}

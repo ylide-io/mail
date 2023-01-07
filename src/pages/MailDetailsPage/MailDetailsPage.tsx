@@ -13,7 +13,7 @@ import { IMessageDecodedContent } from '../../indexedDB/MessagesDB';
 import { GenericLayout } from '../../layouts/GenericLayout';
 import contacts from '../../stores/Contacts';
 import mailbox from '../../stores/Mailbox';
-import mailList, { FolderId, ILinkedMessage } from '../../stores/MailList';
+import { FolderId, ILinkedMessage, useMailStore } from '../../stores/MailList';
 import { EDITOR_JS_TOOLS } from '../../utils/editorJs';
 import { useNav } from '../../utils/navigate';
 
@@ -25,7 +25,9 @@ interface MailDetailsPageInnerProps {
 
 const MailDetailsPageInner = observer(({ message }: MailDetailsPageInnerProps) => {
 	const navigate = useNav();
-	const decoded: IMessageDecodedContent | undefined = mailList.decodedMessagesById[message.msgId];
+	const { lastActiveFolderId, decodedMessagesById, decodeMessage, markMessagesAsReaded, markMessagesAsDeleted } =
+		useMailStore();
+	const decoded: IMessageDecodedContent | undefined = decodedMessagesById[message.msgId];
 	const contact = contacts.contactsByAddress[message.msg.senderAddress || '-1'];
 
 	console.log('decoded: ', decoded);
@@ -34,14 +36,14 @@ const MailDetailsPageInner = observer(({ message }: MailDetailsPageInnerProps) =
 	useEffect(() => {
 		(async () => {
 			if (!decoded) {
-				await mailList.decodeMessage(message);
+				await decodeMessage(message);
 			}
-			await mailList.markMessageAsReaded(message.id);
+			await markMessagesAsReaded([message.id]);
 		})();
-	}, [decoded, message]);
+	}, [decodeMessage, decoded, markMessagesAsReaded, message]);
 
 	const encodedMessageClickHandler = () => {
-		mailList.decodeMessage(message);
+		decodeMessage(message);
 	};
 
 	const data = useMemo(
@@ -77,15 +79,15 @@ const MailDetailsPageInner = observer(({ message }: MailDetailsPageInnerProps) =
 	};
 
 	const deleteHandler = () => {
-		mailList.markMessageAsDeleted(message);
-		navigate(`/${mailList.activeFolderId}`);
+		markMessagesAsDeleted([message]);
+		navigate(`/${lastActiveFolderId}`);
 	};
 
 	return (
 		<GenericLayout
 			mobileTopButtonProps={{
 				text: '‹ Return to Mailbox',
-				link: `/mail/${mailList.activeFolderId || FolderId.Inbox}`,
+				link: `/mail/${lastActiveFolderId}`,
 			}}
 		>
 			<div className="mail-page animated fadeInRight">
@@ -176,10 +178,12 @@ const MailDetailsPageInner = observer(({ message }: MailDetailsPageInnerProps) =
 	);
 });
 
-export const MailDetailsPage = observer(() => {
-	const { id } = useParams();
+export const MailDetailsPage = () => {
 	const navigate = useNav();
-	const message = mailList.messages.find(m => m.id === id!);
+	const { id } = useParams();
+
+	const lastMessagesList = useMailStore(state => state.lastMessagesList);
+	const message = lastMessagesList.find(m => m.id === id!);
 
 	useEffect(() => {
 		if (!message) {
@@ -188,4 +192,4 @@ export const MailDetailsPage = observer(() => {
 	}, [message, navigate]);
 
 	return <>{message && <MailDetailsPageInner message={message} />}</>;
-});
+};

@@ -2,21 +2,21 @@ import { EthereumBlockchainController, EthereumListSource } from '@ylide/ethereu
 import {
 	AbstractBlockchainController,
 	BlockchainListSource,
+	BlockchainMap,
 	BlockchainSourceType,
-	CriticalSection,
 	IListSource,
 	IMessage,
 	IMessageContent,
 	IMessageWithSource,
 	IndexerListSource,
-	ISourceSubject,
 	ListSourceDrainer,
 	ListSourceMultiplexer,
 	SourceReadingSession,
 	Uint256,
 } from '@ylide/sdk';
-import { autobind } from 'core-decorators';
-import { makeObservable, observable, reaction } from 'mobx';
+import { reaction } from 'mobx';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import create from 'zustand';
 
 import messagesDB, { IMessageDecodedContent } from '../indexedDB/MessagesDB';
 import { analytics } from './Analytics';
@@ -31,12 +31,22 @@ export enum FolderId {
 	Archive = 'archive',
 }
 
-export interface IFolder {
-	id: string;
-	title: string;
-	tag: string;
-	subjects: ISourceSubject[];
+export function getFolderName(folderId: FolderId) {
+	if (folderId === FolderId.Inbox) {
+		return 'Inbox';
+	} else if (folderId === FolderId.Sent) {
+		return 'Sent';
+	} else if (folderId === FolderId.Archive) {
+		return 'Archive';
+	} else {
+		const tag = tags.tags.find(t => String(t.id) === folderId);
+		return tag?.name || 'Unknown';
+	}
 }
+
+//
+
+const MailPageSize = 10;
 
 export interface ILinkedMessage {
 	id: string;
@@ -46,44 +56,286 @@ export interface ILinkedMessage {
 	reader: AbstractBlockchainController;
 }
 
-export class MailList {
-	// @ts-ignore
-	readingSession: SourceReadingSession = (window.rs = new SourceReadingSession());
+interface UseMailListProps {
+	folderId: FolderId;
+	sender?: string;
+	filter?: (m: ILinkedMessage) => boolean;
+}
 
-	@observable messages: ILinkedMessage[] = [];
-	@observable isNextPageAvailable: boolean = false;
-	@observable loading: boolean = true;
-	@observable firstLoading: boolean = true;
+export function useMailList({ folderId, sender, filter }: UseMailListProps) {
+	const readingSession = useMailStore(state => state.readingSession);
 
-	@observable saveDecodedMessages = localStorage.getItem('saveDecodedMessages') === 'true';
+	const accountSourceMatch = useMemo(
+		() => new Map<IListSource, { account: DomainAccount; reader: AbstractBlockchainController }>(),
+		[],
+	);
 
-	@observable folderById: Record<string, IFolder> = {};
+	const [activeAccounts, setActiveAccounts] = useState(domain.accounts.activeAccounts);
+	reaction(
+		() => domain.accounts.activeAccounts,
+		() => {
+			console.log(`reaction`, domain.accounts.activeAccounts);
+			setActiveAccounts([]);
+		},
+	);
 
-	currentList!: ListSourceDrainer;
+	const [blockchains, setBlockchains] = useState(domain.blockchains);
+	reaction(
+		() => domain.blockchains,
+		() => setBlockchains(domain.blockchains),
+	);
 
-	@observable messagesContentById: Record<string, IMessageContent> = {};
-	@observable decodedMessagesById: Record<string, IMessageDecodedContent> = {};
-	@observable checkedMessageIds: string[] = [];
-	@observable readMessageIds: Set<string> = new Set();
+	const [stream, setStream] = useState<ListSourceDrainer | undefined>();
+	const [messages, setMessages] = useState<ILinkedMessage[]>([]);
+	const [isLoading, setLoading] = useState(false);
+	const [isNextPageAvailable, setNextPageAvailable] = useState(true);
+	const [isNeedMore, setNeedMore] = useState(false);
+	const loadNextPage = useCallback(() => setNeedMore(true), []);
 
-	deletedMessageIds: Record<string, Set<string>> = {};
+	const wrapMessage = useCallback(
+		(p: IMessageWithSource): ILinkedMessage => ({
+			id: `${p.msg.msgId}:${accountSourceMatch.get(p.source)?.account.account.address}`,
+			msgId: p.msg.msgId,
+			msg: p.msg,
+			recipient: accountSourceMatch.get(p.source)?.account || null,
+			reader: accountSourceMatch.get(p.source)!.reader,
+		}),
+		[accountSourceMatch],
+	);
 
-	@observable activeFolderId: FolderId | null = null;
+	useEffect(() => {
+		console.log(`build stream`);
+		let isDestroyed = false;
 
-	@observable filterBySender: string | null = null;
+		setStream(undefined);
+		setMessages([]);
+		setNextPageAvailable(true);
 
-	folderChangeCriticalSection = new CriticalSection();
+		function buildSources(
+			accountSourceMatch: Map<IListSource, { account: DomainAccount; reader: AbstractBlockchainController }>,
+			activeAccounts: DomainAccount[],
+			blockchains: BlockchainMap<AbstractBlockchainController>,
+			readingSession: SourceReadingSession,
+			folderId: FolderId,
+			sender?: string,
+		) {
+			if (folderId === FolderId.Inbox || folderId === FolderId.Archive) {
+				return activeAccounts
+					.map(account => {
+						const res: IListSource[] = [];
+						for (const blockchain of Object.keys(blockchains)) {
+							const reader = blockchains[blockchain];
+							const ls = readingSession.listSource(
+								{
+									blockchain,
+									type: BlockchainSourceType.DIRECT,
+									recipient: account.uint256Address,
+									sender: sender || null,
+								},
+								reader,
+							);
+							accountSourceMatch.set(ls, { account, reader });
+							res.push(ls);
+						}
+						return res;
+					})
+					.flat();
+			} else if (folderId === FolderId.Sent) {
+				return activeAccounts
+					.map(account => {
+						const res: IListSource[] = [];
+						for (const blockchain of account.appropriateBlockchains()) {
+							const reader = blockchain.reader;
+							const ls = readingSession.listSource(
+								{
+									blockchain: blockchain.factory.blockchain,
+									type: BlockchainSourceType.DIRECT,
+									recipient: account.sentAddress,
+									sender: null,
+								},
+								reader,
+							);
+							accountSourceMatch.set(ls, { account, reader });
+							res.push(ls);
+						}
+						return res;
+					})
+					.flat();
+			} else {
+				const tag = tags.tags.find(t => String(t.id) === folderId);
+				if (!tag) {
+					return [];
+				}
+				const contactsV = contacts.contacts.filter(c => c.tags.includes(tag.id));
+				return contactsV
+					.map(v =>
+						activeAccounts.map(account => {
+							const res: IListSource[] = [];
+							for (const blockchain of Object.keys(blockchains)) {
+								const reader = blockchains[blockchain];
+								const ls = readingSession.listSource(
+									{
+										blockchain,
+										type: BlockchainSourceType.DIRECT,
+										recipient: account.uint256Address,
+										sender: v.address,
+									},
+									reader,
+								);
+								accountSourceMatch.set(ls, { account, reader });
+								res.push(ls);
+							}
+							return res;
+						}),
+					)
+					.flat()
+					.flat();
+			}
+		}
 
-	accountSourceMatch: Map<IListSource, { account: DomainAccount; reader: AbstractBlockchainController }> = new Map();
+		const listSourceDrainer = new ListSourceDrainer(
+			new ListSourceMultiplexer(
+				buildSources(accountSourceMatch, activeAccounts, blockchains, readingSession, folderId, sender),
+			),
+		);
 
-	constructor() {
-		makeObservable(this);
+		async function onNewMessages({ messages }: { messages: IMessageWithSource[] }) {
+			setMessages(messages.map(wrapMessage));
+		}
 
-		this.readingSession.sourceOptimizer = (subject, reader) => {
+		listSourceDrainer.on('messages', onNewMessages);
+
+		listSourceDrainer
+			.resume()
+			.then(() => {
+				console.log(`build stream: then`);
+				if (!isDestroyed) {
+					console.log(`build stream: setStream`);
+					setStream(listSourceDrainer);
+					loadNextPage();
+				}
+			})
+			.catch(() => {
+				console.log(`build stream: catch`);
+			});
+
+		return () => {
+			console.log(`build stream: destroy`);
+
+			isDestroyed = true;
+			setStream(undefined);
+
+			listSourceDrainer.pause();
+			listSourceDrainer.off('messages', onNewMessages);
+		};
+	}, [accountSourceMatch, activeAccounts, blockchains, folderId, loadNextPage, readingSession, sender, wrapMessage]);
+
+	useEffect(() => {
+		let isDestroyed = false;
+
+		if (stream && !stream.paused) {
+			console.log(`resetFilter`);
+			stream.resetFilter(m => {
+				if (!filter) return true;
+
+				const linkedMessage = wrapMessage(m);
+				return filter(linkedMessage);
+			});
+
+			console.log(`resetFilter: readMore`);
+			stream.readMore(MailPageSize).then(m => {
+				if (!isDestroyed) {
+					setMessages(m.map(wrapMessage));
+					setNextPageAvailable(!stream.drained);
+				}
+			});
+		}
+
+		return () => {
+			isDestroyed = true;
+		};
+	}, [filter, stream, wrapMessage]);
+
+	useEffect(() => {
+		console.log(`loading: check`, isNextPageAvailable, isNeedMore, !!stream, !isLoading);
+		if (isNextPageAvailable && isNeedMore && stream && !stream.paused && !isLoading) {
+			setLoading(true);
+			console.log(`loading: readMore`);
+			stream.readMore(MailPageSize).then(messages => {
+				console.log(`loading: end`);
+				setMessages(messages.map(wrapMessage));
+				setNextPageAvailable(!stream.drained);
+				setLoading(false);
+			});
+		}
+	}, [isLoading, isNeedMore, isNextPageAvailable, stream, wrapMessage]);
+
+	return {
+		isLoading: !stream || isLoading,
+		messages,
+		isNextPageAvailable,
+		loadNextPage,
+	};
+}
+
+//
+
+interface MailStore {
+	init: () => Promise<void>;
+
+	readingSession: SourceReadingSession;
+
+	lastActiveFolderId: FolderId;
+	setLastActiveFolderId: (folderId: FolderId) => void;
+
+	lastMessagesList: ILinkedMessage[];
+	setLastMessagesList: (messages: ILinkedMessage[]) => void;
+
+	saveDecodedMessages: boolean;
+	setSaveDecodedSetting: (flag: boolean) => Promise<void>;
+	messagesContentById: Record<string, IMessageContent>;
+	decodedMessagesById: Record<string, IMessageDecodedContent>;
+	decodeMessage: (pushMsg: ILinkedMessage) => Promise<IMessageDecodedContent>;
+
+	readMessageIds: Set<string>;
+	markMessagesAsReaded: (ids: string[]) => Promise<void>;
+
+	deletedMessageIds: Record<string, Set<string>>;
+	markMessagesAsDeleted: (messages: ILinkedMessage[]) => Promise<void>;
+	markMessagesAsNotDeleted: (messages: ILinkedMessage[]) => Promise<void>;
+}
+
+export const useMailStore = create<MailStore>((set, get) => ({
+	init: async () => {
+		const dbDecodedMessages = await messagesDB.retrieveAllDecodedMessages();
+		const decodedMessagesById = dbDecodedMessages.reduce(
+			(p, c) => ({
+				...p,
+				[c.msgId]: c,
+			}),
+			{},
+		);
+
+		const dbReadMessage = await messagesDB.getReadMessages();
+		const readMessageIds = new Set(dbReadMessage);
+
+		const dbDeletedMessages = await messagesDB.retrieveAllDeletedMessages();
+		const deletedMessageIds: Record<string, Set<string>> = {};
+		for (const acc in dbDeletedMessages) {
+			deletedMessageIds[acc] = new Set(dbDeletedMessages[acc]);
+		}
+
+		set({ decodedMessagesById, readMessageIds, deletedMessageIds });
+	},
+
+	readingSession: (() => {
+		const readingSession = new SourceReadingSession();
+
+		readingSession.sourceOptimizer = (subject, reader) => {
 			if (reader instanceof EthereumBlockchainController) {
 				return new IndexerListSource(
 					new EthereumListSource(reader, subject, 30000),
-					this.readingSession.indexerHub,
+					readingSession.indexerHub,
 					reader,
 					subject,
 				);
@@ -91,337 +343,120 @@ export class MailList {
 				return new BlockchainListSource(reader, subject, 10000);
 			}
 		};
-	}
 
-	async init() {
-		const dmsgs = await messagesDB.retrieveAllDecodedMessages();
-		this.decodedMessagesById = dmsgs.reduce(
-			(p, c) => ({
-				...p,
-				[c.msgId]: c,
-			}),
-			{},
-		);
-		const deletedMessageIds = await messagesDB.retrieveAllDeletedMessages();
-		for (const acc in deletedMessageIds) {
-			this.deletedMessageIds[acc] = new Set(deletedMessageIds[acc]);
+		return readingSession;
+	})(),
+
+	lastActiveFolderId: FolderId.Inbox,
+	setLastActiveFolderId: folderId => set({ lastActiveFolderId: folderId }),
+
+	lastMessagesList: [],
+	setLastMessagesList: (messages: ILinkedMessage[]) => {
+		set({ lastMessagesList: messages });
+	},
+
+	saveDecodedMessages: localStorage.getItem('saveDecodedMessages') === 'true',
+	setSaveDecodedSetting: async flag => {
+		set({ saveDecodedMessages: flag });
+		localStorage.setItem('saveDecodedMessages', flag ? 'true' : 'false');
+		if (!flag) {
+			await messagesDB.clearAllDecodedMessages();
 		}
-		const readMessageIds = await messagesDB.getReadMessages();
-		this.readMessageIds = new Set(readMessageIds);
+	},
+	messagesContentById: {},
+	decodedMessagesById: {},
+	decodeMessage: async pushMsg => {
+		const state = get();
 
-		reaction(
-			() => domain.accounts.activeAccounts,
-			() => {
-				if (this.activeFolderId) {
-					this.openFolder(this.activeFolderId);
-				}
-			},
-		);
-	}
+		analytics.mailOpened(state.lastActiveFolderId || 'null');
 
-	getFolderName(folderId: FolderId) {
-		if (folderId === FolderId.Inbox) {
-			return 'Inbox';
-		} else if (folderId === FolderId.Sent) {
-			return 'Sent';
-		} else if (folderId === FolderId.Archive) {
-			return 'Archive';
-		} else {
-			const tag = tags.tags.find(t => String(t.id) === folderId);
-			if (!tag) {
-				return this.folderById[folderId].title;
-			} else {
-				return tag.name;
+		if (state.decodedMessagesById[pushMsg.msgId]) {
+			return state.decodedMessagesById[pushMsg.msgId];
+		}
+
+		async function fetchMessageContent(pushMsg: ILinkedMessage) {
+			if (state.messagesContentById[pushMsg.msgId]) {
+				return state.messagesContentById[pushMsg.msgId];
 			}
-		}
-	}
 
-	checkMessage(message: ILinkedMessage, flag: boolean) {
-		if (flag) {
-			this.checkedMessageIds.push(message.id);
-		} else {
-			this.checkedMessageIds = this.checkedMessageIds.filter(id => id !== message.id);
-		}
-	}
-
-	isMessageChecked(id: string) {
-		return this.checkedMessageIds.includes(id);
-	}
-
-	async markMessagesAsReaded(ids: string[]) {
-		ids.forEach(id => this.readMessageIds.add(id));
-		await messagesDB.saveMessagesRead(ids);
-	}
-
-	async markMessageAsReaded(id: string) {
-		this.readMessageIds.add(id);
-		await messagesDB.saveMessageRead(id);
-	}
-
-	async markAsReaded() {
-		await this.markMessagesAsReaded(this.checkedMessageIds);
-		this.checkedMessageIds = [];
-	}
-
-	@autobind
-	deletedFilter(m: IMessageWithSource): boolean {
-		const { id, recipient } = this.wrapMessage(m);
-		return !this.deletedMessageIds[recipient?.account.address || 'null']?.has(id);
-	}
-
-	@autobind
-	onlyDeletedFilter(m: IMessageWithSource): boolean {
-		const { id, recipient } = this.wrapMessage(m);
-		return this.deletedMessageIds[recipient?.account.address || 'null']?.has(id);
-	}
-
-	async deletedWasUpdated() {
-		if (this.activeFolderId === FolderId.Inbox) {
-			this.currentList.resetFilter(this.deletedFilter);
-			this.messages = (await this.currentList.readMore(10)).map(this.wrapMessage);
-		} else if (this.activeFolderId === FolderId.Archive) {
-			this.currentList.resetFilter(this.onlyDeletedFilter);
-			this.messages = (await this.currentList.readMore(10)).map(this.wrapMessage);
-		}
-	}
-
-	async markMessageAsDeleted(m: ILinkedMessage) {
-		if (this.deletedMessageIds[m.recipient?.account.address || 'null']) {
-			this.deletedMessageIds[m.recipient?.account.address || 'null'].add(m.id);
-		} else {
-			this.deletedMessageIds[m.recipient?.account.address || 'null'] = new Set([m.id]);
-		}
-		await messagesDB.saveMessageDeleted(m.id, m.recipient?.account.address || 'null');
-		await this.deletedWasUpdated();
-	}
-
-	async markMessagesAsNotDeleted(ms: ILinkedMessage[]) {
-		ms.forEach(m => {
-			if (this.deletedMessageIds[m.recipient?.account.address || 'null']) {
-				this.deletedMessageIds[m.recipient?.account.address || 'null'].delete(m.id);
+			const content = await pushMsg.reader.retrieveMessageContentByMsgId(pushMsg.msgId);
+			if (!content || content.corrupted) {
+				throw new Error('Content is not available or corrupted');
 			}
-		});
-		await messagesDB.saveMessagesNotDeleted(
-			ms.map(m => ({
-				id: m.id,
-				accountAddress: m.recipient?.account.address || 'null',
-			})),
-		);
-		await this.deletedWasUpdated();
-	}
 
-	async markMessagesAsDeleted(ms: ILinkedMessage[]) {
-		ms.forEach(m => {
-			if (this.deletedMessageIds[m.recipient?.account.address || 'null']) {
-				this.deletedMessageIds[m.recipient?.account.address || 'null'].add(m.id);
-			} else {
-				this.deletedMessageIds[m.recipient?.account.address || 'null'] = new Set([m.id]);
-			}
-		});
-		await messagesDB.saveMessagesDeleted(
-			ms.map(m => ({
-				id: m.id,
-				accountAddress: m.recipient?.account.address || 'null',
-			})),
-		);
-		await this.deletedWasUpdated();
-	}
+			state.messagesContentById[pushMsg.msgId] = content;
 
-	async markAsDeleted() {
-		await this.markMessagesAsDeleted(this.messages.filter(t => this.checkedMessageIds.includes(t.id)));
-		this.checkedMessageIds = [];
-	}
-
-	async markAsNotDeleted() {
-		await this.markMessagesAsNotDeleted(this.messages.filter(t => this.checkedMessageIds.includes(t.id)));
-		this.checkedMessageIds = [];
-	}
-
-	async fetchMessageContent(pushMsg: ILinkedMessage) {
-		if (this.messagesContentById[pushMsg.msgId]) {
-			return this.messagesContentById[pushMsg.msgId];
+			return content;
 		}
 
-		const content = await pushMsg.reader.retrieveMessageContentByMsgId(pushMsg.msgId);
-		if (!content || content.corrupted) {
-			throw new Error('Content is not available or corrupted');
-		}
-
-		this.messagesContentById[pushMsg.msgId] = content;
-
-		return content;
-	}
-
-	async decodeMessage(pushMsg: ILinkedMessage) {
-		analytics.mailOpened(this.activeFolderId || 'null');
-
-		if (this.decodedMessagesById[pushMsg.msgId]) {
-			return this.decodedMessagesById[pushMsg.msgId];
-		}
-
-		const content = await this.fetchMessageContent(pushMsg);
+		const content = await fetchMessageContent(pushMsg);
 
 		const result = pushMsg.msg.isBroadcast
 			? await domain.ylide.decryptBroadcastContent(pushMsg.msg, content)
 			: await domain.ylide.decryptMessageContent(pushMsg.recipient!.account, pushMsg.msg, content);
 
-		this.decodedMessagesById[pushMsg.msgId] = {
+		const decodedMessage = {
 			msgId: pushMsg.msgId,
 			decodedSubject: result.subject,
 			decodedTextData: result.content,
 		};
 
-		if (this.saveDecodedMessages) {
+		state.decodedMessagesById[pushMsg.msgId] = decodedMessage;
+
+		if (state.saveDecodedMessages) {
 			console.log('msg saved: ', pushMsg.msgId);
-			await messagesDB.saveDecodedMessage(this.decodedMessagesById[pushMsg.msgId]);
+			await messagesDB.saveDecodedMessage(decodedMessage);
 		}
-	}
 
-	async setSaveDecodedSetting(flag: boolean) {
-		this.saveDecodedMessages = flag;
-		localStorage.setItem('saveDecodedMessages', flag ? 'true' : 'false');
-		if (!flag) {
-			await messagesDB.clearAllDecodedMessages();
-		}
-	}
+		return decodedMessage;
+	},
 
-	@autobind
-	async nextPage() {
-		this.loading = true;
-		await this.folderChangeCriticalSection.enter();
-		this.messages = (await this.currentList.readMore(10)).map(this.wrapMessage);
-		this.isNextPageAvailable = !this.currentList.drained;
-		await this.folderChangeCriticalSection.leave();
-		this.loading = false;
-	}
+	readMessageIds: new Set(),
+	markMessagesAsReaded: async ids => {
+		const readMessageIds = new Set(get().readMessageIds);
+		ids.forEach(id => readMessageIds.add(id));
+		set({ readMessageIds });
 
-	@autobind
-	private wrapId(p: IMessageWithSource) {
-		return `${p.msg.msgId}:${this.accountSourceMatch.get(p.source)?.account.account.address}`;
-	}
+		await messagesDB.saveMessagesRead(ids);
+	},
 
-	@autobind
-	private wrapMessage(p: IMessageWithSource) {
-		return {
-			id: this.wrapId(p),
-			msgId: p.msg.msgId,
-			msg: p.msg,
-			recipient: this.accountSourceMatch.get(p.source)?.account || null,
-			reader: this.accountSourceMatch.get(p.source)!.reader,
-		};
-	}
+	deletedMessageIds: {},
+	markMessagesAsDeleted: async messages => {
+		const deletedMessageIds = { ...get().deletedMessageIds };
 
-	buildSourcesByFolder(folderId: FolderId): IListSource[] {
-		if (folderId === FolderId.Inbox || folderId === FolderId.Archive) {
-			return domain.accounts.activeAccounts
-				.map(account => {
-					const res: IListSource[] = [];
-					for (const blockchain of Object.keys(domain.blockchains)) {
-						const reader = domain.blockchains[blockchain];
-						const ls = this.readingSession.listSource(
-							{
-								blockchain,
-								type: BlockchainSourceType.DIRECT,
-								recipient: account.uint256Address,
-								sender: this.filterBySender,
-							},
-							reader,
-						);
-						this.accountSourceMatch.set(ls, { account, reader });
-						res.push(ls);
-					}
-					return res;
-				})
-				.flat();
-		} else if (folderId === FolderId.Sent) {
-			return domain.accounts.activeAccounts
-				.map(account => {
-					const res: IListSource[] = [];
-					for (const blockchain of account.appropriateBlockchains()) {
-						const reader = blockchain.reader;
-						const ls = this.readingSession.listSource(
-							{
-								blockchain: blockchain.factory.blockchain,
-								type: BlockchainSourceType.DIRECT,
-								recipient: account.sentAddress,
-								sender: null,
-							},
-							reader,
-						);
-						this.accountSourceMatch.set(ls, { account, reader });
-						res.push(ls);
-					}
-					return res;
-				})
-				.flat();
-		} else {
-			const tag = tags.tags.find(t => String(t.id) === folderId);
-			if (!tag) {
-				return [];
+		messages.forEach(m => {
+			if (deletedMessageIds[m.recipient?.account.address || 'null']) {
+				deletedMessageIds[m.recipient?.account.address || 'null'].add(m.id);
+			} else {
+				deletedMessageIds[m.recipient?.account.address || 'null'] = new Set([m.id]);
 			}
-			const contactsV = contacts.contacts.filter(c => c.tags.includes(tag.id));
-			return contactsV
-				.map(v =>
-					domain.accounts.activeAccounts.map(account => {
-						const res: IListSource[] = [];
-						for (const blockchain of Object.keys(domain.blockchains)) {
-							const reader = domain.blockchains[blockchain];
-							const ls = this.readingSession.listSource(
-								{
-									blockchain,
-									type: BlockchainSourceType.DIRECT,
-									recipient: account.uint256Address,
-									sender: v.address,
-								},
-								reader,
-							);
-							this.accountSourceMatch.set(ls, { account, reader });
-							res.push(ls);
-						}
-						return res;
-					}),
-				)
-				.flat()
-				.flat();
-		}
-	}
+		});
 
-	@autobind
-	async handleNewMessages({ messages }: { messages: IMessageWithSource[] }) {
-		this.messages = messages.map(this.wrapMessage);
-	}
+		set({ deletedMessageIds });
 
-	async openFolder(folderId: FolderId) {
-		analytics.mailFolderOpened(folderId);
-		if (this.activeFolderId) {
-			await this.folderChangeCriticalSection.enter();
-			this.currentList.pause();
-			this.currentList.off('messages', this.handleNewMessages);
-			await this.folderChangeCriticalSection.leave();
-		}
-		this.activeFolderId = folderId;
+		await messagesDB.saveMessagesDeleted(
+			messages.map(m => ({
+				id: m.id,
+				accountAddress: m.recipient?.account.address || 'null',
+			})),
+		);
+	},
+	markMessagesAsNotDeleted: async messages => {
+		const deletedMessageIds = { ...get().deletedMessageIds };
 
-		this.currentList = new ListSourceDrainer(new ListSourceMultiplexer(this.buildSourcesByFolder(folderId)));
-		this.currentList.on('messages', this.handleNewMessages);
-		if (this.activeFolderId === FolderId.Archive) {
-			this.currentList.resetFilter(this.onlyDeletedFilter);
-		} else if (this.activeFolderId === FolderId.Sent) {
-			this.currentList.resetFilter(null);
-		} else {
-			this.currentList.resetFilter(this.deletedFilter);
-		}
+		messages.forEach(m => {
+			if (deletedMessageIds[m.recipient?.account.address || 'null']) {
+				deletedMessageIds[m.recipient?.account.address || 'null'].delete(m.id);
+			}
+		});
 
-		this.firstLoading = true;
-		await this.folderChangeCriticalSection.enter();
-		await this.currentList.resume();
-		await this.folderChangeCriticalSection.leave();
+		set({ deletedMessageIds });
 
-		await this.nextPage();
-		this.firstLoading = false;
-	}
-}
-
-const mailList = new MailList();
-// @ts-ignore
-window.mailList = mailList;
-export default mailList;
+		await messagesDB.saveMessagesNotDeleted(
+			messages.map(m => ({
+				id: m.id,
+				accountAddress: m.recipient?.account.address || 'null',
+			})),
+		);
+	},
+}));
