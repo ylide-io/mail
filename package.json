@@ -26,6 +26,7 @@
 		"ethereum-blockies-base64": "^1.0.2",
 		"eventemitter3": "^4.0.7",
 		"fuzzysort": "^2.0.1",
+		"ical-js-parser": "^0.7.0",
 		"mobx": "^6.5.0",
 		"mobx-react": "^7.4.0",
 		"react": "^17.0.2",

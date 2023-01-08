@@ -12,6 +12,9 @@ import { useNav } from '../utils/navigate';
 import moment from 'moment';
 import mailList from '../stores/MailList';
 import { IMessageDecodedContent } from '../indexedDB/MessagesDB';
+import { CalendarOutlined } from '@ant-design/icons';
+import { parseEventFileString } from '../utils/eventFileString';
+import CollapsedText from '../components/CollapsedText/CollapsedText';
 import { Button } from 'antd';
 import { Blockie } from '../controls/Blockie';
 import { AdaptiveAddress } from '../controls/AdaptiveAddress';
@@ -42,7 +45,7 @@ const MailDetail = observer(() => {
 		mailList.decodeMessage(message);
 	};
 
-	const data = (() => {
+	const rawData = (() => {
 		// console.log('decoded.decodedTextData: ', decoded.decodedTextData);
 		if (typeof decoded?.decodedTextData === 'string') {
 			return {
@@ -52,6 +55,33 @@ const MailDetail = observer(() => {
 			return { blocks: toJS(decoded?.decodedTextData?.blocks) };
 		}
 	})();
+
+	const { data, eventData } = (() => {
+		if (!Array.isArray(rawData.blocks)) {
+			return { data: rawData, eventData: undefined };
+		}
+
+		const eventFileBlockIndex = rawData.blocks.findIndex((item: { data: { text: string }, type: string }) => {
+			return item.type === 'calendarEvent';
+		});
+
+		if (eventFileBlockIndex < 0) {
+			return { data: rawData, eventData: undefined };
+		}
+
+		const eventFileData = parseEventFileString(rawData.blocks[eventFileBlockIndex].data.text);
+		rawData.blocks.splice(eventFileBlockIndex, 1);
+
+
+		return {
+			data: rawData, eventData: eventFileData
+		};
+
+	})();
+
+	const downloadUrl = URL.createObjectURL(new Blob([eventData?.originalFile || ''], {
+		type: "text/plain;charset=utf-8"
+	}));
 
 	const replyClickHandler = () => {
 		mailbox.to = message.msg.senderAddress
@@ -137,6 +167,38 @@ const MailDetail = observer(() => {
 						<div className="mail-date">{moment.unix(message.msg.createdAt).format('HH:mm DD.MM.YYYY')}</div>
 					</div>
 				</div>
+				{eventData && <div className='event-box'>
+					<h3 className='font-bold'>
+						<span style={{ verticalAlign: 'bottom' }}>
+							<CalendarOutlined style={{ fontSize: '22px' }} />
+						</span> {eventData?.summary}
+					</h3>
+					<a href={downloadUrl} rel="noreferrer noopener" target={'_blank'} download={'invite.ics'}>Download invite</a>
+					<div className='event-box-details'>
+						<table>
+							<tbody>
+								<tr>
+									<td className='event-box-label font-bold'>Start</td>
+									<td>{eventData?.start}</td>
+									<td className='event-box-label font-bold'>End</td>
+									<td>{eventData?.end}</td>
+								</tr>
+								<tr>
+									<td className='event-box-label font-bold'>Where</td>
+									<td>{eventData?.location}</td>
+									<td className='event-box-label font-bold'>Who</td>
+									<td>{eventData?.attendees}</td>
+								</tr>
+								<tr>
+									<td className='event-box-label font-bold'>Description</td>
+									<td style={{whiteSpace: 'pre-line'}} colSpan={3}>
+										<CollapsedText text={eventData?.description || ''} collapseCount={250} />
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>}
 				<div className="mail-body" style={{ minHeight: 370 }}>
 					{data.blocks ? (
 						<ReactEditorJS
