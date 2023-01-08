@@ -82,7 +82,12 @@ const MailDetailsPageInner = observer(({ message }: MailDetailsPageInnerProps) =
 	};
 
 	return (
-		<GenericLayout>
+		<GenericLayout
+			mobileTopButtonProps={{
+				text: '‹ Return to Mailbox',
+				link: `/mail/${mailList.activeFolderId || FolderId.Inbox}`,
+			}}
+		>
 			<div className="mail-page animated fadeInRight">
 				<div className="mail-top">
 					<div className="mail-header">

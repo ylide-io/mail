@@ -18,7 +18,7 @@ export const MailboxPage = () => {
 	}, [folderId, search]);
 
 	return (
-		<GenericLayout>
+		<GenericLayout mobileTopButtonProps={{ text: 'Compose Mail', link: '/mail/compose' }}>
 			<div className="mailbox-page animated fadeInRight">
 				<MailboxHeader />
 				<MailboxList />
