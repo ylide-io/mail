@@ -30,9 +30,6 @@ const MailDetailsPageInner = observer(({ message }: MailDetailsPageInnerProps) =
 	const decoded: IMessageDecodedContent | undefined = decodedMessagesById[message.msgId];
 	const contact = contacts.contactsByAddress[message.msg.senderAddress || '-1'];
 
-	console.log('decoded: ', decoded);
-	console.log('message: ', message);
-
 	useEffect(() => {
 		(async () => {
 			if (!decoded) {
@@ -41,10 +38,6 @@ const MailDetailsPageInner = observer(({ message }: MailDetailsPageInnerProps) =
 			await markMessagesAsReaded([message.id]);
 		})();
 	}, [decodeMessage, decoded, markMessagesAsReaded, message]);
-
-	const encodedMessageClickHandler = () => {
-		decodeMessage(message);
-	};
 
 	const data = useMemo(
 		() => ({
@@ -138,27 +131,13 @@ const MailDetailsPageInner = observer(({ message }: MailDetailsPageInnerProps) =
 					</div>
 				</div>
 				<div className="mail-body" style={{ minHeight: 370 }}>
-					{data.blocks ? (
+					{data.blocks && (
 						<ReactEditorJS
 							tools={EDITOR_JS_TOOLS}
 							readOnly={true}
 							//@ts-ignore
 							data={data}
 						/>
-					) : (
-						<div
-							onClick={encodedMessageClickHandler}
-							style={
-								!decoded
-									? {
-											filter: 'blur(5px)',
-											cursor: 'pointer',
-									  }
-									: {}
-							}
-						>
-							Message is not decoded yet
-						</div>
 					)}
 				</div>
 				<div className="mail-footer">
