@@ -62,7 +62,11 @@ interface UseMailListProps {
 	filter?: (m: ILinkedMessage) => boolean;
 }
 
-export function useMailList({ folderId, sender, filter }: UseMailListProps) {
+export function useMailList(props?: UseMailListProps) {
+	const folderId = props?.folderId;
+	const sender = props?.sender;
+	const filter = props?.filter;
+
 	const readingSession = useMailStore(state => state.readingSession);
 
 	const accountSourceMatch = useMemo(
@@ -104,6 +108,8 @@ export function useMailList({ folderId, sender, filter }: UseMailListProps) {
 	);
 
 	useEffect(() => {
+		if (!folderId) return;
+
 		console.log(`build stream`);
 		let isDestroyed = false;
 

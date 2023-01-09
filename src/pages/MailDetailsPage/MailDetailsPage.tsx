@@ -1,7 +1,7 @@
 import { toJS } from 'mobx';
 import { observer } from 'mobx-react';
 import moment from 'moment';
-import React, { useEffect, useMemo } from 'react';
+import React, { useCallback, useEffect, useMemo } from 'react';
 import { createReactEditorJS } from 'react-editor-js';
 import { useParams } from 'react-router-dom';
 
@@ -13,7 +13,7 @@ import { IMessageDecodedContent } from '../../indexedDB/MessagesDB';
 import { GenericLayout } from '../../layouts/GenericLayout';
 import contacts from '../../stores/Contacts';
 import mailbox from '../../stores/Mailbox';
-import { FolderId, useMailStore } from '../../stores/MailList';
+import { FolderId, ILinkedMessage, useMailList, useMailStore } from '../../stores/MailList';
 import { EDITOR_JS_TOOLS } from '../../utils/editorJs';
 import { useNav } from '../../utils/navigate';
 
@@ -23,7 +23,8 @@ export const MailDetailsPage = observer(() => {
 	const navigate = useNav();
 	const { id } = useParams();
 
-	const { lastActiveFolderId, decodedMessagesById, markMessagesAsDeleted, lastMessagesList } = useMailStore();
+	const { lastActiveFolderId, lastMessagesList, decodedMessagesById, deletedMessageIds, markMessagesAsDeleted } =
+		useMailStore();
 
 	const message = lastMessagesList.find(m => m.id === id!);
 	const decoded: IMessageDecodedContent | undefined = message && decodedMessagesById[message.msgId];
@@ -34,6 +35,25 @@ export const MailDetailsPage = observer(() => {
 			navigate(`/mail/${FolderId.Inbox}`);
 		}
 	}, [decoded, message, navigate]);
+
+	const threadFilter = useCallback(
+		(m: ILinkedMessage) => {
+			const { id, recipient } = m;
+			const isDeleted = deletedMessageIds[recipient?.account.address || 'null']?.has(id);
+			return !isDeleted;
+		},
+		[deletedMessageIds],
+	);
+
+	const { messages } = useMailList(
+		lastActiveFolderId === FolderId.Inbox && message?.msg.senderAddress
+			? {
+					folderId: FolderId.Inbox,
+					sender: message?.msg.senderAddress,
+					filter: threadFilter,
+			  }
+			: undefined,
+	);
 
 	const data = useMemo(
 		() => ({
