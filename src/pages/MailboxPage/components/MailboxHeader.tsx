@@ -76,7 +76,7 @@ export const MailboxHeader = observer(
 						</Tooltip>
 					)}
 
-					{folderId !== FolderId.Sent && (
+					{folderId === FolderId.Inbox && (
 						<Tooltip title="Archive mails">
 							<ActionButton
 								onClick={() => onDeleteClick()}
