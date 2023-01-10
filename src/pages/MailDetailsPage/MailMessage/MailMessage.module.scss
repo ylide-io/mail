@@ -1,0 +1,51 @@
+.root {
+	display: grid;
+	grid-template-columns: 48px 1fr auto;
+	grid-template-rows: auto auto 1fr;
+	grid-column-gap: 16px;
+	grid-row-gap: 8px;
+	align-items: center;
+	padding: 24px;
+}
+
+.avatar {
+	align-self: start;
+	grid-row: 1/4;
+	margin: 4px 0;
+	width: 48px;
+	height: 48px;
+}
+
+.title {
+	font-size: 20px;
+}
+
+.actions {
+	justify-self: end;
+	display: grid;
+	grid-auto-flow: column;
+	grid-gap: 4px;
+}
+
+.sender {
+	display: grid;
+	grid-template-columns: auto 1fr;
+	grid-gap: 8px;
+	align-items: center;
+}
+
+.date {
+	justify-self: end;
+	color: var(--secondary-text-color);
+}
+
+.body {
+	align-self: start;
+	margin: 32px 0 0;
+	font-size: 16px;
+	line-height: 1.5;
+
+	:global(.codex-editor__redactor) {
+		padding: 0 !important;
+	}
+}

@@ -1,0 +1,25 @@
+.layout {
+	padding: 0 !important;
+}
+
+.root {
+	flex-grow: 1;
+	display: flex;
+	flex-direction: column;
+}
+
+.messageWrapper {
+	flex-grow: 1;
+	flex-basis: 0;
+	overflow-y: auto;
+}
+
+.footer {
+	display: grid;
+	grid-auto-flow: column;
+	grid-gap: 8px;
+	align-items: center;
+	justify-content: end;
+	padding: 20px;
+	border-top: 1px solid #e0e0e0;
+}

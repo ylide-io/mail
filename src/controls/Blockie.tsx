@@ -1,12 +1,18 @@
 import makeBlockie from 'ethereum-blockies-base64';
 import { useEffect, useState } from 'react';
 
-export function Blockie({ address, ...rest }: { address: string } & any) {
+import { WithClassNameProps } from '../components/WithClassNameProps';
+
+interface BlockieProps extends WithClassNameProps {
+	address: string;
+}
+
+export function Blockie({ className, address }: BlockieProps) {
 	const [url, setUrl] = useState('');
 
 	useEffect(() => {
 		setUrl(makeBlockie(address));
 	}, [address]);
 
-	return <img src={url} alt="Blockie img" style={{ borderRadius: '50%', border: '1px solid white' }} {...rest} />;
+	return <img className={className} src={url} alt="Blockie img" style={{ borderRadius: '50%' }} />;
 }

@@ -1,25 +1,17 @@
-import { toJS } from 'mobx';
-import { observer } from 'mobx-react';
-import moment from 'moment';
-import React, { useCallback, useEffect, useMemo } from 'react';
-import { createReactEditorJS } from 'react-editor-js';
+import React, { useCallback, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 
-import { ActionButton, ActionButtonStyle } from '../../components/ActionButton/ActionButton';
+import { ActionButton } from '../../components/ActionButton/ActionButton';
 import { smallButtonIcons } from '../../components/smallButton/smallButton';
-import { AdaptiveAddress } from '../../controls/AdaptiveAddress';
-import { Blockie } from '../../controls/Blockie';
 import { IMessageDecodedContent } from '../../indexedDB/MessagesDB';
 import { GenericLayout } from '../../layouts/GenericLayout';
-import contacts from '../../stores/Contacts';
 import mailbox from '../../stores/Mailbox';
 import { FolderId, ILinkedMessage, useMailList, useMailStore } from '../../stores/MailList';
-import { EDITOR_JS_TOOLS } from '../../utils/editorJs';
 import { useNav } from '../../utils/navigate';
+import css from './MailDetailsPage.module.scss';
+import { MailMessage } from './MailMessage/MailMessage';
 
-const ReactEditorJS = createReactEditorJS();
-
-export const MailDetailsPage = observer(() => {
+export const MailDetailsPage = () => {
 	const navigate = useNav();
 	const { id } = useParams();
 
@@ -28,7 +20,6 @@ export const MailDetailsPage = observer(() => {
 
 	const message = lastMessagesList.find(m => m.id === id!);
 	const decoded: IMessageDecodedContent | undefined = message && decodedMessagesById[message.msgId];
-	const contact = contacts.contactsByAddress[message?.msg.senderAddress || '-1'];
 
 	useEffect(() => {
 		if (!message || !decoded) {
@@ -55,17 +46,7 @@ export const MailDetailsPage = observer(() => {
 			: undefined,
 	);
 
-	const data = useMemo(
-		() => ({
-			blocks:
-				typeof decoded?.decodedTextData === 'string'
-					? JSON.parse(decoded.decodedTextData).blocks
-					: toJS(decoded?.decodedTextData?.blocks),
-		}),
-		[decoded?.decodedTextData],
-	);
-
-	const replyClickHandler = () => {
+	const onReplyClick = () => {
 		mailbox.to = message!.msg.senderAddress
 			? [
 					{
@@ -81,94 +62,44 @@ export const MailDetailsPage = observer(() => {
 		navigate('/mail/compose');
 	};
 
-	const forwardClickHandler = () => {
+	const onForwardClick = () => {
 		mailbox.textEditorData = decoded?.decodedTextData || '';
 		mailbox.subject = decoded?.decodedSubject || '';
 		navigate('/mail/compose');
 	};
 
-	const deleteHandler = () => {
+	const onDeleteClick = () => {
 		markMessagesAsDeleted([message!]);
-		navigate(`/${lastActiveFolderId}`);
+		navigate(`/mail/${lastActiveFolderId}`);
 	};
 
 	return (
 		<GenericLayout
+			mainClass={css.layout}
 			mobileTopButtonProps={{
 				text: '‹ Return to Mailbox',
 				link: `/mail/${lastActiveFolderId}`,
 			}}
 		>
 			{message && decoded && (
-				<div className="mail-page animated fadeInRight">
-					<div className="mail-top">
-						<div className="mail-header">
-							<h2 className="mailbox-title">
-								{decoded ? decoded.decodedSubject || 'View Message' : 'View Message'}
-							</h2>
-							<div className="mail-actions">
-								<ActionButton
-									onClick={replyClickHandler}
-									icon={<i className={`fa ${smallButtonIcons.reply}`} />}
-								>
-									Reply
-								</ActionButton>
+				<div className={css.root}>
+					<div className={css.messageWrapper}>
+						<MailMessage
+							message={message}
+							decoded={decoded}
+							onReplyClick={onReplyClick}
+							onForwardClick={onForwardClick}
+							onDeleteClick={onDeleteClick}
+						/>
+					</div>
 
-								<ActionButton
-									style={ActionButtonStyle.Dengerous}
-									onClick={deleteHandler}
-									icon={<i className={`fa ${smallButtonIcons.trash}`} />}
-								>
-									Archive
-								</ActionButton>
-							</div>
-						</div>
-						<div className="mail-meta">
-							<div className="mail-params">
-								<div className="mmp-row">
-									<div className="mmp-row-title mmp-from">Sender:</div>
-									<div className="mmp-row-value">
-										{contact ? (
-											<div className="mail-contact-name">{contact.name}</div>
-										) : (
-											<div className="mail-sender">
-												<Blockie
-													className="mail-sender-blockie"
-													address={message.msg.senderAddress}
-												/>{' '}
-												<div className="mail-sender-address">
-													<AdaptiveAddress address={message.msg.senderAddress} />
-												</div>
-											</div>
-										)}
-									</div>
-								</div>
-							</div>
-							<div className="mail-date">
-								{moment.unix(message.msg.createdAt).format('HH:mm DD.MM.YYYY')}
-							</div>
-						</div>
-					</div>
-					<div className="mail-body" style={{ minHeight: 370 }}>
-						{data.blocks && (
-							<ReactEditorJS
-								tools={EDITOR_JS_TOOLS}
-								readOnly={true}
-								//@ts-ignore
-								data={data}
-							/>
-						)}
-					</div>
-					<div className="mail-footer">
-						<ActionButton
-							onClick={replyClickHandler}
-							icon={<i className={`fa ${smallButtonIcons.reply}`} />}
-						>
+					<div className={css.footer}>
+						<ActionButton onClick={onReplyClick} icon={<i className={`fa ${smallButtonIcons.reply}`} />}>
 							Reply
 						</ActionButton>
 
 						<ActionButton
-							onClick={forwardClickHandler}
+							onClick={onForwardClick}
 							icon={<i className={`fa ${smallButtonIcons.forward}`} />}
 						>
 							Forward
@@ -178,4 +109,4 @@ export const MailDetailsPage = observer(() => {
 			)}
 		</GenericLayout>
 	);
-});
+};
