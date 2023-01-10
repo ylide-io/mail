@@ -6,6 +6,7 @@ import { useLocation } from 'react-router-dom';
 import Header from '../components/Header/Header';
 import { LinkButton } from '../components/Sidebar/LinkButton';
 import SidebarMenu from '../components/Sidebar/SidebarMenu';
+import { TransactionPopup } from '../components/TransactionPopup/TransactionPopup';
 import mailList, { FolderId } from '../stores/MailList';
 import css from './GenericLayout.module.scss';
 
@@ -50,8 +51,10 @@ export const GenericLayout: React.FC<GenericLayoutProps> = observer(({ children,
 	}, []);
 
 	return (
+		// domain.txPlateVisible
 		<div className={css.root}>
 			<Header />
+			{true ? <TransactionPopup /> : null}
 			<div className={css.main}>
 				<SidebarMenu />
 

@@ -126,7 +126,7 @@ const Header = observer(() => {
 							setShowQuest3(false);
 							localStorage.setItem('quest3', 'false');
 							AlertModal.show(
-								'Ylide $2,000 giveaway on Quest3',
+								'Ylide $1,000 giveaway on Quest3',
 								'',
 								<div style={{ fontSize: 14, marginTop: 20 }}>
 									Hey there,

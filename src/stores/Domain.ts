@@ -71,6 +71,11 @@ export class Domain {
 
 	ylide: Ylide = new Ylide(this.keystore);
 
+	@observable txChain: 'fantom' | 'gnosis' | 'polygon' = 'polygon';
+	@observable txPlateVisible: boolean = false;
+	@observable isTxPublishing: boolean = false;
+	@observable publishingTxHash: string = '';
+
 	@observable devMode = false; //document.location.href.includes('localhost');
 
 	@observable security: 'none' | 'encrypted' = 'none';

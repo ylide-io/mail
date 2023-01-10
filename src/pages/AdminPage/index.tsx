@@ -21,7 +21,7 @@ export class AdminPage extends PureComponent {
 	@observable changingBonucesRegistryV5 = false;
 	@observable registryV5Address = '';
 
-	selectedChain: EVMNetwork.GNOSIS | EVMNetwork.POLYGON | EVMNetwork.FANTOM = EVMNetwork.FANTOM;
+	selectedChain: EVMNetwork.GNOSIS | EVMNetwork.POLYGON | EVMNetwork.FANTOM = EVMNetwork.POLYGON;
 
 	@autobind
 	async deployRegistryV5() {
@@ -47,15 +47,37 @@ export class AdminPage extends PureComponent {
 	@autobind
 	async changeBonucerRegistryV5() {
 		this.changingBonucerRegistryV5 = true;
-		console.log(
-			'result: ',
-			await (domain.walletControllers.evm.metamask as EthereumWalletController).setBonucer(
-				this.selectedChain,
-				'0x15a33D60283e3D20751D6740162D1212c1ad2a2d'.toLowerCase(),
-				'0xEbe8aab1C6d379D566e28fE4bC3fafcA79Ba3cFF'.toLowerCase(),
-				true,
-			),
-		);
+		const sb = async (a: string) =>
+			console.log(
+				'result: ',
+				await (domain.walletControllers.evm.metamask as EthereumWalletController).setBonucer(
+					this.selectedChain,
+					'0x15a33D60283e3D20751D6740162D1212c1ad2a2d'.toLowerCase(),
+					a.toLowerCase(),
+					true,
+				),
+			);
+
+		// await sb('0x2D15daF82b187f022348456ae4fbF4ffe40f1F72');
+		// await sb('0x0C386867628470786A90fd88809dAfb7ca1d3173');
+		// await sb('0x5D929f09db6E328fbE08f032AA6A784925bFCC35');
+		// await sb('0x157C7280d709CF24f52786Cd9A5aEC429c3b92cF');
+		// await sb('0xef26583C8C53B92fA1F052bE8ef23b896680Be51');
+		// await sb('0x9CEc8BFc69F890BAfeF7E6Cca091a10449618b6f');
+		// await sb('0xC5741b5Fe4a9a4899fb35B4884a55933541b0Ec4');
+		// await sb('0xd143358374AE027d82ed8176F6192e09fFaA9Ce6');
+		// await sb('0x76Fdf77758C5A0579809417C44555Cdc623345d4');
+		// await sb('0x1855A04623511B5bE555CaD56D4532D873cF6700');
+		// await sb('0x85E1438bAa18c9C0aFC4F5e54ff88F4a271AD337');
+		// await sb('0x0EB0a61A6aD78911A38F1b33BA94f65f3C3eB633');
+		// await sb('0x739C62cDC2dC3Cf4639E00d3f327fD48987C7221');
+		// await sb('0xD079915b8EB369C889fDFa6A3CAb29e7A0407efe');
+		// await sb('0x1888f1d499604316F96Ee5E8cEe03D5a2Ac0A702');
+		// await sb('0x58C8fa5806C27D9fC7363951686F615dB54C096f');
+		// await sb('0x1F094c8719F777D2543Db6744cE12df9B7466414');
+		// await sb('0xEAe0a0C374933dbCd3bC882c0e2a74F922849bD6');
+		// await sb('0x0F65679859bE0CAF3Cda34eBb8eB6eD80aa66A8F');
+
 		this.changingBonucerRegistryV5 = false;
 	}
 

@@ -2,8 +2,8 @@ import { observer } from 'mobx-react';
 import React, { useEffect } from 'react';
 import { Navigate, Route, Routes, useLocation } from 'react-router-dom';
 
+import { TransactionPopup } from './components/TransactionPopup/TransactionPopup';
 import { Loader } from './controls/Loader';
-import AlertModal from './modals/AlertModal';
 import { AdminPage } from './pages/AdminPage';
 import { ComposePage } from './pages/ComposePage/ComposePage';
 import { ContactsTab } from './pages/ContactsPage/components/Contacts/ContactsTab';
@@ -71,11 +71,14 @@ const App = observer(() => {
 		);
 	}
 
+	const canSkipRegistration = localStorage.getItem('can_skip_registration') === 'true';
+
 	if (
 		domain.accounts.isFirstTime &&
 		location.pathname !== '/test' &&
 		location.pathname !== '/wallets' &&
-		location.pathname !== '/admin'
+		location.pathname !== '/admin' &&
+		(!location.pathname.startsWith('/feed/') || !canSkipRegistration)
 	) {
 		return <Navigate to={`/wallets${location.search ? location.search : ''}`} state={{ from: location }} replace />;
 	}

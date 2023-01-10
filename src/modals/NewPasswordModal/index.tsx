@@ -148,11 +148,20 @@ export default class NewPasswordModal extends PureComponent<NewPasswordModalProp
 	@observable pleaseWait = false;
 
 	async publishThroughFaucet(account: DomainAccount, faucetType: 'polygon' | 'gnosis' | 'fantom', bonus: boolean) {
+		localStorage.setItem('can_skip_registration', 'true');
 		console.log('public key: ', '0x' + new SmartBuffer(account.key.keypair.publicKey).toHexString());
 		this.step = 1;
 		const signature = await this.requestFaucetSignature(account);
 		this.pleaseWait = true;
-		const response = await fetch(`https://faucet.ylide.io/${faucetType}`, {
+		domain.isTxPublishing = true;
+		analytics.walletRegistered(
+			this.props.wallet.factory.wallet,
+			account.account.address,
+			domain.accounts.accounts.length,
+		);
+		domain.txChain = faucetType;
+		domain.txPlateVisible = true;
+		fetch(`https://faucet.ylide.io/${faucetType}`, {
 			method: 'POST',
 			body: JSON.stringify({
 				address: account.account.address.toLowerCase(),
@@ -164,26 +173,33 @@ export default class NewPasswordModal extends PureComponent<NewPasswordModalProp
 				_s: signature.s,
 				_v: signature.v,
 			}),
-		});
-		const result = await response.json();
-		if (result && result.data && result.data.txHash) {
-			await asyncDelay(7000);
-			await account.init();
-			analytics.walletRegistered(
-				this.props.wallet.factory.wallet,
-				account.account.address,
-				domain.accounts.accounts.length,
-			);
-			this.step = 5;
-		} else {
-			if (result.error === 'Already exists') {
-				alert(
-					`Your address has been already registered or the previous transaction is in progress. Please try connecting another address or wait for transaction to finalize (1-2 minutes).`,
-				);
-				return;
-			}
-			alert('Something went wrong with key publishing :(\n\n' + JSON.stringify(result, null, '\t'));
-		}
+		})
+			.then(response => response.json())
+			.then(async result => {
+				if (result && result.data && result.data.txHash) {
+					await asyncDelay(20000);
+					await account.init();
+					domain.publishingTxHash = result.data.txHash;
+					domain.isTxPublishing = false;
+				} else {
+					domain.isTxPublishing = false;
+					if (result.error === 'Already exists') {
+						alert(
+							`Your address has been already registered or the previous transaction is in progress. Please try connecting another address or wait for transaction to finalize (1-2 minutes).`,
+						);
+						document.location.href = '/wallets';
+						return;
+					}
+					alert('Something went wrong with key publishing :(\n\n' + JSON.stringify(result, null, '\t'));
+					document.location.href = '/wallets';
+					return;
+				}
+			})
+			.catch(err => {
+				domain.isTxPublishing = false;
+				domain.txPlateVisible = false;
+			});
+		this.step = 5;
 	}
 
 	async publishLocalKey(account: DomainAccount) {
