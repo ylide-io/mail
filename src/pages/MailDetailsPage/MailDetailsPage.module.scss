@@ -1,3 +1,9 @@
+.secondaryText {
+	color: var(--secondary-text-color);
+}
+
+//
+
 .layout {
 	padding: 0 !important;
 }
@@ -18,10 +24,37 @@
 	border-radius: 10px 10px 0 0;
 }
 
+.headerSpinner {
+	margin: 0 4px 0 0;
+}
+
+.messagesFrom {
+	display: grid;
+	grid-template-columns: auto 1fr;
+	grid-gap: 4px;
+	align-items: center;
+	min-width: 400px;
+	white-space: nowrap;
+}
+
 .messageWrapper {
 	flex-grow: 1;
 	flex-basis: 0;
 	overflow-y: auto;
+}
+
+.messageThreadItem {
+	padding: 24px 0;
+	border-bottom: 1px solid var(--border-color);
+
+	&:first-child {
+		padding-top: 0;
+	}
+
+	&:last-child {
+		padding-bottom: 64px;
+		border: 0;
+	}
 }
 
 .footer {

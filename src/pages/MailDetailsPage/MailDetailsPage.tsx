@@ -1,8 +1,10 @@
-import React, { useCallback, useEffect } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useParams } from 'react-router-dom';
 
 import { ActionButton } from '../../components/ActionButton/ActionButton';
 import { smallButtonIcons } from '../../components/smallButton/smallButton';
+import { Spinner } from '../../components/spinner/spinner';
+import { AdaptiveAddress } from '../../controls/AdaptiveAddress';
 import { IMessageDecodedContent } from '../../indexedDB/MessagesDB';
 import { GenericLayout } from '../../layouts/GenericLayout';
 import mailbox from '../../stores/Mailbox';
@@ -15,7 +17,8 @@ export const MailDetailsPage = () => {
 	const navigate = useNav();
 	const { folderId, id } = useParams();
 
-	const { lastMessagesList, decodedMessagesById, deletedMessageIds, markMessagesAsDeleted } = useMailStore();
+	const { lastMessagesList, decodedMessagesById, deletedMessageIds, markMessagesAsDeleted, decodeMessage } =
+		useMailStore();
 
 	const message = lastMessagesList.find(m => m.id === id!);
 	const decoded: IMessageDecodedContent | undefined = message && decodedMessagesById[message.msgId];
@@ -26,6 +29,10 @@ export const MailDetailsPage = () => {
 		}
 	}, [decoded, folderId, message, navigate]);
 
+	//
+
+	const canLoadThread = folderId === FolderId.Inbox && message?.msg.senderAddress;
+
 	const threadFilter = useCallback(
 		(m: ILinkedMessage) => {
 			const { id, recipient } = m;
@@ -35,8 +42,13 @@ export const MailDetailsPage = () => {
 		[deletedMessageIds],
 	);
 
-	const { messages } = useMailList(
-		folderId === FolderId.Inbox && message?.msg.senderAddress
+	const {
+		messages: threadMessages,
+		isLoading,
+		isNextPageAvailable,
+		loadNextPage,
+	} = useMailList(
+		canLoadThread
 			? {
 					folderId: FolderId.Inbox,
 					sender: message?.msg.senderAddress,
@@ -45,36 +57,66 @@ export const MailDetailsPage = () => {
 			: undefined,
 	);
 
+	const [isLoadingThread, setLoadingThread] = useState(canLoadThread);
+	const isThreadDecodedRef = useRef(false);
+
+	useEffect(() => {
+		if (isThreadDecodedRef.current) return;
+
+		if (!isNextPageAvailable) {
+			isThreadDecodedRef.current = true;
+
+			(async () => {
+				for (const m of threadMessages) {
+					console.log('decodeMessage');
+					await decodeMessage(m);
+				}
+
+				setLoadingThread(false);
+			})();
+		} else if (!isLoading) {
+			loadNextPage();
+		}
+	}, [decodeMessage, isLoading, isNextPageAvailable, loadNextPage, threadMessages]);
+
+	const [isShowingThread, setShowingThread] = useState(false);
+
+	const onShowThreadClick = () => {
+		setShowingThread(true);
+	};
+
+	//
+
 	const onBackClick = () => {
 		navigate(`/mail/${folderId}`);
 	};
 
-	const onReplyClick = () => {
-		mailbox.to = message!.msg.senderAddress
-			? [
-					{
-						type: 'address',
-						loading: false,
-						isAchievable: null,
-						input: message!.msg.senderAddress,
-						address: message!.msg.senderAddress,
-					},
-			  ]
-			: [];
-		mailbox.subject = decoded?.decodedSubject || '';
+	const onReplyClick = (senderAddress: string, subject: string | null) => {
+		mailbox.to = [
+			{
+				type: 'address',
+				loading: false,
+				isAchievable: null,
+				input: senderAddress,
+				address: senderAddress,
+			},
+		];
+		mailbox.subject = subject || '';
 		navigate('/mail/compose');
 	};
 
-	const onForwardClick = () => {
-		mailbox.textEditorData = decoded?.decodedTextData || '';
-		mailbox.subject = decoded?.decodedSubject || '';
+	const onForwardClick = (decodedTextData: any | null, subject: string | null) => {
+		mailbox.textEditorData = decodedTextData || '';
+		mailbox.subject = subject || '';
 		navigate('/mail/compose');
 	};
 
-	const onDeleteClick = () => {
-		markMessagesAsDeleted([message!]);
+	const onDeleteClick = (m: ILinkedMessage) => {
+		markMessagesAsDeleted([m]);
 		navigate(`/mail/${folderId}`);
 	};
+
+	//
 
 	return (
 		<GenericLayout
@@ -91,30 +133,68 @@ export const MailDetailsPage = () => {
 							onClick={onBackClick}
 							icon={<i className={`fa ${smallButtonIcons.backward}`} />}
 						/>
+
+						{isLoadingThread ? (
+							<Spinner className={css.headerSpinner} />
+						) : isShowingThread ? (
+							<div className={css.messagesFrom}>
+								<div className={css.secondaryText}>Messages from</div>
+								<AdaptiveAddress address={message.msg.senderAddress} />
+							</div>
+						) : (
+							threadMessages.length > 1 && (
+								<ActionButton onClick={onShowThreadClick}>
+									{threadMessages.length} messages from this sender
+								</ActionButton>
+							)
+						)}
 					</div>
 
 					<div className={css.messageWrapper}>
-						<MailMessage
-							message={message}
-							decoded={decoded}
-							onReplyClick={onReplyClick}
-							onForwardClick={onForwardClick}
-							onDeleteClick={onDeleteClick}
-						/>
+						{isShowingThread ? (
+							threadMessages.map(m => {
+								const d = decodedMessagesById[m.msgId];
+
+								return (
+									<div className={css.messageThreadItem}>
+										<MailMessage
+											message={m}
+											decoded={d}
+											onReplyClick={() => onReplyClick(m.msg.senderAddress, d.decodedSubject)}
+											onForwardClick={() => onForwardClick(d.decodedTextData, d.decodedSubject)}
+											onDeleteClick={() => onDeleteClick(m)}
+										/>
+									</div>
+								);
+							})
+						) : (
+							<MailMessage
+								message={message}
+								decoded={decoded}
+								onReplyClick={() => onReplyClick(message.msg.senderAddress, decoded.decodedSubject)}
+								onForwardClick={() => onForwardClick(decoded.decodedTextData, decoded.decodedSubject)}
+								onDeleteClick={() => onDeleteClick(message)}
+							/>
+						)}
 					</div>
 
-					<div className={css.footer}>
-						<ActionButton onClick={onReplyClick} icon={<i className={`fa ${smallButtonIcons.reply}`} />}>
-							Reply
-						</ActionButton>
+					{isShowingThread || (
+						<div className={css.footer}>
+							<ActionButton
+								onClick={() => onReplyClick(message.msg.senderAddress, decoded.decodedSubject)}
+								icon={<i className={`fa ${smallButtonIcons.reply}`} />}
+							>
+								Reply
+							</ActionButton>
 
-						<ActionButton
-							onClick={onForwardClick}
-							icon={<i className={`fa ${smallButtonIcons.forward}`} />}
-						>
-							Forward
-						</ActionButton>
-					</div>
+							<ActionButton
+								onClick={() => onForwardClick(decoded.decodedTextData, decoded.decodedSubject)}
+								icon={<i className={`fa ${smallButtonIcons.forward}`} />}
+							>
+								Forward
+							</ActionButton>
+						</div>
+					)}
 				</div>
 			)}
 		</GenericLayout>
