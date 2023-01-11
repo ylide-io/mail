@@ -170,10 +170,19 @@ export const FeedPage = observer(() => {
 	const sourceId = searchParams?.get('sourceId') || null;
 	const navigate = useNav();
 
+	const scrollToTop = useCallback(() => {
+		window.scrollTo({
+			top: 0,
+			behavior: 'smooth',
+		});
+	}, []);
+
 	useEffect(() => {
+		scrollToTop();
+
 		// noinspection JSIgnoredPromiseFromCall
 		feed.loadCategory(category!, sourceId);
-	}, [category, sourceId]);
+	}, [category, scrollToTop, sourceId]);
 
 	useEffect(() => {
 		const timer = setInterval(async () => {
@@ -192,18 +201,11 @@ export const FeedPage = observer(() => {
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [feed.loading, feed.moreAvailable]);
 
-	const scrollToTop = useCallback(() => {
-		window.scrollTo({
-			top: 0,
-			behavior: 'smooth',
-		});
-	}, []);
-
 	const showNewPosts = useCallback(() => {
+		scrollToTop();
+
 		// noinspection JSIgnoredPromiseFromCall
 		feed.loadNew();
-
-		scrollToTop();
 	}, [scrollToTop]);
 
 	let title;
