@@ -4,9 +4,11 @@ import React, { useMemo } from 'react';
 import { createReactEditorJS } from 'react-editor-js';
 
 import { ActionButton, ActionButtonStyle } from '../../../components/ActionButton/ActionButton';
-import { smallButtonIcons } from '../../../components/smallButton/smallButton';
 import { AdaptiveAddress } from '../../../controls/AdaptiveAddress';
 import { Blockie } from '../../../controls/Blockie';
+import { ForwardIcon } from '../../../icons/ForwardIcon';
+import { ReplyIcon } from '../../../icons/ReplyIcon';
+import { TrashIcon } from '../../../icons/TrashIcon';
 import { IMessageDecodedContent } from '../../../indexedDB/MessagesDB';
 import { ILinkedMessage } from '../../../stores/MailList';
 import { EDITOR_JS_TOOLS } from '../../../utils/editorJs';
@@ -40,18 +42,15 @@ export function MailMessage({ message, decoded, onReplyClick, onForwardClick, on
 			<div className={css.title}>{decoded.decodedSubject || 'View Message'}</div>
 
 			<div className={css.actions}>
-				<ActionButton icon={<i className={`fa ${smallButtonIcons.reply}`} />} onClick={() => onReplyClick()}>
+				<ActionButton icon={<ReplyIcon />} onClick={() => onReplyClick()}>
 					Reply
 				</ActionButton>
 
-				<ActionButton
-					icon={<i className={`fa ${smallButtonIcons.forward}`} />}
-					onClick={() => onForwardClick()}
-				/>
+				<ActionButton icon={<ForwardIcon />} onClick={() => onForwardClick()} />
 
 				<ActionButton
 					style={ActionButtonStyle.Dengerous}
-					icon={<i className={`fa ${smallButtonIcons.trash}`} />}
+					icon={<TrashIcon />}
 					onClick={() => onDeleteClick()}
 				/>
 			</div>

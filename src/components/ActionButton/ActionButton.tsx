@@ -26,9 +26,19 @@ export function ActionButton({ children, className, icon, style, onClick, ...pro
 	}[style || ActionButtonStyle.Default];
 
 	return (
-		<button className={clsx(css.root, styleClass, className)} onClick={onClick} {...props}>
+		<button
+			className={clsx(
+				css.root,
+				styleClass,
+				icon != null && css.root_hasIcon,
+				children != null && css.root_hasContent,
+				className,
+			)}
+			onClick={onClick}
+			{...props}
+		>
 			{icon}
-			{children != null && <span>{children}</span>}
+			{children != null && <div className={css.content}>{children}</div>}
 		</button>
 	);
 }

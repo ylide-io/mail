@@ -2,9 +2,12 @@ import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useParams } from 'react-router-dom';
 
 import { ActionButton } from '../../components/ActionButton/ActionButton';
-import { smallButtonIcons } from '../../components/smallButton/smallButton';
 import { Spinner } from '../../components/spinner/spinner';
 import { AdaptiveAddress } from '../../controls/AdaptiveAddress';
+import { BackIcon } from '../../icons/BackIcon';
+import { ContactIcon } from '../../icons/ContactIcon';
+import { ForwardIcon } from '../../icons/ForwardIcon';
+import { ReplyIcon } from '../../icons/ReplyIcon';
 import { IMessageDecodedContent } from '../../indexedDB/MessagesDB';
 import { GenericLayout } from '../../layouts/GenericLayout';
 import mailbox from '../../stores/Mailbox';
@@ -129,10 +132,7 @@ export const MailDetailsPage = () => {
 			{message && decoded && (
 				<div className={css.root}>
 					<div className={css.header}>
-						<ActionButton
-							onClick={onBackClick}
-							icon={<i className={`fa ${smallButtonIcons.backward}`} />}
-						/>
+						<ActionButton onClick={onBackClick} icon={<BackIcon />} />
 
 						{isLoadingThread ? (
 							<Spinner className={css.headerSpinner} />
@@ -143,7 +143,7 @@ export const MailDetailsPage = () => {
 							</div>
 						) : (
 							threadMessages.length > 1 && (
-								<ActionButton onClick={onShowThreadClick}>
+								<ActionButton icon={<ContactIcon />} onClick={onShowThreadClick}>
 									{threadMessages.length} messages from this sender
 								</ActionButton>
 							)
@@ -182,14 +182,14 @@ export const MailDetailsPage = () => {
 						<div className={css.footer}>
 							<ActionButton
 								onClick={() => onReplyClick(message.msg.senderAddress, decoded.decodedSubject)}
-								icon={<i className={`fa ${smallButtonIcons.reply}`} />}
+								icon={<ReplyIcon />}
 							>
 								Reply
 							</ActionButton>
 
 							<ActionButton
 								onClick={() => onForwardClick(decoded.decodedTextData, decoded.decodedSubject)}
-								icon={<i className={`fa ${smallButtonIcons.forward}`} />}
+								icon={<ForwardIcon />}
 							>
 								Forward
 							</ActionButton>

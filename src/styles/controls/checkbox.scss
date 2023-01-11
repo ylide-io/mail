@@ -3,11 +3,12 @@
 	align-items: center;
 	justify-content: center;
 
-	height: 22px;
-	width: 22px;
-	flex: 0 0 22px;
+	height: 18px;
+	width: 18px;
+	flex: 0 0 18px;
 	background-color: #fff;
 	border: 1px solid rgba(33, 37, 41, 0.25);
+	border-radius: 4px;
 	cursor: pointer;
 
 	transition: all 0.3s;
@@ -18,17 +19,5 @@
 
 	&.checked {
 		background-color: #1ab394;
-	}
-
-	@include less720px {
-		height: 18px;
-		width: 18px;
-		flex: 0 0 18px;
-	}
-
-	@include less630px {
-		height: 26px;
-		width: 26px;
-		flex: 0 0 26px;
 	}
 }
