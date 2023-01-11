@@ -161,6 +161,7 @@ export default class NewPasswordModal extends PureComponent<NewPasswordModalProp
 		);
 		domain.txChain = faucetType;
 		domain.txPlateVisible = true;
+		domain.txWithBonus = bonus;
 		fetch(`https://faucet.ylide.io/${faucetType}`, {
 			method: 'POST',
 			body: JSON.stringify({

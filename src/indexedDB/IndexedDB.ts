@@ -77,6 +77,12 @@ export class IndexedDB {
 					description: 'Ylide COO',
 					tags: [1],
 				});
+				contactsStore.add({
+					name: 'team.ylide',
+					address: '0x9Eb187e2b5280c41b1e6723b0F215331a099dc65',
+					description: 'Ylide Team',
+					tags: [1],
+				});
 
 				// ----------------------
 

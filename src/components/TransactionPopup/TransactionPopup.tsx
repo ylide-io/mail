@@ -68,7 +68,19 @@ export const TransactionPopup = observer(() => {
 								/>
 							</svg>
 						</div>
-						<div className={css.central}>Your tokens has been sent</div>
+						<div className={css.central}>
+							{domain.txWithBonus
+								? `Your ${
+										domain.txChain === 'fantom'
+											? '$FTM'
+											: domain.txChain === 'gnosis'
+											? '$xDAI'
+											: domain.txChain === 'polygon'
+											? '$MATIC'
+											: 'tokens'
+								  } has been sent`
+								: `Successfully processed`}
+						</div>
 						<YlideButton
 							nice
 							onClick={() => {
@@ -87,7 +99,19 @@ export const TransactionPopup = observer(() => {
 				) : (
 					<>
 						<div className={css.progress} style={{ width: `${p}%` }}></div>
-						<h4 className={css.header}>Your tokens are on the way</h4>
+						<h4 className={css.header}>
+							{domain.txWithBonus
+								? `Your ${
+										domain.txChain === 'fantom'
+											? '$FTM'
+											: domain.txChain === 'gnosis'
+											? '$xDAI'
+											: domain.txChain === 'polygon'
+											? '$MATIC'
+											: 'tokens'
+								  } are on the way`
+								: `Transaction in progress`}
+						</h4>
 						<div className={css.text}>
 							Transaction is in queue. Please, wait 2-3 minutes for it to be mined.
 						</div>
