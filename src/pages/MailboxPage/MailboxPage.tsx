@@ -3,7 +3,7 @@ import { useLocation, useParams } from 'react-router-dom';
 import AutoSizer from 'react-virtualized-auto-sizer';
 import { FixedSizeList, ListChildComponentProps } from 'react-window';
 
-import { Loader } from '../../controls/Loader';
+import { YlideLoader } from '../../components/ylideLoader/ylideLoader';
 import { GenericLayout } from '../../layouts/GenericLayout';
 import { analytics } from '../../stores/Analytics';
 import domain from '../../stores/Domain';
@@ -128,7 +128,7 @@ export const MailboxPage = () => {
 				<div className="mailbox">
 					{isLoading && !messages.length ? (
 						<div style={{ height: 400 }}>
-							<Loader
+							<YlideLoader
 								reason={`Retrieving your mails from ${
 									Object.keys(domain.blockchains).length
 								} blockchains`}

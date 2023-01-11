@@ -6,8 +6,8 @@ import { observer } from 'mobx-react';
 import { PureComponent } from 'react';
 import QRCode from 'react-qr-code';
 
+import { YlideLoader } from '../../components/ylideLoader/ylideLoader';
 import { supportedWallets, walletsMap } from '../../constants';
-import { Loader } from '../../controls/Loader';
 import { YlideButton } from '../../controls/YlideButton';
 import { CrossIcon } from '../../icons/CrossIcon';
 import domain from '../../stores/Domain';
@@ -451,7 +451,7 @@ export default class SelectWalletModal extends PureComponent<SelectWalletModalPr
 										<div className="wallets-list">
 											{walletConnect.loading ? (
 												<>
-													<Loader />
+													<YlideLoader />
 												</>
 											) : (
 												links
@@ -533,7 +533,7 @@ export default class SelectWalletModal extends PureComponent<SelectWalletModalPr
 								<div className="wallets-list">
 									{walletConnect.loading ? (
 										<>
-											<Loader />
+											<YlideLoader />
 										</>
 									) : (
 										links

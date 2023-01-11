@@ -8,7 +8,7 @@ import { useLocation, useParams } from 'react-router-dom';
 
 import { ActionButton, ActionButtonStyle } from '../../components/ActionButton/ActionButton';
 import { smallButtonIcons } from '../../components/smallButton/smallButton';
-import { Loader } from '../../controls/Loader';
+import { YlideLoader } from '../../components/ylideLoader/ylideLoader';
 import { YlideButton } from '../../controls/YlideButton';
 import { CaretDown } from '../../icons/CaretDown';
 import { discordSourceIcon } from '../../icons/static/discordSourceIcon';
@@ -270,13 +270,13 @@ export const FeedPage = observer(() => {
 
 								{feed.moreAvailable && (
 									<div className={css.feedLastPost} ref={lastPostView}>
-										{feed.loading && <Loader reason="Loading more posts..." />}
+										{feed.loading && <YlideLoader reason="Loading more posts..." />}
 									</div>
 								)}
 							</>
 						) : (
 							<div style={{ marginTop: 30 }}>
-								<Loader reason="Your feed is loading..." />
+								<YlideLoader reason="Your feed is loading..." />
 							</div>
 						)}
 

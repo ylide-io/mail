@@ -2,8 +2,7 @@ import { observer } from 'mobx-react';
 import React, { useEffect } from 'react';
 import { Navigate, Route, Routes, useLocation } from 'react-router-dom';
 
-import { TransactionPopup } from './components/TransactionPopup/TransactionPopup';
-import { Loader } from './controls/Loader';
+import { YlideLoader } from './components/ylideLoader/ylideLoader';
 import { AdminPage } from './pages/AdminPage';
 import { ComposePage } from './pages/ComposePage/ComposePage';
 import { ContactsTab } from './pages/ContactsPage/components/Contacts/ContactsTab';
@@ -66,7 +65,7 @@ const App = observer(() => {
 					textAlign: 'center',
 				}}
 			>
-				<Loader reason="Loading your accounts data from blockchain..." />
+				<YlideLoader reason="Loading your accounts data from blockchain..." />
 			</div>
 		);
 	}
