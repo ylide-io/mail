@@ -34,6 +34,10 @@
 	align-items: center;
 }
 
+.senderLabel {
+	color: var(--secondary-text-color);
+}
+
 .date {
 	justify-self: end;
 	color: var(--secondary-text-color);

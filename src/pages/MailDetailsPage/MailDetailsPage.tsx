@@ -45,6 +45,10 @@ export const MailDetailsPage = () => {
 			: undefined,
 	);
 
+	const onBackClick = () => {
+		navigate(`/mail/${folderId}`);
+	};
+
 	const onReplyClick = () => {
 		mailbox.to = message!.msg.senderAddress
 			? [
@@ -82,6 +86,13 @@ export const MailDetailsPage = () => {
 		>
 			{message && decoded && (
 				<div className={css.root}>
+					<div className={css.header}>
+						<ActionButton
+							onClick={onBackClick}
+							icon={<i className={`fa ${smallButtonIcons.backward}`} />}
+						/>
+					</div>
+
 					<div className={css.messageWrapper}>
 						<MailMessage
 							message={message}

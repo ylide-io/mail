@@ -9,5 +9,6 @@ export enum smallButtonIcons {
 	trash = 'fa-trash-o',
 	restore = 'fa-rotate-left',
 	forward = 'fa-arrow-right',
+	backward = 'fa-arrow-left',
 	arrowLeft = 'fa-arrow-left',
 }

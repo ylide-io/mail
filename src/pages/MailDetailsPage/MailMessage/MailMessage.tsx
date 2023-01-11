@@ -57,7 +57,8 @@ export function MailMessage({ message, decoded, onReplyClick, onForwardClick, on
 			</div>
 
 			<div className={css.sender}>
-				Sender: <AdaptiveAddress address={message.msg.senderAddress} />
+				<div className={css.senderLabel}>Sender:</div>
+				<AdaptiveAddress address={message.msg.senderAddress} />
 			</div>
 
 			<div className={css.date}>{moment.unix(message.msg.createdAt).format('HH:mm DD.MM.YYYY')}</div>
