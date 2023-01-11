@@ -13,19 +13,18 @@ import { MailMessage } from './MailMessage/MailMessage';
 
 export const MailDetailsPage = () => {
 	const navigate = useNav();
-	const { id } = useParams();
+	const { folderId, id } = useParams();
 
-	const { lastActiveFolderId, lastMessagesList, decodedMessagesById, deletedMessageIds, markMessagesAsDeleted } =
-		useMailStore();
+	const { lastMessagesList, decodedMessagesById, deletedMessageIds, markMessagesAsDeleted } = useMailStore();
 
 	const message = lastMessagesList.find(m => m.id === id!);
 	const decoded: IMessageDecodedContent | undefined = message && decodedMessagesById[message.msgId];
 
 	useEffect(() => {
 		if (!message || !decoded) {
-			navigate(`/mail/${FolderId.Inbox}`);
+			navigate(`/mail/${folderId}`);
 		}
-	}, [decoded, message, navigate]);
+	}, [decoded, folderId, message, navigate]);
 
 	const threadFilter = useCallback(
 		(m: ILinkedMessage) => {
@@ -37,7 +36,7 @@ export const MailDetailsPage = () => {
 	);
 
 	const { messages } = useMailList(
-		lastActiveFolderId === FolderId.Inbox && message?.msg.senderAddress
+		folderId === FolderId.Inbox && message?.msg.senderAddress
 			? {
 					folderId: FolderId.Inbox,
 					sender: message?.msg.senderAddress,
@@ -70,7 +69,7 @@ export const MailDetailsPage = () => {
 
 	const onDeleteClick = () => {
 		markMessagesAsDeleted([message!]);
-		navigate(`/mail/${lastActiveFolderId}`);
+		navigate(`/mail/${folderId}`);
 	};
 
 	return (
@@ -78,7 +77,7 @@ export const MailDetailsPage = () => {
 			mainClass={css.layout}
 			mobileTopButtonProps={{
 				text: '‹ Return to Mailbox',
-				link: `/mail/${lastActiveFolderId}`,
+				link: `/mail/${folderId}`,
 			}}
 		>
 			{message && decoded && (
