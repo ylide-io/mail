@@ -42,19 +42,15 @@
 .messageWrapper {
 	flex-grow: 1;
 	flex-basis: 0;
+	padding: 0 0 48px;
 	overflow-y: auto;
 }
 
 .messageThreadItem {
-	padding: 24px 0;
+	padding: 0 0 24px;
 	border-bottom: 1px solid var(--border-color);
 
-	&:first-child {
-		padding-top: 0;
-	}
-
 	&:last-child {
-		padding-bottom: 64px;
 		border: 0;
 	}
 
@@ -62,6 +58,19 @@
 		&:last-child {
 			padding-bottom: 32px;
 		}
+	}
+}
+
+.deletedPlaceholder {
+	display: grid;
+	grid-template-columns: auto 1fr;
+	align-items: center;
+	grid-gap: 8px;
+	padding: 24px 24px 0 88px;
+	color: var(--secondary-text-color);
+
+	@include less720px {
+		padding-left: 24px;
 	}
 }
 

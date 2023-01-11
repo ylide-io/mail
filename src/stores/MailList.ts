@@ -265,8 +265,10 @@ export function useMailList(props?: UseMailListProps) {
 	useEffect(() => {
 		console.log(`loading: check`, isNextPageAvailable, isNeedMore, !!stream, !isLoading);
 		if (isNextPageAvailable && isNeedMore && stream && !stream.paused && !isLoading) {
+			console.log(`loading: start`);
+
 			setLoading(true);
-			console.log(`loading: readMore`);
+
 			stream.readMore(MailPageSize).then(messages => {
 				console.log(`loading: end`);
 				setMessages(messages.map(wrapMessage));

@@ -16,12 +16,23 @@ import { useNav } from '../../utils/navigate';
 import css from './MailDetailsPage.module.scss';
 import { MailMessage } from './MailMessage/MailMessage';
 
+interface WrappedThreadMessage {
+	message: ILinkedMessage;
+	isDeleted: boolean;
+}
+
 export const MailDetailsPage = () => {
 	const navigate = useNav();
 	const { folderId, id } = useParams();
 
-	const { lastMessagesList, decodedMessagesById, deletedMessageIds, markMessagesAsDeleted, decodeMessage } =
-		useMailStore();
+	const {
+		lastMessagesList,
+		decodedMessagesById,
+		deletedMessageIds,
+		markMessagesAsDeleted,
+		markMessagesAsNotDeleted,
+		decodeMessage,
+	} = useMailStore();
 
 	const message = lastMessagesList.find(m => m.id === id!);
 	const decoded: IMessageDecodedContent | undefined = message && decodedMessagesById[message.msgId];
@@ -34,7 +45,10 @@ export const MailDetailsPage = () => {
 
 	//
 
-	const canLoadThread = folderId === FolderId.Inbox && message?.msg.senderAddress;
+	const [needToLoadThread, setNeedToLoadThread] = useState(folderId === FolderId.Inbox && message?.msg.senderAddress);
+	const [isLoadingThread, setLoadingThread] = useState(needToLoadThread);
+	const [isDecodingThread, setDecodingThread] = useState(false);
+	const [isThreadOpen, setThreadOpen] = useState(false);
 
 	const threadFilter = useCallback(
 		(m: ILinkedMessage) => {
@@ -51,7 +65,7 @@ export const MailDetailsPage = () => {
 		isNextPageAvailable,
 		loadNextPage,
 	} = useMailList(
-		canLoadThread
+		needToLoadThread
 			? {
 					folderId: FolderId.Inbox,
 					sender: message?.msg.senderAddress,
@@ -60,30 +74,35 @@ export const MailDetailsPage = () => {
 			: undefined,
 	);
 
-	const [isLoadingThread, setLoadingThread] = useState(canLoadThread);
+	const [wrappedThreadMessages, setWrappedThreadMessages] = useState<WrappedThreadMessage[]>([]);
 
 	useEffect(() => {
 		if (!isNextPageAvailable) {
+			setWrappedThreadMessages(
+				threadMessages.map(it => ({
+					message: it,
+					isDeleted: false,
+				})),
+			);
+
+			setNeedToLoadThread(false);
 			setLoadingThread(false);
 		} else if (!isLoading) {
 			loadNextPage();
 		}
 	}, [decodeMessage, isLoading, isNextPageAvailable, loadNextPage, threadMessages]);
 
-	const [isDecodingThread, setDecodingThread] = useState(false);
-	const [isShowingThread, setShowingThread] = useState(false);
-
-	const onShowThreadClick = () => {
+	const onOpenThreadClick = () => {
 		setDecodingThread(true);
 
 		(async () => {
-			for (const m of threadMessages) {
+			for (const m of wrappedThreadMessages) {
 				console.log('decodeMessage');
-				await decodeMessage(m);
+				await decodeMessage(m.message);
 			}
 
 			setDecodingThread(false);
-			setShowingThread(true);
+			setThreadOpen(true);
 		})();
 	};
 
@@ -115,7 +134,22 @@ export const MailDetailsPage = () => {
 
 	const onDeleteClick = (m: ILinkedMessage) => {
 		markMessagesAsDeleted([m]);
-		navigate(`/mail/${folderId}`);
+
+		if (isThreadOpen) {
+			setWrappedThreadMessages(
+				wrappedThreadMessages.map(it => (it.message.msgId === m.msgId ? { ...it, isDeleted: true } : it)),
+			);
+		} else {
+			navigate(`/mail/${folderId}`);
+		}
+	};
+
+	const onRestoreClick = (m: ILinkedMessage) => {
+		markMessagesAsNotDeleted([m]);
+
+		setWrappedThreadMessages(
+			wrappedThreadMessages.map(it => (it.message.msgId === m.msgId ? { ...it, isDeleted: false } : it)),
+		);
 	};
 
 	//
@@ -129,34 +163,49 @@ export const MailDetailsPage = () => {
 
 						{isLoadingThread || isDecodingThread ? (
 							<Spinner className={css.headerSpinner} />
-						) : isShowingThread ? (
+						) : isThreadOpen ? (
 							<div className={css.messagesFrom}>
 								<div className={css.messagesFromLebel}>Messages from</div>
 								<AdaptiveAddress address={message.msg.senderAddress} />
 							</div>
 						) : (
-							threadMessages.length > 1 && (
-								<ActionButton icon={<ContactIcon />} onClick={onShowThreadClick}>
-									{threadMessages.length} messages from this sender
+							wrappedThreadMessages.length > 1 && (
+								<ActionButton icon={<ContactIcon />} onClick={onOpenThreadClick}>
+									{wrappedThreadMessages.length} messages from this sender
 								</ActionButton>
 							)
 						)}
 					</div>
 
 					<div className={css.messageWrapper}>
-						{isShowingThread ? (
-							threadMessages.map(m => {
-								const d = decodedMessagesById[m.msgId];
+						{isThreadOpen ? (
+							wrappedThreadMessages.map(it => {
+								const d = decodedMessagesById[it.message.msgId];
 
 								return (
 									<div className={css.messageThreadItem}>
-										<MailMessage
-											message={m}
-											decoded={d}
-											onReplyClick={() => onReplyClick(m.msg.senderAddress, d.decodedSubject)}
-											onForwardClick={() => onForwardClick(d.decodedTextData, d.decodedSubject)}
-											onDeleteClick={() => onDeleteClick(m)}
-										/>
+										{it.isDeleted ? (
+											<div className={css.deletedPlaceholder}>
+												This message was archived
+												<div>
+													<ActionButton onClick={() => onRestoreClick(it.message)}>
+														Restore
+													</ActionButton>
+												</div>
+											</div>
+										) : (
+											<MailMessage
+												message={it.message}
+												decoded={d}
+												onReplyClick={() =>
+													onReplyClick(it.message.msg.senderAddress, d.decodedSubject)
+												}
+												onForwardClick={() =>
+													onForwardClick(d.decodedTextData, d.decodedSubject)
+												}
+												onDeleteClick={() => onDeleteClick(it.message)}
+											/>
+										)}
 									</div>
 								);
 							})
@@ -171,7 +220,7 @@ export const MailDetailsPage = () => {
 						)}
 					</div>
 
-					{isShowingThread || (
+					{isThreadOpen || (
 						<div className={css.footer}>
 							<ActionButton
 								onClick={() => onReplyClick(message.msg.senderAddress, decoded.decodedSubject)}
