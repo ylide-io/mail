@@ -1,9 +1,3 @@
-.secondaryText {
-	color: var(--secondary-text-color);
-}
-
-//
-
 .layout {
 	padding: 0 !important;
 }
@@ -35,6 +29,14 @@
 	align-items: center;
 	min-width: 400px;
 	white-space: nowrap;
+
+	@include less720px {
+		min-width: 240px;
+	}
+}
+
+.messagesFromLebel {
+	color: var(--secondary-text-color);
 }
 
 .messageWrapper {
@@ -55,6 +57,12 @@
 		padding-bottom: 64px;
 		border: 0;
 	}
+
+	@include less720px {
+		&:last-child {
+			padding-bottom: 32px;
+		}
+	}
 }
 
 .footer {
@@ -65,4 +73,8 @@
 	justify-content: end;
 	padding: 20px;
 	border-top: 1px solid var(--border-color);
+
+	@include less720px {
+		display: none;
+	}
 }

@@ -122,13 +122,7 @@ export const MailDetailsPage = () => {
 	//
 
 	return (
-		<GenericLayout
-			mainClass={css.layout}
-			mobileTopButtonProps={{
-				text: '‹ Return to Mailbox',
-				link: `/mail/${folderId}`,
-			}}
-		>
+		<GenericLayout mainClass={css.layout}>
 			{message && decoded && (
 				<div className={css.root}>
 					<div className={css.header}>
@@ -138,7 +132,7 @@ export const MailDetailsPage = () => {
 							<Spinner className={css.headerSpinner} />
 						) : isShowingThread ? (
 							<div className={css.messagesFrom}>
-								<div className={css.secondaryText}>Messages from</div>
+								<div className={css.messagesFromLebel}>Messages from</div>
 								<AdaptiveAddress address={message.msg.senderAddress} />
 							</div>
 						) : (

@@ -44,6 +44,7 @@
 }
 
 .body {
+	grid-column: 2/4;
 	align-self: start;
 	margin: 32px 0 0;
 	font-size: 16px;
@@ -51,5 +52,30 @@
 
 	:global(.codex-editor__redactor) {
 		padding: 0 !important;
+	}
+}
+
+@include less720px {
+	.root {
+		grid-template-columns: 1fr;
+		grid-template-rows: repeat(5, auto);
+	}
+
+	.avatar {
+		display: none;
+	}
+
+	.actions {
+		justify-self: start;
+		grid-row: 5/6;
+	}
+
+	.date {
+		justify-self: start;
+	}
+
+	.body {
+		grid-column: 1/2;
+		margin: 16px 0;
 	}
 }
