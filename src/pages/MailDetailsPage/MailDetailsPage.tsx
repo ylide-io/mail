@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 
 import { ActionButton } from '../../components/ActionButton/ActionButton';
@@ -61,31 +61,30 @@ export const MailDetailsPage = () => {
 	);
 
 	const [isLoadingThread, setLoadingThread] = useState(canLoadThread);
-	const isThreadDecodedRef = useRef(false);
 
 	useEffect(() => {
-		if (isThreadDecodedRef.current) return;
-
 		if (!isNextPageAvailable) {
-			isThreadDecodedRef.current = true;
-
-			(async () => {
-				for (const m of threadMessages) {
-					console.log('decodeMessage');
-					await decodeMessage(m);
-				}
-
-				setLoadingThread(false);
-			})();
+			setLoadingThread(false);
 		} else if (!isLoading) {
 			loadNextPage();
 		}
 	}, [decodeMessage, isLoading, isNextPageAvailable, loadNextPage, threadMessages]);
 
+	const [isDecodingThread, setDecodingThread] = useState(false);
 	const [isShowingThread, setShowingThread] = useState(false);
 
 	const onShowThreadClick = () => {
-		setShowingThread(true);
+		setDecodingThread(true);
+
+		(async () => {
+			for (const m of threadMessages) {
+				console.log('decodeMessage');
+				await decodeMessage(m);
+			}
+
+			setDecodingThread(false);
+			setShowingThread(true);
+		})();
 	};
 
 	//
@@ -128,7 +127,7 @@ export const MailDetailsPage = () => {
 					<div className={css.header}>
 						<ActionButton onClick={onBackClick} icon={<BackIcon />} />
 
-						{isLoadingThread ? (
+						{isLoadingThread || isDecodingThread ? (
 							<Spinner className={css.headerSpinner} />
 						) : isShowingThread ? (
 							<div className={css.messagesFrom}>
