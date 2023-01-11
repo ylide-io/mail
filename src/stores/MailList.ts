@@ -408,6 +408,7 @@ export const useMailStore = create<MailStore>((set, get) => ({
 		};
 
 		state.decodedMessagesById[pushMsg.msgId] = decodedMessage;
+		set({ decodedMessagesById: { ...state.decodedMessagesById } });
 
 		if (state.saveDecodedMessages) {
 			console.log('msg saved: ', pushMsg.msgId);
