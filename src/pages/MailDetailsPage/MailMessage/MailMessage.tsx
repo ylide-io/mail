@@ -1,3 +1,4 @@
+import { Tooltip } from 'antd';
 import { toJS } from 'mobx';
 import moment from 'moment';
 import React, { useMemo } from 'react';
@@ -46,13 +47,17 @@ export function MailMessage({ message, decoded, onReplyClick, onForwardClick, on
 					Reply
 				</ActionButton>
 
-				<ActionButton icon={<ForwardIcon />} onClick={() => onForwardClick()} />
+				<Tooltip title="Forward">
+					<ActionButton icon={<ForwardIcon />} onClick={() => onForwardClick()} />
+				</Tooltip>
 
-				<ActionButton
-					style={ActionButtonStyle.Dengerous}
-					icon={<TrashIcon />}
-					onClick={() => onDeleteClick()}
-				/>
+				<Tooltip title="Archive">
+					<ActionButton
+						style={ActionButtonStyle.Dengerous}
+						icon={<TrashIcon />}
+						onClick={() => onDeleteClick()}
+					/>
+				</Tooltip>
 			</div>
 
 			<div className={css.sender}>
