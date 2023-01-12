@@ -23,7 +23,7 @@ interface WrappedThreadMessage {
 
 export const MailDetailsPage = () => {
 	const navigate = useNav();
-	const { folderId, id } = useParams();
+	const { folderId, id } = useParams<{ folderId: FolderId; id: string }>();
 
 	const {
 		lastMessagesList,
@@ -217,6 +217,7 @@ export const MailDetailsPage = () => {
 											<MailMessage
 												message={message.message}
 												decoded={decoded}
+												folderId={folderId}
 												onReady={isPrimaryItem ? onPrimaryThreadMessageReady : undefined}
 												onReplyClick={() =>
 													onReplyClick(
@@ -237,6 +238,7 @@ export const MailDetailsPage = () => {
 							<MailMessage
 								message={initialMessage}
 								decoded={initialDecodedContent}
+								folderId={folderId}
 								onReplyClick={() =>
 									onReplyClick(initialMessage.msg.senderAddress, initialDecodedContent.decodedSubject)
 								}

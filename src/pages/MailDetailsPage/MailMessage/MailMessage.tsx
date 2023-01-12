@@ -11,7 +11,7 @@ import { ForwardIcon } from '../../../icons/ForwardIcon';
 import { ReplyIcon } from '../../../icons/ReplyIcon';
 import { TrashIcon } from '../../../icons/TrashIcon';
 import { IMessageDecodedContent } from '../../../indexedDB/MessagesDB';
-import { ILinkedMessage, useMailStore } from '../../../stores/MailList';
+import { FolderId, ILinkedMessage, useMailStore } from '../../../stores/MailList';
 import { EDITOR_JS_TOOLS } from '../../../utils/editorJs';
 import css from './MailMessage.module.scss';
 
@@ -20,6 +20,7 @@ const ReactEditorJS = createReactEditorJS();
 export interface MailMessageProps {
 	message: ILinkedMessage;
 	decoded?: IMessageDecodedContent;
+	folderId?: FolderId;
 	onReady?: () => void;
 	onReplyClick: () => void;
 	onForwardClick: () => void;
@@ -29,13 +30,14 @@ export interface MailMessageProps {
 export function MailMessage({
 	message,
 	decoded,
+	folderId,
 	onReady,
 	onReplyClick,
 	onForwardClick,
 	onDeleteClick,
 }: MailMessageProps) {
 	const decodeMessage = useMailStore(state => state.decodeMessage);
-
+	console.log('folderId', folderId, folderId === FolderId.Archive);
 	const data = useMemo(
 		() => ({
 			blocks:
@@ -74,13 +76,15 @@ export function MailMessage({
 							<ActionButton icon={<ForwardIcon />} onClick={() => onForwardClick()} />
 						</Tooltip>
 
-						<Tooltip title="Archive">
-							<ActionButton
-								style={ActionButtonStyle.Dengerous}
-								icon={<TrashIcon />}
-								onClick={() => onDeleteClick()}
-							/>
-						</Tooltip>
+						{folderId !== FolderId.Archive && (
+							<Tooltip title="Archive">
+								<ActionButton
+									style={ActionButtonStyle.Dengerous}
+									icon={<TrashIcon />}
+									onClick={() => onDeleteClick()}
+								/>
+							</Tooltip>
+						)}
 					</>
 				) : (
 					<ActionButton onClick={() => onDecodeClick()}>Decode message</ActionButton>
