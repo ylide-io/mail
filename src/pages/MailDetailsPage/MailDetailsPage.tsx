@@ -34,18 +34,21 @@ export const MailDetailsPage = () => {
 		decodeMessage,
 	} = useMailStore();
 
-	const message = lastMessagesList.find(m => m.id === id!);
-	const decoded: IMessageDecodedContent | undefined = message && decodedMessagesById[message.msgId];
+	const initialMessage = lastMessagesList.find(m => m.id === id!);
+	const initialDecodedContent: IMessageDecodedContent | undefined =
+		initialMessage && decodedMessagesById[initialMessage.msgId];
 
 	useEffect(() => {
-		if (!message || !decoded) {
+		if (!initialMessage || !initialDecodedContent) {
 			navigate(`/mail/${folderId}`);
 		}
-	}, [decoded, folderId, message, navigate]);
+	}, [initialDecodedContent, folderId, initialMessage, navigate]);
 
 	//
 
-	const [needToLoadThread, setNeedToLoadThread] = useState(folderId === FolderId.Inbox && message?.msg.senderAddress);
+	const [needToLoadThread, setNeedToLoadThread] = useState(
+		folderId === FolderId.Inbox && initialMessage?.msg.senderAddress,
+	);
 	const [isLoadingThread, setLoadingThread] = useState(needToLoadThread);
 	const [isDecodingThread, setDecodingThread] = useState(false);
 	const [isThreadOpen, setThreadOpen] = useState(false);
@@ -68,7 +71,7 @@ export const MailDetailsPage = () => {
 		needToLoadThread
 			? {
 					folderId: FolderId.Inbox,
-					sender: message?.msg.senderAddress,
+					sender: initialMessage?.msg.senderAddress,
 					filter: threadFilter,
 			  }
 			: undefined,
@@ -156,7 +159,7 @@ export const MailDetailsPage = () => {
 
 	return (
 		<GenericLayout mainClass={css.layout}>
-			{message && decoded && (
+			{initialMessage && initialDecodedContent && (
 				<div className={css.root}>
 					<div className={css.header}>
 						<ActionButton onClick={onBackClick} icon={<BackIcon />} />
@@ -166,7 +169,7 @@ export const MailDetailsPage = () => {
 						) : isThreadOpen ? (
 							<div className={css.messagesFrom}>
 								<div className={css.messagesFromLebel}>Messages from</div>
-								<AdaptiveAddress address={message.msg.senderAddress} />
+								<AdaptiveAddress address={initialMessage.msg.senderAddress} />
 							</div>
 						) : (
 							wrappedThreadMessages.length > 1 && (
@@ -179,31 +182,34 @@ export const MailDetailsPage = () => {
 
 					<div className={css.messageWrapper}>
 						{isThreadOpen ? (
-							wrappedThreadMessages.map(it => {
-								const d = decodedMessagesById[it.message.msgId];
+							wrappedThreadMessages.map(message => {
+								const decoded = decodedMessagesById[message.message.msgId];
 
 								return (
 									<div className={css.messageThreadItem}>
-										{it.isDeleted ? (
+										{message.isDeleted ? (
 											<div className={css.deletedPlaceholder}>
 												This message was archived
 												<div>
-													<ActionButton onClick={() => onRestoreClick(it.message)}>
+													<ActionButton onClick={() => onRestoreClick(message.message)}>
 														Restore
 													</ActionButton>
 												</div>
 											</div>
 										) : (
 											<MailMessage
-												message={it.message}
-												decoded={d}
+												message={message.message}
+												decoded={decoded}
 												onReplyClick={() =>
-													onReplyClick(it.message.msg.senderAddress, d.decodedSubject)
+													onReplyClick(
+														message.message.msg.senderAddress,
+														decoded.decodedSubject,
+													)
 												}
 												onForwardClick={() =>
-													onForwardClick(d.decodedTextData, d.decodedSubject)
+													onForwardClick(decoded.decodedTextData, decoded.decodedSubject)
 												}
-												onDeleteClick={() => onDeleteClick(it.message)}
+												onDeleteClick={() => onDeleteClick(message.message)}
 											/>
 										)}
 									</div>
@@ -211,11 +217,18 @@ export const MailDetailsPage = () => {
 							})
 						) : (
 							<MailMessage
-								message={message}
-								decoded={decoded}
-								onReplyClick={() => onReplyClick(message.msg.senderAddress, decoded.decodedSubject)}
-								onForwardClick={() => onForwardClick(decoded.decodedTextData, decoded.decodedSubject)}
-								onDeleteClick={() => onDeleteClick(message)}
+								message={initialMessage}
+								decoded={initialDecodedContent}
+								onReplyClick={() =>
+									onReplyClick(initialMessage.msg.senderAddress, initialDecodedContent.decodedSubject)
+								}
+								onForwardClick={() =>
+									onForwardClick(
+										initialDecodedContent.decodedTextData,
+										initialDecodedContent.decodedSubject,
+									)
+								}
+								onDeleteClick={() => onDeleteClick(initialMessage)}
 							/>
 						)}
 					</div>
@@ -223,14 +236,21 @@ export const MailDetailsPage = () => {
 					{isThreadOpen || (
 						<div className={css.footer}>
 							<ActionButton
-								onClick={() => onReplyClick(message.msg.senderAddress, decoded.decodedSubject)}
+								onClick={() =>
+									onReplyClick(initialMessage.msg.senderAddress, initialDecodedContent.decodedSubject)
+								}
 								icon={<ReplyIcon />}
 							>
 								Reply
 							</ActionButton>
 
 							<ActionButton
-								onClick={() => onForwardClick(decoded.decodedTextData, decoded.decodedSubject)}
+								onClick={() =>
+									onForwardClick(
+										initialDecodedContent.decodedTextData,
+										initialDecodedContent.decodedSubject,
+									)
+								}
 								icon={<ForwardIcon />}
 							>
 								Forward
