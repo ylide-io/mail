@@ -1,9 +1,9 @@
 import clsx from 'clsx';
 
-import { WithClassNameProps } from '../WithClassNameProps';
+import { PropsWithClassName } from '../propsWithClassName';
 import css from './spinner.module.scss';
 
-export interface LoaderProps extends WithClassNameProps {}
+export interface LoaderProps extends PropsWithClassName {}
 
 export function Spinner({ className }: LoaderProps) {
 	return (

@@ -1,8 +1,7 @@
 import clsx from 'clsx';
-import React, { ReactNode } from 'react';
+import React, { PropsWithChildren, ReactNode } from 'react';
 
-import { WithChildrenProps } from '../WithChildrenProps';
-import { WithClassNameProps } from '../WithClassNameProps';
+import { PropsWithClassName } from '../propsWithClassName';
 import css from './ActionButton.module.scss';
 
 export enum ActionButtonStyle {
@@ -11,7 +10,7 @@ export enum ActionButtonStyle {
 	Primary,
 }
 
-interface ActionButtonProps extends WithChildrenProps, WithClassNameProps {
+interface ActionButtonProps extends PropsWithChildren, PropsWithClassName {
 	icon?: ReactNode;
 	style?: ActionButtonStyle;
 	onClick?: React.MouseEventHandler<HTMLElement>;
