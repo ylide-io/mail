@@ -7,7 +7,7 @@ import { OverlappingLoader } from '../../controls/OverlappingLoader';
 import { GenericLayout } from '../../layouts/GenericLayout';
 import { analytics } from '../../stores/Analytics';
 import mailer from '../../stores/Mailer';
-import mailList, { FolderId } from '../../stores/MailList';
+import { useMailStore } from '../../stores/MailList';
 import { useNav } from '../../utils/navigate';
 import ComposeMailBody from './components/Mailbox/ComposeMailBody';
 import ComposeMailFooter from './components/Mailbox/ComposeMailFooter';
@@ -15,6 +15,7 @@ import { MailComposeMeta } from './components/MailComposeMeta';
 
 export const ComposePage = observer(() => {
 	const navigate = useNav();
+	const lastActiveFolderId = useMailStore(state => state.lastActiveFolderId);
 
 	useEffect(() => {
 		analytics.composeOpened();
@@ -30,7 +31,7 @@ export const ComposePage = observer(() => {
 							<ActionButton
 								style={ActionButtonStyle.Dengerous}
 								onClick={() => {
-									navigate(`/mail/${mailList.activeFolderId || FolderId.Inbox}`);
+									navigate(`/mail/${lastActiveFolderId}`);
 								}}
 								icon={<i className={`fa ${smallButtonIcons.cross}`} />}
 							>

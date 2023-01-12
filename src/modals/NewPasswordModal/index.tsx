@@ -6,8 +6,8 @@ import { makeObservable, observable } from 'mobx';
 import { observer } from 'mobx-react';
 import { PureComponent } from 'react';
 
+import { YlideLoader } from '../../components/ylideLoader/ylideLoader';
 import { blockchainsMap, calloutSvg, evmNameToNetwork } from '../../constants';
-import { Loader } from '../../controls/Loader';
 import { WalletTag } from '../../controls/WalletTag';
 import { YlideButton } from '../../controls/YlideButton';
 import { CrossIcon } from '../../icons/CrossIcon';
@@ -649,7 +649,7 @@ export default class NewPasswordModal extends PureComponent<NewPasswordModalProp
 										paddingBottom: 40,
 									}}
 								>
-									<Loader />
+									<YlideLoader />
 								</div>
 								<h3 className="wm-title">Publishing the key</h3>
 								<h4 className="wm-subtitle">Please, wait for the transaction to be completed</h4>

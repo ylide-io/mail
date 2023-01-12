@@ -8,7 +8,7 @@ import { useLocation, useParams } from 'react-router-dom';
 
 import { ActionButton, ActionButtonStyle } from '../../components/ActionButton/ActionButton';
 import { smallButtonIcons } from '../../components/smallButton/smallButton';
-import { Loader } from '../../controls/Loader';
+import { YlideLoader } from '../../components/ylideLoader/ylideLoader';
 import { YlideButton } from '../../controls/YlideButton';
 import { CaretDown } from '../../icons/CaretDown';
 import { discordSourceIcon } from '../../icons/static/discordSourceIcon';
@@ -170,10 +170,19 @@ export const FeedPage = observer(() => {
 	const sourceId = searchParams?.get('sourceId') || null;
 	const navigate = useNav();
 
+	const scrollToTop = useCallback(() => {
+		window.scrollTo({
+			top: 0,
+			behavior: 'smooth',
+		});
+	}, []);
+
 	useEffect(() => {
+		scrollToTop();
+
 		// noinspection JSIgnoredPromiseFromCall
 		feed.loadCategory(category!, sourceId);
-	}, [category, sourceId]);
+	}, [category, scrollToTop, sourceId]);
 
 	useEffect(() => {
 		const timer = setInterval(async () => {
@@ -192,18 +201,11 @@ export const FeedPage = observer(() => {
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [feed.loading, feed.moreAvailable]);
 
-	const scrollToTop = useCallback(() => {
-		window.scrollTo({
-			top: 0,
-			behavior: 'smooth',
-		});
-	}, []);
-
 	const showNewPosts = useCallback(() => {
+		scrollToTop();
+
 		// noinspection JSIgnoredPromiseFromCall
 		feed.loadNew();
-
-		scrollToTop();
 	}, [scrollToTop]);
 
 	let title;
@@ -270,13 +272,13 @@ export const FeedPage = observer(() => {
 
 								{feed.moreAvailable && (
 									<div className={css.feedLastPost} ref={lastPostView}>
-										{feed.loading && <Loader reason="Loading more posts..." />}
+										{feed.loading && <YlideLoader reason="Loading more posts..." />}
 									</div>
 								)}
 							</>
 						) : (
 							<div style={{ marginTop: 30 }}>
-								<Loader reason="Your feed is loading..." />
+								<YlideLoader reason="Your feed is loading..." />
 							</div>
 						)}
 

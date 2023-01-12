@@ -13,7 +13,7 @@ import EventEmitter from 'eventemitter3';
 import { computed, makeObservable, observable } from 'mobx';
 
 import { Domain } from '../Domain';
-import mailList from '../MailList';
+import { useMailStore } from '../MailList';
 import { DomainAccount } from './DomainAccount';
 
 export class Wallet extends EventEmitter {
@@ -156,13 +156,15 @@ export class Wallet extends EventEmitter {
 			};
 		};
 		if (this.factory.blockchainGroup === 'evm') {
-			return await mailList.readingSession.indexerHub.retryingOperation(
+			const readingSession = useMailStore.getState().readingSession;
+
+			return await readingSession.indexerHub.retryingOperation(
 				async () => {
 					let remoteKey: ExternalYlidePublicKey | null = null;
 					const remoteKeys: Record<string, ExternalYlidePublicKey | null> = {};
-					const results = await mailList.readingSession.indexerHub.requestMultipleKeys([account.address]);
+					const results = await readingSession.indexerHub.requestMultipleKeys([account.address]);
 					console.log('results: ', results);
-					const rawRemoteKeys = await mailList.readingSession.indexerHub.requestKeys(account.address);
+					const rawRemoteKeys = await readingSession.indexerHub.requestKeys(account.address);
 					const bcs = Object.keys(rawRemoteKeys);
 					let timestamp = -1;
 					for (const bc of bcs) {

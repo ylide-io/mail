@@ -1,4 +1,4 @@
-import { Loader } from './Loader';
+import { YlideLoader } from '../components/ylideLoader/ylideLoader';
 
 export function OverlappingLoader({ text }: { text: string }) {
 	return (
@@ -13,7 +13,7 @@ export function OverlappingLoader({ text }: { text: string }) {
 				backdropFilter: 'blur(10px)',
 			}}
 		>
-			<Loader />
+			<YlideLoader />
 			<br />
 			<div
 				style={{

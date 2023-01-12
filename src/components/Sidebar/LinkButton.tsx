@@ -2,7 +2,7 @@ import clsx from 'clsx';
 import React from 'react';
 
 import { useNav } from '../../utils/navigate';
-import { WithClassNameProps } from '../WithClassNameProps';
+import { PropsWithClassName } from '../propsWithClassName';
 import css from './LinkButton.module.scss';
 
 export enum LinkButtonType {
@@ -10,7 +10,7 @@ export enum LinkButtonType {
 	PRIMARY,
 }
 
-interface LinkButtonProps extends WithClassNameProps {
+interface LinkButtonProps extends PropsWithClassName {
 	type?: LinkButtonType;
 	text: string;
 	link: string;

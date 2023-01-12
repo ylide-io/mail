@@ -10,11 +10,12 @@ import AlertModal from '../../../../modals/AlertModal';
 import domain from '../../../../stores/Domain';
 import mailbox from '../../../../stores/Mailbox';
 import mailer from '../../../../stores/Mailer';
-import mailList, { FolderId } from '../../../../stores/MailList';
+import { useMailStore } from '../../../../stores/MailList';
 import { useNav } from '../../../../utils/navigate';
 
 const ComposeMailFooter = observer(() => {
 	const navigate = useNav();
+	const lastActiveFolderId = useMailStore(state => state.lastActiveFolderId);
 
 	useEffect(() => {
 		(async () => {
@@ -106,7 +107,7 @@ const ComposeMailFooter = observer(() => {
 			await AlertModal.show('Message sent', 'Your message was successfully sent');
 			console.log('id: ', msgId);
 
-			navigate(`/mail/${mailList.activeFolderId || FolderId.Inbox}`);
+			navigate(`/mail/${lastActiveFolderId}`);
 		} catch (e) {
 			console.log('Error sending message', e);
 		}

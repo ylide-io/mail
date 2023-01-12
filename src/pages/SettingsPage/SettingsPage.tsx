@@ -1,10 +1,11 @@
-import { observer } from 'mobx-react';
 import React from 'react';
 
 import { GenericLayout } from '../../layouts/GenericLayout';
-import mailList from '../../stores/MailList';
+import { useMailStore } from '../../stores/MailList';
 
-export const SettingsPage = observer(() => {
+export const SettingsPage = () => {
+	const { saveDecodedMessages, setSaveDecodedSetting } = useMailStore();
+
 	return (
 		<GenericLayout>
 			<div className="mail-page animated fadeInRight">
@@ -17,8 +18,8 @@ export const SettingsPage = observer(() => {
 					<div style={{ marginTop: 30, display: 'flex', alignItems: 'center' }}>
 						<span style={{ marginRight: 50 }}>Save decoded mails to internal storage</span>
 						<input
-							checked={!!mailList.saveDecodedMessages}
-							onChange={() => mailList.setSaveDecodedSetting(!mailList.saveDecodedMessages)}
+							checked={saveDecodedMessages}
+							onChange={() => setSaveDecodedSetting(!saveDecodedMessages)}
 							type="checkbox"
 						/>
 					</div>
@@ -26,4 +27,4 @@ export const SettingsPage = observer(() => {
 			</div>
 		</GenericLayout>
 	);
-});
+};

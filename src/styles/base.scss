@@ -1,11 +1,21 @@
 :root {
 	--primary-text-color: #111;
-	--secondary-text-color: #a5a8b4;
+	--secondary-text-color: #888;
 
-	--link-color: #1d9bf0;
+	--surface-color: #fff;
+	--secondary-surface-color: #f8f8f8;
 
-	--error: #f01d55;
-	--success: #0eb040;
+	--border-color: rgba(0, 0, 0, 0.15);
+
+	--link-color: #19f;
+
+	--error-color: #f45;
+	--success-color: #0b4;
+
+	--lite-button-border-color: rgba(0, 0, 0, 0.18);
+	--lite-button-hover-background-color: rgba(0, 0, 0, 0.05);
+	--error-button-border-color: rgba(255, 68, 85, 0.35);
+	--error-button-hover-background-color: rgba(255, 68, 85, 0.1);
 }
 
 body,

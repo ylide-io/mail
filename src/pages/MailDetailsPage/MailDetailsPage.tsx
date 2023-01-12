@@ -1,186 +1,284 @@
-import { toJS } from 'mobx';
-import { observer } from 'mobx-react';
-import moment from 'moment';
-import React, { useEffect, useMemo } from 'react';
-import { createReactEditorJS } from 'react-editor-js';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useParams } from 'react-router-dom';
 
-import { ActionButton, ActionButtonStyle } from '../../components/ActionButton/ActionButton';
-import { smallButtonIcons } from '../../components/smallButton/smallButton';
+import { ActionButton } from '../../components/ActionButton/ActionButton';
+import { Spinner } from '../../components/spinner/spinner';
 import { AdaptiveAddress } from '../../controls/AdaptiveAddress';
-import { Blockie } from '../../controls/Blockie';
+import { BackIcon } from '../../icons/BackIcon';
+import { ContactIcon } from '../../icons/ContactIcon';
+import { ForwardIcon } from '../../icons/ForwardIcon';
+import { ReplyIcon } from '../../icons/ReplyIcon';
 import { IMessageDecodedContent } from '../../indexedDB/MessagesDB';
 import { GenericLayout } from '../../layouts/GenericLayout';
-import contacts from '../../stores/Contacts';
 import mailbox from '../../stores/Mailbox';
-import mailList, { FolderId, ILinkedMessage } from '../../stores/MailList';
-import { EDITOR_JS_TOOLS } from '../../utils/editorJs';
+import { FolderId, ILinkedMessage, useMailList, useMailStore } from '../../stores/MailList';
 import { useNav } from '../../utils/navigate';
+import css from './MailDetailsPage.module.scss';
+import { MailMessage } from './MailMessage/MailMessage';
 
-const ReactEditorJS = createReactEditorJS();
-
-interface MailDetailsPageInnerProps {
+interface WrappedThreadMessage {
 	message: ILinkedMessage;
+	isDeleted: boolean;
 }
 
-const MailDetailsPageInner = observer(({ message }: MailDetailsPageInnerProps) => {
+export const MailDetailsPage = () => {
 	const navigate = useNav();
-	const decoded: IMessageDecodedContent | undefined = mailList.decodedMessagesById[message.msgId];
-	const contact = contacts.contactsByAddress[message.msg.senderAddress || '-1'];
+	const { folderId, id } = useParams<{ folderId: FolderId; id: string }>();
 
-	console.log('decoded: ', decoded);
-	console.log('message: ', message);
+	const {
+		lastMessagesList,
+		decodedMessagesById,
+		deletedMessageIds,
+		markMessagesAsDeleted,
+		markMessagesAsNotDeleted,
+		markMessagesAsReaded,
+		decodeMessage,
+	} = useMailStore();
+
+	const initialMessage = lastMessagesList.find(m => m.id === id!);
+	const initialDecodedContent: IMessageDecodedContent | undefined =
+		initialMessage && decodedMessagesById[initialMessage.msgId];
 
 	useEffect(() => {
-		(async () => {
-			if (!decoded) {
-				await mailList.decodeMessage(message);
-			}
-			await mailList.markMessageAsReaded(message.id);
-		})();
-	}, [decoded, message]);
+		if (id && initialDecodedContent) {
+			markMessagesAsReaded([id]);
+		}
+	}, [id, initialDecodedContent, markMessagesAsReaded]);
 
-	const encodedMessageClickHandler = () => {
-		mailList.decodeMessage(message);
-	};
+	useEffect(() => {
+		if (!initialMessage || !initialDecodedContent) {
+			navigate(`/mail/${folderId}`);
+		}
+	}, [initialDecodedContent, folderId, initialMessage, navigate]);
 
-	const data = useMemo(
-		() => ({
-			blocks:
-				typeof decoded?.decodedTextData === 'string'
-					? JSON.parse(decoded.decodedTextData).blocks
-					: toJS(decoded?.decodedTextData?.blocks),
-		}),
-		[decoded?.decodedTextData],
+	//
+
+	const primaryThreadItemRef = useRef<HTMLDivElement>(null);
+
+	const [needToLoadThread, setNeedToLoadThread] = useState(
+		folderId === FolderId.Inbox && initialMessage?.msg.senderAddress,
+	);
+	const [isLoadingThread, setLoadingThread] = useState(needToLoadThread);
+	const [isDecodingThread, setDecodingThread] = useState(false);
+	const [isThreadOpen, setThreadOpen] = useState(false);
+
+	const threadFilter = useCallback(
+		(m: ILinkedMessage) => {
+			const { id, recipient } = m;
+			const isDeleted = deletedMessageIds[recipient?.account.address || 'null']?.has(id);
+			return !isDeleted;
+		},
+		[deletedMessageIds],
 	);
 
-	const replyClickHandler = () => {
-		mailbox.to = message.msg.senderAddress
-			? [
-					{
-						type: 'address',
-						loading: false,
-						isAchievable: null,
-						input: message.msg.senderAddress,
-						address: message.msg.senderAddress,
-					},
-			  ]
-			: [];
-		mailbox.subject = decoded?.decodedSubject || '';
+	const {
+		messages: threadMessages,
+		isLoading,
+		isNextPageAvailable,
+		loadNextPage,
+	} = useMailList(
+		needToLoadThread
+			? {
+					folderId: FolderId.Inbox,
+					sender: initialMessage?.msg.senderAddress,
+					filter: threadFilter,
+			  }
+			: undefined,
+	);
+
+	const [wrappedThreadMessages, setWrappedThreadMessages] = useState<WrappedThreadMessage[]>([]);
+
+	useEffect(() => {
+		if (!isNextPageAvailable) {
+			setWrappedThreadMessages(
+				threadMessages.map(it => ({
+					message: it,
+					isDeleted: false,
+				})),
+			);
+
+			setNeedToLoadThread(false);
+			setLoadingThread(false);
+		} else if (!isLoading) {
+			loadNextPage();
+		}
+	}, [decodeMessage, isLoading, isNextPageAvailable, loadNextPage, threadMessages]);
+
+	const onOpenThreadClick = () => {
+		setDecodingThread(true);
+
+		(async () => {
+			for (const m of wrappedThreadMessages) {
+				console.log('decodeMessage');
+				await decodeMessage(m.message);
+			}
+
+			setDecodingThread(false);
+			setThreadOpen(true);
+		})();
+	};
+
+	const onPrimaryThreadMessageReady = () => {
+		primaryThreadItemRef.current?.scrollIntoView();
+	};
+
+	//
+
+	const onBackClick = () => {
+		navigate(`/mail/${folderId}`);
+	};
+
+	const onReplyClick = (senderAddress: string, subject: string | null) => {
+		mailbox.to = [
+			{
+				type: 'address',
+				loading: false,
+				isAchievable: null,
+				input: senderAddress,
+				address: senderAddress,
+			},
+		];
+		mailbox.subject = subject || '';
 		navigate('/mail/compose');
 	};
 
-	const forwardClickHandler = () => {
-		mailbox.textEditorData = decoded?.decodedTextData || '';
-		mailbox.subject = decoded?.decodedSubject || '';
+	const onForwardClick = (decodedTextData: any | null, subject: string | null) => {
+		mailbox.textEditorData = decodedTextData || '';
+		mailbox.subject = subject || '';
 		navigate('/mail/compose');
 	};
 
-	const deleteHandler = () => {
-		mailList.markMessageAsDeleted(message);
-		navigate(`/${mailList.activeFolderId}`);
+	const onDeleteClick = (m: ILinkedMessage) => {
+		markMessagesAsDeleted([m]);
+
+		if (isThreadOpen) {
+			setWrappedThreadMessages(
+				wrappedThreadMessages.map(it => (it.message.msgId === m.msgId ? { ...it, isDeleted: true } : it)),
+			);
+		} else {
+			navigate(`/mail/${folderId}`);
+		}
 	};
+
+	const onRestoreClick = (m: ILinkedMessage) => {
+		markMessagesAsNotDeleted([m]);
+
+		setWrappedThreadMessages(
+			wrappedThreadMessages.map(it => (it.message.msgId === m.msgId ? { ...it, isDeleted: false } : it)),
+		);
+	};
+
+	//
 
 	return (
-		<GenericLayout>
-			<div className="mail-page animated fadeInRight">
-				<div className="mail-top">
-					<div className="mail-header">
-						<h2 className="mailbox-title">
-							{decoded ? decoded.decodedSubject || 'View Message' : 'View Message'}
-						</h2>
-						<div className="mail-actions">
+		<GenericLayout mainClass={css.layout}>
+			{initialMessage && initialDecodedContent && (
+				<div className={css.root}>
+					<div className={css.header}>
+						<ActionButton onClick={onBackClick} icon={<BackIcon />} />
+
+						{isLoadingThread || isDecodingThread ? (
+							<Spinner className={css.headerSpinner} />
+						) : isThreadOpen ? (
+							<div className={css.messagesFrom}>
+								<div className={css.messagesFromLebel}>Messages from</div>
+								<AdaptiveAddress address={initialMessage.msg.senderAddress} />
+							</div>
+						) : (
+							wrappedThreadMessages.length > 1 && (
+								<ActionButton icon={<ContactIcon />} onClick={onOpenThreadClick}>
+									{wrappedThreadMessages.length} messages from this sender
+								</ActionButton>
+							)
+						)}
+					</div>
+
+					<div className={css.messageWrapper}>
+						{isThreadOpen ? (
+							wrappedThreadMessages.map(message => {
+								const decoded = decodedMessagesById[message.message.msgId];
+								const isPrimaryItem = message.message.id === initialMessage.id;
+
+								return (
+									<div
+										ref={isPrimaryItem ? primaryThreadItemRef : undefined}
+										className={css.messageThreadItem}
+									>
+										{message.isDeleted ? (
+											<div className={css.deletedPlaceholder}>
+												This message was archived
+												<div>
+													<ActionButton onClick={() => onRestoreClick(message.message)}>
+														Restore
+													</ActionButton>
+												</div>
+											</div>
+										) : (
+											<MailMessage
+												message={message.message}
+												decoded={decoded}
+												folderId={folderId}
+												onReady={isPrimaryItem ? onPrimaryThreadMessageReady : undefined}
+												onReplyClick={() =>
+													onReplyClick(
+														message.message.msg.senderAddress,
+														decoded.decodedSubject,
+													)
+												}
+												onForwardClick={() =>
+													onForwardClick(decoded.decodedTextData, decoded.decodedSubject)
+												}
+												onDeleteClick={() => onDeleteClick(message.message)}
+											/>
+										)}
+									</div>
+								);
+							})
+						) : (
+							<MailMessage
+								message={initialMessage}
+								decoded={initialDecodedContent}
+								folderId={folderId}
+								onReplyClick={() =>
+									onReplyClick(initialMessage.msg.senderAddress, initialDecodedContent.decodedSubject)
+								}
+								onForwardClick={() =>
+									onForwardClick(
+										initialDecodedContent.decodedTextData,
+										initialDecodedContent.decodedSubject,
+									)
+								}
+								onDeleteClick={() => onDeleteClick(initialMessage)}
+							/>
+						)}
+					</div>
+
+					{isThreadOpen || (
+						<div className={css.footer}>
 							<ActionButton
-								onClick={replyClickHandler}
-								icon={<i className={`fa ${smallButtonIcons.reply}`} />}
+								onClick={() =>
+									onReplyClick(initialMessage.msg.senderAddress, initialDecodedContent.decodedSubject)
+								}
+								icon={<ReplyIcon />}
 							>
 								Reply
 							</ActionButton>
 
 							<ActionButton
-								style={ActionButtonStyle.Dengerous}
-								onClick={deleteHandler}
-								icon={<i className={`fa ${smallButtonIcons.trash}`} />}
+								onClick={() =>
+									onForwardClick(
+										initialDecodedContent.decodedTextData,
+										initialDecodedContent.decodedSubject,
+									)
+								}
+								icon={<ForwardIcon />}
 							>
-								Archive
+								Forward
 							</ActionButton>
-						</div>
-					</div>
-					<div className="mail-meta">
-						<div className="mail-params">
-							<div className="mmp-row">
-								<div className="mmp-row-title mmp-from">Sender:</div>
-								<div className="mmp-row-value">
-									{contact ? (
-										<div className="mail-contact-name">{contact.name}</div>
-									) : (
-										<div className="mail-sender">
-											<Blockie
-												className="mail-sender-blockie"
-												address={message.msg.senderAddress}
-											/>{' '}
-											<div className="mail-sender-address">
-												<AdaptiveAddress address={message.msg.senderAddress} />
-											</div>
-										</div>
-									)}
-								</div>
-							</div>
-						</div>
-						<div className="mail-date">{moment.unix(message.msg.createdAt).format('HH:mm DD.MM.YYYY')}</div>
-					</div>
-				</div>
-				<div className="mail-body" style={{ minHeight: 370 }}>
-					{data.blocks ? (
-						<ReactEditorJS
-							tools={EDITOR_JS_TOOLS}
-							readOnly={true}
-							//@ts-ignore
-							data={data}
-						/>
-					) : (
-						<div
-							onClick={encodedMessageClickHandler}
-							style={
-								!decoded
-									? {
-											filter: 'blur(5px)',
-											cursor: 'pointer',
-									  }
-									: {}
-							}
-						>
-							Message is not decoded yet
 						</div>
 					)}
 				</div>
-				<div className="mail-footer">
-					<ActionButton onClick={replyClickHandler} icon={<i className={`fa ${smallButtonIcons.reply}`} />}>
-						Reply
-					</ActionButton>
-
-					<ActionButton
-						onClick={forwardClickHandler}
-						icon={<i className={`fa ${smallButtonIcons.forward}`} />}
-					>
-						Forward
-					</ActionButton>
-				</div>
-			</div>
+			)}
 		</GenericLayout>
 	);
-});
-
-export const MailDetailsPage = observer(() => {
-	const { id } = useParams();
-	const navigate = useNav();
-	const message = mailList.messages.find(m => m.id === id!);
-
-	useEffect(() => {
-		if (!message) {
-			navigate(`/mail/${FolderId.Inbox}`);
-		}
-	}, [message, navigate]);
-
-	return <>{message && <MailDetailsPageInner message={message} />}</>;
-});
+};
