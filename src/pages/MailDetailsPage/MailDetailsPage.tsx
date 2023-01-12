@@ -31,12 +31,19 @@ export const MailDetailsPage = () => {
 		deletedMessageIds,
 		markMessagesAsDeleted,
 		markMessagesAsNotDeleted,
+		markMessagesAsReaded,
 		decodeMessage,
 	} = useMailStore();
 
 	const initialMessage = lastMessagesList.find(m => m.id === id!);
 	const initialDecodedContent: IMessageDecodedContent | undefined =
 		initialMessage && decodedMessagesById[initialMessage.msgId];
+
+	useEffect(() => {
+		if (id && initialDecodedContent) {
+			markMessagesAsReaded([id]);
+		}
+	}, [id, initialDecodedContent, markMessagesAsReaded]);
 
 	useEffect(() => {
 		if (!initialMessage || !initialDecodedContent) {
