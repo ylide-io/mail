@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useParams } from 'react-router-dom';
 
 import { ActionButton } from '../../components/ActionButton/ActionButton';
@@ -45,6 +45,8 @@ export const MailDetailsPage = () => {
 	}, [initialDecodedContent, folderId, initialMessage, navigate]);
 
 	//
+
+	const primaryThreadItemRef = useRef<HTMLDivElement>(null);
 
 	const [needToLoadThread, setNeedToLoadThread] = useState(
 		folderId === FolderId.Inbox && initialMessage?.msg.senderAddress,
@@ -107,6 +109,10 @@ export const MailDetailsPage = () => {
 			setDecodingThread(false);
 			setThreadOpen(true);
 		})();
+	};
+
+	const onPrimaryThreadMessageReady = () => {
+		primaryThreadItemRef.current?.scrollIntoView();
 	};
 
 	//
@@ -184,9 +190,13 @@ export const MailDetailsPage = () => {
 						{isThreadOpen ? (
 							wrappedThreadMessages.map(message => {
 								const decoded = decodedMessagesById[message.message.msgId];
+								const isPrimaryItem = message.message.id === initialMessage.id;
 
 								return (
-									<div className={css.messageThreadItem}>
+									<div
+										ref={isPrimaryItem ? primaryThreadItemRef : undefined}
+										className={css.messageThreadItem}
+									>
 										{message.isDeleted ? (
 											<div className={css.deletedPlaceholder}>
 												This message was archived
@@ -200,6 +210,7 @@ export const MailDetailsPage = () => {
 											<MailMessage
 												message={message.message}
 												decoded={decoded}
+												onReady={isPrimaryItem ? onPrimaryThreadMessageReady : undefined}
 												onReplyClick={() =>
 													onReplyClick(
 														message.message.msg.senderAddress,

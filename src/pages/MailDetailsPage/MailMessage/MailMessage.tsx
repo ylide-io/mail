@@ -1,7 +1,7 @@
 import { Tooltip } from 'antd';
 import { toJS } from 'mobx';
 import moment from 'moment';
-import React, { useMemo } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { createReactEditorJS } from 'react-editor-js';
 
 import { ActionButton, ActionButtonStyle } from '../../../components/ActionButton/ActionButton';
@@ -20,12 +20,20 @@ const ReactEditorJS = createReactEditorJS();
 export interface MailMessageProps {
 	message: ILinkedMessage;
 	decoded?: IMessageDecodedContent;
+	onReady?: () => void;
 	onReplyClick: () => void;
 	onForwardClick: () => void;
 	onDeleteClick: () => void;
 }
 
-export function MailMessage({ message, decoded, onReplyClick, onForwardClick, onDeleteClick }: MailMessageProps) {
+export function MailMessage({
+	message,
+	decoded,
+	onReady,
+	onReplyClick,
+	onForwardClick,
+	onDeleteClick,
+}: MailMessageProps) {
 	const decodeMessage = useMailStore(state => state.decodeMessage);
 
 	const data = useMemo(
@@ -41,6 +49,13 @@ export function MailMessage({ message, decoded, onReplyClick, onForwardClick, on
 	const onDecodeClick = () => {
 		decodeMessage(message);
 	};
+
+	const [isEditorReady, setEditorReady] = useState(!data.blocks);
+	useEffect(() => {
+		if (isEditorReady) {
+			onReady?.();
+		}
+	}, [isEditorReady, onReady]);
 
 	return (
 		<div className={css.root}>
@@ -86,6 +101,7 @@ export function MailMessage({ message, decoded, onReplyClick, onForwardClick, on
 						readOnly={true}
 						//@ts-ignore
 						data={data}
+						onReady={() => setEditorReady(true)}
 					/>
 				</div>
 			)}
