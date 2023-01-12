@@ -20,7 +20,10 @@
 	}
 }
 
-.root_unread {
+.root_unread .contact,
+.root_unread .preview,
+.root_unread .subject,
+.root_unread .date {
 	font-weight: bold;
 }
 
