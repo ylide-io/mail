@@ -53,6 +53,10 @@
 	:global(.codex-editor__redactor) {
 		padding: 0 !important;
 	}
+
+	:global(.ce-block__content) {
+		max-width: 100% !important;
+	}
 }
 
 @include less720px {
