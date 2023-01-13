@@ -6,7 +6,7 @@
 		bottom: 0;
 		left: -210px;
 		background-color: #fff;
-		box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2);
+		box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
 		width: 210px;
 		transition: left 0.2s;
 
@@ -27,5 +27,41 @@
 	@include less920px {
 		position: static;
 		padding: 15px;
+	}
+}
+
+.socials {
+	display: grid;
+	grid-auto-flow: column;
+	justify-content: start;
+	grid-gap: 8px;
+	position: relative;
+	padding: 24px 0 0 24px;
+
+	&:before {
+		content: '';
+		position: absolute;
+		top: 0;
+		right: 8px;
+		left: 4px;
+		height: 1px;
+		background: var(--border-color);
+	}
+
+	a {
+		@include expand-click-area(4px);
+		color: var(--primary-text-color);
+
+		&:hover {
+			color: var(--link--hover-color);
+		}
+
+		svg {
+			fill: currentColor;
+		}
+	}
+
+	@include less920px {
+		padding-left: 14px;
 	}
 }

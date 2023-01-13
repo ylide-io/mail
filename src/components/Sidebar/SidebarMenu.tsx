@@ -8,6 +8,11 @@ import { useLocation } from 'react-router-dom';
 import { YlideButton } from '../../controls/YlideButton';
 import { CaretDown } from '../../icons/CaretDown';
 import { CaretUp } from '../../icons/CaretUp';
+import { ReactComponent as DiscordSvg } from '../../icons/social/discord.svg';
+import { ReactComponent as LinkedInSvg } from '../../icons/social/linkedIn.svg';
+import { ReactComponent as MediumSvg } from '../../icons/social/medium.svg';
+import { ReactComponent as TelegramSvg } from '../../icons/social/telegram.svg';
+import { ReactComponent as TwitterSvg } from '../../icons/social/twitter.svg';
 import { checkboxCheckIcon } from '../../icons/static/checkboxCheckIcon';
 import { sideAllTopicsIcon } from '../../icons/static/sideAllTopicsIcon';
 import { sideAnalyticsIcon } from '../../icons/static/sideAnalyticsIcon';
@@ -344,6 +349,7 @@ const SidebarMenu = observer(() => {
 						</div>
 					</div>
 				</div>
+
 				<div className="sidebar-section">
 					<div className="sidebar-section-title">
 						Mail{' '}
@@ -432,27 +438,24 @@ const SidebarMenu = observer(() => {
 						</div>
 					</div>
 				</div>
-				{/* {windowWidth < 920 ? (
-					<div className="sidebar-mobile-header">
-						<div className="header-burger">
-							<Button
-								onClick={() => {
-									modals.sidebarOpen = !modals.sidebarOpen;
-								}}
-								icon={modals.sidebarOpen ? <MenuFoldOutlined /> : <MenuUnfoldOutlined />}
-							/>
-						</div>
-					</div>
-				) : null}
-				{windowWidth < 920 ? null : <LinkButton text={linkButtonProps.text} link={linkButtonProps.link} />}
-				<div className="sidebar-block">
-					<h5 className="tag-list-title">Default folders</h5>
-					<PermanentTagList />
+
+				<div className={css.socials}>
+					<a href="https://t.me/ylide_chat" target="_blank noreferrer" title="Telegram">
+						<TelegramSvg />
+					</a>
+					<a href="https://discord.gg/XfKfKhbvHS" target="_blank noreferrer" title="Discord">
+						<DiscordSvg />
+					</a>
+					<a href="https://twitter.com/ylideio" target="_blank noreferrer" title="Twitter">
+						<TwitterSvg />
+					</a>
+					<a href="https://www.linkedin.com/company/ylide/" target="_blank noreferrer" title="LinkedIn">
+						<LinkedInSvg />
+					</a>
+					<a href="https://medium.com/@ylide" target="_blank noreferrer" title="Medium">
+						<MediumSvg />
+					</a>
 				</div>
-				<div className="sidebar-block">
-					<h5 className="tag-list-title">Folders</h5>
-					<TagsList />
-				</div> */}
 			</div>
 		</div>
 	);
