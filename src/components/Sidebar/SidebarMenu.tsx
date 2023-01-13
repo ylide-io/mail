@@ -443,10 +443,10 @@ const SidebarMenu = observer(() => {
 					<a href="https://t.me/ylide_chat" target="_blank noreferrer" title="Telegram">
 						<TelegramSvg />
 					</a>
-					<a href="https://discord.gg/XfKfKhbvHS" target="_blank noreferrer" title="Discord">
+					<a href="https://discord.gg/ylide" target="_blank noreferrer" title="Discord">
 						<DiscordSvg />
 					</a>
-					<a href="https://twitter.com/ylideio" target="_blank noreferrer" title="Twitter">
+					<a href="https://twitter.com/ylide_" target="_blank noreferrer" title="Twitter">
 						<TwitterSvg />
 					</a>
 					<a href="https://www.linkedin.com/company/ylide/" target="_blank noreferrer" title="LinkedIn">
