@@ -2,6 +2,38 @@
 	"name": "@ylide/social-hub",
 	"version": "0.1.0",
 	"private": true,
+	"scripts": {
+		"start": "react-app-rewired start",
+		"build": "react-app-rewired build",
+		"test": "react-app-rewired test",
+		"eject": "react-app-rewired eject"
+	},
+	"eslintConfig": {
+		"root": true,
+		"extends": [
+			"react-app",
+			"react-app/jest"
+		],
+		"plugins": [
+			"simple-import-sort"
+		],
+		"rules": {
+			"simple-import-sort/imports": "warn",
+			"simple-import-sort/exports": "warn"
+		}
+	},
+	"browserslist": {
+		"production": [
+			">0.2%",
+			"not dead",
+			"not op_mini all"
+		],
+		"development": [
+			"last 1 chrome version",
+			"last 1 firefox version",
+			"last 1 safari version"
+		]
+	},
 	"dependencies": {
 		"@ant-design/icons": "^4.7.0",
 		"@editorjs/editorjs": "^2.26.4",
@@ -52,38 +84,6 @@
 		"web-vitals": "^2.1.4",
 		"web3": "^1.7.5",
 		"zustand": "^4.2.0"
-	},
-	"scripts": {
-		"start": "react-app-rewired start",
-		"build": "react-app-rewired build",
-		"test": "react-app-rewired test",
-		"eject": "react-app-rewired eject"
-	},
-	"eslintConfig": {
-		"root": true,
-		"extends": [
-			"react-app",
-			"react-app/jest"
-		],
-		"plugins": [
-			"simple-import-sort"
-		],
-		"rules": {
-			"simple-import-sort/imports": "warn",
-			"simple-import-sort/exports": "warn"
-		}
-	},
-	"browserslist": {
-		"production": [
-			">0.2%",
-			"not dead",
-			"not op_mini all"
-		],
-		"development": [
-			"last 1 chrome version",
-			"last 1 firefox version",
-			"last 1 safari version"
-		]
 	},
 	"devDependencies": {
 		"@types/pako": "^2.0.0",
