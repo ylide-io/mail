@@ -14,7 +14,7 @@ import { observer } from 'mobx-react';
 import React, { useState } from 'react';
 
 import { walletsMap } from '../../constants';
-import { AdaptiveAddress } from '../../controls/AdaptiveAddress';
+import { AdaptiveAddress } from '../../controls/adaptiveAddress/adaptiveAddress';
 import { Blockie } from '../../controls/Blockie';
 import { YlideLargeLogo } from '../../icons/YlideLargeLogo';
 import AlertModal from '../../modals/AlertModal';

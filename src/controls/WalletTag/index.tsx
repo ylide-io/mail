@@ -1,5 +1,5 @@
 import { walletsMap } from '../../constants';
-import { AdaptiveAddress } from '../AdaptiveAddress';
+import { AdaptiveAddress } from '../adaptiveAddress/adaptiveAddress';
 
 export function WalletTag({ wallet, address }: { wallet: string; address: string }) {
 	const wData = walletsMap[wallet];

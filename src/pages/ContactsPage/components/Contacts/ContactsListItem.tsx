@@ -4,7 +4,7 @@ import clsx from 'clsx';
 import React, { ChangeEvent, useMemo, useState } from 'react';
 
 import { ActionButton, ActionButtonStyle } from '../../../../components/ActionButton/ActionButton';
-import { AdaptiveAddress } from '../../../../controls/AdaptiveAddress';
+import { AdaptiveAddress } from '../../../../controls/adaptiveAddress/adaptiveAddress';
 import { Blockie } from '../../../../controls/Blockie';
 import contacts from '../../../../stores/Contacts';
 import domain from '../../../../stores/Domain';

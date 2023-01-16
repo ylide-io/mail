@@ -27,10 +27,11 @@
 }
 
 .mailbox-title-secondary {
-	flex-grow: 1;
+	flex: 1;
 	display: flex;
 	align-items: baseline;
 	margin: 0 0 0 0.5em;
+	min-width: 0;
 	color: var(--secondary-text-color);
 	font-size: 75%;
 	font-weight: $font-weight_light;
@@ -271,10 +272,6 @@
 			@include flex-row(center, flex-start);
 
 			margin-left: 5px;
-
-			.ylide-address {
-				min-width: 254px;
-			}
 		}
 	}
 }

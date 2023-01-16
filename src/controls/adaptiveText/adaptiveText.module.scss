@@ -1,0 +1,14 @@
+.root {
+	position: relative;
+	overflow: hidden;
+}
+
+.invisible {
+	visibility: hidden;
+}
+
+.visible {
+	position: absolute;
+	top: 0;
+	left: 0;
+}

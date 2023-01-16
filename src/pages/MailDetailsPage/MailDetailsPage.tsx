@@ -3,7 +3,7 @@ import { useParams } from 'react-router-dom';
 
 import { ActionButton } from '../../components/ActionButton/ActionButton';
 import { Spinner } from '../../components/spinner/spinner';
-import { AdaptiveAddress } from '../../controls/AdaptiveAddress';
+import { AdaptiveAddress } from '../../controls/adaptiveAddress/adaptiveAddress';
 import { BackIcon } from '../../icons/BackIcon';
 import { ContactIcon } from '../../icons/ContactIcon';
 import { ForwardIcon } from '../../icons/ForwardIcon';

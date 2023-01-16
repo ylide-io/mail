@@ -201,17 +201,12 @@
 		}
 
 		.cw-subtitle {
-			@include flex-row(center, center);
-
-			width: 120px;
-
+			max-width: 120px;
 			font-style: normal;
 			font-weight: 300;
 			font-size: 14px;
-			line-height: 16px;
 			text-align: center;
-
-			color: rgba(0, 0, 0, 0.4);
+			color: var(--secondary-text-color);
 		}
 
 		.cw-delete {

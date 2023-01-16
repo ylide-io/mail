@@ -9,7 +9,9 @@
 }
 
 .header {
-	display: flex;
+	display: grid;
+	grid-auto-flow: column;
+	grid-gap: 8px;
 	align-items: center;
 	justify-content: space-between;
 	padding: 0 12px;
@@ -27,12 +29,7 @@
 	grid-template-columns: auto 1fr;
 	grid-gap: 4px;
 	align-items: center;
-	min-width: 400px;
 	white-space: nowrap;
-
-	@include less720px {
-		min-width: 240px;
-	}
 }
 
 .messagesFromLebel {

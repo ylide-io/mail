@@ -3,7 +3,7 @@ import { observer } from 'mobx-react';
 import React, { CSSProperties, useEffect, useMemo, useState } from 'react';
 
 import { BlockChainLabel } from '../../../../components/BlockChainLabel/BlockChainLabel';
-import { AdaptiveAddress } from '../../../../controls/AdaptiveAddress';
+import { AdaptiveAddress } from '../../../../controls/adaptiveAddress/adaptiveAddress';
 import { YlideCheckbox } from '../../../../controls/YlideCheckbox';
 import { FilterIcon } from '../../../../icons/FilterIcon';
 import contacts from '../../../../stores/Contacts';

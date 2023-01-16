@@ -3,7 +3,7 @@ import { observer } from 'mobx-react';
 import { PureComponent } from 'react';
 
 import { blockchainsMap, walletsMap } from '../../constants';
-import { AdaptiveAddress } from '../../controls/AdaptiveAddress';
+import { AdaptiveAddress } from '../../controls/adaptiveAddress/adaptiveAddress';
 import { YlideButton } from '../../controls/YlideButton';
 import { ArrowRight } from '../../icons/ArrowRight';
 import { CrossIcon } from '../../icons/CrossIcon';

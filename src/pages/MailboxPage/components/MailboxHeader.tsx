@@ -3,7 +3,7 @@ import { observer } from 'mobx-react';
 
 import { ActionButton, ActionButtonStyle } from '../../../components/ActionButton/ActionButton';
 import { smallButtonIcons } from '../../../components/smallButton/smallButton';
-import { AdaptiveAddress } from '../../../controls/AdaptiveAddress';
+import { AdaptiveAddress } from '../../../controls/adaptiveAddress/adaptiveAddress';
 import { YlideCheckbox } from '../../../controls/YlideCheckbox';
 import contacts from '../../../stores/Contacts';
 import { FolderId, getFolderName } from '../../../stores/MailList';

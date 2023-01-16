@@ -5,7 +5,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { createReactEditorJS } from 'react-editor-js';
 
 import { ActionButton, ActionButtonStyle } from '../../../components/ActionButton/ActionButton';
-import { AdaptiveAddress } from '../../../controls/AdaptiveAddress';
+import { AdaptiveAddress } from '../../../controls/adaptiveAddress/adaptiveAddress';
 import { Blockie } from '../../../controls/Blockie';
 import { ForwardIcon } from '../../../icons/ForwardIcon';
 import { ReplyIcon } from '../../../icons/ReplyIcon';
