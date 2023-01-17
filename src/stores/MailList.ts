@@ -363,7 +363,7 @@ export const useMailStore = create<MailStore>((set, get) => ({
 		set({ lastMessagesList: messages });
 	},
 
-	saveDecodedMessages: localStorage.getItem('saveDecodedMessages') === 'true',
+	saveDecodedMessages: localStorage.getItem('saveDecodedMessages') !== 'false',
 	setSaveDecodedSetting: async flag => {
 		set({ saveDecodedMessages: flag });
 		localStorage.setItem('saveDecodedMessages', flag ? 'true' : 'false');
