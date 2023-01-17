@@ -71,7 +71,7 @@
 	background-color: white;
 	border: 1px solid black;
 	cursor: pointer;
-	box-shadow: 0px 0px 0px rgba(0, 0, 0, 0.2);
+	box-shadow: 0 0 0 rgba(0, 0, 0, 0.2);
 
 	position: fixed;
 	right: 20px;
@@ -80,7 +80,7 @@
 	transition: box-shadow 0.2s;
 
 	&:hover {
-		box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2);
+		box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
 	}
 }
 
@@ -221,6 +221,7 @@
 .postEmbed {
 	$padding: 15px;
 	padding-bottom: $padding;
+	font-weight: $font-weight_light;
 	background: #fafcf9;
 	border: 1px solid #e0e0e0;
 	border-radius: 10px;
@@ -250,7 +251,7 @@
 	.postEmbedTitle {
 		color: #202020;
 		font-size: 18px;
-		font-weight: bold;
+		font-weight: bolder;
 		margin-top: 8px;
 		padding-left: $padding;
 		padding-right: $padding;

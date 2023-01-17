@@ -75,6 +75,11 @@ button,
 	cursor: pointer;
 }
 
+b,
+strong {
+	font-weight: bolder;
+}
+
 code {
 	font-family: $font-family_code;
 }
