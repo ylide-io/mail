@@ -11,13 +11,14 @@ export enum ActionButtonStyle {
 }
 
 interface ActionButtonProps extends PropsWithChildren, PropsWithClassName {
-	icon?: ReactNode;
 	style?: ActionButtonStyle;
+	icon?: ReactNode;
+	isDisabled?: boolean;
 	onClick?: React.MouseEventHandler<HTMLElement>;
 }
 
 // 'props' are needed to let AntD show Tooltips https://github.com/ant-design/ant-design/issues/15909
-export function ActionButton({ children, className, icon, style, onClick, ...props }: ActionButtonProps) {
+export function ActionButton({ children, className, style, icon, isDisabled, onClick, ...props }: ActionButtonProps) {
 	const styleClass = {
 		[ActionButtonStyle.Default]: css.root_default,
 		[ActionButtonStyle.Primary]: css.root_primary,
@@ -31,8 +32,10 @@ export function ActionButton({ children, className, icon, style, onClick, ...pro
 				styleClass,
 				icon != null && css.root_hasIcon,
 				children != null && css.root_hasContent,
+				isDisabled && css.root_disabled,
 				className,
 			)}
+			disabled={isDisabled}
 			onClick={onClick}
 			{...props}
 		>

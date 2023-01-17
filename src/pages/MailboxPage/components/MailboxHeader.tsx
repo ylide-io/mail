@@ -14,6 +14,7 @@ interface MailboxHeaderProps {
 	filterBySender?: string;
 	isAllSelected: boolean;
 	onSelectAllCheckBoxClick: (isChecked: boolean) => void;
+	isActionButtonsDisabled: boolean;
 	onMarkReadClick: () => void;
 	onDeleteClick: () => void;
 	onRestoreClick: () => void;
@@ -25,6 +26,7 @@ export const MailboxHeader = observer(
 		filterBySender,
 		isAllSelected,
 		onSelectAllCheckBoxClick,
+		isActionButtonsDisabled,
 		onMarkReadClick,
 		onDeleteClick,
 		onRestoreClick,
@@ -62,16 +64,18 @@ export const MailboxHeader = observer(
 
 					<Tooltip title="Mark as read">
 						<ActionButton
-							onClick={() => onMarkReadClick()}
 							icon={<i className={`fa ${smallButtonIcons.eye}`} />}
+							isDisabled={isActionButtonsDisabled}
+							onClick={() => onMarkReadClick()}
 						/>
 					</Tooltip>
 
 					{folderId === FolderId.Archive && (
 						<Tooltip title="Restore mails">
 							<ActionButton
-								onClick={() => onRestoreClick()}
 								icon={<i className={`fa ${smallButtonIcons.restore}`} />}
+								isDisabled={isActionButtonsDisabled}
+								onClick={() => onRestoreClick()}
 							/>
 						</Tooltip>
 					)}
@@ -79,8 +83,9 @@ export const MailboxHeader = observer(
 					{folderId === FolderId.Inbox && (
 						<Tooltip title="Archive mails">
 							<ActionButton
-								onClick={() => onDeleteClick()}
 								icon={<i className={`fa ${smallButtonIcons.trash}`} />}
+								isDisabled={isActionButtonsDisabled}
+								onClick={() => onDeleteClick()}
 							/>
 						</Tooltip>
 					)}

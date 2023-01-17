@@ -111,6 +111,7 @@ export const MailboxPage = () => {
 					onSelectAllCheckBoxClick={isChecked => {
 						setSelectedMessageIds(isChecked ? new Set(messages.map(it => it.id)) : new Set());
 					}}
+					isActionButtonsDisabled={!selectedMessageIds.size}
 					onMarkReadClick={() => {
 						markMessagesAsReaded(Array.from(selectedMessageIds)).then();
 						setSelectedMessageIds(new Set());

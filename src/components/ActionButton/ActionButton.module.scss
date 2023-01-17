@@ -42,6 +42,10 @@
 .root_hasIcon:not(.root_hasContent) {
 	padding: 0 3px;
 }
+.root_disabled {
+	pointer-events: none;
+	opacity: 0.5;
+}
 
 .content {
 	padding: 1px 0 0;
