@@ -11,6 +11,8 @@ import { blockchainsMap } from '../../../../constants';
 import classNames from 'classnames';
 import { Dropdown, Menu } from 'antd';
 import mailList from '../../../../stores/MailList';
+import { createEventFileString } from '../../../../utils/eventFileString';
+import { isValidCalendarEventDates } from '../../../../utils/calendarEventDate';
 
 const evmNetworks = (Object.keys(EVM_NAMES) as unknown as EVMNetwork[]).map((network: EVMNetwork) => ({
 	name: EVM_NAMES[network],
@@ -103,10 +105,33 @@ const ComposeMailFooter = observer(() => {
 				await domain.handleSwitchRequest(acc.wallet.factory.wallet, curr, acc.account);
 			}
 
+			const payload = mailbox.textEditorData;
+
+			if (mailbox.event.active && mailbox.event.start && mailbox.event.end) {
+				const eventBlockText = createEventFileString({
+					organizer: mailbox.from?.account.address || '',
+					attendees: mailbox.to.map(toAddress => toAddress.address).filter(i => i) as string[],
+					start: mailbox.event.start,
+					end: mailbox.event.end,
+					summary: mailbox.event.summary || '',
+					location: mailbox.event.location || '',
+					description: mailbox.event.description || '',
+				});
+
+				if (payload.blocks && Array.isArray(payload.blocks)) {
+					payload.blocks.push({
+						type: "calendarEvent",
+						data: {
+							text: eventBlockText
+						}
+					});
+				}
+			}
+
 			const msgId = await mailer.sendMail(
 				acc,
 				mailbox.subject,
-				JSON.stringify(mailbox.textEditorData),
+				JSON.stringify(payload),
 				recipients,
 				mailbox.network,
 			);
@@ -120,6 +145,8 @@ const ComposeMailFooter = observer(() => {
 		}
 	};
 
+	const validCalendarEvent = !mailbox.event.active || isValidCalendarEventDates(mailbox.event.start, mailbox.event.end);
+
 	return (
 		<div className="mail-footer compose-mail-footer">
 			<div
@@ -129,7 +156,8 @@ const ComposeMailFooter = observer(() => {
 						mailer.sending ||
 						!mailbox.to.some(r => r.isAchievable) ||
 						!mailbox.textEditorData?.blocks?.length ||
-						!mailbox.to.length,
+						!mailbox.to.length ||
+						!validCalendarEvent,
 					withDropdown: mailbox.from?.wallet.factory.blockchainGroup === 'evm',
 				})}
 			>

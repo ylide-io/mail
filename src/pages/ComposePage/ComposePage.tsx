@@ -10,6 +10,7 @@ import { Button } from 'antd';
 import ComposeMailFooter from './components/Mailbox/ComposeMailFooter';
 import ComposeMailBody from './components/Mailbox/ComposeMailBody';
 import { MailComposeMeta } from './components/MailComposeMeta';
+import MailboxCalendarEventEditor from './components/Mailbox/MailboxCalendarEventEditor/MailboxCalendarEventEditor';
 
 const ComposePage = observer(() => {
 	const navigate = useNav();
@@ -36,6 +37,7 @@ const ComposePage = observer(() => {
 						</div>
 					</div>
 					<MailComposeMeta />
+					<MailboxCalendarEventEditor />
 				</div>
 				<div className="mail-body" style={{ position: 'relative' }}>
 					<ComposeMailBody />

@@ -16,4 +16,5 @@ export enum smallButtonIcons {
 	restore = 'fa-rotate-left',
 	forward = 'fa-arrow-right',
 	arrowLeft = 'fa-arrow-left',
+	calendar = 'fa-calendar',
 }
