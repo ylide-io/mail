@@ -5,7 +5,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { createReactEditorJS } from 'react-editor-js';
 
 import { ActionButton, ActionButtonStyle } from '../../../components/ActionButton/ActionButton';
-import { AdaptiveAddress } from '../../../controls/adaptiveAddress/adaptiveAddress';
+import { ContactName } from '../../../components/contactName/contactName';
 import { Blockie } from '../../../controls/Blockie';
 import { ForwardIcon } from '../../../icons/ForwardIcon';
 import { ReplyIcon } from '../../../icons/ReplyIcon';
@@ -93,7 +93,7 @@ export function MailMessage({
 
 			<div className={css.sender}>
 				<div className={css.senderLabel}>Sender:</div>
-				<AdaptiveAddress address={message.msg.senderAddress} />
+				<ContactName address={message.msg.senderAddress} />
 			</div>
 
 			<div className={css.date}>{moment.unix(message.msg.createdAt).format('HH:mm DD.MM.YYYY')}</div>

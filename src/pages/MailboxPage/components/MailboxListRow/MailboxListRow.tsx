@@ -3,10 +3,9 @@ import { observer } from 'mobx-react';
 import React, { CSSProperties, useEffect, useMemo, useState } from 'react';
 
 import { BlockChainLabel } from '../../../../components/BlockChainLabel/BlockChainLabel';
-import { AdaptiveAddress } from '../../../../controls/adaptiveAddress/adaptiveAddress';
+import { ContactName } from '../../../../components/contactName/contactName';
 import { YlideCheckbox } from '../../../../controls/YlideCheckbox';
 import { FilterIcon } from '../../../../icons/FilterIcon';
-import contacts from '../../../../stores/Contacts';
 import domain from '../../../../stores/Domain';
 import { ILinkedMessage, useMailStore } from '../../../../stores/MailList';
 import { isToday } from '../../../../utils/date';
@@ -27,7 +26,6 @@ const MailboxListRow: React.FC<MailboxListRowProps> = observer(
 		const navigate = useNav();
 		const [isLoading, setLoading] = useState(false);
 		const [error, setError] = useState('');
-		const contact = contacts.contactsByAddress[message.msg.senderAddress];
 
 		const { decodedMessagesById, readMessageIds, decodeMessage } = useMailStore();
 
@@ -99,7 +97,7 @@ const MailboxListRow: React.FC<MailboxListRowProps> = observer(
 				</div>
 
 				<div className={css.contact}>
-					{contact ? contact.name : <AdaptiveAddress address={message.msg.senderAddress} />}
+					<ContactName address={message.msg.senderAddress} />
 
 					{onFilterBySenderClick && (
 						<div

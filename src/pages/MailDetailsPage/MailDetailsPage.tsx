@@ -2,8 +2,8 @@ import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useParams } from 'react-router-dom';
 
 import { ActionButton } from '../../components/ActionButton/ActionButton';
+import { ContactName } from '../../components/contactName/contactName';
 import { Spinner } from '../../components/spinner/spinner';
-import { AdaptiveAddress } from '../../controls/adaptiveAddress/adaptiveAddress';
 import { BackIcon } from '../../icons/BackIcon';
 import { ContactIcon } from '../../icons/ContactIcon';
 import { ForwardIcon } from '../../icons/ForwardIcon';
@@ -182,7 +182,7 @@ export const MailDetailsPage = () => {
 						) : isThreadOpen ? (
 							<div className={css.messagesFrom}>
 								<div className={css.messagesFromLebel}>Messages from</div>
-								<AdaptiveAddress address={initialMessage.msg.senderAddress} />
+								<ContactName address={initialMessage.msg.senderAddress} />
 							</div>
 						) : (
 							wrappedThreadMessages.length > 1 && (
