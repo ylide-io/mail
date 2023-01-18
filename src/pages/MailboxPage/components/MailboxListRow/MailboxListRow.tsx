@@ -4,11 +4,11 @@ import React, { CSSProperties, useEffect, useMemo, useState } from 'react';
 
 import { BlockChainLabel } from '../../../../components/BlockChainLabel/BlockChainLabel';
 import { ContactName } from '../../../../components/contactName/contactName';
+import { ReadableDate } from '../../../../components/readableDate/readableDate';
 import { YlideCheckbox } from '../../../../controls/YlideCheckbox';
 import { FilterIcon } from '../../../../icons/FilterIcon';
 import domain from '../../../../stores/Domain';
 import { ILinkedMessage, useMailStore } from '../../../../stores/MailList';
-import { isToday } from '../../../../utils/date';
 import { useNav } from '../../../../utils/navigate';
 import { safeJson } from '../../../../utils/safeJson';
 import css from './MailboxListRow.module.scss';
@@ -52,20 +52,6 @@ const MailboxListRow: React.FC<MailboxListRowProps> = observer(
 		useEffect(() => {
 			setError('');
 		}, [message.id]);
-
-		const date = useMemo(() => {
-			const fullDate = new Date(message.msg.createdAt * 1000);
-
-			if (isToday(fullDate)) {
-				return fullDate.toLocaleTimeString('en-us', {
-					hourCycle: 'h23',
-					minute: '2-digit',
-					hour: '2-digit',
-				});
-			}
-
-			return fullDate.toLocaleString('en-us', { day: 'numeric', month: 'short' }).split(' ').reverse().join(' ');
-		}, [message.msg.createdAt]);
 
 		const preview = useMemo(() => {
 			return (
@@ -129,7 +115,7 @@ const MailboxListRow: React.FC<MailboxListRowProps> = observer(
 					<BlockChainLabel blockchain={message.msg.blockchain} />
 				</div>
 
-				<div className={css.date}>{date}</div>
+				<ReadableDate className={css.date} value={message.msg.createdAt * 1000} />
 			</div>
 		);
 	},

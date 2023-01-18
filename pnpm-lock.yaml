@@ -44,7 +44,6 @@ specifiers:
   jest: ^29.3.1
   mobx: ^6.5.0
   mobx-react: ^7.4.0
-  moment: ^2.29.4
   os-browserify: ^0.3.0
   prettier: ^2.8.1
   process: ^0.11.10
@@ -106,7 +105,6 @@ dependencies:
   idb: 7.1.1
   mobx: 6.7.0
   mobx-react: 7.6.0_babczrqhj3q4qgfqwtwyebsria
-  moment: 2.29.4
   react: 17.0.2
   react-beforeunload: 2.5.3_react@17.0.2
   react-dom: 17.0.2_react@17.0.2

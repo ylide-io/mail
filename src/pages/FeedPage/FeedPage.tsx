@@ -2,11 +2,11 @@ import { UserOutlined } from '@ant-design/icons';
 import Avatar from 'antd/lib/avatar/avatar';
 import clsx from 'clsx';
 import { observer } from 'mobx-react';
-import moment from 'moment';
 import React, { MouseEvent, useCallback, useEffect, useRef, useState } from 'react';
 import { useLocation, useParams } from 'react-router-dom';
 
 import { ActionButton, ActionButtonStyle } from '../../components/ActionButton/ActionButton';
+import { ReadableDate } from '../../components/readableDate/readableDate';
 import { smallButtonIcons } from '../../components/smallButton/smallButton';
 import { YlideLoader } from '../../components/ylideLoader/ylideLoader';
 import { YlideButton } from '../../controls/YlideButton';
@@ -79,7 +79,7 @@ const FeedPostControl = observer(({ post }: { post: FeedPost }) => {
 						</>
 					)}
 				</div>
-				<div className={css.postDate}>{moment.utc(post.date).local().format('MMM D, YYYY, HH:mm')}</div>
+				<ReadableDate className={css.postDate} value={Date.parse(post.date)} />
 				{!!post.sourceLink && (
 					<a className={css.postExternalButton} href={post.sourceLink} target="_blank" rel="noreferrer">
 						{linkIcon}
