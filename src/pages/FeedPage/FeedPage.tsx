@@ -18,7 +18,7 @@ import { telegramSourceIcon } from '../../icons/static/telegramSourceIcon';
 import { twitterSourceIcon } from '../../icons/static/twitterSourceIcon';
 import { GenericLayout } from '../../layouts/GenericLayout';
 import GalleryModal from '../../modals/GalleryModal';
-import feed, { FeedPost, LinkType } from '../../stores/Feed';
+import feed, { FeedCategory, FeedPost, LinkType } from '../../stores/Feed';
 import { useNav } from '../../utils/navigate';
 import css from './FeedPage.module.scss';
 
@@ -210,9 +210,9 @@ export const FeedPage = observer(() => {
 
 	let title;
 
-	if (feed.selectedCategory === 'main') {
+	if (feed.selectedCategory === FeedCategory.MAIN) {
 		title = 'My feed';
-	} else if (feed.selectedCategory === 'all') {
+	} else if (feed.selectedCategory === FeedCategory.ALL) {
 		title = 'All topics';
 	} else {
 		title = feed.selectedCategory;

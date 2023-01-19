@@ -14,6 +14,7 @@ import { YlideButton } from '../../controls/YlideButton';
 import { CrossIcon } from '../../icons/CrossIcon';
 import { analytics } from '../../stores/Analytics';
 import domain from '../../stores/Domain';
+import { FeedCategory } from '../../stores/Feed';
 import modals from '../../stores/Modals';
 import { DomainAccount } from '../../stores/models/DomainAccount';
 import { Wallet } from '../../stores/models/Wallet';
@@ -690,7 +691,7 @@ function PasswordModalFooter({ close }: { close: () => void }) {
 			<YlideButton
 				primary
 				onClick={() => {
-					navigate(generatePath(RoutePath.FEED_CATEGORY, { category: 'main' }));
+					navigate(generatePath(RoutePath.FEED_CATEGORY, { category: FeedCategory.MAIN }));
 					close();
 				}}
 			>

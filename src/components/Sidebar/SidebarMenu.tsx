@@ -25,7 +25,7 @@ import { sideProjectsIcon } from '../../icons/static/sideProjectsIcon';
 import { sideSecurityIcon } from '../../icons/static/sideSecurityIcon';
 import { sideTechnologyIcon } from '../../icons/static/sideTechnologyIcon';
 import { topicSettingsIcon } from '../../icons/static/topicSettingsIcon';
-import feed from '../../stores/Feed';
+import feed, { FeedCategory, getFeedCategoryName, nonSyntheticFeedCategories } from '../../stores/Feed';
 import { FolderId } from '../../stores/MailList';
 import modals from '../../stores/Modals';
 import { RoutePath } from '../../stores/routePath';
@@ -43,126 +43,24 @@ const FeedSettings = observer(() => {
 	return (
 		<div className="feed-settings-popup">
 			<div className="fsp-title">My feed settings</div>
-			<div className="fsp-row">
-				<div
-					onClick={() => {
-						if (newValues.includes('Markets')) {
-							setNewValues(newValues.filter(t => t !== 'Markets'));
-						} else {
-							setNewValues([...newValues, 'Markets']);
-						}
-					}}
-					className={clsx('fsp-checkbox', { checked: newValues.includes('Markets') })}
-				>
-					{newValues.includes('Markets') ? checkboxCheckIcon : null}
+
+			{nonSyntheticFeedCategories.map(category => (
+				<div key={category} className="fsp-row">
+					<div
+						onClick={() => {
+							if (newValues.includes(category)) {
+								setNewValues(newValues.filter(t => t !== category));
+							} else {
+								setNewValues([...newValues, category]);
+							}
+						}}
+						className={clsx('fsp-checkbox', { checked: newValues.includes(category) })}
+					>
+						{newValues.includes(category) ? checkboxCheckIcon : null}
+					</div>
+					<div className="fsp-row-title">{getFeedCategoryName(category)}</div>
 				</div>
-				<div className="fsp-row-title">Markets</div>
-			</div>
-			<div className="fsp-row">
-				<div
-					onClick={() => {
-						if (newValues.includes('Analytics')) {
-							setNewValues(newValues.filter(t => t !== 'Analytics'));
-						} else {
-							setNewValues([...newValues, 'Analytics']);
-						}
-					}}
-					className={clsx('fsp-checkbox', { checked: newValues.includes('Analytics') })}
-				>
-					{newValues.includes('Analytics') ? checkboxCheckIcon : null}
-				</div>
-				<div className="fsp-row-title">Analytics</div>
-			</div>
-			<div className="fsp-row">
-				<div
-					onClick={() => {
-						if (newValues.includes('Projects')) {
-							setNewValues(newValues.filter(t => t !== 'Projects'));
-						} else {
-							setNewValues([...newValues, 'Projects']);
-						}
-					}}
-					className={clsx('fsp-checkbox', { checked: newValues.includes('Projects') })}
-				>
-					{newValues.includes('Projects') ? checkboxCheckIcon : null}
-				</div>
-				<div className="fsp-row-title">Projects</div>
-			</div>
-			<div className="fsp-row">
-				<div
-					onClick={() => {
-						if (newValues.includes('Policy')) {
-							setNewValues(newValues.filter(t => t !== 'Policy'));
-						} else {
-							setNewValues([...newValues, 'Policy']);
-						}
-					}}
-					className={clsx('fsp-checkbox', { checked: newValues.includes('Policy') })}
-				>
-					{newValues.includes('Policy') ? checkboxCheckIcon : null}
-				</div>
-				<div className="fsp-row-title">Policy</div>
-			</div>
-			<div className="fsp-row">
-				<div
-					onClick={() => {
-						if (newValues.includes('Security')) {
-							setNewValues(newValues.filter(t => t !== 'Security'));
-						} else {
-							setNewValues([...newValues, 'Security']);
-						}
-					}}
-					className={clsx('fsp-checkbox', { checked: newValues.includes('Security') })}
-				>
-					{newValues.includes('Security') ? checkboxCheckIcon : null}
-				</div>
-				<div className="fsp-row-title">Security</div>
-			</div>
-			<div className="fsp-row">
-				<div
-					onClick={() => {
-						if (newValues.includes('Technology')) {
-							setNewValues(newValues.filter(t => t !== 'Technology'));
-						} else {
-							setNewValues([...newValues, 'Technology']);
-						}
-					}}
-					className={clsx('fsp-checkbox', { checked: newValues.includes('Technology') })}
-				>
-					{newValues.includes('Technology') ? checkboxCheckIcon : null}
-				</div>
-				<div className="fsp-row-title">Technology</div>
-			</div>
-			<div className="fsp-row">
-				<div
-					onClick={() => {
-						if (newValues.includes('Culture')) {
-							setNewValues(newValues.filter(t => t !== 'Culture'));
-						} else {
-							setNewValues([...newValues, 'Culture']);
-						}
-					}}
-					className={clsx('fsp-checkbox', { checked: newValues.includes('Culture') })}
-				>
-					{newValues.includes('Culture') ? checkboxCheckIcon : null}
-				</div>
-				<div className="fsp-row-title">Culture</div>
-			</div>
-			<div className="fsp-row">
-				<div
-					onClick={() => {
-						if (newValues.includes('Education')) {
-							setNewValues(newValues.filter(t => t !== 'Education'));
-						} else {
-							setNewValues([...newValues, 'Education']);
-						}
-					}}
-					className={clsx('fsp-checkbox', { checked: newValues.includes('Education') })}
-				>
-					{newValues.includes('Education') ? checkboxCheckIcon : null}
-				</div>
-				<div className="fsp-row-title">Education</div>
-			</div>
+			))}
 
 			<div className="fsp-row" style={{ justifyContent: 'space-evenly', marginTop: 8 }}>
 				<YlideButton
@@ -171,8 +69,8 @@ const FeedSettings = observer(() => {
 					onClick={() => {
 						feed.mainCategories = [...newValues];
 						localStorage.setItem('t_main_categories', JSON.stringify(feed.mainCategories));
-						if (feed.selectedCategory === 'main') {
-							feed.loadCategory('main', null);
+						if (feed.selectedCategory === FeedCategory.MAIN) {
+							feed.loadCategory(FeedCategory.MAIN, null);
 						}
 					}}
 				>
@@ -191,6 +89,51 @@ const FeedSettings = observer(() => {
 		</div>
 	);
 });
+
+//
+
+const feedMenuItems = [
+	{
+		category: FeedCategory.MAIN,
+		icon: sideFeedIcon(14),
+	},
+	{
+		category: FeedCategory.ALL,
+		icon: sideAllTopicsIcon(15),
+	},
+	{
+		category: FeedCategory.MARKETS,
+		icon: sideMarketsIcon(15),
+	},
+	{
+		category: FeedCategory.ANALYTICS,
+		icon: sideAnalyticsIcon(15),
+	},
+	{
+		category: FeedCategory.PROJECTS,
+		icon: sideProjectsIcon(15),
+	},
+	{
+		category: FeedCategory.POLICY,
+		icon: sidePolicyIcon(15),
+	},
+	{
+		category: FeedCategory.SECURITY,
+		icon: sideSecurityIcon(15),
+	},
+	{
+		category: FeedCategory.TECHNOLOGY,
+		icon: sideTechnologyIcon(15),
+	},
+	{
+		category: FeedCategory.CULTURE,
+		icon: sideCultureIcon(15),
+	},
+	{
+		category: FeedCategory.EDUCATION,
+		icon: sideEducationIcon(18),
+	},
+];
 
 const SidebarMenu = observer(() => {
 	const location = useLocation();
@@ -239,146 +182,31 @@ const SidebarMenu = observer(() => {
 						</div>
 					</div>
 					<div className={clsx('sidebar-section-content', { open: feedOpen })}>
-						<div
-							className={clsx('sidebar-section-link', {
-								active:
-									location.pathname === generatePath(RoutePath.FEED_CATEGORY, { category: 'main' }),
-							})}
-							onClick={() => {
-								modals.sidebarOpen = false;
-								navigate(generatePath(RoutePath.FEED_CATEGORY, { category: 'main' }));
-							}}
-						>
-							<div className="sidebar-link-icon-left">{sideFeedIcon(14)}</div>
-							<div className="sidebar-link-title">My feed</div>
-							<div className="sidebar-link-icon-right">
-								<Dropdown overlay={<FeedSettings />}>{topicSettingsIcon}</Dropdown>
-							</div>
-						</div>
-						<div
-							className={clsx('sidebar-section-link', {
-								active:
-									location.pathname === generatePath(RoutePath.FEED_CATEGORY, { category: 'all' }),
-							})}
-							onClick={() => {
-								modals.sidebarOpen = false;
-								navigate(generatePath(RoutePath.FEED_CATEGORY, { category: 'all' }));
-							}}
-						>
-							<div className="sidebar-link-icon-left">{sideAllTopicsIcon(15)}</div>
-							<div className="sidebar-link-title">All topics</div>
-						</div>
-						<div
-							className={clsx('sidebar-section-link', {
-								active:
-									location.pathname ===
-									generatePath(RoutePath.FEED_CATEGORY, { category: 'Markets' }),
-							})}
-							onClick={() => {
-								modals.sidebarOpen = false;
-								navigate(generatePath(RoutePath.FEED_CATEGORY, { category: 'Markets' }));
-							}}
-						>
-							<div className="sidebar-link-icon-left">{sideMarketsIcon(15)}</div>
-							<div className="sidebar-link-title">Markets</div>
-						</div>
-						<div
-							className={clsx('sidebar-section-link', {
-								active:
-									location.pathname ===
-									generatePath(RoutePath.FEED_CATEGORY, { category: 'Analytics' }),
-							})}
-							onClick={() => {
-								modals.sidebarOpen = false;
-								navigate(generatePath(RoutePath.FEED_CATEGORY, { category: 'Analytics' }));
-							}}
-						>
-							<div className="sidebar-link-icon-left">{sideAnalyticsIcon(15)}</div>
-							<div className="sidebar-link-title">Analytics</div>
-						</div>
-						<div
-							className={clsx('sidebar-section-link', {
-								active:
-									location.pathname ===
-									generatePath(RoutePath.FEED_CATEGORY, { category: 'Projects' }),
-							})}
-							onClick={() => {
-								modals.sidebarOpen = false;
-								navigate(generatePath(RoutePath.FEED_CATEGORY, { category: 'Projects' }));
-							}}
-						>
-							<div className="sidebar-link-icon-left">{sideProjectsIcon(15)}</div>
-							<div className="sidebar-link-title">Projects</div>
-						</div>
-						<div
-							className={clsx('sidebar-section-link', {
-								active:
-									location.pathname === generatePath(RoutePath.FEED_CATEGORY, { category: 'Policy' }),
-							})}
-							onClick={() => {
-								modals.sidebarOpen = false;
-								navigate(generatePath(RoutePath.FEED_CATEGORY, { category: 'Policy' }));
-							}}
-						>
-							<div className="sidebar-link-icon-left">{sidePolicyIcon(15)}</div>
-							<div className="sidebar-link-title">Policy</div>
-						</div>
-						<div
-							className={clsx('sidebar-section-link', {
-								active:
-									location.pathname ===
-									generatePath(RoutePath.FEED_CATEGORY, { category: 'Security' }),
-							})}
-							onClick={() => {
-								modals.sidebarOpen = false;
-								navigate(generatePath(RoutePath.FEED_CATEGORY, { category: 'Security' }));
-							}}
-						>
-							<div className="sidebar-link-icon-left">{sideSecurityIcon(15)}</div>
-							<div className="sidebar-link-title">Security</div>
-						</div>
-						<div
-							className={clsx('sidebar-section-link', {
-								active:
-									location.pathname ===
-									generatePath(RoutePath.FEED_CATEGORY, { category: 'Technology' }),
-							})}
-							onClick={() => {
-								modals.sidebarOpen = false;
-								navigate(generatePath(RoutePath.FEED_CATEGORY, { category: 'Technology' }));
-							}}
-						>
-							<div className="sidebar-link-icon-left">{sideTechnologyIcon(15)}</div>
-							<div className="sidebar-link-title">Technology</div>
-						</div>
-						<div
-							className={clsx('sidebar-section-link', {
-								active:
-									location.pathname ===
-									generatePath(RoutePath.FEED_CATEGORY, { category: 'Culture' }),
-							})}
-							onClick={() => {
-								modals.sidebarOpen = false;
-								navigate(generatePath(RoutePath.FEED_CATEGORY, { category: 'Culture' }));
-							}}
-						>
-							<div className="sidebar-link-icon-left">{sideCultureIcon(15)}</div>
-							<div className="sidebar-link-title">Culture</div>
-						</div>
-						<div
-							className={clsx('sidebar-section-link', {
-								active:
-									location.pathname ===
-									generatePath(RoutePath.FEED_CATEGORY, { category: 'Education' }),
-							})}
-							onClick={() => {
-								modals.sidebarOpen = false;
-								navigate(generatePath(RoutePath.FEED_CATEGORY, { category: 'Education' }));
-							}}
-						>
-							<div className="sidebar-link-icon-left">{sideEducationIcon(18)}</div>
-							<div className="sidebar-link-title">Education</div>
-						</div>
+						{feedMenuItems.map(item => {
+							const path = generatePath(RoutePath.FEED_CATEGORY, { category: item.category });
+
+							return (
+								<div
+									key={item.category}
+									className={clsx('sidebar-section-link', {
+										active: location.pathname === path,
+									})}
+									onClick={() => {
+										modals.sidebarOpen = false;
+										navigate(path);
+									}}
+								>
+									<div className="sidebar-link-icon-left">{item.icon}</div>
+									<div className="sidebar-link-title">{getFeedCategoryName(item.category)}</div>
+
+									{item.category === FeedCategory.MAIN && (
+										<div className="sidebar-link-icon-right">
+											<Dropdown overlay={<FeedSettings />}>{topicSettingsIcon}</Dropdown>
+										</div>
+									)}
+								</div>
+							);
+						})}
 					</div>
 				</div>
 

@@ -2,6 +2,33 @@ import { makeObservable, observable } from 'mobx';
 
 import { analytics } from './Analytics';
 
+export enum FeedCategory {
+	MAIN = 'main',
+	ALL = 'all',
+	MARKETS = 'Markets',
+	ANALYTICS = 'Analytics',
+	PROJECTS = 'Projects',
+	POLICY = 'Policy',
+	SECURITY = 'Security',
+	TECHNOLOGY = 'Technology',
+	CULTURE = 'Culture',
+	EDUCATION = 'Education',
+}
+
+export const nonSyntheticFeedCategories = Object.values(FeedCategory).filter(
+	it => it !== FeedCategory.MAIN && it !== FeedCategory.ALL,
+);
+
+export function getFeedCategoryName(category: FeedCategory) {
+	if (category === FeedCategory.MAIN) {
+		return 'My feed';
+	} else if (category === FeedCategory.ALL) {
+		return 'All topics';
+	} else {
+		return category;
+	}
+}
+
 export enum LinkType {
 	TELEGRAM = 'telegram',
 	TWITTER = 'twitter',
@@ -44,19 +71,9 @@ class Feed {
 	@observable loaded = false;
 	@observable loading = false;
 
-	@observable selectedCategory: string = 'main';
+	@observable selectedCategory: string = FeedCategory.MAIN;
 	@observable mainCategories: string[] = JSON.parse(
-		localStorage.getItem('t_main_categories') ||
-			JSON.stringify([
-				'Markets',
-				'Analytics',
-				'Projects',
-				'Policy',
-				'Security',
-				'Technology',
-				'Culture',
-				'Education',
-			]),
+		localStorage.getItem('t_main_categories') || JSON.stringify(nonSyntheticFeedCategories),
 	);
 
 	@observable sourceId: string | null = null;
@@ -66,10 +83,10 @@ class Feed {
 	@observable errorLoading = false;
 
 	getCategories(id: string) {
-		if (id === 'main') {
+		if (id === FeedCategory.MAIN) {
 			return this.mainCategories;
-		} else if (id === 'all') {
-			return ['Markets', 'Analytics', 'Projects', 'Policy', 'Security', 'Technology', 'Culture', 'Education'];
+		} else if (id === FeedCategory.ALL) {
+			return nonSyntheticFeedCategories;
 		} else {
 			return [id];
 		}
@@ -175,7 +192,7 @@ class Feed {
 
 	constructor() {
 		makeObservable(this);
-		this.loadCategory('main', null);
+		this.loadCategory(FeedCategory.MAIN, null);
 	}
 }
 

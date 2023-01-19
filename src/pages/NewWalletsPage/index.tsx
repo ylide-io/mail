@@ -12,6 +12,7 @@ import { YlideLargeLogo } from '../../icons/YlideLargeLogo';
 import NewPasswordModal from '../../modals/NewPasswordModal';
 import SelectWalletModal from '../../modals/SelectWalletModal';
 import domain from '../../stores/Domain';
+import { FeedCategory } from '../../stores/Feed';
 import { RoutePath } from '../../stores/routePath';
 import { getQueryString } from '../../utils/getQueryString';
 import { useNav } from '../../utils/navigate';
@@ -23,7 +24,7 @@ function NextButton() {
 		<YlideButton
 			style={{ marginTop: 20 }}
 			onClick={() => {
-				navigate(generatePath(RoutePath.FEED_CATEGORY, { category: 'main' }));
+				navigate(generatePath(RoutePath.FEED_CATEGORY, { category: FeedCategory.MAIN }));
 			}}
 		>
 			Continue with connected accounts <ArrowRight style={{ marginLeft: 10 }} />
