@@ -3,12 +3,14 @@ import { Button } from 'antd';
 import Tooltip from 'antd/es/tooltip';
 import { observer } from 'mobx-react';
 import React from 'react';
+import { generatePath } from 'react-router-dom';
 
 import { walletsMap } from '../../../constants';
 import { AdaptiveAddress } from '../../../controls/adaptiveAddress/adaptiveAddress';
 import { Blockie } from '../../../controls/Blockie';
 import domain from '../../../stores/Domain';
 import { DomainAccount } from '../../../stores/models/DomainAccount';
+import { RoutePath } from '../../../stores/routePath';
 import { useNav } from '../../../utils/navigate';
 import css from './accountsPopup.module.scss';
 
@@ -50,7 +52,7 @@ const AccountItem = observer(({ account }: { account: DomainAccount }) => {
 							await account.wallet.disconnectAccount(account);
 							await domain.accounts.removeAccount(account);
 							if (domain.accounts.activeAccounts.length === 0) {
-								nav('/wallets');
+								nav(generatePath(RoutePath.WALLETS));
 							}
 						}}
 					/>
@@ -70,7 +72,7 @@ export const AccountsPopup = observer(() => {
 			))}
 
 			<div className={css.addAccountRow}>
-				<Button type="primary" icon={<PlusOutlined />} onClick={() => nav('/wallets')}>
+				<Button type="primary" icon={<PlusOutlined />} onClick={() => nav(RoutePath.WALLETS)}>
 					Connect account
 				</Button>
 			</div>

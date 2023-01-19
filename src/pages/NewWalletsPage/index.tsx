@@ -1,6 +1,7 @@
 import clsx from 'clsx';
 import { observer } from 'mobx-react';
 import { PureComponent } from 'react';
+import { generatePath } from 'react-router-dom';
 
 import { blockchainsMap, walletsMap } from '../../constants';
 import { AdaptiveAddress } from '../../controls/adaptiveAddress/adaptiveAddress';
@@ -11,6 +12,7 @@ import { YlideLargeLogo } from '../../icons/YlideLargeLogo';
 import NewPasswordModal from '../../modals/NewPasswordModal';
 import SelectWalletModal from '../../modals/SelectWalletModal';
 import domain from '../../stores/Domain';
+import { RoutePath } from '../../stores/routePath';
 import { getQueryString } from '../../utils/getQueryString';
 import { useNav } from '../../utils/navigate';
 
@@ -21,7 +23,7 @@ function NextButton() {
 		<YlideButton
 			style={{ marginTop: 20 }}
 			onClick={() => {
-				navigate(`/feed/main`);
+				navigate(generatePath(RoutePath.FEED_CATEGORY, { category: 'main' }));
 			}}
 		>
 			Continue with connected accounts <ArrowRight style={{ marginLeft: 10 }} />

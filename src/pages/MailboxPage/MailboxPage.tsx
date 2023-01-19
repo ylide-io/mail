@@ -8,6 +8,7 @@ import { GenericLayout } from '../../layouts/GenericLayout';
 import { analytics } from '../../stores/Analytics';
 import domain from '../../stores/Domain';
 import { FolderId, ILinkedMessage, useMailList, useMailStore } from '../../stores/MailList';
+import { RoutePath } from '../../stores/routePath';
 import { useNav } from '../../utils/navigate';
 import { useWindowSize } from '../../utils/useWindowSize';
 import MailboxEmpty from './components/MailboxEmpty';
@@ -102,7 +103,7 @@ export const MailboxPage = () => {
 	}, [itemSize, scrollParams, isLoading, messages.length, isNextPageAvailable, loadNextPage]);
 
 	return (
-		<GenericLayout mobileTopButtonProps={{ text: 'Compose Mail', link: '/mail/compose' }}>
+		<GenericLayout mobileTopButtonProps={{ text: 'Compose Mail', link: RoutePath.MAIL_COMPOSE }}>
 			<div className="mailbox-page animated fadeInRight">
 				<MailboxHeader
 					folderId={folderId!}

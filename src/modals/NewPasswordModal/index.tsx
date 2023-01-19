@@ -5,6 +5,7 @@ import clsx from 'clsx';
 import { makeObservable, observable } from 'mobx';
 import { observer } from 'mobx-react';
 import { PureComponent } from 'react';
+import { generatePath } from 'react-router-dom';
 
 import { YlideLoader } from '../../components/ylideLoader/ylideLoader';
 import { blockchainsMap, calloutSvg, evmNameToNetwork } from '../../constants';
@@ -16,6 +17,7 @@ import domain from '../../stores/Domain';
 import modals from '../../stores/Modals';
 import { DomainAccount } from '../../stores/models/DomainAccount';
 import { Wallet } from '../../stores/models/Wallet';
+import { RoutePath } from '../../stores/routePath';
 import { isBytesEqual } from '../../utils/isBytesEqual';
 import { useNav } from '../../utils/navigate';
 
@@ -688,7 +690,7 @@ function PasswordModalFooter({ close }: { close: () => void }) {
 			<YlideButton
 				primary
 				onClick={() => {
-					navigate('/feed/main');
+					navigate(generatePath(RoutePath.FEED_CATEGORY, { category: 'main' }));
 					close();
 				}}
 			>

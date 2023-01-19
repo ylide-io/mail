@@ -3,6 +3,7 @@ import { Dropdown, Menu } from 'antd';
 import clsx from 'clsx';
 import { observer } from 'mobx-react';
 import React, { ReactNode, useEffect } from 'react';
+import { generatePath } from 'react-router-dom';
 
 import { smallButtonIcons } from '../../../../components/smallButton/smallButton';
 import { blockchainsMap, evmNameToNetwork } from '../../../../constants';
@@ -11,6 +12,7 @@ import domain from '../../../../stores/Domain';
 import mailbox from '../../../../stores/Mailbox';
 import mailer from '../../../../stores/Mailer';
 import { useMailStore } from '../../../../stores/MailList';
+import { RoutePath } from '../../../../stores/routePath';
 import { useNav } from '../../../../utils/navigate';
 
 const ComposeMailFooter = observer(() => {
@@ -107,7 +109,7 @@ const ComposeMailFooter = observer(() => {
 			await AlertModal.show('Message sent', 'Your message was successfully sent');
 			console.log('id: ', msgId);
 
-			navigate(`/mail/${lastActiveFolderId}`);
+			navigate(generatePath(RoutePath.MAIL_FOLDER, { folderId: lastActiveFolderId }));
 		} catch (e) {
 			console.log('Error sending message', e);
 		}

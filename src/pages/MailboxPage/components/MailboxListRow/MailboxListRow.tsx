@@ -1,6 +1,7 @@
 import clsx from 'clsx';
 import { observer } from 'mobx-react';
 import React, { CSSProperties, useEffect, useMemo, useState } from 'react';
+import { generatePath, useParams } from 'react-router-dom';
 
 import { BlockChainLabel } from '../../../../components/BlockChainLabel/BlockChainLabel';
 import { ContactName } from '../../../../components/contactName/contactName';
@@ -8,7 +9,8 @@ import { ReadableDate } from '../../../../components/readableDate/readableDate';
 import { YlideCheckbox } from '../../../../controls/YlideCheckbox';
 import { FilterIcon } from '../../../../icons/FilterIcon';
 import domain from '../../../../stores/Domain';
-import { ILinkedMessage, useMailStore } from '../../../../stores/MailList';
+import { FolderId, ILinkedMessage, useMailStore } from '../../../../stores/MailList';
+import { RoutePath } from '../../../../stores/routePath';
 import { useNav } from '../../../../utils/navigate';
 import { safeJson } from '../../../../utils/safeJson';
 import css from './MailboxListRow.module.scss';
@@ -23,6 +25,7 @@ interface MailboxListRowProps {
 
 const MailboxListRow: React.FC<MailboxListRowProps> = observer(
 	({ message, style, isSelected, onCheckBoxClick, onFilterBySenderClick }) => {
+		const { folderId } = useParams<{ folderId: FolderId }>();
 		const navigate = useNav();
 		const [isLoading, setLoading] = useState(false);
 		const [error, setError] = useState('');
@@ -34,7 +37,7 @@ const MailboxListRow: React.FC<MailboxListRowProps> = observer(
 
 		const messageClickHandler = async () => {
 			if (decoded) {
-				navigate(message.id);
+				navigate(generatePath(RoutePath.MAIL_DETAILS, { folderId: folderId!, id: message.id }));
 			} else {
 				setLoading(true);
 				try {
@@ -45,7 +48,7 @@ const MailboxListRow: React.FC<MailboxListRowProps> = observer(
 				} finally {
 					setLoading(false);
 				}
-				navigate(message.id);
+				navigate(generatePath(RoutePath.MAIL_DETAILS, { folderId: folderId!, id: message.id }));
 			}
 		};
 

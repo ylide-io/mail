@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { generatePath, useParams } from 'react-router-dom';
 
 import { ActionButton } from '../../components/ActionButton/ActionButton';
 import { ContactName } from '../../components/contactName/contactName';
@@ -12,6 +12,7 @@ import { IMessageDecodedContent } from '../../indexedDB/MessagesDB';
 import { GenericLayout } from '../../layouts/GenericLayout';
 import mailbox from '../../stores/Mailbox';
 import { FolderId, ILinkedMessage, useMailList, useMailStore } from '../../stores/MailList';
+import { RoutePath } from '../../stores/routePath';
 import { useNav } from '../../utils/navigate';
 import css from './MailDetailsPage.module.scss';
 import { MailMessage } from './MailMessage/MailMessage';
@@ -47,7 +48,7 @@ export const MailDetailsPage = () => {
 
 	useEffect(() => {
 		if (!initialMessage || !initialDecodedContent) {
-			navigate(`/mail/${folderId}`);
+			navigate(generatePath(RoutePath.MAIL_FOLDER, { folderId: folderId! }));
 		}
 	}, [initialDecodedContent, folderId, initialMessage, navigate]);
 
@@ -125,7 +126,7 @@ export const MailDetailsPage = () => {
 	//
 
 	const onBackClick = () => {
-		navigate(`/mail/${folderId}`);
+		navigate(generatePath(RoutePath.MAIL_FOLDER, { folderId: folderId! }));
 	};
 
 	const onReplyClick = (senderAddress: string, subject: string | null) => {
@@ -139,13 +140,13 @@ export const MailDetailsPage = () => {
 			},
 		];
 		mailbox.subject = subject || '';
-		navigate('/mail/compose');
+		navigate(RoutePath.MAIL_COMPOSE);
 	};
 
 	const onForwardClick = (decodedTextData: any | null, subject: string | null) => {
 		mailbox.textEditorData = decodedTextData || '';
 		mailbox.subject = subject || '';
-		navigate('/mail/compose');
+		navigate(RoutePath.MAIL_COMPOSE);
 	};
 
 	const onDeleteClick = (m: ILinkedMessage) => {
@@ -156,7 +157,7 @@ export const MailDetailsPage = () => {
 				wrappedThreadMessages.map(it => (it.message.msgId === m.msgId ? { ...it, isDeleted: true } : it)),
 			);
 		} else {
-			navigate(`/mail/${folderId}`);
+			navigate(generatePath(RoutePath.MAIL_FOLDER, { folderId: folderId! }));
 		}
 	};
 

@@ -1,6 +1,6 @@
 import { observer } from 'mobx-react';
 import React, { useEffect } from 'react';
-import { Navigate, Route, Routes, useLocation } from 'react-router-dom';
+import { generatePath, Navigate, Route, Routes, useLocation } from 'react-router-dom';
 
 import { YlideLoader } from './components/ylideLoader/ylideLoader';
 import { AdminPage } from './pages/AdminPage';
@@ -18,6 +18,7 @@ import { analytics } from './stores/Analytics';
 import domain from './stores/Domain';
 import { FolderId } from './stores/MailList';
 import modals from './stores/Modals';
+import { RoutePath } from './stores/routePath';
 import walletConnect from './stores/WalletConnect';
 
 const App = observer(() => {
@@ -86,27 +87,32 @@ const App = observer(() => {
 		<>
 			<Routes>
 				<>
-					<Route path={'/test'} element={<TestPage />} />
+					<Route path={RoutePath.TEST} element={<TestPage />} />
 					{/* <Route path={'/first-time'} element={<FirstTimePage />} /> */}
 					{/* <Route path={'/connect-wallets'} element={<ConnectWalletsPage />} /> */}
-					<Route path={'/wallets'} element={<NewWalletsPage />} />
-					<Route path={'/settings'} element={<SettingsPage />} />
-					<Route path={'/admin'} element={<AdminPage />} />
+					<Route path={RoutePath.WALLETS} element={<NewWalletsPage />} />
+					<Route path={RoutePath.SETTINGS} element={<SettingsPage />} />
+					<Route path={RoutePath.ADMIN} element={<AdminPage />} />
 
-					<Route path={'/feed'} element={<FeedPage />} />
-					<Route path={'/feed/:category'} element={<FeedPage />} />
+					<Route path={RoutePath.FEED} element={<FeedPage />} />
+					<Route path={RoutePath.FEED_CATEGORY} element={<FeedPage />} />
 
-					<Route path={'/mail/compose'} element={<ComposePage />} />
-					<Route path={'/mail/contacts'} element={<ContactsPage />}>
+					<Route path={RoutePath.MAIL_COMPOSE} element={<ComposePage />} />
+					<Route path={RoutePath.MAIL_CONTACTS} element={<ContactsPage />}>
 						<Route index element={<ContactsTab />} />
 					</Route>
-					<Route path={'/mail/folders'} element={<ContactsPage />}>
+					<Route path={RoutePath.MAIL_FOLDERS} element={<ContactsPage />}>
 						<Route index element={<TagsTab />} />
 					</Route>
-					<Route path={'/mail/:folderId'} element={<MailboxPage />} />
-					<Route path={'/mail/:folderId/:id'} element={<MailDetailsPage />} />
+					<Route path={RoutePath.MAIL_FOLDER} element={<MailboxPage />} />
+					<Route path={RoutePath.MAIL_DETAILS} element={<MailDetailsPage />} />
 
-					<Route path={'/*'} element={<Navigate replace to={`/mail/${FolderId.Inbox}`} />} />
+					<Route
+						path={RoutePath.ANY}
+						element={
+							<Navigate replace to={generatePath(RoutePath.MAIL_FOLDER, { folderId: FolderId.Inbox })} />
+						}
+					/>
 				</>
 			</Routes>
 			{modals.render()}

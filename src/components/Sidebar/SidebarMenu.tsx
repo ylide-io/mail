@@ -3,7 +3,7 @@ import { Button, Dropdown } from 'antd';
 import clsx from 'clsx';
 import { observer } from 'mobx-react';
 import React, { useEffect, useState } from 'react';
-import { useLocation } from 'react-router-dom';
+import { generatePath, useLocation } from 'react-router-dom';
 
 import { YlideButton } from '../../controls/YlideButton';
 import { CaretDown } from '../../icons/CaretDown';
@@ -28,6 +28,7 @@ import { topicSettingsIcon } from '../../icons/static/topicSettingsIcon';
 import feed from '../../stores/Feed';
 import { FolderId } from '../../stores/MailList';
 import modals from '../../stores/Modals';
+import { RoutePath } from '../../stores/routePath';
 import { useNav } from '../../utils/navigate';
 import css from './SidebarMenu.module.scss';
 
@@ -239,10 +240,13 @@ const SidebarMenu = observer(() => {
 					</div>
 					<div className={clsx('sidebar-section-content', { open: feedOpen })}>
 						<div
-							className={clsx('sidebar-section-link', { active: location.pathname === '/feed/main' })}
+							className={clsx('sidebar-section-link', {
+								active:
+									location.pathname === generatePath(RoutePath.FEED_CATEGORY, { category: 'main' }),
+							})}
 							onClick={() => {
 								modals.sidebarOpen = false;
-								navigate('/feed/main');
+								navigate(generatePath(RoutePath.FEED_CATEGORY, { category: 'main' }));
 							}}
 						>
 							<div className="sidebar-link-icon-left">{sideFeedIcon(14)}</div>
@@ -252,20 +256,27 @@ const SidebarMenu = observer(() => {
 							</div>
 						</div>
 						<div
-							className={clsx('sidebar-section-link', { active: location.pathname === '/feed/all' })}
+							className={clsx('sidebar-section-link', {
+								active:
+									location.pathname === generatePath(RoutePath.FEED_CATEGORY, { category: 'all' }),
+							})}
 							onClick={() => {
 								modals.sidebarOpen = false;
-								navigate('/feed/all');
+								navigate(generatePath(RoutePath.FEED_CATEGORY, { category: 'all' }));
 							}}
 						>
 							<div className="sidebar-link-icon-left">{sideAllTopicsIcon(15)}</div>
 							<div className="sidebar-link-title">All topics</div>
 						</div>
 						<div
-							className={clsx('sidebar-section-link', { active: location.pathname === '/feed/Markets' })}
+							className={clsx('sidebar-section-link', {
+								active:
+									location.pathname ===
+									generatePath(RoutePath.FEED_CATEGORY, { category: 'Markets' }),
+							})}
 							onClick={() => {
 								modals.sidebarOpen = false;
-								navigate('/feed/Markets');
+								navigate(generatePath(RoutePath.FEED_CATEGORY, { category: 'Markets' }));
 							}}
 						>
 							<div className="sidebar-link-icon-left">{sideMarketsIcon(15)}</div>
@@ -273,41 +284,54 @@ const SidebarMenu = observer(() => {
 						</div>
 						<div
 							className={clsx('sidebar-section-link', {
-								active: location.pathname === '/feed/Analytics',
+								active:
+									location.pathname ===
+									generatePath(RoutePath.FEED_CATEGORY, { category: 'Analytics' }),
 							})}
 							onClick={() => {
 								modals.sidebarOpen = false;
-								navigate('/feed/Analytics');
+								navigate(generatePath(RoutePath.FEED_CATEGORY, { category: 'Analytics' }));
 							}}
 						>
 							<div className="sidebar-link-icon-left">{sideAnalyticsIcon(15)}</div>
 							<div className="sidebar-link-title">Analytics</div>
 						</div>
 						<div
-							className={clsx('sidebar-section-link', { active: location.pathname === '/feed/Projects' })}
+							className={clsx('sidebar-section-link', {
+								active:
+									location.pathname ===
+									generatePath(RoutePath.FEED_CATEGORY, { category: 'Projects' }),
+							})}
 							onClick={() => {
 								modals.sidebarOpen = false;
-								navigate('/feed/Projects');
+								navigate(generatePath(RoutePath.FEED_CATEGORY, { category: 'Projects' }));
 							}}
 						>
 							<div className="sidebar-link-icon-left">{sideProjectsIcon(15)}</div>
 							<div className="sidebar-link-title">Projects</div>
 						</div>
 						<div
-							className={clsx('sidebar-section-link', { active: location.pathname === '/feed/Policy' })}
+							className={clsx('sidebar-section-link', {
+								active:
+									location.pathname === generatePath(RoutePath.FEED_CATEGORY, { category: 'Policy' }),
+							})}
 							onClick={() => {
 								modals.sidebarOpen = false;
-								navigate('/feed/Policy');
+								navigate(generatePath(RoutePath.FEED_CATEGORY, { category: 'Policy' }));
 							}}
 						>
 							<div className="sidebar-link-icon-left">{sidePolicyIcon(15)}</div>
 							<div className="sidebar-link-title">Policy</div>
 						</div>
 						<div
-							className={clsx('sidebar-section-link', { active: location.pathname === '/feed/Security' })}
+							className={clsx('sidebar-section-link', {
+								active:
+									location.pathname ===
+									generatePath(RoutePath.FEED_CATEGORY, { category: 'Security' }),
+							})}
 							onClick={() => {
 								modals.sidebarOpen = false;
-								navigate('/feed/Security');
+								navigate(generatePath(RoutePath.FEED_CATEGORY, { category: 'Security' }));
 							}}
 						>
 							<div className="sidebar-link-icon-left">{sideSecurityIcon(15)}</div>
@@ -315,21 +339,27 @@ const SidebarMenu = observer(() => {
 						</div>
 						<div
 							className={clsx('sidebar-section-link', {
-								active: location.pathname === '/feed/Technology',
+								active:
+									location.pathname ===
+									generatePath(RoutePath.FEED_CATEGORY, { category: 'Technology' }),
 							})}
 							onClick={() => {
 								modals.sidebarOpen = false;
-								navigate('/feed/Technology');
+								navigate(generatePath(RoutePath.FEED_CATEGORY, { category: 'Technology' }));
 							}}
 						>
 							<div className="sidebar-link-icon-left">{sideTechnologyIcon(15)}</div>
 							<div className="sidebar-link-title">Technology</div>
 						</div>
 						<div
-							className={clsx('sidebar-section-link', { active: location.pathname === '/feed/Culture' })}
+							className={clsx('sidebar-section-link', {
+								active:
+									location.pathname ===
+									generatePath(RoutePath.FEED_CATEGORY, { category: 'Culture' }),
+							})}
 							onClick={() => {
 								modals.sidebarOpen = false;
-								navigate('/feed/Culture');
+								navigate(generatePath(RoutePath.FEED_CATEGORY, { category: 'Culture' }));
 							}}
 						>
 							<div className="sidebar-link-icon-left">{sideCultureIcon(15)}</div>
@@ -337,11 +367,13 @@ const SidebarMenu = observer(() => {
 						</div>
 						<div
 							className={clsx('sidebar-section-link', {
-								active: location.pathname === '/feed/Education',
+								active:
+									location.pathname ===
+									generatePath(RoutePath.FEED_CATEGORY, { category: 'Education' }),
 							})}
 							onClick={() => {
 								modals.sidebarOpen = false;
-								navigate('/feed/Education');
+								navigate(generatePath(RoutePath.FEED_CATEGORY, { category: 'Education' }));
 							}}
 						>
 							<div className="sidebar-link-icon-left">{sideEducationIcon(18)}</div>
@@ -370,18 +402,20 @@ const SidebarMenu = observer(() => {
 							className="sidebar-section-button"
 							onClick={() => {
 								modals.sidebarOpen = false;
-								navigate('/mail/compose');
+								navigate(RoutePath.MAIL_COMPOSE);
 							}}
 						>
 							Compose mail
 						</div>
 						<div
 							className={clsx('sidebar-section-link', {
-								active: location.pathname === `/mail/${FolderId.Inbox}`,
+								active:
+									location.pathname ===
+									generatePath(RoutePath.MAIL_FOLDER, { folderId: FolderId.Inbox }),
 							})}
 							onClick={() => {
 								modals.sidebarOpen = false;
-								navigate(`/mail/${FolderId.Inbox}`);
+								navigate(generatePath(RoutePath.MAIL_FOLDER, { folderId: FolderId.Inbox }));
 							}}
 						>
 							<div className="sidebar-link-icon-left">
@@ -410,11 +444,13 @@ const SidebarMenu = observer(() => {
 						</div>
 						<div
 							className={clsx('sidebar-section-link', {
-								active: location.pathname === `/mail/${FolderId.Sent}`,
+								active:
+									location.pathname ===
+									generatePath(RoutePath.MAIL_FOLDER, { folderId: FolderId.Sent }),
 							})}
 							onClick={() => {
 								modals.sidebarOpen = false;
-								navigate(`/mail/${FolderId.Sent}`);
+								navigate(generatePath(RoutePath.MAIL_FOLDER, { folderId: FolderId.Sent }));
 							}}
 						>
 							<div className="sidebar-link-icon-left">
@@ -424,11 +460,13 @@ const SidebarMenu = observer(() => {
 						</div>
 						<div
 							className={clsx('sidebar-section-link', {
-								active: location.pathname === `/mail/${FolderId.Archive}`,
+								active:
+									location.pathname ===
+									generatePath(RoutePath.MAIL_FOLDER, { folderId: FolderId.Archive }),
 							})}
 							onClick={() => {
 								modals.sidebarOpen = false;
-								navigate(`/mail/${FolderId.Archive}`);
+								navigate(generatePath(RoutePath.MAIL_FOLDER, { folderId: FolderId.Archive }));
 							}}
 						>
 							<div className="sidebar-link-icon-left">

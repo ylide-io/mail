@@ -5,6 +5,7 @@ import { LinkButton, LinkButtonType } from '../../../components/Sidebar/LinkButt
 import ClickToCopy from '../../../controls/ClickToCopy';
 import domain from '../../../stores/Domain';
 import { FolderId } from '../../../stores/MailList';
+import { RoutePath } from '../../../stores/routePath';
 
 interface MailboxEmptyProps {
 	folderId: FolderId;
@@ -43,7 +44,7 @@ const MailboxEmpty = observer(({ folderId }: MailboxEmptyProps) => {
 						Send a message to your friend now.
 					</h3>
 
-					<LinkButton type={LinkButtonType.PRIMARY} text="Compose Mail" link="/mail/compose" />
+					<LinkButton type={LinkButtonType.PRIMARY} text="Compose Mail" link={RoutePath.MAIL_COMPOSE} />
 				</>
 			) : (
 				<h3>No messages here.</h3>

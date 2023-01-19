@@ -6,6 +6,7 @@ import { Outlet, useLocation } from 'react-router-dom';
 
 import { GenericLayout } from '../../layouts/GenericLayout';
 import contacts from '../../stores/Contacts';
+import { RoutePath } from '../../stores/routePath';
 import tags from '../../stores/Tags';
 import { useNav } from '../../utils/navigate';
 import { useWindowSize } from '../../utils/useWindowSize';
@@ -18,9 +19,9 @@ export const ContactsPage = observer(() => {
 	const { windowWidth } = useWindowSize();
 
 	const addHandler = () => {
-		if (location.pathname === '/mail/contacts') {
+		if (location.pathname === RoutePath.MAIL_CONTACTS) {
 			contacts.generateNewContact();
-		} else if (location.pathname === '/mail/folders') {
+		} else if (location.pathname === RoutePath.MAIL_FOLDERS) {
 			tags.generateNewTag();
 		}
 	};
@@ -66,12 +67,12 @@ export const ContactsPage = observer(() => {
 				</div>
 				<div className="page-body">
 					<Tabs
-						activeKey={location.pathname.split('/')[1]}
-						onTabClick={key => nav(`/${key}`)}
+						activeKey={`/${location.pathname.split('/')[1]}`}
+						onTabClick={key => nav(key)}
 						tabBarExtraContent={windowWidth > 480 ? extraContent : null}
 					>
-						<Tabs.TabPane tab="Contacts" key="mail/contacts" />
-						<Tabs.TabPane tab="Folders" key="mail/folders" />
+						<Tabs.TabPane tab="Contacts" key={RoutePath.MAIL_CONTACTS} />
+						<Tabs.TabPane tab="Folders" key={RoutePath.MAIL_FOLDERS} />
 					</Tabs>
 					<Outlet />
 				</div>

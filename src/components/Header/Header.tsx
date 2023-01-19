@@ -4,6 +4,7 @@ import Tooltip from 'antd/es/tooltip';
 import clsx from 'clsx';
 import { observer } from 'mobx-react';
 import React, { useState } from 'react';
+import { generatePath } from 'react-router-dom';
 
 import { Blockie } from '../../controls/Blockie';
 import { YlideLargeLogo } from '../../icons/YlideLargeLogo';
@@ -11,6 +12,7 @@ import AlertModal from '../../modals/AlertModal';
 import domain from '../../stores/Domain';
 import { FolderId } from '../../stores/MailList';
 import modals from '../../stores/Modals';
+import { RoutePath } from '../../stores/routePath';
 import { useNav } from '../../utils/navigate';
 import { AccountsPopup } from './accountsPopup/accountsPopup';
 import css from './Header.module.scss';
@@ -32,10 +34,10 @@ const Header = observer(() => {
 
 			<div className={css.logo}>
 				<a
-					href={`/mail/${FolderId.Inbox}`}
+					href={generatePath(RoutePath.MAIL_FOLDER, { folderId: FolderId.Inbox })}
 					onClick={e => {
 						e.preventDefault();
-						nav(`/mail/${FolderId.Inbox}`);
+						nav(generatePath(RoutePath.MAIL_FOLDER, { folderId: FolderId.Inbox }));
 					}}
 				>
 					<YlideLargeLogo className={css.logoImage} />
@@ -103,7 +105,7 @@ const Header = observer(() => {
 						<UsergroupAddOutlined
 							onClick={e => {
 								e.preventDefault();
-								nav('/mail/contacts');
+								nav(generatePath(RoutePath.MAIL_CONTACTS));
 							}}
 							style={{ fontSize: 20 }}
 						/>

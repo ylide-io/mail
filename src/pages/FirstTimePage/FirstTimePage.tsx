@@ -5,6 +5,7 @@ import { YlideButton } from '../../controls/YlideButton';
 import { ArrowRight } from '../../icons/ArrowRight';
 import { Logo } from '../../icons/Logo';
 import domain from '../../stores/Domain';
+import { RoutePath } from '../../stores/routePath';
 import { useNav } from '../../utils/navigate';
 
 const FirstTimePage = observer(() => {
@@ -67,7 +68,7 @@ const FirstTimePage = observer(() => {
 							}
 							domain.savedPassword = password;
 							navigate({
-								path: '/connect-wallets',
+								path: RoutePath.WALLETS_CONNECT,
 								search: { firstTime: 'true' },
 							});
 						}}
@@ -96,7 +97,9 @@ const FirstTimePage = observer(() => {
 					<br />
 				</div>
 				<div className="intro-buttons">
-					<YlideButton onClick={() => navigate('/connect-wallets')}>I've used Ylide before</YlideButton>
+					<YlideButton onClick={() => navigate(RoutePath.WALLETS_CONNECT)}>
+						I've used Ylide before
+					</YlideButton>
 					<YlideButton onClick={() => setShowPassword(true)}>It's my first time with Ylide</YlideButton>
 				</div>
 			</>

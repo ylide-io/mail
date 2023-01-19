@@ -1,5 +1,6 @@
 import { observer } from 'mobx-react';
 import React, { useEffect } from 'react';
+import { generatePath } from 'react-router-dom';
 
 import { ActionButton, ActionButtonStyle } from '../../components/ActionButton/ActionButton';
 import { smallButtonIcons } from '../../components/smallButton/smallButton';
@@ -8,6 +9,7 @@ import { GenericLayout } from '../../layouts/GenericLayout';
 import { analytics } from '../../stores/Analytics';
 import mailer from '../../stores/Mailer';
 import { useMailStore } from '../../stores/MailList';
+import { RoutePath } from '../../stores/routePath';
 import { useNav } from '../../utils/navigate';
 import ComposeMailBody from './components/Mailbox/ComposeMailBody';
 import ComposeMailFooter from './components/Mailbox/ComposeMailFooter';
@@ -31,7 +33,7 @@ export const ComposePage = observer(() => {
 							<ActionButton
 								style={ActionButtonStyle.Dengerous}
 								onClick={() => {
-									navigate(`/mail/${lastActiveFolderId}`);
+									navigate(generatePath(RoutePath.MAIL_FOLDER, { folderId: lastActiveFolderId }));
 								}}
 								icon={<i className={`fa ${smallButtonIcons.cross}`} />}
 							>

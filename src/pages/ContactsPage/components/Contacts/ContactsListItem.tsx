@@ -11,6 +11,7 @@ import domain from '../../../../stores/Domain';
 import mailbox from '../../../../stores/Mailbox';
 import { IContact } from '../../../../stores/models/IContact';
 import { ITag } from '../../../../stores/models/ITag';
+import { RoutePath } from '../../../../stores/routePath';
 import TagsStore from '../../../../stores/Tags';
 import { useNav } from '../../../../utils/navigate';
 
@@ -136,7 +137,7 @@ const ContactsListItem: React.FC<ContactsListItemProps> = ({ contact, isNew }) =
 				address: contact.address,
 			},
 		];
-		navigate('/mail/compose');
+		navigate(RoutePath.MAIL_COMPOSE);
 	};
 
 	if (editing) {
