@@ -21,7 +21,7 @@ export class AdminPage extends PureComponent {
 	@observable changingBonucesRegistryV5 = false;
 	@observable registryV5Address = '';
 
-	selectedChain: EVMNetwork.GNOSIS | EVMNetwork.POLYGON | EVMNetwork.FANTOM = EVMNetwork.POLYGON;
+	selectedChain: EVMNetwork.GNOSIS | EVMNetwork.POLYGON | EVMNetwork.FANTOM = EVMNetwork.GNOSIS;
 
 	@autobind
 	async deployRegistryV5() {
@@ -85,7 +85,7 @@ export class AdminPage extends PureComponent {
 	async changeBonucesRegistryV5() {
 		this.changingBonucesRegistryV5 = true;
 		const bonuces = {
-			[EVMNetwork.GNOSIS]: '1500000000000000',
+			[EVMNetwork.GNOSIS]: '3000000000000000',
 			[EVMNetwork.FANTOM]: '5000000000000000',
 			[EVMNetwork.POLYGON]: '50000000000000000',
 		};
