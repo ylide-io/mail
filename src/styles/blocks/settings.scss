@@ -38,6 +38,8 @@
 			flex-grow: 1;
 			flex-shrink: 0;
 
+			padding: 0 8px 0 0;
+
 			font-size: 14px;
 			font-weight: 500;
 
@@ -46,6 +48,7 @@
 
 				flex-basis: auto;
 				flex-grow: 0;
+				padding: 0;
 			}
 		}
 
@@ -56,12 +59,14 @@
 			flex-grow: 10;
 			flex-shrink: 0;
 
+			padding: 0 8px 0 0;
+
 			font-size: 14px;
 			font-family: $font-family_code;
 
 			@include less920px {
 				flex-basis: auto;
-				margin-top: 10px;
+				padding: 8px 0 0;
 			}
 		}
 
@@ -70,10 +75,10 @@
 
 			flex-grow: 0;
 			flex-shrink: 0;
-			padding: 0 10px;
+			padding: 0 8px 0 0;
 
 			@include less920px {
-				padding: 10px 0;
+				padding: 8px 0 0;
 			}
 		}
 
@@ -86,8 +91,8 @@
 
 			@include less920px {
 				flex-basis: auto;
-				margin-top: 10px;
-				margin-bottom: 20px;
+				justify-content: start;
+				padding: 8px 0 16px;
 			}
 		}
 	}

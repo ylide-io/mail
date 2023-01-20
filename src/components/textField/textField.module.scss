@@ -1,0 +1,16 @@
+.root {
+	padding: 0 8px;
+	width: 100%;
+	height: 32px;
+	font-weight: $font-weight_light;
+	border: 1px solid var(--border-color);
+	border-radius: 4px;
+}
+
+.root_error {
+	border-color: var(--field-error-border-color);
+}
+
+.root:focus {
+	border-color: var(--field-focus-border-color);
+}

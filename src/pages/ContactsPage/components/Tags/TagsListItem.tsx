@@ -1,8 +1,8 @@
 import { DeleteOutlined, EditOutlined, SaveOutlined } from '@ant-design/icons';
-import { Input } from 'antd';
 import React, { useState } from 'react';
 
 import { ActionButton, ActionButtonStyle } from '../../../../components/ActionButton/ActionButton';
+import { TextField } from '../../../../components/textField/textField';
 import { ITag } from '../../../../stores/models/ITag';
 import tags from '../../../../stores/Tags';
 import { allColors } from '../../../../utils/colors';
@@ -58,13 +58,7 @@ const TagsListItem: React.FC<TagsListItemProps> = ({ tag, isNew }) => {
 					</div>
 				</div>
 				<div className="contact-name">
-					<Input
-						type="text"
-						placeholder="Type new folder name"
-						value={name}
-						style={{ width: '100%' }}
-						onChange={e => setName(e.target.value)}
-					/>
+					<TextField placeholder="Type new folder name" value={name} onChange={setName} />
 				</div>
 				<div className="contact-actions small-actions">
 					{!isNew ? (

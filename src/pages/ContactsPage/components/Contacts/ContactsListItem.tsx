@@ -1,9 +1,10 @@
 import { DeleteOutlined, EditOutlined, MailOutlined, SaveOutlined } from '@ant-design/icons';
-import { Avatar, Input, Select } from 'antd';
+import { Avatar, Select } from 'antd';
 import clsx from 'clsx';
-import React, { ChangeEvent, useMemo, useState } from 'react';
+import React, { useMemo, useState } from 'react';
 
 import { ActionButton, ActionButtonStyle } from '../../../../components/ActionButton/ActionButton';
+import { TextField } from '../../../../components/textField/textField';
 import { AdaptiveAddress } from '../../../../controls/adaptiveAddress/adaptiveAddress';
 import { Blockie } from '../../../../controls/Blockie';
 import contacts from '../../../../stores/Contacts';
@@ -36,13 +37,13 @@ const ContactsListItem: React.FC<ContactsListItemProps> = ({ contact, isNew }) =
 	const [nameError, setNameError] = useState(false);
 	const [addressError, setAddressError] = useState(false);
 
-	const onNameEdit = (e: ChangeEvent<HTMLInputElement>) => {
-		setName(e.target.value);
+	const onNameEdit = (value: string) => {
+		setName(value);
 		setNameError(false);
 	};
 
-	const onAddressEdit = (e: ChangeEvent<HTMLInputElement>) => {
-		setAddress(e.target.value);
+	const onAddressEdit = (value: string) => {
+		setAddress(value);
 		setAddressError(false);
 	};
 
@@ -147,19 +148,17 @@ const ContactsListItem: React.FC<ContactsListItemProps> = ({ contact, isNew }) =
 					{contact.img ? <img alt="Avatar" src={contact.img} /> : <Avatar />}
 				</div>
 				<div className="contact-name">
-					<Input
-						type="text"
-						style={nameError ? { border: '1px solid red', width: '890%' } : { width: '90%' }}
+					<TextField
+						isError={nameError}
 						value={name}
 						placeholder={'Type contact name'}
 						onChange={onNameEdit}
 					/>
 				</div>
 				<div className="contact-address">
-					<Input
-						style={addressError ? { border: '1px solid red', width: '90%' } : { width: '90%' }}
+					<TextField
+						isError={addressError}
 						placeholder={'Type contact address'}
-						type="text"
 						value={address}
 						onChange={onAddressEdit}
 					/>
