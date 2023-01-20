@@ -2,6 +2,7 @@ import { observer } from 'mobx-react';
 import React, { useEffect } from 'react';
 import { generatePath, Navigate, Route, Routes, useLocation } from 'react-router-dom';
 
+import { PopupManager } from './components/popup/popupManager/popupManager';
 import { YlideLoader } from './components/ylideLoader/ylideLoader';
 import { AdminPage } from './pages/AdminPage';
 import { ComposePage } from './pages/ComposePage/ComposePage';
@@ -84,7 +85,7 @@ const App = observer(() => {
 	}
 
 	return (
-		<>
+		<PopupManager>
 			<Routes>
 				<>
 					<Route path={RoutePath.TEST} element={<TestPage />} />
@@ -116,7 +117,7 @@ const App = observer(() => {
 				</>
 			</Routes>
 			{modals.render()}
-		</>
+		</PopupManager>
 	);
 });
 

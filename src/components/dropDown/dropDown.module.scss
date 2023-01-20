@@ -1,0 +1,44 @@
+.root {
+	position: fixed;
+	padding: 4px 0;
+}
+
+.content {
+	padding: 6px 0;
+	max-height: calc(var(--interactive-elem-size) * 10 + 12px);
+	background: var(--surface-color);
+	border-radius: 4px;
+	box-shadow: var(--popup-shadow);
+	overflow-y: auto;
+}
+
+//
+
+.item {
+	display: flex;
+	align-items: center;
+	padding: 0 12px;
+	height: var(--interactive-elem-size);
+	white-space: nowrap;
+	overflow: hidden;
+}
+
+.item_regular {
+	cursor: pointer;
+}
+
+.item_regular:hover,
+.item_regular:focus-visible {
+	background: var(--surface-hover-color);
+}
+
+.item_selected {
+	color: var(--selected-text-color);
+	background: var(--selected-background-color);
+	cursor: default;
+}
+
+.item_disabled {
+	color: var(--secondary-text-color);
+	cursor: default;
+}

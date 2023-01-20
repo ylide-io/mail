@@ -3,6 +3,7 @@
 	--secondary-text-color: #888;
 
 	--surface-color: #fff;
+	--surface-hover-color: #eee;
 	--secondary-surface-color: #f8f8f8;
 
 	--border-color: rgba(0, 0, 0, 0.15);
@@ -14,6 +15,9 @@
 	--field-focus-border-color: #4bf;
 	--field-error-border-color: #f45;
 
+	--selected-text-color: #19f;
+	--selected-background-color: #8cf;
+
 	--error-color: #f45;
 	--success-color: #0b4;
 
@@ -21,6 +25,10 @@
 	--lite-button-hover-background-color: rgba(0, 0, 0, 0.05);
 	--error-button-border-color: rgba(255, 68, 85, 0.35);
 	--error-button-hover-background-color: rgba(255, 68, 85, 0.1);
+
+	--interactive-elem-size: 32px;
+
+	--popup-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
 }
 
 body,
