@@ -5,7 +5,7 @@
 
 .content {
 	padding: 6px 0;
-	max-height: calc(var(--interactive-elem-size) * 10 + 12px);
+	max-height: $interactive-elem-size * 10 + 12px;
 	background: var(--surface-color);
 	border-radius: 4px;
 	box-shadow: var(--popup-shadow);
@@ -18,7 +18,7 @@
 	display: flex;
 	align-items: center;
 	padding: 0 12px;
-	height: var(--interactive-elem-size);
+	height: $interactive-elem-size;
 	white-space: nowrap;
 	overflow: hidden;
 }

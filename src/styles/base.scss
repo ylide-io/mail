@@ -5,6 +5,9 @@
 	--surface-color: #fff;
 	--surface-hover-color: #eee;
 	--secondary-surface-color: #f8f8f8;
+	--tertiary-surface-color: #eee;
+	--error-surface-color: rgba(255, 68, 85, 0.2);
+	--success-surface-color: rgb(0, 187, 68, 0.18);
 
 	--border-color: rgba(0, 0, 0, 0.15);
 
@@ -25,8 +28,6 @@
 	--lite-button-hover-background-color: rgba(0, 0, 0, 0.05);
 	--error-button-border-color: rgba(255, 68, 85, 0.35);
 	--error-button-hover-background-color: rgba(255, 68, 85, 0.1);
-
-	--interactive-elem-size: 32px;
 
 	--popup-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
 }
@@ -98,6 +99,13 @@ code {
 
 svg {
 	display: block;
+}
+
+hr {
+	margin: 0;
+	width: 100%;
+	border: solid var(--border-color);
+	border-width: 0 0 1px;
 }
 
 //

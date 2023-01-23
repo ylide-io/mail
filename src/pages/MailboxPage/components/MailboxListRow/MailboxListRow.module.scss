@@ -28,7 +28,7 @@
 }
 
 .root_loading {
-	@include stripes-animation;
+	@include stripes-animation-background;
 }
 
 .root_error {
