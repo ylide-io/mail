@@ -45,13 +45,16 @@ export function DropDown({
 			alignerOptions={alignerOptions}
 			onCloseRequest={onCloseRequest}
 		>
-			<div className={css.content}>{children}</div>
+			<div className={css.content} onMouseDown={e => e.preventDefault()}>
+				{children}
+			</div>
 		</AnchoredPopup>
 	);
 }
 
 export enum DropDownItemMode {
 	REGULAR = 'REGULAR',
+	HIGHLIGHTED = 'HIGHLIGHTED',
 	SELECTED = 'SELECTED',
 	DISABLED = 'DISABLED',
 }
@@ -68,12 +71,13 @@ export function DropDownItem({ children, mode = DropDownItemMode.REGULAR, onSele
 				css.item,
 				{
 					[DropDownItemMode.REGULAR]: css.item_regular,
+					[DropDownItemMode.HIGHLIGHTED]: css.item_highlighted,
 					[DropDownItemMode.SELECTED]: css.item_selected,
 					[DropDownItemMode.DISABLED]: css.item_disabled,
 				}[mode || DropDownItemMode.REGULAR],
 			)}
 			onClick={() => {
-				if (mode === DropDownItemMode.REGULAR) {
+				if (mode !== DropDownItemMode.DISABLED) {
 					onSelect?.();
 				}
 			}}

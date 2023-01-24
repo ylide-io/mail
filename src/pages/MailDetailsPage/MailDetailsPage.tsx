@@ -130,15 +130,7 @@ export const MailDetailsPage = () => {
 	};
 
 	const onReplyClick = (senderAddress: string, subject: string | null) => {
-		mailbox.to = [
-			{
-				type: 'address',
-				loading: false,
-				isAchievable: null,
-				input: senderAddress,
-				address: senderAddress,
-			},
-		];
+		mailbox.to = [senderAddress];
 		mailbox.subject = subject || '';
 		navigate(RoutePath.MAIL_COMPOSE);
 	};

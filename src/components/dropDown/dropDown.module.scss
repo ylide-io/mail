@@ -36,8 +36,12 @@ $contentPadding: 6px;
 	background: var(--surface-hover-color);
 }
 
+.item_highlighted {
+	background: var(--selected-light-background-color);
+	cursor: pointer;
+}
+
 .item_selected {
-	color: var(--selected-text-color);
 	background: var(--selected-background-color);
 	cursor: default;
 }

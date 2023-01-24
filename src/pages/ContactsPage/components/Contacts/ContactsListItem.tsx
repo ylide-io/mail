@@ -129,15 +129,7 @@ const ContactsListItem: React.FC<ContactsListItemProps> = ({ contact, isNew }) =
 	};
 
 	const mailThisContact = () => {
-		mailbox.to = [
-			{
-				type: 'contact',
-				loading: false,
-				isAchievable: null,
-				input: contact.name,
-				address: contact.address,
-			},
-		];
+		mailbox.to = [contact.name];
 		navigate(RoutePath.MAIL_COMPOSE);
 	};
 

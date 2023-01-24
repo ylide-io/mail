@@ -2,7 +2,7 @@ import clsx from 'clsx';
 import { observer } from 'mobx-react';
 import React from 'react';
 
-import { TagInput } from '../../components/tagInput/tagInput';
+import { TagInput, TagInputItem } from '../../components/tagInput/tagInput';
 import { AdaptiveAddress } from '../../controls/adaptiveAddress/adaptiveAddress';
 import css from './TestPage.module.scss';
 
@@ -12,10 +12,10 @@ export const TestPage = observer(() => {
 			<TagInput placeholder="Enter something" />
 
 			<TagInput>
-				<TagInput.Tag>12345678</TagInput.Tag>
-				<TagInput.Tag>
+				<TagInputItem>12345678</TagInputItem>
+				<TagInputItem>
 					<AdaptiveAddress address="0x15a33D60283e3D20751D6740162D1212c1ad2a2d" />
-				</TagInput.Tag>
+				</TagInputItem>
 			</TagInput>
 
 			<hr style={{ margin: '32px 0' }} />

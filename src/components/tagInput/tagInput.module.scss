@@ -35,7 +35,7 @@ $borderWidth: 1px;
 	align-items: center;
 	grid-gap: 4px;
 	margin: 0 8px ($vPadding - $borderWidth) 0;
-	padding: 0 4px 0 8px;
+	padding: 0 8px;
 	max-width: 200px;
 	height: 20px;
 	border-radius: 4px;
@@ -63,6 +63,7 @@ $borderWidth: 1px;
 
 .tagRemoveButton {
 	@include expand-click-area(4px);
+	margin: 0 -4px 0 0;
 	width: 14px;
 	height: 14px;
 

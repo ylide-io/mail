@@ -224,7 +224,6 @@
 			grid-template-columns: 100px 1fr;
 			grid-gap: 8px;
 			align-items: center;
-			font-size: 15px;
 
 			@include less480px {
 				grid-template-columns: 1fr;
