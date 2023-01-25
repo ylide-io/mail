@@ -1,11 +1,15 @@
+$shift: 4px;
+$contentPadding: 6px;
+
 .root {
 	position: fixed;
-	padding: 4px 0;
+	padding: $shift 0;
 }
 
 .content {
-	padding: 6px 0;
-	max-height: $interactive-elem-size * 10 + 12px;
+	padding: $contentPadding 0;
+	height: 100%;
+	max-height: $interactive-elem-size * 8 + ($interactive-elem-size / 2) + $contentPadding;
 	background: var(--surface-color);
 	border-radius: 4px;
 	box-shadow: var(--popup-shadow);

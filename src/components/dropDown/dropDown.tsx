@@ -12,7 +12,7 @@ import { PropsWithClassName } from '../propsWithClassName';
 import css from './dropDown.module.scss';
 
 const alignerOptions: DefaultAnchoredElementAlignerOptions = {
-	fitTopToViewport: true,
+	fitTopToViewport: false,
 	fitLeftToViewport: true,
 	fitHeightToViewport: true,
 	fitWidthToViewport: true,
