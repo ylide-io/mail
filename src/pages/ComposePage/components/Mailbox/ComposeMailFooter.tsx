@@ -79,7 +79,7 @@ const ComposeMailFooter = observer(({ recipients }: ComposeMailFooterProps) => {
 			const msgId = await mailer.sendMail(
 				acc,
 				mailbox.subject,
-				JSON.stringify(mailbox.textEditorData),
+				JSON.stringify(mailbox.editorData),
 				recipients.map(r => r.routing?.address!),
 				mailbox.network,
 			);
@@ -102,7 +102,7 @@ const ComposeMailFooter = observer(({ recipients }: ComposeMailFooterProps) => {
 						!mailbox.from ||
 						!recipients.length ||
 						recipients.some(r => r.isLoading) ||
-						!mailbox.textEditorData?.blocks?.length,
+						!mailbox.editorData?.blocks?.length,
 					withDropdown: mailbox.from?.wallet.factory.blockchainGroup === 'evm',
 				})}
 			>

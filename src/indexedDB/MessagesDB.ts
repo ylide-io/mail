@@ -5,7 +5,7 @@ import { IndexedDB } from './IndexedDB';
 
 export interface IMessageDecodedContent {
 	msgId: string;
-	decodedTextData: any | null;
+	decodedTextData: string | null;
 	decodedSubject: string | null;
 }
 

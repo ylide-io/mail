@@ -17,14 +17,11 @@ const MailboxEditor = () => {
 		};
 	}, []);
 
-	const initialTextData = useMemo(() => {
-		return mailbox.textEditorData;
-	}, []);
+	const initialEditorData = useMemo(() => mailbox.editorData, []);
 
 	async function handleSave() {
-		if (instanceRef?.current) {
-			const savedData = await instanceRef!.current!.save();
-			mailbox.textEditorData = savedData;
+		if (instanceRef.current) {
+			mailbox.editorData = await instanceRef.current.save();
 		}
 	}
 
@@ -39,7 +36,7 @@ const MailboxEditor = () => {
 			<ReactEditorJS
 				tools={EDITOR_JS_TOOLS}
 				//@ts-ignore
-				data={initialTextData}
+				data={initialEditorData}
 				onChange={handleSave}
 				instanceRef={(instance: any) => (instanceRef.current = instance)}
 				onInitialize={(instance: any) => {

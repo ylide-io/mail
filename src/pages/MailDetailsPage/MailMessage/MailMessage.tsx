@@ -1,5 +1,4 @@
 import { Tooltip } from 'antd';
-import { toJS } from 'mobx';
 import React, { useEffect, useMemo, useState } from 'react';
 import { createReactEditorJS } from 'react-editor-js';
 
@@ -13,7 +12,7 @@ import { TrashIcon } from '../../../icons/TrashIcon';
 import { IMessageDecodedContent } from '../../../indexedDB/MessagesDB';
 import { FolderId, ILinkedMessage, useMailStore } from '../../../stores/MailList';
 import { DateFormatStyle } from '../../../utils/date';
-import { EDITOR_JS_TOOLS } from '../../../utils/editorJs';
+import { decodeEditorData, EDITOR_JS_TOOLS } from '../../../utils/editorJs';
 import css from './MailMessage.module.scss';
 
 const ReactEditorJS = createReactEditorJS();
@@ -38,22 +37,14 @@ export function MailMessage({
 	onDeleteClick,
 }: MailMessageProps) {
 	const decodeMessage = useMailStore(state => state.decodeMessage);
-	console.log('folderId', folderId, folderId === FolderId.Archive);
-	const data = useMemo(
-		() => ({
-			blocks:
-				typeof decoded?.decodedTextData === 'string'
-					? JSON.parse(decoded.decodedTextData).blocks
-					: toJS(decoded?.decodedTextData?.blocks),
-		}),
-		[decoded?.decodedTextData],
-	);
+
+	const editorData = useMemo(() => decodeEditorData(decoded?.decodedTextData), [decoded?.decodedTextData]);
 
 	const onDecodeClick = () => {
 		decodeMessage(message);
 	};
 
-	const [isEditorReady, setEditorReady] = useState(!data.blocks);
+	const [isEditorReady, setEditorReady] = useState(!editorData.blocks);
 	useEffect(() => {
 		if (isEditorReady) {
 			onReady?.();
@@ -99,13 +90,13 @@ export function MailMessage({
 
 			<ReadableDate className={css.date} style={DateFormatStyle.LONG} value={message.msg.createdAt * 1000} />
 
-			{data.blocks && (
+			{editorData.blocks && (
 				<div className={css.body}>
 					<ReactEditorJS
 						tools={EDITOR_JS_TOOLS}
 						readOnly={true}
 						//@ts-ignore
-						data={data}
+						data={editorData}
 						onReady={() => setEditorReady(true)}
 					/>
 				</div>

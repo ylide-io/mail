@@ -13,6 +13,7 @@ import { GenericLayout } from '../../layouts/GenericLayout';
 import mailbox from '../../stores/Mailbox';
 import { FolderId, ILinkedMessage, useMailList, useMailStore } from '../../stores/MailList';
 import { RoutePath } from '../../stores/routePath';
+import { decodeEditorData } from '../../utils/editorJs';
 import { useNav } from '../../utils/navigate';
 import css from './MailDetailsPage.module.scss';
 import { MailMessage } from './MailMessage/MailMessage';
@@ -135,8 +136,8 @@ export const MailDetailsPage = () => {
 		navigate(RoutePath.MAIL_COMPOSE);
 	};
 
-	const onForwardClick = (decodedTextData: any | null, subject: string | null) => {
-		mailbox.textEditorData = decodedTextData || '';
+	const onForwardClick = (decodedTextData: string | null, subject: string | null) => {
+		mailbox.editorData = decodeEditorData(decodedTextData);
 		mailbox.subject = subject || '';
 		navigate(RoutePath.MAIL_COMPOSE);
 	};

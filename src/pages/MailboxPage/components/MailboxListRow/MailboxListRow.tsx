@@ -11,8 +11,8 @@ import { FilterIcon } from '../../../../icons/FilterIcon';
 import domain from '../../../../stores/Domain';
 import { FolderId, ILinkedMessage, useMailStore } from '../../../../stores/MailList';
 import { RoutePath } from '../../../../stores/routePath';
+import { decodeEditorData } from '../../../../utils/editorJs';
 import { useNav } from '../../../../utils/navigate';
-import { safeJson } from '../../../../utils/safeJson';
 import css from './MailboxListRow.module.scss';
 
 interface MailboxListRowProps {
@@ -57,12 +57,9 @@ const MailboxListRow: React.FC<MailboxListRowProps> = observer(
 		}, [message.id]);
 
 		const preview = useMemo(() => {
-			return (
-				decoded &&
-				safeJson(decoded.decodedTextData, null)
-					?.blocks.map((b: any) => b.data.text)
-					.join('\n')
-			);
+			return decodeEditorData(decoded?.decodedTextData)
+				?.blocks.map((b: any) => b.data.text)
+				.join('\n');
 		}, [decoded]);
 
 		return (

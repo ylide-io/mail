@@ -1,3 +1,4 @@
+import { OutputData } from '@editorjs/editorjs';
 import { EVMNetwork } from '@ylide/ethereum';
 import { makeObservable, observable } from 'mobx';
 
@@ -32,7 +33,7 @@ class Mailbox {
 
 	@observable subject: string = '';
 
-	@observable textEditorData: any | null = null;
+	@observable editorData: OutputData | undefined;
 
 	constructor() {
 		makeObservable(this);
@@ -43,7 +44,7 @@ class Mailbox {
 		this.from = domain.accounts.activeAccounts[0];
 		this.to = [];
 		this.subject = '';
-		this.textEditorData = '';
+		this.editorData = undefined;
 	}
 }
 
