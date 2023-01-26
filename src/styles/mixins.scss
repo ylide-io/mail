@@ -86,32 +86,13 @@ $interactive-elem-size: 32px;
 //
 
 @keyframes stripes-animation-background-keyframes {
-	from {
-		background-position-x: 0;
-	}
 	to {
-		background-position-x: 46px;
+		background-position-x: 69px;
 	}
 }
 
 @mixin stripes-animation-background {
-	background: -webkit-repeating-linear-gradient(
-		145deg,
-		#dbf8f4 1px,
-		#edfffd 2px,
-		#dbf8f4 11px,
-		#dbf8f4 12px,
-		#dbf8f4 20px
-	);
-	background: repeating-linear-gradient(-55deg, #edfffd 1px, #dbf8f4 2px, #dbf8f4 11px, #edfffd 12px, #edfffd 20px);
-
-	-webkit-animation-name: stripes-animation-background-keyframes;
-	-webkit-animation-duration: 0.6s;
-	-webkit-animation-timing-function: linear;
-	-webkit-animation-iteration-count: infinite;
-
-	animation-name: stripes-animation-background-keyframes;
-	animation-duration: 0.6s;
-	animation-timing-function: linear;
-	animation-iteration-count: infinite;
+	background-image: repeating-linear-gradient(-60deg, #dbf8f4, #dbf8f4 10px, #edfffd 10px, #edfffd 20px);
+	background-size: 69px 40px;
+	animation: stripes-animation-background-keyframes 1s linear infinite;
 }
