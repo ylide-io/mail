@@ -6,12 +6,14 @@ import contacts from '../../stores/Contacts';
 import domain from '../../stores/Domain';
 import { HorizontalAlignment } from '../../utils/alignment';
 import { isAddress, isEns } from '../../utils/blockchain';
+import { constrain } from '../../utils/number';
 import { DropDown, DropDownItem, DropDownItemMode } from '../dropDown/dropDown';
 import { TagInput, TagInputItem, TagInputItemStyle } from '../tagInput/tagInput';
 
 interface DropDownOption {
 	name: string;
 	address: string;
+	isHighlighted: boolean;
 }
 
 let itemIdCounter = Date.now();
@@ -131,7 +133,7 @@ export function RecipientInput({ initialValue, onChange }: RecipientInputProps) 
 						),
 				)
 
-				.map(contact => ({ name: contact.name, address: contact.address })),
+				.map((contact, i) => ({ name: contact.name, address: contact.address, isHighlighted: !i })),
 		);
 	}, [isFocused, items, search]);
 
@@ -150,19 +152,40 @@ export function RecipientInput({ initialValue, onChange }: RecipientInputProps) 
 		setSearch('');
 	};
 
-	const onEnterKey = (e: KeyboardEvent<HTMLInputElement>) => {
-		const firstOption = options[0];
-		const cleanSearch = search.trim();
+	const onKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
+		const keyCode = e.keyCode;
 
-		if (firstOption) {
-			e.preventDefault();
-			onSelect(firstOption);
-		} else if (cleanSearch && !items.some(it => it.name === cleanSearch || it.routing?.address === cleanSearch)) {
-			e.preventDefault();
-			setItems([...items, createItem(cleanSearch)]);
+		// Enter
+		if (keyCode === 13) {
+			const highlightedOption = options.find(o => o.isHighlighted);
+			const cleanSearch = search.trim();
+
+			if (highlightedOption) {
+				e.preventDefault();
+				onSelect(highlightedOption);
+			} else if (
+				cleanSearch &&
+				!items.some(it => it.name === cleanSearch || it.routing?.address === cleanSearch)
+			) {
+				e.preventDefault();
+				setItems([...items, createItem(cleanSearch)]);
+			}
+
+			setSearch('');
 		}
 
-		setSearch('');
+		// Up, Down
+		else if ((keyCode === 38 || keyCode === 40) && options.length) {
+			e.preventDefault();
+
+			if (options.length > 1) {
+				const isDown = keyCode === 40;
+				const currentIndex = options.findIndex(o => o.isHighlighted);
+				const newIndex = constrain(isDown ? currentIndex + 1 : currentIndex - 1, 0, options.length - 1);
+
+				setOptions(options.map((o, i) => ({ ...o, isHighlighted: i === newIndex })));
+			}
+		}
 	};
 
 	const onSelect = (option: DropDownOption) => {
@@ -183,7 +206,7 @@ export function RecipientInput({ initialValue, onChange }: RecipientInputProps) 
 				onSearchChange={setSearch}
 				onFocus={onFocus}
 				onBlur={onBlur}
-				onEnterKey={onEnterKey}
+				onKeyDown={onKeyDown}
 			>
 				{items?.map((item, i) => {
 					const routing = item.routing;
@@ -222,7 +245,7 @@ export function RecipientInput({ initialValue, onChange }: RecipientInputProps) 
 					{options.map((option, i) => (
 						<DropDownItem
 							key={i}
-							mode={i ? DropDownItemMode.REGULAR : DropDownItemMode.HIGHLIGHTED}
+							mode={option.isHighlighted ? DropDownItemMode.HIGHLIGHTED : DropDownItemMode.REGULAR}
 							onSelect={() => onSelect(option)}
 						>
 							{option.name}

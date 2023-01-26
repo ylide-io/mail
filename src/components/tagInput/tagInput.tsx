@@ -1,5 +1,5 @@
 import clsx from 'clsx';
-import { forwardRef, KeyboardEvent, PropsWithChildren, Ref, useRef, useState } from 'react';
+import { FocusEvent, forwardRef, KeyboardEvent, PropsWithChildren, Ref, useRef, useState } from 'react';
 
 import { ReactComponent as CrossSvg } from '../../icons/cross.svg';
 import { PropsWithClassName } from '../propsWithClassName';
@@ -49,25 +49,14 @@ interface TagInputProps extends PropsWithChildren, PropsWithClassName {
 	placeholder?: string;
 	search?: string;
 	onSearchChange?: (search: string) => void;
-	onFocus?: () => void;
-	onBlur?: () => void;
-	onEnterKey?: (event: KeyboardEvent<HTMLInputElement>) => void;
-	onTabKey?: (event: KeyboardEvent<HTMLInputElement>) => void;
+	onFocus?: (event: FocusEvent<HTMLInputElement>) => void;
+	onBlur?: (event: FocusEvent<HTMLInputElement>) => void;
+	onKeyDown?: (event: KeyboardEvent<HTMLInputElement>) => void;
 }
 
 export const TagInput = forwardRef(
 	(
-		{
-			children,
-			className,
-			placeholder,
-			search,
-			onSearchChange,
-			onFocus,
-			onBlur,
-			onEnterKey,
-			onTabKey,
-		}: TagInputProps,
+		{ children, className, placeholder, search, onSearchChange, onFocus, onBlur, onKeyDown }: TagInputProps,
 		ref: Ref<HTMLDivElement>,
 	) => {
 		const inputRef = useRef<HTMLInputElement>(null);
@@ -88,25 +77,15 @@ export const TagInput = forwardRef(
 					placeholder={placeholder}
 					value={search}
 					onChange={e => onSearchChange?.(e.target.value)}
-					onFocus={() => {
+					onFocus={e => {
 						setFocused(true);
-						onFocus?.();
+						onFocus?.(e);
 					}}
-					onBlur={() => {
+					onBlur={e => {
 						setFocused(false);
-						onBlur?.();
+						onBlur?.(e);
 					}}
-					onKeyDown={e => {
-						// enter
-						if (e.keyCode === 13) {
-							onEnterKey?.(e);
-						}
-
-						// tab
-						if (e.keyCode === 9) {
-							onTabKey?.(e);
-						}
-					}}
+					onKeyDown={onKeyDown}
 				/>
 			</div>
 		);

@@ -1,5 +1,5 @@
 import clsx from 'clsx';
-import { PropsWithChildren, RefObject } from 'react';
+import { PropsWithChildren, RefObject, useEffect, useRef } from 'react';
 
 import {
 	AlignmentDirection,
@@ -7,6 +7,7 @@ import {
 	HorizontalAlignment,
 	VerticalAlignment,
 } from '../../utils/alignment';
+import { scrollIntoViewIfNeeded } from '../../utils/ui';
 import { AnchoredPopup } from '../popup/anchoredPopup/anchoredPopup';
 import { PropsWithClassName } from '../propsWithClassName';
 import css from './dropDown.module.scss';
@@ -65,8 +66,17 @@ interface DropDownItemProps extends PropsWithChildren {
 }
 
 export function DropDownItem({ children, mode = DropDownItemMode.REGULAR, onSelect }: DropDownItemProps) {
+	const itemRef = useRef<HTMLDivElement>(null);
+
+	useEffect(() => {
+		if (itemRef.current && mode === DropDownItemMode.HIGHLIGHTED) {
+			scrollIntoViewIfNeeded(itemRef.current);
+		}
+	}, [mode]);
+
 	return (
 		<div
+			ref={itemRef}
 			className={clsx(
 				css.item,
 				{
