@@ -14,3 +14,10 @@ export function getElementRect(element: HTMLElement): Rect {
 
 	return new Rect(clientRect.left, clientRect.top, clientRect.width, clientRect.height);
 }
+
+export function scrollIntoViewIfNeeded(elem: Element) {
+	elem.scrollIntoView
+		? elem.scrollIntoView({ block: 'nearest', inline: 'nearest' })
+		: // @ts-ignore
+		  elem.scrollIntoViewIfNeeded && elem.scrollIntoViewIfNeeded();
+}

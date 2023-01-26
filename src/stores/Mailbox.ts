@@ -4,25 +4,10 @@ import { makeObservable, observable } from 'mobx';
 import domain from './Domain';
 import { DomainAccount } from './models/DomainAccount';
 
-export interface IRecipient {
-	loading: boolean;
-	input: string;
-	type: 'contact' | 'ns' | 'address' | 'invalid';
-	address: string | null;
-	isAchievable:
-		| null
-		| false
-		| {
-				type: string;
-				blockchain: string | null;
-		  };
-	comment?: string;
-}
-
 class Mailbox {
 	@observable from?: DomainAccount;
-	@observable to: IRecipient[] = [];
-	@observable bcc: IRecipient[] = [];
+	@observable to: string[] = [];
+	@observable bcc: string[] = [];
 	@observable network?: EVMNetwork;
 
 	@observable evmBalances: Record<EVMNetwork, number> = {

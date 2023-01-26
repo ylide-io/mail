@@ -77,10 +77,7 @@ export function useMailList(props?: UseMailListProps) {
 	const [activeAccounts, setActiveAccounts] = useState(domain.accounts.activeAccounts);
 	reaction(
 		() => domain.accounts.activeAccounts,
-		() => {
-			console.log(`reaction`, domain.accounts.activeAccounts);
-			setActiveAccounts([]);
-		},
+		() => setActiveAccounts(domain.accounts.activeAccounts),
 	);
 
 	const [blockchains, setBlockchains] = useState(domain.blockchains);

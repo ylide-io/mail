@@ -1,3 +1,13 @@
-.root > div {
+.verticalGrid {
+	display: grid;
+	grid-template-columns: 100%;
+	grid-gap: 8px;
+}
+
+.noWrap {
+	white-space: nowrap;
+}
+
+.borderedChildren > div {
 	border: 1px solid #000;
 }

@@ -6,6 +6,8 @@ $font-weight_normal: 400;
 $font-weight_bold: 700;
 $font-weight_light: 300;
 
+$interactive-elem-size: 32px;
+
 // MEDIA RULES
 
 @mixin less980px() {
@@ -83,52 +85,14 @@ $font-weight_light: 300;
 
 //
 
-@keyframes MOVE-BG {
-	from {
-		transform: translateX(0);
-	}
+@keyframes stripes-animation-background-keyframes {
 	to {
-		transform: translateX(46px);
+		background-position-x: 69px;
 	}
 }
 
-@mixin stripes-animation {
-	position: relative;
-	overflow: hidden;
-	&::after {
-		content: ' ';
-		position: absolute;
-		left: -46px;
-		right: 0;
-		top: 0;
-		bottom: 0;
-		z-index: -1;
-
-		background: -webkit-repeating-linear-gradient(
-			145deg,
-			#dbf8f4 1px,
-			#edfffd 2px,
-			#dbf8f4 11px,
-			#dbf8f4 12px,
-			#dbf8f4 20px
-		);
-		background: repeating-linear-gradient(
-			-55deg,
-			#edfffd 1px,
-			#dbf8f4 2px,
-			#dbf8f4 11px,
-			#edfffd 12px,
-			#edfffd 20px
-		);
-
-		-webkit-animation-name: MOVE-BG;
-		-webkit-animation-duration: 0.6s;
-		-webkit-animation-timing-function: linear;
-		-webkit-animation-iteration-count: infinite;
-
-		animation-name: MOVE-BG;
-		animation-duration: 0.6s;
-		animation-timing-function: linear;
-		animation-iteration-count: infinite;
-	}
+@mixin stripes-animation-background {
+	background-image: repeating-linear-gradient(-60deg, #dbf8f4, #dbf8f4 10px, #edfffd 10px, #edfffd 20px);
+	background-size: 69px 40px;
+	animation: stripes-animation-background-keyframes 1s linear infinite;
 }

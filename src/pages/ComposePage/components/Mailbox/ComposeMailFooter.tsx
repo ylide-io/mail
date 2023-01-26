@@ -5,6 +5,7 @@ import { observer } from 'mobx-react';
 import React, { ReactNode, useEffect } from 'react';
 import { generatePath } from 'react-router-dom';
 
+import { RecipientInputItem } from '../../../../components/recipientInput/recipientInput';
 import { smallButtonIcons } from '../../../../components/smallButton/smallButton';
 import { blockchainsMap, evmNameToNetwork } from '../../../../constants';
 import AlertModal from '../../../../modals/AlertModal';
@@ -15,7 +16,11 @@ import { useMailStore } from '../../../../stores/MailList';
 import { RoutePath } from '../../../../stores/routePath';
 import { useNav } from '../../../../utils/navigate';
 
-const ComposeMailFooter = observer(() => {
+interface ComposeMailFooterProps {
+	recipients: RecipientInputItem[];
+}
+
+const ComposeMailFooter = observer(({ recipients }: ComposeMailFooterProps) => {
 	const navigate = useNav();
 	const lastActiveFolderId = useMailStore(state => state.lastActiveFolderId);
 
@@ -57,40 +62,13 @@ const ComposeMailFooter = observer(() => {
 		}
 	}
 
-	const sendMailHandler = async (e: React.MouseEvent) => {
+	const sendMailHandler = async () => {
 		try {
-			e.preventDefault();
-
-			if (!mailbox.textEditorData?.blocks?.length || !mailbox.to.length) return;
+			if (recipients.some(r => !r.routing?.details)) {
+				return alert("For some of your recipients we didn't find keys on the blockchain.");
+			}
 
 			mailer.sending = true;
-
-			//Filter duplicates addresses
-			const recipients = mailbox.to
-				.filter(v => !!v.address)
-				.filter((value, index, array) => array.indexOf(value) === index)
-				.map(v => v.address!);
-
-			// identifyRouteToAddresses
-			const notFoundRecipients: Record<string, boolean> = recipients.reduce(
-				(p, c) => ({
-					...p,
-					[c]: true,
-				}),
-				{},
-			);
-			const route = await domain.identifyRouteToAddresses(recipients);
-			route.forEach(r => {
-				notFoundRecipients[r.recipients[0].keyAddressOriginal] = false;
-			});
-
-			const leftNotFound = Object.keys(notFoundRecipients).filter(k => notFoundRecipients[k]);
-
-			if (leftNotFound.length) {
-				alert(`For some of your recipients we didn't find keys on the blockchain`);
-				mailer.sending = false;
-				return;
-			}
 
 			const acc = mailbox.from!;
 			const curr = await acc.wallet.getCurrentAccount();
@@ -102,7 +80,7 @@ const ComposeMailFooter = observer(() => {
 				acc,
 				mailbox.subject,
 				JSON.stringify(mailbox.textEditorData),
-				recipients,
+				recipients.map(r => r.routing?.address!),
 				mailbox.network,
 			);
 
@@ -120,11 +98,11 @@ const ComposeMailFooter = observer(() => {
 			<div
 				className={clsx('send-btn', {
 					disabled:
-						!mailbox.from ||
 						mailer.sending ||
-						!mailbox.to.some(r => r.isAchievable) ||
-						!mailbox.textEditorData?.blocks?.length ||
-						!mailbox.to.length,
+						!mailbox.from ||
+						!recipients.length ||
+						recipients.some(r => r.isLoading) ||
+						!mailbox.textEditorData?.blocks?.length,
 					withDropdown: mailbox.from?.wallet.factory.blockchainGroup === 'evm',
 				})}
 			>
