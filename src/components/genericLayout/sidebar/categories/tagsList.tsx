@@ -1,10 +1,10 @@
 import { observer } from 'mobx-react';
 import React, { useEffect } from 'react';
 
-import { FolderId } from '../../../stores/MailList';
-import tags from '../../../stores/Tags';
-import TagsEmpty from '../TagsEmpty';
-import Tag from './Tag';
+import { FolderId } from '../../../../stores/MailList';
+import tags from '../../../../stores/Tags';
+import TagsEmpty from '../tagsEmpty';
+import Tag from './tag';
 
 interface TagsListProps {
 	folderId: FolderId;

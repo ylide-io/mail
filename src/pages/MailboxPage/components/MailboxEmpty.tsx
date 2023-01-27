@@ -1,7 +1,7 @@
 import { observer } from 'mobx-react';
 import React from 'react';
 
-import { LinkButton, LinkButtonType } from '../../../components/Sidebar/LinkButton';
+import { LinkButton, LinkButtonType } from '../../../components/genericLayout/sidebar/linkButton';
 import ClickToCopy from '../../../controls/ClickToCopy';
 import domain from '../../../stores/Domain';
 import { FolderId } from '../../../stores/MailList';

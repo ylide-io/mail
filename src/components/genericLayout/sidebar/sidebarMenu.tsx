@@ -5,32 +5,32 @@ import { observer } from 'mobx-react';
 import React, { useEffect, useState } from 'react';
 import { generatePath, useLocation } from 'react-router-dom';
 
-import { YlideButton } from '../../controls/YlideButton';
-import { CaretDown } from '../../icons/CaretDown';
-import { CaretUp } from '../../icons/CaretUp';
-import { ReactComponent as DiscordSvg } from '../../icons/social/discord.svg';
-import { ReactComponent as LinkedInSvg } from '../../icons/social/linkedIn.svg';
-import { ReactComponent as MediumSvg } from '../../icons/social/medium.svg';
-import { ReactComponent as TelegramSvg } from '../../icons/social/telegram.svg';
-import { ReactComponent as TwitterSvg } from '../../icons/social/twitter.svg';
-import { checkboxCheckIcon } from '../../icons/static/checkboxCheckIcon';
-import { sideAllTopicsIcon } from '../../icons/static/sideAllTopicsIcon';
-import { sideAnalyticsIcon } from '../../icons/static/sideAnalyticsIcon';
-import { sideCultureIcon } from '../../icons/static/sideCultureIcon';
-import { sideEducationIcon } from '../../icons/static/sideEducationIcon';
-import { sideFeedIcon } from '../../icons/static/sideFeedIcon';
-import { sideMarketsIcon } from '../../icons/static/sideMarketsIcon';
-import { sidePolicyIcon } from '../../icons/static/sidePolicyIcon';
-import { sideProjectsIcon } from '../../icons/static/sideProjectsIcon';
-import { sideSecurityIcon } from '../../icons/static/sideSecurityIcon';
-import { sideTechnologyIcon } from '../../icons/static/sideTechnologyIcon';
-import { topicSettingsIcon } from '../../icons/static/topicSettingsIcon';
-import feed, { FeedCategory, getFeedCategoryName, nonSyntheticFeedCategories } from '../../stores/Feed';
-import { FolderId } from '../../stores/MailList';
-import modals from '../../stores/Modals';
-import { RoutePath } from '../../stores/routePath';
-import { useNav } from '../../utils/navigate';
-import css from './SidebarMenu.module.scss';
+import { YlideButton } from '../../../controls/YlideButton';
+import { CaretDown } from '../../../icons/CaretDown';
+import { CaretUp } from '../../../icons/CaretUp';
+import { ReactComponent as DiscordSvg } from '../../../icons/social/discord.svg';
+import { ReactComponent as LinkedInSvg } from '../../../icons/social/linkedIn.svg';
+import { ReactComponent as MediumSvg } from '../../../icons/social/medium.svg';
+import { ReactComponent as TelegramSvg } from '../../../icons/social/telegram.svg';
+import { ReactComponent as TwitterSvg } from '../../../icons/social/twitter.svg';
+import { checkboxCheckIcon } from '../../../icons/static/checkboxCheckIcon';
+import { sideAllTopicsIcon } from '../../../icons/static/sideAllTopicsIcon';
+import { sideAnalyticsIcon } from '../../../icons/static/sideAnalyticsIcon';
+import { sideCultureIcon } from '../../../icons/static/sideCultureIcon';
+import { sideEducationIcon } from '../../../icons/static/sideEducationIcon';
+import { sideFeedIcon } from '../../../icons/static/sideFeedIcon';
+import { sideMarketsIcon } from '../../../icons/static/sideMarketsIcon';
+import { sidePolicyIcon } from '../../../icons/static/sidePolicyIcon';
+import { sideProjectsIcon } from '../../../icons/static/sideProjectsIcon';
+import { sideSecurityIcon } from '../../../icons/static/sideSecurityIcon';
+import { sideTechnologyIcon } from '../../../icons/static/sideTechnologyIcon';
+import { topicSettingsIcon } from '../../../icons/static/topicSettingsIcon';
+import feed, { FeedCategory, getFeedCategoryName, nonSyntheticFeedCategories } from '../../../stores/Feed';
+import { FolderId } from '../../../stores/MailList';
+import modals from '../../../stores/Modals';
+import { RoutePath } from '../../../stores/routePath';
+import { useNav } from '../../../utils/navigate';
+import css from './sidebarMenu.module.scss';
 
 const FeedSettings = observer(() => {
 	const [newValues, setNewValues] = useState(feed.mainCategories);
@@ -315,7 +315,11 @@ const SidebarMenu = observer(() => {
 					<a href="https://twitter.com/ylide_" target="_blank noreferrer" title="Twitter">
 						<TwitterSvg />
 					</a>
-					<a href="https://www.linkedin.com/company/ylide/" target="_blank noreferrer" title="LinkedIn">
+					<a
+						href="src/components/genericLayout/sidebar/sidebarMenu"
+						target="_blank noreferrer"
+						title="LinkedIn"
+					>
 						<LinkedInSvg />
 					</a>
 					<a href="https://medium.com/@ylide" target="_blank noreferrer" title="Medium">

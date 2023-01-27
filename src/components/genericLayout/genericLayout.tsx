@@ -3,11 +3,11 @@ import { observer } from 'mobx-react';
 import React, { ReactNode, useEffect } from 'react';
 
 import domain from '../../stores/Domain';
-import { LinkButton } from '../Sidebar/LinkButton';
-import SidebarMenu from '../Sidebar/SidebarMenu';
 import { TransactionPopup } from '../TransactionPopup/TransactionPopup';
 import css from './genericLayout.module.scss';
 import Header from './header/header';
+import { LinkButton } from './sidebar/linkButton';
+import SidebarMenu from './sidebar/sidebarMenu';
 
 interface GenericLayoutProps {
 	children: ReactNode;
