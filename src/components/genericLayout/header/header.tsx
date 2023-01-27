@@ -22,7 +22,7 @@ const Header = observer(() => {
 	const [showQuest3, setShowQuest3] = useState(localStorage.getItem('quest3') !== 'false');
 
 	return (
-		<div className="header">
+		<div className={css.root}>
 			<div className="header-burger">
 				<Button
 					onClick={() => {
@@ -43,8 +43,8 @@ const Header = observer(() => {
 					<YlideLargeLogo className={css.logoImage} />
 				</a>
 			</div>
-			<div className="header-main">
-				<div className="header-block">
+			<div className={css.main}>
+				<div className={css.block}>
 					<div
 						className={clsx(css.quest3Btn, { [css.shine]: showQuest3 })}
 						onClick={() => {
@@ -100,7 +100,7 @@ const Header = observer(() => {
 						Quest3
 					</div>
 				</div>
-				<div className="header-block">
+				<div className={css.block}>
 					<Tooltip title="Manage contacts and folders">
 						<UsergroupAddOutlined
 							onClick={e => {
@@ -111,21 +111,10 @@ const Header = observer(() => {
 						/>
 					</Tooltip>
 				</div>
-				{/* <div className="header-block">
-					<Tooltip title="Settings">
-						<SettingFilled
-							onClick={e => {
-								e.preventDefault();
-								nav('/settings');
-							}}
-							style={{ fontSize: 20 }}
-						/>
-					</Tooltip>
-				</div> */}
-				<div className="header-block">
+				<div className={css.block}>
 					<Dropdown overlay={<AccountsPopup />}>
-						<div className="users-block">
-							<div className="users-block-avatars">
+						<div className={css.users}>
+							<div className={css.usersAvatars}>
 								{domain.accounts.accounts.map(acc => (
 									<Avatar
 										key={acc.account.address}
@@ -133,12 +122,12 @@ const Header = observer(() => {
 									/>
 								))}
 							</div>
-							<div className="users-block-text">
+							<div className={css.usersText}>
 								<span>Connected&nbsp;</span>
 								{domain.accounts.accounts.length} account
 								{domain.accounts.accounts.length > 1 ? 's' : ''}
 							</div>
-							<div className="users-block-icon">
+							<div className={css.usersIcon}>
 								<DownOutlined size={16} />
 							</div>
 						</div>

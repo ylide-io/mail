@@ -1,3 +1,83 @@
+.root {
+	@include flex-row(center, flex-start);
+
+	padding-left: 15px;
+	padding-right: 15px;
+	padding-top: 0px;
+
+	height: 64px;
+	flex-basis: 64px;
+
+	border-bottom: 1px solid #d3d4db;
+
+	@include less480px {
+		padding-right: 5px;
+	}
+}
+
+.main {
+	@include flex-row(center, flex-end);
+
+	flex-grow: 1;
+	flex-shrink: 1;
+}
+
+.block {
+	@include flex-row(center, flex-end);
+
+	&:not(:first-child) {
+		margin-left: 30px;
+	}
+
+	:global(.anticon) {
+		color: rgba(0, 0, 0, 0.65);
+		&:hover {
+			color: #111111;
+		}
+	}
+}
+
+.users {
+	@include flex-row(center, flex-start);
+
+	height: 36px;
+	padding: 2px;
+	background-color: white;
+	border-radius: 20px;
+
+	box-shadow: 0px 0px 3px rgba(0, 0, 0, 0.3);
+}
+
+.usersAvatars {
+	@include flex-row(center, flex-start);
+
+	:global(.ant-avatar:not(:first-child)) {
+		margin-left: -18px;
+	}
+}
+
+.usersText {
+	@include flex-row(center, flex-start);
+	margin-left: 10px;
+	margin-right: 0px;
+	white-space: nowrap;
+
+	@include less480px {
+		span {
+			display: none;
+		}
+	}
+}
+
+.usersIcon {
+	@include flex-row(center, center);
+
+	flex-grow: 0;
+	flex-shrink: 0;
+	flex-basis: 34px;
+	width: 34px;
+}
+
 .logo {
 	@include less720px {
 		display: none;
