@@ -126,7 +126,7 @@ const Header = observer(() => {
 					<Dropdown overlay={<AccountsPopup />}>
 						<div className="users-block">
 							<div className="users-block-avatars">
-								{domain.accounts.activeAccounts.map(acc => (
+								{domain.accounts.accounts.map(acc => (
 									<Avatar
 										key={acc.account.address}
 										icon={<Blockie address={acc.account.address} />}
@@ -135,8 +135,8 @@ const Header = observer(() => {
 							</div>
 							<div className="users-block-text">
 								<span>Connected&nbsp;</span>
-								{domain.accounts.activeAccounts.length} account
-								{domain.accounts.activeAccounts.length > 1 ? 's' : ''}
+								{domain.accounts.accounts.length} account
+								{domain.accounts.accounts.length > 1 ? 's' : ''}
 							</div>
 							<div className="users-block-icon">
 								<DownOutlined size={16} />
