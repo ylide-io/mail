@@ -2,12 +2,12 @@ import clsx from 'clsx';
 import { observer } from 'mobx-react';
 import React, { ReactNode, useEffect } from 'react';
 
-import Header from '../components/Header/Header';
-import { LinkButton } from '../components/Sidebar/LinkButton';
-import SidebarMenu from '../components/Sidebar/SidebarMenu';
-import { TransactionPopup } from '../components/TransactionPopup/TransactionPopup';
-import domain from '../stores/Domain';
-import css from './GenericLayout.module.scss';
+import domain from '../../stores/Domain';
+import { LinkButton } from '../Sidebar/LinkButton';
+import SidebarMenu from '../Sidebar/SidebarMenu';
+import { TransactionPopup } from '../TransactionPopup/TransactionPopup';
+import css from './genericLayout.module.scss';
+import Header from './header/header';
 
 interface GenericLayoutProps {
 	children: ReactNode;

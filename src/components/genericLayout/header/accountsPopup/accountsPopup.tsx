@@ -5,13 +5,13 @@ import { observer } from 'mobx-react';
 import React from 'react';
 import { generatePath } from 'react-router-dom';
 
-import { walletsMeta } from '../../../constants';
-import { AdaptiveAddress } from '../../../controls/adaptiveAddress/adaptiveAddress';
-import { Blockie } from '../../../controls/Blockie';
-import domain from '../../../stores/Domain';
-import { DomainAccount } from '../../../stores/models/DomainAccount';
-import { RoutePath } from '../../../stores/routePath';
-import { useNav } from '../../../utils/navigate';
+import { walletsMeta } from '../../../../constants';
+import { AdaptiveAddress } from '../../../../controls/adaptiveAddress/adaptiveAddress';
+import { Blockie } from '../../../../controls/Blockie';
+import domain from '../../../../stores/Domain';
+import { DomainAccount } from '../../../../stores/models/DomainAccount';
+import { RoutePath } from '../../../../stores/routePath';
+import { useNav } from '../../../../utils/navigate';
 import css from './accountsPopup.module.scss';
 
 const AccountItem = observer(({ account }: { account: DomainAccount }) => {

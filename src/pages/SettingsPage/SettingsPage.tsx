@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { GenericLayout } from '../../layouts/GenericLayout';
+import { GenericLayout } from '../../components/genericLayout/genericLayout';
 import { useMailStore } from '../../stores/MailList';
 
 export const SettingsPage = () => {

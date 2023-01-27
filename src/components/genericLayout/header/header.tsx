@@ -6,16 +6,16 @@ import { observer } from 'mobx-react';
 import React, { useState } from 'react';
 import { generatePath } from 'react-router-dom';
 
-import { Blockie } from '../../controls/Blockie';
-import { YlideLargeLogo } from '../../icons/YlideLargeLogo';
-import AlertModal from '../../modals/AlertModal';
-import domain from '../../stores/Domain';
-import { FolderId } from '../../stores/MailList';
-import modals from '../../stores/Modals';
-import { RoutePath } from '../../stores/routePath';
-import { useNav } from '../../utils/navigate';
+import { Blockie } from '../../../controls/Blockie';
+import { YlideLargeLogo } from '../../../icons/YlideLargeLogo';
+import AlertModal from '../../../modals/AlertModal';
+import domain from '../../../stores/Domain';
+import { FolderId } from '../../../stores/MailList';
+import modals from '../../../stores/Modals';
+import { RoutePath } from '../../../stores/routePath';
+import { useNav } from '../../../utils/navigate';
 import { AccountsPopup } from './accountsPopup/accountsPopup';
-import css from './Header.module.scss';
+import css from './header.module.scss';
 
 const Header = observer(() => {
 	const nav = useNav();

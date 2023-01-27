@@ -4,7 +4,7 @@ import { observer } from 'mobx-react';
 import React from 'react';
 import { Outlet, useLocation } from 'react-router-dom';
 
-import { GenericLayout } from '../../layouts/GenericLayout';
+import { GenericLayout } from '../../components/genericLayout/genericLayout';
 import contacts from '../../stores/Contacts';
 import { RoutePath } from '../../stores/routePath';
 import tags from '../../stores/Tags';

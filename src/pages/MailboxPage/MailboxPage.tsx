@@ -3,8 +3,8 @@ import { useLocation, useParams } from 'react-router-dom';
 import AutoSizer from 'react-virtualized-auto-sizer';
 import { FixedSizeList, ListChildComponentProps } from 'react-window';
 
+import { GenericLayout } from '../../components/genericLayout/genericLayout';
 import { YlideLoader } from '../../components/ylideLoader/ylideLoader';
-import { GenericLayout } from '../../layouts/GenericLayout';
 import { analytics } from '../../stores/Analytics';
 import domain from '../../stores/Domain';
 import { FolderId, ILinkedMessage, useMailList, useMailStore } from '../../stores/MailList';

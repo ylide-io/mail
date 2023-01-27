@@ -4,12 +4,12 @@ import React, { useEffect, useState } from 'react';
 import { generatePath } from 'react-router-dom';
 
 import { ActionButton, ActionButtonStyle } from '../../components/ActionButton/ActionButton';
+import { GenericLayout } from '../../components/genericLayout/genericLayout';
 import { RecipientInput, RecipientInputItem } from '../../components/recipientInput/recipientInput';
 import { smallButtonIcons } from '../../components/smallButton/smallButton';
 import { TextField } from '../../components/textField/textField';
 import { walletsMeta } from '../../constants';
 import { OverlappingLoader } from '../../controls/OverlappingLoader';
-import { GenericLayout } from '../../layouts/GenericLayout';
 import { analytics } from '../../stores/Analytics';
 import domain from '../../stores/Domain';
 import mailbox from '../../stores/Mailbox';

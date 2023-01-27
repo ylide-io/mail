@@ -6,6 +6,7 @@ import React, { MouseEvent, useCallback, useEffect, useRef, useState } from 'rea
 import { useLocation, useParams } from 'react-router-dom';
 
 import { ActionButton, ActionButtonStyle } from '../../components/ActionButton/ActionButton';
+import { GenericLayout } from '../../components/genericLayout/genericLayout';
 import { ReadableDate } from '../../components/readableDate/readableDate';
 import { smallButtonIcons } from '../../components/smallButton/smallButton';
 import { YlideLoader } from '../../components/ylideLoader/ylideLoader';
@@ -16,7 +17,6 @@ import { linkIcon } from '../../icons/static/linkIcon';
 import { mirrorSourceIcon } from '../../icons/static/mirrorSourceIcon';
 import { telegramSourceIcon } from '../../icons/static/telegramSourceIcon';
 import { twitterSourceIcon } from '../../icons/static/twitterSourceIcon';
-import { GenericLayout } from '../../layouts/GenericLayout';
 import GalleryModal from '../../modals/GalleryModal';
 import feed, { FeedCategory, FeedPost, LinkType } from '../../stores/Feed';
 import { useNav } from '../../utils/navigate';
