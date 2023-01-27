@@ -16,7 +16,7 @@ import mailer from '../../stores/Mailer';
 import { useMailStore } from '../../stores/MailList';
 import { RoutePath } from '../../stores/routePath';
 import { useNav } from '../../utils/navigate';
-import { shrinkAddress } from '../../utils/shrinkAddress';
+import { truncateInMiddle } from '../../utils/string';
 import ComposeMailBody from './components/Mailbox/ComposeMailBody';
 import ComposeMailFooter from './components/Mailbox/ComposeMailFooter';
 
@@ -74,7 +74,7 @@ export const ComposePage = observer(() => {
 										{domain.accounts.activeAccounts.map((acc, idx) => (
 											<Select.Option key={idx} value={String(idx)}>
 												{(acc.name || 'No name') +
-													` (${shrinkAddress(acc.account.address, 10)})`}{' '}
+													` (${truncateInMiddle(acc.account.address, 10)})`}{' '}
 												[{acc.wallet.factory.wallet === 'metamask' ? 'MetaMask' : 'EverWallet'}]
 											</Select.Option>
 										))}

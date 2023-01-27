@@ -17,7 +17,7 @@ import domain from '../../stores/Domain';
 import { DomainAccount } from '../../stores/models/DomainAccount';
 import { Wallet } from '../../stores/models/Wallet';
 import { isBytesEqual } from '../../utils/isBytesEqual';
-import { shrinkAddress } from '../../utils/shrinkAddress';
+import { truncateInMiddle } from '../../utils/string';
 
 export interface WalletBlockProps {
 	wallet: string;
@@ -38,7 +38,7 @@ export class AccountBlock extends PureComponent<{ account: DomainAccount }> {
 		const account = this.props.account;
 		return (
 			<div key={account.account.address} className="wb-account">
-				<div className="wb-account-title">{shrinkAddress(account.account.address, 36)}</div>
+				<div className="wb-account-title">{truncateInMiddle(account.account.address, 36)}</div>
 				<div className="wb-account-actions">
 					{!account.isLocalKeyRegistered ? (
 						<YlideButton
@@ -240,7 +240,7 @@ export class WalletBlock extends PureComponent<WalletBlockProps> {
 						<>
 							Add{' '}
 							{wallet.currentWalletAccount
-								? shrinkAddress(wallet.currentWalletAccount.address, 8)
+								? truncateInMiddle(wallet.currentWalletAccount.address, 8)
 								: 'new account'}
 						</>
 					);
