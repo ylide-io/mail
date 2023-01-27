@@ -6,6 +6,7 @@ import { FolderId, useMailStore } from '../../../../stores/MailList';
 import modals from '../../../../stores/Modals';
 import { RoutePath } from '../../../../stores/routePath';
 import { useNav } from '../../../../utils/navigate';
+import css from './categories.module.scss';
 import PermanentTag from './permanentTag';
 
 interface PermanentTagListProps {}
@@ -15,7 +16,7 @@ const PermanentTagList: React.FC<PermanentTagListProps> = observer(() => {
 	const lastActiveFolderId = useMailStore(state => state.lastActiveFolderId);
 
 	return (
-		<div className="tag-list">
+		<div className={css.list}>
 			<PermanentTag
 				active={lastActiveFolderId === FolderId.Inbox}
 				text={'Inbox'}

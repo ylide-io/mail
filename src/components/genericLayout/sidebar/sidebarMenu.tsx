@@ -2,7 +2,7 @@ import { MenuFoldOutlined, MenuUnfoldOutlined } from '@ant-design/icons';
 import { Button, Dropdown } from 'antd';
 import clsx from 'clsx';
 import { observer } from 'mobx-react';
-import React, { useEffect, useState } from 'react';
+import React, { PropsWithChildren, useEffect, useState } from 'react';
 import { generatePath, useLocation } from 'react-router-dom';
 
 import { YlideButton } from '../../../controls/YlideButton';
@@ -30,7 +30,26 @@ import { FolderId } from '../../../stores/MailList';
 import modals from '../../../stores/Modals';
 import { RoutePath } from '../../../stores/routePath';
 import { useNav } from '../../../utils/navigate';
+import { PropsWithClassName } from '../../propsWithClassName';
 import css from './sidebarMenu.module.scss';
+
+interface SidebarBurgerProps extends PropsWithClassName, PropsWithChildren {}
+
+export function SidebarBurger({ className, children }: SidebarBurgerProps) {
+	return (
+		<Button
+			className={clsx(css.burger, className)}
+			onClick={() => {
+				modals.sidebarOpen = !modals.sidebarOpen;
+			}}
+			icon={modals.sidebarOpen ? <MenuFoldOutlined /> : <MenuUnfoldOutlined />}
+		>
+			{children}
+		</Button>
+	);
+}
+
+//
 
 const FeedSettings = observer(() => {
 	const [newValues, setNewValues] = useState(feed.mainCategories);
@@ -152,22 +171,12 @@ const SidebarMenu = observer(() => {
 	return (
 		<div className={clsx(css.root, { [css.root_open]: modals.sidebarOpen })}>
 			<div className={css.container}>
-				<div className="sidebar-mobile-header" style={{ alignSelf: 'center', marginBottom: 30 }}>
-					<div className="header-burger" style={{ marginRight: 0 }}>
-						<Button
-							onClick={() => {
-								modals.sidebarOpen = !modals.sidebarOpen;
-							}}
-							style={{ borderRadius: 8 }}
-							icon={modals.sidebarOpen ? <MenuFoldOutlined /> : <MenuUnfoldOutlined />}
-						>
-							Hide sidebar
-						</Button>
-					</div>
+				<div className={css.mobileHeader}>
+					<SidebarBurger>Hide sidebar</SidebarBurger>
 				</div>
 
-				<div className="sidebar-section">
-					<div className="sidebar-section-title">
+				<div className={css.section}>
+					<div className={css.sectionTitle}>
 						Feed{' '}
 						<div
 							style={{
@@ -181,26 +190,26 @@ const SidebarMenu = observer(() => {
 							{feedOpen ? <CaretDown /> : <CaretUp />}
 						</div>
 					</div>
-					<div className={clsx('sidebar-section-content', { open: feedOpen })}>
+					<div className={clsx(css.sectionContent, feedOpen && css.sectionContent_open)}>
 						{feedMenuItems.map(item => {
 							const path = generatePath(RoutePath.FEED_CATEGORY, { category: item.category });
 
 							return (
 								<div
 									key={item.category}
-									className={clsx('sidebar-section-link', {
-										active: location.pathname === path,
+									className={clsx(css.sectionLink, {
+										[css.sectionLink_active]: location.pathname === path,
 									})}
 									onClick={() => {
 										modals.sidebarOpen = false;
 										navigate(path);
 									}}
 								>
-									<div className="sidebar-link-icon-left">{item.icon}</div>
-									<div className="sidebar-link-title">{getFeedCategoryName(item.category)}</div>
+									<div className={css.sectionLinkIconLeft}>{item.icon}</div>
+									<div className={css.sectionLinkTitle}>{getFeedCategoryName(item.category)}</div>
 
 									{item.category === FeedCategory.MAIN && (
-										<div className="sidebar-link-icon-right">
+										<div className={css.sectionLinkIconRight}>
 											<Dropdown overlay={<FeedSettings />}>{topicSettingsIcon}</Dropdown>
 										</div>
 									)}
@@ -210,8 +219,8 @@ const SidebarMenu = observer(() => {
 					</div>
 				</div>
 
-				<div className="sidebar-section">
-					<div className="sidebar-section-title">
+				<div className={css.section}>
+					<div className={css.sectionTitle}>
 						Mail{' '}
 						<div
 							style={{
@@ -225,9 +234,9 @@ const SidebarMenu = observer(() => {
 							{mailOpen ? <CaretDown /> : <CaretUp />}
 						</div>
 					</div>
-					<div className={clsx('sidebar-section-content', { open: mailOpen })}>
+					<div className={clsx(css.sectionContent, mailOpen && css.sectionContent_open)}>
 						<div
-							className="sidebar-section-button"
+							className={css.sectionButton}
 							onClick={() => {
 								modals.sidebarOpen = false;
 								navigate(RoutePath.MAIL_COMPOSE);
@@ -236,8 +245,8 @@ const SidebarMenu = observer(() => {
 							Compose mail
 						</div>
 						<div
-							className={clsx('sidebar-section-link', {
-								active:
+							className={clsx(css.sectionLink, {
+								[css.sectionLink_active]:
 									location.pathname ===
 									generatePath(RoutePath.MAIL_FOLDER, { folderId: FolderId.Inbox }),
 							})}
@@ -246,11 +255,11 @@ const SidebarMenu = observer(() => {
 								navigate(generatePath(RoutePath.MAIL_FOLDER, { folderId: FolderId.Inbox }));
 							}}
 						>
-							<div className="sidebar-link-icon-left">
+							<div className={css.sectionLinkIconLeft}>
 								<i className="fa fa-inbox" />
 							</div>
-							<div className="sidebar-link-title">Inbox</div>
-							<div className="sidebar-link-icon-right">
+							<div className={css.sectionLinkTitle}>Inbox</div>
+							<div className={css.sectionLinkIconRight}>
 								{/* <div
 									style={{
 										borderRadius: '50%',
@@ -271,8 +280,8 @@ const SidebarMenu = observer(() => {
 							</div>
 						</div>
 						<div
-							className={clsx('sidebar-section-link', {
-								active:
+							className={clsx(css.sectionLink, {
+								[css.sectionLink_active]:
 									location.pathname ===
 									generatePath(RoutePath.MAIL_FOLDER, { folderId: FolderId.Sent }),
 							})}
@@ -281,14 +290,14 @@ const SidebarMenu = observer(() => {
 								navigate(generatePath(RoutePath.MAIL_FOLDER, { folderId: FolderId.Sent }));
 							}}
 						>
-							<div className="sidebar-link-icon-left">
+							<div className={css.sectionLinkIconLeft}>
 								<i className="fa fa-share" />
 							</div>
-							<div className="sidebar-link-title">Sent</div>
+							<div className={css.sectionLinkTitle}>Sent</div>
 						</div>
 						<div
-							className={clsx('sidebar-section-link', {
-								active:
+							className={clsx(css.sectionLink, {
+								[css.sectionLink_active]:
 									location.pathname ===
 									generatePath(RoutePath.MAIL_FOLDER, { folderId: FolderId.Archive }),
 							})}
@@ -297,10 +306,10 @@ const SidebarMenu = observer(() => {
 								navigate(generatePath(RoutePath.MAIL_FOLDER, { folderId: FolderId.Archive }));
 							}}
 						>
-							<div className="sidebar-link-icon-left">
+							<div className={css.sectionLinkIconLeft}>
 								<i className="fa fa-trash-o" />
 							</div>
-							<div className="sidebar-link-title">Archive</div>
+							<div className={css.sectionLinkTitle}>Archive</div>
 						</div>
 					</div>
 				</div>

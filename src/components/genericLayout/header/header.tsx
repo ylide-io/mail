@@ -1,5 +1,5 @@
-import { DownOutlined, MenuFoldOutlined, MenuUnfoldOutlined, UsergroupAddOutlined } from '@ant-design/icons';
-import { Avatar, Button, Dropdown } from 'antd';
+import { DownOutlined, UsergroupAddOutlined } from '@ant-design/icons';
+import { Avatar, Dropdown } from 'antd';
 import Tooltip from 'antd/es/tooltip';
 import clsx from 'clsx';
 import { observer } from 'mobx-react';
@@ -11,9 +11,9 @@ import { YlideLargeLogo } from '../../../icons/YlideLargeLogo';
 import AlertModal from '../../../modals/AlertModal';
 import domain from '../../../stores/Domain';
 import { FolderId } from '../../../stores/MailList';
-import modals from '../../../stores/Modals';
 import { RoutePath } from '../../../stores/routePath';
 import { useNav } from '../../../utils/navigate';
+import { SidebarBurger } from '../sidebar/sidebarMenu';
 import { AccountsPopup } from './accountsPopup/accountsPopup';
 import css from './header.module.scss';
 
@@ -23,14 +23,7 @@ const Header = observer(() => {
 
 	return (
 		<div className={css.root}>
-			<div className="header-burger">
-				<Button
-					onClick={() => {
-						modals.sidebarOpen = !modals.sidebarOpen;
-					}}
-					icon={modals.sidebarOpen ? <MenuFoldOutlined /> : <MenuUnfoldOutlined />}
-				/>
-			</div>
+			<SidebarBurger className={css.burger} />
 
 			<div className={css.logo}>
 				<a

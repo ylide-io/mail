@@ -1,6 +1,8 @@
 import clsx from 'clsx';
 import React from 'react';
 
+import css from './categories.module.scss';
+
 interface PermanentTagInterface {
 	onClick: () => void;
 	text: string;
@@ -29,8 +31,8 @@ const PermanentTag: React.FC<PermanentTagInterface> = ({ onClick, text, active }
 	};
 
 	return (
-		<div className="tag-list-item" onClick={onClick}>
-			<div className="tag-list-item-title" style={active ? { ...styles, ...activeStyles } : styles}>
+		<div className={css.listItem} onClick={onClick}>
+			<div className={css.listItemTitle} style={active ? { ...styles, ...activeStyles } : styles}>
 				<i className={clsx('fa', icon)} /> {text}
 			</div>
 		</div>

@@ -4,6 +4,7 @@ import { useLocation } from 'react-router-dom';
 
 import modals from '../../../../stores/Modals';
 import { useNav } from '../../../../utils/navigate';
+import css from './categories.module.scss';
 
 interface TagProps {
 	circleColor: string;
@@ -33,8 +34,8 @@ const Tag: React.FC<TagProps> = ({ icon, circleColor, text, isActive, tagId }) =
 	};
 
 	return (
-		<div className="tag-list-item" onClick={clickHandler}>
-			<div className="tag-list-item-title" style={isActive ? { ...styles, ...activeStyles } : styles}>
+		<div className={css.listItem} onClick={clickHandler}>
+			<div className={css.listItemTitle} style={isActive ? { ...styles, ...activeStyles } : styles}>
 				<i className={clsx('fa fa-circle text-navy')} style={{ color: circleColor }} /> {text}
 			</div>
 		</div>

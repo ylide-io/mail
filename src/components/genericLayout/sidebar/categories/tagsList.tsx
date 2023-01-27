@@ -4,6 +4,7 @@ import React, { useEffect } from 'react';
 import { FolderId } from '../../../../stores/MailList';
 import tags from '../../../../stores/Tags';
 import TagsEmpty from '../tagsEmpty';
+import css from './categories.module.scss';
 import Tag from './tag';
 
 interface TagsListProps {
@@ -16,7 +17,7 @@ const TagsList = observer(({ folderId }: TagsListProps) => {
 	}, []);
 
 	return (
-		<div className="tag-list">
+		<div className={css.list}>
 			{tags.tags.length ? (
 				tags.tags.map(elem => (
 					<Tag
