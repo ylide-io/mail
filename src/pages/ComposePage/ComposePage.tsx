@@ -74,7 +74,7 @@ export const ComposePage = observer(() => {
 									>
 										{domain.accounts.activeAccounts.map((acc, idx) => (
 											<Select.Option key={idx} value={String(idx)}>
-												{`${acc.name} (${truncateInMiddle(acc.account.address, 10)}) `}[
+												{`${acc.name} (${truncateInMiddle(acc.account.address, 10, '..')}) `}[
 												{walletsMeta[acc.wallet.wallet].title}]
 											</Select.Option>
 										))}

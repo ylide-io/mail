@@ -38,7 +38,7 @@ export class AccountBlock extends PureComponent<{ account: DomainAccount }> {
 		const account = this.props.account;
 		return (
 			<div key={account.account.address} className="wb-account">
-				<div className="wb-account-title">{truncateInMiddle(account.account.address, 36)}</div>
+				<div className="wb-account-title">{truncateInMiddle(account.account.address, 36, '..')}</div>
 				<div className="wb-account-actions">
 					{!account.isLocalKeyRegistered ? (
 						<YlideButton
@@ -238,7 +238,7 @@ export class WalletBlock extends PureComponent<WalletBlockProps> {
 						<>
 							Add{' '}
 							{wallet.currentWalletAccount
-								? truncateInMiddle(wallet.currentWalletAccount.address, 8)
+								? truncateInMiddle(wallet.currentWalletAccount.address, 8, '..')
 								: 'new account'}
 						</>
 					);
