@@ -7,7 +7,7 @@ import { makeObservable, observable } from 'mobx';
 import { observer } from 'mobx-react';
 import { PureComponent } from 'react';
 
-import { blockchainsMap, walletsMap } from '../../constants';
+import { blockchainsMap, walletsMeta } from '../../constants';
 import { YlideButton } from '../../controls/YlideButton';
 import PasswordModal from '../../modals/PasswordModal';
 import PublishKeyModal from '../../modals/PublishKeyModal';
@@ -180,8 +180,6 @@ export class WalletBlock extends PureComponent<WalletBlockProps> {
 	}
 
 	render() {
-		const wData = walletsMap[this.props.wallet];
-
 		let headRight: JSX.Element = (
 			<div
 				style={{
@@ -280,7 +278,7 @@ export class WalletBlock extends PureComponent<WalletBlockProps> {
 				};
 				buttonContent = <>Show QR</>;
 			} else {
-				const w = walletsMap[this.props.wallet];
+				const w = walletsMeta[this.props.wallet];
 				if (w) {
 					buttonHandler = () => {
 						if (w) {
@@ -307,9 +305,9 @@ export class WalletBlock extends PureComponent<WalletBlockProps> {
 			<div className={wrapperClass}>
 				<div className="wb-head">
 					<div className="wb-head-left">
-						<div className="wb-logo">{wData.logo()}</div>
+						<div className="wb-logo">{walletsMeta[this.props.wallet].logo()}</div>
 						<div className="wb-title">
-							<div className="wb-title-name">{wData.title}</div>
+							<div className="wb-title-name">{walletsMeta[this.props.wallet].title}</div>
 							{this.props.wallet === 'walletconnect' && wallet ? (
 								<div className="wb-via">
 									<div className="wb-via-name">{'null'}</div>

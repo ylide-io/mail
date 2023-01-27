@@ -9,6 +9,7 @@ import { makeObservable, observable } from 'mobx';
 import { observer } from 'mobx-react';
 import React, { PureComponent } from 'react';
 
+import { walletsMeta } from '../../../../constants';
 import contacts from '../../../../stores/Contacts';
 import domain from '../../../../stores/Domain';
 import mailbox from '../../../../stores/Mailbox';
@@ -155,8 +156,7 @@ export class Recipients extends PureComponent {
 						<Select style={{ width: '100%' }} value={'0'}>
 							{domain.accounts.activeAccounts.map((acc, idx) => (
 								<Select.Option value={String(idx)}>
-									{acc.account.address} [
-									{acc.wallet.factory.wallet === 'metamask' ? 'MetaMask' : 'EverWallet'}]
+									{acc.account.address} [{walletsMeta[acc.wallet.wallet].title}]
 								</Select.Option>
 							))}
 						</Select>

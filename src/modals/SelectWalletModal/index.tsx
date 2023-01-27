@@ -7,7 +7,7 @@ import { PureComponent } from 'react';
 import QRCode from 'react-qr-code';
 
 import { YlideLoader } from '../../components/ylideLoader/ylideLoader';
-import { supportedWallets, walletsMap } from '../../constants';
+import { supportedWallets, walletsMeta } from '../../constants';
 import { YlideButton } from '../../controls/YlideButton';
 import { CrossIcon } from '../../icons/CrossIcon';
 import domain from '../../stores/Domain';
@@ -239,24 +239,21 @@ export default class SelectWalletModal extends PureComponent<SelectWalletModalPr
 						<div className="available-wallets">
 							<div className="aw-title">Available browser extensions</div>
 							<div className="wallets-container">
-								{this.availableBrowserWallets.map(w => {
-									const wData = walletsMap[w];
-									return (
-										<div
-											className="wallet-icon"
-											key={w}
-											onClick={async () => {
-												this.wallet = w;
-												await this.connectAccount();
-											}}
-										>
-											<div className="wallet-icon-block">
-												<div className="wallet-icon-image">{wData.logo(32)}</div>
-											</div>
-											<div className="wallet-icon-title">{wData.title}</div>
+								{this.availableBrowserWallets.map(w => (
+									<div
+										className="wallet-icon"
+										key={w}
+										onClick={async () => {
+											this.wallet = w;
+											await this.connectAccount();
+										}}
+									>
+										<div className="wallet-icon-block">
+											<div className="wallet-icon-image">{walletsMeta[w].logo(32)}</div>
 										</div>
-									);
-								})}
+										<div className="wallet-icon-title">{walletsMeta[w].title}</div>
+									</div>
+								))}
 							</div>
 						</div>
 					) : null}
@@ -579,12 +576,12 @@ export default class SelectWalletModal extends PureComponent<SelectWalletModalPr
 								<div className="wallets-list">
 									{this.walletsToInstall
 										.filter(w =>
-											walletsMap[w]
-												? walletsMap[w].title.toLowerCase().includes(this.search.toLowerCase())
+											walletsMeta[w]
+												? walletsMeta[w].title.toLowerCase().includes(this.search.toLowerCase())
 												: false,
 										)
 										.map(w => {
-											const wData = walletsMap[w];
+											const wData = walletsMeta[w];
 											return (
 												<div
 													className="wallet-icon"

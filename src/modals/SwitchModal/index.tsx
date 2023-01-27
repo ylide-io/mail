@@ -6,6 +6,7 @@ import { observer } from 'mobx-react';
 import { PureComponent } from 'react';
 
 import metamaskSwitchVideo from '../../assets/video/metamask-switch.mp4';
+import { walletsMeta } from '../../constants';
 import modals from '../../stores/Modals';
 import { Wallet } from '../../stores/models/Wallet';
 
@@ -140,7 +141,7 @@ export default class SwitchModal extends PureComponent<SwitchModalProps> {
 
 	render() {
 		const wallet = this.props.wallet;
-		if (wallet.factory.wallet === 'everwallet') {
+		if (wallet.wallet === 'everwallet') {
 			return null;
 		}
 
@@ -150,9 +151,7 @@ export default class SwitchModal extends PureComponent<SwitchModalProps> {
 				visible={true}
 				closable={false}
 				okButtonProps={{ style: { display: 'none' } }}
-				title={`Please, switch ${this.props.type} in ${
-					wallet.factory.wallet === 'metamask' ? 'MetaMask' : wallet.factory.wallet
-				}`}
+				title={`Please, switch ${this.props.type} in ${walletsMeta[wallet.wallet].title}`}
 				onCancel={() => {
 					this.props.onConfirm(false);
 				}}

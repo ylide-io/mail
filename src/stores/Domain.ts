@@ -24,7 +24,7 @@ import {
 } from '@ylide/sdk';
 import { makeObservable, observable, toJS } from 'mobx';
 
-import { blockchainsMap, supportedWallets, walletsMap } from '../constants';
+import { blockchainsMap, supportedWallets } from '../constants';
 import PasswordModal from '../modals/PasswordModal';
 import SwitchModal from '../modals/SwitchModal';
 import { Accounts } from './Accounts';
@@ -453,13 +453,7 @@ export class Domain {
 				continue;
 			}
 			if (!this.wallets.find(w => w.factory.wallet === factory.wallet)) {
-				const newWallet = new Wallet(
-					this,
-					factory.wallet,
-					factory,
-					controller,
-					walletsMap[factory.wallet].link,
-				);
+				const newWallet = new Wallet(this, factory, controller);
 				await newWallet.init();
 				this.wallets.push(newWallet);
 			}

@@ -438,7 +438,13 @@ export const blockchainsMap: Record<
 	},
 };
 
-export const walletsMap: Record<string, { title: string; link: string; logo: (size?: number) => JSX.Element }> = {
+export interface WalletMeta {
+	title: string;
+	link: string;
+	logo: (size?: number) => JSX.Element;
+}
+
+export const walletsMeta: Record<string, WalletMeta> = {
 	metamask: {
 		title: 'MetaMask',
 		logo: (s = 30) => <MetaMaskLogo size={s} />,

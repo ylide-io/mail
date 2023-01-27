@@ -3,7 +3,7 @@ import { observer } from 'mobx-react';
 import { PureComponent } from 'react';
 import { generatePath } from 'react-router-dom';
 
-import { blockchainsMap, walletsMap } from '../../constants';
+import { blockchainsMap, walletsMeta } from '../../constants';
 import { AdaptiveAddress } from '../../controls/adaptiveAddress/adaptiveAddress';
 import { YlideButton } from '../../controls/YlideButton';
 import { ArrowRight } from '../../icons/ArrowRight';
@@ -55,13 +55,13 @@ export class NewWalletsPage extends PureComponent {
 							return (
 								<div className={clsx('cw-block', { notActive: !isActive })} key={acc.account.address}>
 									<div className="cw-logo">
-										{walletsMap[acc.wallet.wallet].logo(isActive ? 32 : 24)}
+										{walletsMeta[acc.wallet.wallet].logo(isActive ? 32 : 24)}
 										{/* <div className="cw-blockchain">
 											{blockchainsMap[acc.account.blockchain].logo(16)}
 										</div> */}
 									</div>
 									<div className="cw-title">
-										<span>{walletsMap[acc.wallet.wallet].title}</span>
+										<span>{walletsMeta[acc.wallet.wallet].title}</span>
 										{!isActive && <span style={{ fontSize: 12, marginLeft: 4 }}>[not active]</span>}
 									</div>
 									<div className="cw-subtitle">

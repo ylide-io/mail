@@ -7,6 +7,7 @@ import { ActionButton, ActionButtonStyle } from '../../components/ActionButton/A
 import { RecipientInput, RecipientInputItem } from '../../components/recipientInput/recipientInput';
 import { smallButtonIcons } from '../../components/smallButton/smallButton';
 import { TextField } from '../../components/textField/textField';
+import { walletsMeta } from '../../constants';
 import { OverlappingLoader } from '../../controls/OverlappingLoader';
 import { GenericLayout } from '../../layouts/GenericLayout';
 import { analytics } from '../../stores/Analytics';
@@ -73,9 +74,8 @@ export const ComposePage = observer(() => {
 									>
 										{domain.accounts.activeAccounts.map((acc, idx) => (
 											<Select.Option key={idx} value={String(idx)}>
-												{(acc.name || 'No name') +
-													` (${truncateInMiddle(acc.account.address, 10)})`}{' '}
-												[{acc.wallet.factory.wallet === 'metamask' ? 'MetaMask' : 'EverWallet'}]
+												{`${acc.name} (${truncateInMiddle(acc.account.address, 10)}) `}[
+												{walletsMeta[acc.wallet.wallet].title}]
 											</Select.Option>
 										))}
 									</Select>

@@ -5,7 +5,7 @@ import { observer } from 'mobx-react';
 import React from 'react';
 import { generatePath } from 'react-router-dom';
 
-import { walletsMap } from '../../../constants';
+import { walletsMeta } from '../../../constants';
 import { AdaptiveAddress } from '../../../controls/adaptiveAddress/adaptiveAddress';
 import { Blockie } from '../../../controls/Blockie';
 import domain from '../../../stores/Domain';
@@ -39,7 +39,7 @@ const AccountItem = observer(({ account }: { account: DomainAccount }) => {
 					</Tooltip>
 				</div>
 				<div className={css.itemWallet}>
-					{walletsMap[account.wallet.wallet].logo(12)} {walletsMap[account.wallet.wallet].title}
+					{walletsMeta[account.wallet.wallet].logo(12)} {walletsMeta[account.wallet.wallet].title}
 				</div>
 				<AdaptiveAddress className={css.itemAddress} address={account.account.address} />
 			</div>

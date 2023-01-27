@@ -29,15 +29,13 @@ export class Wallet extends EventEmitter {
 
 	constructor(
 		public readonly domain: Domain,
-		wallet: string,
 		factory: WalletControllerFactory,
 		controller: AbstractWalletController,
-		public readonly installLink: string,
 	) {
 		super();
 
 		makeObservable(this);
-		this.wallet = wallet;
+		this.wallet = factory.wallet;
 		this.factory = factory;
 		this.controller = controller;
 	}
