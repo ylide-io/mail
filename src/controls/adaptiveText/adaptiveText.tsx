@@ -37,9 +37,9 @@ export function AdaptiveText({ className, text, ...props }: AdaptiveTextProps) {
 
 		visibleElem.innerText = text;
 
-		let removeCounter = 2;
+		let removeCounter = 3;
 		while (removeCounter < text.length && visibleElem.clientWidth > clientWidth) {
-			visibleElem.innerText = truncateInMiddle(text, removeCounter, '..');
+			visibleElem.innerText = truncateInMiddle(text, text.length - removeCounter, '..');
 			removeCounter++;
 		}
 	}, [text, size.clientWidth, size.scrollWidth]);
