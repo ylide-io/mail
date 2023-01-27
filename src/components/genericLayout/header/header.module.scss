@@ -1,17 +1,11 @@
 .root {
 	@include flex-row(center, flex-start);
-
-	padding-left: 15px;
-	padding-right: 15px;
-	padding-top: 0px;
-
+	padding: 0 16px;
 	height: 64px;
-	flex-basis: 64px;
-
-	border-bottom: 1px solid #d3d4db;
+	border-bottom: 1px solid var(--border-color);
 
 	@include less480px {
-		padding-right: 5px;
+		padding-right: 8px;
 	}
 }
 
