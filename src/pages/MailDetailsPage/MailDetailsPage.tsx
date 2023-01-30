@@ -5,7 +5,7 @@ import { ActionButton } from '../../components/ActionButton/ActionButton';
 import { ContactName } from '../../components/contactName/contactName';
 import { GenericLayout } from '../../components/genericLayout/genericLayout';
 import { Spinner } from '../../components/spinner/spinner';
-import { BackIcon } from '../../icons/BackIcon';
+import { ReactComponent as ArrowLeftSvg } from '../../icons/arrowLeft.svg';
 import { ContactIcon } from '../../icons/ContactIcon';
 import { ForwardIcon } from '../../icons/ForwardIcon';
 import { ReplyIcon } from '../../icons/ReplyIcon';
@@ -169,7 +169,7 @@ export const MailDetailsPage = () => {
 			{initialMessage && initialDecodedContent && (
 				<div className={css.root}>
 					<div className={css.header}>
-						<ActionButton onClick={onBackClick} icon={<BackIcon />} />
+						<ActionButton onClick={onBackClick} icon={<ArrowLeftSvg />} />
 
 						{isLoadingThread || isDecodingThread ? (
 							<Spinner className={css.headerSpinner} />

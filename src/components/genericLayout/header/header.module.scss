@@ -37,10 +37,12 @@
 
 .users {
 	@include expand-click-area;
-	@include flex-row(center, flex-start);
-
+	display: grid;
+	grid-auto-flow: column;
+	align-items: center;
+	grid-gap: 8px;
+	padding: 0 2px;
 	height: 36px;
-	padding: 2px;
 	background-color: var(--surface-color);
 	border: 1px solid var(--border-color);
 	border-radius: 20px;
@@ -61,8 +63,6 @@
 
 .usersText {
 	@include flex-row(center, flex-start);
-	margin-left: 10px;
-	margin-right: 0px;
 	white-space: nowrap;
 
 	@include less480px {
@@ -73,12 +73,10 @@
 }
 
 .usersIcon {
-	@include flex-row(center, center);
-
-	flex-grow: 0;
-	flex-shrink: 0;
-	flex-basis: 34px;
-	width: 34px;
+	margin: 0 8px 0 -2px;
+	width: 20px;
+	height: 20px;
+	fill: currentColor;
 }
 
 .logo {

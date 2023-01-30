@@ -1,4 +1,4 @@
-import { DownOutlined, UsergroupAddOutlined } from '@ant-design/icons';
+import { UsergroupAddOutlined } from '@ant-design/icons';
 import { Avatar, Tooltip } from 'antd';
 import clsx from 'clsx';
 import { observer } from 'mobx-react';
@@ -6,6 +6,7 @@ import React, { useRef, useState } from 'react';
 import { generatePath } from 'react-router-dom';
 
 import { Blockie } from '../../../controls/Blockie';
+import { ReactComponent as ArrowDownSvg } from '../../../icons/arrowDown.svg';
 import { YlideLargeLogo } from '../../../icons/YlideLargeLogo';
 import AlertModal from '../../../modals/AlertModal';
 import domain from '../../../stores/Domain';
@@ -118,13 +119,11 @@ const Header = observer(() => {
 							))}
 						</div>
 						<div className={css.usersText}>
-							<span>Connected&nbsp;</span>
 							{domain.accounts.accounts.length} account
 							{domain.accounts.accounts.length > 1 ? 's' : ''}
+							<span>&nbsp;connected</span>
 						</div>
-						<div className={css.usersIcon}>
-							<DownOutlined size={16} />
-						</div>
+						<ArrowDownSvg className={css.usersIcon} />
 					</button>
 
 					{isAccountsPopupOpen && (
