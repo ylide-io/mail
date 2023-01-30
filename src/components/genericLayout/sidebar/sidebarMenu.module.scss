@@ -139,13 +139,19 @@
 	font-weight: 400;
 	font-size: 13px;
 	line-height: 20px;
-
 	color: #202020;
 }
 
 .sectionLinkIconRight {
-	@include flex-row(center, flex-start);
-	margin-left: 9px;
+	width: 24px;
+	height: 24px;
+	margin-left: auto;
+	opacity: 0.2;
+
+	&:hover,
+	&:focus-visible {
+		opacity: 0.5;
+	}
 }
 
 .socials {

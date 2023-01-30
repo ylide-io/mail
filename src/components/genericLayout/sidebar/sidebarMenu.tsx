@@ -1,19 +1,18 @@
 import { MenuFoldOutlined, MenuUnfoldOutlined } from '@ant-design/icons';
-import { Button, Dropdown } from 'antd';
+import { Button } from 'antd';
 import clsx from 'clsx';
 import { observer } from 'mobx-react';
-import React, { PropsWithChildren, useEffect, useState } from 'react';
+import React, { PropsWithChildren, useEffect, useRef, useState } from 'react';
 import { generatePath, useLocation } from 'react-router-dom';
 
-import { YlideButton } from '../../../controls/YlideButton';
 import { CaretDown } from '../../../icons/CaretDown';
 import { CaretUp } from '../../../icons/CaretUp';
+import { ReactComponent as SettingsSvg } from '../../../icons/settings.svg';
 import { ReactComponent as DiscordSvg } from '../../../icons/social/discord.svg';
 import { ReactComponent as LinkedInSvg } from '../../../icons/social/linkedIn.svg';
 import { ReactComponent as MediumSvg } from '../../../icons/social/medium.svg';
 import { ReactComponent as TelegramSvg } from '../../../icons/social/telegram.svg';
 import { ReactComponent as TwitterSvg } from '../../../icons/social/twitter.svg';
-import { checkboxCheckIcon } from '../../../icons/static/checkboxCheckIcon';
 import { sideAllTopicsIcon } from '../../../icons/static/sideAllTopicsIcon';
 import { sideAnalyticsIcon } from '../../../icons/static/sideAnalyticsIcon';
 import { sideCultureIcon } from '../../../icons/static/sideCultureIcon';
@@ -24,13 +23,13 @@ import { sidePolicyIcon } from '../../../icons/static/sidePolicyIcon';
 import { sideProjectsIcon } from '../../../icons/static/sideProjectsIcon';
 import { sideSecurityIcon } from '../../../icons/static/sideSecurityIcon';
 import { sideTechnologyIcon } from '../../../icons/static/sideTechnologyIcon';
-import { topicSettingsIcon } from '../../../icons/static/topicSettingsIcon';
-import feed, { FeedCategory, getFeedCategoryName, nonSyntheticFeedCategories } from '../../../stores/Feed';
+import { FeedCategory, getFeedCategoryName } from '../../../stores/Feed';
 import { FolderId } from '../../../stores/MailList';
 import modals from '../../../stores/Modals';
 import { RoutePath } from '../../../stores/routePath';
 import { useNav } from '../../../utils/navigate';
 import { PropsWithClassName } from '../../propsWithClassName';
+import { FeedSettingsPopup } from './feedSettingsPopup/feedSettingsPopup';
 import css from './sidebarMenu.module.scss';
 
 interface SidebarBurgerProps extends PropsWithClassName, PropsWithChildren {}
@@ -48,66 +47,6 @@ export function SidebarBurger({ className, children }: SidebarBurgerProps) {
 		</Button>
 	);
 }
-
-//
-
-const FeedSettings = observer(() => {
-	const [newValues, setNewValues] = useState(feed.mainCategories);
-
-	useEffect(() => {
-		setNewValues(feed.mainCategories);
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [feed.mainCategories]);
-
-	return (
-		<div className="feed-settings-popup">
-			<div className="fsp-title">My feed settings</div>
-
-			{nonSyntheticFeedCategories.map(category => (
-				<div key={category} className="fsp-row">
-					<div
-						onClick={() => {
-							if (newValues.includes(category)) {
-								setNewValues(newValues.filter(t => t !== category));
-							} else {
-								setNewValues([...newValues, category]);
-							}
-						}}
-						className={clsx('fsp-checkbox', { checked: newValues.includes(category) })}
-					>
-						{newValues.includes(category) ? checkboxCheckIcon : null}
-					</div>
-					<div className="fsp-row-title">{getFeedCategoryName(category)}</div>
-				</div>
-			))}
-
-			<div className="fsp-row" style={{ justifyContent: 'space-evenly', marginTop: 8 }}>
-				<YlideButton
-					nice
-					size="small"
-					onClick={() => {
-						feed.mainCategories = [...newValues];
-						localStorage.setItem('t_main_categories', JSON.stringify(feed.mainCategories));
-						if (feed.selectedCategory === FeedCategory.MAIN) {
-							feed.loadCategory(FeedCategory.MAIN, null);
-						}
-					}}
-				>
-					Save changes
-				</YlideButton>
-				<YlideButton
-					ghost
-					size="small"
-					onClick={e => {
-						setNewValues(feed.mainCategories);
-					}}
-				>
-					Cancel
-				</YlideButton>
-			</div>
-		</div>
-	);
-});
 
 //
 
@@ -168,6 +107,9 @@ const SidebarMenu = observer(() => {
 		localStorage.setItem('tv1_mailOpen', JSON.stringify(mailOpen));
 	}, [mailOpen]);
 
+	const feedSettingsButtonRef = useRef(null);
+	const [isFeedSettingsOpen, setFeedSettingsOpen] = useState(false);
+
 	return (
 		<div className={clsx(css.root, { [css.root_open]: modals.sidebarOpen })}>
 			<div className={css.container}>
@@ -190,6 +132,7 @@ const SidebarMenu = observer(() => {
 							{feedOpen ? <CaretDown /> : <CaretUp />}
 						</div>
 					</div>
+
 					<div className={clsx(css.sectionContent, feedOpen && css.sectionContent_open)}>
 						{feedMenuItems.map(item => {
 							const path = generatePath(RoutePath.FEED_CATEGORY, { category: item.category });
@@ -209,9 +152,25 @@ const SidebarMenu = observer(() => {
 									<div className={css.sectionLinkTitle}>{getFeedCategoryName(item.category)}</div>
 
 									{item.category === FeedCategory.MAIN && (
-										<div className={css.sectionLinkIconRight}>
-											<Dropdown overlay={<FeedSettings />}>{topicSettingsIcon}</Dropdown>
-										</div>
+										<>
+											<button
+												ref={feedSettingsButtonRef}
+												className={css.sectionLinkIconRight}
+												onClick={e => {
+													e.stopPropagation();
+													setFeedSettingsOpen(!isFeedSettingsOpen);
+												}}
+											>
+												<SettingsSvg />
+											</button>
+
+											{isFeedSettingsOpen && (
+												<FeedSettingsPopup
+													anchorRef={feedSettingsButtonRef}
+													onClose={() => setFeedSettingsOpen(false)}
+												/>
+											)}
+										</>
 									)}
 								</div>
 							);

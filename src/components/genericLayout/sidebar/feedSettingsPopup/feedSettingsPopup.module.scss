@@ -1,0 +1,58 @@
+.root {
+	position: fixed;
+	display: grid;
+	grid-gap: 16px;
+	padding: 12px 16px 16px;
+	white-space: nowrap;
+	background: var(--surface-color);
+	border-radius: 10px;
+	box-shadow: var(--popup-shadow);
+}
+
+.title {
+	font-size: 15px;
+}
+
+.list {
+	display: grid;
+	grid-gap: 12px;
+}
+
+.row {
+	display: flex;
+	align-items: center;
+}
+
+.checkBox {
+	@include flex-row(center, center);
+
+	width: 16px;
+	height: 16px;
+
+	border: 1px solid #a5a8b4;
+	border-radius: 4px;
+
+	margin-right: 8px;
+
+	&:hover {
+		opacity: 0.7;
+	}
+}
+
+.checkBox_checked {
+	background: #9747ff;
+	border: 1px solid transparent;
+	border-radius: 4px;
+}
+
+.rowTitle {
+	font-style: normal;
+	font-weight: 300;
+	font-size: 13px;
+}
+
+.footer {
+	display: grid;
+	grid-auto-flow: column;
+	grid-gap: 4px;
+}
