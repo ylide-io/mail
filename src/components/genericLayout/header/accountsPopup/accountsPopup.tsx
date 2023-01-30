@@ -27,6 +27,7 @@ export const AccountsPopup = observer(({ anchorRef, onClose }: AccountsPopupProp
 			anchorRef={anchorRef}
 			className={css.root}
 			horizontalAlign={HorizontalAlignment.END}
+			alignerOptions={{ fitLeftToViewport: true }}
 			onCloseRequest={onClose}
 		>
 			<div className={css.content}>
