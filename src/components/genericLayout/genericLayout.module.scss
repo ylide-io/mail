@@ -8,9 +8,9 @@
 
 .main {
 	display: grid;
-	grid-template-columns: 210px 1fr;
+	grid-template-columns: 226px 1fr;
 	grid-gap: 16px;
-	padding: 24px 16px;
+	padding: 24px 16px 24px 0;
 	overflow-y: auto;
 
 	@include less920px {
