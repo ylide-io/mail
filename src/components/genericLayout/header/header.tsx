@@ -1,6 +1,5 @@
 import { DownOutlined, UsergroupAddOutlined } from '@ant-design/icons';
-import { Avatar } from 'antd';
-import Tooltip from 'antd/es/tooltip';
+import { Avatar, Tooltip } from 'antd';
 import clsx from 'clsx';
 import { observer } from 'mobx-react';
 import React, { useRef, useState } from 'react';

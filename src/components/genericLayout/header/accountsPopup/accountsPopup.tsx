@@ -1,6 +1,5 @@
 import { EditOutlined, LogoutOutlined, PlusOutlined } from '@ant-design/icons';
-import { Button } from 'antd';
-import Tooltip from 'antd/es/tooltip';
+import { Button, Tooltip } from 'antd';
 import { observer } from 'mobx-react';
 import React, { RefObject } from 'react';
 import { generatePath } from 'react-router-dom';
