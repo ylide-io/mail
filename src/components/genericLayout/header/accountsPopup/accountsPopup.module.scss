@@ -1,6 +1,11 @@
 .root {
-	display: grid;
+	position: fixed;
+	padding: 4px 0;
 	max-width: 500px;
+}
+
+.content {
+	display: grid;
 	background: var(--surface-color);
 	border-radius: 10px;
 	box-shadow: var(--popup-shadow);

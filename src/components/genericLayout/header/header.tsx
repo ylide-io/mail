@@ -1,9 +1,9 @@
 import { DownOutlined, UsergroupAddOutlined } from '@ant-design/icons';
-import { Avatar, Dropdown } from 'antd';
+import { Avatar } from 'antd';
 import Tooltip from 'antd/es/tooltip';
 import clsx from 'clsx';
 import { observer } from 'mobx-react';
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { generatePath } from 'react-router-dom';
 
 import { Blockie } from '../../../controls/Blockie';
@@ -20,6 +20,9 @@ import css from './header.module.scss';
 const Header = observer(() => {
 	const nav = useNav();
 	const [showQuest3, setShowQuest3] = useState(localStorage.getItem('quest3') !== 'false');
+
+	const accountsPopupButtonRef = useRef(null);
+	const [isAccountsPopupOpen, setAccountsPopupOpen] = useState(false);
 
 	return (
 		<div className={css.root}>
@@ -105,26 +108,29 @@ const Header = observer(() => {
 					</Tooltip>
 				</div>
 				<div className={css.block}>
-					<Dropdown overlay={<AccountsPopup />}>
-						<div className={css.users}>
-							<div className={css.usersAvatars}>
-								{domain.accounts.accounts.map(acc => (
-									<Avatar
-										key={acc.account.address}
-										icon={<Blockie address={acc.account.address} />}
-									/>
-								))}
-							</div>
-							<div className={css.usersText}>
-								<span>Connected&nbsp;</span>
-								{domain.accounts.accounts.length} account
-								{domain.accounts.accounts.length > 1 ? 's' : ''}
-							</div>
-							<div className={css.usersIcon}>
-								<DownOutlined size={16} />
-							</div>
+					<button
+						ref={accountsPopupButtonRef}
+						className={css.users}
+						onClick={() => setAccountsPopupOpen(!isAccountsPopupOpen)}
+					>
+						<div className={css.usersAvatars}>
+							{domain.accounts.accounts.map(acc => (
+								<Avatar key={acc.account.address} icon={<Blockie address={acc.account.address} />} />
+							))}
 						</div>
-					</Dropdown>
+						<div className={css.usersText}>
+							<span>Connected&nbsp;</span>
+							{domain.accounts.accounts.length} account
+							{domain.accounts.accounts.length > 1 ? 's' : ''}
+						</div>
+						<div className={css.usersIcon}>
+							<DownOutlined size={16} />
+						</div>
+					</button>
+
+					{isAccountsPopupOpen && (
+						<AccountsPopup anchorRef={accountsPopupButtonRef} onClose={() => setAccountsPopupOpen(false)} />
+					)}
 				</div>
 			</div>
 		</div>
