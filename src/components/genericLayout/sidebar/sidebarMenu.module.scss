@@ -104,10 +104,7 @@
 .sectionLink {
 	@include flex-row(center, flex-start);
 
-	padding-left: 28px;
-
 	padding: 6px 6px 6px 40px;
-	width: 224px;
 	height: 32px;
 
 	&:hover {

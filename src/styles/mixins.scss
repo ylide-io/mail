@@ -48,7 +48,7 @@ $interactive-elem-size: 32px;
 
 // UTILS
 
-@mixin expand-click-area($size: 8px, $pseudo: before) {
+@mixin expand-click-area($size: 4px, $pseudo: before) {
 	position: relative;
 
 	&:#{$pseudo} {

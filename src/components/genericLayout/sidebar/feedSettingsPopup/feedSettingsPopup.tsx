@@ -22,7 +22,12 @@ export function FeedSettingsPopup({ anchorRef, onClose }: FeedSettingsPopupProps
 	);
 
 	return (
-		<AnchoredPopup anchorRef={anchorRef} className={css.root} onCloseRequest={onClose}>
+		<AnchoredPopup
+			anchorRef={anchorRef}
+			className={css.root}
+			alignerOptions={{ fitLeftToViewport: true, fitTopToViewport: true }}
+			onCloseRequest={onClose}
+		>
 			<div className={css.title}>My feed settings</div>
 
 			<div className={css.list}>
