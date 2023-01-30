@@ -1,10 +1,9 @@
-import clsx from 'clsx';
 import { reaction } from 'mobx';
 import React, { RefObject, useState } from 'react';
 
 import { YlideButton } from '../../../../controls/YlideButton';
-import { checkboxCheckIcon } from '../../../../icons/static/checkboxCheckIcon';
 import feed, { FeedCategory, getFeedCategoryName, nonSyntheticFeedCategories } from '../../../../stores/Feed';
+import { CheckBox } from '../../../checkBox/checkBox';
 import { AnchoredPopup } from '../../../popup/anchoredPopup/anchoredPopup';
 import css from './feedSettingsPopup.module.scss';
 
@@ -32,20 +31,18 @@ export function FeedSettingsPopup({ anchorRef, onClose }: FeedSettingsPopupProps
 
 			<div className={css.list}>
 				{nonSyntheticFeedCategories.map(category => (
-					<button
-						key={category}
-						className={css.row}
-						onClick={() => {
-							setValue(
-								value.includes(category) ? value.filter(t => t !== category) : [...value, category],
-							);
-						}}
-					>
-						<div className={clsx(css.checkBox, value.includes(category) && css.checkBox_checked)}>
-							{value.includes(category) && checkboxCheckIcon}
-						</div>
+					<label key={category} className={css.row}>
+						<CheckBox
+							isChecked={value.includes(category)}
+							onChange={() =>
+								setValue(
+									value.includes(category) ? value.filter(t => t !== category) : [...value, category],
+								)
+							}
+						/>
+
 						<div className={css.rowTitle}>{getFeedCategoryName(category)}</div>
-					</button>
+					</label>
 				))}
 			</div>
 

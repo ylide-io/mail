@@ -4,9 +4,9 @@ import React, { CSSProperties, useEffect, useMemo, useState } from 'react';
 import { generatePath, useParams } from 'react-router-dom';
 
 import { BlockChainLabel } from '../../../../components/BlockChainLabel/BlockChainLabel';
+import { CheckBox } from '../../../../components/checkBox/checkBox';
 import { ContactName } from '../../../../components/contactName/contactName';
 import { ReadableDate } from '../../../../components/readableDate/readableDate';
-import { YlideCheckbox } from '../../../../controls/YlideCheckbox';
 import { FilterIcon } from '../../../../icons/FilterIcon';
 import domain from '../../../../stores/Domain';
 import { FolderId, ILinkedMessage, useMailStore } from '../../../../stores/MailList';
@@ -78,8 +78,8 @@ const MailboxListRow: React.FC<MailboxListRowProps> = observer(
 						: undefined
 				}
 			>
-				<div className={css.checkbox} onClick={e => e.stopPropagation()}>
-					<YlideCheckbox checked={isSelected} onCheck={value => onCheckBoxClick(value)} />
+				<div className={css.checkbox}>
+					<CheckBox isChecked={isSelected} onChange={onCheckBoxClick} />
 				</div>
 
 				<div className={css.contact}>

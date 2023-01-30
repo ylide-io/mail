@@ -23,6 +23,9 @@
 	--selected-background-color: #8cf;
 	--selected-light-background-color: #d1ecff;
 
+	--checkbox-accent: #1ab394;
+	--checkbox-hover-accent: #0f947a;
+
 	--error-color: #f45;
 	--success-color: #0b4;
 
@@ -63,7 +66,7 @@ body {
 }
 
 label {
-	cursor: inherit;
+	cursor: pointer;
 }
 
 input,

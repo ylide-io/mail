@@ -19,30 +19,12 @@
 }
 
 .row {
-	display: flex;
+	@include expand-click-area(4px);
+	display: grid;
+	justify-content: start;
+	grid-auto-flow: column;
 	align-items: center;
-}
-
-.checkBox {
-	@include flex-row(center, center);
-
-	width: 16px;
-	height: 16px;
-
-	border: 1px solid #a5a8b4;
-	border-radius: 4px;
-
-	margin-right: 8px;
-
-	&:hover {
-		opacity: 0.7;
-	}
-}
-
-.checkBox_checked {
-	background: #9747ff;
-	border: 1px solid transparent;
-	border-radius: 4px;
+	grid-gap: 8px;
 }
 
 .rowTitle {

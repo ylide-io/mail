@@ -1,9 +1,9 @@
 import { Tooltip } from 'antd';
 
 import { ActionButton, ActionButtonStyle } from '../../../components/ActionButton/ActionButton';
+import { CheckBox } from '../../../components/checkBox/checkBox';
 import { ContactName } from '../../../components/contactName/contactName';
 import { smallButtonIcons } from '../../../components/smallButton/smallButton';
-import { YlideCheckbox } from '../../../controls/YlideCheckbox';
 import { FolderId, getFolderName } from '../../../stores/MailList';
 import { useNav } from '../../../utils/navigate';
 
@@ -54,7 +54,7 @@ export function MailboxHeader({
 			<div className="mailbox-tools">
 				<Tooltip title={isAllSelected ? 'Deselect all' : 'Select all'}>
 					<div className="global-checkbox-wrapper">
-						<YlideCheckbox checked={isAllSelected} onCheck={onSelectAllCheckBoxClick} />
+						<CheckBox isChecked={isAllSelected} onChange={onSelectAllCheckBoxClick} />
 					</div>
 				</Tooltip>
 
