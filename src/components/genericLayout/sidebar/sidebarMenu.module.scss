@@ -118,7 +118,7 @@
 
 .sectionLink_active {
 	background: rgba(151, 71, 255, 0.08);
-	border-radius: 0px 30px 30px 0px;
+	border-radius: 0 30px 30px 0;
 
 	.sectionLinkTitle {
 		color: #9747ff;
@@ -140,9 +140,9 @@
 }
 
 .sectionLinkIconRight {
+	margin: 0 0 0 8px;
 	width: 24px;
 	height: 24px;
-	margin-left: auto;
 	opacity: 0.2;
 
 	&:hover,
