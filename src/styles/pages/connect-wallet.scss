@@ -16,6 +16,8 @@
 
 .wallet-modal {
 	@include flex-column(stretch, flex-start);
+	padding: 24px 12px 12px;
+	width: 400px;
 
 	.wm-title {
 		font-weight: 400;
@@ -42,6 +44,13 @@
 			display: inline;
 		}
 	}
+}
+
+.account-modal {
+	height: 520px;
+	padding: 24px;
+	padding-top: 12px;
+	padding-bottom: 0px;
 }
 
 .available-wallets {
@@ -90,14 +99,15 @@
 }
 
 .wallets-list {
-	@include flex-row(center, flex-start);
+	@include flex-row(center, space-evenly);
 	flex-wrap: wrap;
 
 	padding-top: 8px;
 	margin-top: 8px;
 	width: 100%;
-	max-height: 250px;
-	overflow-y: scroll;
+	min-height: 160px;
+	max-height: 260px;
+	overflow-y: auto;
 
 	.wallet-icon {
 		margin-bottom: 12px;
@@ -182,7 +192,7 @@
 		}
 
 		&.active {
-			color: #9747ff;
+			color: var(--accent2-color);
 			&::after {
 				position: absolute;
 				bottom: -3px;
@@ -191,7 +201,7 @@
 				height: 6px;
 				border-top-left-radius: 3px;
 				border-top-right-radius: 3px;
-				background: #9747ff;
+				background: var(--accent2-color);
 			}
 		}
 
@@ -203,8 +213,9 @@
 
 .wm-tab-content {
 	@include flex-column(stretch, flex-start);
-
-	padding-top: 16px;
+	position: relative;
+	margin-top: 16px;
+	min-height: 0;
 
 	.qr-content {
 		margin-top: 4px;
@@ -238,7 +249,7 @@
 		text-align: center;
 		letter-spacing: -0.09em;
 
-		color: #9747ff;
+		color: var(--accent2-color);
 	}
 }
 

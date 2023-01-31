@@ -37,11 +37,11 @@
 }
 
 .view_checked {
-	background: var(--checkbox-accent);
+	background: var(--accent-color);
 
 	&:hover,
 	.input:focus-visible + & {
-		background: var(--checkbox-hover-accent);
+		background: var(--accent-hover-color);
 	}
 
 	> svg {

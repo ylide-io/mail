@@ -1,0 +1,40 @@
+.root {
+	// To make .body fit .root and not overflow
+	display: flex;
+	flex-direction: column;
+
+	position: fixed;
+	padding: 8px;
+	max-width: 100%;
+	max-height: 100%;
+}
+
+.body {
+	width: 400px;
+	max-width: 100%;
+	max-height: 100%;
+	background: var(--surface-color);
+	border-radius: 20px;
+	box-shadow: var(--popup-shadow);
+	overflow-y: auto;
+}
+
+.closeButton {
+	@include expand-click-area;
+	position: absolute;
+	top: 0;
+	right: 0;
+	width: 28px;
+	height: 28px;
+	background: var(--inverted-surface-color);
+	border-radius: 100%;
+
+	&:hover,
+	&:focus-visible {
+		background: var(--accent2-color);
+	}
+
+	> svg {
+		fill: var(--on-inverted-surface-color);
+	}
+}

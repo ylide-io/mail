@@ -40,7 +40,7 @@
 	position: relative;
 
 	background: #ffffff;
-	border: 0.5px solid #9747ff;
+	border: 0.5px solid var(--accent2-color);
 	box-shadow: 0px 4px 24px rgba(151, 71, 255, 0.24);
 	border-radius: 12px;
 
@@ -62,7 +62,7 @@
 
 		transition: 0.3s all;
 
-		background-color: #9747ff;
+		background-color: var(--accent2-color);
 	}
 
 	.header {

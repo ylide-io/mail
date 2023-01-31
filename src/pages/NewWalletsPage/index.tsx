@@ -1,5 +1,6 @@
 import clsx from 'clsx';
 import { observer } from 'mobx-react';
+import { ReactNode, useState } from 'react';
 import { generatePath } from 'react-router-dom';
 
 import { blockchainsMap, walletsMeta } from '../../constants';
@@ -9,7 +10,7 @@ import { ArrowRight } from '../../icons/ArrowRight';
 import { CrossIcon } from '../../icons/CrossIcon';
 import { YlideLargeLogo } from '../../icons/YlideLargeLogo';
 import NewPasswordModal from '../../modals/NewPasswordModal';
-import SelectWalletModal from '../../modals/SelectWalletModal';
+import { SelectWalletModal } from '../../modals/SelectWalletModal';
 import domain from '../../stores/Domain';
 import { FeedCategory } from '../../stores/Feed';
 import { RoutePath } from '../../stores/routePath';
@@ -18,6 +19,10 @@ import { useNav } from '../../utils/navigate';
 
 export const NewWalletsPage = observer(() => {
 	const navigate = useNav();
+
+	const [isSelectWalletModalOpen, setSelectWalletModalOpen] = useState(false);
+
+	const [passwordModal, setPasswordModal] = useState<ReactNode>();
 
 	return (
 		<div className="intro-page">
@@ -79,14 +84,20 @@ export const NewWalletsPage = observer(() => {
 												const wallet = acc.wallet;
 												const remoteKeys = await wallet.readRemoteKeys(acc.account);
 												const qqs = getQueryString();
-												await NewPasswordModal.show(
-													['polygon', 'fantom', 'gnosis'].includes(qqs.faucet)
-														? (qqs.faucet as any)
-														: 'gnosis',
-													qqs.bonus === 'true',
-													wallet,
-													acc.account,
-													remoteKeys.remoteKeys,
+
+												setPasswordModal(
+													<NewPasswordModal
+														faucetType={
+															['polygon', 'fantom', 'gnosis'].includes(qqs.faucet)
+																? (qqs.faucet as any)
+																: 'gnosis'
+														}
+														bonus={qqs.bonus === 'true'}
+														wallet={wallet}
+														account={acc.account}
+														remoteKeys={remoteKeys.remoteKeys}
+														onResolve={() => setPasswordModal(undefined)}
+													/>,
 												);
 											}}
 										>
@@ -116,12 +127,7 @@ export const NewWalletsPage = observer(() => {
 						);
 					})}
 
-					<div
-						className="cw-block emphaized"
-						onClick={() => {
-							SelectWalletModal.show();
-						}}
-					>
+					<div className="cw-block emphaized" onClick={() => setSelectWalletModalOpen(true)}>
 						<div className="cw-logo">
 							<svg
 								width="28"
@@ -153,6 +159,10 @@ export const NewWalletsPage = observer(() => {
 					))}
 				</div>
 			</div>
+
+			{isSelectWalletModalOpen && <SelectWalletModal onClose={() => setSelectWalletModalOpen(false)} />}
+
+			{passwordModal}
 		</div>
 	);
 });

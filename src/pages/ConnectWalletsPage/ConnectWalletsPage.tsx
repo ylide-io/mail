@@ -1,11 +1,11 @@
 import { observer } from 'mobx-react';
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { generatePath } from 'react-router-dom';
 
 import { supportedWallets } from '../../constants';
 import { YlideButton } from '../../controls/YlideButton';
 import { ArrowRight } from '../../icons/ArrowRight';
-import SelectWalletModal from '../../modals/SelectWalletModal';
+import { SelectWalletModal } from '../../modals/SelectWalletModal';
 import domain from '../../stores/Domain';
 import { FolderId } from '../../stores/MailList';
 import { RoutePath } from '../../stores/routePath';
@@ -20,6 +20,8 @@ const ConnectWalletsPage = observer(() => {
 		walletConnect.load();
 	}, []);
 
+	const [isSelectWalletModalOpen, setSelectWalletModalOpen] = useState(false);
+
 	return (
 		<div className="intro-page">
 			<div className="intro-inner-block">
@@ -29,7 +31,7 @@ const ConnectWalletsPage = observer(() => {
 						href="#test"
 						onClick={e => {
 							e.preventDefault();
-							SelectWalletModal.show();
+							setSelectWalletModalOpen(true);
 						}}
 					>
 						test
@@ -53,6 +55,8 @@ const ConnectWalletsPage = observer(() => {
 					<WalletBlock key={wallet} wallet={wallet} blockchains={blockchains} />
 				))}
 			</div>
+
+			{isSelectWalletModalOpen && <SelectWalletModal onClose={() => setSelectWalletModalOpen(false)} />}
 		</div>
 	);
 });

@@ -24,44 +24,6 @@
 	background-color: rgba(0, 0, 0, 0.5);
 }
 
-.modal-content {
-	@include flex-column(stretch, flex-start);
-
-	position: absolute;
-	z-index: 2041;
-	padding: 24px;
-	border-radius: 20px;
-	background-color: white;
-	width: 500px;
-
-	@include less480px {
-		width: 98%;
-		margin-left: 10px;
-		margin-right: 10px;
-
-		padding: 15px;
-		padding-top: 30px;
-	}
-
-	&.wallet-modal {
-		width: 400px;
-		padding-left: 12px;
-		padding-right: 12px;
-		padding-bottom: 12px;
-
-		@include less480px {
-			width: 96%;
-		}
-	}
-
-	&.account-modal {
-		height: 523px;
-		padding: 24px;
-		padding-top: 12px;
-		padding-bottom: 0px;
-	}
-}
-
 .wm-body {
 	@include flex-column(stretch, flex-start);
 	flex-grow: 1;

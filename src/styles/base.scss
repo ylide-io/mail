@@ -8,6 +8,8 @@
 	--tertiary-surface-color: #eee;
 	--error-surface-color: rgba(255, 68, 85, 0.2);
 	--success-surface-color: rgb(0, 187, 68, 0.18);
+	--inverted-surface-color: #111;
+	--on-inverted-surface-color: #fff;
 
 	--border-color: rgba(0, 0, 0, 0.15);
 	--border-heavier-color: rgba(0, 0, 0, 0.3);
@@ -23,8 +25,10 @@
 	--selected-background-color: #8cf;
 	--selected-light-background-color: #d1ecff;
 
-	--checkbox-accent: #1ab394;
-	--checkbox-hover-accent: #0f947a;
+	--accent-color: #1ab394;
+	--accent-hover-color: #0f947a;
+	--accent2-color: #9747ff;
+	--accent2-hover-color: #8231ec;
 
 	--error-color: #f45;
 	--success-color: #0b4;
@@ -34,6 +38,7 @@
 	--error-button-border-color: rgba(255, 68, 85, 0.35);
 	--error-button-hover-background-color: rgba(255, 68, 85, 0.1);
 
+	--shade-color: #000;
 	--popup-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
 }
 

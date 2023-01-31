@@ -3,6 +3,7 @@ import React, { useEffect } from 'react';
 import { generatePath, Navigate, Route, Routes, useLocation } from 'react-router-dom';
 
 import { PopupManager } from './components/popup/popupManager/popupManager';
+import { StaticComponentManager } from './components/staticComponentManager/staticComponentManager';
 import { YlideLoader } from './components/ylideLoader/ylideLoader';
 import { AdminPage } from './pages/AdminPage';
 import { ComposePage } from './pages/ComposePage/ComposePage';
@@ -86,8 +87,8 @@ const App = observer(() => {
 
 	return (
 		<PopupManager>
-			<Routes>
-				<>
+			<StaticComponentManager>
+				<Routes>
 					<Route path={RoutePath.TEST} element={<TestPage />} />
 					{/* <Route path={'/first-time'} element={<FirstTimePage />} /> */}
 					{/* <Route path={'/connect-wallets'} element={<ConnectWalletsPage />} /> */}
@@ -114,9 +115,10 @@ const App = observer(() => {
 							<Navigate replace to={generatePath(RoutePath.MAIL_FOLDER, { folderId: FolderId.Inbox })} />
 						}
 					/>
-				</>
-			</Routes>
-			{modals.render()}
+				</Routes>
+
+				{modals.render()}
+			</StaticComponentManager>
 		</PopupManager>
 	);
 });

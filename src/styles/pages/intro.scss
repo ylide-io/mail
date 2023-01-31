@@ -141,7 +141,7 @@
 		}
 
 		&.emphaized {
-			background: #9747ff;
+			background: var(--accent2-color);
 			border: 1px dashed white;
 			color: white;
 			cursor: pointer;
@@ -157,7 +157,7 @@
 			}
 
 			&:hover {
-				background: #a661ff;
+				background: var(--accent2-hover-color);
 			}
 		}
 
