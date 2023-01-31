@@ -25,7 +25,7 @@ export interface SelectWalletModalProps {
 @observer
 export default class SelectWalletModal extends PureComponent<SelectWalletModalProps> {
 	static async show(): Promise<{} | null> {
-		return new Promise<{} | null>((resolve, reject) => {
+		return new Promise<{} | null>(resolve => {
 			modals.show((close: () => void) => (
 				<SelectWalletModal
 					onResolve={() => {
@@ -57,8 +57,6 @@ export default class SelectWalletModal extends PureComponent<SelectWalletModalPr
 		document.location.reload();
 	}
 
-	walletConnectWas = domain.walletConnectState.loading ? false : domain.walletConnectState.connected;
-
 	async componentDidMount() {
 		reaction(
 			() => toJS(domain.walletConnectState),
@@ -81,54 +79,6 @@ export default class SelectWalletModal extends PureComponent<SelectWalletModalPr
 	}
 
 	@observable loading = false;
-
-	// async publishLocalKey(account: DomainAccount) {
-	// 	let publishCtrl = PublishKeyModal.view(account.wallet, false);
-	// 	try {
-	// 		await account.attachRemoteKey();
-	// 		publishCtrl.hide();
-	// 		publishCtrl = PublishKeyModal.view(account.wallet, true);
-	// 		await asyncDelay(7000);
-	// 		await account.init();
-	// 	} catch (err) {
-	// 		alert('Transaction was not published. Please, try again');
-	// 	} finally {
-	// 		publishCtrl.hide();
-	// 	}
-	// }
-
-	// async createLocalKey(wallet: Wallet, account: IGenericAccount) {
-	// 	const result = await PasswordModal.show('to activate new account');
-	// 	if (!result) {
-	// 		return;
-	// 	}
-	// 	let tempLocalKey;
-	// 	const signatureCtrl = SignatureModal.view(wallet);
-	// 	try {
-	// 		tempLocalKey = await wallet.constructLocalKey(account, result.value);
-	// 	} finally {
-	// 		signatureCtrl.hide();
-	// 	}
-	// 	let remoteKey;
-	// 	try {
-	// 		const { remoteKey: remoteKeyInst } = await wallet.readRemoteKeys(account);
-	// 		remoteKey = remoteKeyInst;
-	// 	} catch (err) {
-	// 		alert('Retrieving blockchain keys failed, please, try again');
-	// 	}
-	// 	if (!remoteKey) {
-	// 		const domainAccount = await wallet.instantiateNewAccount(account, tempLocalKey);
-	// 		return await this.publishLocalKey(domainAccount);
-	// 	} else if (isBytesEqual(remoteKey.publicKey.bytes, tempLocalKey.publicKey)) {
-	// 		return await wallet.instantiateNewAccount(account, tempLocalKey);
-	// 	} else if (result.forceNew) {
-	// 		const domainAccount = await wallet.instantiateNewAccount(account, tempLocalKey);
-	// 		return await this.publishLocalKey(domainAccount);
-	// 	} else {
-	// 		alert('Ylide password was wrong, please, try again');
-	// 		return;
-	// 	}
-	// }
 
 	async connectWalletAccount(wallet: Wallet) {
 		let currentAccount = await wallet.getCurrentAccount();
@@ -204,11 +154,8 @@ export default class SelectWalletModal extends PureComponent<SelectWalletModalPr
 				return w !== 'walletconnect' && !domain.availableWallets.find(ww => ww.wallet === w);
 			});
 	}
-	// supportedWallets
 
 	render() {
-		// const isAndroid = browserUtils.isAndroid();
-		// const isIOS = !isAndroid;
 		const isMobile = browserUtils.isMobile();
 		const isDesktop = !isMobile;
 
@@ -216,7 +163,7 @@ export default class SelectWalletModal extends PureComponent<SelectWalletModalPr
 		const links = browserUtils.getMobileLinkRegistry(
 			browserUtils.formatMobileRegistry(walletConnect.registry, platform),
 		);
-		// var href = browserUtils.formatIOSMobile(props.uri, entry);
+
 		return (
 			<div className="modal-wrap">
 				<div
