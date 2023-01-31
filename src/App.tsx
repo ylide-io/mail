@@ -91,7 +91,6 @@ const App = observer(() => {
 				<Routes>
 					<Route path={RoutePath.TEST} element={<TestPage />} />
 					{/* <Route path={'/first-time'} element={<FirstTimePage />} /> */}
-					{/* <Route path={'/connect-wallets'} element={<ConnectWalletsPage />} /> */}
 					<Route path={RoutePath.WALLETS} element={<NewWalletsPage />} />
 					<Route path={RoutePath.SETTINGS} element={<SettingsPage />} />
 					<Route path={RoutePath.ADMIN} element={<AdminPage />} />
