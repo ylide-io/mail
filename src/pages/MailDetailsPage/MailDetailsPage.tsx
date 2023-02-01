@@ -1,3 +1,4 @@
+import { OutputBlockData } from '@editorjs/editorjs';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { generatePath, useParams } from 'react-router-dom';
 
@@ -13,7 +14,9 @@ import { IMessageDecodedContent } from '../../indexedDB/MessagesDB';
 import mailbox from '../../stores/Mailbox';
 import { FolderId, ILinkedMessage, useMailList, useMailStore } from '../../stores/MailList';
 import { RoutePath } from '../../stores/routePath';
-import { decodeEditorData } from '../../utils/editorJs';
+import { DateFormatStyle, formatDate } from '../../utils/date';
+import { decodeEditorData, generateEditorJsId } from '../../utils/editorJs';
+import { formatSubject } from '../../utils/mail';
 import { useNav } from '../../utils/navigate';
 import css from './MailDetailsPage.module.scss';
 import { MailMessage } from './MailMessage/MailMessage';
@@ -136,9 +139,45 @@ export const MailDetailsPage = () => {
 		navigate(RoutePath.MAIL_COMPOSE);
 	};
 
-	const onForwardClick = (decodedTextData: string | null, subject: string | null) => {
-		mailbox.editorData = decodeEditorData(decodedTextData);
-		mailbox.subject = subject || '';
+	const onForwardClick = (message: ILinkedMessage, decodedTextData: string | null, subject: string | null) => {
+		const editorData = decodeEditorData(decodedTextData);
+		if (editorData) {
+			const forwardedBlocks: OutputBlockData[] = [
+				{
+					id: generateEditorJsId(),
+					type: 'paragraph',
+					data: {
+						text: '',
+					},
+				},
+				{
+					id: generateEditorJsId(),
+					type: 'paragraph',
+					data: {
+						text: [
+							'---------- Forwarded message ---------',
+							`From: ${message.msg.senderAddress}`,
+							`Date: ${formatDate(message.msg.createdAt * 1000, DateFormatStyle.LONG)}`,
+							`Subject: ${formatSubject(subject)}`,
+							`To: ${message.recipient?.account.address || message.msg.recipientAddress}`,
+						].join('<br>'),
+					},
+				},
+				{
+					id: generateEditorJsId(),
+					type: 'paragraph',
+					data: {
+						text: '',
+					},
+				},
+			];
+
+			editorData.blocks = [...forwardedBlocks, ...editorData.blocks];
+		}
+
+		mailbox.editorData = editorData;
+		mailbox.subject = `Fwd: ${formatSubject(subject).replace(/^Fwd:\s+/i, '')}`;
+
 		navigate(RoutePath.MAIL_COMPOSE);
 	};
 
@@ -220,7 +259,11 @@ export const MailDetailsPage = () => {
 													)
 												}
 												onForwardClick={() =>
-													onForwardClick(decoded.decodedTextData, decoded.decodedSubject)
+													onForwardClick(
+														message.message,
+														decoded.decodedTextData,
+														decoded.decodedSubject,
+													)
 												}
 												onDeleteClick={() => onDeleteClick(message.message)}
 											/>
@@ -238,6 +281,7 @@ export const MailDetailsPage = () => {
 								}
 								onForwardClick={() =>
 									onForwardClick(
+										initialMessage,
 										initialDecodedContent.decodedTextData,
 										initialDecodedContent.decodedSubject,
 									)
@@ -261,6 +305,7 @@ export const MailDetailsPage = () => {
 							<ActionButton
 								onClick={() =>
 									onForwardClick(
+										initialMessage,
 										initialDecodedContent.decodedTextData,
 										initialDecodedContent.decodedSubject,
 									)

@@ -44,6 +44,7 @@ specifiers:
   jest: ^29.3.1
   mobx: ^6.5.0
   mobx-react: ^7.4.0
+  nanoid: ^4.0.0
   os-browserify: ^0.3.0
   prettier: ^2.8.1
   process: ^0.11.10
@@ -105,6 +106,7 @@ dependencies:
   idb: 7.1.1
   mobx: 6.7.0
   mobx-react: 7.6.0_babczrqhj3q4qgfqwtwyebsria
+  nanoid: 4.0.0
   react: 17.0.2
   react-beforeunload: 2.5.3_react@17.0.2
   react-dom: 17.0.2_react@17.0.2
@@ -10262,6 +10264,12 @@ packages:
     resolution: {integrity: sha512-MqBkQh/OHTS2egovRtLk45wEyNXwF+cokD+1YPf9u5VfJiRdAiRwB2froX5Co9Rh20xs4siNPm8naNotSD6RBw==}
     engines: {node: ^10 || ^12 || ^13.7 || ^14 || >=15.0.1}
     hasBin: true
+
+  /nanoid/4.0.0:
+    resolution: {integrity: sha512-IgBP8piMxe/gf73RTQx7hmnhwz0aaEXYakvqZyE302IXW3HyVNhdNGC+O2MwMAVhLEnvXlvKtGbtJf6wvHihCg==}
+    engines: {node: ^14 || ^16 || >=18}
+    hasBin: true
+    dev: false
 
   /natural-compare-lite/1.4.0:
     resolution: {integrity: sha512-Tj+HTDSJJKaZnfiuw+iaF9skdPpTo2GtEly5JHnWV/hfv2Qj/9RKsGISQtLh2ox3l5EAGw487hnBee0sIJ6v2g==}

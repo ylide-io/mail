@@ -3,16 +3,18 @@
 import List from '@editorjs/list';
 import Header from '@editorjs/header';
 import { toJS } from 'mobx';
+import { nanoid } from 'nanoid';
+import { OutputData } from '@editorjs/editorjs';
 
 export const EDITOR_JS_TOOLS = {
 	list: List,
 	header: Header,
 };
 
-export function decodeEditorData(data: any) {
+export function decodeEditorData(data: any): OutputData | undefined {
 	try {
 		return typeof data === 'string' ? JSON.parse(data) : toJS(data);
-	} catch (e) {
-		return null;
-	}
+	} catch (e) {}
 }
+
+export const generateEditorJsId = () => nanoid(10);

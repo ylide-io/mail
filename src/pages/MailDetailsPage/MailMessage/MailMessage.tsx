@@ -13,6 +13,7 @@ import { IMessageDecodedContent } from '../../../indexedDB/MessagesDB';
 import { FolderId, ILinkedMessage, useMailStore } from '../../../stores/MailList';
 import { DateFormatStyle } from '../../../utils/date';
 import { decodeEditorData, EDITOR_JS_TOOLS } from '../../../utils/editorJs';
+import { formatSubject } from '../../../utils/mail';
 import css from './MailMessage.module.scss';
 
 const ReactEditorJS = createReactEditorJS();
@@ -44,7 +45,7 @@ export function MailMessage({
 		decodeMessage(message);
 	};
 
-	const [isEditorReady, setEditorReady] = useState(!editorData.blocks);
+	const [isEditorReady, setEditorReady] = useState(!editorData?.blocks);
 	useEffect(() => {
 		if (isEditorReady) {
 			onReady?.();
@@ -55,7 +56,7 @@ export function MailMessage({
 		<div className={css.root}>
 			<Blockie className={css.avatar} address={message.msg.senderAddress} />
 
-			<div className={css.title}>{decoded ? decoded.decodedSubject || '(no subject)' : '[Encrypted]'}</div>
+			<div className={css.title}>{decoded ? formatSubject(decoded.decodedSubject) : '[Encrypted]'}</div>
 
 			<div className={css.actions}>
 				{decoded ? (
@@ -90,7 +91,7 @@ export function MailMessage({
 
 			<ReadableDate className={css.date} style={DateFormatStyle.LONG} value={message.msg.createdAt * 1000} />
 
-			{editorData.blocks && (
+			{editorData?.blocks && (
 				<div className={css.body}>
 					<ReactEditorJS
 						tools={EDITOR_JS_TOOLS}

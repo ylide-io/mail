@@ -12,9 +12,7 @@ const MailboxEditor = () => {
 	const instanceRef = React.useRef<any>(null);
 
 	useEffect(() => {
-		return () => {
-			mailbox.resetData();
-		};
+		return () => mailbox.resetData();
 	}, []);
 
 	const initialEditorData = useMemo(() => mailbox.editorData, []);

@@ -12,6 +12,7 @@ import domain from '../../../../stores/Domain';
 import { FolderId, ILinkedMessage, useMailStore } from '../../../../stores/MailList';
 import { RoutePath } from '../../../../stores/routePath';
 import { decodeEditorData } from '../../../../utils/editorJs';
+import { formatSubject } from '../../../../utils/mail';
 import { useNav } from '../../../../utils/navigate';
 import css from './MailboxListRow.module.scss';
 
@@ -101,7 +102,7 @@ const MailboxListRow: React.FC<MailboxListRowProps> = observer(
 
 				{decoded ? (
 					<>
-						<div className={css.subject}>{decoded.decodedSubject || '(no subject)'}</div>
+						<div className={css.subject}>{formatSubject(decoded.decodedSubject)}</div>
 
 						{!!preview && <div className={css.preview}>{preview}</div>}
 					</>
