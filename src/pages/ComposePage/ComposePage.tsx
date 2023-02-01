@@ -18,8 +18,8 @@ import { useMailStore } from '../../stores/MailList';
 import { RoutePath } from '../../stores/routePath';
 import { useNav } from '../../utils/navigate';
 import { truncateInMiddle } from '../../utils/string';
-import ComposeMailBody from './components/Mailbox/ComposeMailBody';
 import ComposeMailFooter from './components/Mailbox/ComposeMailFooter';
+import MailboxEditor from './components/Mailbox/MailboxEditor/MailboxEditor';
 
 export const ComposePage = observer(() => {
 	const navigate = useNav();
@@ -97,8 +97,12 @@ export const ComposePage = observer(() => {
 					</div>
 				</div>
 				<div className="mail-body" style={{ position: 'relative' }}>
-					<ComposeMailBody />
+					<div className="mail-text">
+						<MailboxEditor />
+					</div>
+
 					<ComposeMailFooter recipients={recipients} />
+
 					{mailer.sending ? <OverlappingLoader text="Broadcasting your message to blockchain..." /> : null}
 				</div>
 			</div>
