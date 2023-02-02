@@ -11,7 +11,7 @@ import { blockchainsMap, evmNameToNetwork } from '../../../../constants';
 import AlertModal from '../../../../modals/AlertModal';
 import domain from '../../../../stores/Domain';
 import { evmBalances } from '../../../../stores/evmBalances';
-import mailbox from '../../../../stores/Mailbox';
+import { mailbox } from '../../../../stores/Mailbox';
 import mailer from '../../../../stores/Mailer';
 import { useMailStore } from '../../../../stores/MailList';
 import { RoutePath } from '../../../../stores/routePath';

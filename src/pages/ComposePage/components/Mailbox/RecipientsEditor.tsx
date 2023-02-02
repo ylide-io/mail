@@ -12,7 +12,7 @@ import React, { PureComponent } from 'react';
 import { walletsMeta } from '../../../../constants';
 import contacts from '../../../../stores/Contacts';
 import domain from '../../../../stores/Domain';
-import mailbox from '../../../../stores/Mailbox';
+import { mailbox } from '../../../../stores/Mailbox';
 
 export interface IRecipient {
 	loading: boolean;

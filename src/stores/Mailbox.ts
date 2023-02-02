@@ -28,6 +28,4 @@ class Mailbox {
 	}
 }
 
-const mailbox = new Mailbox();
-
-export default mailbox;
+export const mailbox = new Mailbox();

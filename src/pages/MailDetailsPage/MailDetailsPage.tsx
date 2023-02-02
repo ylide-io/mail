@@ -11,7 +11,7 @@ import { ContactIcon } from '../../icons/ContactIcon';
 import { ForwardIcon } from '../../icons/ForwardIcon';
 import { ReplyIcon } from '../../icons/ReplyIcon';
 import { IMessageDecodedContent } from '../../indexedDB/MessagesDB';
-import mailbox from '../../stores/Mailbox';
+import { mailbox } from '../../stores/Mailbox';
 import { FolderId, ILinkedMessage, useMailList, useMailStore } from '../../stores/MailList';
 import { RoutePath } from '../../stores/routePath';
 import { DateFormatStyle, formatDate } from '../../utils/date';

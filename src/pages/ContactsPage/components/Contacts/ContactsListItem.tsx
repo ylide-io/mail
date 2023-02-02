@@ -9,7 +9,7 @@ import { AdaptiveAddress } from '../../../../controls/adaptiveAddress/adaptiveAd
 import { Blockie } from '../../../../controls/Blockie';
 import contacts from '../../../../stores/Contacts';
 import domain from '../../../../stores/Domain';
-import mailbox from '../../../../stores/Mailbox';
+import { mailbox } from '../../../../stores/Mailbox';
 import { IContact } from '../../../../stores/models/IContact';
 import { ITag } from '../../../../stores/models/ITag';
 import { RoutePath } from '../../../../stores/routePath';

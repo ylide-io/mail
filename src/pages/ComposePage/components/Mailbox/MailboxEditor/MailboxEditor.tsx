@@ -3,7 +3,7 @@ import './MailboxEditor.scss';
 import React, { useEffect, useMemo } from 'react';
 import { createReactEditorJS } from 'react-editor-js';
 
-import mailbox from '../../../../../stores/Mailbox';
+import { mailbox } from '../../../../../stores/Mailbox';
 import { EDITOR_JS_TOOLS } from '../../../../../utils/editorJs';
 
 const ReactEditorJS = createReactEditorJS();

@@ -12,7 +12,7 @@ import { walletsMeta } from '../../constants';
 import { OverlappingLoader } from '../../controls/OverlappingLoader';
 import { analytics } from '../../stores/Analytics';
 import domain from '../../stores/Domain';
-import mailbox from '../../stores/Mailbox';
+import { mailbox } from '../../stores/Mailbox';
 import mailer from '../../stores/Mailer';
 import { useMailStore } from '../../stores/MailList';
 import { RoutePath } from '../../stores/routePath';
