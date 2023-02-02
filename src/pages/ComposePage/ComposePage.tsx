@@ -1,14 +1,13 @@
-import { Select } from 'antd';
 import { observer } from 'mobx-react';
 import React, { useEffect, useState } from 'react';
 import { generatePath } from 'react-router-dom';
 
+import { AccountSelect } from '../../components/accountSelect/accountSelect';
 import { ActionButton, ActionButtonStyle } from '../../components/ActionButton/ActionButton';
 import { GenericLayout } from '../../components/genericLayout/genericLayout';
 import { RecipientInput, RecipientInputItem } from '../../components/recipientInput/recipientInput';
 import { smallButtonIcons } from '../../components/smallButton/smallButton';
 import { TextField } from '../../components/textField/textField';
-import { walletsMeta } from '../../constants';
 import { OverlappingLoader } from '../../controls/OverlappingLoader';
 import { analytics } from '../../stores/Analytics';
 import domain from '../../stores/Domain';
@@ -17,7 +16,6 @@ import { useMailStore } from '../../stores/MailList';
 import { globalOutgoingMailData } from '../../stores/outgoingMailData';
 import { RoutePath } from '../../stores/routePath';
 import { useNav } from '../../utils/navigate';
-import { truncateInMiddle } from '../../utils/string';
 import ComposeMailFooter from './components/Mailbox/ComposeMailFooter';
 import MailboxEditor from './components/Mailbox/MailboxEditor/MailboxEditor';
 
@@ -61,28 +59,10 @@ export const ComposePage = observer(() => {
 							<div className="mmp-row">
 								<label className="mmp-row-title">From:</label>
 								<div className="mmp-row-value">
-									<Select
-										style={{ width: '100%' }}
-										value={
-											globalOutgoingMailData.from
-												? String(
-														domain.accounts.activeAccounts.indexOf(
-															globalOutgoingMailData.from,
-														),
-												  )
-												: ''
-										}
-										onSelect={(val: string) => {
-											globalOutgoingMailData.from = domain.accounts.activeAccounts[Number(val)];
-										}}
-									>
-										{domain.accounts.activeAccounts.map((acc, idx) => (
-											<Select.Option key={idx} value={String(idx)}>
-												{`${acc.name} (${truncateInMiddle(acc.account.address, 10, '..')}) `}[
-												{walletsMeta[acc.wallet.wallet].title}]
-											</Select.Option>
-										))}
-									</Select>
+									<AccountSelect
+										activeAccount={globalOutgoingMailData.from}
+										onChange={account => (globalOutgoingMailData.from = account)}
+									/>
 								</div>
 							</div>
 							<div className="mmp-row">
