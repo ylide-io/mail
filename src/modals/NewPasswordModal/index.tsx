@@ -14,6 +14,7 @@ import { WalletTag } from '../../controls/WalletTag';
 import { YlideButton } from '../../controls/YlideButton';
 import { analytics } from '../../stores/Analytics';
 import domain from '../../stores/Domain';
+import { useEvmBalancesStore } from '../../stores/evmBalances';
 import { FeedCategory } from '../../stores/Feed';
 import { DomainAccount } from '../../stores/models/DomainAccount';
 import { Wallet } from '../../stores/models/Wallet';
@@ -58,37 +59,16 @@ export default class NewPasswordModal extends PureComponent<NewPasswordModalProp
 		makeObservable(this);
 	}
 
-	@observable evmBalances: Record<EVMNetwork, number> = {
-		[EVMNetwork.LOCAL_HARDHAT]: 0,
-		[EVMNetwork.ETHEREUM]: 0,
-		[EVMNetwork.BNBCHAIN]: 0,
-		[EVMNetwork.POLYGON]: 0,
-		[EVMNetwork.ARBITRUM]: 0,
-		[EVMNetwork.OPTIMISM]: 0,
-		[EVMNetwork.AVALANCHE]: 0,
-		[EVMNetwork.FANTOM]: 0,
-		[EVMNetwork.KLAYTN]: 0,
-		[EVMNetwork.GNOSIS]: 0,
-		[EVMNetwork.AURORA]: 0,
-		[EVMNetwork.CELO]: 0,
-		[EVMNetwork.CRONOS]: 0,
-		[EVMNetwork.MOONBEAM]: 0,
-		[EVMNetwork.MOONRIVER]: 0,
-		[EVMNetwork.METIS]: 0,
-		[EVMNetwork.ASTAR]: 0,
-	};
+	@observable evmBalances = useEvmBalancesStore.getState().balances;
 
 	async componentDidMount() {
 		if (this.props.wallet.factory.blockchainGroup === 'evm') {
 			const blockchainName = await this.props.wallet.controller.getCurrentBlockchain();
 			this.network = evmNameToNetwork(blockchainName);
-			const balances = await this.props.wallet.getBalancesOf(this.props.account.address);
-			for (const bcName of Object.keys(balances)) {
-				const network = evmNameToNetwork(bcName);
-				if (network) {
-					this.evmBalances[network] = balances[bcName].number;
-				}
-			}
+
+			this.evmBalances = await useEvmBalancesStore
+				.getState()
+				.updateBalances(this.props.wallet, this.props.account.address);
 		}
 	}
 

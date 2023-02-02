@@ -11,26 +11,6 @@ class Mailbox {
 	@observable bcc: string[] = [];
 	@observable network?: EVMNetwork;
 
-	@observable evmBalances: Record<EVMNetwork, number> = {
-		[EVMNetwork.LOCAL_HARDHAT]: 0,
-		[EVMNetwork.ETHEREUM]: 0,
-		[EVMNetwork.BNBCHAIN]: 0,
-		[EVMNetwork.POLYGON]: 0,
-		[EVMNetwork.ARBITRUM]: 0,
-		[EVMNetwork.OPTIMISM]: 0,
-		[EVMNetwork.AVALANCHE]: 0,
-		[EVMNetwork.FANTOM]: 0,
-		[EVMNetwork.KLAYTN]: 0,
-		[EVMNetwork.GNOSIS]: 0,
-		[EVMNetwork.AURORA]: 0,
-		[EVMNetwork.CELO]: 0,
-		[EVMNetwork.CRONOS]: 0,
-		[EVMNetwork.MOONBEAM]: 0,
-		[EVMNetwork.MOONRIVER]: 0,
-		[EVMNetwork.METIS]: 0,
-		[EVMNetwork.ASTAR]: 0,
-	};
-
 	@observable subject: string = '';
 
 	@observable editorData: OutputData | undefined;
