@@ -1,16 +1,11 @@
 import { EVMNetwork } from '@ylide/ethereum';
-import create from 'zustand';
+import { makeAutoObservable } from 'mobx';
 
 import { evmNameToNetwork } from '../constants';
 import { Wallet } from './models/Wallet';
 
-interface EvmBalancesStore {
-	balances: Record<EVMNetwork, number>;
-	updateBalances: (wallet: Wallet, address: string) => Promise<Record<EVMNetwork, number>>;
-}
-
-export const useEvmBalancesStore = create<EvmBalancesStore>((setState, getState) => ({
-	balances: {
+class EvmBalances {
+	balances = {
 		[EVMNetwork.LOCAL_HARDHAT]: 0,
 		[EVMNetwork.ETHEREUM]: 0,
 		[EVMNetwork.BNBCHAIN]: 0,
@@ -28,11 +23,15 @@ export const useEvmBalancesStore = create<EvmBalancesStore>((setState, getState)
 		[EVMNetwork.MOONRIVER]: 0,
 		[EVMNetwork.METIS]: 0,
 		[EVMNetwork.ASTAR]: 0,
-	},
+	};
 
-	updateBalances: async (wallet, address) => {
+	constructor() {
+		makeAutoObservable(this);
+	}
+
+	async updateBalances(wallet: Wallet, address: string) {
 		const rawBalances = await wallet.getBalancesOf(address);
-		const result = { ...getState().balances };
+		const result = { ...this.balances };
 
 		for (const bcName of Object.keys(rawBalances)) {
 			const network = evmNameToNetwork(bcName);
@@ -41,8 +40,13 @@ export const useEvmBalancesStore = create<EvmBalancesStore>((setState, getState)
 			}
 		}
 
-		setState({ balances: result });
+		this.balances = result;
 
 		return result;
-	},
-}));
+	}
+}
+
+export const evmBalances = new EvmBalances();
+
+// @ts-ignore
+window.evmBalances = evmBalances;

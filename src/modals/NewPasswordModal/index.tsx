@@ -14,7 +14,7 @@ import { WalletTag } from '../../controls/WalletTag';
 import { YlideButton } from '../../controls/YlideButton';
 import { analytics } from '../../stores/Analytics';
 import domain from '../../stores/Domain';
-import { useEvmBalancesStore } from '../../stores/evmBalances';
+import { evmBalances } from '../../stores/evmBalances';
 import { FeedCategory } from '../../stores/Feed';
 import { DomainAccount } from '../../stores/models/DomainAccount';
 import { Wallet } from '../../stores/models/Wallet';
@@ -59,16 +59,12 @@ export default class NewPasswordModal extends PureComponent<NewPasswordModalProp
 		makeObservable(this);
 	}
 
-	@observable evmBalances = useEvmBalancesStore.getState().balances;
-
 	async componentDidMount() {
 		if (this.props.wallet.factory.blockchainGroup === 'evm') {
 			const blockchainName = await this.props.wallet.controller.getCurrentBlockchain();
 			this.network = evmNameToNetwork(blockchainName);
 
-			this.evmBalances = await useEvmBalancesStore
-				.getState()
-				.updateBalances(this.props.wallet, this.props.account.address);
+			await evmBalances.updateBalances(this.props.wallet, this.props.account.address);
 		}
 	}
 
@@ -463,10 +459,10 @@ export default class NewPasswordModal extends PureComponent<NewPasswordModalProp
 								.filter(f => f.blockchainGroup === 'evm')
 								.sort((a, b) => {
 									const aBalance = Number(
-										this.evmBalances[evmNameToNetwork(a.blockchain)!].toFixed(4),
+										evmBalances.balances[evmNameToNetwork(a.blockchain)!].toFixed(4),
 									);
 									const bBalance = Number(
-										this.evmBalances[evmNameToNetwork(b.blockchain)!].toFixed(4),
+										evmBalances.balances[evmNameToNetwork(b.blockchain)!].toFixed(4),
 									);
 									const aTx = txPrices[evmNameToNetwork(a.blockchain)!];
 									const bTx = txPrices[evmNameToNetwork(b.blockchain)!];
@@ -483,7 +479,9 @@ export default class NewPasswordModal extends PureComponent<NewPasswordModalProp
 											className={clsx('wmn-plate', {
 												disabled:
 													Number(
-														this.evmBalances[evmNameToNetwork(bc.blockchain)!].toFixed(4),
+														evmBalances.balances[evmNameToNetwork(bc.blockchain)!].toFixed(
+															4,
+														),
 													) === 0,
 											})}
 											onClick={() => this.networkSelect(evmNameToNetwork(bc.blockchain)!)}
@@ -491,15 +489,18 @@ export default class NewPasswordModal extends PureComponent<NewPasswordModalProp
 											<div className="wmn-icon">{bData.logo(32)}</div>
 											<div className="wmn-title">
 												<div className="wmn-blockchain">{bData.title}</div>
-												{Number(this.evmBalances[evmNameToNetwork(bc.blockchain)!].toFixed(4)) >
-													0 && idx === 0 ? (
+												{Number(
+													evmBalances.balances[evmNameToNetwork(bc.blockchain)!].toFixed(4),
+												) > 0 && idx === 0 ? (
 													<div className="wmn-optimal">Optimal</div>
 												) : null}
 											</div>
 											<div className="wmn-balance">
 												<div className="wmn-wallet-balance">
 													{Number(
-														this.evmBalances[evmNameToNetwork(bc.blockchain)!].toFixed(4),
+														evmBalances.balances[evmNameToNetwork(bc.blockchain)!].toFixed(
+															4,
+														),
 													)}{' '}
 													{bData.ethNetwork?.nativeCurrency.symbol || 'ETH'}
 												</div>

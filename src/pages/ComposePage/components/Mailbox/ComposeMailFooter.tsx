@@ -10,7 +10,7 @@ import { smallButtonIcons } from '../../../../components/smallButton/smallButton
 import { blockchainsMap, evmNameToNetwork } from '../../../../constants';
 import AlertModal from '../../../../modals/AlertModal';
 import domain from '../../../../stores/Domain';
-import { useEvmBalancesStore } from '../../../../stores/evmBalances';
+import { evmBalances } from '../../../../stores/evmBalances';
 import mailbox from '../../../../stores/Mailbox';
 import mailer from '../../../../stores/Mailer';
 import { useMailStore } from '../../../../stores/MailList';
@@ -25,19 +25,17 @@ const ComposeMailFooter = observer(({ recipients }: ComposeMailFooterProps) => {
 	const navigate = useNav();
 	const lastActiveFolderId = useMailStore(state => state.lastActiveFolderId);
 
-	const { balances, updateBalances } = useEvmBalancesStore();
-
 	useEffect(() => {
 		(async () => {
 			if (mailbox.from?.wallet.factory.blockchainGroup === 'evm') {
 				const blockchainName = await mailbox.from.wallet.controller.getCurrentBlockchain();
 				mailbox.network = evmNameToNetwork(blockchainName);
 
-				await updateBalances(mailbox.from.wallet, mailbox.from.account.address);
+				await evmBalances.updateBalances(mailbox.from.wallet, mailbox.from.account.address);
 			}
 		})();
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [mailbox.from, updateBalances]);
+	}, [mailbox.from]);
 
 	let text: ReactNode = 'Send';
 	if (mailbox.from?.wallet.factory.blockchainGroup === 'everscale') {
@@ -135,11 +133,17 @@ const ComposeMailFooter = observer(({ recipients }: ComposeMailFooterProps) => {
 										return {
 											key: bc.blockchain,
 											disabled:
-												Number(balances[evmNameToNetwork(bc.blockchain)!].toFixed(3)) === 0,
+												Number(
+													evmBalances.balances[evmNameToNetwork(bc.blockchain)!].toFixed(3),
+												) === 0,
 											label: (
 												<>
 													{bData.title} [
-													{Number(balances[evmNameToNetwork(bc.blockchain)!].toFixed(3))}{' '}
+													{Number(
+														evmBalances.balances[evmNameToNetwork(bc.blockchain)!].toFixed(
+															3,
+														),
+													)}{' '}
 													{bData.ethNetwork!.nativeCurrency.symbol}]
 												</>
 											),
