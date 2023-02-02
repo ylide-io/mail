@@ -9,9 +9,9 @@ import { AdaptiveAddress } from '../../../../controls/adaptiveAddress/adaptiveAd
 import { Blockie } from '../../../../controls/Blockie';
 import contacts from '../../../../stores/Contacts';
 import domain from '../../../../stores/Domain';
-import { mailbox } from '../../../../stores/Mailbox';
 import { IContact } from '../../../../stores/models/IContact';
 import { ITag } from '../../../../stores/models/ITag';
+import { globalOutgoingMailData } from '../../../../stores/outgoingMailData';
 import { RoutePath } from '../../../../stores/routePath';
 import TagsStore from '../../../../stores/Tags';
 import { useNav } from '../../../../utils/navigate';
@@ -129,7 +129,7 @@ const ContactsListItem: React.FC<ContactsListItemProps> = ({ contact, isNew }) =
 	};
 
 	const mailThisContact = () => {
-		mailbox.to = [contact.name];
+		globalOutgoingMailData.to = [contact.name];
 		navigate(RoutePath.MAIL_COMPOSE);
 	};
 

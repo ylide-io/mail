@@ -12,9 +12,9 @@ import { walletsMeta } from '../../constants';
 import { OverlappingLoader } from '../../controls/OverlappingLoader';
 import { analytics } from '../../stores/Analytics';
 import domain from '../../stores/Domain';
-import { mailbox } from '../../stores/Mailbox';
 import mailer from '../../stores/Mailer';
 import { useMailStore } from '../../stores/MailList';
+import { globalOutgoingMailData } from '../../stores/outgoingMailData';
 import { RoutePath } from '../../stores/routePath';
 import { useNav } from '../../utils/navigate';
 import { truncateInMiddle } from '../../utils/string';
@@ -30,8 +30,8 @@ export const ComposePage = observer(() => {
 	}, []);
 
 	useEffect(() => {
-		if (!mailbox.from && domain.accounts.activeAccounts.length) {
-			mailbox.from = domain.accounts.activeAccounts[0];
+		if (!globalOutgoingMailData.from) {
+			globalOutgoingMailData.from = domain.accounts.activeAccounts[0];
 		}
 	}, []);
 
@@ -64,12 +64,16 @@ export const ComposePage = observer(() => {
 									<Select
 										style={{ width: '100%' }}
 										value={
-											mailbox.from
-												? String(domain.accounts.activeAccounts.indexOf(mailbox.from))
+											globalOutgoingMailData.from
+												? String(
+														domain.accounts.activeAccounts.indexOf(
+															globalOutgoingMailData.from,
+														),
+												  )
 												: ''
 										}
 										onSelect={(val: string) => {
-											mailbox.from = domain.accounts.activeAccounts[Number(val)];
+											globalOutgoingMailData.from = domain.accounts.activeAccounts[Number(val)];
 										}}
 									>
 										{domain.accounts.activeAccounts.map((acc, idx) => (
@@ -84,13 +88,16 @@ export const ComposePage = observer(() => {
 							<div className="mmp-row">
 								<label className="mmp-row-title">To:</label>
 								<div className="mmp-row-value">
-									<RecipientInput initialValue={mailbox.to} onChange={setRecipients} />
+									<RecipientInput initialValue={globalOutgoingMailData.to} onChange={setRecipients} />
 								</div>
 							</div>
 							<div className="mmp-row">
 								<label className="mmp-row-title">Subject:</label>
 								<div className="mmp-row-value">
-									<TextField value={mailbox.subject} onChange={value => (mailbox.subject = value)} />
+									<TextField
+										value={globalOutgoingMailData.subject}
+										onChange={value => (globalOutgoingMailData.subject = value)}
+									/>
 								</div>
 							</div>
 						</div>

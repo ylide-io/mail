@@ -11,9 +11,9 @@ import { blockchainsMap, evmNameToNetwork } from '../../../../constants';
 import AlertModal from '../../../../modals/AlertModal';
 import domain from '../../../../stores/Domain';
 import { evmBalances } from '../../../../stores/evmBalances';
-import { mailbox } from '../../../../stores/Mailbox';
 import mailer from '../../../../stores/Mailer';
 import { useMailStore } from '../../../../stores/MailList';
+import { globalOutgoingMailData } from '../../../../stores/outgoingMailData';
 import { RoutePath } from '../../../../stores/routePath';
 import { useNav } from '../../../../utils/navigate';
 
@@ -27,26 +27,32 @@ const ComposeMailFooter = observer(({ recipients }: ComposeMailFooterProps) => {
 
 	useEffect(() => {
 		(async () => {
-			if (mailbox.from?.wallet.factory.blockchainGroup === 'evm') {
-				const blockchainName = await mailbox.from.wallet.controller.getCurrentBlockchain();
-				mailbox.network = evmNameToNetwork(blockchainName);
+			if (globalOutgoingMailData.from?.wallet.factory.blockchainGroup === 'evm') {
+				const blockchainName = await globalOutgoingMailData.from.wallet.controller.getCurrentBlockchain();
+				globalOutgoingMailData.network = evmNameToNetwork(blockchainName);
 
-				await evmBalances.updateBalances(mailbox.from.wallet, mailbox.from.account.address);
+				await evmBalances.updateBalances(
+					globalOutgoingMailData.from.wallet,
+					globalOutgoingMailData.from.account.address,
+				);
 			}
 		})();
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [mailbox.from]);
+	}, [globalOutgoingMailData.from]);
 
 	let text: ReactNode = 'Send';
-	if (mailbox.from?.wallet.factory.blockchainGroup === 'everscale') {
+	if (globalOutgoingMailData.from?.wallet.factory.blockchainGroup === 'everscale') {
 		const bData = blockchainsMap.everscale;
 		text = (
 			<>
 				Send via {bData.logo(14)} {bData.title}
 			</>
 		);
-	} else if (mailbox.from?.wallet.factory.blockchainGroup === 'evm' && mailbox.network !== undefined) {
-		const bData = blockchainsMap[EVM_NAMES[mailbox.network]];
+	} else if (
+		globalOutgoingMailData.from?.wallet.factory.blockchainGroup === 'evm' &&
+		globalOutgoingMailData.network !== undefined
+	) {
+		const bData = blockchainsMap[EVM_NAMES[globalOutgoingMailData.network]];
 		if (bData) {
 			text = (
 				<>
@@ -54,7 +60,7 @@ const ComposeMailFooter = observer(({ recipients }: ComposeMailFooterProps) => {
 				</>
 			);
 		} else {
-			console.log('WTF: ', mailbox.network, EVM_NAMES[mailbox.network]);
+			console.log('WTF: ', globalOutgoingMailData.network, EVM_NAMES[globalOutgoingMailData.network]);
 		}
 	}
 
@@ -66,7 +72,7 @@ const ComposeMailFooter = observer(({ recipients }: ComposeMailFooterProps) => {
 
 			mailer.sending = true;
 
-			const acc = mailbox.from!;
+			const acc = globalOutgoingMailData.from!;
 			const curr = await acc.wallet.getCurrentAccount();
 			if (curr?.address !== acc.account.address) {
 				await domain.handleSwitchRequest(acc.wallet.factory.wallet, curr, acc.account);
@@ -74,10 +80,10 @@ const ComposeMailFooter = observer(({ recipients }: ComposeMailFooterProps) => {
 
 			const msgId = await mailer.sendMail(
 				acc,
-				mailbox.subject,
-				JSON.stringify(mailbox.editorData),
+				globalOutgoingMailData.subject,
+				JSON.stringify(globalOutgoingMailData.editorData),
 				recipients.map(r => r.routing?.address!),
-				mailbox.network,
+				globalOutgoingMailData.network,
 			);
 
 			await AlertModal.show('Message sent', 'Your message was successfully sent');
@@ -95,18 +101,18 @@ const ComposeMailFooter = observer(({ recipients }: ComposeMailFooterProps) => {
 				className={clsx('send-btn', {
 					disabled:
 						mailer.sending ||
-						!mailbox.from ||
+						!globalOutgoingMailData.from ||
 						!recipients.length ||
 						recipients.some(r => r.isLoading) ||
-						!mailbox.editorData?.blocks?.length,
-					withDropdown: mailbox.from?.wallet.factory.blockchainGroup === 'evm',
+						!globalOutgoingMailData.editorData?.blocks?.length,
+					withDropdown: globalOutgoingMailData.from?.wallet.factory.blockchainGroup === 'evm',
 				})}
 			>
 				<div className="send-btn-text" onClick={sendMailHandler}>
 					<i style={{ marginRight: 6 }} className={clsx('fa', smallButtonIcons.reply)}></i>
 					{text && <span className="send-btn-title">{text}</span>}
 				</div>
-				{mailbox.from?.wallet.factory.blockchainGroup === 'evm' ? (
+				{globalOutgoingMailData.from?.wallet.factory.blockchainGroup === 'evm' ? (
 					<Dropdown
 						overlay={
 							<Menu
@@ -120,10 +126,10 @@ const ComposeMailFooter = observer(({ recipients }: ComposeMailFooterProps) => {
 									const blockchainName = info.key;
 									const newNetwork = evmNetworks.find(n => n.name === blockchainName)?.network;
 									const currentBlockchainName =
-										await mailbox.from!.wallet.controller.getCurrentBlockchain();
+										await globalOutgoingMailData.from!.wallet.controller.getCurrentBlockchain();
 									if (currentBlockchainName !== blockchainName) {
 										await domain.switchEVMChain(newNetwork!);
-										mailbox.network = newNetwork;
+										globalOutgoingMailData.network = newNetwork;
 									}
 								}}
 								items={domain.registeredBlockchains

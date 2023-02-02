@@ -12,7 +12,7 @@ import React, { PureComponent } from 'react';
 import { walletsMeta } from '../../../../constants';
 import contacts from '../../../../stores/Contacts';
 import domain from '../../../../stores/Domain';
-import { mailbox } from '../../../../stores/Mailbox';
+import { globalOutgoingMailData } from '../../../../stores/outgoingMailData';
 
 export interface IRecipient {
 	loading: boolean;
@@ -137,7 +137,7 @@ export class Recipients extends PureComponent {
 		}
 		this.updateOptions();
 		// @ts-ignore
-		mailbox.recipients = this.recipients.filter(r => !!r.address).map(r => r.address);
+		globalOutgoingMailData.recipients = this.recipients.filter(r => !!r.address).map(r => r.address);
 	}
 
 	@autobind

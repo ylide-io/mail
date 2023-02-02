@@ -3,7 +3,7 @@ import './MailboxEditor.scss';
 import React, { useEffect, useMemo } from 'react';
 import { createReactEditorJS } from 'react-editor-js';
 
-import { mailbox } from '../../../../../stores/Mailbox';
+import { globalOutgoingMailData } from '../../../../../stores/outgoingMailData';
 import { EDITOR_JS_TOOLS } from '../../../../../utils/editorJs';
 
 const ReactEditorJS = createReactEditorJS();
@@ -12,14 +12,14 @@ const MailboxEditor = () => {
 	const instanceRef = React.useRef<any>(null);
 
 	useEffect(() => {
-		return () => mailbox.resetData();
+		return () => globalOutgoingMailData.reset();
 	}, []);
 
-	const initialEditorData = useMemo(() => mailbox.editorData, []);
+	const initialEditorData = useMemo(() => globalOutgoingMailData.editorData, []);
 
 	async function handleSave() {
 		if (instanceRef.current) {
-			mailbox.editorData = await instanceRef.current.save();
+			globalOutgoingMailData.editorData = await instanceRef.current.save();
 		}
 	}
 
