@@ -1,10 +1,12 @@
-import { createContext, Fragment, PropsWithChildren, ReactNode, useMemo, useState } from 'react';
+import { createContext, Fragment, PropsWithChildren, ReactNode, useContext, useMemo, useState } from 'react';
 
 interface StaticComponentManagerApi {
 	show: (render: (onRemove: () => void) => ReactNode) => void;
 }
 
 export const StaticComponentManagerContext = createContext<StaticComponentManagerApi | undefined>(undefined);
+
+export const useStaticComponentManager = () => useContext(StaticComponentManagerContext)!;
 
 export function StaticComponentManager({ children }: PropsWithChildren) {
 	const [modals, setModals] = useState<ReactNode[]>([]);
