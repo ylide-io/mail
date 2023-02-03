@@ -1,5 +1,5 @@
 import clsx from 'clsx';
-import React from 'react';
+import React, { ReactNode } from 'react';
 
 import { ReactComponent as CrossSvg } from '../../icons/cross.svg';
 import { OutgoingMailData } from '../../stores/outgoingMailData';
@@ -9,24 +9,37 @@ import { Popup } from '../popup/popup';
 import { useStaticComponentManager } from '../staticComponentManager/staticComponentManager';
 import css from './composeMailPopup.module.scss';
 
-export interface ComposeMailPopupProps {
-	mailData: OutgoingMailData;
-	onClose?: () => void;
-}
+let currentPopup: ReactNode = undefined;
 
 export function useComposeMailPopup() {
 	const staticComponentManager = useStaticComponentManager();
 
-	return (props: ComposeMailPopupProps) =>
-		staticComponentManager.show(onRemove => (
+	return (props: ComposeMailPopupProps) => {
+		if (currentPopup) {
+			staticComponentManager.remove(currentPopup);
+		}
+
+		const newPopup = (
 			<ComposeMailPopup
+				key={Date.now()}
 				{...props}
 				onClose={() => {
-					onRemove();
+					staticComponentManager.remove(newPopup);
 					props.onClose?.();
 				}}
 			/>
-		));
+		);
+
+		currentPopup = newPopup;
+		staticComponentManager.attach(newPopup);
+	};
+}
+
+//
+
+export interface ComposeMailPopupProps {
+	mailData: OutgoingMailData;
+	onClose?: () => void;
 }
 
 export function ComposeMailPopup({ onClose, mailData }: ComposeMailPopupProps) {
