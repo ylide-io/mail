@@ -1,6 +1,6 @@
 import './MailboxEditor.scss';
 
-import React, { useMemo, useRef } from 'react';
+import React, { useRef, useState } from 'react';
 import { createReactEditorJS } from 'react-editor-js';
 
 import { OutgoingMailData } from '../../../../../stores/outgoingMailData';
@@ -15,7 +15,7 @@ interface MailboxEditorProps {
 export function MailboxEditor({ mailData }: MailboxEditorProps) {
 	const instanceRef = useRef<any>(null);
 
-	const initialEditorData = useMemo(() => mailData.editorData, []);
+	const [initialEditorData] = useState(() => mailData.editorData);
 
 	async function handleSave() {
 		if (instanceRef.current) {

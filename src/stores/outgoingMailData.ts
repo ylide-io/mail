@@ -7,7 +7,7 @@ import domain from './Domain';
 import { DomainAccount } from './models/DomainAccount';
 
 export class OutgoingMailData {
-	from?: DomainAccount;
+	from?: DomainAccount = domain.accounts.activeAccounts[0];
 	to: Recipients = new Recipients();
 	network?: EVMNetwork;
 

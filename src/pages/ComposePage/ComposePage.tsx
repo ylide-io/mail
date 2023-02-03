@@ -11,7 +11,6 @@ import { smallButtonIcons } from '../../components/smallButton/smallButton';
 import { TextField } from '../../components/textField/textField';
 import { OverlappingLoader } from '../../controls/OverlappingLoader';
 import { analytics } from '../../stores/Analytics';
-import domain from '../../stores/Domain';
 import mailer from '../../stores/Mailer';
 import { useMailStore } from '../../stores/MailList';
 import { globalOutgoingMailData } from '../../stores/outgoingMailData';
@@ -27,11 +26,7 @@ export const ComposePage = observer(() => {
 		analytics.composeOpened();
 	}, []);
 
-	useEffect(() => {
-		if (!globalOutgoingMailData.from) {
-			globalOutgoingMailData.from = domain.accounts.activeAccounts[0];
-		}
-	}, []);
+	useEffect(() => () => globalOutgoingMailData.reset(), []);
 
 	return (
 		<GenericLayout>
