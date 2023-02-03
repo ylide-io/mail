@@ -51,9 +51,20 @@ export function RecipientInput({ initialValue, onChange }: RecipientInputProps) 
 	const [options, setOptions] = useState<DropDownOption[]>([]);
 	const [isFocused, setFocused] = useState(false);
 
-	const [items, setItems] = useState<RecipientInputItem[]>(initialValue?.map(v => createItem(v)) || []);
+	const [items, setItems] = useState<RecipientInputItem[]>(() => initialValue?.map(v => createItem(v)) || []);
 
-	useEffect(() => onChange(items), [items, onChange]);
+	/*
+	Since 'onChange' is being called in 'useEffect' callbacks,
+	it should be listed as their deps. So it shouldn't change on every render.
+	We need either use 'useCallback' outside of this component to cache 'onChange',
+	or use Ref here.
+	 */
+	const onChangeRef = useRef(onChange);
+	useEffect(() => {
+		onChangeRef.current = onChange;
+	}, [onChange]);
+
+	useEffect(() => onChangeRef.current?.(items), [items]);
 
 	// Update item routing
 	useEffect(() => {
