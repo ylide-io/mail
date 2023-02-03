@@ -14,13 +14,15 @@
 
 .content {
 	flex-grow: 1;
+	padding: 20px 0 0;
+	overflow-y: auto;
 }
 
 .footer {
+	flex: 0 0 64px;
 	display: flex;
 	align-items: center;
 	justify-content: flex-end;
 	padding: 0 16px;
-	height: 64px;
 	border-top: 1px solid var(--border-color);
 }

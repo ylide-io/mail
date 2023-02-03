@@ -31,11 +31,11 @@
 }
 
 .header {
+	flex: 0 0 40px;
 	display: flex;
 	align-items: center;
 	justify-content: space-between;
 	padding: 0 12px 0 16px;
-	height: 40px;
 	background: var(--secondary-surface-color);
 	border-radius: 10px 10px 0 0;
 
@@ -51,4 +51,5 @@
 
 .form {
 	flex-grow: 1;
+	min-height: 0;
 }

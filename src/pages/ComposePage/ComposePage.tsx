@@ -17,7 +17,7 @@ import { globalOutgoingMailData } from '../../stores/outgoingMailData';
 import { RoutePath } from '../../stores/routePath';
 import { useNav } from '../../utils/navigate';
 import ComposeMailFooter from './components/Mailbox/ComposeMailFooter';
-import MailboxEditor from './components/Mailbox/MailboxEditor/MailboxEditor';
+import { MailboxEditor } from './components/Mailbox/MailboxEditor/MailboxEditor';
 
 export const ComposePage = observer(() => {
 	const navigate = useNav();
@@ -85,7 +85,7 @@ export const ComposePage = observer(() => {
 				</div>
 				<div className="mail-body" style={{ position: 'relative' }}>
 					<div className="mail-text">
-						<MailboxEditor />
+						<MailboxEditor mailData={globalOutgoingMailData} />
 					</div>
 
 					<ComposeMailFooter recipients={recipients} />

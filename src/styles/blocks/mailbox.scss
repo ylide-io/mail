@@ -315,11 +315,8 @@
 }
 
 .mail-text {
-	@include flex-column(stretch, flex-start);
-
-	flex-grow: 1;
-	flex-shrink: 1;
-	flex-basis: 200px;
-
+	flex: 1 1 200px;
+	padding: 25px 15px 0;
+	border-top: 1px solid var(--border-color);
 	overflow: auto;
 }

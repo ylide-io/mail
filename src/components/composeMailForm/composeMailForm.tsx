@@ -2,6 +2,7 @@ import clsx from 'clsx';
 import { observer } from 'mobx-react';
 import React from 'react';
 
+import { MailboxEditor } from '../../pages/ComposePage/components/Mailbox/MailboxEditor/MailboxEditor';
 import { OutgoingMailData } from '../../stores/outgoingMailData';
 import { formatSubject } from '../../utils/mail';
 import { AccountSelect } from '../accountSelect/accountSelect';
@@ -35,7 +36,9 @@ export const ComposeMailForm = observer(({ className, mailData }: ComposeMailFor
 				/>
 			</div>
 
-			<div className={css.content} />
+			<div className={css.content}>
+				<MailboxEditor mailData={mailData} />
+			</div>
 
 			<div className={css.footer}>FOOTER</div>
 		</div>
