@@ -4,8 +4,6 @@ import clsx from 'clsx';
 import { observer } from 'mobx-react';
 import React, { ReactNode, useEffect } from 'react';
 import { generatePath } from 'react-router-dom';
-
-import { RecipientInputItem } from '../../../../components/recipientInput/recipientInput';
 import { smallButtonIcons } from '../../../../components/smallButton/smallButton';
 import { blockchainsMap, evmNameToNetwork } from '../../../../constants';
 import AlertModal from '../../../../modals/AlertModal';
@@ -17,11 +15,7 @@ import { globalOutgoingMailData } from '../../../../stores/outgoingMailData';
 import { RoutePath } from '../../../../stores/routePath';
 import { useNav } from '../../../../utils/navigate';
 
-interface ComposeMailFooterProps {
-	recipients: RecipientInputItem[];
-}
-
-const ComposeMailFooter = observer(({ recipients }: ComposeMailFooterProps) => {
+const ComposeMailFooter = observer(() => {
 	const navigate = useNav();
 	const lastActiveFolderId = useMailStore(state => state.lastActiveFolderId);
 
@@ -66,7 +60,7 @@ const ComposeMailFooter = observer(({ recipients }: ComposeMailFooterProps) => {
 
 	const sendMailHandler = async () => {
 		try {
-			if (recipients.some(r => !r.routing?.details)) {
+			if (globalOutgoingMailData.to.items.some(r => !r.routing?.details)) {
 				return alert("For some of your recipients we didn't find keys on the blockchain.");
 			}
 
@@ -82,7 +76,7 @@ const ComposeMailFooter = observer(({ recipients }: ComposeMailFooterProps) => {
 				acc,
 				globalOutgoingMailData.subject,
 				JSON.stringify(globalOutgoingMailData.editorData),
-				recipients.map(r => r.routing?.address!),
+				globalOutgoingMailData.to.items.map(r => r.routing?.address!),
 				globalOutgoingMailData.network,
 			);
 
@@ -102,8 +96,8 @@ const ComposeMailFooter = observer(({ recipients }: ComposeMailFooterProps) => {
 					disabled:
 						mailer.sending ||
 						!globalOutgoingMailData.from ||
-						!recipients.length ||
-						recipients.some(r => r.isLoading) ||
+						!globalOutgoingMailData.to.items.length ||
+						globalOutgoingMailData.to.items.some(r => r.isLoading) ||
 						!globalOutgoingMailData.editorData?.blocks?.length,
 					withDropdown: globalOutgoingMailData.from?.wallet.factory.blockchainGroup === 'evm',
 				})}

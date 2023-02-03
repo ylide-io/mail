@@ -5,6 +5,7 @@ import { generatePath, useParams } from 'react-router-dom';
 import { ActionButton } from '../../components/ActionButton/ActionButton';
 import { ContactName } from '../../components/contactName/contactName';
 import { GenericLayout } from '../../components/genericLayout/genericLayout';
+import { Recipients } from '../../components/recipientInput/recipientInput';
 import { Spinner } from '../../components/spinner/spinner';
 import { ReactComponent as ArrowLeftSvg } from '../../icons/arrowLeft.svg';
 import { ContactIcon } from '../../icons/ContactIcon';
@@ -134,7 +135,7 @@ export const MailDetailsPage = () => {
 	};
 
 	const onReplyClick = (senderAddress: string, subject: string | null) => {
-		globalOutgoingMailData.to = [senderAddress];
+		globalOutgoingMailData.to = new Recipients([senderAddress]);
 		globalOutgoingMailData.subject = subject || '';
 		navigate(RoutePath.MAIL_COMPOSE);
 	};

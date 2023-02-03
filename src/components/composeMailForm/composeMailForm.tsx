@@ -23,10 +23,7 @@ export const ComposeMailForm = observer(({ className, mailData }: ComposeMailFor
 				<AccountSelect activeAccount={mailData.from} onChange={account => (mailData.from = account)} />
 
 				<div className={css.metaLabel}>To</div>
-				<RecipientInput
-					initialValue={mailData.to}
-					onChange={value => (mailData.to = value.map(it => it.routing?.address).filter(Boolean) as string[])}
-				/>
+				<RecipientInput value={mailData.to} />
 
 				<div className={css.metaLabel}>Subject</div>
 				<TextField

@@ -1,11 +1,11 @@
 import { observer } from 'mobx-react';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { generatePath } from 'react-router-dom';
 
 import { AccountSelect } from '../../components/accountSelect/accountSelect';
 import { ActionButton, ActionButtonStyle } from '../../components/ActionButton/ActionButton';
 import { GenericLayout } from '../../components/genericLayout/genericLayout';
-import { RecipientInput, RecipientInputItem } from '../../components/recipientInput/recipientInput';
+import { RecipientInput } from '../../components/recipientInput/recipientInput';
 import { smallButtonIcons } from '../../components/smallButton/smallButton';
 import { TextField } from '../../components/textField/textField';
 import { OverlappingLoader } from '../../controls/OverlappingLoader';
@@ -32,8 +32,6 @@ export const ComposePage = observer(() => {
 			globalOutgoingMailData.from = domain.accounts.activeAccounts[0];
 		}
 	}, []);
-
-	const [recipients, setRecipients] = useState<RecipientInputItem[]>([]);
 
 	return (
 		<GenericLayout>
@@ -68,7 +66,7 @@ export const ComposePage = observer(() => {
 							<div className="mmp-row">
 								<label className="mmp-row-title">To:</label>
 								<div className="mmp-row-value">
-									<RecipientInput initialValue={globalOutgoingMailData.to} onChange={setRecipients} />
+									<RecipientInput value={globalOutgoingMailData.to} />
 								</div>
 							</div>
 							<div className="mmp-row">
@@ -88,7 +86,7 @@ export const ComposePage = observer(() => {
 						<MailboxEditor mailData={globalOutgoingMailData} />
 					</div>
 
-					<ComposeMailFooter recipients={recipients} />
+					<ComposeMailFooter />
 
 					{mailer.sending ? <OverlappingLoader text="Broadcasting your message to blockchain..." /> : null}
 				</div>

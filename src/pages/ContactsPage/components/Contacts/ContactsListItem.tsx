@@ -4,6 +4,7 @@ import clsx from 'clsx';
 import React, { useMemo, useState } from 'react';
 
 import { ActionButton, ActionButtonStyle } from '../../../../components/ActionButton/ActionButton';
+import { Recipients } from '../../../../components/recipientInput/recipientInput';
 import { TextField } from '../../../../components/textField/textField';
 import { AdaptiveAddress } from '../../../../controls/adaptiveAddress/adaptiveAddress';
 import { Blockie } from '../../../../controls/Blockie';
@@ -129,7 +130,7 @@ const ContactsListItem: React.FC<ContactsListItemProps> = ({ contact, isNew }) =
 	};
 
 	const mailThisContact = () => {
-		globalOutgoingMailData.to = [contact.name];
+		globalOutgoingMailData.to = new Recipients([contact.name]);
 		navigate(RoutePath.MAIL_COMPOSE);
 	};
 

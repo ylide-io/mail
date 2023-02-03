@@ -1,4 +1,6 @@
 import { Tooltip } from 'antd';
+import { autorun, makeAutoObservable } from 'mobx';
+import { observer } from 'mobx-react';
 import { KeyboardEvent, useEffect, useRef, useState } from 'react';
 
 import { AdaptiveText } from '../../controls/adaptiveText/adaptiveText';
@@ -10,21 +12,7 @@ import { constrain } from '../../utils/number';
 import { DropDown, DropDownItem, DropDownItemMode } from '../dropDown/dropDown';
 import { TagInput, TagInputItem, TagInputItemStyle } from '../tagInput/tagInput';
 
-interface DropDownOption {
-	name: string;
-	address: string;
-	isHighlighted: boolean;
-}
-
 let itemIdCounter = Date.now();
-
-function createItem(name: string, props: Partial<RecipientInputItem> = {}): RecipientInputItem {
-	return {
-		id: `${itemIdCounter++}`,
-		name,
-		...props,
-	};
-}
 
 export interface RecipientInputItem {
 	id: string;
@@ -39,82 +27,90 @@ export interface RecipientInputItem {
 	} | null;
 }
 
-interface RecipientInputProps {
-	initialValue?: string[];
-	onChange: (value: RecipientInputItem[]) => void;
+export class Recipients {
+	items: RecipientInputItem[] = [];
+
+	constructor(initialItems?: string[]) {
+		makeAutoObservable(this);
+
+		autorun(() => {
+			this.items.forEach(item => {
+				if (item.isLoading) return;
+				if (item.routing === null || item.routing?.details || item.routing?.details === null) return;
+
+				item.isLoading = true;
+				Recipients.processItem(item).finally(() => {
+					item.isLoading = false;
+				});
+			});
+		});
+
+		if (initialItems?.length) {
+			this.items = initialItems?.map(it => Recipients.createItem(it));
+		}
+	}
+
+	static createItem(name: string, props: Partial<RecipientInputItem> = {}): RecipientInputItem {
+		return {
+			id: `${itemIdCounter++}`,
+			name,
+			...props,
+		};
+	}
+
+	static async processItem(item: RecipientInputItem) {
+		if (!item.routing?.address) {
+			const contact = contacts.contacts.find(c => c.name === item.name || c.address === item.name);
+			if (contact) {
+				item.name = contact.name;
+				item.routing = { address: contact.address };
+			} else if (isEns(item.name)) {
+				const nss = domain.getNSBlockchainsForAddress(item.name);
+				for (const ns of nss) {
+					const address = (await ns.service.resolve(item.name)) || undefined;
+					if (address) {
+						item.routing = { address };
+						break;
+					}
+				}
+			} else if (isAddress(item.name)) {
+				item.routing = { address: item.name };
+			} else {
+				item.routing = null;
+				return;
+			}
+		}
+
+		if (!item.routing?.details && item.routing?.address) {
+			const achievability = await domain.identifyAddressAchievability(item.routing.address);
+			if (achievability) {
+				item.routing.details = {
+					type: achievability.type,
+					blockchain: achievability.blockchain,
+				};
+			} else {
+				item.routing.details = null;
+			}
+		}
+	}
 }
 
-export function RecipientInput({ initialValue, onChange }: RecipientInputProps) {
+interface DropDownOption {
+	name: string;
+	address: string;
+	isHighlighted: boolean;
+}
+
+interface RecipientInputProps {
+	value: Recipients;
+}
+
+export const RecipientInput = observer(({ value }: RecipientInputProps) => {
 	const tagInputRef = useRef(null);
 
 	const [search, setSearch] = useState('');
 	const [options, setOptions] = useState<DropDownOption[]>([]);
 	const [isFocused, setFocused] = useState(false);
-
-	const [items, setItems] = useState<RecipientInputItem[]>(() => initialValue?.map(v => createItem(v)) || []);
-
-	/*
-	Since 'onChange' is being called in 'useEffect' callbacks,
-	it should be listed as their deps. So it shouldn't change on every render.
-	We need either use 'useCallback' outside of this component to cache 'onChange',
-	or use Ref here.
-	 */
-	const onChangeRef = useRef(onChange);
-	useEffect(() => {
-		onChangeRef.current = onChange;
-	}, [onChange]);
-
-	useEffect(() => onChangeRef.current?.(items), [items]);
-
-	// Update item routing
-	useEffect(() => {
-		function patchItem(id: string, patch: Partial<RecipientInputItem>) {
-			setItems(prev => prev.map(it => (it.id === id ? { ...it, ...patch } : it)));
-		}
-
-		items.forEach(async item => {
-			if (item.isLoading) return;
-			if (item.routing === null || item.routing?.details || item.routing?.details === null) return;
-
-			patchItem(item.id, { isLoading: true });
-
-			let name = item.name;
-			let address = item.routing?.address;
-			let details = item.routing?.details;
-
-			if (!address) {
-				const contact = contacts.contacts.find(c => c.name === item.name || c.address === item.name);
-				if (contact) {
-					name = contact.name;
-					address = contact.address;
-				} else if (isEns(item.name)) {
-					const nss = domain.getNSBlockchainsForAddress(item.name);
-					for (const ns of nss) {
-						address = (await ns.service.resolve(item.name)) || undefined;
-						if (address) break;
-					}
-				} else if (isAddress(item.name)) {
-					address = item.name;
-				}
-			}
-
-			if (!details && address) {
-				const achievability = await domain.identifyAddressAchievability(address);
-				if (achievability) {
-					details = {
-						type: achievability.type,
-						blockchain: achievability.blockchain,
-					};
-				}
-			}
-
-			patchItem(item.id, {
-				name,
-				isLoading: false,
-				routing: address ? { address, details: details || null } : null,
-			});
-		});
-	}, [items]);
 
 	// Build drop-down options
 	useEffect(() => {
@@ -136,7 +132,7 @@ export function RecipientInput({ initialValue, onChange }: RecipientInputProps) 
 				// Filter already selected contacts out
 				.filter(
 					contact =>
-						!items.some(
+						!value.items.some(
 							it =>
 								it.name === contact.name ||
 								it.name === contact.address ||
@@ -146,7 +142,7 @@ export function RecipientInput({ initialValue, onChange }: RecipientInputProps) 
 
 				.map((contact, i) => ({ name: contact.name, address: contact.address, isHighlighted: !i })),
 		);
-	}, [isFocused, items, search]);
+	}, [isFocused, search, value.items]);
 
 	const onFocus = () => {
 		setFocused(true);
@@ -156,8 +152,8 @@ export function RecipientInput({ initialValue, onChange }: RecipientInputProps) 
 		setFocused(false);
 
 		const cleanSearch = search.trim();
-		if (cleanSearch && !items.some(it => it.name === cleanSearch || it.routing?.address === cleanSearch)) {
-			setItems([...items, createItem(cleanSearch)]);
+		if (cleanSearch && !value.items.some(it => it.name === cleanSearch || it.routing?.address === cleanSearch)) {
+			value.items = [...value.items, Recipients.createItem(cleanSearch)];
 		}
 
 		setSearch('');
@@ -176,10 +172,10 @@ export function RecipientInput({ initialValue, onChange }: RecipientInputProps) 
 				onSelect(highlightedOption);
 			} else if (
 				cleanSearch &&
-				!items.some(it => it.name === cleanSearch || it.routing?.address === cleanSearch)
+				!value.items.some(it => it.name === cleanSearch || it.routing?.address === cleanSearch)
 			) {
 				e.preventDefault();
-				setItems([...items, createItem(cleanSearch)]);
+				value.items = [...value.items, Recipients.createItem(cleanSearch)];
 			}
 
 			setSearch('');
@@ -200,26 +196,26 @@ export function RecipientInput({ initialValue, onChange }: RecipientInputProps) 
 	};
 
 	const onSelect = (option: DropDownOption) => {
-		setItems([...items, createItem(option.name, { routing: { address: option.address } })]);
+		value.items = [...value.items, Recipients.createItem(option.name, { routing: { address: option.address } })];
 		setSearch('');
 	};
 
 	const onRemove = (item: RecipientInputItem) => {
-		setItems(items.filter(it => it.id !== item.id));
+		value.items = value.items.filter(it => it.id !== item.id);
 	};
 
 	return (
 		<>
 			<TagInput
 				ref={tagInputRef}
-				placeholder={!items.length ? 'Enter address or ENS domain here' : undefined}
+				placeholder={!value.items.length ? 'Enter address or ENS domain here' : undefined}
 				search={search}
 				onSearchChange={setSearch}
 				onFocus={onFocus}
 				onBlur={onBlur}
 				onKeyDown={onKeyDown}
 			>
-				{items?.map((item, i) => {
+				{value.items?.map((item, i) => {
 					const routing = item.routing;
 
 					const tooltip = routing?.details
@@ -266,4 +262,4 @@ export function RecipientInput({ initialValue, onChange }: RecipientInputProps) 
 			)}
 		</>
 	);
-}
+});
