@@ -10,6 +10,7 @@ import { PropsWithClassName } from '../propsWithClassName';
 import { RecipientInput } from '../recipientInput/recipientInput';
 import { TextField } from '../textField/textField';
 import css from './composeMailForm.module.scss';
+import { SendMailButton } from './sendMailButton/sendMailButton';
 
 export interface ComposeMailFormProps extends PropsWithClassName {
 	mailData: OutgoingMailData;
@@ -37,7 +38,9 @@ export const ComposeMailForm = observer(({ className, mailData }: ComposeMailFor
 				<MailboxEditor mailData={mailData} />
 			</div>
 
-			<div className={css.footer}>FOOTER</div>
+			<div className={css.footer}>
+				<SendMailButton mailData={mailData} />
+			</div>
 		</div>
 	);
 });

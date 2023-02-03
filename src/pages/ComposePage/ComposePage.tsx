@@ -4,6 +4,7 @@ import { generatePath } from 'react-router-dom';
 
 import { AccountSelect } from '../../components/accountSelect/accountSelect';
 import { ActionButton, ActionButtonStyle } from '../../components/ActionButton/ActionButton';
+import { SendMailButton } from '../../components/composeMailForm/sendMailButton/sendMailButton';
 import { GenericLayout } from '../../components/genericLayout/genericLayout';
 import { RecipientInput } from '../../components/recipientInput/recipientInput';
 import { smallButtonIcons } from '../../components/smallButton/smallButton';
@@ -16,7 +17,6 @@ import { useMailStore } from '../../stores/MailList';
 import { globalOutgoingMailData } from '../../stores/outgoingMailData';
 import { RoutePath } from '../../stores/routePath';
 import { useNav } from '../../utils/navigate';
-import ComposeMailFooter from './components/Mailbox/ComposeMailFooter';
 import { MailboxEditor } from './components/Mailbox/MailboxEditor/MailboxEditor';
 
 export const ComposePage = observer(() => {
@@ -86,7 +86,9 @@ export const ComposePage = observer(() => {
 						<MailboxEditor mailData={globalOutgoingMailData} />
 					</div>
 
-					<ComposeMailFooter />
+					<div className="mail-footer compose-mail-footer">
+						<SendMailButton mailData={globalOutgoingMailData} />
+					</div>
 
 					{mailer.sending ? <OverlappingLoader text="Broadcasting your message to blockchain..." /> : null}
 				</div>
