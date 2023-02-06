@@ -25,8 +25,10 @@ export const LinkButton = ({ className, type, text, link }: LinkButtonProps) => 
 	}[type || LinkButtonType.DEFAULT];
 
 	return (
-		<button className={clsx(css.root, typeClass, className)} onClick={() => navigate(link)}>
-			{text}
-		</button>
+		<div className={className}>
+			<button className={clsx(css.root, typeClass)} onClick={() => navigate(link)}>
+				{text}
+			</button>
+		</div>
 	);
 };
