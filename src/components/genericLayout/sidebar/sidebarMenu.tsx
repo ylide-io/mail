@@ -26,8 +26,10 @@ import { sideTechnologyIcon } from '../../../icons/static/sideTechnologyIcon';
 import { FeedCategory, getFeedCategoryName } from '../../../stores/Feed';
 import { FolderId } from '../../../stores/MailList';
 import modals from '../../../stores/Modals';
+import { OutgoingMailData } from '../../../stores/outgoingMailData';
 import { RoutePath } from '../../../stores/routePath';
 import { useNav } from '../../../utils/navigate';
+import { useComposeMailPopup } from '../../composeMailPopup/composeMailPopup';
 import { PropsWithClassName } from '../../propsWithClassName';
 import { FeedSettingsPopup } from './feedSettingsPopup/feedSettingsPopup';
 import css from './sidebarMenu.module.scss';
@@ -109,6 +111,8 @@ const SidebarMenu = observer(() => {
 
 	const feedSettingsButtonRef = useRef(null);
 	const [isFeedSettingsOpen, setFeedSettingsOpen] = useState(false);
+
+	const composeMailPopup = useComposeMailPopup();
 
 	return (
 		<div className={clsx(css.root, { [css.root_open]: modals.sidebarOpen })}>
@@ -198,7 +202,10 @@ const SidebarMenu = observer(() => {
 							className={css.sectionButton}
 							onClick={() => {
 								modals.sidebarOpen = false;
-								navigate(RoutePath.MAIL_COMPOSE);
+
+								if (location.pathname !== generatePath(RoutePath.MAIL_COMPOSE)) {
+									composeMailPopup({ mailData: new OutgoingMailData() });
+								}
 							}}
 						>
 							Compose mail
