@@ -3,6 +3,7 @@ import './sendMailButton.module.scss';
 import { EVM_NAMES, EVMNetwork } from '@ylide/ethereum';
 import { Dropdown, Menu } from 'antd';
 import clsx from 'clsx';
+import { autorun } from 'mobx';
 import { observer } from 'mobx-react';
 import React, { ReactNode, useEffect } from 'react';
 import { generatePath } from 'react-router-dom';
@@ -26,17 +27,18 @@ export const SendMailButton = observer(({ mailData }: SendMailButtonProps) => {
 	const navigate = useNav();
 	const lastActiveFolderId = useMailStore(state => state.lastActiveFolderId);
 
-	useEffect(() => {
-		(async () => {
-			if (mailData.from?.wallet.factory.blockchainGroup === 'evm') {
-				const blockchainName = await mailData.from.wallet.controller.getCurrentBlockchain();
-				mailData.network = evmNameToNetwork(blockchainName);
+	useEffect(
+		() =>
+			autorun(async () => {
+				if (mailData.from?.wallet.factory.blockchainGroup === 'evm') {
+					const blockchainName = await mailData.from.wallet.controller.getCurrentBlockchain();
+					mailData.network = evmNameToNetwork(blockchainName);
 
-				await evmBalances.updateBalances(mailData.from.wallet, mailData.from.account.address);
-			}
-		})();
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [mailData.from]);
+					await evmBalances.updateBalances(mailData.from.wallet, mailData.from.account.address);
+				}
+			}),
+		[mailData],
+	);
 
 	let text: ReactNode = 'Send';
 	if (mailData.from?.wallet.factory.blockchainGroup === 'everscale') {
