@@ -8,7 +8,6 @@ import { observer } from 'mobx-react';
 import React, { ReactNode, useEffect } from 'react';
 
 import { blockchainsMap, evmNameToNetwork } from '../../../constants';
-import AlertModal from '../../../modals/AlertModal';
 import domain from '../../../stores/Domain';
 import { evmBalances } from '../../../stores/evmBalances';
 import mailer from '../../../stores/Mailer';
@@ -77,8 +76,8 @@ export const SendMailButton = observer(({ mailData, onSent }: SendMailButtonProp
 				mailData.network,
 			);
 
-			await AlertModal.show('Message sent', 'Your message was successfully sent');
 			console.log('id: ', msgId);
+			alert('Your message has been sent successfully.');
 
 			onSent?.();
 		} catch (e) {
