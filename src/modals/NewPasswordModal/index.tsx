@@ -579,7 +579,6 @@ export default class NewPasswordModal extends PureComponent<NewPasswordModalProp
 							<div
 								style={{
 									display: 'flex',
-									flexDirection: 'row',
 									alignItems: 'center',
 									justifyContent: 'center',
 									paddingBottom: 40,
