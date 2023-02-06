@@ -4,14 +4,15 @@ import clsx from 'clsx';
 import React, { useMemo, useState } from 'react';
 
 import { ActionButton, ActionButtonStyle } from '../../../../components/ActionButton/ActionButton';
+import { Recipients } from '../../../../components/recipientInput/recipientInput';
 import { TextField } from '../../../../components/textField/textField';
 import { AdaptiveAddress } from '../../../../controls/adaptiveAddress/adaptiveAddress';
 import { Blockie } from '../../../../controls/Blockie';
 import contacts from '../../../../stores/Contacts';
 import domain from '../../../../stores/Domain';
-import mailbox from '../../../../stores/Mailbox';
 import { IContact } from '../../../../stores/models/IContact';
 import { ITag } from '../../../../stores/models/ITag';
+import { globalOutgoingMailData } from '../../../../stores/outgoingMailData';
 import { RoutePath } from '../../../../stores/routePath';
 import TagsStore from '../../../../stores/Tags';
 import { useNav } from '../../../../utils/navigate';
@@ -129,7 +130,7 @@ const ContactsListItem: React.FC<ContactsListItemProps> = ({ contact, isNew }) =
 	};
 
 	const mailThisContact = () => {
-		mailbox.to = [contact.name];
+		globalOutgoingMailData.to = new Recipients([contact.name]);
 		navigate(RoutePath.MAIL_COMPOSE);
 	};
 

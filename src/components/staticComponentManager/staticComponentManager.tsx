@@ -1,22 +1,21 @@
-import { createContext, Fragment, PropsWithChildren, ReactNode, useMemo, useState } from 'react';
+import { createContext, Fragment, PropsWithChildren, ReactNode, useContext, useMemo, useState } from 'react';
 
 interface StaticComponentManagerApi {
-	show: (render: (onRemove: () => void) => ReactNode) => void;
+	attach: (node: ReactNode) => void;
+	remove: (node: ReactNode) => void;
 }
 
 export const StaticComponentManagerContext = createContext<StaticComponentManagerApi | undefined>(undefined);
 
+export const useStaticComponentManager = () => useContext(StaticComponentManagerContext)!;
+
 export function StaticComponentManager({ children }: PropsWithChildren) {
-	const [modals, setModals] = useState<ReactNode[]>([]);
+	const [nodes, setNodes] = useState<ReactNode[]>([]);
 
 	const api = useMemo<StaticComponentManagerApi>(
 		() => ({
-			show: render => {
-				const onRemove = () => setModals(m => m.filter(m => m !== modal));
-				const modal = render(onRemove);
-
-				setModals(m => [...m, modal]);
-			},
+			attach: node => setNodes(n => [...n, node]),
+			remove: node => setNodes(prev => prev.filter(n => n !== node)),
 		}),
 		[],
 	);
@@ -25,7 +24,7 @@ export function StaticComponentManager({ children }: PropsWithChildren) {
 		<StaticComponentManagerContext.Provider value={api}>
 			{children}
 
-			{modals.map((m, i) => (
+			{nodes.map((m, i) => (
 				<Fragment key={i}>{m}</Fragment>
 			))}
 		</StaticComponentManagerContext.Provider>

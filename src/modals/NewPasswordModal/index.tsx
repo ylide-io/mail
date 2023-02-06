@@ -14,6 +14,7 @@ import { WalletTag } from '../../controls/WalletTag';
 import { YlideButton } from '../../controls/YlideButton';
 import { analytics } from '../../stores/Analytics';
 import domain from '../../stores/Domain';
+import { evmBalances } from '../../stores/evmBalances';
 import { FeedCategory } from '../../stores/Feed';
 import { DomainAccount } from '../../stores/models/DomainAccount';
 import { Wallet } from '../../stores/models/Wallet';
@@ -58,37 +59,12 @@ export default class NewPasswordModal extends PureComponent<NewPasswordModalProp
 		makeObservable(this);
 	}
 
-	@observable evmBalances: Record<EVMNetwork, number> = {
-		[EVMNetwork.LOCAL_HARDHAT]: 0,
-		[EVMNetwork.ETHEREUM]: 0,
-		[EVMNetwork.BNBCHAIN]: 0,
-		[EVMNetwork.POLYGON]: 0,
-		[EVMNetwork.ARBITRUM]: 0,
-		[EVMNetwork.OPTIMISM]: 0,
-		[EVMNetwork.AVALANCHE]: 0,
-		[EVMNetwork.FANTOM]: 0,
-		[EVMNetwork.KLAYTN]: 0,
-		[EVMNetwork.GNOSIS]: 0,
-		[EVMNetwork.AURORA]: 0,
-		[EVMNetwork.CELO]: 0,
-		[EVMNetwork.CRONOS]: 0,
-		[EVMNetwork.MOONBEAM]: 0,
-		[EVMNetwork.MOONRIVER]: 0,
-		[EVMNetwork.METIS]: 0,
-		[EVMNetwork.ASTAR]: 0,
-	};
-
 	async componentDidMount() {
 		if (this.props.wallet.factory.blockchainGroup === 'evm') {
 			const blockchainName = await this.props.wallet.controller.getCurrentBlockchain();
 			this.network = evmNameToNetwork(blockchainName);
-			const balances = await this.props.wallet.getBalancesOf(this.props.account.address);
-			for (const bcName of Object.keys(balances)) {
-				const network = evmNameToNetwork(bcName);
-				if (network) {
-					this.evmBalances[network] = balances[bcName].number;
-				}
-			}
+
+			await evmBalances.updateBalances(this.props.wallet, this.props.account.address);
 		}
 	}
 
@@ -483,10 +459,10 @@ export default class NewPasswordModal extends PureComponent<NewPasswordModalProp
 								.filter(f => f.blockchainGroup === 'evm')
 								.sort((a, b) => {
 									const aBalance = Number(
-										this.evmBalances[evmNameToNetwork(a.blockchain)!].toFixed(4),
+										evmBalances.balances[evmNameToNetwork(a.blockchain)!].toFixed(4),
 									);
 									const bBalance = Number(
-										this.evmBalances[evmNameToNetwork(b.blockchain)!].toFixed(4),
+										evmBalances.balances[evmNameToNetwork(b.blockchain)!].toFixed(4),
 									);
 									const aTx = txPrices[evmNameToNetwork(a.blockchain)!];
 									const bTx = txPrices[evmNameToNetwork(b.blockchain)!];
@@ -503,7 +479,9 @@ export default class NewPasswordModal extends PureComponent<NewPasswordModalProp
 											className={clsx('wmn-plate', {
 												disabled:
 													Number(
-														this.evmBalances[evmNameToNetwork(bc.blockchain)!].toFixed(4),
+														evmBalances.balances[evmNameToNetwork(bc.blockchain)!].toFixed(
+															4,
+														),
 													) === 0,
 											})}
 											onClick={() => this.networkSelect(evmNameToNetwork(bc.blockchain)!)}
@@ -511,15 +489,18 @@ export default class NewPasswordModal extends PureComponent<NewPasswordModalProp
 											<div className="wmn-icon">{bData.logo(32)}</div>
 											<div className="wmn-title">
 												<div className="wmn-blockchain">{bData.title}</div>
-												{Number(this.evmBalances[evmNameToNetwork(bc.blockchain)!].toFixed(4)) >
-													0 && idx === 0 ? (
+												{Number(
+													evmBalances.balances[evmNameToNetwork(bc.blockchain)!].toFixed(4),
+												) > 0 && idx === 0 ? (
 													<div className="wmn-optimal">Optimal</div>
 												) : null}
 											</div>
 											<div className="wmn-balance">
 												<div className="wmn-wallet-balance">
 													{Number(
-														this.evmBalances[evmNameToNetwork(bc.blockchain)!].toFixed(4),
+														evmBalances.balances[evmNameToNetwork(bc.blockchain)!].toFixed(
+															4,
+														),
 													)}{' '}
 													{bData.ethNetwork?.nativeCurrency.symbol || 'ETH'}
 												</div>
@@ -598,7 +579,6 @@ export default class NewPasswordModal extends PureComponent<NewPasswordModalProp
 							<div
 								style={{
 									display: 'flex',
-									flexDirection: 'row',
 									alignItems: 'center',
 									justifyContent: 'center',
 									paddingBottom: 40,

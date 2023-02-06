@@ -1,4 +1,4 @@
-import { createContext, createRef, PropsWithChildren, ReactNode, ReactPortal, useMemo } from 'react';
+import { createContext, PropsWithChildren, ReactNode, ReactPortal, useMemo, useRef } from 'react';
 import { createPortal } from 'react-dom';
 
 interface PopupManagerApi {
@@ -8,7 +8,7 @@ interface PopupManagerApi {
 export const PopupManagerContext = createContext<PopupManagerApi | undefined>(undefined);
 
 export function PopupManager({ children }: PropsWithChildren) {
-	const mainRef = createRef<HTMLDivElement>();
+	const mainRef = useRef<HTMLDivElement>(null);
 
 	const api = useMemo<PopupManagerApi>(
 		() => ({

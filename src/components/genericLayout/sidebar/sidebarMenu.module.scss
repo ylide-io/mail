@@ -1,4 +1,5 @@
 .root {
+	padding: 0 0 20px;
 	overflow-y: auto;
 
 	@include less920px {
@@ -28,7 +29,7 @@
 
 	@include less920px {
 		position: static;
-		padding: 15px;
+		padding: 15px 15px 0;
 	}
 }
 
@@ -174,7 +175,7 @@
 		color: var(--primary-text-color);
 
 		&:hover {
-			color: var(--link--hover-color);
+			color: var(--link-hover-color);
 		}
 
 		svg {

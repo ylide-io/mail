@@ -129,7 +129,7 @@ export const MailboxPage = () => {
 
 				<div className="mailbox">
 					{isLoading && !messages.length ? (
-						<div style={{ height: 400 }}>
+						<div style={{ padding: '40px 0' }}>
 							<YlideLoader
 								reason={`Retrieving your mails from ${
 									Object.keys(domain.blockchains).length

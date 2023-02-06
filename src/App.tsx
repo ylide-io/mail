@@ -61,14 +61,13 @@ const App = observer(() => {
 				style={{
 					display: 'flex',
 					flexDirection: 'column',
-					flexGrow: 1,
+					justifyContent: 'center',
+					paddingBottom: '10vh',
 					width: '100vw',
 					height: '100vh',
-					alignItems: 'stretch',
-					textAlign: 'center',
 				}}
 			>
-				<YlideLoader reason="Loading your accounts data from blockchain..." />
+				<YlideLoader reason="Loading your account data from blockchain..." />
 			</div>
 		);
 	}

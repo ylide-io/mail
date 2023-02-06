@@ -3,16 +3,18 @@ import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { generatePath, useParams } from 'react-router-dom';
 
 import { ActionButton } from '../../components/ActionButton/ActionButton';
+import { useComposeMailPopup } from '../../components/composeMailPopup/composeMailPopup';
 import { ContactName } from '../../components/contactName/contactName';
 import { GenericLayout } from '../../components/genericLayout/genericLayout';
+import { Recipients } from '../../components/recipientInput/recipientInput';
 import { Spinner } from '../../components/spinner/spinner';
 import { ReactComponent as ArrowLeftSvg } from '../../icons/arrowLeft.svg';
 import { ContactIcon } from '../../icons/ContactIcon';
 import { ForwardIcon } from '../../icons/ForwardIcon';
 import { ReplyIcon } from '../../icons/ReplyIcon';
 import { IMessageDecodedContent } from '../../indexedDB/MessagesDB';
-import mailbox from '../../stores/Mailbox';
 import { FolderId, ILinkedMessage, useMailList, useMailStore } from '../../stores/MailList';
+import { globalOutgoingMailData, OutgoingMailData } from '../../stores/outgoingMailData';
 import { RoutePath } from '../../stores/routePath';
 import { DateFormatStyle, formatDate } from '../../utils/date';
 import { decodeEditorData, generateEditorJsId } from '../../utils/editorJs';
@@ -29,6 +31,8 @@ interface WrappedThreadMessage {
 export const MailDetailsPage = () => {
 	const navigate = useNav();
 	const { folderId, id } = useParams<{ folderId: FolderId; id: string }>();
+
+	const composeMailPopup = useComposeMailPopup();
 
 	const {
 		lastMessagesList,
@@ -134,9 +138,11 @@ export const MailDetailsPage = () => {
 	};
 
 	const onReplyClick = (senderAddress: string, subject: string | null) => {
-		mailbox.to = [senderAddress];
-		mailbox.subject = subject || '';
-		navigate(RoutePath.MAIL_COMPOSE);
+		const mailData = new OutgoingMailData();
+		mailData.to = new Recipients([senderAddress]);
+		mailData.subject = formatSubject(subject || '', 'Re: ');
+
+		composeMailPopup({ mailData });
 	};
 
 	const onForwardClick = (message: ILinkedMessage, decodedTextData: string | null, subject: string | null) => {
@@ -175,8 +181,8 @@ export const MailDetailsPage = () => {
 			editorData.blocks = [...forwardedBlocks, ...editorData.blocks];
 		}
 
-		mailbox.editorData = editorData;
-		mailbox.subject = `Fwd: ${formatSubject(subject).replace(/^Fwd:\s+/i, '')}`;
+		globalOutgoingMailData.editorData = editorData;
+		globalOutgoingMailData.subject = formatSubject(subject?.replace(/^Fwd:\s+/i, ''), 'Fwd: ');
 
 		navigate(RoutePath.MAIL_COMPOSE);
 	};
