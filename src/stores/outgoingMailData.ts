@@ -1,13 +1,13 @@
 import { OutputData } from '@editorjs/editorjs';
 import { EVMNetwork } from '@ylide/ethereum';
-import { makeAutoObservable } from 'mobx';
+import { autorun, makeAutoObservable } from 'mobx';
 
 import { Recipients } from '../components/recipientInput/recipientInput';
 import domain from './Domain';
 import { DomainAccount } from './models/DomainAccount';
 
 export class OutgoingMailData {
-	from?: DomainAccount = domain.accounts.activeAccounts[0];
+	from?: DomainAccount;
 	to: Recipients = new Recipients();
 	network?: EVMNetwork;
 
@@ -16,6 +16,10 @@ export class OutgoingMailData {
 
 	constructor() {
 		makeAutoObservable(this);
+
+		autorun(() => {
+			this.from = this.from || domain.accounts.activeAccounts[0];
+		});
 	}
 
 	reset() {
