@@ -1,10 +1,13 @@
 import clsx from 'clsx';
+import { observer } from 'mobx-react';
 import React, { ReactNode } from 'react';
 
 import { ReactComponent as CrossSvg } from '../../icons/cross.svg';
+import mailer from '../../stores/Mailer';
 import { OutgoingMailData } from '../../stores/outgoingMailData';
 import { useOnMountAnimation } from '../../utils/useOnMountAnimation';
 import { ComposeMailForm } from '../composeMailForm/composeMailForm';
+import { OverlappingLoader } from '../overlappingLoader/overlappingLoader';
 import { Popup } from '../popup/popup';
 import { useStaticComponentManager } from '../staticComponentManager/staticComponentManager';
 import css from './composeMailPopup.module.scss';
@@ -42,7 +45,7 @@ export interface ComposeMailPopupProps {
 	onClose?: () => void;
 }
 
-export function ComposeMailPopup({ onClose, mailData }: ComposeMailPopupProps) {
+export const ComposeMailPopup = observer(({ onClose, mailData }: ComposeMailPopupProps) => {
 	const isMount = useOnMountAnimation();
 
 	return (
@@ -59,6 +62,8 @@ export function ComposeMailPopup({ onClose, mailData }: ComposeMailPopupProps) {
 			</div>
 
 			<ComposeMailForm className={css.form} mailData={mailData} />
+
+			{mailer.sending && <OverlappingLoader text="Broadcasting your message to blockchain..." />}
 		</Popup>
 	);
-}
+});

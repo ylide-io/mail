@@ -1,0 +1,25 @@
+.header {
+	display: flex;
+	justify-content: space-between;
+	padding: 0 16px 8px;
+}
+
+.headerTitle {
+	font-size: 32px;
+
+	@include less720px {
+		font-size: 28px;
+	}
+}
+
+.headerActions {
+	display: grid;
+	grid-auto-flow: column;
+	grid-gap: 8px;
+	align-items: center;
+	justify-content: end;
+}
+
+.form {
+	flex-grow: 1;
+}

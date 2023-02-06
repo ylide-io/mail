@@ -12,6 +12,10 @@
 	border-bottom: 1px solid var(--border-color);
 }
 
+.metaLabel {
+	color: var(--secondary-text-color);
+}
+
 .content {
 	flex-grow: 1;
 	padding: 20px 0 0;
