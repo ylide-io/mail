@@ -1,10 +1,14 @@
 import clsx from 'clsx';
 import { observer } from 'mobx-react';
 import React, { ReactNode } from 'react';
+import { generatePath } from 'react-router-dom';
 
 import { ReactComponent as CrossSvg } from '../../icons/cross.svg';
+import { ReactComponent as ExternalSvg } from '../../icons/external.svg';
 import mailer from '../../stores/Mailer';
-import { OutgoingMailData } from '../../stores/outgoingMailData';
+import { globalOutgoingMailData, OutgoingMailData } from '../../stores/outgoingMailData';
+import { RoutePath } from '../../stores/routePath';
+import { useNav } from '../../utils/navigate';
 import { useOnMountAnimation } from '../../utils/useOnMountAnimation';
 import { ComposeMailForm } from '../composeMailForm/composeMailForm';
 import { OverlappingLoader } from '../overlappingLoader/overlappingLoader';
@@ -46,6 +50,7 @@ export interface ComposeMailPopupProps {
 }
 
 export const ComposeMailPopup = observer(({ onClose, mailData }: ComposeMailPopupProps) => {
+	const navigate = useNav();
 	const isMount = useOnMountAnimation();
 
 	return (
@@ -56,9 +61,24 @@ export const ComposeMailPopup = observer(({ onClose, mailData }: ComposeMailPopu
 		>
 			<div className={css.header}>
 				New message
-				<button className={css.headerButton} onClick={() => onClose?.()}>
-					<CrossSvg />
-				</button>
+				<div className={css.headerActions}>
+					<button
+						className={css.headerButton}
+						title="Open full editor"
+						onClick={() => {
+							onClose?.();
+
+							globalOutgoingMailData.reset(mailData);
+							navigate(generatePath(RoutePath.MAIL_COMPOSE));
+						}}
+					>
+						<ExternalSvg />
+					</button>
+
+					<button className={css.headerButton} title="Close" onClick={() => onClose?.()}>
+						<CrossSvg />
+					</button>
+				</div>
 			</div>
 
 			<ComposeMailForm className={css.form} mailData={mailData} />

@@ -22,13 +22,13 @@ export class OutgoingMailData {
 		});
 	}
 
-	reset() {
-		this.from = domain.accounts.activeAccounts[0];
-		this.to = new Recipients();
-		this.network = undefined;
+	reset(data?: OutgoingMailData) {
+		this.from = data?.from || domain.accounts.activeAccounts[0];
+		this.to = data?.to || new Recipients();
+		this.network = data?.network;
 
-		this.subject = '';
-		this.editorData = undefined;
+		this.subject = data?.subject || '';
+		this.editorData = data?.editorData;
 	}
 }
 
