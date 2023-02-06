@@ -43,7 +43,11 @@ export const ComposePage = observer(() => {
 				</div>
 			</div>
 
-			<ComposeMailForm className={css.form} mailData={globalOutgoingMailData} />
+			<ComposeMailForm
+				className={css.form}
+				mailData={globalOutgoingMailData}
+				onSent={() => navigate(generatePath(RoutePath.MAIL_FOLDER, { folderId: lastActiveFolderId }))}
+			/>
 
 			{mailer.sending && <OverlappingLoader text="Broadcasting your message to blockchain..." />}
 		</GenericLayout>

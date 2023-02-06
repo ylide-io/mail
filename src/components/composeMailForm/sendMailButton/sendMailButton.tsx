@@ -6,27 +6,21 @@ import clsx from 'clsx';
 import { autorun } from 'mobx';
 import { observer } from 'mobx-react';
 import React, { ReactNode, useEffect } from 'react';
-import { generatePath } from 'react-router-dom';
 
 import { blockchainsMap, evmNameToNetwork } from '../../../constants';
 import AlertModal from '../../../modals/AlertModal';
 import domain from '../../../stores/Domain';
 import { evmBalances } from '../../../stores/evmBalances';
 import mailer from '../../../stores/Mailer';
-import { useMailStore } from '../../../stores/MailList';
 import { OutgoingMailData } from '../../../stores/outgoingMailData';
-import { RoutePath } from '../../../stores/routePath';
-import { useNav } from '../../../utils/navigate';
 import { smallButtonIcons } from '../../smallButton/smallButton';
 
 export interface SendMailButtonProps {
 	mailData: OutgoingMailData;
+	onSent?: () => void;
 }
 
-export const SendMailButton = observer(({ mailData }: SendMailButtonProps) => {
-	const navigate = useNav();
-	const lastActiveFolderId = useMailStore(state => state.lastActiveFolderId);
-
+export const SendMailButton = observer(({ mailData, onSent }: SendMailButtonProps) => {
 	useEffect(
 		() =>
 			autorun(async () => {
@@ -86,7 +80,7 @@ export const SendMailButton = observer(({ mailData }: SendMailButtonProps) => {
 			await AlertModal.show('Message sent', 'Your message was successfully sent');
 			console.log('id: ', msgId);
 
-			navigate(generatePath(RoutePath.MAIL_FOLDER, { folderId: lastActiveFolderId }));
+			onSent?.();
 		} catch (e) {
 			console.log('Error sending message', e);
 		}

@@ -81,7 +81,7 @@ export const ComposeMailPopup = observer(({ onClose, mailData }: ComposeMailPopu
 				</div>
 			</div>
 
-			<ComposeMailForm className={css.form} mailData={mailData} />
+			<ComposeMailForm className={css.form} mailData={mailData} onSent={onClose} />
 
 			{mailer.sending && <OverlappingLoader text="Broadcasting your message to blockchain..." />}
 		</Popup>

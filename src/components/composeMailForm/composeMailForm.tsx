@@ -14,9 +14,10 @@ import { SendMailButton } from './sendMailButton/sendMailButton';
 
 export interface ComposeMailFormProps extends PropsWithClassName {
 	mailData: OutgoingMailData;
+	onSent?: () => void;
 }
 
-export const ComposeMailForm = observer(({ className, mailData }: ComposeMailFormProps) => {
+export const ComposeMailForm = observer(({ className, mailData, onSent }: ComposeMailFormProps) => {
 	return (
 		<div className={clsx(css.root, className)}>
 			<div className={css.meta}>
@@ -39,7 +40,7 @@ export const ComposeMailForm = observer(({ className, mailData }: ComposeMailFor
 			</div>
 
 			<div className={css.footer}>
-				<SendMailButton mailData={mailData} />
+				<SendMailButton mailData={mailData} onSent={onSent} />
 			</div>
 		</div>
 	);
