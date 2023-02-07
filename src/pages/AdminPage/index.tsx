@@ -26,9 +26,9 @@ export class AdminPage extends PureComponent {
 	@autobind
 	async deployRegistryV5() {
 		this.deployingRegistryV5 = true;
-		this.registryV5Address = await (
-			domain.walletControllers.evm.metamask as EthereumWalletController
-		).deployRegistryV5();
+		// this.registryV5Address = await (
+		// 	domain.walletControllers.evm.metamask as EthereumWalletController
+		// ).deployRegistryV5();
 		this.deployingRegistryV5 = false;
 	}
 
@@ -38,25 +38,25 @@ export class AdminPage extends PureComponent {
 	@autobind
 	async deployMailerV7() {
 		this.deployingMailerV7 = true;
-		this.mailerV7Address = await (
-			domain.walletControllers.evm.metamask as EthereumWalletController
-		).deployMailerV7();
+		// this.mailerV7Address = await (
+		// 	domain.walletControllers.evm.metamask as EthereumWalletController
+		// ).deployMailerV7();
 		this.deployingMailerV7 = false;
 	}
 
 	@autobind
 	async changeBonucerRegistryV5() {
 		this.changingBonucerRegistryV5 = true;
-		const sb = async (a: string) =>
-			console.log(
-				'result: ',
-				await (domain.walletControllers.evm.metamask as EthereumWalletController).setBonucer(
-					this.selectedChain,
-					'0x15a33D60283e3D20751D6740162D1212c1ad2a2d'.toLowerCase(),
-					a.toLowerCase(),
-					true,
-				),
-			);
+		// const sb = async (a: string) =>
+		// 	console.log(
+		// 		'result: ',
+		// 		await (domain.walletControllers.evm.metamask as EthereumWalletController).setBonucer(
+		// 			this.selectedChain,
+		// 			'0x15a33D60283e3D20751D6740162D1212c1ad2a2d'.toLowerCase(),
+		// 			a.toLowerCase(),
+		// 			true,
+		// 		),
+		// 	);
 
 		// await sb('0x2D15daF82b187f022348456ae4fbF4ffe40f1F72');
 		// await sb('0x0C386867628470786A90fd88809dAfb7ca1d3173');
@@ -89,15 +89,15 @@ export class AdminPage extends PureComponent {
 			[EVMNetwork.FANTOM]: '5000000000000000',
 			[EVMNetwork.POLYGON]: '50000000000000000',
 		};
-		console.log(
-			'result: ',
-			await (domain.walletControllers.evm.metamask as EthereumWalletController).setBonuses(
-				this.selectedChain,
-				'0x15a33D60283e3D20751D6740162D1212c1ad2a2d'.toLowerCase(),
-				bonuces[this.selectedChain], // newcomer: 0.001
-				'0', // referrer: 0
-			),
-		);
+		// console.log(
+		// 	'result: ',
+		// 	await (domain.walletControllers.evm.metamask as EthereumWalletController).setBonuses(
+		// 		this.selectedChain,
+		// 		'0x15a33D60283e3D20751D6740162D1212c1ad2a2d'.toLowerCase(),
+		// 		bonuces[this.selectedChain], // newcomer: 0.001
+		// 		'0', // referrer: 0
+		// 	),
+		// );
 		this.changingBonucesRegistryV5 = false;
 	}
 

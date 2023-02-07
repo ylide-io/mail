@@ -50,8 +50,8 @@ Ylide.registerBlockchainFactory(evmBlockchainFactories[EVMNetwork.MOONBEAM]);
 Ylide.registerBlockchainFactory(evmBlockchainFactories[EVMNetwork.MOONRIVER]);
 Ylide.registerBlockchainFactory(evmBlockchainFactories[EVMNetwork.METIS]);
 // Ylide.registerBlockchainFactory(evmBlockchainFactories[EVMNetwork.ASTAR]);
-Ylide.registerBlockchainFactory(everscaleBlockchainFactory);
-Ylide.registerWalletFactory(everscaleWalletFactory);
+// Ylide.registerBlockchainFactory(everscaleBlockchainFactory);
+// Ylide.registerWalletFactory(everscaleWalletFactory);
 Ylide.registerWalletFactory(evmWalletFactories.metamask);
 Ylide.registerWalletFactory(evmWalletFactories.coinbase);
 Ylide.registerWalletFactory(evmWalletFactories.trustwallet);
@@ -170,6 +170,7 @@ export class Domain {
 			}
 		}
 		return await DynamicEncryptionRouter.findEncyptionRoute(
+			this.ylide.core,
 			actualRecipients,
 			this.getRegisteredBlockchains().map(b => b.reader),
 		);
@@ -188,6 +189,7 @@ export class Domain {
 			},
 		];
 		const route = await DynamicEncryptionRouter.findEncyptionRoute(
+			this.ylide.core,
 			actualRecipients,
 			blockchains.map(b => b.reader),
 		);
@@ -389,7 +391,7 @@ export class Domain {
 		}
 		this.walletControllers[factory.blockchainGroup] = {
 			...(this.walletControllers[factory.blockchainGroup] || {}),
-			[factory.wallet]: await this.ylide.addWallet(factory.blockchainGroup, factory.wallet, {
+			[factory.wallet]: await this.ylide.controllers.addWallet(factory.blockchainGroup, factory.wallet, {
 				dev: false, //document.location.hostname === 'localhost',
 				onSwitchAccountRequest: this.handleSwitchRequest.bind(this, factory.wallet),
 				onNetworkSwitchRequest: async (
@@ -434,7 +436,7 @@ export class Domain {
 		}
 		for (const factory of this.registeredBlockchains) {
 			if (!this.blockchains[factory.blockchain]) {
-				this.blockchains[factory.blockchain] = await this.ylide.addBlockchain(factory.blockchain, {
+				this.blockchains[factory.blockchain] = await this.ylide.controllers.addBlockchain(factory.blockchain, {
 					dev: false, //document.location.hostname === 'localhost',
 					endpoints: ['https://mainnet.evercloud.dev/695e40eeac6b4e3fa4a11666f6e0d6af/graphql'],
 				});

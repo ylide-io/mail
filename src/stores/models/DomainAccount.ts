@@ -1,5 +1,5 @@
 import { EVM_NAMES, EVMNetwork } from '@ylide/ethereum';
-import { ExternalYlidePublicKey, IGenericAccount, Ylide, YlideKey } from '@ylide/sdk';
+import { YlideCore, ExternalYlidePublicKey, IGenericAccount, YlideKey } from '@ylide/sdk';
 import { computed, makeAutoObservable, observable } from 'mobx';
 
 import { isBytesEqual } from '../../utils/isBytesEqual';
@@ -45,7 +45,7 @@ export class DomainAccount {
 			}));
 	}
 
-	async getBalances(): Promise<Record<string, { original: string; number: number; e18: string }>> {
+	async getBalances(): Promise<Record<string, { original: string; numeric: number; e18: string }>> {
 		return await this.wallet.getBalancesOf(this.account.address);
 	}
 
@@ -64,7 +64,7 @@ export class DomainAccount {
 	}
 
 	get sentAddress() {
-		return Ylide.getSentAddress(this.wallet.controller.addressToUint256(this.account.address));
+		return YlideCore.getSentAddress(this.wallet.controller.addressToUint256(this.account.address));
 	}
 
 	@computed get isCurrentlySelected() {

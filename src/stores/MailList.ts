@@ -1,14 +1,12 @@
-import { EthereumBlockchainController, EthereumListSource } from '@ylide/ethereum';
+import { EthereumBlockchainController } from '@ylide/ethereum';
 import {
 	AbstractBlockchainController,
-	BlockchainListSource,
 	BlockchainMap,
 	BlockchainSourceType,
 	IListSource,
 	IMessage,
 	IMessageContent,
 	IMessageWithSource,
-	IndexerListSource,
 	ListSourceDrainer,
 	ListSourceMultiplexer,
 	SourceReadingSession,
@@ -50,7 +48,7 @@ const MailPageSize = 10;
 
 export interface ILinkedMessage {
 	id: string;
-	msgId: Uint256;
+	msgId: string;
 	msg: IMessage;
 	recipient: DomainAccount | null;
 	reader: AbstractBlockchainController;
@@ -125,42 +123,55 @@ export function useMailList(props?: UseMailListProps) {
 			if (folderId === FolderId.Inbox || folderId === FolderId.Archive) {
 				return activeAccounts
 					.map(account => {
-						const res: IListSource[] = [];
-						for (const blockchain of Object.keys(blockchains)) {
-							const reader = blockchains[blockchain];
-							const ls = readingSession.listSource(
-								{
-									blockchain,
-									type: BlockchainSourceType.DIRECT,
-									recipient: account.uint256Address,
-									sender: sender || null,
-								},
-								reader,
-							);
-							accountSourceMatch.set(ls, { account, reader });
-							res.push(ls);
-						}
+						const res: IListSource[] = domain.ylide.core.getListSources(readingSession, [
+							{
+								type: BlockchainSourceType.DIRECT,
+								recipient: account.uint256Address,
+								sender: sender || null,
+							},
+						]);
+						// for (const blockchain of Object.keys(blockchains)) {
+						// 	const reader = blockchains[blockchain];
+						// 	const ls = readingSession.listSource(
+						// 		{
+						// 			blockchain,
+						// 			type: BlockchainSourceType.DIRECT,
+						// 			recipient: account.uint256Address,
+						// 			sender: sender || null,
+						// 		},
+						// 		reader,
+						// 	);
+						// 	accountSourceMatch.set(ls, { account, reader });
+						// 	res.push(ls);
+						// }
 						return res;
 					})
 					.flat();
 			} else if (folderId === FolderId.Sent) {
 				return activeAccounts
 					.map(account => {
-						const res: IListSource[] = [];
-						for (const blockchain of account.appropriateBlockchains()) {
-							const reader = blockchain.reader;
-							const ls = readingSession.listSource(
-								{
-									blockchain: blockchain.factory.blockchain,
-									type: BlockchainSourceType.DIRECT,
-									recipient: account.sentAddress,
-									sender: null,
-								},
-								reader,
-							);
-							accountSourceMatch.set(ls, { account, reader });
-							res.push(ls);
-						}
+						const res: IListSource[] = domain.ylide.core.getListSources(readingSession, [
+							{
+								type: BlockchainSourceType.DIRECT,
+								recipient: account.sentAddress,
+								sender: null,
+							},
+						]);
+						// const res: IListSource[] = [];
+						// for (const blockchain of account.appropriateBlockchains()) {
+						// 	const reader = blockchain.reader;
+						// 	const ls = readingSession.listSource(
+						// 		{
+						// 			blockchain: blockchain.factory.blockchain,
+						// 			type: BlockchainSourceType.DIRECT,
+						// 			recipient: account.sentAddress,
+						// 			sender: null,
+						// 		},
+						// 		reader,
+						// 	);
+						// 	accountSourceMatch.set(ls, { account, reader });
+						// 	res.push(ls);
+						// }
 						return res;
 					})
 					.flat();
@@ -173,21 +184,28 @@ export function useMailList(props?: UseMailListProps) {
 				return contactsV
 					.map(v =>
 						activeAccounts.map(account => {
-							const res: IListSource[] = [];
-							for (const blockchain of Object.keys(blockchains)) {
-								const reader = blockchains[blockchain];
-								const ls = readingSession.listSource(
-									{
-										blockchain,
-										type: BlockchainSourceType.DIRECT,
-										recipient: account.uint256Address,
-										sender: v.address,
-									},
-									reader,
-								);
-								accountSourceMatch.set(ls, { account, reader });
-								res.push(ls);
-							}
+							const res: IListSource[] = domain.ylide.core.getListSources(readingSession, [
+								{
+									type: BlockchainSourceType.DIRECT,
+									recipient: account.uint256Address,
+									sender: v.address,
+								},
+							]);
+							// const res: IListSource[] = [];
+							// for (const blockchain of Object.keys(blockchains)) {
+							// 	const reader = blockchains[blockchain];
+							// 	const ls = readingSession.listSource(
+							// 		{
+							// 			blockchain,
+							// 			type: BlockchainSourceType.DIRECT,
+							// 			recipient: account.uint256Address,
+							// 			sender: v.address,
+							// 		},
+							// 		reader,
+							// 	);
+							// 	accountSourceMatch.set(ls, { account, reader });
+							// 	res.push(ls);
+							// }
 							return res;
 						}),
 					)
@@ -336,18 +354,18 @@ export const useMailStore = create<MailStore>((set, get) => ({
 	readingSession: (() => {
 		const readingSession = new SourceReadingSession();
 
-		readingSession.sourceOptimizer = (subject, reader) => {
-			if (reader instanceof EthereumBlockchainController) {
-				return new IndexerListSource(
-					new EthereumListSource(reader, subject, 30000),
-					readingSession.indexerHub,
-					reader,
-					subject,
-				);
-			} else {
-				return new BlockchainListSource(reader, subject, 10000);
-			}
-		};
+		// readingSession.sourceOptimizer = (subject, reader) => {
+		// 	if (reader instanceof EthereumBlockchainController) {
+		// 		return new IndexerListSource(
+		// 			new EthereumListSource(reader, subject, 30000),
+		// 			readingSession.indexerHub,
+		// 			reader,
+		// 			subject,
+		// 		);
+		// 	} else {
+		// 		return new BlockchainListSource(reader, subject, 10000);
+		// 	}
+		// };
 
 		return readingSession;
 	})(),
@@ -384,7 +402,7 @@ export const useMailStore = create<MailStore>((set, get) => ({
 				return state.messagesContentById[pushMsg.msgId];
 			}
 
-			const content = await pushMsg.reader.retrieveMessageContentByMsgId(pushMsg.msgId);
+			const content = await pushMsg.reader.retrieveMessageContent(pushMsg.msg);
 			if (!content || content.corrupted) {
 				throw new Error('Content is not available or corrupted');
 			}
@@ -397,8 +415,8 @@ export const useMailStore = create<MailStore>((set, get) => ({
 		const content = await fetchMessageContent(pushMsg);
 
 		const result = pushMsg.msg.isBroadcast
-			? await domain.ylide.decryptBroadcastContent(pushMsg.msg, content)
-			: await domain.ylide.decryptMessageContent(pushMsg.recipient!.account, pushMsg.msg, content);
+			? await domain.ylide.core.decryptBroadcastContent(pushMsg.msg, content)
+			: await domain.ylide.core.decryptMessageContent(pushMsg.recipient!.account, pushMsg.msg, content);
 
 		const decodedMessage = {
 			msgId: pushMsg.msgId,
