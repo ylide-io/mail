@@ -63,7 +63,6 @@ export default class NewPasswordModal extends PureComponent<NewPasswordModalProp
 		if (this.props.wallet.factory.blockchainGroup === 'evm') {
 			const blockchainName = await this.props.wallet.controller.getCurrentBlockchain();
 			this.network = evmNameToNetwork(blockchainName);
-
 			await evmBalances.updateBalances(this.props.wallet, this.props.account.address);
 		}
 	}
