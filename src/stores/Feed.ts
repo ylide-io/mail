@@ -104,15 +104,14 @@ class Feed {
 		try {
 			console.log('fetch start');
 			const feedEndpoint =
-				false && document.location.hostname === 'localhost'
-					? 'http://localhost:8294'
-					: [
-							'https://fd1.ylide.io',
-							'https://fd2.ylide.io',
-							'https://fd3.ylide.io',
-							'https://fd4.ylide.io',
-							'https://fd5.ylide.io',
-					  ][Math.floor(Math.random() * 5)];
+				process.env.REACT_APP_FEED_SERVER ||
+				[
+					'https://fd1.ylide.io',
+					'https://fd2.ylide.io',
+					'https://fd3.ylide.io',
+					'https://fd4.ylide.io',
+					'https://fd5.ylide.io',
+				][Math.floor(Math.random() * 5)];
 			const response = await fetch(
 				`${feedEndpoint}/${needOld ? 'post' : 'new-post'}?categories=${encodeURIComponent(
 					categories.join(','),
