@@ -333,9 +333,7 @@ export const SelectWalletModal = observer(({ onClose }: SelectWalletModalProps) 
 
 											<div className="wallets-list">
 												{walletConnect.loading ? (
-													<>
-														<YlideLoader />
-													</>
+													<YlideLoader />
 												) : (
 													links
 														.filter(d =>
@@ -402,9 +400,7 @@ export const SelectWalletModal = observer(({ onClose }: SelectWalletModalProps) 
 
 										<div className="wallets-list">
 											{walletConnect.loading ? (
-												<>
-													<YlideLoader />
-												</>
+												<YlideLoader />
 											) : (
 												links
 													.filter(d => d.name.toLowerCase().includes(search.toLowerCase()))

@@ -2,27 +2,9 @@ import css from './ylideLoader.module.scss';
 
 export const YlideLoader = ({ reason }: { reason?: string }) => {
 	return (
-		<div
-			style={{
-				flexGrow: 1,
-				width: '100%',
-				height: '100%',
-				display: 'flex',
-				flexDirection: 'column',
-				alignItems: 'center',
-				justifyContent: 'center',
-				textAlign: 'center',
-			}}
-		>
-			<div style={{ transform: 'scale(1.2)' }}>
-				<svg
-					width="48"
-					height="58"
-					style={{ transform: 'scaleY(0.99)' }}
-					viewBox="0 0 267 321"
-					fill="black"
-					xmlns="http://www.w3.org/2000/svg"
-				>
+		<div className={css.root}>
+			<div className={css.loader}>
+				<svg width="48" height="58" viewBox="0 0 267 321" fill="black" xmlns="http://www.w3.org/2000/svg">
 					<path d="M119.014 33.769L86.5931 1.32588V0.719727C83.7901 5.95392 79.4719 10.255 74.2246 13.0368H74.8841L107.295 45.4697V45.5606C110.007 40.609 114.081 36.5103 119.014 33.769Z" />
 					<path d="M180.613 1.32588V1.13221C183.42 6.17989 187.648 10.3285 192.757 13.0368H192.322L159.911 45.4697V45.9795C157.22 40.8741 153.093 36.6433 148.067 33.825H148.136L180.613 1.32588Z" />
 					<path d="M125.331 88.5928V176.886C127.924 176.15 130.661 175.756 133.491 175.756C136.408 175.756 139.227 176.175 141.892 176.955V88.5232C139.227 89.3035 136.408 89.722 133.491 89.722C130.661 89.722 127.924 89.3283 125.331 88.5928Z" />
@@ -33,14 +15,10 @@ export const YlideLoader = ({ reason }: { reason?: string }) => {
 					<path d="M233.279 118.899V119.962C230.482 114.519 226.062 110.048 220.658 107.188H221.57L253.887 74.8664C256.752 79.7902 260.986 83.8194 266.067 86.4332H265.74L233.279 118.899Z" />
 				</svg>
 
-				<div className={css.loader} style={{ marginLeft: 3, marginTop: -68.5 }}>
-					{(() => [...new Array(9)].map((_, i) => <div key={i} />))()}
-				</div>
+				<div className={css.dots}>{(() => [...new Array(9)].map((_, i) => <div key={i} />))()}</div>
 			</div>
 
-			{reason ? (
-				<div style={{ fontSize: 20, marginTop: 60, paddingLeft: 20, paddingRight: 20 }}>{reason}</div>
-			) : null}
+			{reason != null && <div className={css.reason}>{reason}</div>}
 		</div>
 	);
 };
