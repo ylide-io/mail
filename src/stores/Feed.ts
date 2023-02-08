@@ -1,5 +1,6 @@
 import { makeObservable, observable } from 'mobx';
 
+import { FeedServerApi } from '../api/feedServerApi';
 import { analytics } from './Analytics';
 
 export enum FeedCategory {
@@ -99,33 +100,10 @@ class Feed {
 		firstPostId: string | null,
 		length: number,
 		needOld: boolean = true,
-	): Promise<{ result: boolean; data: null | { moreAvailable: boolean; newPosts: number; items: FeedPost[] } }> {
+	): Promise<FeedServerApi.GetPostsResponse> {
 		this.loading = true;
 		try {
-			console.log('fetch start');
-			const feedEndpoint =
-				process.env.REACT_APP_FEED_SERVER ||
-				[
-					'https://fd1.ylide.io',
-					'https://fd2.ylide.io',
-					'https://fd3.ylide.io',
-					'https://fd4.ylide.io',
-					'https://fd5.ylide.io',
-				][Math.floor(Math.random() * 5)];
-			const response = await fetch(
-				`${feedEndpoint}/${needOld ? 'post' : 'new-post'}?categories=${encodeURIComponent(
-					categories.join(','),
-				)}&sourceId=${sourceId || ''}&lastPostId=${
-					lastPostId ? encodeURIComponent(lastPostId) : 'null'
-				}&firstPostId=${firstPostId ? encodeURIComponent(firstPostId) : 'null'}&length=${encodeURIComponent(
-					String(length),
-				)}`,
-				{
-					method: 'GET',
-				},
-			);
-			console.log('fetch end');
-			return await response.json();
+			return await FeedServerApi.getPosts(categories, sourceId, lastPostId, firstPostId, length, needOld);
 		} catch {
 			this.errorLoading = true;
 			return { result: false, data: null };
