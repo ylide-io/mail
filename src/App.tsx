@@ -17,6 +17,7 @@ import { NewWalletsPage } from './pages/NewWalletsPage';
 import { SettingsPage } from './pages/SettingsPage/SettingsPage';
 import { TestPage } from './pages/TestPage/TestPage';
 import { analytics } from './stores/Analytics';
+import { browserStorage } from './stores/browserStorage';
 import domain from './stores/Domain';
 import { FolderId } from './stores/MailList';
 import modals from './stores/Modals';
@@ -72,14 +73,12 @@ const App = observer(() => {
 		);
 	}
 
-	const canSkipRegistration = localStorage.getItem('can_skip_registration') === 'true';
-
 	if (
 		domain.accounts.isFirstTime &&
 		location.pathname !== '/test' &&
 		location.pathname !== '/wallets' &&
 		location.pathname !== '/admin' &&
-		(!location.pathname.startsWith('/feed/') || !canSkipRegistration)
+		(!location.pathname.startsWith('/feed/') || !browserStorage.canSkipRegistration)
 	) {
 		return <Navigate to={`/wallets${location.search ? location.search : ''}`} state={{ from: location }} replace />;
 	}
