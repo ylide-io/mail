@@ -1,6 +1,6 @@
 import { createSearchParams } from 'react-router-dom';
 
-import { FeedPost } from '../stores/Feed';
+import { FeedPost, FeedSource } from '../stores/Feed';
 
 export namespace FeedServerApi {
 	export const getUrl = () =>
@@ -37,6 +37,32 @@ export namespace FeedServerApi {
 		};
 
 		const response = await fetch(`${endpoint}?${createSearchParams(search).toString()}`);
+
+		return await response.json();
+	}
+
+	export interface GetSourcesResponse {
+		sources: FeedSource[];
+	}
+
+	export async function getSources(): Promise<GetSourcesResponse> {
+		const response = await fetch(`${getUrl()}/source`);
+
+		return await response.json();
+	}
+
+	export interface CreateSourceListResponse {
+		sourceListId: string;
+	}
+
+	export async function createSourceList(sourceIds: string[]): Promise<CreateSourceListResponse> {
+		const response = await fetch(`${getUrl()}/source-list/create`, {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json',
+			},
+			body: JSON.stringify({ sourceIds }),
+		});
 
 		return await response.json();
 	}

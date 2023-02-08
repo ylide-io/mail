@@ -1,8 +1,14 @@
 import { makeAutoObservable } from 'mobx';
 
+export interface FeedSourceSettings {
+	listId: string;
+	sourceIds: string[];
+}
+
 enum BrowserStorageKey {
 	CAN_SKIP_REGISTRATION = 'can_skip_registration',
 	QUEST3 = 'quest3',
+	FEED_SOURCE_SETTINGS = 'ylide_feedSourceSettings',
 }
 
 class BrowserStorage {
@@ -34,6 +40,23 @@ class BrowserStorage {
 	set quest3(value: boolean) {
 		localStorage.setItem(BrowserStorageKey.QUEST3, value.toString());
 		this._quest3 = value;
+	}
+
+	//
+
+	private _feedSourceSettings: FeedSourceSettings | undefined = localStorage.getItem(
+		BrowserStorageKey.FEED_SOURCE_SETTINGS,
+	)
+		? JSON.parse(localStorage.getItem(BrowserStorageKey.FEED_SOURCE_SETTINGS)!)
+		: undefined;
+
+	get feedSourceSettings() {
+		return this._feedSourceSettings;
+	}
+
+	set feedSourceSettings(value: FeedSourceSettings | undefined) {
+		localStorage.setItem(BrowserStorageKey.FEED_SOURCE_SETTINGS, JSON.stringify(value));
+		this._feedSourceSettings = value;
 	}
 }
 

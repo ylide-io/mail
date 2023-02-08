@@ -63,14 +63,14 @@
 }
 
 .root_primary {
-	color: #fff;
-	background: #1890ff;
-	border-color: #1890ff;
+	color: var(--on-accent2-color);
+	background: var(--accent2-color);
+	border-color: var(--accent2-color);
 
 	&:hover,
 	&:focus-visible {
-		background: darken(#1890ff, 15%);
-		border-color: darken(#1890ff, 15%);
+		background: var(--accent2-hover-color);
+		border-color: var(--accent2-hover-color);
 	}
 }
 

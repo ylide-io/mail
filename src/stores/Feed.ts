@@ -67,6 +67,14 @@ export interface FeedPost {
 	embeds: FeedPostEmbed[];
 }
 
+export interface FeedSource {
+	id: string;
+	category: FeedCategory;
+	name: string;
+	link: string;
+	type: string;
+}
+
 class Feed {
 	@observable posts: FeedPost[] = [];
 	@observable loaded = false;
