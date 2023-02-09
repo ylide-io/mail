@@ -1,5 +1,12 @@
 import { Rect } from './rect';
 
+export function scrollWindowToTop() {
+	window.scrollTo({
+		top: 0,
+		behavior: 'smooth',
+	});
+}
+
 export function getViewportRect() {
 	return new Rect(
 		window.scrollX,

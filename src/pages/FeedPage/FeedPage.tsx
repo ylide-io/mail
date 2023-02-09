@@ -2,7 +2,7 @@ import { UserOutlined } from '@ant-design/icons';
 import Avatar from 'antd/lib/avatar/avatar';
 import clsx from 'clsx';
 import { observer } from 'mobx-react';
-import React, { MouseEvent, useCallback, useEffect, useRef, useState } from 'react';
+import React, { MouseEvent, useEffect, useRef, useState } from 'react';
 import { useLocation, useParams } from 'react-router-dom';
 
 import { ActionButton, ActionButtonStyle } from '../../components/ActionButton/ActionButton';
@@ -20,6 +20,7 @@ import { twitterSourceIcon } from '../../icons/static/twitterSourceIcon';
 import GalleryModal from '../../modals/GalleryModal';
 import feed, { FeedCategory, FeedPost, LinkType } from '../../stores/Feed';
 import { useNav } from '../../utils/navigate';
+import { scrollWindowToTop } from '../../utils/ui';
 import css from './FeedPage.module.scss';
 
 const sourceIcon: Record<LinkType, JSX.Element> = {
@@ -170,19 +171,11 @@ export const FeedPage = observer(() => {
 	const sourceId = searchParams?.get('sourceId') || null;
 	const navigate = useNav();
 
-	const scrollToTop = useCallback(() => {
-		window.scrollTo({
-			top: 0,
-			behavior: 'smooth',
-		});
-	}, []);
-
 	useEffect(() => {
-		scrollToTop();
+		scrollWindowToTop();
 
-		// noinspection JSIgnoredPromiseFromCall
-		feed.loadCategory(category!, sourceId);
-	}, [category, scrollToTop, sourceId]);
+		feed.loadCategory(category!, sourceId).then();
+	}, [category, sourceId]);
 
 	useEffect(() => {
 		const timer = setInterval(async () => {
@@ -201,12 +194,10 @@ export const FeedPage = observer(() => {
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [feed.loading, feed.moreAvailable]);
 
-	const showNewPosts = useCallback(() => {
-		scrollToTop();
-
-		// noinspection JSIgnoredPromiseFromCall
-		feed.loadNew();
-	}, [scrollToTop]);
+	const showNewPosts = async () => {
+		scrollWindowToTop();
+		await feed.loadNew();
+	};
 
 	let title;
 
@@ -245,7 +236,7 @@ export const FeedPage = observer(() => {
 					</div>
 
 					{newPostsVisible && (
-						<div className={css.feedScrollToTop} onClick={scrollToTop}>
+						<div className={css.feedScrollToTop} onClick={() => scrollWindowToTop()}>
 							<CaretDown color="black" style={{ width: 40, height: 40 }} />
 						</div>
 					)}
