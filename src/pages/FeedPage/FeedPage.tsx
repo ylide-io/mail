@@ -6,6 +6,7 @@ import React, { MouseEvent, useEffect, useRef, useState } from 'react';
 import { useLocation, useParams } from 'react-router-dom';
 
 import { ActionButton, ActionButtonStyle } from '../../components/ActionButton/ActionButton';
+import { ErrorMessage } from '../../components/errorMessage/errorMessage';
 import { GenericLayout } from '../../components/genericLayout/genericLayout';
 import { ReadableDate } from '../../components/readableDate/readableDate';
 import { smallButtonIcons } from '../../components/smallButton/smallButton';
@@ -267,13 +268,15 @@ export const FeedPage = observer(() => {
 									</div>
 								)}
 							</>
+						) : feed.errorLoading ? (
+							<ErrorMessage>
+								Sorry, an error occured during feed loading. Please, try again later.
+							</ErrorMessage>
 						) : (
 							<div style={{ marginTop: 30 }}>
 								<YlideLoader reason="Your feed is loading..." />
 							</div>
 						)}
-
-						{feed.errorLoading && `Sorry, an error occured during feed loading. Please, try again later.`}
 					</div>
 				</div>
 			</div>
