@@ -97,13 +97,16 @@ class Feed {
 		this.loadCategory(FeedCategory.MAIN, null).then();
 	}
 
-	async genericLoad(params: {
-		needOld: boolean;
-		length: number;
-		sourceId?: string;
-		lastPostId?: string;
-		firstPostId?: string;
-	}): Promise<FeedServerApi.GetPostsResponse | undefined> {
+	async genericLoad(
+		params: {
+			needOld: boolean;
+			length: number;
+			sourceId?: string;
+			lastPostId?: string;
+			firstPostId?: string;
+		},
+		isRetryWithNewSourceList: boolean = false,
+	): Promise<FeedServerApi.GetPostsResponse | undefined> {
 		try {
 			this.loading = true;
 
@@ -130,6 +133,25 @@ class Feed {
 
 			return response;
 		} catch (e) {
+			if (
+				e instanceof FeedServerApi.FeedServerError &&
+				e.code === FeedServerApi.ErrorCode.SOURCE_LIST_NOT_FOUND &&
+				!isRetryWithNewSourceList
+			) {
+				const sourceIds = browserStorage.feedSourceSettings?.sourceIds;
+				if (sourceIds) {
+					try {
+						const data = await FeedServerApi.createSourceList(sourceIds);
+						browserStorage.feedSourceSettings = {
+							listId: data.sourceListId,
+							sourceIds,
+						};
+
+						return await this.genericLoad(params, true);
+					} catch (e) {}
+				}
+			}
+
 			this.errorLoading = true;
 		} finally {
 			this.loading = false;
