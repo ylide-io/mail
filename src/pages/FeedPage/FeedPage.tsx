@@ -12,8 +12,8 @@ import { smallButtonIcons } from '../../components/smallButton/smallButton';
 import { YlideLoader } from '../../components/ylideLoader/ylideLoader';
 import { YlideButton } from '../../controls/YlideButton';
 import { CaretDown } from '../../icons/CaretDown';
+import { ReactComponent as ExternalSvg } from '../../icons/external.svg';
 import { discordSourceIcon } from '../../icons/static/discordSourceIcon';
-import { linkIcon } from '../../icons/static/linkIcon';
 import { mirrorSourceIcon } from '../../icons/static/mirrorSourceIcon';
 import { telegramSourceIcon } from '../../icons/static/telegramSourceIcon';
 import { twitterSourceIcon } from '../../icons/static/twitterSourceIcon';
@@ -83,7 +83,7 @@ const FeedPostControl = observer(({ post }: { post: FeedPost }) => {
 				<ReadableDate className={css.postDate} value={Date.parse(post.date)} />
 				{!!post.sourceLink && (
 					<a className={css.postExternalButton} href={post.sourceLink} target="_blank" rel="noreferrer">
-						{linkIcon}
+						<ExternalSvg />
 					</a>
 				)}
 			</div>
