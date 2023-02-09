@@ -1,6 +1,5 @@
-import { createSearchParams } from 'react-router-dom';
-
 import { FeedPost, FeedSource } from '../stores/Feed';
+import { createCleanSerachParams } from '../utils/url';
 
 export namespace FeedServerApi {
 	export const getUrl = () =>
@@ -13,30 +12,25 @@ export namespace FeedServerApi {
 			'https://fd5.ylide.io',
 		][Math.floor(Math.random() * 5)];
 
+	export interface GetPostsParams {
+		categories: string[];
+		needOld: boolean;
+		length: number;
+		sourceId?: string;
+		sourceListId?: string;
+		lastPostId?: string;
+		firstPostId?: string;
+	}
+
 	export interface GetPostsResponse {
 		result: boolean;
 		data: { moreAvailable: boolean; newPosts: number; items: FeedPost[] } | null;
 	}
 
-	export async function getPosts(
-		categories: string[],
-		sourceId: string | null,
-		lastPostId: string | null,
-		firstPostId: string | null,
-		length: number,
-		needOld: boolean = true,
-	): Promise<GetPostsResponse> {
-		const endpoint = `${getUrl()}/${needOld ? 'post' : 'new-post'}`;
+	export async function getPosts(params: GetPostsParams): Promise<GetPostsResponse> {
+		const endpoint = `${getUrl()}/${params.needOld ? 'post' : 'new-post'}`;
 
-		const search: Record<string, any> = {
-			categories: categories.join(','),
-			sourceId: sourceId || '',
-			lastPostId: lastPostId || 'null',
-			firstPostId: firstPostId || 'null',
-			length,
-		};
-
-		const response = await fetch(`${endpoint}?${createSearchParams(search).toString()}`);
+		const response = await fetch(`${endpoint}?${createCleanSerachParams(params)}`);
 
 		return await response.json();
 	}

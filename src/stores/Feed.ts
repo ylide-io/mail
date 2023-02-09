@@ -106,17 +106,10 @@ class Feed {
 		}
 	}
 
-	async genericLoad(
-		categories: string[],
-		sourceId: string | null,
-		lastPostId: string | null,
-		firstPostId: string | null,
-		length: number,
-		needOld: boolean = true,
-	): Promise<FeedServerApi.GetPostsResponse> {
+	async genericLoad(params: FeedServerApi.GetPostsParams): Promise<FeedServerApi.GetPostsResponse> {
 		this.loading = true;
 		try {
-			return await FeedServerApi.getPosts(categories, sourceId, lastPostId, firstPostId, length, needOld);
+			return await FeedServerApi.getPosts(params);
 		} catch {
 			this.errorLoading = true;
 			return { result: false, data: null };
@@ -130,14 +123,13 @@ class Feed {
 		this.selectedCategory = id;
 		this.sourceId = sourceId;
 		this.loaded = false;
-		const result = await this.genericLoad(
-			this.getCategories(this.selectedCategory),
-			this.sourceId,
-			null, // '1599259863087190016',
-			null, // '1599259863087190016',
-			10,
-			true,
-		);
+		const result = await this.genericLoad({
+			categories: this.getCategories(this.selectedCategory),
+			needOld: true,
+			length: 10,
+			sourceId: this.sourceId || undefined,
+		});
+
 		if (result.result && result.data) {
 			this.loaded = true;
 			this.posts = result.data.items;
@@ -148,14 +140,14 @@ class Feed {
 
 	async loadMore(length: number) {
 		analytics.feedPageLoaded(this.selectedCategory, Math.floor(this.posts.length / 10) + 1);
-		const result = await this.genericLoad(
-			this.getCategories(this.selectedCategory),
-			this.sourceId,
-			this.posts.at(-1)?.id || null, // '1599259863087190016',
-			this.posts.at(0)?.id || null, // '1599259863087190016',
+		const result = await this.genericLoad({
+			categories: this.getCategories(this.selectedCategory),
+			needOld: true,
 			length,
-			true,
-		);
+			sourceId: this.sourceId || undefined,
+			lastPostId: this.posts.at(-1)?.id,
+			firstPostId: this.posts.at(0)?.id,
+		});
 		if (result.result && result.data) {
 			this.loaded = true;
 			this.posts.push(...result.data.items);
@@ -165,14 +157,14 @@ class Feed {
 	}
 
 	async loadNew() {
-		const result = await this.genericLoad(
-			this.getCategories(this.selectedCategory),
-			this.sourceId,
-			this.posts.at(-1)?.id || null, // '1599259863087190016',
-			this.posts.at(0)?.id || null, // '1599259863087190016',
-			10,
-			false,
-		);
+		const result = await this.genericLoad({
+			categories: this.getCategories(this.selectedCategory),
+			needOld: false,
+			length: 10,
+			sourceId: this.sourceId || undefined,
+			lastPostId: this.posts.at(-1)?.id,
+			firstPostId: this.posts.at(0)?.id,
+		});
 		if (result.result && result.data) {
 			this.loaded = true;
 			this.posts.unshift(...result.data.items);
