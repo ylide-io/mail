@@ -2,6 +2,7 @@ import { makeObservable, observable } from 'mobx';
 
 import { FeedServerApi } from '../api/feedServerApi';
 import { analytics } from './Analytics';
+import { browserStorage } from './browserStorage';
 
 export enum FeedCategory {
 	MAIN = 'main',
@@ -96,23 +97,40 @@ class Feed {
 		this.loadCategory(FeedCategory.MAIN, null).then();
 	}
 
-	getCategories(id: string) {
-		if (id === FeedCategory.MAIN) {
-			return this.mainCategories;
-		} else if (id === FeedCategory.ALL) {
-			return nonSyntheticFeedCategories;
-		} else {
-			return [id];
-		}
-	}
-
-	async genericLoad(params: FeedServerApi.GetPostsParams): Promise<FeedServerApi.GetPostsResponse> {
-		this.loading = true;
+	async genericLoad(params: {
+		needOld: boolean;
+		length: number;
+		sourceId?: string;
+		lastPostId?: string;
+		firstPostId?: string;
+	}): Promise<FeedServerApi.GetPostsResponse | undefined> {
 		try {
-			return await FeedServerApi.getPosts(params);
-		} catch {
+			this.loading = true;
+
+			const selectedCategory = this.selectedCategory;
+			const categories =
+				selectedCategory === FeedCategory.MAIN
+					? this.mainCategories
+					: selectedCategory === FeedCategory.ALL
+					? nonSyntheticFeedCategories
+					: [selectedCategory];
+
+			const sourceListId =
+				selectedCategory === FeedCategory.MAIN && !params.sourceId
+					? browserStorage.feedSourceSettings?.listId
+					: undefined;
+
+			const response = await FeedServerApi.getPosts({
+				...params,
+				categories,
+				sourceListId,
+			});
+
+			this.loaded = true;
+
+			return response;
+		} catch (e) {
 			this.errorLoading = true;
-			return { result: false, data: null };
 		} finally {
 			this.loading = false;
 		}
@@ -120,54 +138,53 @@ class Feed {
 
 	async loadCategory(id: string, sourceId: string | null) {
 		analytics.feedPageLoaded(id, 1);
+
 		this.selectedCategory = id;
 		this.sourceId = sourceId;
 		this.loaded = false;
-		const result = await this.genericLoad({
-			categories: this.getCategories(this.selectedCategory),
+
+		const data = await this.genericLoad({
 			needOld: true,
 			length: 10,
 			sourceId: this.sourceId || undefined,
 		});
 
-		if (result.result && result.data) {
-			this.loaded = true;
-			this.posts = result.data.items;
-			this.moreAvailable = result.data.moreAvailable;
-			this.newPosts = result.data.newPosts;
+		if (data) {
+			this.posts = data.items;
+			this.moreAvailable = data.moreAvailable;
+			this.newPosts = data.newPosts;
 		}
 	}
 
 	async loadMore(length: number) {
 		analytics.feedPageLoaded(this.selectedCategory, Math.floor(this.posts.length / 10) + 1);
-		const result = await this.genericLoad({
-			categories: this.getCategories(this.selectedCategory),
+
+		const data = await this.genericLoad({
 			needOld: true,
 			length,
 			sourceId: this.sourceId || undefined,
 			lastPostId: this.posts.at(-1)?.id,
 			firstPostId: this.posts.at(0)?.id,
 		});
-		if (result.result && result.data) {
-			this.loaded = true;
-			this.posts.push(...result.data.items);
-			this.moreAvailable = result.data.moreAvailable;
-			this.newPosts = result.data.newPosts;
+
+		if (data) {
+			this.posts.push(...data.items);
+			this.moreAvailable = data.moreAvailable;
+			this.newPosts = data.newPosts;
 		}
 	}
 
 	async loadNew() {
-		const result = await this.genericLoad({
-			categories: this.getCategories(this.selectedCategory),
+		const data = await this.genericLoad({
 			needOld: false,
 			length: 10,
 			sourceId: this.sourceId || undefined,
 			lastPostId: this.posts.at(-1)?.id,
 			firstPostId: this.posts.at(0)?.id,
 		});
-		if (result.result && result.data) {
-			this.loaded = true;
-			this.posts.unshift(...result.data.items);
+
+		if (data) {
+			this.posts.unshift(...data.items);
 			this.newPosts = 0;
 		}
 	}
