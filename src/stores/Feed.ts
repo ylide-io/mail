@@ -91,6 +91,11 @@ class Feed {
 	@observable moreAvailable = false;
 	@observable errorLoading = false;
 
+	constructor() {
+		makeObservable(this);
+		this.loadCategory(FeedCategory.MAIN, null).then();
+	}
+
 	getCategories(id: string) {
 		if (id === FeedCategory.MAIN) {
 			return this.mainCategories;
@@ -173,11 +178,6 @@ class Feed {
 			this.posts.unshift(...result.data.items);
 			this.newPosts = 0;
 		}
-	}
-
-	constructor() {
-		makeObservable(this);
-		this.loadCategory(FeedCategory.MAIN, null);
 	}
 }
 
