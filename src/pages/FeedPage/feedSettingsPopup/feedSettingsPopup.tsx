@@ -1,4 +1,4 @@
-import { Fragment, PropsWithChildren, useLayoutEffect, useMemo, useState } from 'react';
+import { Fragment, useLayoutEffect, useMemo, useState } from 'react';
 import { useMutation, useQuery } from 'react-query';
 
 import { FeedServerApi } from '../../../api/feedServerApi';
@@ -8,22 +8,32 @@ import { ErrorMessage } from '../../../components/errorMessage/errorMessage';
 import { Modal } from '../../../components/modal/modal';
 import { OverlappingLoader } from '../../../components/overlappingLoader/overlappingLoader';
 import { Spinner } from '../../../components/spinner/spinner';
+import { ReactComponent as ExternalSvg } from '../../../icons/external.svg';
 import { browserStorage } from '../../../stores/browserStorage';
 import { FeedCategory, FeedSource, getFeedCategoryName, nonSyntheticFeedCategories } from '../../../stores/Feed';
 import { toggleArrayItem } from '../../../utils/array';
 import { invariant } from '../../../utils/invariant';
 import css from './feedSettingsPopup.module.scss';
 
-interface SourceItemProps extends PropsWithChildren {
+interface SourceItemProps {
+	name: string;
+	link?: string;
 	isChecked?: boolean;
 	onChange?: (isChecked: boolean) => void;
 }
 
-export function SourceItem({ children, isChecked, onChange }: SourceItemProps) {
+export function SourceItem({ name, link, isChecked, onChange }: SourceItemProps) {
 	return (
 		<label className={css.item}>
 			<CheckBox isChecked={isChecked} onChange={onChange} />
-			{children}
+
+			<div className={css.itemText}>{name}</div>
+
+			{link && (
+				<a className={css.itemLink} href={link} target="_blank" rel="noreferrer">
+					<ExternalSvg />
+				</a>
+			)}
 		</label>
 	);
 }
@@ -93,6 +103,7 @@ export function FeedSettingsPopup({ onClose }: FeedSettingsPopupProps) {
 						return (
 							<Fragment key={category}>
 								<SourceItem
+									name={getFeedCategoryName(category)}
 									isChecked={isAllSelectedInCategory}
 									onChange={isChecked => {
 										const categoryUnselected =
@@ -102,23 +113,21 @@ export function FeedSettingsPopup({ onClose }: FeedSettingsPopupProps) {
 											isChecked ? categoryUnselected.concat(sourceIds) : categoryUnselected,
 										);
 									}}
-								>
-									{getFeedCategoryName(category)}
-								</SourceItem>
+								/>
 
 								<div className={css.subList}>
 									{sources.map(source => (
 										<SourceItem
 											key={source.id}
+											name={source.name}
+											link={source.link}
 											isChecked={selectedSourceIds?.includes(source.id)}
 											onChange={isChecked =>
 												setSelectedSourceIds(
 													toggleArrayItem(selectedSourceIds || [], source.id, isChecked),
 												)
 											}
-										>
-											{source.name}
-										</SourceItem>
+										/>
 									))}
 								</div>
 							</Fragment>

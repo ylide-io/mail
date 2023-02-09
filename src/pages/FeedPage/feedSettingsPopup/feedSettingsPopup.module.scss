@@ -4,8 +4,8 @@ $hPadding: 20px;
 	display: flex;
 	flex-direction: column;
 	padding: 16px $hPadding;
-	width: 340px;
-	height: 440px;
+	width: 480px;
+	height: 640px;
 	max-width: 100%;
 	max-height: 100%;
 }
@@ -36,10 +36,44 @@ $hPadding: 20px;
 
 .item {
 	display: grid;
-	grid-template-columns: auto 1fr;
+	grid-template-columns: auto 1fr auto;
 	grid-gap: 8px;
 	align-items: center;
-	padding: 4px $hPadding;
+	padding: 4px 16px 4px $hPadding;
+}
+
+.itemText {
+	@include truncate-text;
+}
+
+.itemLink {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	margin: -14px 0;
+	width: 28px;
+	height: 28px;
+	border-radius: 100%;
+	opacity: 0;
+	transition: opacity 200ms;
+
+	&:hover {
+		background-color: var(--surface-hover-color);
+
+		> svg {
+			fill: var(--accent2-hover-color);
+		}
+	}
+
+	> svg {
+		width: 20px;
+		height: 20px;
+		fill: var(--secondary-text-color);
+	}
+
+	.item:hover & {
+		opacity: 1;
+	}
 }
 
 .error {

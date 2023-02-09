@@ -30,6 +30,7 @@ const App = observer(() => {
 		new QueryClient({
 			defaultOptions: {
 				queries: {
+					cacheTime: 0,
 					retry: false,
 					refetchOnWindowFocus: false,
 				},
