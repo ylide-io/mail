@@ -9,6 +9,7 @@ import { Modal } from '../../../components/modal/modal';
 import { OverlappingLoader } from '../../../components/overlappingLoader/overlappingLoader';
 import { Spinner } from '../../../components/spinner/spinner';
 import { ReactComponent as ExternalSvg } from '../../../icons/external.svg';
+import { ReactComponent as SelectAllSvg } from '../../../icons/selectAll.svg';
 import { browserStorage } from '../../../stores/browserStorage';
 import { FeedCategory, FeedSource, getFeedCategoryName, nonSyntheticFeedCategories } from '../../../stores/Feed';
 import { toggleArrayItem } from '../../../utils/array';
@@ -78,15 +79,18 @@ export function FeedSettingsPopup({ onClose }: FeedSettingsPopupProps) {
 		return categoryToSourceList;
 	}, [data?.sources]);
 
+	const allSourceIds = useMemo(
+		() => list && Object.values(list).reduce((prev, curr) => prev.concat(curr.map(s => s.id)), [] as string[]),
+		[list],
+	);
+
 	const [selectedSourceIds, setSelectedSourceIds] = useState(browserStorage.feedSourceSettings?.sourceIds);
 
 	useLayoutEffect(() => {
-		if (selectedSourceIds == null && list) {
-			setSelectedSourceIds(
-				Object.values(list).reduce((prev, curr) => prev.concat(curr.map(s => s.id)), [] as string[]),
-			);
+		if (selectedSourceIds == null && allSourceIds) {
+			setSelectedSourceIds(allSourceIds);
 		}
-	}, [list, selectedSourceIds]);
+	}, [allSourceIds, selectedSourceIds]);
 
 	return (
 		<Modal className={css.root} onClose={onClose}>
@@ -156,7 +160,23 @@ export function FeedSettingsPopup({ onClose }: FeedSettingsPopupProps) {
 					Cancel
 				</ActionButton>
 
-				{createSourceListMutation.isLoading && <Spinner className={css.footerRight} />}
+				{createSourceListMutation.isLoading ? (
+					<Spinner className={css.footerRight} />
+				) : (
+					list && (
+						<ActionButton
+							className={css.footerRight}
+							style={ActionButtonStyle.Lite}
+							icon={<SelectAllSvg />}
+							title="Select All"
+							onClick={() => {
+								setSelectedSourceIds(
+									selectedSourceIds?.length !== allSourceIds?.length ? allSourceIds : [],
+								);
+							}}
+						/>
+					)
+				)}
 			</div>
 		</Modal>
 	);

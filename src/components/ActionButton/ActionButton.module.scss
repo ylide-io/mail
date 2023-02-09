@@ -54,6 +54,7 @@
 // STYLES
 
 .root_default {
+	color: var(--primary-text-color);
 	border-color: var(--lite-button-border-color);
 
 	&:hover,
@@ -81,5 +82,15 @@
 	&:hover,
 	&:focus-visible {
 		background: var(--error-button-hover-background-color);
+	}
+}
+
+.root_lite {
+	color: var(--primary-text-color);
+	border-color: transparent;
+
+	&:hover,
+	&:focus-visible {
+		background: var(--surface-hover-color);
 	}
 }
