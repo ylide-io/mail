@@ -76,6 +76,7 @@
 		"react-query": "^3.39.3",
 		"react-router-dom": "^6.3.0",
 		"react-select": "^5.3.2",
+		"react-share": "^4.4.1",
 		"react-svg": "^15.0.3",
 		"react-virtualized-auto-sizer": "^1.0.7",
 		"react-window": "^1.8.7",
