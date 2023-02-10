@@ -177,7 +177,11 @@
 	color: var(--secondary-text-color);
 
 	&:hover {
-		color: var(--primary-text-color);
+		color: var(--accent2-hover-color);
+	}
+
+	> svg {
+		fill: currentColor;
 	}
 }
 

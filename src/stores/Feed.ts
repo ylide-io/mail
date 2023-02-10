@@ -1,6 +1,8 @@
 import { makeObservable, observable } from 'mobx';
 
+import { FeedServerApi } from '../api/feedServerApi';
 import { analytics } from './Analytics';
+import { browserStorage } from './browserStorage';
 
 export enum FeedCategory {
 	MAIN = 'main',
@@ -66,6 +68,14 @@ export interface FeedPost {
 	embeds: FeedPostEmbed[];
 }
 
+export interface FeedSource {
+	id: string;
+	category: FeedCategory;
+	name: string;
+	link: string;
+	type: string;
+}
+
 class Feed {
 	@observable posts: FeedPost[] = [];
 	@observable loaded = false;
@@ -76,122 +86,131 @@ class Feed {
 		localStorage.getItem('t_main_categories') || JSON.stringify(nonSyntheticFeedCategories),
 	);
 
-	@observable sourceId: string | null = null;
+	@observable sourceId: string | undefined;
 
 	@observable newPosts: number = 0;
 	@observable moreAvailable = false;
 	@observable errorLoading = false;
 
-	getCategories(id: string) {
-		if (id === FeedCategory.MAIN) {
-			return this.mainCategories;
-		} else if (id === FeedCategory.ALL) {
-			return nonSyntheticFeedCategories;
-		} else {
-			return [id];
-		}
+	constructor() {
+		makeObservable(this);
+		this.loadCategory(FeedCategory.MAIN).then();
 	}
 
 	async genericLoad(
-		categories: string[],
-		sourceId: string | null,
-		lastPostId: string | null,
-		firstPostId: string | null,
-		length: number,
-		needOld: boolean = true,
-	): Promise<{ result: boolean; data: null | { moreAvailable: boolean; newPosts: number; items: FeedPost[] } }> {
-		this.loading = true;
+		params: {
+			needOld: boolean;
+			length: number;
+			sourceId?: string;
+			lastPostId?: string;
+			firstPostId?: string;
+		},
+		isRetryWithNewSourceList: boolean = false,
+	): Promise<FeedServerApi.GetPostsResponse | undefined> {
 		try {
-			console.log('fetch start');
-			const feedEndpoint =
-				process.env.REACT_APP_FEED_SERVER ||
-				[
-					'https://fd1.ylide.io',
-					'https://fd2.ylide.io',
-					'https://fd3.ylide.io',
-					'https://fd4.ylide.io',
-					'https://fd5.ylide.io',
-				][Math.floor(Math.random() * 5)];
-			const response = await fetch(
-				`${feedEndpoint}/${needOld ? 'post' : 'new-post'}?categories=${encodeURIComponent(
-					categories.join(','),
-				)}&sourceId=${sourceId || ''}&lastPostId=${
-					lastPostId ? encodeURIComponent(lastPostId) : 'null'
-				}&firstPostId=${firstPostId ? encodeURIComponent(firstPostId) : 'null'}&length=${encodeURIComponent(
-					String(length),
-				)}`,
-				{
-					method: 'GET',
-				},
-			);
-			console.log('fetch end');
-			return await response.json();
-		} catch {
+			this.loading = true;
+
+			const selectedCategory = this.selectedCategory;
+
+			const sourceListId =
+				selectedCategory === FeedCategory.MAIN && !params.sourceId
+					? browserStorage.feedSourceSettings?.listId
+					: undefined;
+
+			const categories = sourceListId
+				? undefined
+				: selectedCategory === FeedCategory.MAIN
+				? this.mainCategories
+				: selectedCategory === FeedCategory.ALL
+				? nonSyntheticFeedCategories
+				: [selectedCategory];
+
+			const response = await FeedServerApi.getPosts({
+				...params,
+				categories,
+				sourceListId,
+			});
+
+			this.loaded = true;
+
+			return response;
+		} catch (e) {
+			if (
+				e instanceof FeedServerApi.FeedServerError &&
+				e.code === FeedServerApi.ErrorCode.SOURCE_LIST_NOT_FOUND &&
+				!isRetryWithNewSourceList
+			) {
+				const sourceIds = browserStorage.feedSourceSettings?.sourceIds;
+				if (sourceIds) {
+					try {
+						const data = await FeedServerApi.createSourceList(sourceIds);
+						browserStorage.feedSourceSettings = {
+							listId: data.sourceListId,
+							sourceIds,
+						};
+
+						return await this.genericLoad(params, true);
+					} catch (e) {}
+				}
+			}
+
 			this.errorLoading = true;
-			return { result: false, data: null };
 		} finally {
 			this.loading = false;
 		}
 	}
 
-	async loadCategory(id: string, sourceId: string | null) {
+	async loadCategory(id: FeedCategory, sourceId?: string) {
 		analytics.feedPageLoaded(id, 1);
+
 		this.selectedCategory = id;
 		this.sourceId = sourceId;
 		this.loaded = false;
-		const result = await this.genericLoad(
-			this.getCategories(this.selectedCategory),
-			this.sourceId,
-			null, // '1599259863087190016',
-			null, // '1599259863087190016',
-			10,
-			true,
-		);
-		if (result.result && result.data) {
-			this.loaded = true;
-			this.posts = result.data.items;
-			this.moreAvailable = result.data.moreAvailable;
-			this.newPosts = result.data.newPosts;
+
+		const data = await this.genericLoad({
+			needOld: true,
+			length: 10,
+			sourceId,
+		});
+
+		if (data) {
+			this.posts = data.items;
+			this.moreAvailable = data.moreAvailable;
+			this.newPosts = data.newPosts;
 		}
 	}
 
 	async loadMore(length: number) {
 		analytics.feedPageLoaded(this.selectedCategory, Math.floor(this.posts.length / 10) + 1);
-		const result = await this.genericLoad(
-			this.getCategories(this.selectedCategory),
-			this.sourceId,
-			this.posts.at(-1)?.id || null, // '1599259863087190016',
-			this.posts.at(0)?.id || null, // '1599259863087190016',
+
+		const data = await this.genericLoad({
+			needOld: true,
 			length,
-			true,
-		);
-		if (result.result && result.data) {
-			this.loaded = true;
-			this.posts.push(...result.data.items);
-			this.moreAvailable = result.data.moreAvailable;
-			this.newPosts = result.data.newPosts;
+			sourceId: this.sourceId,
+			lastPostId: this.posts.at(-1)?.id,
+			firstPostId: this.posts.at(0)?.id,
+		});
+
+		if (data) {
+			this.posts.push(...data.items);
+			this.moreAvailable = data.moreAvailable;
+			this.newPosts = data.newPosts;
 		}
 	}
 
 	async loadNew() {
-		const result = await this.genericLoad(
-			this.getCategories(this.selectedCategory),
-			this.sourceId,
-			this.posts.at(-1)?.id || null, // '1599259863087190016',
-			this.posts.at(0)?.id || null, // '1599259863087190016',
-			10,
-			false,
-		);
-		if (result.result && result.data) {
-			this.loaded = true;
-			this.posts.unshift(...result.data.items);
+		const data = await this.genericLoad({
+			needOld: false,
+			length: 10,
+			sourceId: this.sourceId,
+			lastPostId: this.posts.at(-1)?.id,
+			firstPostId: this.posts.at(0)?.id,
+		});
+
+		if (data) {
+			this.posts.unshift(...data.items);
 			this.newPosts = 0;
 		}
-	}
-
-	constructor() {
-		makeObservable(this);
-		this.loadCategory(FeedCategory.MAIN, null);
 	}
 }
 

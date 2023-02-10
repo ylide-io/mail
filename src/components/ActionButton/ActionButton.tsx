@@ -6,23 +6,35 @@ import css from './ActionButton.module.scss';
 
 export enum ActionButtonStyle {
 	Default,
-	Dengerous,
 	Primary,
+	Dengerous,
+	Lite,
 }
 
 interface ActionButtonProps extends PropsWithChildren, PropsWithClassName {
 	style?: ActionButtonStyle;
 	icon?: ReactNode;
+	title?: string;
 	isDisabled?: boolean;
 	onClick?: React.MouseEventHandler<HTMLElement>;
 }
 
 // 'props' are needed to let AntD show Tooltips https://github.com/ant-design/ant-design/issues/15909
-export function ActionButton({ children, className, style, icon, isDisabled, onClick, ...props }: ActionButtonProps) {
+export function ActionButton({
+	children,
+	className,
+	style,
+	icon,
+	title,
+	isDisabled,
+	onClick,
+	...props
+}: ActionButtonProps) {
 	const styleClass = {
 		[ActionButtonStyle.Default]: css.root_default,
 		[ActionButtonStyle.Primary]: css.root_primary,
 		[ActionButtonStyle.Dengerous]: css.root_dangerous,
+		[ActionButtonStyle.Lite]: css.root_lite,
 	}[style || ActionButtonStyle.Default];
 
 	return (
@@ -36,6 +48,7 @@ export function ActionButton({ children, className, style, icon, isDisabled, onC
 				className,
 			)}
 			disabled={isDisabled}
+			title={title}
 			onClick={onClick}
 			{...props}
 		>

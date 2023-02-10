@@ -2,24 +2,27 @@ import { UserOutlined } from '@ant-design/icons';
 import Avatar from 'antd/lib/avatar/avatar';
 import clsx from 'clsx';
 import { observer } from 'mobx-react';
-import React, { MouseEvent, useCallback, useEffect, useRef, useState } from 'react';
+import React, { MouseEvent, useEffect, useRef, useState } from 'react';
 import { useLocation, useParams } from 'react-router-dom';
 
 import { ActionButton, ActionButtonStyle } from '../../components/ActionButton/ActionButton';
+import { ErrorMessage } from '../../components/errorMessage/errorMessage';
 import { GenericLayout } from '../../components/genericLayout/genericLayout';
 import { ReadableDate } from '../../components/readableDate/readableDate';
 import { smallButtonIcons } from '../../components/smallButton/smallButton';
 import { YlideLoader } from '../../components/ylideLoader/ylideLoader';
 import { YlideButton } from '../../controls/YlideButton';
 import { CaretDown } from '../../icons/CaretDown';
+import { ReactComponent as ExternalSvg } from '../../icons/external.svg';
 import { discordSourceIcon } from '../../icons/static/discordSourceIcon';
-import { linkIcon } from '../../icons/static/linkIcon';
 import { mirrorSourceIcon } from '../../icons/static/mirrorSourceIcon';
 import { telegramSourceIcon } from '../../icons/static/telegramSourceIcon';
 import { twitterSourceIcon } from '../../icons/static/twitterSourceIcon';
 import GalleryModal from '../../modals/GalleryModal';
+import { browserStorage } from '../../stores/browserStorage';
 import feed, { FeedCategory, FeedPost, LinkType } from '../../stores/Feed';
 import { useNav } from '../../utils/navigate';
+import { scrollWindowToTop } from '../../utils/ui';
 import css from './FeedPage.module.scss';
 
 const sourceIcon: Record<LinkType, JSX.Element> = {
@@ -82,7 +85,7 @@ const FeedPostControl = observer(({ post }: { post: FeedPost }) => {
 				<ReadableDate className={css.postDate} value={Date.parse(post.date)} />
 				{!!post.sourceLink && (
 					<a className={css.postExternalButton} href={post.sourceLink} target="_blank" rel="noreferrer">
-						{linkIcon}
+						<ExternalSvg />
 					</a>
 				)}
 			</div>
@@ -161,28 +164,35 @@ const FeedPostControl = observer(({ post }: { post: FeedPost }) => {
 });
 
 export const FeedPage = observer(() => {
+	const navigate = useNav();
 	const lastPostView = useRef<HTMLDivElement>(null);
 	const feedBodyRef = useRef<HTMLDivElement>(null);
 	const [newPostsVisible, setNewPostsVisible] = useState(false);
-	const { category } = useParams();
+	const { category } = useParams<{ category: FeedCategory }>();
 	const { search } = useLocation();
 	const searchParams = search.length > 1 ? new URLSearchParams(search.slice(1)) : undefined;
-	const sourceId = searchParams?.get('sourceId') || null;
-	const navigate = useNav();
+	const sourceId = searchParams?.get('sourceId') || undefined;
 
-	const scrollToTop = useCallback(() => {
-		window.scrollTo({
-			top: 0,
-			behavior: 'smooth',
-		});
-	}, []);
+	const sourceListId = browserStorage.feedSourceSettings?.listId;
+	const [lastSourceListId, setLastSourceListId] = useState(sourceListId);
 
+	// Re-load when category changes
 	useEffect(() => {
-		scrollToTop();
+		scrollWindowToTop();
+		feed.loadCategory(category!, sourceId).then();
+	}, [category, sourceId]);
 
-		// noinspection JSIgnoredPromiseFromCall
-		feed.loadCategory(category!, sourceId);
-	}, [category, scrollToTop, sourceId]);
+	// Re-load when source-list changes
+	useEffect(() => {
+		if (lastSourceListId !== sourceListId) {
+			setLastSourceListId(sourceListId);
+
+			if (category === FeedCategory.MAIN) {
+				scrollWindowToTop();
+				feed.loadCategory(category, sourceId).then();
+			}
+		}
+	}, [category, lastSourceListId, sourceId, sourceListId]);
 
 	useEffect(() => {
 		const timer = setInterval(async () => {
@@ -201,12 +211,10 @@ export const FeedPage = observer(() => {
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [feed.loading, feed.moreAvailable]);
 
-	const showNewPosts = useCallback(() => {
-		scrollToTop();
-
-		// noinspection JSIgnoredPromiseFromCall
-		feed.loadNew();
-	}, [scrollToTop]);
+	const showNewPosts = async () => {
+		scrollWindowToTop();
+		await feed.loadNew();
+	};
 
 	let title;
 
@@ -245,7 +253,7 @@ export const FeedPage = observer(() => {
 					</div>
 
 					{newPostsVisible && (
-						<div className={css.feedScrollToTop} onClick={scrollToTop}>
+						<div className={css.feedScrollToTop} onClick={() => scrollWindowToTop()}>
 							<CaretDown color="black" style={{ width: 40, height: 40 }} />
 						</div>
 					)}
@@ -276,13 +284,15 @@ export const FeedPage = observer(() => {
 									</div>
 								)}
 							</>
+						) : feed.errorLoading ? (
+							<ErrorMessage>
+								Sorry, an error occured during feed loading. Please, try again later.
+							</ErrorMessage>
 						) : (
 							<div style={{ marginTop: 30 }}>
 								<YlideLoader reason="Your feed is loading..." />
 							</div>
 						)}
-
-						{feed.errorLoading && `Sorry, an error occured during feed loading. Please, try again later.`}
 					</div>
 				</div>
 			</div>

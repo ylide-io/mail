@@ -9,6 +9,7 @@ import { Blockie } from '../../../controls/Blockie';
 import { ReactComponent as ArrowDownSvg } from '../../../icons/arrowDown.svg';
 import { YlideLargeLogo } from '../../../icons/YlideLargeLogo';
 import AlertModal from '../../../modals/AlertModal';
+import { browserStorage } from '../../../stores/browserStorage';
 import domain from '../../../stores/Domain';
 import { FolderId } from '../../../stores/MailList';
 import { RoutePath } from '../../../stores/routePath';
@@ -19,7 +20,6 @@ import css from './header.module.scss';
 
 const Header = observer(() => {
 	const nav = useNav();
-	const [showQuest3, setShowQuest3] = useState(localStorage.getItem('quest3') !== 'false');
 
 	const accountsPopupButtonRef = useRef(null);
 	const [isAccountsPopupOpen, setAccountsPopupOpen] = useState(false);
@@ -42,10 +42,10 @@ const Header = observer(() => {
 			<div className={css.main}>
 				<div className={css.block}>
 					<div
-						className={clsx(css.quest3Btn, { [css.shine]: showQuest3 })}
+						className={clsx(css.quest3Btn, { [css.shine]: browserStorage.quest3 })}
 						onClick={() => {
-							setShowQuest3(false);
-							localStorage.setItem('quest3', 'false');
+							browserStorage.quest3 = false;
+
 							AlertModal.show(
 								'Ylide $1,000 giveaway on Quest3',
 								'',
