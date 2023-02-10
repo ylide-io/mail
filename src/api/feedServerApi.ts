@@ -61,7 +61,7 @@ export namespace FeedServerApi {
 	export type GetPostsResponse = { moreAvailable: boolean; newPosts: number; items: FeedPost[] };
 
 	export async function getPosts(params: GetPostsParams): Promise<GetPostsResponse> {
-		return await request(`/${params.needOld ? 'post' : 'new-post'}?${createCleanSerachParams(params)}`);
+		return await request(`/posts?${createCleanSerachParams(params)}`);
 	}
 
 	//
@@ -69,7 +69,7 @@ export namespace FeedServerApi {
 	export type GetSourcesResponse = { sources: FeedSource[] };
 
 	export async function getSources(): Promise<GetSourcesResponse> {
-		return await request('/source');
+		return await request('/sources');
 	}
 
 	//
@@ -77,7 +77,7 @@ export namespace FeedServerApi {
 	export type CreateSourceListResponse = { sourceListId: string };
 
 	export async function createSourceList(sourceIds: string[]): Promise<CreateSourceListResponse> {
-		return await request('/source-list/create', {
+		return await request('/source-lists/create', {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json',
