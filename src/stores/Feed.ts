@@ -97,7 +97,7 @@ class Feed {
 		this.loadCategory(FeedCategory.MAIN).then();
 	}
 
-	async genericLoad(
+	private async genericLoad(
 		params: {
 			needOld: boolean;
 			length: number;
@@ -117,13 +117,14 @@ class Feed {
 					? browserStorage.feedSourceSettings?.listId
 					: undefined;
 
-			const categories = sourceListId
-				? undefined
-				: selectedCategory === FeedCategory.MAIN
-				? this.mainCategories
-				: selectedCategory === FeedCategory.ALL
-				? nonSyntheticFeedCategories
-				: [selectedCategory];
+			const categories =
+				params.sourceId || sourceListId
+					? undefined
+					: selectedCategory === FeedCategory.MAIN
+					? this.mainCategories
+					: selectedCategory === FeedCategory.ALL
+					? nonSyntheticFeedCategories
+					: [selectedCategory];
 
 			const response = await FeedServerApi.getPosts({
 				...params,
