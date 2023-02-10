@@ -139,7 +139,7 @@ export function FeedSettingsPopup({ onClose }: FeedSettingsPopupProps) {
 											key={source.id}
 											name={source.name}
 											link={source.link}
-											isChecked={selectedSourceIds?.includes(source.id)}
+											isChecked={selectedSourceIds?.includes(source.id) || false}
 											onChange={isChecked =>
 												setSelectedSourceIds(
 													toggleArrayItem(selectedSourceIds || [], source.id, isChecked),
