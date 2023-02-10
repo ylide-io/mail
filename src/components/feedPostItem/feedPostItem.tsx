@@ -25,19 +25,20 @@ const sourceIcon: Record<LinkType, ReactNode> = {
 };
 
 interface FeedPostItemProps {
+	isInFeed?: boolean;
 	post: FeedPost;
 }
 
-export function FeedPostItem({ post }: FeedPostItemProps) {
+export function FeedPostItem({ isInFeed, post }: FeedPostItemProps) {
 	const selfRef = useRef<HTMLDivElement>(null);
 	const [collapsed, setCollapsed] = useState(false);
 	const navigate = useNav();
 
 	useEffect(() => {
-		if (selfRef.current && selfRef.current.getBoundingClientRect().height > 600) {
+		if (isInFeed && selfRef.current && selfRef.current.getBoundingClientRect().height > 600) {
 			setCollapsed(true);
 		}
-	}, []);
+	}, [isInFeed]);
 
 	const onPostTextClick = (e: MouseEvent) => {
 		if ((e.target as Element).tagName.toUpperCase() === 'IMG') {

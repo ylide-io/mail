@@ -124,7 +124,7 @@ export const FeedPage = observer(() => {
 				{feed.loaded ? (
 					<>
 						{feed.posts.map(post => (
-							<FeedPostItem post={post} key={post.id} />
+							<FeedPostItem isInFeed post={post} key={post.id} />
 						))}
 
 						{feed.moreAvailable && (
