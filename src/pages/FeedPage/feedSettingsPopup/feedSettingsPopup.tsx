@@ -79,18 +79,32 @@ export function FeedSettingsPopup({ onClose }: FeedSettingsPopupProps) {
 		return categoryToSourceList;
 	}, [data?.sources]);
 
+	const [selectedSourceIds, setSelectedSourceIds] = useState(browserStorage.feedSourceSettings?.sourceIds);
+
 	const allSourceIds = useMemo(
 		() => list && Object.values(list).reduce((prev, curr) => prev.concat(curr.map(s => s.id)), [] as string[]),
 		[list],
 	);
 
-	const [selectedSourceIds, setSelectedSourceIds] = useState(browserStorage.feedSourceSettings?.sourceIds);
+	const isSelectedAll = selectedSourceIds?.length === allSourceIds?.length;
 
+	// Populate selected-source-ids
 	useLayoutEffect(() => {
 		if (selectedSourceIds == null && allSourceIds) {
 			setSelectedSourceIds(allSourceIds);
 		}
 	}, [allSourceIds, selectedSourceIds]);
+
+	const saveChanges = () => {
+		invariant(selectedSourceIds);
+
+		if (isSelectedAll) {
+			browserStorage.feedSourceSettings = undefined;
+			onClose?.();
+		} else {
+			createSourceListMutation.mutate(selectedSourceIds);
+		}
+	};
 
 	return (
 		<Modal className={css.root} onClose={onClose}>
@@ -148,10 +162,7 @@ export function FeedSettingsPopup({ onClose }: FeedSettingsPopupProps) {
 				<ActionButton
 					isDisabled={!selectedSourceIds?.length || createSourceListMutation.isLoading}
 					style={ActionButtonStyle.Primary}
-					onClick={() => {
-						invariant(selectedSourceIds);
-						createSourceListMutation.mutate(selectedSourceIds);
-					}}
+					onClick={() => saveChanges()}
 				>
 					Save Settings
 				</ActionButton>
@@ -169,11 +180,7 @@ export function FeedSettingsPopup({ onClose }: FeedSettingsPopupProps) {
 							style={ActionButtonStyle.Lite}
 							icon={<SelectAllSvg />}
 							title="Select All"
-							onClick={() => {
-								setSelectedSourceIds(
-									selectedSourceIds?.length !== allSourceIds?.length ? allSourceIds : [],
-								);
-							}}
+							onClick={() => setSelectedSourceIds(isSelectedAll ? [] : allSourceIds)}
 						/>
 					)
 				)}
