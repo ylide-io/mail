@@ -66,6 +66,14 @@ export namespace FeedServerApi {
 
 	//
 
+	export type GetPostResponse = { post: FeedPost };
+
+	export async function getPost(id: string): Promise<GetPostResponse> {
+		return await request(`/posts/${id}`);
+	}
+
+	//
+
 	export type GetSourcesResponse = { sources: FeedSource[] };
 
 	export async function getSources(): Promise<GetSourcesResponse> {

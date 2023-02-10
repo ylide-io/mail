@@ -1,19 +1,19 @@
 import { Fragment, useLayoutEffect, useMemo, useState } from 'react';
 import { useMutation, useQuery } from 'react-query';
 
-import { FeedServerApi } from '../../../api/feedServerApi';
-import { ActionButton, ActionButtonStyle } from '../../../components/ActionButton/ActionButton';
-import { CheckBox } from '../../../components/checkBox/checkBox';
-import { ErrorMessage } from '../../../components/errorMessage/errorMessage';
-import { Modal } from '../../../components/modal/modal';
-import { OverlappingLoader } from '../../../components/overlappingLoader/overlappingLoader';
-import { Spinner } from '../../../components/spinner/spinner';
-import { ReactComponent as ExternalSvg } from '../../../icons/external.svg';
-import { ReactComponent as SelectAllSvg } from '../../../icons/selectAll.svg';
-import { browserStorage } from '../../../stores/browserStorage';
-import { FeedCategory, FeedSource, getFeedCategoryName, nonSyntheticFeedCategories } from '../../../stores/Feed';
-import { toggleArrayItem } from '../../../utils/array';
-import { invariant } from '../../../utils/invariant';
+import { FeedServerApi } from '../../api/feedServerApi';
+import { ReactComponent as ExternalSvg } from '../../icons/external.svg';
+import { ReactComponent as SelectAllSvg } from '../../icons/selectAll.svg';
+import { browserStorage } from '../../stores/browserStorage';
+import { FeedCategory, FeedSource, getFeedCategoryName, nonSyntheticFeedCategories } from '../../stores/Feed';
+import { toggleArrayItem } from '../../utils/array';
+import { invariant } from '../../utils/invariant';
+import { ActionButton, ActionButtonStyle } from '../ActionButton/ActionButton';
+import { CheckBox } from '../checkBox/checkBox';
+import { ErrorMessage } from '../errorMessage/errorMessage';
+import { Modal } from '../modal/modal';
+import { OverlappingLoader } from '../overlappingLoader/overlappingLoader';
+import { Spinner } from '../spinner/spinner';
 import css from './feedSettingsPopup.module.scss';
 
 interface SourceItemProps {

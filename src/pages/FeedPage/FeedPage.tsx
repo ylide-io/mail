@@ -1,167 +1,25 @@
-import { UserOutlined } from '@ant-design/icons';
-import Avatar from 'antd/lib/avatar/avatar';
-import clsx from 'clsx';
 import { observer } from 'mobx-react';
-import React, { MouseEvent, useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useLocation, useParams } from 'react-router-dom';
 
 import { ActionButton, ActionButtonStyle } from '../../components/ActionButton/ActionButton';
 import { ErrorMessage } from '../../components/errorMessage/errorMessage';
-import { GenericLayout } from '../../components/genericLayout/genericLayout';
-import { ReadableDate } from '../../components/readableDate/readableDate';
+import { FeedLayout } from '../../components/feedLayout/feedLayout';
+import { FeedPostItem } from '../../components/feedPostItem/feedPostItem';
 import { smallButtonIcons } from '../../components/smallButton/smallButton';
 import { YlideLoader } from '../../components/ylideLoader/ylideLoader';
 import { YlideButton } from '../../controls/YlideButton';
 import { CaretDown } from '../../icons/CaretDown';
-import { ReactComponent as ExternalSvg } from '../../icons/external.svg';
-import { discordSourceIcon } from '../../icons/static/discordSourceIcon';
-import { mirrorSourceIcon } from '../../icons/static/mirrorSourceIcon';
-import { telegramSourceIcon } from '../../icons/static/telegramSourceIcon';
-import { twitterSourceIcon } from '../../icons/static/twitterSourceIcon';
-import GalleryModal from '../../modals/GalleryModal';
 import { browserStorage } from '../../stores/browserStorage';
-import feed, { FeedCategory, FeedPost, LinkType } from '../../stores/Feed';
+import feed, { FeedCategory } from '../../stores/Feed';
 import { useNav } from '../../utils/navigate';
 import { scrollWindowToTop } from '../../utils/ui';
 import css from './FeedPage.module.scss';
-
-const sourceIcon: Record<LinkType, JSX.Element> = {
-	[LinkType.TWITTER]: twitterSourceIcon,
-	[LinkType.MIRROR]: mirrorSourceIcon,
-	[LinkType.DISCORD]: discordSourceIcon,
-	[LinkType.TELEGRAM]: telegramSourceIcon,
-	[LinkType.MEDIUM]: <></>,
-};
 
 function isInViewport(element: HTMLDivElement) {
 	const rect = element.getBoundingClientRect();
 	return rect.top >= -100 && rect.top <= (window.innerHeight || document.documentElement.clientHeight);
 }
-
-const FeedPostControl = observer(({ post }: { post: FeedPost }) => {
-	const selfRef = useRef<HTMLDivElement>(null);
-	const [collapsed, setCollapsed] = useState(false);
-	const navigate = useNav();
-
-	useEffect(() => {
-		if (selfRef.current && selfRef.current.getBoundingClientRect().height > 600) {
-			setCollapsed(true);
-		}
-	}, []);
-
-	const onPostTextClick = (e: MouseEvent) => {
-		if ((e.target as Element).tagName.toUpperCase() === 'IMG') {
-			GalleryModal.view([(e.target as HTMLImageElement).src]);
-		}
-	};
-
-	const onSourceIdClick = () => {
-		navigate({
-			search: { sourceId: post.sourceId },
-		});
-	};
-
-	return (
-		<div ref={selfRef} className={clsx(css.post, { [css.post_collapsed]: collapsed })}>
-			<div className={css.postAva}>
-				<Avatar size={48} src={post.authorAvatar} icon={<UserOutlined />} />
-				<div className={css.postAvaSource}>{sourceIcon[post.sourceType]}</div>
-			</div>
-
-			<div className={css.postMeta}>
-				<div className={css.postSource} onClick={onSourceIdClick}>
-					{!!post.authorName && <div>{post.authorName}</div>}
-					{!!post.authorNickname && <div className={css.postSourceUser}>{post.authorNickname}</div>}
-					{!!post.sourceName && (
-						<>
-							<div>in</div>
-							<div className={css.postSourceName}>
-								<div>{discordSourceIcon}</div>
-								<div>{post.sourceName}</div>
-							</div>
-						</>
-					)}
-				</div>
-				<ReadableDate className={css.postDate} value={Date.parse(post.date)} />
-				{!!post.sourceLink && (
-					<a className={css.postExternalButton} href={post.sourceLink} target="_blank" rel="noreferrer">
-						<ExternalSvg />
-					</a>
-				)}
-			</div>
-
-			<div className={css.postContent}>
-				{!!post.title && <div className={css.postTitle}>{post.title}</div>}
-
-				{!!post.subtitle && <div className={css.postSubtitle}>{post.subtitle}</div>}
-
-				<div
-					className={css.postText}
-					dangerouslySetInnerHTML={{ __html: post.content }}
-					onClick={onPostTextClick}
-				/>
-
-				{!!post.picrel &&
-					post.sourceType !== LinkType.MIRROR &&
-					(post.picrel.endsWith('.mp4') ? (
-						<video loop className={css.postPicture} controls>
-							<source src={post.picrel} type="video/mp4" />
-						</video>
-					) : (
-						<div
-							style={{ backgroundImage: `url("${post.picrel}")` }}
-							className={css.postPicture}
-							onClick={() => {
-								GalleryModal.view([post.picrel]);
-							}}
-						/>
-					))}
-
-				{!!post.embeds.length && (
-					<div className={css.postEmbeds}>
-						{post.embeds.map((e, idx) => (
-							<a
-								key={idx}
-								className={clsx(css.postEmbed, {
-									[css.postEmbed_withLink]: !!e.link,
-								})}
-								href={e.link}
-								target="_blank"
-								rel="noreferrer"
-							>
-								{!!e.previewImageUrl && (
-									<div
-										className={css.postEmbedImage}
-										style={{
-											backgroundImage: `url("${e.previewImageUrl}")`,
-										}}
-									/>
-								)}
-
-								{!!e.link && (
-									<div className={css.postEmbedLink}>
-										{e.link.length > 60 ? `${e.link.substring(0, 60)}...` : e.link}
-									</div>
-								)}
-								{e.title ? <div className={css.postEmbedTitle}>{e.title}</div> : null}
-
-								{!!e.text && (
-									<div className={css.postEmbedText} dangerouslySetInnerHTML={{ __html: e.text }} />
-								)}
-							</a>
-						))}
-					</div>
-				)}
-			</div>
-
-			{collapsed && (
-				<button className={css.postReadMore} onClick={() => setCollapsed(false)}>
-					Read more
-				</button>
-			)}
-		</div>
-	);
-});
 
 export const FeedPage = observer(() => {
 	const navigate = useNav();
@@ -227,75 +85,62 @@ export const FeedPage = observer(() => {
 	}
 
 	return (
-		<GenericLayout isCustomContent>
-			<div className={css.root}>
-				<div className={css.feed}>
-					<div className={css.feedTitle}>
-						<div className={css.feedTitleLeft}>
-							<h3 className={css.feedTitleText}>{title}</h3>
-
-							{!!sourceId && (
-								<ActionButton
-									style={ActionButtonStyle.Primary}
-									icon={<i className={`fa ${smallButtonIcons.cross}`} />}
-									onClick={() => navigate({ search: {} })}
-								>
-									Clear filter
-								</ActionButton>
-							)}
-						</div>
-
-						{!!feed.newPosts && (
-							<YlideButton size="small" nice onClick={showNewPosts}>
-								Show {feed.newPosts} new posts
-							</YlideButton>
-						)}
-					</div>
-
-					{newPostsVisible && (
-						<div className={css.feedScrollToTop} onClick={() => scrollWindowToTop()}>
-							<CaretDown color="black" style={{ width: 40, height: 40 }} />
-						</div>
-					)}
-
-					<div className={css.feedBody} ref={feedBodyRef}>
-						{newPostsVisible && !!feed.newPosts && (
-							<div className={css.feedNewPosts}>
-								<YlideButton
-									className={css.feedNewPostsButton}
-									size="small"
-									nice
-									onClick={showNewPosts}
-								>
-									Show {feed.newPosts} new posts
-								</YlideButton>
-							</div>
-						)}
-
-						{feed.loaded ? (
-							<>
-								{feed.posts.map(post => {
-									return <FeedPostControl post={post} key={post.id} />;
-								})}
-
-								{feed.moreAvailable && (
-									<div className={css.feedLastPost} ref={lastPostView}>
-										{feed.loading && <YlideLoader reason="Loading more posts..." />}
-									</div>
-								)}
-							</>
-						) : feed.errorLoading ? (
-							<ErrorMessage>
-								Sorry, an error occured during feed loading. Please, try again later.
-							</ErrorMessage>
-						) : (
-							<div style={{ marginTop: 30 }}>
-								<YlideLoader reason="Your feed is loading..." />
-							</div>
-						)}
-					</div>
+		<FeedLayout
+			title={title}
+			titleSubItem={
+				!!sourceId && (
+					<ActionButton
+						style={ActionButtonStyle.Primary}
+						icon={<i className={`fa ${smallButtonIcons.cross}`} />}
+						onClick={() => navigate({ search: {} })}
+					>
+						Clear filter
+					</ActionButton>
+				)
+			}
+			titleRight={
+				!!feed.newPosts && (
+					<YlideButton size="small" nice onClick={showNewPosts}>
+						Show {feed.newPosts} new posts
+					</YlideButton>
+				)
+			}
+		>
+			{newPostsVisible && (
+				<div className={css.scrollToTop} onClick={() => scrollWindowToTop()}>
+					<CaretDown color="black" style={{ width: 40, height: 40 }} />
 				</div>
+			)}
+
+			<div className={css.feedBody} ref={feedBodyRef}>
+				{newPostsVisible && !!feed.newPosts && (
+					<div className={css.newPosts}>
+						<YlideButton className={css.feedNewPostsButton} size="small" nice onClick={showNewPosts}>
+							Show {feed.newPosts} new posts
+						</YlideButton>
+					</div>
+				)}
+
+				{feed.loaded ? (
+					<>
+						{feed.posts.map(post => (
+							<FeedPostItem post={post} key={post.id} />
+						))}
+
+						{feed.moreAvailable && (
+							<div className={css.loader} ref={lastPostView}>
+								{feed.loading && <YlideLoader reason="Loading more posts ..." />}
+							</div>
+						)}
+					</>
+				) : feed.errorLoading ? (
+					<ErrorMessage>Sorry, an error occured during feed loading. Please, try again later.</ErrorMessage>
+				) : (
+					<div className={css.loader}>
+						<YlideLoader reason="Your feed is loading ..." />
+					</div>
+				)}
 			</div>
-		</GenericLayout>
+		</FeedLayout>
 	);
 });

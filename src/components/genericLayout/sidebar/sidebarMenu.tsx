@@ -23,7 +23,6 @@ import { sidePolicyIcon } from '../../../icons/static/sidePolicyIcon';
 import { sideProjectsIcon } from '../../../icons/static/sideProjectsIcon';
 import { sideSecurityIcon } from '../../../icons/static/sideSecurityIcon';
 import { sideTechnologyIcon } from '../../../icons/static/sideTechnologyIcon';
-import { FeedSettingsPopup } from '../../../pages/FeedPage/feedSettingsPopup/feedSettingsPopup';
 import { FeedCategory, getFeedCategoryName } from '../../../stores/Feed';
 import { FolderId } from '../../../stores/MailList';
 import modals from '../../../stores/Modals';
@@ -31,6 +30,7 @@ import { OutgoingMailData } from '../../../stores/outgoingMailData';
 import { RoutePath } from '../../../stores/routePath';
 import { useNav } from '../../../utils/navigate';
 import { useComposeMailPopup } from '../../composeMailPopup/composeMailPopup';
+import { FeedSettingsPopup } from '../../feedSettingsPopup/feedSettingsPopup';
 import { PropsWithClassName } from '../../propsWithClassName';
 import css from './sidebarMenu.module.scss';
 

@@ -12,6 +12,7 @@ import { ContactsTab } from './pages/ContactsPage/components/Contacts/ContactsTa
 import { TagsTab } from './pages/ContactsPage/components/Tags/TagsTab';
 import { ContactsPage } from './pages/ContactsPage/ContactsPage';
 import { FeedPage } from './pages/FeedPage/FeedPage';
+import { FeedPostPage } from './pages/FeedPostPage/FeedPostPage';
 import { MailboxPage } from './pages/MailboxPage/MailboxPage';
 import { MailDetailsPage } from './pages/MailDetailsPage/MailDetailsPage';
 import { NewWalletsPage } from './pages/NewWalletsPage';
@@ -81,7 +82,7 @@ const App = observer(() => {
 					height: '100vh',
 				}}
 			>
-				<YlideLoader reason="Loading your account data from blockchain..." />
+				<YlideLoader reason="Loading your account data from blockchain ..." />
 			</div>
 		);
 	}
@@ -107,6 +108,7 @@ const App = observer(() => {
 						<Route path={RoutePath.ADMIN} element={<AdminPage />} />
 
 						<Route path={RoutePath.FEED} element={<FeedPage />} />
+						<Route path={RoutePath.FEED_POST} element={<FeedPostPage />} />
 						<Route path={RoutePath.FEED_CATEGORY} element={<FeedPage />} />
 
 						<Route path={RoutePath.MAIL_COMPOSE} element={<ComposePage />} />
