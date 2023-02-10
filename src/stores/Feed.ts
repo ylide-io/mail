@@ -111,17 +111,19 @@ class Feed {
 			this.loading = true;
 
 			const selectedCategory = this.selectedCategory;
-			const categories =
-				selectedCategory === FeedCategory.MAIN
-					? this.mainCategories
-					: selectedCategory === FeedCategory.ALL
-					? nonSyntheticFeedCategories
-					: [selectedCategory];
 
 			const sourceListId =
 				selectedCategory === FeedCategory.MAIN && !params.sourceId
 					? browserStorage.feedSourceSettings?.listId
 					: undefined;
+
+			const categories = sourceListId
+				? undefined
+				: selectedCategory === FeedCategory.MAIN
+				? this.mainCategories
+				: selectedCategory === FeedCategory.ALL
+				? nonSyntheticFeedCategories
+				: [selectedCategory];
 
 			const response = await FeedServerApi.getPosts({
 				...params,

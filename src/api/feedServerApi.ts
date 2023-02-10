@@ -49,9 +49,9 @@ export namespace FeedServerApi {
 	//
 
 	export interface GetPostsParams {
-		categories: string[];
 		needOld: boolean;
 		length: number;
+		categories?: string[];
 		sourceId?: string;
 		sourceListId?: string;
 		lastPostId?: string;
