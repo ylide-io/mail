@@ -55,7 +55,10 @@ class BrowserStorage {
 	}
 
 	set feedSourceSettings(value: FeedSourceSettings | undefined) {
-		localStorage.setItem(BrowserStorageKey.FEED_SOURCE_SETTINGS, JSON.stringify(value));
+		value
+			? localStorage.setItem(BrowserStorageKey.FEED_SOURCE_SETTINGS, JSON.stringify(value))
+			: localStorage.removeItem(BrowserStorageKey.FEED_SOURCE_SETTINGS);
+
 		this._feedSourceSettings = value;
 	}
 }
