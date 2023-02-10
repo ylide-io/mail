@@ -132,6 +132,7 @@ class Feed {
 			});
 
 			this.loaded = true;
+			this.errorLoading = false;
 
 			return response;
 		} catch (e) {
