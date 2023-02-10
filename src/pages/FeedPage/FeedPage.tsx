@@ -19,6 +19,7 @@ import { mirrorSourceIcon } from '../../icons/static/mirrorSourceIcon';
 import { telegramSourceIcon } from '../../icons/static/telegramSourceIcon';
 import { twitterSourceIcon } from '../../icons/static/twitterSourceIcon';
 import GalleryModal from '../../modals/GalleryModal';
+import { browserStorage } from '../../stores/browserStorage';
 import feed, { FeedCategory, FeedPost, LinkType } from '../../stores/Feed';
 import { useNav } from '../../utils/navigate';
 import { scrollWindowToTop } from '../../utils/ui';
@@ -163,6 +164,7 @@ const FeedPostControl = observer(({ post }: { post: FeedPost }) => {
 });
 
 export const FeedPage = observer(() => {
+	const navigate = useNav();
 	const lastPostView = useRef<HTMLDivElement>(null);
 	const feedBodyRef = useRef<HTMLDivElement>(null);
 	const [newPostsVisible, setNewPostsVisible] = useState(false);
@@ -170,13 +172,27 @@ export const FeedPage = observer(() => {
 	const { search } = useLocation();
 	const searchParams = search.length > 1 ? new URLSearchParams(search.slice(1)) : undefined;
 	const sourceId = searchParams?.get('sourceId') || undefined;
-	const navigate = useNav();
 
+	const sourceListId = browserStorage.feedSourceSettings?.listId;
+	const [lastSourceListId, setLastSourceListId] = useState(sourceListId);
+
+	// Re-load when category changes
 	useEffect(() => {
 		scrollWindowToTop();
-
 		feed.loadCategory(category!, sourceId).then();
 	}, [category, sourceId]);
+
+	// Re-load when source-list changes
+	useEffect(() => {
+		if (lastSourceListId !== sourceListId) {
+			setLastSourceListId(sourceListId);
+
+			if (category === FeedCategory.MAIN) {
+				scrollWindowToTop();
+				feed.loadCategory(category, sourceId).then();
+			}
+		}
+	}, [category, lastSourceListId, sourceId, sourceListId]);
 
 	useEffect(() => {
 		const timer = setInterval(async () => {
