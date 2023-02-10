@@ -16,49 +16,62 @@ class BrowserStorage {
 		makeAutoObservable(this);
 	}
 
+	private static getItem(key: BrowserStorageKey) {
+		return localStorage.getItem(key) || undefined;
+	}
+
+	private static getItemWithTransform<T>(key: BrowserStorageKey, transform: (item: string) => T): T | undefined {
+		const item = localStorage.getItem(key) || undefined;
+		return item ? transform(item) : undefined;
+	}
+
+	private static setItem(key: BrowserStorageKey, value: any) {
+		if (value != null) {
+			localStorage.setItem(key, value.toString());
+		} else {
+			localStorage.removeItem(key);
+		}
+	}
+
 	//
 
-	private _canSkipRegistration = localStorage.getItem(BrowserStorageKey.CAN_SKIP_REGISTRATION) === 'true';
+	private _canSkipRegistration = BrowserStorage.getItem(BrowserStorageKey.CAN_SKIP_REGISTRATION) === 'true';
 
 	get canSkipRegistration() {
 		return this._canSkipRegistration;
 	}
 
 	set canSkipRegistration(value: boolean) {
-		localStorage.setItem(BrowserStorageKey.CAN_SKIP_REGISTRATION, value.toString());
+		BrowserStorage.setItem(BrowserStorageKey.CAN_SKIP_REGISTRATION, value);
 		this._canSkipRegistration = value;
 	}
 
 	//
 
-	private _quest3 = localStorage.getItem(BrowserStorageKey.QUEST3) !== 'false';
+	private _quest3 = BrowserStorage.getItem(BrowserStorageKey.QUEST3) !== 'false';
 
 	get quest3() {
 		return this._quest3;
 	}
 
 	set quest3(value: boolean) {
-		localStorage.setItem(BrowserStorageKey.QUEST3, value.toString());
+		BrowserStorage.setItem(BrowserStorageKey.QUEST3, value);
 		this._quest3 = value;
 	}
 
 	//
 
-	private _feedSourceSettings: FeedSourceSettings | undefined = localStorage.getItem(
+	private _feedSourceSettings = BrowserStorage.getItemWithTransform(
 		BrowserStorageKey.FEED_SOURCE_SETTINGS,
-	)
-		? JSON.parse(localStorage.getItem(BrowserStorageKey.FEED_SOURCE_SETTINGS)!)
-		: undefined;
+		item => JSON.parse(item) as FeedSourceSettings,
+	);
 
 	get feedSourceSettings() {
 		return this._feedSourceSettings;
 	}
 
 	set feedSourceSettings(value: FeedSourceSettings | undefined) {
-		value
-			? localStorage.setItem(BrowserStorageKey.FEED_SOURCE_SETTINGS, JSON.stringify(value))
-			: localStorage.removeItem(BrowserStorageKey.FEED_SOURCE_SETTINGS);
-
+		BrowserStorage.setItem(BrowserStorageKey.FEED_SOURCE_SETTINGS, value && JSON.stringify(value));
 		this._feedSourceSettings = value;
 	}
 }
