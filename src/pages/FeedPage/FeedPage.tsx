@@ -166,10 +166,10 @@ export const FeedPage = observer(() => {
 	const lastPostView = useRef<HTMLDivElement>(null);
 	const feedBodyRef = useRef<HTMLDivElement>(null);
 	const [newPostsVisible, setNewPostsVisible] = useState(false);
-	const { category } = useParams();
+	const { category } = useParams<{ category: FeedCategory }>();
 	const { search } = useLocation();
 	const searchParams = search.length > 1 ? new URLSearchParams(search.slice(1)) : undefined;
-	const sourceId = searchParams?.get('sourceId') || null;
+	const sourceId = searchParams?.get('sourceId') || undefined;
 	const navigate = useNav();
 
 	useEffect(() => {

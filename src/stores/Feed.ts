@@ -86,7 +86,7 @@ class Feed {
 		localStorage.getItem('t_main_categories') || JSON.stringify(nonSyntheticFeedCategories),
 	);
 
-	@observable sourceId: string | null = null;
+	@observable sourceId: string | undefined;
 
 	@observable newPosts: number = 0;
 	@observable moreAvailable = false;
@@ -94,7 +94,7 @@ class Feed {
 
 	constructor() {
 		makeObservable(this);
-		this.loadCategory(FeedCategory.MAIN, null).then();
+		this.loadCategory(FeedCategory.MAIN).then();
 	}
 
 	async genericLoad(
@@ -160,7 +160,7 @@ class Feed {
 		}
 	}
 
-	async loadCategory(id: string, sourceId: string | null) {
+	async loadCategory(id: FeedCategory, sourceId?: string) {
 		analytics.feedPageLoaded(id, 1);
 
 		this.selectedCategory = id;
@@ -170,7 +170,7 @@ class Feed {
 		const data = await this.genericLoad({
 			needOld: true,
 			length: 10,
-			sourceId: this.sourceId || undefined,
+			sourceId,
 		});
 
 		if (data) {
@@ -186,7 +186,7 @@ class Feed {
 		const data = await this.genericLoad({
 			needOld: true,
 			length,
-			sourceId: this.sourceId || undefined,
+			sourceId: this.sourceId,
 			lastPostId: this.posts.at(-1)?.id,
 			firstPostId: this.posts.at(0)?.id,
 		});
@@ -202,7 +202,7 @@ class Feed {
 		const data = await this.genericLoad({
 			needOld: false,
 			length: 10,
-			sourceId: this.sourceId || undefined,
+			sourceId: this.sourceId,
 			lastPostId: this.posts.at(-1)?.id,
 			firstPostId: this.posts.at(0)?.id,
 		});
