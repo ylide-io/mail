@@ -1,8 +1,15 @@
+import clsx from 'clsx';
+
+import { PropsWithClassName } from '../propsWithClassName';
 import css from './ylideLoader.module.scss';
 
-export const YlideLoader = ({ reason }: { reason?: string }) => {
+interface YlideLoaderProps extends PropsWithClassName {
+	reason?: string;
+}
+
+export function YlideLoader({ className, reason }: YlideLoaderProps) {
 	return (
-		<div className={css.root}>
+		<div className={clsx(css.root, className)}>
 			<div className={css.loader}>
 				<svg width="48" height="58" viewBox="0 0 267 321" fill="black" xmlns="http://www.w3.org/2000/svg">
 					<path d="M119.014 33.769L86.5931 1.32588V0.719727C83.7901 5.95392 79.4719 10.255 74.2246 13.0368H74.8841L107.295 45.4697V45.5606C110.007 40.609 114.081 36.5103 119.014 33.769Z" />
@@ -21,4 +28,4 @@ export const YlideLoader = ({ reason }: { reason?: string }) => {
 			{reason != null && <div className={css.reason}>{reason}</div>}
 		</div>
 	);
-};
+}

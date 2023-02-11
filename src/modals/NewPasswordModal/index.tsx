@@ -13,6 +13,7 @@ import { blockchainsMap, calloutSvg, evmNameToNetwork } from '../../constants';
 import { WalletTag } from '../../controls/WalletTag';
 import { YlideButton } from '../../controls/YlideButton';
 import { analytics } from '../../stores/Analytics';
+import { browserStorage } from '../../stores/browserStorage';
 import domain from '../../stores/Domain';
 import { evmBalances } from '../../stores/evmBalances';
 import { FeedCategory } from '../../stores/Feed';
@@ -97,7 +98,7 @@ export default class NewPasswordModal extends PureComponent<NewPasswordModalProp
 	@observable pleaseWait = false;
 
 	async publishThroughFaucet(account: DomainAccount, faucetType: 'polygon' | 'gnosis' | 'fantom', bonus: boolean) {
-		localStorage.setItem('can_skip_registration', 'true');
+		browserStorage.canSkipRegistration = true;
 		console.log('public key: ', '0x' + new SmartBuffer(account.key.keypair.publicKey).toHexString());
 		this.step = 1;
 		const signature = await this.requestFaucetSignature(account);

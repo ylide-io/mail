@@ -1,0 +1,95 @@
+$hPadding: 20px;
+
+.root {
+	display: flex;
+	flex-direction: column;
+	padding: 16px $hPadding;
+	width: 480px;
+	height: 640px;
+	max-width: 100%;
+	max-height: 100%;
+}
+
+.title {
+	font-weight: bolder;
+	text-transform: uppercase;
+}
+
+.description {
+	margin: 8px 0 0;
+	color: var(--secondary-text-color);
+}
+
+.list {
+	flex: 1;
+	position: relative;
+	margin: 12px (-$hPadding) 0;
+	padding: 12px 0;
+	overflow-y: auto;
+	border: solid var(--border-color);
+	border-width: 1px 0;
+}
+
+.subList {
+	padding: 0 0 0 16px;
+}
+
+.item {
+	display: grid;
+	grid-template-columns: auto 1fr auto;
+	grid-gap: 8px;
+	align-items: center;
+	padding: 4px 16px 4px $hPadding;
+}
+
+.itemText {
+	@include truncate-text;
+}
+
+.itemLink {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	margin: -14px 0;
+	width: 28px;
+	height: 28px;
+	border-radius: 100%;
+	opacity: 0;
+	transition: opacity 200ms;
+
+	&:hover {
+		background-color: var(--surface-hover-color);
+
+		> svg {
+			fill: var(--accent2-hover-color);
+		}
+	}
+
+	> svg {
+		width: 20px;
+		height: 20px;
+		fill: var(--secondary-text-color);
+	}
+
+	.item:hover & {
+		opacity: 1;
+	}
+}
+
+.error {
+	margin: $hPadding;
+}
+
+.footer {
+	display: flex;
+	align-items: center;
+	margin: 16px 0 0;
+
+	> *:not(:first-child) {
+		margin: 0 0 0 8px;
+	}
+
+	.footerRight {
+		margin: 0 0 0 auto;
+	}
+}

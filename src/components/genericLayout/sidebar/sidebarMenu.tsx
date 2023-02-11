@@ -2,7 +2,7 @@ import { MenuFoldOutlined, MenuUnfoldOutlined } from '@ant-design/icons';
 import { Button } from 'antd';
 import clsx from 'clsx';
 import { observer } from 'mobx-react';
-import React, { PropsWithChildren, useEffect, useRef, useState } from 'react';
+import React, { PropsWithChildren, useEffect, useState } from 'react';
 import { generatePath, useLocation } from 'react-router-dom';
 
 import { CaretDown } from '../../../icons/CaretDown';
@@ -30,8 +30,8 @@ import { OutgoingMailData } from '../../../stores/outgoingMailData';
 import { RoutePath } from '../../../stores/routePath';
 import { useNav } from '../../../utils/navigate';
 import { useComposeMailPopup } from '../../composeMailPopup/composeMailPopup';
+import { FeedSettingsPopup } from '../../feedSettingsPopup/feedSettingsPopup';
 import { PropsWithClassName } from '../../propsWithClassName';
-import { FeedSettingsPopup } from './feedSettingsPopup/feedSettingsPopup';
 import css from './sidebarMenu.module.scss';
 
 interface SidebarBurgerProps extends PropsWithClassName, PropsWithChildren {}
@@ -52,48 +52,20 @@ export function SidebarBurger({ className, children }: SidebarBurgerProps) {
 
 //
 
-const feedMenuItems = [
-	{
-		category: FeedCategory.MAIN,
-		icon: sideFeedIcon(14),
-	},
-	{
-		category: FeedCategory.ALL,
-		icon: sideAllTopicsIcon(15),
-	},
-	{
-		category: FeedCategory.MARKETS,
-		icon: sideMarketsIcon(15),
-	},
-	{
-		category: FeedCategory.ANALYTICS,
-		icon: sideAnalyticsIcon(15),
-	},
-	{
-		category: FeedCategory.PROJECTS,
-		icon: sideProjectsIcon(15),
-	},
-	{
-		category: FeedCategory.POLICY,
-		icon: sidePolicyIcon(15),
-	},
-	{
-		category: FeedCategory.SECURITY,
-		icon: sideSecurityIcon(15),
-	},
-	{
-		category: FeedCategory.TECHNOLOGY,
-		icon: sideTechnologyIcon(15),
-	},
-	{
-		category: FeedCategory.CULTURE,
-		icon: sideCultureIcon(15),
-	},
-	{
-		category: FeedCategory.EDUCATION,
-		icon: sideEducationIcon(18),
-	},
-];
+const getFeedCategoryIcon = (category: FeedCategory) => {
+	return {
+		[FeedCategory.MAIN]: sideFeedIcon(14),
+		[FeedCategory.ALL]: sideAllTopicsIcon(15),
+		[FeedCategory.MARKETS]: sideMarketsIcon(15),
+		[FeedCategory.ANALYTICS]: sideAnalyticsIcon(15),
+		[FeedCategory.PROJECTS]: sideProjectsIcon(15),
+		[FeedCategory.POLICY]: sidePolicyIcon(15),
+		[FeedCategory.SECURITY]: sideSecurityIcon(15),
+		[FeedCategory.TECHNOLOGY]: sideTechnologyIcon(15),
+		[FeedCategory.CULTURE]: sideCultureIcon(15),
+		[FeedCategory.EDUCATION]: sideEducationIcon(18),
+	}[category];
+};
 
 const SidebarMenu = observer(() => {
 	const location = useLocation();
@@ -109,7 +81,6 @@ const SidebarMenu = observer(() => {
 		localStorage.setItem('tv1_mailOpen', JSON.stringify(mailOpen));
 	}, [mailOpen]);
 
-	const feedSettingsButtonRef = useRef(null);
 	const [isFeedSettingsOpen, setFeedSettingsOpen] = useState(false);
 
 	const composeMailPopup = useComposeMailPopup();
@@ -138,12 +109,12 @@ const SidebarMenu = observer(() => {
 					</div>
 
 					<div className={clsx(css.sectionContent, feedOpen && css.sectionContent_open)}>
-						{feedMenuItems.map(item => {
-							const path = generatePath(RoutePath.FEED_CATEGORY, { category: item.category });
+						{Object.values(FeedCategory).map(category => {
+							const path = generatePath(RoutePath.FEED_CATEGORY, { category });
 
 							return (
 								<div
-									key={item.category}
+									key={category}
 									className={clsx(css.sectionLink, {
 										[css.sectionLink_active]: location.pathname === path,
 									})}
@@ -152,13 +123,12 @@ const SidebarMenu = observer(() => {
 										navigate(path);
 									}}
 								>
-									<div className={css.sectionLinkIconLeft}>{item.icon}</div>
-									<div className={css.sectionLinkTitle}>{getFeedCategoryName(item.category)}</div>
+									<div className={css.sectionLinkIconLeft}>{getFeedCategoryIcon(category)}</div>
+									<div className={css.sectionLinkTitle}>{getFeedCategoryName(category)}</div>
 
-									{item.category === FeedCategory.MAIN && (
+									{category === FeedCategory.MAIN && (
 										<>
 											<button
-												ref={feedSettingsButtonRef}
 												className={css.sectionLinkIconRight}
 												onClick={e => {
 													e.stopPropagation();
@@ -169,10 +139,7 @@ const SidebarMenu = observer(() => {
 											</button>
 
 											{isFeedSettingsOpen && (
-												<FeedSettingsPopup
-													anchorRef={feedSettingsButtonRef}
-													onClose={() => setFeedSettingsOpen(false)}
-												/>
+												<FeedSettingsPopup onClose={() => setFeedSettingsOpen(false)} />
 											)}
 										</>
 									)}

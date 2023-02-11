@@ -1,5 +1,6 @@
 import { observer } from 'mobx-react';
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
+import { QueryClient, QueryClientProvider } from 'react-query';
 import { generatePath, Navigate, Route, Routes, useLocation } from 'react-router-dom';
 
 import { PopupManager } from './components/popup/popupManager/popupManager';
@@ -11,12 +12,14 @@ import { ContactsTab } from './pages/ContactsPage/components/Contacts/ContactsTa
 import { TagsTab } from './pages/ContactsPage/components/Tags/TagsTab';
 import { ContactsPage } from './pages/ContactsPage/ContactsPage';
 import { FeedPage } from './pages/FeedPage/FeedPage';
+import { FeedPostPage } from './pages/FeedPostPage/FeedPostPage';
 import { MailboxPage } from './pages/MailboxPage/MailboxPage';
 import { MailDetailsPage } from './pages/MailDetailsPage/MailDetailsPage';
 import { NewWalletsPage } from './pages/NewWalletsPage';
 import { SettingsPage } from './pages/SettingsPage/SettingsPage';
 import { TestPage } from './pages/TestPage/TestPage';
 import { analytics } from './stores/Analytics';
+import { browserStorage } from './stores/browserStorage';
 import domain from './stores/Domain';
 import { FolderId } from './stores/MailList';
 import modals from './stores/Modals';
@@ -24,6 +27,18 @@ import { RoutePath } from './stores/routePath';
 import walletConnect from './stores/WalletConnect';
 
 const App = observer(() => {
+	const [queryClient] = useState(
+		new QueryClient({
+			defaultOptions: {
+				queries: {
+					cacheTime: 0,
+					retry: false,
+					refetchOnWindowFocus: false,
+				},
+			},
+		}),
+	);
+
 	const location = useLocation();
 
 	useEffect(() => {
@@ -67,56 +82,60 @@ const App = observer(() => {
 					height: '100vh',
 				}}
 			>
-				<YlideLoader reason="Loading your account data from blockchain..." />
+				<YlideLoader reason="Loading your account data from blockchain ..." />
 			</div>
 		);
 	}
-
-	const canSkipRegistration = localStorage.getItem('can_skip_registration') === 'true';
 
 	if (
 		domain.accounts.isFirstTime &&
 		location.pathname !== '/test' &&
 		location.pathname !== '/wallets' &&
 		location.pathname !== '/admin' &&
-		(!location.pathname.startsWith('/feed/') || !canSkipRegistration)
+		(!location.pathname.startsWith('/feed/') || !browserStorage.canSkipRegistration)
 	) {
 		return <Navigate to={`/wallets${location.search ? location.search : ''}`} state={{ from: location }} replace />;
 	}
 
 	return (
-		<PopupManager>
-			<StaticComponentManager>
-				<Routes>
-					<Route path={RoutePath.TEST} element={<TestPage />} />
-					<Route path={RoutePath.WALLETS} element={<NewWalletsPage />} />
-					<Route path={RoutePath.SETTINGS} element={<SettingsPage />} />
-					<Route path={RoutePath.ADMIN} element={<AdminPage />} />
+		<QueryClientProvider client={queryClient}>
+			<PopupManager>
+				<StaticComponentManager>
+					<Routes>
+						<Route path={RoutePath.TEST} element={<TestPage />} />
+						<Route path={RoutePath.WALLETS} element={<NewWalletsPage />} />
+						<Route path={RoutePath.SETTINGS} element={<SettingsPage />} />
+						<Route path={RoutePath.ADMIN} element={<AdminPage />} />
 
-					<Route path={RoutePath.FEED} element={<FeedPage />} />
-					<Route path={RoutePath.FEED_CATEGORY} element={<FeedPage />} />
+						<Route path={RoutePath.FEED} element={<FeedPage />} />
+						<Route path={RoutePath.FEED_POST} element={<FeedPostPage />} />
+						<Route path={RoutePath.FEED_CATEGORY} element={<FeedPage />} />
 
-					<Route path={RoutePath.MAIL_COMPOSE} element={<ComposePage />} />
-					<Route path={RoutePath.MAIL_CONTACTS} element={<ContactsPage />}>
-						<Route index element={<ContactsTab />} />
-					</Route>
-					<Route path={RoutePath.MAIL_FOLDERS} element={<ContactsPage />}>
-						<Route index element={<TagsTab />} />
-					</Route>
-					<Route path={RoutePath.MAIL_FOLDER} element={<MailboxPage />} />
-					<Route path={RoutePath.MAIL_DETAILS} element={<MailDetailsPage />} />
+						<Route path={RoutePath.MAIL_COMPOSE} element={<ComposePage />} />
+						<Route path={RoutePath.MAIL_CONTACTS} element={<ContactsPage />}>
+							<Route index element={<ContactsTab />} />
+						</Route>
+						<Route path={RoutePath.MAIL_FOLDERS} element={<ContactsPage />}>
+							<Route index element={<TagsTab />} />
+						</Route>
+						<Route path={RoutePath.MAIL_FOLDER} element={<MailboxPage />} />
+						<Route path={RoutePath.MAIL_DETAILS} element={<MailDetailsPage />} />
 
-					<Route
-						path={RoutePath.ANY}
-						element={
-							<Navigate replace to={generatePath(RoutePath.MAIL_FOLDER, { folderId: FolderId.Inbox })} />
-						}
-					/>
-				</Routes>
+						<Route
+							path={RoutePath.ANY}
+							element={
+								<Navigate
+									replace
+									to={generatePath(RoutePath.MAIL_FOLDER, { folderId: FolderId.Inbox })}
+								/>
+							}
+						/>
+					</Routes>
 
-				{modals.render()}
-			</StaticComponentManager>
-		</PopupManager>
+					{modals.render()}
+				</StaticComponentManager>
+			</PopupManager>
+		</QueryClientProvider>
 	);
 });
 
