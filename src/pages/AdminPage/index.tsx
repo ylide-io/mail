@@ -25,7 +25,7 @@ export interface EthereumContractPlateProps {
 
 export const EthereumContractPlate: FC<EthereumContractPlateProps> = ({ contract, isModern, network }) => {
 	const [deployModalVisible, setDeployModalVisible] = useState(false);
-	const [manageModalVisible, setManageModalVisible] = useState(false);
+	const [, setManageModalVisible] = useState(false);
 
 	const name = EVM_NAMES[network];
 	const scan = blockchainsMap[name].ethNetwork!.blockExplorerUrls[0]!;

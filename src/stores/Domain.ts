@@ -1,5 +1,13 @@
-import { makeObservable, observable } from 'mobx';
 import WalletConnectProvider from '@walletconnect/web3-provider';
+import {
+	EthereumWalletController,
+	EVM_CHAINS,
+	EVM_NAMES,
+	EVM_RPCS,
+	evmBlockchainFactories,
+	EVMNetwork,
+	evmWalletFactories,
+} from '@ylide/ethereum';
 import {
 	AbstractBlockchainController,
 	AbstractNameService,
@@ -14,17 +22,9 @@ import {
 	Ylide,
 	YlideKeyStore,
 } from '@ylide/sdk';
-import {
-	EVM_CHAINS,
-	EVM_NAMES,
-	EVM_RPCS,
-	evmBlockchainFactories,
-	EVMNetwork,
-	evmWalletFactories,
-	EthereumWalletController,
-} from '@ylide/ethereum';
-// import { everscaleBlockchainFactory, everscaleWalletFactory } from '@ylide/everscale';
+import { makeObservable, observable } from 'mobx';
 
+// import { everscaleBlockchainFactory, everscaleWalletFactory } from '@ylide/everscale';
 import { blockchainsMap, supportedWallets } from '../constants';
 import PasswordModal from '../modals/PasswordModal';
 import SwitchModal from '../modals/SwitchModal';
