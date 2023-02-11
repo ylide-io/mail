@@ -1,6 +1,7 @@
+import { computed, makeAutoObservable, observable } from 'mobx';
+
 import { EVM_NAMES, EVMNetwork } from '@ylide/ethereum';
 import { YlideCore, ExternalYlidePublicKey, IGenericAccount, YlideKey } from '@ylide/sdk';
-import { computed, makeAutoObservable, observable } from 'mobx';
 
 import { isBytesEqual } from '../../utils/isBytesEqual';
 import { Wallet } from './Wallet';

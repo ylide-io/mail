@@ -1,0 +1,152 @@
+.networksList {
+	@include flex-column(stretch, flex-start);
+
+	padding: 10px;
+	overflow: scroll;
+
+	.networkItem {
+		@include flex-row(stretch, flex-start);
+
+		margin-bottom: 8px;
+		padding-bottom: 8px;
+
+		// border-bottom: 1px solid #d0d0d0;
+
+		.networkTitle {
+			@include flex-column(center, flex-start);
+			flex-basis: 110px;
+			flex-grow: 0;
+			flex-shrink: 0;
+
+			// border-right: 1px solid #d0d0d0;
+
+			margin-right: 15px;
+
+			.networkLogo {
+				margin-bottom: 10px;
+				padding-top: 10px;
+			}
+
+			.networkName {
+				font-size: 16px;
+				text-align: center;
+			}
+		}
+
+		.contractsGroup {
+			@include flex-row(stretch, flex-start);
+
+			flex-basis: 0;
+			flex-grow: 1;
+			flex-shrink: 1;
+
+			padding: 10px;
+			margin-right: 10px;
+
+			background-color: rgb(202, 245, 255);
+			border: 1px solid #c0c0c0;
+			border-radius: 10px;
+
+			.contractItem {
+				@include flex-column(stretch, space-between);
+
+				flex-basis: 190px;
+				max-width: 190px;
+				min-width: 190px;
+				flex-grow: 0;
+				flex-shrink: 0;
+
+				height: 60px;
+
+				padding: 10px; // 8px;
+
+				background-color: rgba(255, 255, 255, 1);
+				border-radius: 8px;
+				// box-shadow: 3px 3px 0px black;
+
+				&:not(:last-child) {
+					margin-right: 10px;
+				}
+
+				.contractTitle {
+					@include flex-row(flex-end, space-between);
+					.contractName {
+						flex-grow: 0;
+						flex-shrink: 0;
+
+						margin-right: 20px;
+
+						font-size: 15px;
+					}
+
+					.contractAddress {
+						flex-grow: 1;
+						flex-shrink: 1;
+
+						min-width: 0;
+
+						font-size: 11px;
+						text-align: right;
+					}
+				}
+
+				.contractStatus {
+					@include flex-row(center, space-between);
+
+					.contractCreationBlock {
+						font-size: 10px;
+					}
+					.contractTerminationBlock {
+						font-size: 10px;
+					}
+				}
+
+				&.notDeployed {
+					position: relative;
+					overflow: hidden;
+					&:after {
+						position: absolute;
+						left: 0;
+						top: 0;
+						right: 0;
+						bottom: 0;
+
+						background: rgba(0, 0, 0, 0.2);
+						content: '';
+					}
+				}
+
+				&.mostModern {
+					box-shadow: 0px 0px 8px rgb(32, 218, 35);
+				}
+
+				&.mostModern.notDeployed {
+					box-shadow: 0px 0px 10px rgb(255, 0, 0);
+				}
+
+				transition: all 0.3s;
+
+				&:hover {
+					cursor: pointer;
+					box-shadow: 0px 0px 8px rgb(0, 0, 0, 0.5);
+
+					&.mostModern {
+						box-shadow: 0px 0px 8px rgb(10, 95, 11);
+					}
+
+					&.mostModern.notDeployed {
+						box-shadow: 0px 0px 10px rgb(118, 0, 0);
+					}
+				}
+
+				&.notVerified {
+					.contractTitle {
+						.contractName {
+							color: rgb(171, 0, 0);
+						}
+					}
+				}
+			}
+		}
+	}
+}

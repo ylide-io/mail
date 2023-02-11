@@ -1,161 +1,223 @@
-import { EthereumWalletController, EVMNetwork } from '@ylide/ethereum';
-import { Spin } from 'antd';
-import { autobind } from 'core-decorators';
-import { makeObservable, observable } from 'mobx';
+import {
+	EVM_CONTRACTS,
+	EVM_NAMES,
+	EVMMailerContractType,
+	EVMNetwork,
+	EVMRegistryContractType,
+	IEVMMailerContractLink,
+	IEVMRegistryContractLink,
+} from '@ylide/ethereum';
+import { Tooltip } from 'antd';
+import clsx from 'clsx';
 import { observer } from 'mobx-react';
-import { PureComponent } from 'react';
+import { FC, PureComponent, useState } from 'react';
 
-import { YlideButton } from '../../controls/YlideButton';
-import domain from '../../stores/Domain';
+import { blockchainsMap, evmNameToNetwork } from '../../constants';
+import { AdaptiveAddress } from '../../controls/adaptiveAddress/adaptiveAddress';
+import css from './adminPage.module.scss';
+import { DeployContractModal } from './contract-modals/deployModal';
+
+export interface EthereumContractPlateProps {
+	network: EVMNetwork;
+	contract: { title: string; contract: IEVMMailerContractLink | IEVMRegistryContractLink | undefined };
+	isModern: boolean;
+}
+
+export const EthereumContractPlate: FC<EthereumContractPlateProps> = ({ contract, isModern, network }) => {
+	const [deployModalVisible, setDeployModalVisible] = useState(false);
+	const [manageModalVisible, setManageModalVisible] = useState(false);
+
+	const name = EVM_NAMES[network];
+	const scan = blockchainsMap[name].ethNetwork!.blockExplorerUrls[0]!;
+
+	const isDeployed = !!contract.contract;
+	const isVerified = contract.contract && contract.contract.verified;
+
+	return (
+		<>
+			{deployModalVisible && (
+				<DeployContractModal
+					contract={contract}
+					network={network}
+					isModern={isModern}
+					onClose={() => setDeployModalVisible(false)}
+				/>
+			)}
+			<div
+				key={contract.title}
+				className={clsx(css.contractItem, {
+					[css.notDeployed]: !isDeployed,
+					[css.mostModern]: isModern,
+					[css.notVerified]: !isVerified,
+				})}
+				onClick={() => (isDeployed ? setManageModalVisible(true) : setDeployModalVisible(true))}
+			>
+				<div className={css.contractTitle}>
+					<div className={css.contractName}>
+						{contract.contract && !contract.contract.verified ? (
+							<Tooltip title="Code not verified on scanner">{contract.title}</Tooltip>
+						) : (
+							contract.title
+						)}
+					</div>
+					<div className={css.contractAddress}>
+						{contract.contract ? (
+							<a
+								href={`${scan}/address/${contract.contract.address.toLowerCase()}`}
+								target="_blank"
+								rel="noreferrer"
+							>
+								<AdaptiveAddress textAlign="right" address={contract.contract.address} />
+							</a>
+						) : (
+							''
+						)}
+					</div>
+				</div>
+				<div className={css.contractStatus}>
+					<div className={css.contractCreationBlock}>
+						{contract.contract ? `Creation: ${contract.contract.creationBlock}` : `Not deployed`}
+					</div>
+					<div className={css.contractTerminationBlock}>{contract.contract ? `Not terminated` : ``}</div>
+				</div>
+			</div>
+		</>
+	);
+};
+
+export class EthereumContractsRow extends PureComponent<{ network: EVMNetwork }> {
+	render() {
+		const { network } = this.props;
+		const name = EVM_NAMES[network];
+
+		const mostModernRegistry = 'RegistryV6';
+		const mostModernMailer = 'MailerV8';
+
+		const registryV3 = {
+			title: 'RegistryV3',
+			contract: EVM_CONTRACTS[network].registryContracts.find(
+				r => r.type === EVMRegistryContractType.YlideRegistryV3,
+			),
+		};
+		const registryV5 = {
+			title: 'RegistryV5',
+			contract: EVM_CONTRACTS[network].registryContracts.find(
+				r => r.type === EVMRegistryContractType.YlideRegistryV5,
+			),
+		};
+		const registryV6 = {
+			title: 'RegistryV6',
+			contract: EVM_CONTRACTS[network].registryContracts.find(
+				r => r.type === EVMRegistryContractType.YlideRegistryV6,
+			),
+		};
+
+		const mailerV6 = {
+			title: 'MailerV6',
+			contract: EVM_CONTRACTS[network].mailerContracts.find(r => r.type === EVMMailerContractType.YlideMailerV6),
+		};
+		const mailerV7 = {
+			title: 'MailerV7',
+			contract: EVM_CONTRACTS[network].mailerContracts.find(r => r.type === EVMMailerContractType.YlideMailerV7),
+		};
+		const mailerV8 = {
+			title: 'MailerV8',
+			contract: EVM_CONTRACTS[network].mailerContracts.find(r => r.type === EVMMailerContractType.YlideMailerV8),
+		};
+
+		const contractGroups: {
+			title: string;
+			contracts: {
+				title: string;
+				contract: IEVMMailerContractLink | IEVMRegistryContractLink | undefined;
+			}[];
+		}[] = [
+			{ title: 'Registry', contracts: [registryV6, registryV5, registryV3] },
+			{ title: 'Mailer', contracts: [mailerV8, mailerV7, mailerV6] },
+		];
+
+		return (
+			<div className={css.networkItem}>
+				<div className={css.networkTitle}>
+					<div className={css.networkLogo}>{blockchainsMap[name].logo(30)}</div>
+					<div className={css.networkName}>{blockchainsMap[name].title}</div>
+				</div>
+				{contractGroups.map(group => (
+					<div
+						key={group.title}
+						className={css.contractsGroup}
+						style={{
+							backgroundColor:
+								group.title === 'Registry' ? 'rgba(255, 245, 202, 0.6)' : 'rgba(202, 245, 255, 0.6)',
+						}}
+					>
+						{group.contracts.map(
+							(
+								c, // <Modal className={css.root} onClose={onClose}>
+							) => (
+								<EthereumContractPlate
+									key={c.title}
+									contract={c}
+									network={network}
+									isModern={c.title === mostModernMailer || c.title === mostModernRegistry}
+								/>
+							),
+						)}
+					</div>
+				))}
+			</div>
+		);
+	}
+}
 
 @observer
 export class AdminPage extends PureComponent {
-	constructor(props: any) {
-		super(props);
-
-		makeObservable(this);
-	}
-
-	@observable deployingRegistryV5 = false;
-	@observable changingBonucerRegistryV5 = false;
-	@observable changingBonucesRegistryV5 = false;
-	@observable registryV5Address = '';
-
-	selectedChain: EVMNetwork.GNOSIS | EVMNetwork.POLYGON | EVMNetwork.FANTOM = EVMNetwork.GNOSIS;
-
-	@autobind
-	async deployRegistryV5() {
-		this.deployingRegistryV5 = true;
-		// this.registryV5Address = await (
-		// 	domain.walletControllers.evm.metamask as EthereumWalletController
-		// ).deployRegistryV5();
-		this.deployingRegistryV5 = false;
-	}
-
-	@observable deployingMailerV7 = false;
-	@observable mailerV7Address = '';
-
-	@autobind
-	async deployMailerV7() {
-		this.deployingMailerV7 = true;
-		// this.mailerV7Address = await (
-		// 	domain.walletControllers.evm.metamask as EthereumWalletController
-		// ).deployMailerV7();
-		this.deployingMailerV7 = false;
-	}
-
-	@autobind
-	async changeBonucerRegistryV5() {
-		this.changingBonucerRegistryV5 = true;
-		// const sb = async (a: string) =>
-		// 	console.log(
-		// 		'result: ',
-		// 		await (domain.walletControllers.evm.metamask as EthereumWalletController).setBonucer(
-		// 			this.selectedChain,
-		// 			'0x15a33D60283e3D20751D6740162D1212c1ad2a2d'.toLowerCase(),
-		// 			a.toLowerCase(),
-		// 			true,
-		// 		),
-		// 	);
-
-		// await sb('0x2D15daF82b187f022348456ae4fbF4ffe40f1F72');
-		// await sb('0x0C386867628470786A90fd88809dAfb7ca1d3173');
-		// await sb('0x5D929f09db6E328fbE08f032AA6A784925bFCC35');
-		// await sb('0x157C7280d709CF24f52786Cd9A5aEC429c3b92cF');
-		// await sb('0xef26583C8C53B92fA1F052bE8ef23b896680Be51');
-		// await sb('0x9CEc8BFc69F890BAfeF7E6Cca091a10449618b6f');
-		// await sb('0xC5741b5Fe4a9a4899fb35B4884a55933541b0Ec4');
-		// await sb('0xd143358374AE027d82ed8176F6192e09fFaA9Ce6');
-		// await sb('0x76Fdf77758C5A0579809417C44555Cdc623345d4');
-		// await sb('0x1855A04623511B5bE555CaD56D4532D873cF6700');
-		// await sb('0x85E1438bAa18c9C0aFC4F5e54ff88F4a271AD337');
-		// await sb('0x0EB0a61A6aD78911A38F1b33BA94f65f3C3eB633');
-		// await sb('0x739C62cDC2dC3Cf4639E00d3f327fD48987C7221');
-		// await sb('0xD079915b8EB369C889fDFa6A3CAb29e7A0407efe');
-		// await sb('0x1888f1d499604316F96Ee5E8cEe03D5a2Ac0A702');
-		// await sb('0x58C8fa5806C27D9fC7363951686F615dB54C096f');
-		// await sb('0x1F094c8719F777D2543Db6744cE12df9B7466414');
-		// await sb('0xEAe0a0C374933dbCd3bC882c0e2a74F922849bD6');
-		// await sb('0x0F65679859bE0CAF3Cda34eBb8eB6eD80aa66A8F');
-
-		this.changingBonucerRegistryV5 = false;
-	}
-
-	@autobind
-	async changeBonucesRegistryV5() {
-		this.changingBonucesRegistryV5 = true;
-		const bonuces = {
-			[EVMNetwork.GNOSIS]: '3000000000000000',
-			[EVMNetwork.FANTOM]: '5000000000000000',
-			[EVMNetwork.POLYGON]: '50000000000000000',
-		};
-		// console.log(
-		// 	'result: ',
-		// 	await (domain.walletControllers.evm.metamask as EthereumWalletController).setBonuses(
-		// 		this.selectedChain,
-		// 		'0x15a33D60283e3D20751D6740162D1212c1ad2a2d'.toLowerCase(),
-		// 		bonuces[this.selectedChain], // newcomer: 0.001
-		// 		'0', // referrer: 0
-		// 	),
-		// );
-		this.changingBonucesRegistryV5 = false;
-	}
-
 	render() {
+		const networks = Object.keys(blockchainsMap).filter(e => e !== 'LOCAL_HARDHAT');
+
+		const groups = [
+			{
+				title: 'EVM',
+				blockchains: networks.filter(n => !!blockchainsMap[n].ethNetwork),
+			},
+			{
+				title: 'Everscale',
+				blockchains: networks.filter(n => !blockchainsMap[n].ethNetwork),
+			},
+		];
+
 		return (
 			<div
 				style={{
-					padding: 30,
+					padding: 20,
 					display: 'flex',
-					flexDirection: 'row',
-					alignItems: 'center',
-					justifyContent: 'center',
+					flexDirection: 'column',
+					alignItems: 'stretch',
+					justifyContent: 'flex-start',
 				}}
 			>
-				<div
-					style={{
-						display: 'flex',
-						flexDirection: 'column',
-						margin: 20,
-						background: 'white',
-						padding: 20,
-						border: '1px solid #e0e0e0',
-						boxShadow: '4px 4px 0px black',
-						width: 400,
-						borderRadius: 10,
-					}}
-				>
-					<YlideButton onClick={this.deployRegistryV5}>
-						{this.deployingRegistryV5 ? <Spin /> : 'Deploy Regsitry V5'}
-					</YlideButton>
-					<YlideButton onClick={this.changeBonucerRegistryV5}>
-						{this.changingBonucerRegistryV5 ? <Spin /> : 'Change Bonucer Regsitry V5'}
-					</YlideButton>
-					<YlideButton onClick={this.changeBonucesRegistryV5}>
-						{this.changingBonucesRegistryV5 ? <Spin /> : 'Change Bonuses Regsitry V5'}
-					</YlideButton>
-					<br />
-					New contract address: {this.registryV5Address}
-				</div>
-				<div
-					style={{
-						display: 'flex',
-						flexDirection: 'column',
-						margin: 20,
-						background: 'white',
-						padding: 20,
-						border: '1px solid #e0e0e0',
-						boxShadow: '4px 4px 0px black',
-						width: 400,
-						borderRadius: 10,
-					}}
-				>
-					<YlideButton onClick={this.deployMailerV7}>
-						{this.deployingMailerV7 ? <Spin /> : 'Deploy Mailer V7'}
-					</YlideButton>
-					<br />
-					New contract address: {this.mailerV7Address}
-				</div>
+				<h2 style={{ fontSize: 26, marginBottom: 30 }}>Ylide Contract Management Console</h2>
+				{groups.map(group => (
+					<div key={group.title}>
+						<h3
+							style={{
+								fontSize: 22,
+								marginBottom: 20,
+							}}
+						>
+							{group.title}
+						</h3>
+						<div className={css.networksList}>
+							{group.blockchains.map(network =>
+								group.title === 'EVM' ? (
+									<EthereumContractsRow key={network} network={evmNameToNetwork(network)!} />
+								) : (
+									<div key={network}>Not implemented</div>
+								),
+							)}
+						</div>
+					</div>
+				))}
 			</div>
 		);
 	}

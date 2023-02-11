@@ -1,9 +1,6 @@
 import {
 	AbstractWalletController,
-	ExternalYlidePublicKey,
 	IGenericAccount,
-	PublicKey,
-	PublicKeyType,
 	WalletControllerFactory,
 	WalletEvent,
 	YlideKeyPair,
@@ -13,7 +10,6 @@ import EventEmitter from 'eventemitter3';
 import { computed, makeObservable, observable } from 'mobx';
 
 import { Domain } from '../Domain';
-import { useMailStore } from '../MailList';
 import { DomainAccount } from './DomainAccount';
 
 export class Wallet extends EventEmitter {
@@ -123,20 +119,12 @@ export class Wallet extends EventEmitter {
 	}
 
 	async readRemoteKeys(account: IGenericAccount) {
-		//
-		const blockchainGroup = this.factory.blockchainGroup;
-		const blockchainFactories = this.domain.registeredBlockchains.filter(
-			b => b.blockchainGroup === blockchainGroup,
-		);
-		const blockchains = blockchainFactories.map(factory => ({
-			factory,
-			controller: this.domain.blockchains[factory.blockchain],
-		}));
 		const result = await this.domain.ylide.core.getAddressKeys(account.address);
+
 		return {
 			remoteKey: result.freshestKey,
 			remoteKeys: result.remoteKeys,
-		}
+		};
 	}
 
 	async getCurrentAccount(): Promise<IGenericAccount | null> {

@@ -1,13 +1,5 @@
+import { makeObservable, observable } from 'mobx';
 import WalletConnectProvider from '@walletconnect/web3-provider';
-import {
-	EVM_CHAINS,
-	EVM_NAMES,
-	EVM_RPCS,
-	evmBlockchainFactories,
-	EVMNetwork,
-	evmWalletFactories,
-} from '@ylide/ethereum';
-import { everscaleBlockchainFactory, everscaleWalletFactory } from '@ylide/everscale';
 import {
 	AbstractBlockchainController,
 	AbstractNameService,
@@ -22,7 +14,16 @@ import {
 	Ylide,
 	YlideKeyStore,
 } from '@ylide/sdk';
-import { makeObservable, observable, toJS } from 'mobx';
+import {
+	EVM_CHAINS,
+	EVM_NAMES,
+	EVM_RPCS,
+	evmBlockchainFactories,
+	EVMNetwork,
+	evmWalletFactories,
+	EthereumWalletController,
+} from '@ylide/ethereum';
+// import { everscaleBlockchainFactory, everscaleWalletFactory } from '@ylide/everscale';
 
 import { blockchainsMap, supportedWallets } from '../constants';
 import PasswordModal from '../modals/PasswordModal';
@@ -32,6 +33,8 @@ import contacts from './Contacts';
 import { useMailStore } from './MailList';
 import { Wallet } from './models/Wallet';
 import tags from './Tags';
+
+const INDEXER_BLOCKCHAINS: string[] = []; //['GNOSIS'];
 
 // Ylide.registerBlockchainFactory(evmBlockchainFactories[EVMNetwork.LOCAL_HARDHAT]);
 Ylide.registerBlockchainFactory(evmBlockchainFactories[EVMNetwork.ETHEREUM]);
@@ -44,8 +47,8 @@ Ylide.registerBlockchainFactory(evmBlockchainFactories[EVMNetwork.FANTOM]);
 Ylide.registerBlockchainFactory(evmBlockchainFactories[EVMNetwork.KLAYTN]);
 Ylide.registerBlockchainFactory(evmBlockchainFactories[EVMNetwork.GNOSIS]);
 Ylide.registerBlockchainFactory(evmBlockchainFactories[EVMNetwork.AURORA]);
-Ylide.registerBlockchainFactory(evmBlockchainFactories[EVMNetwork.CELO]);
-Ylide.registerBlockchainFactory(evmBlockchainFactories[EVMNetwork.CRONOS]);
+// Ylide.registerBlockchainFactory(evmBlockchainFactories[EVMNetwork.CELO]);
+// Ylide.registerBlockchainFactory(evmBlockchainFactories[EVMNetwork.CRONOS]);
 Ylide.registerBlockchainFactory(evmBlockchainFactories[EVMNetwork.MOONBEAM]);
 Ylide.registerBlockchainFactory(evmBlockchainFactories[EVMNetwork.MOONRIVER]);
 Ylide.registerBlockchainFactory(evmBlockchainFactories[EVMNetwork.METIS]);
@@ -69,7 +72,7 @@ export class Domain {
 
 	@observable initialized = false;
 
-	ylide: Ylide = new Ylide(this.keystore);
+	ylide: Ylide = new Ylide(this.keystore, INDEXER_BLOCKCHAINS);
 
 	@observable txChain: 'fantom' | 'gnosis' | 'polygon' = 'polygon';
 	@observable txWithBonus: boolean = false;
@@ -253,11 +256,11 @@ export class Domain {
 		}
 	}
 
-	async switchEVMChain(needNetwork: EVMNetwork) {
+	async switchEVMChain(wallet: Wallet, needNetwork: EVMNetwork) {
 		try {
 			const bData = blockchainsMap[EVM_NAMES[needNetwork]];
-			// @ts-ignore
-			await window.ethereum.request({
+
+			await (wallet.controller as EthereumWalletController).providerObject.request({
 				method: 'wallet_addEthereumChain',
 				params: [bData.ethNetwork!],
 			});
@@ -265,8 +268,7 @@ export class Domain {
 			console.log('error: ', error);
 		}
 		try {
-			// @ts-ignore
-			await window.ethereum.request({
+			await (wallet.controller as EthereumWalletController).providerObject.request({
 				method: 'wallet_switchEthereumChain',
 				params: [{ chainId: '0x' + Number(EVM_CHAINS[needNetwork]).toString(16) }], // chainId must be in hexadecimal numbers
 			});
@@ -315,7 +317,6 @@ export class Domain {
 				async open(uri, cb, opts?) {
 					// fired this method? means disconnected
 					isAvailable = false;
-					console.log('a1');
 					cb();
 				},
 				close() {
@@ -323,12 +324,10 @@ export class Domain {
 				},
 			},
 		});
-		console.log('a2');
+
 		try {
 			await wcTest.enable();
-			console.log('a3');
 		} catch (err) {
-			console.log('a4: ', err);
 			// no-op
 		}
 
@@ -339,7 +338,7 @@ export class Domain {
 				walletName: wcTest.wc.peerMeta?.name || '',
 				provider: wcTest,
 			};
-			console.log('wallet connect available on start: ', wcTest);
+			// console.log('wallet connect available on start: ', wcTest);
 			await this.extractWalletsData();
 		} else {
 			let resolve = (val: { walletName: string; provider: any }) => {};
@@ -356,7 +355,7 @@ export class Domain {
 								resolve = _resolve;
 							}),
 						};
-						console.log('a5: ', toJS(domain.walletConnectState));
+						// console.log('a5: ', toJS(domain.walletConnectState));
 					},
 					async close() {
 						domain.walletConnectState = {
@@ -365,7 +364,7 @@ export class Domain {
 							walletName: wcReal.wc.peerMeta?.name || '',
 							provider: wcReal,
 						};
-						console.log('wallet connect close (good close): ', wcReal);
+						// console.log('wallet connect close (good close): ', wcReal);
 						await self.extractWalletsData();
 						resolve({ walletName: wcReal.wc.peerMeta?.name || '', provider: wcReal });
 					},
@@ -375,10 +374,10 @@ export class Domain {
 			wcReal
 				.enable()
 				.then(result => {
-					console.log('wccReal enabled: ', result);
+					// console.log('wccReal enabled: ', result);
 				})
 				.catch(err => {
-					console.log('wcc error: ', err);
+					// console.log('wcc error: ', err);
 				});
 		}
 	}
@@ -401,7 +400,10 @@ export class Domain {
 					needChainId: number,
 				) => {
 					try {
-						await this.switchEVMChain(needNetwork);
+						await this.switchEVMChain(
+							this.wallets.find(w => w.factory.wallet === factory.wallet)!,
+							needNetwork,
+						);
 					} catch (err) {
 						alert(
 							'Wrong network (' +
@@ -504,23 +506,14 @@ export class Domain {
 		if (this.initialized) {
 			return;
 		}
-		console.log('d1');
 		this.availableWallets = await Ylide.getAvailableWallets();
-		console.log('d2');
 		await this.initWalletConnect();
-		console.log('d3');
 		await this.extractWalletsData();
-		console.log('d4');
 		await this.keystore.init();
-		console.log('d5');
 		await this.accounts.accountsProcessed;
-		console.log('d6');
 		await contacts.init();
-		console.log('d7');
 		await tags.getTags();
-		console.log('d8');
 		await useMailStore.getState().init();
-		console.log('d9');
 		this.initialized = true;
 	}
 

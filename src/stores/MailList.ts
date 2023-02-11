@@ -1,19 +1,17 @@
-import { EthereumBlockchainController } from '@ylide/ethereum';
 import {
 	AbstractBlockchainController,
-	BlockchainMap,
 	BlockchainSourceType,
-	IListSource,
 	IMessage,
 	IMessageContent,
 	IMessageWithSource,
+	ISourceWithMeta,
 	ListSourceDrainer,
 	ListSourceMultiplexer,
 	SourceReadingSession,
 	Uint256,
 } from '@ylide/sdk';
 import { reaction } from 'mobx';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import create from 'zustand';
 
 import messagesDB, { IMessageDecodedContent } from '../indexedDB/MessagesDB';
@@ -67,11 +65,6 @@ export function useMailList(props?: UseMailListProps) {
 
 	const readingSession = useMailStore(state => state.readingSession);
 
-	const accountSourceMatch = useMemo(
-		() => new Map<IListSource, { account: DomainAccount; reader: AbstractBlockchainController }>(),
-		[],
-	);
-
 	const [activeAccounts, setActiveAccounts] = useState(domain.accounts.activeAccounts);
 	reaction(
 		() => domain.accounts.activeAccounts,
@@ -91,16 +84,16 @@ export function useMailList(props?: UseMailListProps) {
 	const [isNeedMore, setNeedMore] = useState(false);
 	const loadNextPage = useCallback(() => setNeedMore(true), []);
 
-	const wrapMessage = useCallback(
-		(p: IMessageWithSource): ILinkedMessage => ({
-			id: `${p.msg.msgId}:${accountSourceMatch.get(p.source)?.account.account.address}`,
+	const wrapMessage = useCallback((p: IMessageWithSource): ILinkedMessage => {
+		const acc = p.meta.account as DomainAccount;
+		return {
+			id: `${p.msg.msgId}:${acc.account.address}`,
 			msgId: p.msg.msgId,
 			msg: p.msg,
-			recipient: accountSourceMatch.get(p.source)?.account || null,
-			reader: accountSourceMatch.get(p.source)!.reader,
-		}),
-		[accountSourceMatch],
-	);
+			recipient: acc || null,
+			reader: domain.ylide.controllers.blockchainsMap[p.msg.blockchain],
+		};
+	}, []);
 
 	useEffect(() => {
 		if (!folderId) return;
@@ -113,68 +106,31 @@ export function useMailList(props?: UseMailListProps) {
 		setNextPageAvailable(true);
 
 		function buildSources(
-			accountSourceMatch: Map<IListSource, { account: DomainAccount; reader: AbstractBlockchainController }>,
 			activeAccounts: DomainAccount[],
-			blockchains: BlockchainMap<AbstractBlockchainController>,
 			readingSession: SourceReadingSession,
 			folderId: FolderId,
 			sender?: string,
-		) {
+		): ISourceWithMeta[] {
+			function getDirectWithMeta(
+				recipient: Uint256,
+				sender: string | null,
+				account: DomainAccount,
+			): ISourceWithMeta[] {
+				return domain.ylide.core
+					.getListSources(readingSession, [
+						{
+							type: BlockchainSourceType.DIRECT,
+							recipient,
+							sender,
+						},
+					])
+					.map(source => ({ source, meta: { account } }));
+			}
+
 			if (folderId === FolderId.Inbox || folderId === FolderId.Archive) {
-				return activeAccounts
-					.map(account => {
-						const res: IListSource[] = domain.ylide.core.getListSources(readingSession, [
-							{
-								type: BlockchainSourceType.DIRECT,
-								recipient: account.uint256Address,
-								sender: sender || null,
-							},
-						]);
-						// for (const blockchain of Object.keys(blockchains)) {
-						// 	const reader = blockchains[blockchain];
-						// 	const ls = readingSession.listSource(
-						// 		{
-						// 			blockchain,
-						// 			type: BlockchainSourceType.DIRECT,
-						// 			recipient: account.uint256Address,
-						// 			sender: sender || null,
-						// 		},
-						// 		reader,
-						// 	);
-						// 	accountSourceMatch.set(ls, { account, reader });
-						// 	res.push(ls);
-						// }
-						return res;
-					})
-					.flat();
+				return activeAccounts.map(acc => getDirectWithMeta(acc.uint256Address, sender || null, acc)).flat();
 			} else if (folderId === FolderId.Sent) {
-				return activeAccounts
-					.map(account => {
-						const res: IListSource[] = domain.ylide.core.getListSources(readingSession, [
-							{
-								type: BlockchainSourceType.DIRECT,
-								recipient: account.sentAddress,
-								sender: null,
-							},
-						]);
-						// const res: IListSource[] = [];
-						// for (const blockchain of account.appropriateBlockchains()) {
-						// 	const reader = blockchain.reader;
-						// 	const ls = readingSession.listSource(
-						// 		{
-						// 			blockchain: blockchain.factory.blockchain,
-						// 			type: BlockchainSourceType.DIRECT,
-						// 			recipient: account.sentAddress,
-						// 			sender: null,
-						// 		},
-						// 		reader,
-						// 	);
-						// 	accountSourceMatch.set(ls, { account, reader });
-						// 	res.push(ls);
-						// }
-						return res;
-					})
-					.flat();
+				return activeAccounts.map(acc => getDirectWithMeta(acc.sentAddress, null, acc)).flat();
 			} else {
 				const tag = tags.tags.find(t => String(t.id) === folderId);
 				if (!tag) {
@@ -182,42 +138,14 @@ export function useMailList(props?: UseMailListProps) {
 				}
 				const contactsV = contacts.contacts.filter(c => c.tags.includes(tag.id));
 				return contactsV
-					.map(v =>
-						activeAccounts.map(account => {
-							const res: IListSource[] = domain.ylide.core.getListSources(readingSession, [
-								{
-									type: BlockchainSourceType.DIRECT,
-									recipient: account.uint256Address,
-									sender: v.address,
-								},
-							]);
-							// const res: IListSource[] = [];
-							// for (const blockchain of Object.keys(blockchains)) {
-							// 	const reader = blockchains[blockchain];
-							// 	const ls = readingSession.listSource(
-							// 		{
-							// 			blockchain,
-							// 			type: BlockchainSourceType.DIRECT,
-							// 			recipient: account.uint256Address,
-							// 			sender: v.address,
-							// 		},
-							// 		reader,
-							// 	);
-							// 	accountSourceMatch.set(ls, { account, reader });
-							// 	res.push(ls);
-							// }
-							return res;
-						}),
-					)
+					.map(v => activeAccounts.map(acc => getDirectWithMeta(acc.uint256Address, v.address, acc)))
 					.flat()
 					.flat();
 			}
 		}
 
 		const listSourceDrainer = new ListSourceDrainer(
-			new ListSourceMultiplexer(
-				buildSources(accountSourceMatch, activeAccounts, blockchains, readingSession, folderId, sender),
-			),
+			new ListSourceMultiplexer(buildSources(activeAccounts, readingSession, folderId, sender)),
 		);
 
 		async function onNewMessages({ messages }: { messages: IMessageWithSource[] }) {
@@ -236,8 +164,8 @@ export function useMailList(props?: UseMailListProps) {
 					loadNextPage();
 				}
 			})
-			.catch(() => {
-				console.log(`build stream: catch`);
+			.catch(err => {
+				console.log(`build stream: catch: `, err);
 			});
 
 		return () => {
@@ -249,7 +177,7 @@ export function useMailList(props?: UseMailListProps) {
 			listSourceDrainer.pause();
 			listSourceDrainer.off('messages', onNewMessages);
 		};
-	}, [accountSourceMatch, activeAccounts, blockchains, folderId, loadNextPage, readingSession, sender, wrapMessage]);
+	}, [activeAccounts, blockchains, folderId, loadNextPage, readingSession, sender, wrapMessage]);
 
 	useEffect(() => {
 		let isDestroyed = false;
@@ -283,6 +211,8 @@ export function useMailList(props?: UseMailListProps) {
 			console.log(`loading: start`);
 
 			setLoading(true);
+
+			// debugger;
 
 			stream.readMore(MailPageSize).then(messages => {
 				console.log(`loading: end`);
@@ -402,6 +332,7 @@ export const useMailStore = create<MailStore>((set, get) => ({
 				return state.messagesContentById[pushMsg.msgId];
 			}
 
+			debugger;
 			const content = await pushMsg.reader.retrieveMessageContent(pushMsg.msg);
 			if (!content || content.corrupted) {
 				throw new Error('Content is not available or corrupted');
