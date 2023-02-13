@@ -48,8 +48,9 @@ export function AnchoredPopup({
 		<Popup
 			className={className}
 			align={alignPopup}
-			outsideClickChecker={elem => elem === anchorRef.current}
-			onCloseRequest={onCloseRequest}
+			closeOnOutsideClick
+			customOutsideClickChecker={elem => elem === anchorRef.current}
+			onClose={onCloseRequest}
 		>
 			{children}
 		</Popup>
