@@ -41,7 +41,7 @@
 
 .contact {
 	display: grid;
-	grid-template-columns: 1fr auto;
+	grid-template-columns: auto 1fr;
 	align-items: center;
 	padding: 0 4px 0 0;
 }
