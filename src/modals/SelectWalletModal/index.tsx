@@ -13,7 +13,7 @@ import domain from '../../stores/Domain';
 import { Wallet } from '../../stores/models/Wallet';
 import walletConnect from '../../stores/WalletConnect';
 import { getQueryString } from '../../utils/getQueryString';
-import NewPasswordModal from '../NewPasswordModal';
+import { NewPasswordModal } from '../NewPasswordModal';
 import SwitchModal from '../SwitchModal';
 
 interface SelectWalletModalProps {
