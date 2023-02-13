@@ -209,15 +209,7 @@ export default class NewPasswordModal extends PureComponent<NewPasswordModalProp
 			this.step = 5;
 		} else if (this.forceNew) {
 			this.account = await this.props.wallet.instantiateNewAccount(this.props.account, tempLocalKey);
-			if (this.props.faucetType && this.props.wallet.factory.blockchainGroup === 'evm') {
-				await this.publishThroughFaucet(this.account, this.props.faucetType, this.props.bonus);
-			} else {
-				if (this.props.wallet.factory.blockchainGroup === 'evm') {
-					this.step = 2;
-				} else {
-					return await this.publishLocalKey(this.account);
-				}
-			}
+			return await this.publishLocalKey(this.account);
 		} else {
 			alert('Ylide password was wrong, please, try again');
 			this.step = 0;
