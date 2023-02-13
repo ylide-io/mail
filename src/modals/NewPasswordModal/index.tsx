@@ -42,7 +42,16 @@ const txPrices: Record<EVMNetwork, number> = {
 	[EVMNetwork.ASTAR]: 0.001,
 };
 
-export interface NewPasswordModalProps {
+enum Step {
+	ENTER_PASSWORD,
+	GENERATE_KEY,
+	SELECT_NETWORK,
+	PUBLISH_KEY,
+	PUBLISHING_KEY,
+	FINISH,
+}
+
+interface NewPasswordModalProps {
 	faucetType: null | 'polygon' | 'gnosis' | 'fantom';
 	bonus: boolean;
 	wallet: Wallet;
@@ -54,7 +63,7 @@ export interface NewPasswordModalProps {
 export function NewPasswordModal({ faucetType, bonus, wallet, account, remoteKeys, onResolve }: NewPasswordModalProps) {
 	const navigate = useNav();
 
-	const [step, setStep] = useState(0);
+	const [step, setStep] = useState(Step.ENTER_PASSWORD);
 
 	const [password, setPassword] = useState('');
 	const [passwordRepeat, setPasswordRepeat] = useState('');
@@ -106,7 +115,7 @@ export function NewPasswordModal({ faucetType, bonus, wallet, account, remoteKey
 	) {
 		browserStorage.canSkipRegistration = true;
 		console.log('public key: ', '0x' + new SmartBuffer(account.key.keypair.publicKey).toHexString());
-		setStep(1);
+		setStep(Step.GENERATE_KEY);
 		const signature = await requestFaucetSignature(account);
 		setPleaseWait(true);
 		domain.isTxPublishing = true;
@@ -154,36 +163,36 @@ export function NewPasswordModal({ faucetType, bonus, wallet, account, remoteKey
 				domain.txPlateVisible = false;
 			});
 
-		setStep(5);
+		setStep(Step.FINISH);
 	}
 
 	async function publishLocalKey(account: DomainAccount) {
-		setStep(3);
+		setStep(Step.PUBLISH_KEY);
 		try {
 			await account.attachRemoteKey(network);
 			await asyncDelay(7000);
 			await account.init();
 			analytics.walletRegistered(wallet.factory.wallet, account.account.address, domain.accounts.accounts.length);
-			setStep(5);
+			setStep(Step.FINISH);
 		} catch (err) {
 			if (wallet.factory.blockchainGroup === 'evm') {
-				setStep(2);
+				setStep(Step.SELECT_NETWORK);
 			} else {
-				setStep(0);
+				setStep(Step.ENTER_PASSWORD);
 			}
 			alert('Transaction was not published. Please, try again');
 		}
 	}
 
 	async function createLocalKey() {
-		setStep(1);
+		setStep(Step.GENERATE_KEY);
 
 		let tempLocalKey;
 		try {
 			tempLocalKey = await wallet.constructLocalKey(account, password);
 		} catch (err) {
 			console.log('createLocalKey ', err);
-			setStep(0);
+			setStep(Step.ENTER_PASSWORD);
 			return;
 		}
 
@@ -194,7 +203,7 @@ export function NewPasswordModal({ faucetType, bonus, wallet, account, remoteKey
 				await publishThroughFaucet(domainAccount, faucetType, bonus);
 			} else {
 				if (wallet.factory.blockchainGroup === 'evm') {
-					setStep(2);
+					setStep(Step.SELECT_NETWORK);
 				} else {
 					return await publishLocalKey(domainAccount);
 				}
@@ -202,26 +211,26 @@ export function NewPasswordModal({ faucetType, bonus, wallet, account, remoteKey
 		} else if (isBytesEqual(freshestKey.key.publicKey.bytes, tempLocalKey.publicKey)) {
 			await wallet.instantiateNewAccount(account, tempLocalKey);
 			analytics.walletConnected(wallet.factory.wallet, account.address, domain.accounts.accounts.length);
-			setStep(5);
+			setStep(Step.FINISH);
 		} else if (forceNew) {
 			const domainAccount = await wallet.instantiateNewAccount(account, tempLocalKey);
 			setDomainAccount(domainAccount);
 			return await publishLocalKey(domainAccount);
 		} else {
 			alert('Ylide password was wrong, please, try again');
-			setStep(0);
+			setStep(Step.ENTER_PASSWORD);
 			return;
 		}
 	}
 
 	async function networkSelect(network: EVMNetwork) {
 		setNetwork(network);
-		setStep(3);
+		setStep(Step.PUBLISH_KEY);
 		try {
 			invariant(domainAccount);
 			await publishLocalKey(domainAccount);
 		} catch (err) {
-			setStep(2);
+			setStep(Step.SELECT_NETWORK);
 		}
 	}
 
@@ -239,7 +248,7 @@ export function NewPasswordModal({ faucetType, bonus, wallet, account, remoteKey
 				<WalletTag wallet={wallet.factory.wallet} address={account.address} />
 			</div>
 
-			{step === 0 ? (
+			{step === Step.ENTER_PASSWORD ? (
 				<>
 					<h3 className="wm-title">{freshestKey ? `Enter password` : `Create password`}</h3>
 					<h4 className="wm-subtitle">
@@ -333,7 +342,7 @@ export function NewPasswordModal({ faucetType, bonus, wallet, account, remoteKey
 						</YlideButton>
 					</div>
 				</>
-			) : step === 1 ? (
+			) : step === Step.GENERATE_KEY ? (
 				<>
 					{pleaseWait ? (
 						<>
@@ -393,12 +402,12 @@ export function NewPasswordModal({ faucetType, bonus, wallet, account, remoteKey
 					)}
 
 					<div className="wm-footer" style={{ justifyContent: 'center' }}>
-						<YlideButton ghost style={{ width: 128 }} onClick={() => setStep(0)}>
+						<YlideButton ghost style={{ width: 128 }} onClick={() => setStep(Step.ENTER_PASSWORD)}>
 							Back
 						</YlideButton>
 					</div>
 				</>
-			) : step === 2 ? (
+			) : step === Step.SELECT_NETWORK ? (
 				<>
 					<h3 className="wm-title">Choose network</h3>
 					<div
@@ -467,7 +476,7 @@ export function NewPasswordModal({ faucetType, bonus, wallet, account, remoteKey
 							})}
 					</div>
 				</>
-			) : step === 3 ? (
+			) : step === Step.PUBLISH_KEY ? (
 				<>
 					<div className="wm-body centered">
 						<div
@@ -518,13 +527,19 @@ export function NewPasswordModal({ faucetType, bonus, wallet, account, remoteKey
 						<YlideButton
 							ghost
 							style={{ width: 128 }}
-							onClick={() => setStep(wallet.factory.blockchainGroup === 'evm' ? 2 : 0)}
+							onClick={() =>
+								setStep(
+									wallet.factory.blockchainGroup === 'evm'
+										? Step.SELECT_NETWORK
+										: Step.ENTER_PASSWORD,
+								)
+							}
 						>
 							Back
 						</YlideButton>
 					</div>
 				</>
-			) : step === 4 ? (
+			) : step === Step.PUBLISHING_KEY ? (
 				<>
 					<div className="wm-body centered">
 						<div
@@ -541,7 +556,7 @@ export function NewPasswordModal({ faucetType, bonus, wallet, account, remoteKey
 						<h4 className="wm-subtitle">Please, wait for the transaction to be completed</h4>
 					</div>
 				</>
-			) : step === 5 ? (
+			) : step === Step.FINISH ? (
 				<>
 					<h3 className="wm-title" style={{ marginBottom: 10 }}>
 						Your account is ready
