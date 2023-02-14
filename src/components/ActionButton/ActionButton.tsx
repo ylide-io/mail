@@ -16,13 +16,14 @@ interface ActionButtonProps extends PropsWithChildren, PropsWithClassName {
 	icon?: ReactNode;
 	title?: string;
 	isDisabled?: boolean;
+	isMultiline?: boolean;
 	onClick?: React.MouseEventHandler<HTMLElement>;
 }
 
 // 'props' are needed to let AntD show Tooltips https://github.com/ant-design/ant-design/issues/15909
 export const ActionButton = forwardRef(
 	(
-		{ children, className, style, icon, title, isDisabled, onClick, ...props }: ActionButtonProps,
+		{ children, className, style, icon, title, isDisabled, isMultiline, onClick, ...props }: ActionButtonProps,
 		ref: Ref<HTMLButtonElement>,
 	) => {
 		const styleClass = {
@@ -41,6 +42,7 @@ export const ActionButton = forwardRef(
 					icon != null && css.root_hasIcon,
 					children != null && css.root_hasContent,
 					isDisabled && css.root_disabled,
+					isMultiline ? css.root_multiline : css.root_singleline,
 					className,
 				)}
 				disabled={isDisabled}

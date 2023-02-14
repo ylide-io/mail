@@ -5,6 +5,7 @@ import clsx from 'clsx';
 import { useEffect, useMemo, useState } from 'react';
 import { generatePath } from 'react-router-dom';
 
+import { ForgotPasswordModal } from '../../components/forgotPasswordModal/forgotPasswordModal';
 import { Modal } from '../../components/modal/modal';
 import { YlideLoader } from '../../components/ylideLoader/ylideLoader';
 import { blockchainsMap, calloutSvg, evmNameToNetwork } from '../../constants';
@@ -68,6 +69,8 @@ export function NewPasswordModal({ faucetType, bonus, wallet, account, remoteKey
 	const [password, setPassword] = useState('');
 	const [passwordRepeat, setPasswordRepeat] = useState('');
 
+	const [forgotPassword, setForgotPassword] = useState(false);
+
 	const [network, setNetwork] = useState<EVMNetwork>();
 	useEffect(() => {
 		if (wallet.factory.blockchainGroup === 'evm') {
@@ -91,8 +94,6 @@ export function NewPasswordModal({ faucetType, bonus, wallet, account, remoteKey
 	);
 
 	const [domainAccount, setDomainAccount] = useState<DomainAccount>();
-
-	const forceNew = false;
 
 	const [pleaseWait, setPleaseWait] = useState(false);
 
@@ -184,7 +185,7 @@ export function NewPasswordModal({ faucetType, bonus, wallet, account, remoteKey
 		}
 	}
 
-	async function createLocalKey() {
+	async function createLocalKey(password: string, forceNew?: boolean) {
 		setStep(Step.GENERATE_KEY);
 
 		let tempLocalKey;
@@ -235,357 +236,380 @@ export function NewPasswordModal({ faucetType, bonus, wallet, account, remoteKey
 	}
 
 	return (
-		<Modal className="account-modal wallet-modal" onClose={() => onResolve(null, false, false)}>
-			<div
-				style={{
-					padding: 24,
-					paddingTop: 12,
-					display: 'flex',
-					alignItems: 'center',
-					justifyContent: 'center',
-				}}
-			>
-				<WalletTag wallet={wallet.factory.wallet} address={account.address} />
-			</div>
+		<>
+			<Modal className="account-modal wallet-modal" onClose={() => onResolve(null, false, false)}>
+				<div
+					style={{
+						padding: 24,
+						paddingTop: 12,
+						display: 'flex',
+						alignItems: 'center',
+						justifyContent: 'center',
+					}}
+				>
+					<WalletTag wallet={wallet.factory.wallet} address={account.address} />
+				</div>
 
-			{step === Step.ENTER_PASSWORD ? (
-				<>
-					<h3 className="wm-title">{freshestKey ? `Enter password` : `Create password`}</h3>
-					<h4 className="wm-subtitle">
-						{freshestKey ? (
-							<>
-								We found your key in the {blockchainsMap[freshestKey.blockchain].logo(12)}{' '}
-								<b>{blockchainsMap[freshestKey.blockchain].title}</b> blockchain. Please, enter your
-								Ylide Password to access it.
-							</>
-						) : (
-							`This password will be used to encrypt and decrypt your mails.`
-						)}
-					</h4>
-					{!freshestKey ? (
-						<div className="wm-body">
-							<form
-								name="sign-up"
-								style={{
-									display: 'flex',
-									flexDirection: 'column',
-									alignItems: 'stretch',
-									justifyContent: 'flex-start',
-								}}
-								action="/"
-								method="POST"
-								noValidate
-							>
-								<input
-									className="ylide-input ylide-password-input"
-									type="password"
-									autoComplete="new-password"
-									name="password"
-									id="password"
-									placeholder="Enter Ylide password"
-									value={password}
-									onChange={e => setPassword(e.target.value)}
-								/>
-								<input
-									className="ylide-input ylide-password-input"
-									type="password"
-									autoComplete="new-password"
-									name="repeat-password"
-									id="repeat-password"
-									placeholder="Repeat your password"
-									value={passwordRepeat}
-									onChange={e => setPasswordRepeat(e.target.value)}
-								/>
-							</form>
-							<div className="ylide-callout">{calloutSvg}</div>
-						</div>
-					) : (
-						<div className="wm-body centered">
-							<input
-								style={{
-									fontSize: 16,
-									borderRadius: 40,
-									textAlign: 'center',
-									height: 36,
-									border: '1px solid #000000',
-									padding: '5px 10px',
-									marginLeft: 20,
-									marginRight: 20,
-									marginTop: 20,
-									marginBottom: 20,
-								}}
-								value={password}
-								onChange={e => setPassword(e.target.value)}
-								type="password"
-								placeholder="Enter your Ylide password"
-							/>
-						</div>
-					)}
-					<div className="wm-footer">
-						<YlideButton
-							ghost
-							style={{ width: 128 }}
-							onClick={() => {
-								onResolve('', false, false);
-							}}
-						>
-							Back
-						</YlideButton>
-						<YlideButton
-							primary
-							style={{ width: 216 }}
-							onClick={() => {
-								createLocalKey();
-							}}
-						>
-							Continue
-						</YlideButton>
-					</div>
-				</>
-			) : step === Step.GENERATE_KEY ? (
-				<>
-					{pleaseWait ? (
-						<>
-							<div className="wm-body centered">
-								<h3 className="wm-title">Please, wait</h3>
-								<h4 className="wm-subtitle">Your transaction is being confirmed</h4>
-							</div>
-						</>
-					) : (
-						<>
-							<div className="wm-body centered">
-								<div
+				{step === Step.ENTER_PASSWORD ? (
+					<>
+						<h3 className="wm-title">{freshestKey ? `Enter password` : `Create password`}</h3>
+						<h4 className="wm-subtitle">
+							{freshestKey ? (
+								<>
+									We found your key in the {blockchainsMap[freshestKey.blockchain].logo(12)}{' '}
+									<b>{blockchainsMap[freshestKey.blockchain].title}</b> blockchain. Please, enter your
+									Ylide Password to access it.
+								</>
+							) : (
+								`This password will be used to encrypt and decrypt your mails.`
+							)}
+						</h4>
+						{!freshestKey ? (
+							<div className="wm-body">
+								<form
+									name="sign-up"
 									style={{
 										display: 'flex',
-										flexDirection: 'row',
-										alignItems: 'flex-start',
-										justifyContent: 'flex-end',
-										paddingRight: 24,
-										paddingBottom: 20,
+										flexDirection: 'column',
+										alignItems: 'stretch',
+										justifyContent: 'flex-start',
+									}}
+									action="/"
+									method="POST"
+									noValidate
+								>
+									<input
+										className="ylide-input ylide-password-input"
+										type="password"
+										autoComplete="new-password"
+										name="password"
+										id="password"
+										placeholder="Enter Ylide password"
+										value={password}
+										onChange={e => setPassword(e.target.value)}
+									/>
+									<input
+										className="ylide-input ylide-password-input"
+										type="password"
+										autoComplete="new-password"
+										name="repeat-password"
+										id="repeat-password"
+										placeholder="Repeat your password"
+										value={passwordRepeat}
+										onChange={e => setPasswordRepeat(e.target.value)}
+									/>
+								</form>
+								<div className="ylide-callout">{calloutSvg}</div>
+							</div>
+						) : (
+							<div className="wm-body centered">
+								<input
+									style={{
+										fontSize: 16,
+										borderRadius: 40,
+										textAlign: 'center',
+										height: 36,
+										border: '1px solid #000000',
+										padding: '5px 10px',
+										marginLeft: 20,
+										marginRight: 20,
+										marginTop: 20,
+										marginBottom: 20,
+									}}
+									value={password}
+									onChange={e => setPassword(e.target.value)}
+									type="password"
+									placeholder="Enter your Ylide password"
+								/>
+
+								<div
+									style={{
+										marginTop: -8,
+										marginRight: 20,
+										textAlign: 'right',
 									}}
 								>
-									<svg
-										width="164"
-										height="104"
-										viewBox="0 0 164 104"
-										fill="none"
-										xmlns="http://www.w3.org/2000/svg"
-									>
-										<path
-											d="M2 102.498C2 61.4999 69.5 15.4999 162 10.4785M162 10.4785L133.5 1.50183M162 10.4785L141.562 31.6153"
-											stroke="url(#paint0_linear_54_5088)"
-											strokeWidth="3"
-											strokeLinecap="round"
-											strokeLinejoin="round"
-										/>
-										<defs>
-											<linearGradient
-												id="paint0_linear_54_5088"
-												x1="82"
-												y1="1.50183"
-												x2="82"
-												y2="102.498"
-												gradientUnits="userSpaceOnUse"
-											>
-												<stop stopColor="#97A1FF" />
-												<stop offset="1" stopColor="#FFB571" />
-											</linearGradient>
-										</defs>
-									</svg>
+									<button onClick={() => setForgotPassword(true)}>Forgot Password?</button>
 								</div>
-								<h3 className="wm-title">Confirm the message</h3>
-								<h4 className="wm-subtitle">
-									We need you to sign your password so we can generate you a unique communication key
-								</h4>
 							</div>
-						</>
-					)}
-
-					<div className="wm-footer" style={{ justifyContent: 'center' }}>
-						<YlideButton ghost style={{ width: 128 }} onClick={() => setStep(Step.ENTER_PASSWORD)}>
-							Back
-						</YlideButton>
-					</div>
-				</>
-			) : step === Step.SELECT_NETWORK ? (
-				<>
-					<h3 className="wm-title">Choose network</h3>
-					<div
-						className="wm-body"
-						style={{
-							marginTop: -24,
-							paddingTop: 24,
-							marginLeft: -24,
-							marginRight: -24,
-							paddingLeft: 24,
-							paddingRight: 24,
-							overflowY: 'scroll',
-							maxHeight: 390,
-						}}
-					>
-						{domain.registeredBlockchains
-							.filter(f => f.blockchainGroup === 'evm')
-							.sort((a, b) => {
-								const aBalance = Number(
-									evmBalances.balances[evmNameToNetwork(a.blockchain)!].toFixed(4),
-								);
-								const bBalance = Number(
-									evmBalances.balances[evmNameToNetwork(b.blockchain)!].toFixed(4),
-								);
-								const aTx = txPrices[evmNameToNetwork(a.blockchain)!];
-								const bTx = txPrices[evmNameToNetwork(b.blockchain)!];
-								if (aBalance === bBalance) {
-									return aTx - bTx;
-								} else {
-									return bBalance - aBalance;
-								}
-							})
-							.map((bc, idx) => {
-								const bData = blockchainsMap[bc.blockchain];
-								return (
+						)}
+						<div className="wm-footer">
+							<YlideButton
+								ghost
+								style={{ width: 128 }}
+								onClick={() => {
+									onResolve('', false, false);
+								}}
+							>
+								Back
+							</YlideButton>
+							<YlideButton primary style={{ width: 216 }} onClick={() => createLocalKey(password)}>
+								Continue
+							</YlideButton>
+						</div>
+					</>
+				) : step === Step.GENERATE_KEY ? (
+					<>
+						{pleaseWait ? (
+							<>
+								<div className="wm-body centered">
+									<h3 className="wm-title">Please, wait</h3>
+									<h4 className="wm-subtitle">Your transaction is being confirmed</h4>
+								</div>
+							</>
+						) : (
+							<>
+								<div className="wm-body centered">
 									<div
-										className={clsx('wmn-plate', {
-											disabled:
-												Number(
-													evmBalances.balances[evmNameToNetwork(bc.blockchain)!].toFixed(4),
-												) === 0,
-										})}
-										onClick={() => networkSelect(evmNameToNetwork(bc.blockchain)!)}
+										style={{
+											display: 'flex',
+											flexDirection: 'row',
+											alignItems: 'flex-start',
+											justifyContent: 'flex-end',
+											paddingRight: 24,
+											paddingBottom: 20,
+										}}
 									>
-										<div className="wmn-icon">{bData.logo(32)}</div>
-										<div className="wmn-title">
-											<div className="wmn-blockchain">{bData.title}</div>
-											{Number(evmBalances.balances[evmNameToNetwork(bc.blockchain)!].toFixed(4)) >
-												0 && idx === 0 ? (
-												<div className="wmn-optimal">Optimal</div>
-											) : null}
-										</div>
-										<div className="wmn-balance">
-											<div className="wmn-wallet-balance">
+										<svg
+											width="164"
+											height="104"
+											viewBox="0 0 164 104"
+											fill="none"
+											xmlns="http://www.w3.org/2000/svg"
+										>
+											<path
+												d="M2 102.498C2 61.4999 69.5 15.4999 162 10.4785M162 10.4785L133.5 1.50183M162 10.4785L141.562 31.6153"
+												stroke="url(#paint0_linear_54_5088)"
+												strokeWidth="3"
+												strokeLinecap="round"
+												strokeLinejoin="round"
+											/>
+											<defs>
+												<linearGradient
+													id="paint0_linear_54_5088"
+													x1="82"
+													y1="1.50183"
+													x2="82"
+													y2="102.498"
+													gradientUnits="userSpaceOnUse"
+												>
+													<stop stopColor="#97A1FF" />
+													<stop offset="1" stopColor="#FFB571" />
+												</linearGradient>
+											</defs>
+										</svg>
+									</div>
+									<h3 className="wm-title">Confirm the message</h3>
+									<h4 className="wm-subtitle">
+										We need you to sign your password so we can generate you a unique communication
+										key
+									</h4>
+								</div>
+							</>
+						)}
+
+						<div className="wm-footer" style={{ justifyContent: 'center' }}>
+							<YlideButton ghost style={{ width: 128 }} onClick={() => setStep(Step.ENTER_PASSWORD)}>
+								Back
+							</YlideButton>
+						</div>
+					</>
+				) : step === Step.SELECT_NETWORK ? (
+					<>
+						<h3 className="wm-title">Choose network</h3>
+						<div
+							className="wm-body"
+							style={{
+								marginTop: -24,
+								paddingTop: 24,
+								marginLeft: -24,
+								marginRight: -24,
+								paddingLeft: 24,
+								paddingRight: 24,
+								overflowY: 'scroll',
+								maxHeight: 390,
+							}}
+						>
+							{domain.registeredBlockchains
+								.filter(f => f.blockchainGroup === 'evm')
+								.sort((a, b) => {
+									const aBalance = Number(
+										evmBalances.balances[evmNameToNetwork(a.blockchain)!].toFixed(4),
+									);
+									const bBalance = Number(
+										evmBalances.balances[evmNameToNetwork(b.blockchain)!].toFixed(4),
+									);
+									const aTx = txPrices[evmNameToNetwork(a.blockchain)!];
+									const bTx = txPrices[evmNameToNetwork(b.blockchain)!];
+									if (aBalance === bBalance) {
+										return aTx - bTx;
+									} else {
+										return bBalance - aBalance;
+									}
+								})
+								.map((bc, idx) => {
+									const bData = blockchainsMap[bc.blockchain];
+									return (
+										<div
+											className={clsx('wmn-plate', {
+												disabled:
+													Number(
+														evmBalances.balances[evmNameToNetwork(bc.blockchain)!].toFixed(
+															4,
+														),
+													) === 0,
+											})}
+											onClick={() => networkSelect(evmNameToNetwork(bc.blockchain)!)}
+										>
+											<div className="wmn-icon">{bData.logo(32)}</div>
+											<div className="wmn-title">
+												<div className="wmn-blockchain">{bData.title}</div>
 												{Number(
 													evmBalances.balances[evmNameToNetwork(bc.blockchain)!].toFixed(4),
-												)}{' '}
-												{bData.ethNetwork?.nativeCurrency.symbol || 'ETH'}
+												) > 0 && idx === 0 ? (
+													<div className="wmn-optimal">Optimal</div>
+												) : null}
 											</div>
-											<div className="wmn-transaction-price">
-												Transaction = 0.0004 {bData.ethNetwork?.nativeCurrency.symbol || 'ETH'}
+											<div className="wmn-balance">
+												<div className="wmn-wallet-balance">
+													{Number(
+														evmBalances.balances[evmNameToNetwork(bc.blockchain)!].toFixed(
+															4,
+														),
+													)}{' '}
+													{bData.ethNetwork?.nativeCurrency.symbol || 'ETH'}
+												</div>
+												<div className="wmn-transaction-price">
+													Transaction = 0.0004{' '}
+													{bData.ethNetwork?.nativeCurrency.symbol || 'ETH'}
+												</div>
 											</div>
 										</div>
-									</div>
-								);
-							})}
-					</div>
-				</>
-			) : step === Step.PUBLISH_KEY ? (
-				<>
-					<div className="wm-body centered">
-						<div
-							style={{
-								display: 'flex',
-								flexDirection: 'row',
-								alignItems: 'flex-start',
-								justifyContent: 'flex-end',
-								paddingRight: 24,
-								paddingBottom: 20,
-							}}
-						>
-							<svg
-								width="164"
-								height="104"
-								viewBox="0 0 164 104"
-								fill="none"
-								xmlns="http://www.w3.org/2000/svg"
+									);
+								})}
+						</div>
+					</>
+				) : step === Step.PUBLISH_KEY ? (
+					<>
+						<div className="wm-body centered">
+							<div
+								style={{
+									display: 'flex',
+									flexDirection: 'row',
+									alignItems: 'flex-start',
+									justifyContent: 'flex-end',
+									paddingRight: 24,
+									paddingBottom: 20,
+								}}
 							>
-								<path
-									d="M2 102.498C2 61.4999 69.5 15.4999 162 10.4785M162 10.4785L133.5 1.50183M162 10.4785L141.562 31.6153"
-									stroke="url(#paint0_linear_54_5088)"
-									strokeWidth="3"
-									strokeLinecap="round"
-									strokeLinejoin="round"
-								/>
-								<defs>
-									<linearGradient
-										id="paint0_linear_54_5088"
-										x1="82"
-										y1="1.50183"
-										x2="82"
-										y2="102.498"
-										gradientUnits="userSpaceOnUse"
-									>
-										<stop stopColor="#97A1FF" />
-										<stop offset="1" stopColor="#FFB571" />
-									</linearGradient>
-								</defs>
-							</svg>
+								<svg
+									width="164"
+									height="104"
+									viewBox="0 0 164 104"
+									fill="none"
+									xmlns="http://www.w3.org/2000/svg"
+								>
+									<path
+										d="M2 102.498C2 61.4999 69.5 15.4999 162 10.4785M162 10.4785L133.5 1.50183M162 10.4785L141.562 31.6153"
+										stroke="url(#paint0_linear_54_5088)"
+										strokeWidth="3"
+										strokeLinecap="round"
+										strokeLinejoin="round"
+									/>
+									<defs>
+										<linearGradient
+											id="paint0_linear_54_5088"
+											x1="82"
+											y1="1.50183"
+											x2="82"
+											y2="102.498"
+											gradientUnits="userSpaceOnUse"
+										>
+											<stop stopColor="#97A1FF" />
+											<stop offset="1" stopColor="#FFB571" />
+										</linearGradient>
+									</defs>
+								</svg>
+							</div>
+							<h3 className="wm-title">Confirm the transaction</h3>
+							<h4 className="wm-subtitle">
+								Please sign the transaction in your wallet to publish your unique communication key
+							</h4>
 						</div>
-						<h3 className="wm-title">Confirm the transaction</h3>
-						<h4 className="wm-subtitle">
-							Please sign the transaction in your wallet to publish your unique communication key
-						</h4>
-					</div>
-					<div className="wm-footer" style={{ justifyContent: 'center' }}>
-						<YlideButton
-							ghost
-							style={{ width: 128 }}
-							onClick={() =>
-								setStep(
-									wallet.factory.blockchainGroup === 'evm'
-										? Step.SELECT_NETWORK
-										: Step.ENTER_PASSWORD,
-								)
-							}
-						>
-							Back
-						</YlideButton>
-					</div>
-				</>
-			) : step === Step.PUBLISHING_KEY ? (
-				<>
-					<div className="wm-body centered">
-						<div
-							style={{
-								display: 'flex',
-								alignItems: 'center',
-								justifyContent: 'center',
-								paddingBottom: 40,
-							}}
-						>
-							<YlideLoader />
+						<div className="wm-footer" style={{ justifyContent: 'center' }}>
+							<YlideButton
+								ghost
+								style={{ width: 128 }}
+								onClick={() =>
+									setStep(
+										wallet.factory.blockchainGroup === 'evm'
+											? Step.SELECT_NETWORK
+											: Step.ENTER_PASSWORD,
+									)
+								}
+							>
+								Back
+							</YlideButton>
 						</div>
-						<h3 className="wm-title">Publishing the key</h3>
-						<h4 className="wm-subtitle">Please, wait for the transaction to be completed</h4>
-					</div>
-				</>
-			) : step === Step.FINISH ? (
-				<>
-					<h3 className="wm-title" style={{ marginBottom: 10 }}>
-						Your account is ready
-					</h3>
+					</>
+				) : step === Step.PUBLISHING_KEY ? (
+					<>
+						<div className="wm-body centered">
+							<div
+								style={{
+									display: 'flex',
+									alignItems: 'center',
+									justifyContent: 'center',
+									paddingBottom: 40,
+								}}
+							>
+								<YlideLoader />
+							</div>
+							<h3 className="wm-title">Publishing the key</h3>
+							<h4 className="wm-subtitle">Please, wait for the transaction to be completed</h4>
+						</div>
+					</>
+				) : step === Step.FINISH ? (
+					<>
+						<h3 className="wm-title" style={{ marginBottom: 10 }}>
+							Your account is ready
+						</h3>
 
-					<div className="wm-body">
-						<img
-							src={require('../../assets/img/success.png')}
-							alt="Success"
-							style={{ marginLeft: -24, marginRight: -24, marginBottom: 14 }}
-						/>
-					</div>
+						<div className="wm-body">
+							<img
+								src={require('../../assets/img/success.png')}
+								alt="Success"
+								style={{ marginLeft: -24, marginRight: -24, marginBottom: 14 }}
+							/>
+						</div>
 
-					<div className="wm-footer-vertical">
-						<YlideButton
-							primary
-							onClick={() => {
-								navigate(generatePath(RoutePath.FEED_CATEGORY, { category: FeedCategory.MAIN }));
-								onResolve('', false, false);
-							}}
-						>
-							Go to Social Hub
-						</YlideButton>
-						<YlideButton nice onClick={() => onResolve('', false, false)}>
-							Add one more account
-						</YlideButton>
-					</div>
-				</>
-			) : null}
-		</Modal>
+						<div className="wm-footer-vertical">
+							<YlideButton
+								primary
+								onClick={() => {
+									navigate(generatePath(RoutePath.FEED_CATEGORY, { category: FeedCategory.MAIN }));
+									onResolve('', false, false);
+								}}
+							>
+								Go to Social Hub
+							</YlideButton>
+							<YlideButton nice onClick={() => onResolve('', false, false)}>
+								Add one more account
+							</YlideButton>
+						</div>
+					</>
+				) : null}
+			</Modal>
+
+			{forgotPassword && (
+				<ForgotPasswordModal
+					onNewPassword={password => {
+						setForgotPassword(false);
+						createLocalKey(password, true);
+					}}
+					onCancel={() => setForgotPassword(false)}
+				/>
+			)}
+		</>
 	);
 }

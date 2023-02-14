@@ -5,11 +5,8 @@
 	align-items: center;
 	min-width: 28px;
 	height: 28px;
-	font-size: 11px;
-	text-transform: uppercase;
-	white-space: nowrap;
 	border: 1px solid;
-	border-radius: 14px;
+	border-radius: 99px;
 
 	> i {
 		min-width: 20px;
@@ -34,21 +31,34 @@
 	}
 }
 .root_hasContent {
-	padding: 0 11px;
+	padding-right: 11px;
+	padding-left: 11px;
 }
 .root_hasIcon {
 	padding-left: 7px;
 }
 .root_hasIcon:not(.root_hasContent) {
-	padding: 0 3px;
+	padding-right: 3px;
+	padding-left: 3px;
 }
 .root_disabled {
 	pointer-events: none;
 	opacity: 0.5;
 }
+.root_multiline {
+	padding-top: 3px;
+	padding-bottom: 3px;
+	height: auto;
+	min-height: 28px;
+}
 
 .content {
 	padding: 1px 0 0;
+	font-size: 11px;
+	text-transform: uppercase;
+}
+.root_singleline .content {
+	@include truncate-text;
 }
 
 // STYLES
