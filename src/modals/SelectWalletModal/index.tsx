@@ -296,7 +296,7 @@ export const SelectWalletModal = observer(({ onClose }: SelectWalletModalProps) 
 											</div>
 											<div className="qr-text">
 												Scan QR code with
-												<br />a Wallet Connect compatible wallet
+												<br />a WalletConnect compatible wallet
 											</div>
 											<a
 												href="#copy-link"

@@ -451,7 +451,7 @@ export const walletsMeta: Record<string, WalletMeta> = {
 		link: 'https://metamask.io/',
 	},
 	walletconnect: {
-		title: 'Wallet Connect',
+		title: 'WalletConnect',
 		logo: (s = 30) => <WalletConnectLogo size={s} />,
 		link: 'https://walletconnect.com/',
 	},
