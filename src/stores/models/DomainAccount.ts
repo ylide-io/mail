@@ -1,5 +1,12 @@
 import { EVM_NAMES, EVMNetwork } from '@ylide/ethereum';
-import { ExternalYlidePublicKey, IGenericAccount, YlideCore, YlideKey } from '@ylide/sdk';
+import {
+	ExternalYlidePublicKey,
+	IGenericAccount,
+	ServiceCode,
+	YlideCore,
+	YlideKey,
+	YlidePublicKeyVersion,
+} from '@ylide/sdk';
 import { computed, makeAutoObservable, observable } from 'mobx';
 
 import { isBytesEqual } from '../../utils/isBytesEqual';
@@ -85,9 +92,18 @@ export class DomainAccount {
 			network: Number(network) as EVMNetwork,
 		}));
 		const blockchainName = await this.wallet.controller.getCurrentBlockchain();
-		const network = preferredNetwork || evmNetworks.find(n => n.name === blockchainName)?.network;
-		await this.wallet.controller.attachPublicKey(this.account, this.key.keypair.publicKey, {
-			network,
-		});
+		const network =
+			preferredNetwork === undefined
+				? evmNetworks.find(n => n.name === blockchainName)?.network
+				: preferredNetwork;
+		await this.wallet.controller.attachPublicKey(
+			this.account,
+			this.key.keypair.publicKey,
+			YlidePublicKeyVersion.KEY_V2,
+			ServiceCode.MAIL,
+			{
+				network,
+			},
+		);
 	}
 }

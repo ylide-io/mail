@@ -332,7 +332,6 @@ export const useMailStore = create<MailStore>((set, get) => ({
 				return state.messagesContentById[pushMsg.msgId];
 			}
 
-			debugger;
 			const content = await pushMsg.reader.retrieveMessageContent(pushMsg.msg);
 			if (!content || content.corrupted) {
 				throw new Error('Content is not available or corrupted');

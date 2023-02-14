@@ -17,21 +17,56 @@ import domain from '../../../stores/Domain';
 import { DomainAccount } from '../../../stores/models/DomainAccount';
 import css from './deployModal.module.scss';
 
-export interface DeployContractModalProps {
+export interface EVMDeployContractModalProps {
 	contract: { title: string; contract: IEVMMailerContractLink | IEVMRegistryContractLink | undefined };
 	isModern: boolean;
 	network: EVMNetwork;
 	onClose: () => void;
 }
 
-export const DeployContractModal: FC<DeployContractModalProps> = ({ contract, isModern, network, onClose }) => {
-	const [account, setAccount] = useState<DomainAccount>(domain.accounts.activeAccounts[0]);
+export const EVMDeployContractModal: FC<EVMDeployContractModalProps> = ({ contract, isModern, network, onClose }) => {
+	const [account, setAccount] = useState<DomainAccount>(domain.accounts.accounts[0]);
 	const [loading, setLoading] = useState(false);
+	const [address, setAddress] = useState('');
 
 	const deployContract = useCallback(async () => {
 		setLoading(true);
-		(account.wallet.controller as EthereumWalletController).addressToUint256('');
-	}, [account]);
+		let address: string = '';
+		if (contract.title === 'MailerV6') {
+			address = await (account.wallet.controller as EthereumWalletController).deployMailerV6(account.account, {
+				network,
+			});
+		} else if (contract.title === 'MailerV7') {
+			address = await (account.wallet.controller as EthereumWalletController).deployMailerV7(account.account, {
+				network,
+			});
+		} else if (contract.title === 'MailerV8') {
+			address = await (account.wallet.controller as EthereumWalletController).deployMailerV8(account.account, {
+				network,
+			});
+		} else if (contract.title === 'RegistryV3') {
+			address = await (account.wallet.controller as EthereumWalletController).deployRegistryV3(
+				account.account,
+				undefined,
+				{
+					network,
+				},
+			);
+		} else if (contract.title === 'RegistryV5') {
+			address = await (account.wallet.controller as EthereumWalletController).deployRegistryV5(
+				account.account,
+				undefined,
+				{
+					network,
+				},
+			);
+		} else if (contract.title === 'RegistryV6') {
+			address = await (account.wallet.controller as EthereumWalletController).deployRegistryV6(account.account, {
+				network,
+			});
+		}
+		setAddress(address);
+	}, [account, contract, network]);
 
 	return (
 		<Modal className={css.root} onClose={onClose}>
@@ -74,20 +109,27 @@ export const DeployContractModal: FC<DeployContractModalProps> = ({ contract, is
 				</div>
 			</div>
 			<div className={css.divider} />
-			<div className={css.actionRow}>
-				<YlideButton className={clsx({ [css.disabled]: loading })} onClick={deployContract}>
-					{loading ? (
-						<div style={{ display: 'flex', flexDirection: 'row' }}>
-							<div style={{ zoom: '0.25' }}>
-								<YlideLoader />
+			{address ? (
+				<div className={css.row}>
+					<div className={css.label}>Deployed address</div>
+					<div className={css.value}>{address}</div>
+				</div>
+			) : (
+				<div className={css.actionRow}>
+					<YlideButton className={clsx({ [css.disabled]: loading })} onClick={deployContract}>
+						{loading ? (
+							<div style={{ display: 'flex', flexDirection: 'row' }}>
+								<div style={{ zoom: '0.25' }}>
+									<YlideLoader />
+								</div>
+								<div style={{ marginLeft: 6 }}>Deploying...</div>
 							</div>
-							<div style={{ marginLeft: 6 }}>Deploying...</div>
-						</div>
-					) : (
-						'Deploy'
-					)}
-				</YlideButton>
-			</div>
+						) : (
+							'Deploy'
+						)}
+					</YlideButton>
+				</div>
+			)}
 		</Modal>
 	);
 };

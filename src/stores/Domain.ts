@@ -8,6 +8,7 @@ import {
 	EVMNetwork,
 	evmWalletFactories,
 } from '@ylide/ethereum';
+import { everscaleBlockchainFactory, everscaleWalletFactory } from '@ylide/everscale';
 import {
 	AbstractBlockchainController,
 	AbstractNameService,
@@ -24,7 +25,6 @@ import {
 } from '@ylide/sdk';
 import { makeObservable, observable } from 'mobx';
 
-// import { everscaleBlockchainFactory, everscaleWalletFactory } from '@ylide/everscale';
 import { blockchainsMap, supportedWallets } from '../constants';
 import PasswordModal from '../modals/PasswordModal';
 import SwitchModal from '../modals/SwitchModal';
@@ -36,30 +36,30 @@ import tags from './Tags';
 
 const INDEXER_BLOCKCHAINS: string[] = []; //['GNOSIS'];
 
-// Ylide.registerBlockchainFactory(evmBlockchainFactories[EVMNetwork.LOCAL_HARDHAT]);
-Ylide.registerBlockchainFactory(evmBlockchainFactories[EVMNetwork.ETHEREUM]);
-Ylide.registerBlockchainFactory(evmBlockchainFactories[EVMNetwork.AVALANCHE]);
-Ylide.registerBlockchainFactory(evmBlockchainFactories[EVMNetwork.ARBITRUM]);
-Ylide.registerBlockchainFactory(evmBlockchainFactories[EVMNetwork.BNBCHAIN]);
-Ylide.registerBlockchainFactory(evmBlockchainFactories[EVMNetwork.OPTIMISM]);
-Ylide.registerBlockchainFactory(evmBlockchainFactories[EVMNetwork.POLYGON]);
-Ylide.registerBlockchainFactory(evmBlockchainFactories[EVMNetwork.FANTOM]);
-Ylide.registerBlockchainFactory(evmBlockchainFactories[EVMNetwork.KLAYTN]);
-Ylide.registerBlockchainFactory(evmBlockchainFactories[EVMNetwork.GNOSIS]);
-Ylide.registerBlockchainFactory(evmBlockchainFactories[EVMNetwork.AURORA]);
+Ylide.registerBlockchainFactory(evmBlockchainFactories[EVMNetwork.LOCAL_HARDHAT]);
+// Ylide.registerBlockchainFactory(evmBlockchainFactories[EVMNetwork.ETHEREUM]);
+// Ylide.registerBlockchainFactory(evmBlockchainFactories[EVMNetwork.AVALANCHE]);
+// Ylide.registerBlockchainFactory(evmBlockchainFactories[EVMNetwork.ARBITRUM]);
+// Ylide.registerBlockchainFactory(evmBlockchainFactories[EVMNetwork.BNBCHAIN]);
+// Ylide.registerBlockchainFactory(evmBlockchainFactories[EVMNetwork.OPTIMISM]);
+// Ylide.registerBlockchainFactory(evmBlockchainFactories[EVMNetwork.POLYGON]);
+// Ylide.registerBlockchainFactory(evmBlockchainFactories[EVMNetwork.FANTOM]);
+// Ylide.registerBlockchainFactory(evmBlockchainFactories[EVMNetwork.KLAYTN]);
+// Ylide.registerBlockchainFactory(evmBlockchainFactories[EVMNetwork.GNOSIS]);
+// Ylide.registerBlockchainFactory(evmBlockchainFactories[EVMNetwork.AURORA]);
 // Ylide.registerBlockchainFactory(evmBlockchainFactories[EVMNetwork.CELO]);
 // Ylide.registerBlockchainFactory(evmBlockchainFactories[EVMNetwork.CRONOS]);
-Ylide.registerBlockchainFactory(evmBlockchainFactories[EVMNetwork.MOONBEAM]);
-Ylide.registerBlockchainFactory(evmBlockchainFactories[EVMNetwork.MOONRIVER]);
-Ylide.registerBlockchainFactory(evmBlockchainFactories[EVMNetwork.METIS]);
+// Ylide.registerBlockchainFactory(evmBlockchainFactories[EVMNetwork.MOONBEAM]);
+// Ylide.registerBlockchainFactory(evmBlockchainFactories[EVMNetwork.MOONRIVER]);
+// Ylide.registerBlockchainFactory(evmBlockchainFactories[EVMNetwork.METIS]);
 // Ylide.registerBlockchainFactory(evmBlockchainFactories[EVMNetwork.ASTAR]);
 // Ylide.registerBlockchainFactory(everscaleBlockchainFactory);
 // Ylide.registerWalletFactory(everscaleWalletFactory);
 Ylide.registerWalletFactory(evmWalletFactories.metamask);
-Ylide.registerWalletFactory(evmWalletFactories.coinbase);
-Ylide.registerWalletFactory(evmWalletFactories.trustwallet);
-Ylide.registerWalletFactory(evmWalletFactories.binance);
-Ylide.registerWalletFactory(evmWalletFactories.walletconnect);
+// Ylide.registerWalletFactory(evmWalletFactories.coinbase);
+// Ylide.registerWalletFactory(evmWalletFactories.trustwallet);
+// Ylide.registerWalletFactory(evmWalletFactories.binance);
+// Ylide.registerWalletFactory(evmWalletFactories.walletconnect);
 
 export class Domain {
 	savedPassword: string | null = null;

@@ -166,6 +166,7 @@ export default class NewPasswordModal extends PureComponent<NewPasswordModalProp
 			);
 			this.step = 5;
 		} catch (err) {
+			console.error('err: ', err);
 			if (this.props.wallet.factory.blockchainGroup === 'evm') {
 				this.step = 2;
 			} else {
@@ -190,7 +191,11 @@ export default class NewPasswordModal extends PureComponent<NewPasswordModalProp
 		}
 		if (!this.freshestKey) {
 			this.account = await this.props.wallet.instantiateNewAccount(this.props.account, tempLocalKey);
-			if (this.props.faucetType && this.props.wallet.factory.blockchainGroup === 'evm') {
+			if (
+				this.network !== EVMNetwork.LOCAL_HARDHAT &&
+				this.props.faucetType &&
+				this.props.wallet.factory.blockchainGroup === 'evm'
+			) {
 				await this.publishThroughFaucet(this.account, this.props.faucetType, this.props.bonus);
 			} else {
 				if (this.props.wallet.factory.blockchainGroup === 'evm') {
