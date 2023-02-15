@@ -54,11 +54,7 @@ export const ComposeMailPopup = observer(({ onClose, mailData }: ComposeMailPopu
 	const isMount = useOnMountAnimation();
 
 	return (
-		<Popup
-			className={clsx(css.root, isMount && css.root_visible)}
-			outsideClickChecker={() => true}
-			onCloseRequest={onClose}
-		>
+		<Popup className={clsx(css.root, isMount && css.root_visible)} onClose={onClose}>
 			<div className={css.header}>
 				New message
 				<div className={css.headerActions}>

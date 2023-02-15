@@ -9,11 +9,20 @@ import { PopupManagerContext } from './popupManager/popupManager';
 interface PopupProps extends PropsWithChildren, PropsWithClassName {
 	align?: (popupElem: HTMLElement) => void;
 	onClick?: (e: React.MouseEvent<HTMLElement>) => void;
-	outsideClickChecker?: (elem: HTMLElement) => boolean;
-	onCloseRequest?: () => void;
+	closeOnOutsideClick?: boolean;
+	customOutsideClickChecker?: (elem: HTMLElement) => boolean;
+	onClose?: () => void;
 }
 
-export function Popup({ children, className, align, onClick, outsideClickChecker, onCloseRequest }: PopupProps) {
+export function Popup({
+	children,
+	className,
+	align,
+	onClick,
+	closeOnOutsideClick,
+	customOutsideClickChecker,
+	onClose,
+}: PopupProps) {
 	const rootRef = useRef<HTMLDivElement>(null);
 
 	const popupManagerApi = useContext(PopupManagerContext);
@@ -37,9 +46,9 @@ export function Popup({ children, className, align, onClick, outsideClickChecker
 		};
 	}, [align]);
 
-	useOutsideClick(rootRef, outsideClickChecker, onCloseRequest);
+	useOutsideClick(rootRef, customOutsideClickChecker, closeOnOutsideClick ? onClose : undefined);
 
-	useEscPress(onCloseRequest);
+	useEscPress(onClose);
 
 	return popupManagerApi.createPortal(
 		<div

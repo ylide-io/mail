@@ -2,11 +2,10 @@ import { EthereumWalletController, EVMNetwork } from '@ylide/ethereum';
 import { asyncDelay, ExternalYlidePublicKey, IGenericAccount } from '@ylide/sdk';
 import SmartBuffer from '@ylide/smart-buffer';
 import clsx from 'clsx';
-import { makeObservable, observable } from 'mobx';
-import { observer } from 'mobx-react';
-import { PureComponent } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { generatePath } from 'react-router-dom';
 
+import { ForgotPasswordModal } from '../../components/forgotPasswordModal/forgotPasswordModal';
 import { Modal } from '../../components/modal/modal';
 import { YlideLoader } from '../../components/ylideLoader/ylideLoader';
 import { blockchainsMap, calloutSvg, evmNameToNetwork } from '../../constants';
@@ -20,6 +19,7 @@ import { FeedCategory } from '../../stores/Feed';
 import { DomainAccount } from '../../stores/models/DomainAccount';
 import { Wallet } from '../../stores/models/Wallet';
 import { RoutePath } from '../../stores/routePath';
+import { invariant } from '../../utils/invariant';
 import { isBytesEqual } from '../../utils/isBytesEqual';
 import { useNav } from '../../utils/navigate';
 
@@ -43,7 +43,16 @@ const txPrices: Record<EVMNetwork, number> = {
 	[EVMNetwork.ASTAR]: 0.001,
 };
 
-export interface NewPasswordModalProps {
+enum Step {
+	ENTER_PASSWORD,
+	GENERATE_KEY,
+	SELECT_NETWORK,
+	PUBLISH_KEY,
+	PUBLISHING_KEY,
+	FINISH,
+}
+
+interface NewPasswordModalProps {
 	faucetType: null | 'polygon' | 'gnosis' | 'fantom';
 	bonus: boolean;
 	wallet: Wallet;
@@ -52,41 +61,46 @@ export interface NewPasswordModalProps {
 	onResolve: (value: null | string, remember: boolean, forceNew: boolean) => void;
 }
 
-@observer
-export default class NewPasswordModal extends PureComponent<NewPasswordModalProps> {
-	constructor(props: NewPasswordModalProps) {
-		super(props);
+export function NewPasswordModal({ faucetType, bonus, wallet, account, remoteKeys, onResolve }: NewPasswordModalProps) {
+	const navigate = useNav();
 
-		makeObservable(this);
-	}
+	const [step, setStep] = useState(Step.ENTER_PASSWORD);
 
-	async componentDidMount() {
-		if (this.props.wallet.factory.blockchainGroup === 'evm') {
-			const blockchainName = await this.props.wallet.controller.getCurrentBlockchain();
-			this.network = evmNameToNetwork(blockchainName);
-			await evmBalances.updateBalances(this.props.wallet, this.props.account.address);
+	const [password, setPassword] = useState('');
+	const [passwordRepeat, setPasswordRepeat] = useState('');
+
+	const [forgotPassword, setForgotPassword] = useState(false);
+
+	const [network, setNetwork] = useState<EVMNetwork>();
+	useEffect(() => {
+		if (wallet.factory.blockchainGroup === 'evm') {
+			wallet.controller.getCurrentBlockchain().then(blockchainName => {
+				setNetwork(evmNameToNetwork(blockchainName));
+				evmBalances.updateBalances(wallet, account.address).then();
+			});
 		}
-	}
+	}, [account.address, wallet]);
 
-	@observable network?: EVMNetwork;
-	@observable loading = false;
-	@observable freshestKey =
-		Object.keys(this.props.remoteKeys)
-			.filter(t => !!this.props.remoteKeys[t])
-			.map(t => ({
-				key: this.props.remoteKeys[t]!,
-				blockchain: t,
-			}))
-			.sort((a, b) => b.key.timestamp - a.key.timestamp)
-			.find(t => true) || null;
+	const freshestKey = useMemo(
+		() =>
+			Object.keys(remoteKeys)
+				.filter(t => !!remoteKeys[t])
+				.map(t => ({
+					key: remoteKeys[t]!,
+					blockchain: t,
+				}))
+				.sort((a, b) => b.key.timestamp - a.key.timestamp)[0],
+		[remoteKeys],
+	);
 
-	async requestFaucetSignature(account: DomainAccount) {
+	const [domainAccount, setDomainAccount] = useState<DomainAccount>();
+
+	const [pleaseWait, setPleaseWait] = useState(false);
+
+	async function requestFaucetSignature(account: DomainAccount) {
 		const msg = new SmartBuffer(account.key.keypair.publicKey).toHexString();
 		try {
-			const signature = await (this.props.wallet.controller as EthereumWalletController).signString(
-				account.account,
-				msg,
-			);
+			const signature = await (wallet.controller as EthereumWalletController).signString(account.account, msg);
 			console.log('signature: ', signature);
 			return signature;
 		} catch (err) {
@@ -95,20 +109,18 @@ export default class NewPasswordModal extends PureComponent<NewPasswordModalProp
 		}
 	}
 
-	@observable pleaseWait = false;
-
-	async publishThroughFaucet(account: DomainAccount, faucetType: 'polygon' | 'gnosis' | 'fantom', bonus: boolean) {
+	async function publishThroughFaucet(
+		account: DomainAccount,
+		faucetType: 'polygon' | 'gnosis' | 'fantom',
+		bonus: boolean,
+	) {
 		browserStorage.canSkipRegistration = true;
 		console.log('public key: ', '0x' + new SmartBuffer(account.key.keypair.publicKey).toHexString());
-		this.step = 1;
-		const signature = await this.requestFaucetSignature(account);
-		this.pleaseWait = true;
+		setStep(Step.GENERATE_KEY);
+		const signature = await requestFaucetSignature(account);
+		setPleaseWait(true);
 		domain.isTxPublishing = true;
-		analytics.walletRegistered(
-			this.props.wallet.factory.wallet,
-			account.account.address,
-			domain.accounts.accounts.length,
-		);
+		analytics.walletRegistered(wallet.factory.wallet, account.account.address, domain.accounts.accounts.length);
 		domain.txChain = faucetType;
 		domain.txPlateVisible = true;
 		domain.txWithBonus = bonus;
@@ -147,108 +159,85 @@ export default class NewPasswordModal extends PureComponent<NewPasswordModalProp
 				}
 			})
 			.catch(err => {
+				console.log('fetch', err);
 				domain.isTxPublishing = false;
 				domain.txPlateVisible = false;
 			});
-		this.step = 5;
+
+		setStep(Step.FINISH);
 	}
 
-	async publishLocalKey(account: DomainAccount) {
-		this.step = 3;
+	async function publishLocalKey(account: DomainAccount) {
+		setStep(Step.PUBLISH_KEY);
 		try {
-			await account.attachRemoteKey(this.network);
+			await account.attachRemoteKey(network);
 			await asyncDelay(7000);
 			await account.init();
-			analytics.walletRegistered(
-				this.props.wallet.factory.wallet,
-				account.account.address,
-				domain.accounts.accounts.length,
-			);
-			this.step = 5;
+			analytics.walletRegistered(wallet.factory.wallet, account.account.address, domain.accounts.accounts.length);
+			setStep(Step.FINISH);
 		} catch (err) {
-			console.error('err: ', err);
-			if (this.props.wallet.factory.blockchainGroup === 'evm') {
-				this.step = 2;
+			if (wallet.factory.blockchainGroup === 'evm') {
+				setStep(Step.SELECT_NETWORK);
 			} else {
-				this.step = 0;
+				setStep(Step.ENTER_PASSWORD);
 			}
 			alert('Transaction was not published. Please, try again');
 		}
 	}
 
-	@observable forceNew = false;
-	@observable account!: DomainAccount;
+	async function createLocalKey(password: string, forceNew?: boolean) {
+		setStep(Step.GENERATE_KEY);
 
-	async createLocalKey() {
-		this.step = 1;
 		let tempLocalKey;
 		try {
-			tempLocalKey = await this.props.wallet.constructLocalKey(this.props.account, this.password);
+			tempLocalKey = await wallet.constructLocalKey(account, password);
 		} catch (err) {
-			console.log('asd: ', err);
-			this.step = 0;
+			console.log('createLocalKey ', err);
+			setStep(Step.ENTER_PASSWORD);
 			return;
 		}
-		if (!this.freshestKey) {
-			this.account = await this.props.wallet.instantiateNewAccount(this.props.account, tempLocalKey);
-			if (
-				this.network !== EVMNetwork.LOCAL_HARDHAT &&
-				this.props.faucetType &&
-				this.props.wallet.factory.blockchainGroup === 'evm'
-			) {
-				await this.publishThroughFaucet(this.account, this.props.faucetType, this.props.bonus);
+
+		if (!freshestKey) {
+			const domainAccount = await wallet.instantiateNewAccount(account, tempLocalKey);
+			setDomainAccount(domainAccount);
+			if (faucetType && wallet.factory.blockchainGroup === 'evm') {
+				await publishThroughFaucet(domainAccount, faucetType, bonus);
 			} else {
-				if (this.props.wallet.factory.blockchainGroup === 'evm') {
-					this.step = 2;
+				if (wallet.factory.blockchainGroup === 'evm') {
+					setStep(Step.SELECT_NETWORK);
 				} else {
-					return await this.publishLocalKey(this.account);
+					return await publishLocalKey(domainAccount);
 				}
 			}
-		} else if (isBytesEqual(this.freshestKey.key.publicKey.bytes, tempLocalKey.publicKey)) {
-			await this.props.wallet.instantiateNewAccount(this.props.account, tempLocalKey);
-			analytics.walletConnected(
-				this.props.wallet.factory.wallet,
-				this.props.account.address,
-				domain.accounts.accounts.length,
-			);
-			this.step = 5;
-		} else if (this.forceNew) {
-			this.account = await this.props.wallet.instantiateNewAccount(this.props.account, tempLocalKey);
-			if (this.props.faucetType && this.props.wallet.factory.blockchainGroup === 'evm') {
-				await this.publishThroughFaucet(this.account, this.props.faucetType, this.props.bonus);
-			} else {
-				if (this.props.wallet.factory.blockchainGroup === 'evm') {
-					this.step = 2;
-				} else {
-					return await this.publishLocalKey(this.account);
-				}
-			}
+		} else if (isBytesEqual(freshestKey.key.publicKey.bytes, tempLocalKey.publicKey)) {
+			await wallet.instantiateNewAccount(account, tempLocalKey);
+			analytics.walletConnected(wallet.factory.wallet, account.address, domain.accounts.accounts.length);
+			setStep(Step.FINISH);
+		} else if (forceNew) {
+			const domainAccount = await wallet.instantiateNewAccount(account, tempLocalKey);
+			setDomainAccount(domainAccount);
+			return await publishLocalKey(domainAccount);
 		} else {
 			alert('Ylide password was wrong, please, try again');
-			this.step = 0;
+			setStep(Step.ENTER_PASSWORD);
 			return;
 		}
 	}
 
-	async networkSelect(network: EVMNetwork) {
-		this.network = network;
-		this.step = 3;
+	async function networkSelect(network: EVMNetwork) {
+		setNetwork(network);
+		setStep(Step.PUBLISH_KEY);
 		try {
-			await this.publishLocalKey(this.account);
+			invariant(domainAccount);
+			await publishLocalKey(domainAccount);
 		} catch (err) {
-			this.step = 2;
+			setStep(Step.SELECT_NETWORK);
 		}
 	}
 
-	@observable password: string = '';
-	@observable passwordRepeat: string = '';
-	@observable remember = false;
-	@observable forgotMode = 0;
-	@observable step = 0;
-
-	render() {
-		return (
-			<Modal className="account-modal wallet-modal" onClose={() => this.props.onResolve(null, false, false)}>
+	return (
+		<>
+			<Modal className="account-modal wallet-modal" onClose={() => onResolve(null, false, false)}>
 				<div
 					style={{
 						padding: 24,
@@ -258,24 +247,24 @@ export default class NewPasswordModal extends PureComponent<NewPasswordModalProp
 						justifyContent: 'center',
 					}}
 				>
-					<WalletTag wallet={this.props.wallet.factory.wallet} address={this.props.account.address} />
+					<WalletTag wallet={wallet.factory.wallet} address={account.address} />
 				</div>
 
-				{this.step === 0 ? (
+				{step === Step.ENTER_PASSWORD ? (
 					<>
-						<h3 className="wm-title">{this.freshestKey ? `Enter password` : `Create password`}</h3>
+						<h3 className="wm-title">{freshestKey ? `Enter password` : `Create password`}</h3>
 						<h4 className="wm-subtitle">
-							{this.freshestKey ? (
+							{freshestKey ? (
 								<>
-									We found your key in the {blockchainsMap[this.freshestKey.blockchain].logo(12)}{' '}
-									<b>{blockchainsMap[this.freshestKey.blockchain].title}</b> blockchain. Please, enter
-									your Ylide Password to access it.
+									We found your key in the {blockchainsMap[freshestKey.blockchain].logo(12)}{' '}
+									<b>{blockchainsMap[freshestKey.blockchain].title}</b> blockchain. Please, enter your
+									Ylide Password to access it.
 								</>
 							) : (
 								`This password will be used to encrypt and decrypt your mails.`
 							)}
 						</h4>
-						{!this.freshestKey ? (
+						{!freshestKey ? (
 							<div className="wm-body">
 								<form
 									name="sign-up"
@@ -296,8 +285,8 @@ export default class NewPasswordModal extends PureComponent<NewPasswordModalProp
 										name="password"
 										id="password"
 										placeholder="Enter Ylide password"
-										value={this.password}
-										onChange={e => (this.password = e.target.value)}
+										value={password}
+										onChange={e => setPassword(e.target.value)}
 									/>
 									<input
 										className="ylide-input ylide-password-input"
@@ -306,8 +295,8 @@ export default class NewPasswordModal extends PureComponent<NewPasswordModalProp
 										name="repeat-password"
 										id="repeat-password"
 										placeholder="Repeat your password"
-										value={this.passwordRepeat}
-										onChange={e => (this.passwordRepeat = e.target.value)}
+										value={passwordRepeat}
+										onChange={e => setPasswordRepeat(e.target.value)}
 									/>
 								</form>
 								<div className="ylide-callout">{calloutSvg}</div>
@@ -327,28 +316,21 @@ export default class NewPasswordModal extends PureComponent<NewPasswordModalProp
 										marginTop: 20,
 										marginBottom: 20,
 									}}
-									value={this.password}
-									onChange={e => (this.password = e.target.value)}
+									value={password}
+									onChange={e => setPassword(e.target.value)}
 									type="password"
 									placeholder="Enter your Ylide password"
 								/>
-								{/* <div style={{ textAlign: 'center' }}>
-										<a
-											href="#forgot"
-											style={{
-												fontStyle: 'normal',
-												fontWeight: '400',
-												fontSize: '14px',
-												lineHeight: '130%',
-												color: '#000000',
-											}}
-											onClick={() => {
-												this.forgotMode = 1;
-											}}
-										>
-											Forgot password?
-										</a>
-									</div> */}
+
+								<div
+									style={{
+										marginTop: -8,
+										marginRight: 20,
+										textAlign: 'right',
+									}}
+								>
+									<button onClick={() => setForgotPassword(true)}>Forgot Password?</button>
+								</div>
 							</div>
 						)}
 						<div className="wm-footer">
@@ -356,25 +338,19 @@ export default class NewPasswordModal extends PureComponent<NewPasswordModalProp
 								ghost
 								style={{ width: 128 }}
 								onClick={() => {
-									this.props.onResolve('', false, false);
+									onResolve('', false, false);
 								}}
 							>
 								Back
 							</YlideButton>
-							<YlideButton
-								primary
-								style={{ width: 216 }}
-								onClick={() => {
-									this.createLocalKey();
-								}}
-							>
+							<YlideButton primary style={{ width: 216 }} onClick={() => createLocalKey(password)}>
 								Continue
 							</YlideButton>
 						</div>
 					</>
-				) : this.step === 1 ? (
+				) : step === Step.GENERATE_KEY ? (
 					<>
-						{this.pleaseWait ? (
+						{pleaseWait ? (
 							<>
 								<div className="wm-body centered">
 									<h3 className="wm-title">Please, wait</h3>
@@ -433,18 +409,12 @@ export default class NewPasswordModal extends PureComponent<NewPasswordModalProp
 						)}
 
 						<div className="wm-footer" style={{ justifyContent: 'center' }}>
-							<YlideButton
-								ghost
-								style={{ width: 128 }}
-								onClick={() => {
-									this.step = 0;
-								}}
-							>
+							<YlideButton ghost style={{ width: 128 }} onClick={() => setStep(Step.ENTER_PASSWORD)}>
 								Back
 							</YlideButton>
 						</div>
 					</>
-				) : this.step === 2 ? (
+				) : step === Step.SELECT_NETWORK ? (
 					<>
 						<h3 className="wm-title">Choose network</h3>
 						<div
@@ -489,7 +459,7 @@ export default class NewPasswordModal extends PureComponent<NewPasswordModalProp
 														),
 													) === 0,
 											})}
-											onClick={() => this.networkSelect(evmNameToNetwork(bc.blockchain)!)}
+											onClick={() => networkSelect(evmNameToNetwork(bc.blockchain)!)}
 										>
 											<div className="wmn-icon">{bData.logo(32)}</div>
 											<div className="wmn-title">
@@ -519,7 +489,7 @@ export default class NewPasswordModal extends PureComponent<NewPasswordModalProp
 								})}
 						</div>
 					</>
-				) : this.step === 3 ? (
+				) : step === Step.PUBLISH_KEY ? (
 					<>
 						<div className="wm-body centered">
 							<div
@@ -570,15 +540,19 @@ export default class NewPasswordModal extends PureComponent<NewPasswordModalProp
 							<YlideButton
 								ghost
 								style={{ width: 128 }}
-								onClick={() => {
-									this.step = this.props.wallet.factory.blockchainGroup === 'evm' ? 2 : 0;
-								}}
+								onClick={() =>
+									setStep(
+										wallet.factory.blockchainGroup === 'evm'
+											? Step.SELECT_NETWORK
+											: Step.ENTER_PASSWORD,
+									)
+								}
 							>
 								Back
 							</YlideButton>
 						</div>
 					</>
-				) : this.step === 4 ? (
+				) : step === Step.PUBLISHING_KEY ? (
 					<>
 						<div className="wm-body centered">
 							<div
@@ -595,11 +569,12 @@ export default class NewPasswordModal extends PureComponent<NewPasswordModalProp
 							<h4 className="wm-subtitle">Please, wait for the transaction to be completed</h4>
 						</div>
 					</>
-				) : this.step === 5 ? (
+				) : step === Step.FINISH ? (
 					<>
 						<h3 className="wm-title" style={{ marginBottom: 10 }}>
 							Your account is ready
 						</h3>
+
 						<div className="wm-body">
 							<img
 								src={require('../../assets/img/success.png')}
@@ -607,35 +582,34 @@ export default class NewPasswordModal extends PureComponent<NewPasswordModalProp
 								style={{ marginLeft: -24, marginRight: -24, marginBottom: 14 }}
 							/>
 						</div>
-						<PasswordModalFooter
-							close={() => {
-								this.props.onResolve('', false, false);
-							}}
-						/>
+
+						<div className="wm-footer-vertical">
+							<YlideButton
+								primary
+								onClick={() => {
+									navigate(generatePath(RoutePath.FEED_CATEGORY, { category: FeedCategory.MAIN }));
+									onResolve('', false, false);
+								}}
+							>
+								Go to Social Hub
+							</YlideButton>
+							<YlideButton nice onClick={() => onResolve('', false, false)}>
+								Add one more account
+							</YlideButton>
+						</div>
 					</>
 				) : null}
 			</Modal>
-		);
-	}
-}
 
-function PasswordModalFooter({ close }: { close: () => void }) {
-	const navigate = useNav();
-
-	return (
-		<div className="wm-footer-vertical">
-			<YlideButton
-				primary
-				onClick={() => {
-					navigate(generatePath(RoutePath.FEED_CATEGORY, { category: FeedCategory.MAIN }));
-					close();
-				}}
-			>
-				Go to Social Hub
-			</YlideButton>
-			<YlideButton nice onClick={close}>
-				Add one more account
-			</YlideButton>
-		</div>
+			{forgotPassword && (
+				<ForgotPasswordModal
+					onNewPassword={password => {
+						setForgotPassword(false);
+						createLocalKey(password, true);
+					}}
+					onCancel={() => setForgotPassword(false)}
+				/>
+			)}
+		</>
 	);
 }

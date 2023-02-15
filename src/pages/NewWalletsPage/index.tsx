@@ -9,7 +9,7 @@ import { YlideButton } from '../../controls/YlideButton';
 import { ArrowRight } from '../../icons/ArrowRight';
 import { CrossIcon } from '../../icons/CrossIcon';
 import { YlideLargeLogo } from '../../icons/YlideLargeLogo';
-import NewPasswordModal from '../../modals/NewPasswordModal';
+import { NewPasswordModal } from '../../modals/NewPasswordModal';
 import { SelectWalletModal } from '../../modals/SelectWalletModal';
 import domain from '../../stores/Domain';
 import { FeedCategory } from '../../stores/Feed';

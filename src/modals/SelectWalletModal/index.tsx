@@ -13,7 +13,7 @@ import domain from '../../stores/Domain';
 import { Wallet } from '../../stores/models/Wallet';
 import walletConnect from '../../stores/WalletConnect';
 import { getQueryString } from '../../utils/getQueryString';
-import NewPasswordModal from '../NewPasswordModal';
+import { NewPasswordModal } from '../NewPasswordModal';
 import SwitchModal from '../SwitchModal';
 
 interface SelectWalletModalProps {
@@ -296,7 +296,7 @@ export const SelectWalletModal = observer(({ onClose }: SelectWalletModalProps) 
 											</div>
 											<div className="qr-text">
 												Scan QR code with
-												<br />a Wallet Connect compatible wallet
+												<br />a WalletConnect compatible wallet
 											</div>
 											<a
 												href="#copy-link"

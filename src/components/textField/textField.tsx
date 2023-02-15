@@ -1,11 +1,13 @@
 import clsx from 'clsx';
-import { forwardRef, Ref } from 'react';
+import { forwardRef, HTMLInputTypeAttribute, Ref } from 'react';
 
 import { PropsWithClassName } from '../propsWithClassName';
 import css from './textField.module.scss';
 
 export interface TextFieldProps extends PropsWithClassName {
 	isError?: boolean;
+	autoFocus?: boolean;
+	type?: HTMLInputTypeAttribute;
 	placeholder?: string;
 	value?: string;
 	onChange?: (value: string) => void;
@@ -13,12 +15,14 @@ export interface TextFieldProps extends PropsWithClassName {
 
 export const TextField = forwardRef(
 	(
-		{ className, isError, placeholder, value, onChange }: TextFieldProps,
-		ref: Ref<HTMLInputElement>, // & HTMLTextAreaElement
+		{ className, isError, autoFocus, type, placeholder, value, onChange }: TextFieldProps,
+		ref: Ref<HTMLInputElement>,
 	) => (
 		<input
 			ref={ref}
 			className={clsx(css.root, isError && css.root_error, className)}
+			autoFocus={autoFocus}
+			type={type}
 			placeholder={placeholder}
 			value={value}
 			onChange={e => onChange?.(e.target.value)}

@@ -6,7 +6,7 @@ import { observer } from 'mobx-react';
 import { PureComponent } from 'react';
 
 import metamaskSwitchVideo from '../../assets/video/metamask-switch.mp4';
-import { walletsMeta } from '../../constants';
+import { ErrorMessage } from '../../components/errorMessage/errorMessage';
 import modals from '../../stores/Modals';
 import { Wallet } from '../../stores/models/Wallet';
 
@@ -151,14 +151,17 @@ export default class SwitchModal extends PureComponent<SwitchModalProps> {
 				visible={true}
 				closable={false}
 				okButtonProps={{ style: { display: 'none' } }}
-				title={`Please, switch ${this.props.type} in ${walletsMeta[wallet.wallet].title}`}
-				onCancel={() => {
-					this.props.onConfirm(false);
-				}}
+				title="Switch account"
+				onCancel={() => this.props.onConfirm(false)}
 			>
 				<div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%' }}>
-					Switch to {this.props.needAccount?.address}
-					<span style={{ color: 'red' }}>{this.error}</span>
+					<p>Please unlock you wallet and make sure that both account and network are selected correctly.</p>
+
+					{this.props.needAccount && <p>Account: {this.props.needAccount.address}</p>}
+					{this.props.needNetwork && <p>Network: {this.props.needNetwork}</p>}
+
+					{this.error && <ErrorMessage>{this.error}</ErrorMessage>}
+
 					<br />
 					<video src={metamaskSwitchVideo} autoPlay loop style={{ maxWidth: 300 }} />
 				</div>
