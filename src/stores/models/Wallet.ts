@@ -13,7 +13,6 @@ import EventEmitter from 'eventemitter3';
 import { computed, makeObservable, observable } from 'mobx';
 
 import { Domain } from '../Domain';
-import { useMailStore } from '../MailList';
 import { DomainAccount } from './DomainAccount';
 
 export class Wallet extends EventEmitter {
@@ -154,7 +153,7 @@ export class Wallet extends EventEmitter {
 			};
 		};
 		if (this.factory.blockchainGroup === 'evm') {
-			const readingSession = useMailStore.getState().readingSession;
+			const readingSession = this.domain.readingSession;
 
 			return await readingSession.indexerHub.retryingOperation(
 				async () => {

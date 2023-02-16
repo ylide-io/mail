@@ -1,5 +1,7 @@
 import WalletConnectProvider from '@walletconnect/web3-provider';
 import {
+	EthereumBlockchainController,
+	EthereumListSource,
 	EVM_CHAINS,
 	EVM_NAMES,
 	EVM_RPCS,
@@ -13,11 +15,14 @@ import {
 	AbstractNameService,
 	AbstractWalletController,
 	BlockchainControllerFactory,
+	BlockchainListSource,
 	BlockchainMap,
 	BlockchainWalletMap,
 	BrowserIframeStorage,
 	DynamicEncryptionRouter,
 	IGenericAccount,
+	IndexerListSource,
+	SourceReadingSession,
 	WalletControllerFactory,
 	Ylide,
 	YlideKeyStore,
@@ -70,6 +75,7 @@ export class Domain {
 	@observable initialized = false;
 
 	ylide: Ylide = new Ylide(this.keystore);
+	readingSession: SourceReadingSession = new SourceReadingSession();
 
 	@observable txChain: 'fantom' | 'gnosis' | 'polygon' = 'polygon';
 	@observable txWithBonus: boolean = false;
@@ -108,6 +114,19 @@ export class Domain {
 				this.devMode = !this.devMode;
 			}
 		});
+
+		this.readingSession.sourceOptimizer = (subject, reader) => {
+			if (reader instanceof EthereumBlockchainController) {
+				return new IndexerListSource(
+					new EthereumListSource(reader, subject, 30000),
+					this.readingSession.indexerHub,
+					reader,
+					subject,
+				);
+			} else {
+				return new BlockchainListSource(reader, subject, 10000);
+			}
+		};
 	}
 
 	getRegisteredBlockchains() {
@@ -172,6 +191,8 @@ export class Domain {
 		return await DynamicEncryptionRouter.findEncyptionRoute(
 			actualRecipients,
 			this.getRegisteredBlockchains().map(b => b.reader),
+			'ylide',
+			this.readingSession.indexerHub,
 		);
 	}
 
@@ -190,6 +211,8 @@ export class Domain {
 		const route = await DynamicEncryptionRouter.findEncyptionRoute(
 			actualRecipients,
 			blockchains.map(b => b.reader),
+			'ylide',
+			this.readingSession.indexerHub,
 		);
 		const apprRoute = route.find(r => r.recipients.some(e => e.address === actualRecipients[0].address));
 		if (!apprRoute) {

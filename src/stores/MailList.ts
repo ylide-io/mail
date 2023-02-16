@@ -1,14 +1,11 @@
-import { EthereumBlockchainController, EthereumListSource } from '@ylide/ethereum';
 import {
 	AbstractBlockchainController,
-	BlockchainListSource,
 	BlockchainMap,
 	BlockchainSourceType,
 	IListSource,
 	IMessage,
 	IMessageContent,
 	IMessageWithSource,
-	IndexerListSource,
 	ListSourceDrainer,
 	ListSourceMultiplexer,
 	SourceReadingSession,
@@ -66,8 +63,6 @@ export function useMailList(props?: UseMailListProps) {
 	const folderId = props?.folderId;
 	const sender = props?.sender;
 	const filter = props?.filter;
-
-	const readingSession = useMailStore(state => state.readingSession);
 
 	const accountSourceMatch = useMemo(
 		() => new Map<IListSource, { account: DomainAccount; reader: AbstractBlockchainController }>(),
@@ -198,7 +193,7 @@ export function useMailList(props?: UseMailListProps) {
 
 		const listSourceDrainer = new ListSourceDrainer(
 			new ListSourceMultiplexer(
-				buildSources(accountSourceMatch, activeAccounts, blockchains, readingSession, folderId, sender),
+				buildSources(accountSourceMatch, activeAccounts, blockchains, domain.readingSession, folderId, sender),
 			),
 		);
 
@@ -231,7 +226,7 @@ export function useMailList(props?: UseMailListProps) {
 			listSourceDrainer.pause();
 			listSourceDrainer.off('messages', onNewMessages);
 		};
-	}, [accountSourceMatch, activeAccounts, blockchains, folderId, loadNextPage, readingSession, sender, wrapMessage]);
+	}, [accountSourceMatch, activeAccounts, blockchains, folderId, loadNextPage, sender, wrapMessage]);
 
 	useEffect(() => {
 		let isDestroyed = false;
@@ -288,8 +283,6 @@ export function useMailList(props?: UseMailListProps) {
 interface MailStore {
 	init: () => Promise<void>;
 
-	readingSession: SourceReadingSession;
-
 	lastActiveFolderId: FolderId;
 	setLastActiveFolderId: (folderId: FolderId) => void;
 
@@ -332,25 +325,6 @@ export const useMailStore = create<MailStore>((set, get) => ({
 
 		set({ decodedMessagesById, readMessageIds, deletedMessageIds });
 	},
-
-	readingSession: (() => {
-		const readingSession = new SourceReadingSession();
-
-		readingSession.sourceOptimizer = (subject, reader) => {
-			if (reader instanceof EthereumBlockchainController) {
-				return new IndexerListSource(
-					new EthereumListSource(reader, subject, 30000),
-					readingSession.indexerHub,
-					reader,
-					subject,
-				);
-			} else {
-				return new BlockchainListSource(reader, subject, 10000);
-			}
-		};
-
-		return readingSession;
-	})(),
 
 	lastActiveFolderId: FolderId.Inbox,
 	setLastActiveFolderId: folderId => set({ lastActiveFolderId: folderId }),
