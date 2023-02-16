@@ -66,6 +66,7 @@ export interface FeedPost {
 	authorNickname: string;
 	sourceLink: string;
 	embeds: FeedPostEmbed[];
+	thread: FeedPost[];
 }
 
 export interface FeedSource {
