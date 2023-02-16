@@ -47,22 +47,6 @@
 .headerActions {
 	display: grid;
 	grid-auto-flow: column;
-	grid-gap: 8px;
-}
-
-.headerButton {
-	@include expand-click-area;
-	width: 20px;
-	height: 20px;
-
-	&:hover,
-	&:focus-visible {
-		color: var(--link-color);
-	}
-
-	> svg {
-		fill: currentColor;
-	}
 }
 
 .form {

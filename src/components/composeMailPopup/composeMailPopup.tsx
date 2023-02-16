@@ -10,6 +10,7 @@ import { globalOutgoingMailData, OutgoingMailData } from '../../stores/outgoingM
 import { RoutePath } from '../../stores/routePath';
 import { useNav } from '../../utils/navigate';
 import { useOnMountAnimation } from '../../utils/useOnMountAnimation';
+import { ActionButton, ActionButtonStyle } from '../ActionButton/ActionButton';
 import { ComposeMailForm } from '../composeMailForm/composeMailForm';
 import { OverlappingLoader } from '../overlappingLoader/overlappingLoader';
 import { Popup } from '../popup/popup';
@@ -58,8 +59,9 @@ export const ComposeMailPopup = observer(({ onClose, mailData }: ComposeMailPopu
 			<div className={css.header}>
 				New message
 				<div className={css.headerActions}>
-					<button
-						className={css.headerButton}
+					<ActionButton
+						style={ActionButtonStyle.Lite}
+						icon={<ExternalSvg />}
 						title="Open full editor"
 						onClick={() => {
 							onClose?.();
@@ -67,13 +69,14 @@ export const ComposeMailPopup = observer(({ onClose, mailData }: ComposeMailPopu
 							globalOutgoingMailData.reset(mailData);
 							navigate(generatePath(RoutePath.MAIL_COMPOSE));
 						}}
-					>
-						<ExternalSvg />
-					</button>
+					/>
 
-					<button className={css.headerButton} title="Close" onClick={() => onClose?.()}>
-						<CrossSvg />
-					</button>
+					<ActionButton
+						style={ActionButtonStyle.Lite}
+						icon={<CrossSvg />}
+						title="Close"
+						onClick={() => onClose?.()}
+					/>
 				</div>
 			</div>
 
