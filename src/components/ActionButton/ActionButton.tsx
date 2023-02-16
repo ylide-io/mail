@@ -4,6 +4,11 @@ import React, { forwardRef, PropsWithChildren, ReactNode, Ref } from 'react';
 import { PropsWithClassName } from '../propsWithClassName';
 import css from './ActionButton.module.scss';
 
+export enum ActionButtonSize {
+	Small,
+	Medium,
+}
+
 export enum ActionButtonStyle {
 	Default,
 	Primary,
@@ -12,6 +17,7 @@ export enum ActionButtonStyle {
 }
 
 interface ActionButtonProps extends PropsWithChildren, PropsWithClassName {
+	size?: ActionButtonSize;
 	style?: ActionButtonStyle;
 	icon?: ReactNode;
 	title?: string;
@@ -20,17 +26,32 @@ interface ActionButtonProps extends PropsWithChildren, PropsWithClassName {
 	onClick?: React.MouseEventHandler<HTMLElement>;
 }
 
-// 'props' are needed to let AntD show Tooltips https://github.com/ant-design/ant-design/issues/15909
 export const ActionButton = forwardRef(
 	(
-		{ children, className, style, icon, title, isDisabled, isMultiline, onClick, ...props }: ActionButtonProps,
+		{
+			children,
+			className,
+			size,
+			style,
+			icon,
+			title,
+			isDisabled,
+			isMultiline,
+			onClick,
+			...props
+		}: ActionButtonProps,
 		ref: Ref<HTMLButtonElement>,
 	) => {
+		const sizeClass = {
+			[ActionButtonSize.Small]: css.root_smallSize,
+			[ActionButtonSize.Medium]: css.root_mediumSize,
+		}[size || ActionButtonSize.Small];
+
 		const styleClass = {
-			[ActionButtonStyle.Default]: css.root_default,
-			[ActionButtonStyle.Primary]: css.root_primary,
-			[ActionButtonStyle.Dengerous]: css.root_dangerous,
-			[ActionButtonStyle.Lite]: css.root_lite,
+			[ActionButtonStyle.Default]: css.root_defaultStyle,
+			[ActionButtonStyle.Primary]: css.root_primaryStyle,
+			[ActionButtonStyle.Dengerous]: css.root_dangerousStyle,
+			[ActionButtonStyle.Lite]: css.root_liteStyle,
 		}[style || ActionButtonStyle.Default];
 
 		return (
@@ -38,6 +59,7 @@ export const ActionButton = forwardRef(
 				ref={ref}
 				className={clsx(
 					css.root,
+					sizeClass,
 					styleClass,
 					icon != null && css.root_hasIcon,
 					children != null && css.root_hasContent,
