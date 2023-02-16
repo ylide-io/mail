@@ -1,5 +1,3 @@
-// import './assets/scss/style.scss';
-import './assets/scss/font-awesome/font-awesome.scss';
 import 'antd/dist/antd.min.css';
 import './styles/index.scss';
 

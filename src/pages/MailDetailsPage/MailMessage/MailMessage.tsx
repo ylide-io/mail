@@ -7,8 +7,8 @@ import { ContactName } from '../../../components/contactName/contactName';
 import { ReadableDate } from '../../../components/readableDate/readableDate';
 import { Blockie } from '../../../controls/Blockie';
 import { ForwardIcon } from '../../../icons/ForwardIcon';
-import { ReplyIcon } from '../../../icons/ReplyIcon';
-import { TrashIcon } from '../../../icons/TrashIcon';
+import { ReactComponent as ReplySvg } from '../../../icons/reply.svg';
+import { ReactComponent as TrashSvg } from '../../../icons/trash.svg';
 import { IMessageDecodedContent } from '../../../indexedDB/MessagesDB';
 import { FolderId, ILinkedMessage, useMailStore } from '../../../stores/MailList';
 import { DateFormatStyle } from '../../../utils/date';
@@ -61,7 +61,7 @@ export function MailMessage({
 			<div className={css.actions}>
 				{decoded ? (
 					<>
-						<ActionButton icon={<ReplyIcon />} onClick={() => onReplyClick()}>
+						<ActionButton icon={<ReplySvg />} onClick={() => onReplyClick()}>
 							Reply
 						</ActionButton>
 
@@ -73,7 +73,7 @@ export function MailMessage({
 							<Tooltip title="Archive">
 								<ActionButton
 									style={ActionButtonStyle.Dengerous}
-									icon={<TrashIcon />}
+									icon={<TrashSvg />}
 									onClick={() => onDeleteClick()}
 								/>
 							</Tooltip>

@@ -50,19 +50,19 @@
 			background-color: #1ab394;
 
 			display: flex;
-			flex-direction: row;
 			align-items: center;
+			padding: 0 4px;
 
 			cursor: pointer;
 
 			border-left: 1px solid #0a9e80;
-			padding-left: 8px;
-			padding-right: 8px;
-			padding-top: 5px;
-			padding-bottom: 5px;
 
 			&:hover {
 				background-color: #18a689;
+			}
+
+			> svg {
+				fill: currentColor;
 			}
 		}
 

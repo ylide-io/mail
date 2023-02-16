@@ -8,11 +8,12 @@ import { observer } from 'mobx-react';
 import React, { ReactNode, useEffect } from 'react';
 
 import { blockchainsMap, evmNameToNetwork } from '../../../constants';
+import { ReactComponent as ArrowDownSvg } from '../../../icons/arrowDown.svg';
+import { ReactComponent as ReplySvg } from '../../../icons/reply.svg';
 import domain from '../../../stores/Domain';
 import { evmBalances } from '../../../stores/evmBalances';
 import mailer from '../../../stores/Mailer';
 import { OutgoingMailData } from '../../../stores/outgoingMailData';
-import { smallButtonIcons } from '../../smallButton/smallButton';
 
 export interface SendMailButtonProps {
 	mailData: OutgoingMailData;
@@ -98,7 +99,7 @@ export const SendMailButton = observer(({ mailData, onSent }: SendMailButtonProp
 			})}
 		>
 			<div className="send-btn-text" onClick={sendMailHandler}>
-				<i style={{ marginRight: 6 }} className={clsx('fa', smallButtonIcons.reply)}></i>
+				<ReplySvg style={{ marginRight: 6, fill: 'currentcolor' }} />
 				{text && <span className="send-btn-title">{text}</span>}
 			</div>
 			{mailData.from?.wallet.factory.blockchainGroup === 'evm' ? (
@@ -147,7 +148,7 @@ export const SendMailButton = observer(({ mailData, onSent }: SendMailButtonProp
 					}
 				>
 					<div className="send-btn-dropdown-icon">
-						<i className="fa fa-caret-down" />
+						<ArrowDownSvg />
 					</div>
 				</Dropdown>
 			) : null}

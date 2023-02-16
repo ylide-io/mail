@@ -6,7 +6,7 @@ import { ActionButton, ActionButtonStyle } from '../../components/ActionButton/A
 import { ComposeMailForm } from '../../components/composeMailForm/composeMailForm';
 import { GenericLayout } from '../../components/genericLayout/genericLayout';
 import { OverlappingLoader } from '../../components/overlappingLoader/overlappingLoader';
-import { smallButtonIcons } from '../../components/smallButton/smallButton';
+import { ReactComponent as CrossSvg } from '../../icons/cross.svg';
 import { analytics } from '../../stores/Analytics';
 import mailer from '../../stores/Mailer';
 import { useMailStore } from '../../stores/MailList';
@@ -36,7 +36,7 @@ export const ComposePage = observer(() => {
 						onClick={() => {
 							navigate(generatePath(RoutePath.MAIL_FOLDER, { folderId: lastActiveFolderId }));
 						}}
-						icon={<i className={`fa ${smallButtonIcons.cross}`} />}
+						icon={<CrossSvg />}
 					>
 						Discard
 					</ActionButton>

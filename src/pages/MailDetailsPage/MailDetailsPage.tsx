@@ -11,7 +11,7 @@ import { Spinner } from '../../components/spinner/spinner';
 import { ReactComponent as ArrowLeftSvg } from '../../icons/arrowLeft.svg';
 import { ContactIcon } from '../../icons/ContactIcon';
 import { ForwardIcon } from '../../icons/ForwardIcon';
-import { ReplyIcon } from '../../icons/ReplyIcon';
+import { ReactComponent as ReplySvg } from '../../icons/reply.svg';
 import { IMessageDecodedContent } from '../../indexedDB/MessagesDB';
 import { FolderId, ILinkedMessage, useMailList, useMailStore } from '../../stores/MailList';
 import { globalOutgoingMailData, OutgoingMailData } from '../../stores/outgoingMailData';
@@ -303,7 +303,7 @@ export const MailDetailsPage = () => {
 								onClick={() =>
 									onReplyClick(initialMessage.msg.senderAddress, initialDecodedContent.decodedSubject)
 								}
-								icon={<ReplyIcon />}
+								icon={<ReplySvg />}
 							>
 								Reply
 							</ActionButton>

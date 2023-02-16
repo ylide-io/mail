@@ -6,10 +6,10 @@ import { ActionButton, ActionButtonStyle } from '../../components/ActionButton/A
 import { ErrorMessage } from '../../components/errorMessage/errorMessage';
 import { FeedLayout } from '../../components/feedLayout/feedLayout';
 import { FeedPostItem } from '../../components/feedPostItem/feedPostItem';
-import { smallButtonIcons } from '../../components/smallButton/smallButton';
 import { YlideLoader } from '../../components/ylideLoader/ylideLoader';
 import { YlideButton } from '../../controls/YlideButton';
 import { CaretDown } from '../../icons/CaretDown';
+import { ReactComponent as CrossSvg } from '../../icons/cross.svg';
 import { browserStorage } from '../../stores/browserStorage';
 import feed, { FeedCategory } from '../../stores/Feed';
 import { useNav } from '../../utils/navigate';
@@ -91,7 +91,7 @@ export const FeedPage = observer(() => {
 				!!sourceId && (
 					<ActionButton
 						style={ActionButtonStyle.Primary}
-						icon={<i className={`fa ${smallButtonIcons.cross}`} />}
+						icon={<CrossSvg />}
 						onClick={() => navigate({ search: {} })}
 					>
 						Clear filter

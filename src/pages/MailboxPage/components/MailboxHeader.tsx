@@ -1,9 +1,13 @@
 import { Tooltip } from 'antd';
+import React from 'react';
 
 import { ActionButton, ActionButtonStyle } from '../../../components/ActionButton/ActionButton';
 import { CheckBox } from '../../../components/checkBox/checkBox';
 import { ContactName } from '../../../components/contactName/contactName';
-import { smallButtonIcons } from '../../../components/smallButton/smallButton';
+import { ReactComponent as CrossSvg } from '../../../icons/cross.svg';
+import { ReactComponent as MerkReadSvg } from '../../../icons/markRead.svg';
+import { ReactComponent as RestoreSvg } from '../../../icons/restore.svg';
+import { ReactComponent as TrashSvg } from '../../../icons/trash.svg';
 import { FolderId, getFolderName } from '../../../stores/MailList';
 import { useNav } from '../../../utils/navigate';
 
@@ -60,7 +64,7 @@ export function MailboxHeader({
 
 				<Tooltip title="Mark as read">
 					<ActionButton
-						icon={<i className={`fa ${smallButtonIcons.eye}`} />}
+						icon={<MerkReadSvg />}
 						isDisabled={isActionButtonsDisabled}
 						onClick={() => onMarkReadClick()}
 					/>
@@ -69,7 +73,7 @@ export function MailboxHeader({
 				{folderId === FolderId.Archive && (
 					<Tooltip title="Restore mails">
 						<ActionButton
-							icon={<i className={`fa ${smallButtonIcons.restore}`} />}
+							icon={<RestoreSvg />}
 							isDisabled={isActionButtonsDisabled}
 							onClick={() => onRestoreClick()}
 						/>
@@ -79,7 +83,7 @@ export function MailboxHeader({
 				{folderId === FolderId.Inbox && (
 					<Tooltip title="Archive mails">
 						<ActionButton
-							icon={<i className={`fa ${smallButtonIcons.trash}`} />}
+							icon={<TrashSvg />}
 							isDisabled={isActionButtonsDisabled}
 							onClick={() => onDeleteClick()}
 						/>
@@ -89,7 +93,7 @@ export function MailboxHeader({
 				{!!filterBySender && (
 					<ActionButton
 						style={ActionButtonStyle.Primary}
-						icon={<i className={`fa ${smallButtonIcons.cross}`} />}
+						icon={<CrossSvg />}
 						onClick={() => navigate({ search: {} })}
 					>
 						Clear filter

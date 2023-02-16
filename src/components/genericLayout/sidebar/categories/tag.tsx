@@ -1,4 +1,3 @@
-import clsx from 'clsx';
 import React from 'react';
 import { useLocation } from 'react-router-dom';
 
@@ -36,7 +35,7 @@ const Tag: React.FC<TagProps> = ({ icon, circleColor, text, isActive, tagId }) =
 	return (
 		<div className={css.listItem} onClick={clickHandler}>
 			<div className={css.listItemTitle} style={isActive ? { ...styles, ...activeStyles } : styles}>
-				<i className={clsx('fa fa-circle text-navy')} style={{ color: circleColor }} /> {text}
+				<i style={{ color: circleColor }}>•</i> {text}
 			</div>
 		</div>
 	);

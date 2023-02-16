@@ -5,8 +5,11 @@ import { observer } from 'mobx-react';
 import React, { PropsWithChildren, useEffect, useState } from 'react';
 import { generatePath, useLocation } from 'react-router-dom';
 
+import { ReactComponent as ArchiveSvg } from '../../../icons/archive.svg';
 import { CaretDown } from '../../../icons/CaretDown';
 import { CaretUp } from '../../../icons/CaretUp';
+import { ReactComponent as InboxSvg } from '../../../icons/inbox.svg';
+import { ReactComponent as SentSvg } from '../../../icons/sent.svg';
 import { ReactComponent as SettingsSvg } from '../../../icons/settings.svg';
 import { ReactComponent as DiscordSvg } from '../../../icons/social/discord.svg';
 import { ReactComponent as LinkedInSvg } from '../../../icons/social/linkedIn.svg';
@@ -191,28 +194,9 @@ const SidebarMenu = observer(() => {
 							}}
 						>
 							<div className={css.sectionLinkIconLeft}>
-								<i className="fa fa-inbox" />
+								<InboxSvg />
 							</div>
 							<div className={css.sectionLinkTitle}>Inbox</div>
-							<div className={css.sectionLinkIconRight}>
-								{/* <div
-									style={{
-										borderRadius: '50%',
-										width: 18,
-										height: 18,
-										display: 'flex',
-										flexDirection: 'row',
-										alignItems: 'center',
-										justifyContent: 'center',
-										background: 'transparent',
-										border: '1px solid #404040',
-										fontWeight: 'bold',
-										color: 'red',
-									}}
-								>
-									1
-								</div> */}
-							</div>
 						</div>
 						<div
 							className={clsx(css.sectionLink, {
@@ -226,7 +210,7 @@ const SidebarMenu = observer(() => {
 							}}
 						>
 							<div className={css.sectionLinkIconLeft}>
-								<i className="fa fa-share" />
+								<SentSvg />
 							</div>
 							<div className={css.sectionLinkTitle}>Sent</div>
 						</div>
@@ -242,7 +226,7 @@ const SidebarMenu = observer(() => {
 							}}
 						>
 							<div className={css.sectionLinkIconLeft}>
-								<i className="fa fa-trash-o" />
+								<ArchiveSvg />
 							</div>
 							<div className={css.sectionLinkTitle}>Archive</div>
 						</div>
