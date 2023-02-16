@@ -50,9 +50,9 @@
 			.contractItem {
 				@include flex-column(stretch, space-between);
 
-				flex-basis: 190px;
-				max-width: 190px;
-				min-width: 190px;
+				flex-basis: 163px;
+				max-width: 163px;
+				min-width: 163px;
 				flex-grow: 0;
 				flex-shrink: 0;
 
@@ -74,9 +74,9 @@
 						flex-grow: 0;
 						flex-shrink: 0;
 
-						margin-right: 20px;
+						margin-right: 10px;
 
-						font-size: 15px;
+						font-size: 12px;
 					}
 
 					.contractAddress {
@@ -85,7 +85,7 @@
 
 						min-width: 0;
 
-						font-size: 11px;
+						font-size: 10px;
 						text-align: right;
 					}
 				}

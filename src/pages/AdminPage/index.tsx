@@ -87,7 +87,7 @@ export const EthereumContractPlate: FC<EthereumContractPlateProps> = ({ contract
 					<div className={css.contractCreationBlock}>
 						{contract.contract ? `Creation: ${contract.contract.creationBlock}` : `Not deployed`}
 					</div>
-					<div className={css.contractTerminationBlock}>{contract.contract ? `Not terminated` : ``}</div>
+					<div className={css.contractTerminationBlock}>{contract.contract ? `Active` : ``}</div>
 				</div>
 			</div>
 		</>
@@ -173,6 +173,12 @@ export class EthereumContractsRow extends PureComponent<{ network: EVMNetwork }>
 				r => r.type === EVMRegistryContractType.EVMRegistryV3,
 			),
 		};
+		const registryV4 = {
+			title: 'RegistryV4',
+			contract: EVM_CONTRACTS[network].registryContracts.find(
+				r => r.type === EVMRegistryContractType.EVMRegistryV4,
+			),
+		};
 		const registryV5 = {
 			title: 'RegistryV5',
 			contract: EVM_CONTRACTS[network].registryContracts.find(
@@ -206,7 +212,7 @@ export class EthereumContractsRow extends PureComponent<{ network: EVMNetwork }>
 				contract: IEVMMailerContractLink | IEVMRegistryContractLink | undefined;
 			}[];
 		}[] = [
-			{ title: 'Registry', contracts: [registryV6, registryV5, registryV3] },
+			{ title: 'Registry', contracts: [registryV6, registryV5, registryV4, registryV3] },
 			{ title: 'Mailer', contracts: [mailerV8, mailerV7, mailerV6] },
 		];
 
