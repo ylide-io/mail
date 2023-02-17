@@ -2,8 +2,8 @@ import { Fragment, useLayoutEffect, useMemo, useState } from 'react';
 import { useMutation, useQuery } from 'react-query';
 
 import { FeedServerApi } from '../../api/feedServerApi';
-import { ReactComponent as ExternalSvg } from '../../icons/external.svg';
-import { ReactComponent as SelectAllSvg } from '../../icons/selectAll.svg';
+import { ReactComponent as ExternalSvg } from '../../icons/ic20/external.svg';
+import { ReactComponent as SelectAllSvg } from '../../icons/ic20/selectAll.svg';
 import { browserStorage } from '../../stores/browserStorage';
 import { FeedCategory, FeedSource, getFeedCategoryName, nonSyntheticFeedCategories } from '../../stores/Feed';
 import { toggleArrayItem } from '../../utils/array';

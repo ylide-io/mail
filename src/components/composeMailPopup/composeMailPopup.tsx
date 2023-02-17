@@ -3,8 +3,8 @@ import { observer } from 'mobx-react';
 import React, { ReactNode } from 'react';
 import { generatePath } from 'react-router-dom';
 
-import { ReactComponent as CrossSvg } from '../../icons/cross.svg';
-import { ReactComponent as ExternalSvg } from '../../icons/external.svg';
+import { ReactComponent as CrossSvg } from '../../icons/ic20/cross.svg';
+import { ReactComponent as ExternalSvg } from '../../icons/ic20/external.svg';
 import mailer from '../../stores/Mailer';
 import { globalOutgoingMailData, OutgoingMailData } from '../../stores/outgoingMailData';
 import { RoutePath } from '../../stores/routePath';

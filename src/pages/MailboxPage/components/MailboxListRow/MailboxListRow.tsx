@@ -7,7 +7,7 @@ import { BlockChainLabel } from '../../../../components/BlockChainLabel/BlockCha
 import { CheckBox } from '../../../../components/checkBox/checkBox';
 import { ContactName } from '../../../../components/contactName/contactName';
 import { ReadableDate } from '../../../../components/readableDate/readableDate';
-import { FilterIcon } from '../../../../icons/FilterIcon';
+import { ReactComponent as FilterSvg } from '../../../../icons/ic20/filter.svg';
 import domain from '../../../../stores/Domain';
 import { FolderId, ILinkedMessage, useMailStore } from '../../../../stores/MailList';
 import { RoutePath } from '../../../../stores/routePath';
@@ -95,7 +95,7 @@ const MailboxListRow: React.FC<MailboxListRowProps> = observer(
 								onFilterBySenderClick();
 							}}
 						>
-							<FilterIcon />
+							<FilterSvg />
 						</div>
 					)}
 				</div>

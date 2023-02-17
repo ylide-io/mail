@@ -8,10 +8,10 @@ import { ContactName } from '../../components/contactName/contactName';
 import { GenericLayout } from '../../components/genericLayout/genericLayout';
 import { Recipients } from '../../components/recipientInput/recipientInput';
 import { Spinner } from '../../components/spinner/spinner';
-import { ReactComponent as ArrowLeftSvg } from '../../icons/arrowLeft.svg';
-import { ContactIcon } from '../../icons/ContactIcon';
-import { ForwardIcon } from '../../icons/ForwardIcon';
-import { ReactComponent as ReplySvg } from '../../icons/reply.svg';
+import { ReactComponent as ArrowLeftSvg } from '../../icons/ic20/arrowLeft.svg';
+import { ReactComponent as ContactSvg } from '../../icons/ic20/contact.svg';
+import { ReactComponent as ForwardSvg } from '../../icons/ic20/forward.svg';
+import { ReactComponent as ReplySvg } from '../../icons/ic20/reply.svg';
 import { IMessageDecodedContent } from '../../indexedDB/MessagesDB';
 import { FolderId, ILinkedMessage, useMailList, useMailStore } from '../../stores/MailList';
 import { globalOutgoingMailData, OutgoingMailData } from '../../stores/outgoingMailData';
@@ -225,7 +225,7 @@ export const MailDetailsPage = () => {
 							</div>
 						) : (
 							wrappedThreadMessages.length > 1 && (
-								<ActionButton icon={<ContactIcon />} onClick={onOpenThreadClick}>
+								<ActionButton icon={<ContactSvg />} onClick={onOpenThreadClick}>
 									{wrappedThreadMessages.length} messages from this sender
 								</ActionButton>
 							)
@@ -316,7 +316,7 @@ export const MailDetailsPage = () => {
 										initialDecodedContent.decodedSubject,
 									)
 								}
-								icon={<ForwardIcon />}
+								icon={<ForwardSvg />}
 							>
 								Forward
 							</ActionButton>

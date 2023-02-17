@@ -8,8 +8,8 @@ import { FeedLayout } from '../../components/feedLayout/feedLayout';
 import { FeedPostItem } from '../../components/feedPostItem/feedPostItem';
 import { YlideLoader } from '../../components/ylideLoader/ylideLoader';
 import { YlideButton } from '../../controls/YlideButton';
-import { CaretDown } from '../../icons/CaretDown';
-import { ReactComponent as CrossSvg } from '../../icons/cross.svg';
+import { ReactComponent as ArrowUpSvg } from '../../icons/ic20/arrowUp.svg';
+import { ReactComponent as CrossSvg } from '../../icons/ic20/cross.svg';
 import { browserStorage } from '../../stores/browserStorage';
 import feed, { FeedCategory } from '../../stores/Feed';
 import { useNav } from '../../utils/navigate';
@@ -106,11 +106,9 @@ export const FeedPage = observer(() => {
 				)
 			}
 		>
-			{newPostsVisible && (
-				<div className={css.scrollToTop} onClick={() => scrollWindowToTop()}>
-					<CaretDown color="black" style={{ width: 40, height: 40 }} />
-				</div>
-			)}
+			<div className={css.scrollToTop} onClick={() => scrollWindowToTop()}>
+				<ArrowUpSvg style={{ width: 40, height: 40 }} />
+			</div>
 
 			<div className={css.feedBody} ref={feedBodyRef}>
 				{newPostsVisible && !!feed.newPosts && (

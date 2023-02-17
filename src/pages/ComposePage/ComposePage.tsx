@@ -6,7 +6,7 @@ import { ActionButton, ActionButtonLook } from '../../components/ActionButton/Ac
 import { ComposeMailForm } from '../../components/composeMailForm/composeMailForm';
 import { GenericLayout } from '../../components/genericLayout/genericLayout';
 import { OverlappingLoader } from '../../components/overlappingLoader/overlappingLoader';
-import { ReactComponent as CrossSvg } from '../../icons/cross.svg';
+import { ReactComponent as CrossSvg } from '../../icons/ic20/cross.svg';
 import { analytics } from '../../stores/Analytics';
 import mailer from '../../stores/Mailer';
 import { useMailStore } from '../../stores/MailList';

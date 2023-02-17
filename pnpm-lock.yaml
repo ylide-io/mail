@@ -1,7 +1,6 @@
 lockfileVersion: 5.4
 
 specifiers:
-  '@ant-design/icons': ^4.7.0
   '@editorjs/editorjs': ^2.26.4
   '@editorjs/header': ^2.6.2
   '@editorjs/list': ^1.7.0
@@ -78,7 +77,6 @@ specifiers:
   zustand: ^4.2.0
 
 dependencies:
-  '@ant-design/icons': 4.8.0_sfoxds7t5ydpegc3knd667wn6m
   '@editorjs/editorjs': 2.26.4
   '@editorjs/header': 2.7.0
   '@editorjs/list': 1.8.0
@@ -11779,7 +11777,6 @@ packages:
   /punycode/2.3.0:
     resolution: {integrity: sha512-rRV+zQD8tVFys26lAGR9WUuS4iUAngJScM+ZRSKtvl5tKeZ2t5bvdNFdNHBW9FWR4guGHlgmsZ1G7BSm2wTbuA==}
     engines: {node: '>=6'}
-    dev: true
 
   /q/1.5.1:
     resolution: {integrity: sha512-kV/CThkXo6xyFEZUugw/+pIOywXcDbFYgSct5cT3gqlbkBE1SJdwy6UQoZvodiWF/ckQLZyDE/Bu1M6gVu5lVw==}
@@ -14210,7 +14207,7 @@ packages:
     engines: {node: '>=0.8'}
     dependencies:
       psl: 1.9.0
-      punycode: 2.1.1
+      punycode: 2.3.0
     dev: false
 
   /tough-cookie/4.1.2:

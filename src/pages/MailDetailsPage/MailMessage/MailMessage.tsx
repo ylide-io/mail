@@ -6,9 +6,9 @@ import { ActionButton, ActionButtonLook } from '../../../components/ActionButton
 import { ContactName } from '../../../components/contactName/contactName';
 import { ReadableDate } from '../../../components/readableDate/readableDate';
 import { Blockie } from '../../../controls/Blockie';
-import { ForwardIcon } from '../../../icons/ForwardIcon';
-import { ReactComponent as ReplySvg } from '../../../icons/reply.svg';
-import { ReactComponent as TrashSvg } from '../../../icons/trash.svg';
+import { ReactComponent as ForwardSvg } from '../../../icons/ic20/forward.svg';
+import { ReactComponent as ReplySvg } from '../../../icons/ic20/reply.svg';
+import { ReactComponent as TrashSvg } from '../../../icons/ic20/trash.svg';
 import { IMessageDecodedContent } from '../../../indexedDB/MessagesDB';
 import { FolderId, ILinkedMessage, useMailStore } from '../../../stores/MailList';
 import { DateFormatStyle } from '../../../utils/date';
@@ -66,7 +66,7 @@ export function MailMessage({
 						</ActionButton>
 
 						<Tooltip title="Forward">
-							<ActionButton icon={<ForwardIcon />} onClick={() => onForwardClick()} />
+							<ActionButton icon={<ForwardSvg />} onClick={() => onForwardClick()} />
 						</Tooltip>
 
 						{folderId !== FolderId.Archive && (

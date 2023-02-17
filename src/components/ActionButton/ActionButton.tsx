@@ -57,7 +57,7 @@ export const ActionButton = forwardRef(
 				disabled={isDisabled}
 				{...props}
 			>
-				{icon}
+				{icon && <div className={css.icon}>{icon}</div>}
 				{children != null && <div className={css.content}>{children}</div>}
 			</button>
 		);

@@ -7,7 +7,7 @@ import { CheckBox } from '../../components/checkBox/checkBox';
 import { TagInput, TagInputItem } from '../../components/tagInput/tagInput';
 import { TextField, TextFieldLook } from '../../components/textField/textField';
 import { AdaptiveAddress } from '../../controls/adaptiveAddress/adaptiveAddress';
-import { ReactComponent as SettingsSvg } from '../../icons/settings.svg';
+import { ReactComponent as SettingsSvg } from '../../icons/ic20/settings.svg';
 import css from './TestPage.module.scss';
 
 export function GridRow({ children }: PropsWithChildren) {
@@ -117,6 +117,14 @@ export const TestPage = observer(() => {
 					Medium
 					<br />
 					Button
+				</ActionButton>
+			</GridRow>
+
+			<GridRow>
+				big icon
+				<ActionButton size={ActionButtonSize.Small} icon={<SettingsSvg style={{ width: 28, height: 28 }} />} />
+				<ActionButton size={ActionButtonSize.Small} icon={<SettingsSvg style={{ width: 28, height: 28 }} />}>
+					With Text
 				</ActionButton>
 			</GridRow>
 

@@ -1,10 +1,10 @@
-import { UserOutlined } from '@ant-design/icons';
 import Avatar from 'antd/lib/avatar/avatar';
 import clsx from 'clsx';
 import React, { MouseEvent, ReactNode, useEffect, useRef, useState } from 'react';
 import { generatePath } from 'react-router-dom';
 
-import { ReactComponent as ExternalSvg } from '../../icons/external.svg';
+import { ReactComponent as ContactSvg } from '../../icons/ic20/contact.svg';
+import { ReactComponent as ExternalSvg } from '../../icons/ic20/external.svg';
 import { discordSourceIcon } from '../../icons/static/discordSourceIcon';
 import { mirrorSourceIcon } from '../../icons/static/mirrorSourceIcon';
 import { telegramSourceIcon } from '../../icons/static/telegramSourceIcon';
@@ -126,7 +126,7 @@ export function FeedPostItem({ isInFeed, post }: FeedPostItemProps) {
 	return (
 		<div ref={selfRef} className={clsx(css.root, { [css.root_collapsed]: collapsed })}>
 			<div className={css.ava}>
-				<Avatar size={48} src={post.authorAvatar} icon={<UserOutlined />} />
+				<Avatar size={48} icon={<ContactSvg width="100%" height="100%" />} />
 				<div className={css.avaSource}>{sourceIcon[post.sourceType]}</div>
 			</div>
 

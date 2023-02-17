@@ -6,8 +6,8 @@ import { generatePath } from 'react-router-dom';
 import { blockchainsMap, walletsMeta } from '../../constants';
 import { AdaptiveAddress } from '../../controls/adaptiveAddress/adaptiveAddress';
 import { YlideButton } from '../../controls/YlideButton';
-import { ArrowRight } from '../../icons/ArrowRight';
-import { CrossIcon } from '../../icons/CrossIcon';
+import { ReactComponent as CrossSvg } from '../../icons/ic20/cross.svg';
+import { ReactComponent as NextSvg } from '../../icons/ic28/next.svg';
 import { YlideLargeLogo } from '../../icons/YlideLargeLogo';
 import { NewPasswordModal } from '../../modals/NewPasswordModal';
 import { SelectWalletModal } from '../../modals/SelectWalletModal';
@@ -44,7 +44,7 @@ export const NewWalletsPage = observer(() => {
 							navigate(generatePath(RoutePath.FEED_CATEGORY, { category: FeedCategory.MAIN }));
 						}}
 					>
-						Continue with connected accounts <ArrowRight style={{ marginLeft: 10 }} />
+						Continue with connected accounts <NextSvg style={{ margin: '-4px -4px -4px 10px' }} />
 					</YlideButton>
 				)}
 
@@ -121,7 +121,7 @@ export const NewWalletsPage = observer(() => {
 										}
 									}}
 								>
-									<CrossIcon size={9} />
+									<CrossSvg />
 								</div>
 							</div>
 						);

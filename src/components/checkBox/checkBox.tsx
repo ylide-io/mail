@@ -1,7 +1,7 @@
 import clsx from 'clsx';
 
-import { ReactComponent as TickSvg } from '../../assets/img/tick.svg';
 import css from './checkBox.module.scss';
+import { ReactComponent as TickSvg } from './tick.svg';
 
 export interface CheckBoxProps {
 	isChecked?: boolean;

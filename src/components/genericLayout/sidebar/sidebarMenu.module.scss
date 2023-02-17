@@ -130,6 +130,11 @@
 	&:focus-visible {
 		opacity: 0.5;
 	}
+
+	> svg {
+		width: 100%;
+		height: 100%;
+	}
 }
 
 .socials {
@@ -173,6 +178,5 @@
 
 	@include less920px {
 		display: block;
-		border-radius: 4px;
 	}
 }

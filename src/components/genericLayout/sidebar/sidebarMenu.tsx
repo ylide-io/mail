@@ -1,16 +1,16 @@
-import { MenuFoldOutlined, MenuUnfoldOutlined } from '@ant-design/icons';
-import { Button } from 'antd';
 import clsx from 'clsx';
 import { observer } from 'mobx-react';
 import React, { PropsWithChildren, useEffect, useState } from 'react';
 import { generatePath, useLocation } from 'react-router-dom';
 
 import { ReactComponent as ArchiveSvg } from '../../../icons/archive.svg';
-import { CaretDown } from '../../../icons/CaretDown';
-import { CaretUp } from '../../../icons/CaretUp';
+import { ReactComponent as ArrowDownSvg } from '../../../icons/ic20/arrowDown.svg';
+import { ReactComponent as ArrowUpSvg } from '../../../icons/ic20/arrowUp.svg';
+import { ReactComponent as SettingsSvg } from '../../../icons/ic20/settings.svg';
+import { ReactComponent as SidebarMenuSvg } from '../../../icons/ic28/sidebarMenu.svg';
+import { ReactComponent as SidebarMenuCloseSvg } from '../../../icons/ic28/sidebarMenu_close.svg';
 import { ReactComponent as InboxSvg } from '../../../icons/inbox.svg';
 import { ReactComponent as SentSvg } from '../../../icons/sent.svg';
-import { ReactComponent as SettingsSvg } from '../../../icons/settings.svg';
 import { ReactComponent as DiscordSvg } from '../../../icons/social/discord.svg';
 import { ReactComponent as LinkedInSvg } from '../../../icons/social/linkedIn.svg';
 import { ReactComponent as MediumSvg } from '../../../icons/social/medium.svg';
@@ -32,7 +32,7 @@ import modals from '../../../stores/Modals';
 import { OutgoingMailData } from '../../../stores/outgoingMailData';
 import { RoutePath } from '../../../stores/routePath';
 import { useNav } from '../../../utils/navigate';
-import { ActionButton, ActionButtonLook } from '../../ActionButton/ActionButton';
+import { ActionButton, ActionButtonLook, ActionButtonSize } from '../../ActionButton/ActionButton';
 import { useComposeMailPopup } from '../../composeMailPopup/composeMailPopup';
 import { FeedSettingsPopup } from '../../feedSettingsPopup/feedSettingsPopup';
 import { PropsWithClassName } from '../../propsWithClassName';
@@ -42,15 +42,17 @@ interface SidebarBurgerProps extends PropsWithClassName, PropsWithChildren {}
 
 export function SidebarBurger({ className, children }: SidebarBurgerProps) {
 	return (
-		<Button
-			className={clsx(css.burger, className)}
-			onClick={() => {
-				modals.sidebarOpen = !modals.sidebarOpen;
-			}}
-			icon={modals.sidebarOpen ? <MenuFoldOutlined /> : <MenuUnfoldOutlined />}
-		>
-			{children}
-		</Button>
+		<div className={clsx(css.burger, className)}>
+			<ActionButton
+				size={ActionButtonSize.Medium}
+				icon={modals.sidebarOpen ? <SidebarMenuCloseSvg /> : <SidebarMenuSvg />}
+				onClick={() => {
+					modals.sidebarOpen = !modals.sidebarOpen;
+				}}
+			>
+				{children}
+			</ActionButton>
+		</div>
 	);
 }
 
@@ -108,7 +110,7 @@ const SidebarMenu = observer(() => {
 							}}
 							onClick={() => setFeedOpen(v => !v)}
 						>
-							{feedOpen ? <CaretDown /> : <CaretUp />}
+							{feedOpen ? <ArrowUpSvg /> : <ArrowDownSvg />}
 						</div>
 					</div>
 
@@ -165,7 +167,7 @@ const SidebarMenu = observer(() => {
 							}}
 							onClick={() => setMailOpen(v => !v)}
 						>
-							{mailOpen ? <CaretDown /> : <CaretUp />}
+							{mailOpen ? <ArrowUpSvg /> : <ArrowDownSvg />}
 						</div>
 					</div>
 					<div className={clsx(css.sectionContent, mailOpen && css.sectionContent_open)}>

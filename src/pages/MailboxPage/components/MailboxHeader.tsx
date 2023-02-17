@@ -4,10 +4,10 @@ import React from 'react';
 import { ActionButton, ActionButtonLook } from '../../../components/ActionButton/ActionButton';
 import { CheckBox } from '../../../components/checkBox/checkBox';
 import { ContactName } from '../../../components/contactName/contactName';
-import { ReactComponent as CrossSvg } from '../../../icons/cross.svg';
-import { ReactComponent as MerkReadSvg } from '../../../icons/markRead.svg';
-import { ReactComponent as RestoreSvg } from '../../../icons/restore.svg';
-import { ReactComponent as TrashSvg } from '../../../icons/trash.svg';
+import { ReactComponent as CrossSvg } from '../../../icons/ic20/cross.svg';
+import { ReactComponent as MerkReadSvg } from '../../../icons/ic20/markRead.svg';
+import { ReactComponent as RestoreSvg } from '../../../icons/ic20/restore.svg';
+import { ReactComponent as TrashSvg } from '../../../icons/ic20/trash.svg';
 import { FolderId, getFolderName } from '../../../stores/MailList';
 import { useNav } from '../../../utils/navigate';
 

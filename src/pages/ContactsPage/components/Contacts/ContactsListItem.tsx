@@ -1,4 +1,3 @@
-import { DeleteOutlined, EditOutlined, MailOutlined, SaveOutlined } from '@ant-design/icons';
 import { Avatar, Select } from 'antd';
 import clsx from 'clsx';
 import React, { useMemo, useState } from 'react';
@@ -8,6 +7,10 @@ import { Recipients } from '../../../../components/recipientInput/recipientInput
 import { TextField } from '../../../../components/textField/textField';
 import { AdaptiveAddress } from '../../../../controls/adaptiveAddress/adaptiveAddress';
 import { Blockie } from '../../../../controls/Blockie';
+import { ReactComponent as EditSvg } from '../../../../icons/ic20/edit.svg';
+import { ReactComponent as MailSvg } from '../../../../icons/ic20/mail.svg';
+import { ReactComponent as TickSvg } from '../../../../icons/ic20/tick.svg';
+import { ReactComponent as TrashSvg } from '../../../../icons/ic20/trash.svg';
 import contacts from '../../../../stores/Contacts';
 import domain from '../../../../stores/Domain';
 import { IContact } from '../../../../stores/models/IContact';
@@ -167,12 +170,12 @@ const ContactsListItem: React.FC<ContactsListItemProps> = ({ contact, isNew }) =
 					/>
 				</div>
 				<div className="contact-actions">
-					<ActionButton look={ActionButtonLook.PRIMARY} onClick={saveClickHandler} icon={<SaveOutlined />} />
+					<ActionButton look={ActionButtonLook.PRIMARY} onClick={saveClickHandler} icon={<TickSvg />} />
 					{!isNew ? (
 						<ActionButton
 							look={ActionButtonLook.DENGEROUS}
 							onClick={deleteClickHandler}
-							icon={<DeleteOutlined />}
+							icon={<TrashSvg />}
 						/>
 					) : null}
 				</div>
@@ -201,10 +204,10 @@ const ContactsListItem: React.FC<ContactsListItemProps> = ({ contact, isNew }) =
 				))}
 			</div>
 			<div className="contact-actions">
-				<ActionButton onClick={mailThisContact} icon={<MailOutlined />}>
+				<ActionButton icon={<MailSvg />} onClick={mailThisContact}>
 					Compose
 				</ActionButton>
-				<ActionButton onClick={editClickHandler} icon={<EditOutlined />}>
+				<ActionButton icon={<EditSvg />} onClick={editClickHandler}>
 					Edit
 				</ActionButton>
 			</div>
