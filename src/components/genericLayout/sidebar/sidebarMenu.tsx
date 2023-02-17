@@ -243,11 +243,7 @@ const SidebarMenu = observer(() => {
 					<a href="https://twitter.com/ylide_" target="_blank noreferrer" title="Twitter">
 						<TwitterSvg />
 					</a>
-					<a
-						href="src/components/genericLayout/sidebar/sidebarMenu"
-						target="_blank noreferrer"
-						title="LinkedIn"
-					>
+					<a href="https://www.linkedin.com/company/ylide/" target="_blank noreferrer" title="LinkedIn">
 						<LinkedInSvg />
 					</a>
 					<a href="https://medium.com/@ylide" target="_blank noreferrer" title="Medium">
