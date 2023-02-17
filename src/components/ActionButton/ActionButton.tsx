@@ -1,5 +1,5 @@
 import clsx from 'clsx';
-import React, { forwardRef, PropsWithChildren, ReactNode, Ref } from 'react';
+import React, { ButtonHTMLAttributes, forwardRef, PropsWithChildren, ReactNode, Ref } from 'react';
 
 import { PropsWithClassName } from '../propsWithClassName';
 import css from './ActionButton.module.scss';
@@ -16,19 +16,17 @@ export enum ActionButtonLook {
 	LITE,
 }
 
-interface ActionButtonProps extends PropsWithChildren, PropsWithClassName {
+interface ActionButtonProps extends PropsWithChildren, PropsWithClassName, ButtonHTMLAttributes<HTMLButtonElement> {
 	size?: ActionButtonSize;
 	look?: ActionButtonLook;
 	icon?: ReactNode;
-	title?: string;
 	isDisabled?: boolean;
 	isMultiline?: boolean;
-	onClick?: React.MouseEventHandler<HTMLElement>;
 }
 
 export const ActionButton = forwardRef(
 	(
-		{ children, className, size, look, icon, title, isDisabled, isMultiline, onClick, ...props }: ActionButtonProps,
+		{ children, className, size, look, icon, isDisabled, isMultiline, ...props }: ActionButtonProps,
 		ref: Ref<HTMLButtonElement>,
 	) => {
 		const sizeClass = {
@@ -57,8 +55,6 @@ export const ActionButton = forwardRef(
 					className,
 				)}
 				disabled={isDisabled}
-				title={title}
-				onClick={onClick}
 				{...props}
 			>
 				{icon}
