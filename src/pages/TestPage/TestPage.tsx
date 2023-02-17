@@ -84,6 +84,70 @@ export const TestPage = observer(() => {
 				<ActionButton size={ActionButtonSize.Medium} icon={<SettingsSvg />} />
 			</div>
 
+			<div
+				style={{
+					display: 'grid',
+					gridAutoFlow: 'column',
+					gridGap: 8,
+					alignItems: 'center',
+					justifyContent: 'start',
+				}}
+			>
+				multiline
+				<ActionButton isMultiline size={ActionButtonSize.Small}>
+					Multiline Small
+				</ActionButton>
+				<ActionButton isMultiline size={ActionButtonSize.Medium}>
+					Multiline Medium
+				</ActionButton>
+				<ActionButton isMultiline size={ActionButtonSize.Small}>
+					Multiline
+					<br />
+					Small
+				</ActionButton>
+				<ActionButton isMultiline size={ActionButtonSize.Medium}>
+					Multiline
+					<br />
+					Medium
+				</ActionButton>
+			</div>
+
+			<div
+				style={{
+					display: 'grid',
+					gridAutoFlow: 'column',
+					gridGap: 8,
+					alignItems: 'center',
+					justifyContent: 'start',
+				}}
+			>
+				multiline
+				<ActionButton isMultiline size={ActionButtonSize.Small} icon={<SettingsSvg />}>
+					Multiline
+					<br />
+					Small
+				</ActionButton>
+				<ActionButton isMultiline size={ActionButtonSize.Medium} icon={<SettingsSvg />}>
+					Multiline
+					<br />
+					Medium
+				</ActionButton>
+				<ActionButton isMultiline size={ActionButtonSize.Small}>
+					Multiline
+					<br />
+					Small
+					<br />
+					Button
+				</ActionButton>
+				<ActionButton isMultiline size={ActionButtonSize.Medium}>
+					Multiline
+					<br />
+					Medium
+					<br />
+					Button
+				</ActionButton>
+			</div>
+
 			<hr style={{ margin: '32px 0' }} />
 
 			<TagInput placeholder="Enter something" />

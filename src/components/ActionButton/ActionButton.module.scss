@@ -4,7 +4,7 @@
 	grid-gap: 4px;
 	align-items: center;
 	border: 1px solid;
-	border-radius: 99px;
+	border-radius: 20px;
 
 	> i {
 		min-width: 20px;
@@ -36,12 +36,6 @@
 	pointer-events: none;
 	opacity: 0.5;
 }
-.root_multiline {
-	padding-top: 3px;
-	padding-bottom: 3px;
-	height: auto;
-	min-height: 28px;
-}
 
 .content {
 	padding: 1px 0 0;
@@ -58,6 +52,13 @@
 	min-width: 28px;
 	height: 28px;
 
+	&.root_multiline {
+		padding-top: 3px;
+		padding-bottom: 3px;
+		height: auto;
+		min-height: 28px;
+	}
+
 	&.root_hasIcon {
 		padding-left: 5px;
 	}
@@ -71,6 +72,13 @@
 .root_mediumSize {
 	min-width: 32px;
 	height: 32px;
+
+	&.root_multiline {
+		padding-top: 3px;
+		padding-bottom: 3px;
+		height: auto;
+		min-height: 32px;
+	}
 
 	&.root_hasIcon {
 		padding-left: 7px;
