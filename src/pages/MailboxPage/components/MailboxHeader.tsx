@@ -1,7 +1,7 @@
 import { Tooltip } from 'antd';
 import React from 'react';
 
-import { ActionButton, ActionButtonStyle } from '../../../components/ActionButton/ActionButton';
+import { ActionButton, ActionButtonLook } from '../../../components/ActionButton/ActionButton';
 import { CheckBox } from '../../../components/checkBox/checkBox';
 import { ContactName } from '../../../components/contactName/contactName';
 import { ReactComponent as CrossSvg } from '../../../icons/cross.svg';
@@ -92,7 +92,7 @@ export function MailboxHeader({
 
 				{!!filterBySender && (
 					<ActionButton
-						style={ActionButtonStyle.Primary}
+						look={ActionButtonLook.PRIMARY}
 						icon={<CrossSvg />}
 						onClick={() => navigate({ search: {} })}
 					>

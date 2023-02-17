@@ -3,7 +3,7 @@ import { Avatar, Select } from 'antd';
 import clsx from 'clsx';
 import React, { useMemo, useState } from 'react';
 
-import { ActionButton, ActionButtonStyle } from '../../../../components/ActionButton/ActionButton';
+import { ActionButton, ActionButtonLook } from '../../../../components/ActionButton/ActionButton';
 import { Recipients } from '../../../../components/recipientInput/recipientInput';
 import { TextField } from '../../../../components/textField/textField';
 import { AdaptiveAddress } from '../../../../controls/adaptiveAddress/adaptiveAddress';
@@ -145,7 +145,7 @@ const ContactsListItem: React.FC<ContactsListItemProps> = ({ contact, isNew }) =
 						isError={nameError}
 						value={name}
 						placeholder={'Type contact name'}
-						onChange={onNameEdit}
+						onValueChange={onNameEdit}
 					/>
 				</div>
 				<div className="contact-address">
@@ -153,7 +153,7 @@ const ContactsListItem: React.FC<ContactsListItemProps> = ({ contact, isNew }) =
 						isError={addressError}
 						placeholder={'Type contact address'}
 						value={address}
-						onChange={onAddressEdit}
+						onValueChange={onAddressEdit}
 					/>
 				</div>
 				<div className="contact-folders">
@@ -167,14 +167,10 @@ const ContactsListItem: React.FC<ContactsListItemProps> = ({ contact, isNew }) =
 					/>
 				</div>
 				<div className="contact-actions">
-					<ActionButton
-						style={ActionButtonStyle.Primary}
-						onClick={saveClickHandler}
-						icon={<SaveOutlined />}
-					/>
+					<ActionButton look={ActionButtonLook.PRIMARY} onClick={saveClickHandler} icon={<SaveOutlined />} />
 					{!isNew ? (
 						<ActionButton
-							style={ActionButtonStyle.Dengerous}
+							look={ActionButtonLook.DENGEROUS}
 							onClick={deleteClickHandler}
 							icon={<DeleteOutlined />}
 						/>

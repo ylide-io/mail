@@ -253,21 +253,6 @@
 	}
 }
 
-.wallets-search {
-	height: 28px;
-
-	font-style: normal;
-	font-weight: 300;
-	font-size: 14px;
-	line-height: 20px;
-
-	background: #f3f4f7;
-	border: 0;
-	border-radius: 100px;
-	padding: 4px 20px;
-	text-align: center;
-}
-
 .cross-button {
 	@include flex-row(center, center);
 

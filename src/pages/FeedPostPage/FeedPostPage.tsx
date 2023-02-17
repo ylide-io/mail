@@ -3,7 +3,7 @@ import { useQuery } from 'react-query';
 import { useParams } from 'react-router-dom';
 
 import { FeedServerApi } from '../../api/feedServerApi';
-import { ActionButton, ActionButtonStyle } from '../../components/ActionButton/ActionButton';
+import { ActionButton, ActionButtonLook } from '../../components/ActionButton/ActionButton';
 import { ErrorMessage } from '../../components/errorMessage/errorMessage';
 import { FeedLayout } from '../../components/feedLayout/feedLayout';
 import { FeedPostItem } from '../../components/feedPostItem/feedPostItem';
@@ -31,7 +31,7 @@ export function FeedPostPage() {
 					<>
 						<ActionButton
 							ref={shareButtonRef}
-							style={ActionButtonStyle.Primary}
+							look={ActionButtonLook.PRIMARY}
 							icon={<ShareSvg />}
 							onClick={() => setSharePopupOpen(!isSharePopupOpen)}
 						>

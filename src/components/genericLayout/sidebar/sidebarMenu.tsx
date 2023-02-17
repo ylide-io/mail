@@ -32,7 +32,7 @@ import modals from '../../../stores/Modals';
 import { OutgoingMailData } from '../../../stores/outgoingMailData';
 import { RoutePath } from '../../../stores/routePath';
 import { useNav } from '../../../utils/navigate';
-import { ActionButton, ActionButtonStyle } from '../../ActionButton/ActionButton';
+import { ActionButton, ActionButtonLook } from '../../ActionButton/ActionButton';
 import { useComposeMailPopup } from '../../composeMailPopup/composeMailPopup';
 import { FeedSettingsPopup } from '../../feedSettingsPopup/feedSettingsPopup';
 import { PropsWithClassName } from '../../propsWithClassName';
@@ -170,7 +170,7 @@ const SidebarMenu = observer(() => {
 					</div>
 					<div className={clsx(css.sectionContent, mailOpen && css.sectionContent_open)}>
 						<ActionButton
-							style={ActionButtonStyle.Primary}
+							look={ActionButtonLook.PRIMARY}
 							className={css.sectionButton}
 							onClick={() => {
 								modals.sidebarOpen = false;

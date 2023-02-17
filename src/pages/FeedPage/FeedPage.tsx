@@ -2,7 +2,7 @@ import { observer } from 'mobx-react';
 import React, { useEffect, useRef, useState } from 'react';
 import { useLocation, useParams } from 'react-router-dom';
 
-import { ActionButton, ActionButtonStyle } from '../../components/ActionButton/ActionButton';
+import { ActionButton, ActionButtonLook } from '../../components/ActionButton/ActionButton';
 import { ErrorMessage } from '../../components/errorMessage/errorMessage';
 import { FeedLayout } from '../../components/feedLayout/feedLayout';
 import { FeedPostItem } from '../../components/feedPostItem/feedPostItem';
@@ -90,7 +90,7 @@ export const FeedPage = observer(() => {
 			titleSubItem={
 				!!sourceId && (
 					<ActionButton
-						style={ActionButtonStyle.Primary}
+						look={ActionButtonLook.PRIMARY}
 						icon={<CrossSvg />}
 						onClick={() => navigate({ search: {} })}
 					>

@@ -1,98 +1,78 @@
 import clsx from 'clsx';
 import { observer } from 'mobx-react';
-import React from 'react';
+import React, { PropsWithChildren } from 'react';
 
-import { ActionButton, ActionButtonSize, ActionButtonStyle } from '../../components/ActionButton/ActionButton';
+import { ActionButton, ActionButtonLook, ActionButtonSize } from '../../components/ActionButton/ActionButton';
+import { CheckBox } from '../../components/checkBox/checkBox';
 import { TagInput, TagInputItem } from '../../components/tagInput/tagInput';
+import { TextField, TextFieldLook } from '../../components/textField/textField';
 import { AdaptiveAddress } from '../../controls/adaptiveAddress/adaptiveAddress';
 import { ReactComponent as SettingsSvg } from '../../icons/settings.svg';
 import css from './TestPage.module.scss';
 
+export function GridRow({ children }: PropsWithChildren) {
+	return (
+		<div
+			style={{
+				display: 'grid',
+				gridAutoFlow: 'column',
+				gridGap: 8,
+				alignItems: 'center',
+				justifyContent: 'start',
+			}}
+		>
+			{children}
+		</div>
+	);
+}
+
+//
+
 export const TestPage = observer(() => {
 	return (
 		<div className={css.verticalGrid} style={{ padding: 50 }}>
-			<div
-				style={{
-					display: 'grid',
-					gridAutoFlow: 'column',
-					gridGap: 8,
-					alignItems: 'center',
-					justifyContent: 'start',
-				}}
-			>
+			<GridRow>
 				content
 				<ActionButton>Text Only</ActionButton>
 				<ActionButton icon={<SettingsSvg />}>With Icon</ActionButton>
 				<ActionButton icon={<SettingsSvg />} />
-			</div>
+			</GridRow>
 
-			<div
-				style={{
-					display: 'grid',
-					gridAutoFlow: 'column',
-					gridGap: 8,
-					alignItems: 'center',
-					justifyContent: 'start',
-				}}
-			>
-				style
-				<ActionButton style={ActionButtonStyle.Default} icon={<SettingsSvg />}>
+			<GridRow>
+				look
+				<ActionButton look={ActionButtonLook.DEFAULT} icon={<SettingsSvg />}>
 					Default
 				</ActionButton>
-				<ActionButton style={ActionButtonStyle.Primary} icon={<SettingsSvg />}>
+				<ActionButton look={ActionButtonLook.PRIMARY} icon={<SettingsSvg />}>
 					Primary
 				</ActionButton>
-				<ActionButton style={ActionButtonStyle.Lite} icon={<SettingsSvg />}>
+				<ActionButton look={ActionButtonLook.LITE} icon={<SettingsSvg />}>
 					Lite
 				</ActionButton>
-				<ActionButton style={ActionButtonStyle.Dengerous} icon={<SettingsSvg />}>
+				<ActionButton look={ActionButtonLook.DENGEROUS} icon={<SettingsSvg />}>
 					Dengerous
 				</ActionButton>
-			</div>
+			</GridRow>
 
-			<div
-				style={{
-					display: 'grid',
-					gridAutoFlow: 'column',
-					gridGap: 8,
-					alignItems: 'center',
-					justifyContent: 'start',
-				}}
-			>
+			<GridRow>
 				small
 				<ActionButton size={ActionButtonSize.Small}>Text Only</ActionButton>
 				<ActionButton size={ActionButtonSize.Small} icon={<SettingsSvg />}>
 					With Icon
 				</ActionButton>
 				<ActionButton size={ActionButtonSize.Small} icon={<SettingsSvg />} />
-			</div>
+			</GridRow>
 
-			<div
-				style={{
-					display: 'grid',
-					gridAutoFlow: 'column',
-					gridGap: 8,
-					alignItems: 'center',
-					justifyContent: 'start',
-				}}
-			>
+			<GridRow>
 				medium
 				<ActionButton size={ActionButtonSize.Medium}>Text Only</ActionButton>
 				<ActionButton size={ActionButtonSize.Medium} icon={<SettingsSvg />}>
 					With Icon
 				</ActionButton>
 				<ActionButton size={ActionButtonSize.Medium} icon={<SettingsSvg />} />
-			</div>
+			</GridRow>
 
-			<div
-				style={{
-					display: 'grid',
-					gridAutoFlow: 'column',
-					gridGap: 8,
-					alignItems: 'center',
-					justifyContent: 'start',
-				}}
-			>
+			<GridRow>
 				multiline
 				<ActionButton isMultiline size={ActionButtonSize.Small}>
 					Multiline Small
@@ -110,17 +90,9 @@ export const TestPage = observer(() => {
 					<br />
 					Medium
 				</ActionButton>
-			</div>
+			</GridRow>
 
-			<div
-				style={{
-					display: 'grid',
-					gridAutoFlow: 'column',
-					gridGap: 8,
-					alignItems: 'center',
-					justifyContent: 'start',
-				}}
-			>
+			<GridRow>
 				multiline
 				<ActionButton isMultiline size={ActionButtonSize.Small} icon={<SettingsSvg />}>
 					Multiline
@@ -146,18 +118,56 @@ export const TestPage = observer(() => {
 					<br />
 					Button
 				</ActionButton>
-			</div>
+			</GridRow>
 
 			<hr style={{ margin: '32px 0' }} />
 
-			<TagInput placeholder="Enter something" />
+			<GridRow>
+				TextField
+				<TextField look={TextFieldLook.DEFAULT} placeholder="Default" />
+				<TextField look={TextFieldLook.PROMO} placeholder="Promo" />
+				<TextField look={TextFieldLook.LITE} placeholder="Lite" />
+			</GridRow>
 
-			<TagInput>
-				<TagInputItem>12345678</TagInputItem>
-				<TagInputItem>
-					<AdaptiveAddress address="0x15a33D60283e3D20751D6740162D1212c1ad2a2d" />
-				</TagInputItem>
-			</TagInput>
+			<GridRow>
+				error
+				<TextField look={TextFieldLook.DEFAULT} isError placeholder="Default" />
+				<TextField look={TextFieldLook.PROMO} isError placeholder="Promo" />
+				<TextField look={TextFieldLook.LITE} isError placeholder="Lite" />
+			</GridRow>
+
+			<hr style={{ margin: '32px 0' }} />
+
+			<GridRow>
+				TagInput
+				<TagInput placeholder="Enter something" />
+			</GridRow>
+
+			<GridRow>
+				TagInput
+				<TagInput>
+					<TagInputItem>12345678</TagInputItem>
+					<TagInputItem>
+						<AdaptiveAddress address="0x15a33D60283e3D20751D6740162D1212c1ad2a2d" />
+					</TagInputItem>
+				</TagInput>
+			</GridRow>
+
+			<hr style={{ margin: '32px 0' }} />
+
+			<GridRow>
+				CheckBox
+				<CheckBox isChecked />
+				<CheckBox />
+			</GridRow>
+
+			<GridRow>
+				with label
+				<label style={{ display: 'grid', gridAutoFlow: 'column', alignItems: 'center', gridGap: 4 }}>
+					<CheckBox isChecked />
+					Label
+				</label>
+			</GridRow>
 
 			<hr style={{ margin: '32px 0' }} />
 

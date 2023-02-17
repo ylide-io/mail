@@ -10,7 +10,7 @@ import { globalOutgoingMailData, OutgoingMailData } from '../../stores/outgoingM
 import { RoutePath } from '../../stores/routePath';
 import { useNav } from '../../utils/navigate';
 import { useOnMountAnimation } from '../../utils/useOnMountAnimation';
-import { ActionButton, ActionButtonStyle } from '../ActionButton/ActionButton';
+import { ActionButton, ActionButtonLook } from '../ActionButton/ActionButton';
 import { ComposeMailForm } from '../composeMailForm/composeMailForm';
 import { OverlappingLoader } from '../overlappingLoader/overlappingLoader';
 import { Popup } from '../popup/popup';
@@ -60,7 +60,7 @@ export const ComposeMailPopup = observer(({ onClose, mailData }: ComposeMailPopu
 				New message
 				<div className={css.headerActions}>
 					<ActionButton
-						style={ActionButtonStyle.Lite}
+						look={ActionButtonLook.LITE}
 						icon={<ExternalSvg />}
 						title="Open full editor"
 						onClick={() => {
@@ -72,7 +72,7 @@ export const ComposeMailPopup = observer(({ onClose, mailData }: ComposeMailPopu
 					/>
 
 					<ActionButton
-						style={ActionButtonStyle.Lite}
+						look={ActionButtonLook.LITE}
 						icon={<CrossSvg />}
 						title="Close"
 						onClick={() => onClose?.()}

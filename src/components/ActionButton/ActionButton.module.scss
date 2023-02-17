@@ -92,7 +92,7 @@
 
 // STYLE
 
-.root_defaultStyle {
+.root_defaultLook {
 	color: var(--primary-text-color);
 	border-color: rgba(var(--shade-rgb-color), 0.18);
 
@@ -102,7 +102,7 @@
 	}
 }
 
-.root_primaryStyle {
+.root_primaryLook {
 	color: var(--on-accent2-color);
 	background: var(--accent2-color);
 	border-color: var(--accent2-color);
@@ -114,7 +114,7 @@
 	}
 }
 
-.root_dangerousStyle {
+.root_dangerousLook {
 	color: var(--error-color);
 	border-color: rgba(var(--error-rgb-color), 0.35);
 
@@ -124,7 +124,7 @@
 	}
 }
 
-.root_liteStyle {
+.root_liteLook {
 	color: var(--primary-text-color);
 	border-color: transparent;
 

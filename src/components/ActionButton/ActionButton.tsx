@@ -9,16 +9,16 @@ export enum ActionButtonSize {
 	Medium,
 }
 
-export enum ActionButtonStyle {
-	Default,
-	Primary,
-	Dengerous,
-	Lite,
+export enum ActionButtonLook {
+	DEFAULT,
+	PRIMARY,
+	DENGEROUS,
+	LITE,
 }
 
 interface ActionButtonProps extends PropsWithChildren, PropsWithClassName {
 	size?: ActionButtonSize;
-	style?: ActionButtonStyle;
+	look?: ActionButtonLook;
 	icon?: ReactNode;
 	title?: string;
 	isDisabled?: boolean;
@@ -28,18 +28,7 @@ interface ActionButtonProps extends PropsWithChildren, PropsWithClassName {
 
 export const ActionButton = forwardRef(
 	(
-		{
-			children,
-			className,
-			size,
-			style,
-			icon,
-			title,
-			isDisabled,
-			isMultiline,
-			onClick,
-			...props
-		}: ActionButtonProps,
+		{ children, className, size, look, icon, title, isDisabled, isMultiline, onClick, ...props }: ActionButtonProps,
 		ref: Ref<HTMLButtonElement>,
 	) => {
 		const sizeClass = {
@@ -47,12 +36,12 @@ export const ActionButton = forwardRef(
 			[ActionButtonSize.Medium]: css.root_mediumSize,
 		}[size || ActionButtonSize.Small];
 
-		const styleClass = {
-			[ActionButtonStyle.Default]: css.root_defaultStyle,
-			[ActionButtonStyle.Primary]: css.root_primaryStyle,
-			[ActionButtonStyle.Dengerous]: css.root_dangerousStyle,
-			[ActionButtonStyle.Lite]: css.root_liteStyle,
-		}[style || ActionButtonStyle.Default];
+		const lookClass = {
+			[ActionButtonLook.DEFAULT]: css.root_defaultLook,
+			[ActionButtonLook.PRIMARY]: css.root_primaryLook,
+			[ActionButtonLook.DENGEROUS]: css.root_dangerousLook,
+			[ActionButtonLook.LITE]: css.root_liteLook,
+		}[look || ActionButtonLook.DEFAULT];
 
 		return (
 			<button
@@ -60,7 +49,7 @@ export const ActionButton = forwardRef(
 				className={clsx(
 					css.root,
 					sizeClass,
-					styleClass,
+					lookClass,
 					icon != null && css.root_hasIcon,
 					children != null && css.root_hasContent,
 					isDisabled && css.root_disabled,

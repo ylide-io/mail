@@ -2,7 +2,7 @@ import { Tooltip } from 'antd';
 import React, { useEffect, useMemo, useState } from 'react';
 import { createReactEditorJS } from 'react-editor-js';
 
-import { ActionButton, ActionButtonStyle } from '../../../components/ActionButton/ActionButton';
+import { ActionButton, ActionButtonLook } from '../../../components/ActionButton/ActionButton';
 import { ContactName } from '../../../components/contactName/contactName';
 import { ReadableDate } from '../../../components/readableDate/readableDate';
 import { Blockie } from '../../../controls/Blockie';
@@ -72,7 +72,7 @@ export function MailMessage({
 						{folderId !== FolderId.Archive && (
 							<Tooltip title="Archive">
 								<ActionButton
-									style={ActionButtonStyle.Dengerous}
+									look={ActionButtonLook.DENGEROUS}
 									icon={<TrashSvg />}
 									onClick={() => onDeleteClick()}
 								/>

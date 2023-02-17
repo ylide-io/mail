@@ -1,7 +1,7 @@
 import { DeleteOutlined, EditOutlined, SaveOutlined } from '@ant-design/icons';
 import React, { useState } from 'react';
 
-import { ActionButton, ActionButtonStyle } from '../../../../components/ActionButton/ActionButton';
+import { ActionButton, ActionButtonLook } from '../../../../components/ActionButton/ActionButton';
 import { TextField } from '../../../../components/textField/textField';
 import { ITag } from '../../../../stores/models/ITag';
 import tags from '../../../../stores/Tags';
@@ -58,25 +58,25 @@ const TagsListItem: React.FC<TagsListItemProps> = ({ tag, isNew }) => {
 					</div>
 				</div>
 				<div className="contact-name">
-					<TextField placeholder="Type new folder name" value={name} onChange={setName} />
+					<TextField placeholder="Type new folder name" value={name} onValueChange={setName} />
 				</div>
 				<div className="contact-actions small-actions">
 					{!isNew ? (
 						<>
 							<ActionButton
-								style={ActionButtonStyle.Primary}
+								look={ActionButtonLook.PRIMARY}
 								onClick={saveClickHandler}
 								icon={<SaveOutlined />}
 							/>
 							<ActionButton
-								style={ActionButtonStyle.Dengerous}
+								look={ActionButtonLook.DENGEROUS}
 								onClick={deleteClickHandler}
 								icon={<DeleteOutlined />}
 							/>
 						</>
 					) : (
 						<ActionButton
-							style={ActionButtonStyle.Primary}
+							look={ActionButtonLook.PRIMARY}
 							onClick={saveClickHandler}
 							icon={<SaveOutlined />}
 						/>

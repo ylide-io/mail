@@ -1,31 +1,38 @@
 import clsx from 'clsx';
-import { forwardRef, HTMLInputTypeAttribute, Ref } from 'react';
+import { forwardRef, InputHTMLAttributes, Ref } from 'react';
 
-import { PropsWithClassName } from '../propsWithClassName';
 import css from './textField.module.scss';
 
-export interface TextFieldProps extends PropsWithClassName {
+export enum TextFieldLook {
+	DEFAULT,
+	PROMO,
+	LITE,
+}
+
+export interface TextFieldProps extends InputHTMLAttributes<HTMLInputElement> {
+	look?: TextFieldLook;
 	isError?: boolean;
-	autoFocus?: boolean;
-	type?: HTMLInputTypeAttribute;
-	placeholder?: string;
-	value?: string;
-	onChange?: (value: string) => void;
+	onValueChange?: (value: string) => void;
 }
 
 export const TextField = forwardRef(
-	(
-		{ className, isError, autoFocus, type, placeholder, value, onChange }: TextFieldProps,
-		ref: Ref<HTMLInputElement>,
-	) => (
-		<input
-			ref={ref}
-			className={clsx(css.root, isError && css.root_error, className)}
-			autoFocus={autoFocus}
-			type={type}
-			placeholder={placeholder}
-			value={value}
-			onChange={e => onChange?.(e.target.value)}
-		/>
-	),
+	({ className, look, isError, onValueChange, ...props }: TextFieldProps, ref: Ref<HTMLInputElement>) => {
+		const lookClass = {
+			[TextFieldLook.DEFAULT]: css.root_defaultLook,
+			[TextFieldLook.PROMO]: css.root_promoLook,
+			[TextFieldLook.LITE]: css.root_liteLook,
+		}[look || TextFieldLook.DEFAULT];
+
+		return (
+			<input
+				ref={ref}
+				className={clsx(css.root, lookClass, isError && css.root_error, className)}
+				onChange={e => {
+					props.onChange?.(e);
+					onValueChange?.(e.target.value);
+				}}
+				{...props}
+			/>
+		);
+	},
 );
