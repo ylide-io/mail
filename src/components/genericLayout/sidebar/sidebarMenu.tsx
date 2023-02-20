@@ -1,6 +1,6 @@
 import clsx from 'clsx';
 import { observer } from 'mobx-react';
-import React, { PropsWithChildren, useEffect, useState } from 'react';
+import React, { PropsWithChildren, useState } from 'react';
 import { generatePath, useLocation } from 'react-router-dom';
 
 import { ReactComponent as ArchiveSvg } from '../../../icons/archive.svg';
@@ -26,6 +26,7 @@ import { sidePolicyIcon } from '../../../icons/static/sidePolicyIcon';
 import { sideProjectsIcon } from '../../../icons/static/sideProjectsIcon';
 import { sideSecurityIcon } from '../../../icons/static/sideSecurityIcon';
 import { sideTechnologyIcon } from '../../../icons/static/sideTechnologyIcon';
+import { browserStorage } from '../../../stores/browserStorage';
 import { FeedCategory, getFeedCategoryName } from '../../../stores/Feed';
 import { FolderId } from '../../../stores/MailList';
 import modals from '../../../stores/Modals';
@@ -58,6 +59,11 @@ export function SidebarBurger({ className, children }: SidebarBurgerProps) {
 
 //
 
+export enum SidebarSection {
+	FEED = 'feed',
+	MAIL = 'mail',
+}
+
 const getFeedCategoryIcon = (category: FeedCategory) => {
 	return {
 		[FeedCategory.MAIN]: sideFeedIcon(14),
@@ -76,16 +82,6 @@ const getFeedCategoryIcon = (category: FeedCategory) => {
 const SidebarMenu = observer(() => {
 	const location = useLocation();
 	const navigate = useNav();
-	const [feedOpen, setFeedOpen] = useState<boolean>(JSON.parse(localStorage.getItem('tv1_feedOpen') || 'true'));
-	const [mailOpen, setMailOpen] = useState<boolean>(JSON.parse(localStorage.getItem('tv1_mailOpen') || 'true'));
-
-	useEffect(() => {
-		localStorage.setItem('tv1_feedOpen', JSON.stringify(feedOpen));
-	}, [feedOpen]);
-
-	useEffect(() => {
-		localStorage.setItem('tv1_mailOpen', JSON.stringify(mailOpen));
-	}, [mailOpen]);
 
 	const [isFeedSettingsOpen, setFeedSettingsOpen] = useState(false);
 
@@ -108,13 +104,22 @@ const SidebarMenu = observer(() => {
 								justifyContent: 'center',
 								cursor: 'pointer',
 							}}
-							onClick={() => setFeedOpen(v => !v)}
+							onClick={() => browserStorage.toggleSidebarSectionFolding(SidebarSection.FEED)}
 						>
-							{feedOpen ? <ArrowUpSvg /> : <ArrowDownSvg />}
+							{browserStorage.isSidebarSectionFolded(SidebarSection.FEED) ? (
+								<ArrowDownSvg />
+							) : (
+								<ArrowUpSvg />
+							)}
 						</div>
 					</div>
 
-					<div className={clsx(css.sectionContent, feedOpen && css.sectionContent_open)}>
+					<div
+						className={clsx(
+							css.sectionContent,
+							browserStorage.isSidebarSectionFolded(SidebarSection.FEED) || css.sectionContent_open,
+						)}
+					>
 						{Object.values(FeedCategory).map(category => {
 							const path = generatePath(RoutePath.FEED_CATEGORY, { category });
 
@@ -165,12 +170,21 @@ const SidebarMenu = observer(() => {
 								justifyContent: 'center',
 								cursor: 'pointer',
 							}}
-							onClick={() => setMailOpen(v => !v)}
+							onClick={() => browserStorage.toggleSidebarSectionFolding(SidebarSection.MAIL)}
 						>
-							{mailOpen ? <ArrowUpSvg /> : <ArrowDownSvg />}
+							{browserStorage.isSidebarSectionFolded(SidebarSection.MAIL) ? (
+								<ArrowDownSvg />
+							) : (
+								<ArrowUpSvg />
+							)}
 						</div>
 					</div>
-					<div className={clsx(css.sectionContent, mailOpen && css.sectionContent_open)}>
+					<div
+						className={clsx(
+							css.sectionContent,
+							browserStorage.isSidebarSectionFolded(SidebarSection.MAIL) || css.sectionContent_open,
+						)}
+					>
 						<ActionButton
 							look={ActionButtonLook.PRIMARY}
 							className={css.sectionButton}
