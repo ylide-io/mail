@@ -135,15 +135,15 @@ const SidebarMenu = observer(() => {
 
 									{category === FeedCategory.MAIN && (
 										<>
-											<button
-												className={css.sectionLinkIconRight}
+											<ActionButton
+												className={css.sectionRightButton}
+												look={ActionButtonLook.LITE}
+												icon={<SettingsSvg />}
 												onClick={e => {
 													e.stopPropagation();
 													setFeedSettingsOpen(!isFeedSettingsOpen);
 												}}
-											>
-												<SettingsSvg />
-											</button>
+											/>
 
 											{isFeedSettingsOpen && (
 												<FeedSettingsPopup onClose={() => setFeedSettingsOpen(false)} />
