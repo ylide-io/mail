@@ -96,22 +96,18 @@ const SidebarMenu = observer(() => {
 
 				<div className={css.section}>
 					<div className={css.sectionTitle}>
-						Feed{' '}
-						<div
-							style={{
-								display: 'flex',
-								alignItems: 'center',
-								justifyContent: 'center',
-								cursor: 'pointer',
-							}}
+						Feed
+						<ActionButton
+							look={ActionButtonLook.LITE}
+							icon={
+								browserStorage.isSidebarSectionFolded(SidebarSection.FEED) ? (
+									<ArrowDownSvg />
+								) : (
+									<ArrowUpSvg />
+								)
+							}
 							onClick={() => browserStorage.toggleSidebarSectionFolding(SidebarSection.FEED)}
-						>
-							{browserStorage.isSidebarSectionFolded(SidebarSection.FEED) ? (
-								<ArrowDownSvg />
-							) : (
-								<ArrowUpSvg />
-							)}
-						</div>
+						/>
 					</div>
 
 					<div
@@ -162,22 +158,18 @@ const SidebarMenu = observer(() => {
 
 				<div className={css.section}>
 					<div className={css.sectionTitle}>
-						Mail{' '}
-						<div
-							style={{
-								display: 'flex',
-								alignItems: 'center',
-								justifyContent: 'center',
-								cursor: 'pointer',
-							}}
+						Mail
+						<ActionButton
+							look={ActionButtonLook.LITE}
+							icon={
+								browserStorage.isSidebarSectionFolded(SidebarSection.MAIL) ? (
+									<ArrowDownSvg />
+								) : (
+									<ArrowUpSvg />
+								)
+							}
 							onClick={() => browserStorage.toggleSidebarSectionFolding(SidebarSection.MAIL)}
-						>
-							{browserStorage.isSidebarSectionFolded(SidebarSection.MAIL) ? (
-								<ArrowDownSvg />
-							) : (
-								<ArrowUpSvg />
-							)}
-						</div>
+						/>
 					</div>
 					<div
 						className={clsx(
