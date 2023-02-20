@@ -16,6 +16,8 @@ import { FeedPostPage } from './pages/FeedPostPage/FeedPostPage';
 import { MailboxPage } from './pages/MailboxPage/MailboxPage';
 import { MailDetailsPage } from './pages/MailDetailsPage/MailDetailsPage';
 import { NewWalletsPage } from './pages/NewWalletsPage';
+import { OtcChatsPage } from './pages/OtcChatsPage/OtcChatsPage';
+import { OtcExplorerPage } from './pages/OtcExplorerPage/OtcExplorerPage';
 import { SettingsPage } from './pages/SettingsPage/SettingsPage';
 import { TestPage } from './pages/TestPage/TestPage';
 import { analytics } from './stores/Analytics';
@@ -120,6 +122,9 @@ const App = observer(() => {
 						</Route>
 						<Route path={RoutePath.MAIL_FOLDER} element={<MailboxPage />} />
 						<Route path={RoutePath.MAIL_DETAILS} element={<MailDetailsPage />} />
+
+						<Route path={RoutePath.OTC_EXPLORER} element={<OtcExplorerPage />} />
+						<Route path={RoutePath.OTC_CHATS} element={<OtcChatsPage />} />
 
 						<Route
 							path={RoutePath.ANY}

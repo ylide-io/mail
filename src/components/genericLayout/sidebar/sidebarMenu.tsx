@@ -62,6 +62,7 @@ export function SidebarBurger({ className, children }: SidebarBurgerProps) {
 export enum SidebarSection {
 	FEED = 'feed',
 	MAIL = 'mail',
+	OTC = 'otc',
 }
 
 const getFeedCategoryIcon = (category: FeedCategory) => {
@@ -153,6 +154,58 @@ const SidebarMenu = observer(() => {
 								</div>
 							);
 						})}
+					</div>
+				</div>
+
+				<div className={css.section}>
+					<div className={css.sectionTitle}>
+						OTC Trading
+						<ActionButton
+							look={ActionButtonLook.LITE}
+							icon={
+								browserStorage.isSidebarSectionFolded(SidebarSection.OTC) ? (
+									<ArrowDownSvg />
+								) : (
+									<ArrowUpSvg />
+								)
+							}
+							onClick={() => browserStorage.toggleSidebarSectionFolding(SidebarSection.OTC)}
+						/>
+					</div>
+					<div
+						className={clsx(
+							css.sectionContent,
+							browserStorage.isSidebarSectionFolded(SidebarSection.OTC) || css.sectionContent_open,
+						)}
+					>
+						<div
+							className={clsx(css.sectionLink, {
+								[css.sectionLink_active]: location.pathname === generatePath(RoutePath.OTC_EXPLORER),
+							})}
+							onClick={() => {
+								modals.sidebarOpen = false;
+								navigate(generatePath(RoutePath.OTC_EXPLORER));
+							}}
+						>
+							<div className={css.sectionLinkIconLeft}>
+								<InboxSvg />
+							</div>
+							<div className={css.sectionLinkTitle}>Asset Explorer</div>
+						</div>
+						<div
+							className={clsx(css.sectionLink, {
+								[css.sectionLink_active]: location.pathname === generatePath(RoutePath.OTC_CHATS),
+							})}
+							onClick={() => {
+								modals.sidebarOpen = false;
+								navigate(generatePath(RoutePath.OTC_CHATS));
+							}}
+						>
+							<div className={css.sectionLinkIconLeft}>
+								<SentSvg />
+							</div>
+							<div className={css.sectionLinkTitle}>Chats</div>
+						</div>
 					</div>
 				</div>
 

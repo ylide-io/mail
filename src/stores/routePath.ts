@@ -18,4 +18,7 @@ export enum RoutePath {
 	FEED = '/feed',
 	FEED_POST = '/feed/post/:id',
 	FEED_CATEGORY = '/feed/:category',
+
+	OTC_EXPLORER = '/otc/explorer',
+	OTC_CHATS = '/otc/chats',
 }
