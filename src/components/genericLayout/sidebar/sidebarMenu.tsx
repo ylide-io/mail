@@ -180,11 +180,11 @@ const SidebarMenu = observer(() => {
 					>
 						<div
 							className={clsx(css.sectionLink, {
-								[css.sectionLink_active]: location.pathname === generatePath(RoutePath.OTC_EXPLORER),
+								[css.sectionLink_active]: location.pathname === generatePath(RoutePath.OTC_ASSETS),
 							})}
 							onClick={() => {
 								modals.sidebarOpen = false;
-								navigate(generatePath(RoutePath.OTC_EXPLORER));
+								navigate(generatePath(RoutePath.OTC_ASSETS));
 							}}
 						>
 							<div className={css.sectionLinkIconLeft}>

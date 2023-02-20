@@ -1,6 +1,6 @@
 import { OtcLayout } from '../components/otcLayout/otcLayout';
 
-export function OtcExplorerPage() {
+export function OtcAssetsPage() {
 	return (
 		<OtcLayout title="Asset Explorer" titleRight="Filters" aside="Aside">
 			da
