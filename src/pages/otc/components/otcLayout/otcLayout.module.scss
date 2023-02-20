@@ -1,0 +1,30 @@
+.root {
+	display: grid;
+	grid-template-columns: 1fr 280px;
+	grid-column-gap: 40px;
+	grid-gap: 12px;
+}
+
+.title {
+	grid-row: 1/2;
+	display: grid;
+	grid-auto-flow: column;
+	align-items: center;
+	justify-content: space-between;
+	grid-gap: 8px;
+}
+
+.titleText {
+	font-size: 24px;
+}
+
+.titleActions {
+	display: grid;
+	grid-auto-flow: column;
+	align-items: center;
+	grid-gap: 8px;
+}
+
+.aside {
+	grid-row: 1/3;
+}
