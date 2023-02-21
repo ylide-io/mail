@@ -12,8 +12,8 @@ export interface OtcLayoutProps extends PropsWithChildren {
 
 export function OtcLayout({ children, title, titleRight, aside, supContent }: OtcLayoutProps) {
 	return (
-		<GenericLayout isCustomContent>
-			<div className={css.root}>
+		<GenericLayout isCustomContent mainClass={css.root}>
+			<div className={css.main}>
 				<div className={css.title}>
 					<div className={css.titleText}>{title}</div>
 					<div className={css.titleActions}>{titleRight}</div>
@@ -21,10 +21,10 @@ export function OtcLayout({ children, title, titleRight, aside, supContent }: Ot
 
 				<div className={css.aside}>{aside}</div>
 
-				<div className={css.main}>
+				<div className={css.body}>
 					{supContent != null && <div className={css.supContent}>{supContent}</div>}
 
-					<div>{children}</div>
+					<div className={css.content}>{children}</div>
 				</div>
 			</div>
 		</GenericLayout>

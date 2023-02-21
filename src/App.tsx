@@ -17,6 +17,7 @@ import { MailboxPage } from './pages/MailboxPage/MailboxPage';
 import { MailDetailsPage } from './pages/MailDetailsPage/MailDetailsPage';
 import { NewWalletsPage } from './pages/NewWalletsPage';
 import { OtcAssetsPage } from './pages/otc/OtcAssetsPage/OtcAssetsPage';
+import { OtcChatPage } from './pages/otc/OtcChatPage/OtcChatPage';
 import { OtcChatsPage } from './pages/otc/OtcChatsPage/OtcChatsPage';
 import { OtcWalletsPage } from './pages/otc/OtcWalletsPage/OtcWalletsPage';
 import { SettingsPage } from './pages/SettingsPage/SettingsPage';
@@ -127,6 +128,7 @@ const App = observer(() => {
 						<Route path={RoutePath.OTC_ASSETS} element={<OtcAssetsPage />} />
 						<Route path={RoutePath.OTC_WALLETS} element={<OtcWalletsPage />} />
 						<Route path={RoutePath.OTC_CHATS} element={<OtcChatsPage />} />
+						<Route path={RoutePath.OTC_CHAT} element={<OtcChatPage />} />
 
 						<Route
 							path={RoutePath.ANY}

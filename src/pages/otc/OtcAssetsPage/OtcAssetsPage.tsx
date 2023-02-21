@@ -18,9 +18,7 @@ export function OtcAssetsPage() {
 	const [tokenQuery, setTokenQuery] = useState('');
 	const [chainQuery, setChainQuery] = useState('');
 
-	const { isError, data } = useQuery('otc_assets', () =>
-		OtcApi.queryAssets(tokenQuery, chainQuery, null, 0, Number.MAX_SAFE_INTEGER),
-	);
+	const { isError, data } = useQuery('otc_assets', () => OtcApi.queryAssets({ tokenQuery, chainQuery }));
 
 	return (
 		<OtcLayout

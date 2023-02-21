@@ -1,8 +1,6 @@
 import { nanoid } from 'nanoid';
 
 export namespace OtcApi {
-	export type IMessage = any;
-
 	export interface IAsset {
 		id: string;
 		token: string; // USDC
@@ -13,13 +11,6 @@ export namespace OtcApi {
 		totalValue: number;
 	}
 
-	export interface IAssetWallet {
-		address: string;
-		balance: number;
-		value: number;
-		blockchain: string; // EVM_NAMES[EVMNetwork.ETHEREUM] - like this
-	}
-
 	export interface IAssetsResponse {
 		assets: IAsset[];
 		totalCount: number;
@@ -27,29 +18,13 @@ export namespace OtcApi {
 		totalValue: number;
 	}
 
-	export interface IWalletsResponse {
-		wallets: IAssetWallet[];
-		totalCount: number;
-		totalValue: number;
-	}
-
-	export type IChatMessage =
-		| { type: 'message'; id: string; isIncoming: boolean; msg: IMessage }
-		| { type: 'deal-proposal'; id: string; isIncoming: boolean; data: any }
-		| { type: 'deal-closed'; id: string; isIncoming: boolean; data: any };
-
-	export interface IThreadResponse {
-		entries: IChatMessage[]; // desc sorted by timestamp
-		totalCount: number;
-	}
-
-	export async function queryAssets(
-		tokenQuery: string,
-		chainQuery: string,
-		sorting: null | { key: 'totalWallets' | 'totalAmount' | 'totalValue'; direction: 'asc' | 'desc' },
-		offset: number,
-		limit: number,
-	): Promise<IAssetsResponse> {
+	export async function queryAssets(params: {
+		tokenQuery: string;
+		chainQuery: string;
+		sorting?: { key: 'totalWallets' | 'totalAmount' | 'totalValue'; direction: 'asc' | 'desc' };
+		offset?: number;
+		limit?: number;
+	}): Promise<IAssetsResponse> {
 		return {
 			assets: [
 				{
@@ -83,13 +58,28 @@ export namespace OtcApi {
 		};
 	}
 
-	export async function queryWalletsByToken(
-		token: string,
-		chainQuery: string,
-		sorting: null | { key: 'balance' | 'value'; direction: 'asc' | 'desc' },
-		offset: number,
-		limit: number,
-	): Promise<IWalletsResponse> {
+	//
+
+	export interface IAssetWallet {
+		address: string;
+		balance: number;
+		value: number;
+		blockchain: string; // EVM_NAMES[EVMNetwork.ETHEREUM] - like this
+	}
+
+	export interface IWalletsResponse {
+		wallets: IAssetWallet[];
+		totalCount: number;
+		totalValue: number;
+	}
+
+	export async function queryWalletsByToken(params: {
+		token: string;
+		chainQuery: string;
+		sorting?: { key: 'balance' | 'value'; direction: 'asc' | 'desc' };
+		offset?: number;
+		limit?: number;
+	}): Promise<IWalletsResponse> {
 		return {
 			wallets: [
 				{
@@ -110,12 +100,26 @@ export namespace OtcApi {
 		};
 	}
 
-	export async function loadOtcThread(
-		myAddress: string,
-		recipientAddress: string,
-		offset: number,
-		limit: number,
-	): Promise<IThreadResponse> {
+	//
+
+	export type IMessage = any;
+
+	export type IChatMessage =
+		| { type: 'message'; id: string; isIncoming: boolean; msg: IMessage }
+		| { type: 'deal-proposal'; id: string; isIncoming: boolean; data: any }
+		| { type: 'deal-closed'; id: string; isIncoming: boolean; data: any };
+
+	export interface IThreadResponse {
+		entries: IChatMessage[]; // desc sorted by timestamp
+		totalCount: number;
+	}
+
+	export async function loadOtcThread(params: {
+		myAddress: string;
+		recipientAddress: string;
+		offset?: number;
+		limit?: number;
+	}): Promise<IThreadResponse> {
 		return null as any;
 	}
 }

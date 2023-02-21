@@ -39,6 +39,7 @@
 	--shade-color: #000;
 	--shade-rgb-color: 0, 0, 0;
 	--popup-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+	--layout-shadow: 0 0 30px rgba(0, 0, 0, 0.15);
 }
 
 body,
@@ -74,6 +75,7 @@ label {
 }
 
 input,
+textarea,
 button {
 	appearance: none;
 	padding: 0;
@@ -82,12 +84,17 @@ button {
 }
 
 input:focus,
+textarea:focus,
 button:focus {
 	outline: none;
 }
 
 ::placeholder {
 	color: var(--secondary-text-color);
+}
+
+textarea {
+	resize: none;
 }
 
 button,

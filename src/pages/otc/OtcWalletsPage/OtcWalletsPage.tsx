@@ -1,25 +1,27 @@
 import { useQuery } from 'react-query';
-import { useSearchParams } from 'react-router-dom';
+import { generatePath, useSearchParams } from 'react-router-dom';
 
 import { OtcApi } from '../../../api/otcApi';
 import { ErrorMessage } from '../../../components/errorMessage/errorMessage';
 import { YlideLoader } from '../../../components/ylideLoader/ylideLoader';
 import { AdaptiveAddress } from '../../../controls/adaptiveAddress/adaptiveAddress';
+import { RoutePath } from '../../../stores/routePath';
 import { invariant } from '../../../utils/invariant';
+import { useNav } from '../../../utils/url';
 import { OtcAsideStatistics } from '../components/otcAsideStatistics/otcAsideStatistics';
 import { OtcLayout } from '../components/otcLayout/otcLayout';
 import { OtcTable } from '../components/otcTable/otcTable';
 import css from './OtcWalletsPage.module.scss';
 
 export function OtcWalletsPage() {
+	const navigate = useNav();
+
 	const [searchParams] = useSearchParams();
 	const token = searchParams.get('token');
 	const chain = searchParams.get('chain');
 	invariant(token && chain);
 
-	const { isError, data } = useQuery('otc_wallets', () =>
-		OtcApi.queryWalletsByToken(token, chain, null, 0, Number.MAX_SAFE_INTEGER),
-	);
+	const { isError, data } = useQuery('otc_wallets', () => OtcApi.queryWalletsByToken({ token, chainQuery: chain }));
 
 	return (
 		<OtcLayout
@@ -72,7 +74,12 @@ export function OtcWalletsPage() {
 							wallet.balance,
 							wallet.value,
 							wallet.blockchain,
-							<button className={css.messageButton}>Message</button>,
+							<button
+								className={css.messageButton}
+								onClick={() => navigate(generatePath(RoutePath.OTC_CHAT, { address: wallet.address }))}
+							>
+								Message
+							</button>,
 						],
 					}))}
 				/>

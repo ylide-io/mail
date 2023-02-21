@@ -22,4 +22,5 @@ export enum RoutePath {
 	OTC_ASSETS = '/otc/assets',
 	OTC_WALLETS = '/otc/wallets',
 	OTC_CHATS = '/otc/chats',
+	OTC_CHAT = '/otc/chats/:address',
 }

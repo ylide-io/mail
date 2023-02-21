@@ -1,0 +1,32 @@
+.root {
+	visibility: visible;
+}
+
+.currencyTitle {
+	margin: 0 0 8px;
+	font-size: 20px;
+	font-weight: $font-weight_bold;
+	text-align: center;
+}
+
+.currency {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	grid-gap: 8px;
+	margin: 0 0 20px;
+}
+
+.amountInput {
+	text-align: right;
+}
+
+.comission {
+	margin: 0 0 16px;
+	font-size: 16px;
+	font-weight: $font-weight_bold;
+	text-align: center;
+}
+
+.tradeButton {
+	width: 100%;
+}

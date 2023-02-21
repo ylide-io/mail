@@ -3,8 +3,6 @@
 	grid-auto-flow: column;
 	grid-gap: 4px;
 	align-items: center;
-	font-size: 13px;
-	line-height: 1.25;
 	border: 1px solid;
 	border-radius: 20px;
 
@@ -48,7 +46,7 @@
 
 .content {
 	padding: 1px 0 0;
-	font-size: 11px;
+	line-height: 1.25;
 	text-transform: uppercase;
 }
 .root_singleline .content {
@@ -58,14 +56,16 @@
 // SIZE
 
 .root_smallSize {
-	min-width: 28px;
-	height: 28px;
+	$size: 28px;
+
+	min-width: $size;
+	height: $size;
 
 	&.root_multiline {
 		padding-top: 3px;
 		padding-bottom: 3px;
 		height: auto;
-		min-height: 28px;
+		min-height: $size;
 	}
 
 	&.root_hasIcon {
@@ -76,17 +76,23 @@
 		padding-right: 3px;
 		padding-left: 3px;
 	}
+
+	.content {
+		font-size: 11px;
+	}
 }
 
 .root_mediumSize {
-	min-width: 32px;
-	height: 32px;
+	$size: 32px;
+
+	min-width: $size;
+	height: $size;
 
 	&.root_multiline {
 		padding-top: 3px;
 		padding-bottom: 3px;
 		height: auto;
-		min-height: 32px;
+		min-height: $size;
 	}
 
 	&.root_hasIcon {
@@ -96,6 +102,42 @@
 	&.root_hasIcon:not(.root_hasContent) {
 		padding-right: 5px;
 		padding-left: 5px;
+	}
+
+	.content {
+		font-size: 11px;
+	}
+}
+
+.root_largeSize {
+	$size: 40px;
+
+	min-width: $size;
+	height: $size;
+
+	&.root_multiline {
+		padding-top: 3px;
+		padding-bottom: 3px;
+		height: auto;
+		min-height: $size;
+	}
+
+	&.root_hasIcon {
+		padding-left: 7px;
+	}
+
+	&.root_hasIcon:not(.root_hasContent) {
+		padding-right: 5px;
+		padding-left: 5px;
+	}
+
+	.icon {
+		width: 28px;
+		height: 28px;
+	}
+
+	.content {
+		font-size: 14px;
 	}
 }
 
