@@ -8,7 +8,7 @@ import { ReactComponent as PlusSvg } from '../../icons/ic20/plus.svg';
 import contacts from '../../stores/Contacts';
 import { RoutePath } from '../../stores/routePath';
 import tags from '../../stores/Tags';
-import { useNav } from '../../utils/navigate';
+import { useNav } from '../../utils/url';
 import { useWindowSize } from '../../utils/useWindowSize';
 import ContactsSearcher from './components/ContactsSearcher';
 import TagsFilter from './components/TagsFilter';

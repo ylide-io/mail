@@ -32,7 +32,7 @@ import { FolderId } from '../../../stores/MailList';
 import modals from '../../../stores/Modals';
 import { OutgoingMailData } from '../../../stores/outgoingMailData';
 import { RoutePath } from '../../../stores/routePath';
-import { useNav } from '../../../utils/navigate';
+import { useNav } from '../../../utils/url';
 import { ActionButton, ActionButtonLook, ActionButtonSize } from '../../ActionButton/ActionButton';
 import { useComposeMailPopup } from '../../composeMailPopup/composeMailPopup';
 import { FeedSettingsPopup } from '../../feedSettingsPopup/feedSettingsPopup';

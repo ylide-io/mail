@@ -1,0 +1,33 @@
+.root {
+	display: grid;
+	grid-gap: 4px;
+}
+
+.row {
+	display: grid;
+	align-items: center;
+	grid-gap: 8px;
+	padding: 0 20px;
+	height: 52px;
+	font-size: 18px;
+}
+
+.row_head {
+	color: var(--secondary-text-color);
+}
+
+.row_data {
+	font-weight: $font-weight_light;
+	background: var(--surface-color);
+	border: 1px solid var(--border-color);
+	border-radius: 12px;
+}
+
+.row_clickable:hover {
+	background: var(--surface-hover-color);
+	cursor: pointer;
+}
+
+.cell {
+	min-width: 0;
+}

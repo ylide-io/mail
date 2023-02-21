@@ -20,5 +20,6 @@ export enum RoutePath {
 	FEED_CATEGORY = '/feed/:category',
 
 	OTC_ASSETS = '/otc/assets',
+	OTC_WALLETS = '/otc/wallets',
 	OTC_CHATS = '/otc/chats',
 }

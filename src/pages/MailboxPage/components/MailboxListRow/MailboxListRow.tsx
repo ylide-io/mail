@@ -13,7 +13,7 @@ import { FolderId, ILinkedMessage, useMailStore } from '../../../../stores/MailL
 import { RoutePath } from '../../../../stores/routePath';
 import { decodeEditorData } from '../../../../utils/editorJs';
 import { formatSubject } from '../../../../utils/mail';
-import { useNav } from '../../../../utils/navigate';
+import { useNav } from '../../../../utils/url';
 import css from './MailboxListRow.module.scss';
 
 interface MailboxListRowProps {

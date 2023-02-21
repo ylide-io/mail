@@ -12,7 +12,7 @@ import { ReactComponent as LogoutSvg } from '../../../../icons/ic28/logout.svg';
 import domain from '../../../../stores/Domain';
 import { RoutePath } from '../../../../stores/routePath';
 import { HorizontalAlignment } from '../../../../utils/alignment';
-import { useNav } from '../../../../utils/navigate';
+import { useNav } from '../../../../utils/url';
 import { ActionButton, ActionButtonLook, ActionButtonSize } from '../../../ActionButton/ActionButton';
 import { AnchoredPopup } from '../../../popup/anchoredPopup/anchoredPopup';
 import css from './accountsPopup.module.scss';

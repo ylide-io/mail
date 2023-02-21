@@ -94,6 +94,8 @@ button,
 [type='button'],
 [type='reset'],
 [type='submit'] {
+	font: inherit;
+	color: inherit;
 	cursor: pointer;
 }
 

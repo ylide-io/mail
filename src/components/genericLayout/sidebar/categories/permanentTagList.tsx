@@ -5,7 +5,7 @@ import { generatePath } from 'react-router-dom';
 import { FolderId, useMailStore } from '../../../../stores/MailList';
 import modals from '../../../../stores/Modals';
 import { RoutePath } from '../../../../stores/routePath';
-import { useNav } from '../../../../utils/navigate';
+import { useNav } from '../../../../utils/url';
 import css from './categories.module.scss';
 import PermanentTag from './permanentTag';
 

@@ -1,7 +1,7 @@
 import clsx from 'clsx';
 import React from 'react';
 
-import { useNav } from '../../../utils/navigate';
+import { useNav } from '../../../utils/url';
 import { PropsWithClassName } from '../../propsWithClassName';
 import css from './linkButton.module.scss';
 

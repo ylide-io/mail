@@ -15,7 +15,7 @@ import domain from '../../stores/Domain';
 import { FeedCategory } from '../../stores/Feed';
 import { RoutePath } from '../../stores/routePath';
 import { getQueryString } from '../../utils/getQueryString';
-import { useNav } from '../../utils/navigate';
+import { useNav } from '../../utils/url';
 
 export const NewWalletsPage = observer(() => {
 	const navigate = useNav();

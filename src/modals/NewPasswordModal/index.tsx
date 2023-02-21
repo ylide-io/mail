@@ -22,7 +22,7 @@ import { Wallet } from '../../stores/models/Wallet';
 import { RoutePath } from '../../stores/routePath';
 import { invariant } from '../../utils/invariant';
 import { isBytesEqual } from '../../utils/isBytesEqual';
-import { useNav } from '../../utils/navigate';
+import { useNav } from '../../utils/url';
 
 const txPrices: Record<EVMNetwork, number> = {
 	[EVMNetwork.LOCAL_HARDHAT]: 0.001,

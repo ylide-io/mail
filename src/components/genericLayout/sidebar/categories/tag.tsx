@@ -2,7 +2,7 @@ import React from 'react';
 import { useLocation } from 'react-router-dom';
 
 import modals from '../../../../stores/Modals';
-import { useNav } from '../../../../utils/navigate';
+import { useNav } from '../../../../utils/url';
 import css from './categories.module.scss';
 
 interface TagProps {

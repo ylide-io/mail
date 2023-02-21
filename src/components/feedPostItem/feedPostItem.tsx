@@ -12,7 +12,7 @@ import { twitterSourceIcon } from '../../icons/static/twitterSourceIcon';
 import GalleryModal from '../../modals/GalleryModal';
 import { FeedCategory, FeedPost, LinkType } from '../../stores/Feed';
 import { RoutePath } from '../../stores/routePath';
-import { useNav } from '../../utils/navigate';
+import { useNav } from '../../utils/url';
 import { ReadableDate } from '../readableDate/readableDate';
 import css from './feedPostItem.module.scss';
 

@@ -19,7 +19,7 @@ import { RoutePath } from '../../stores/routePath';
 import { DateFormatStyle, formatDate } from '../../utils/date';
 import { decodeEditorData, generateEditorJsId } from '../../utils/editorJs';
 import { formatSubject } from '../../utils/mail';
-import { useNav } from '../../utils/navigate';
+import { useNav } from '../../utils/url';
 import css from './MailDetailsPage.module.scss';
 import { MailMessage } from './MailMessage/MailMessage';
 

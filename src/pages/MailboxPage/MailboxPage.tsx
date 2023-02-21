@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { useLocation, useParams } from 'react-router-dom';
+import { useParams, useSearchParams } from 'react-router-dom';
 import AutoSizer from 'react-virtualized-auto-sizer';
 import { FixedSizeList, ListChildComponentProps } from 'react-window';
 
@@ -9,7 +9,7 @@ import { analytics } from '../../stores/Analytics';
 import domain from '../../stores/Domain';
 import { FolderId, ILinkedMessage, useMailList, useMailStore } from '../../stores/MailList';
 import { RoutePath } from '../../stores/routePath';
-import { useNav } from '../../utils/navigate';
+import { useNav } from '../../utils/url';
 import { useWindowSize } from '../../utils/useWindowSize';
 import MailboxEmpty from './components/MailboxEmpty';
 import { MailboxHeader } from './components/MailboxHeader';
@@ -51,8 +51,7 @@ export const MailboxPage = () => {
 	const { setLastActiveFolderId, setLastMessagesList, markMessagesAsReaded } = useMailStore();
 
 	const params = useParams<{ folderId: FolderId }>();
-	const { search } = useLocation();
-	const searchParams = new URLSearchParams(search);
+	const [searchParams] = useSearchParams();
 
 	const folderId = params.folderId || FolderId.Inbox;
 	const filterBySender = searchParams.get('sender') || undefined;

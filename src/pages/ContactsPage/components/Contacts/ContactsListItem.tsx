@@ -18,7 +18,7 @@ import { ITag } from '../../../../stores/models/ITag';
 import { globalOutgoingMailData } from '../../../../stores/outgoingMailData';
 import { RoutePath } from '../../../../stores/routePath';
 import TagsStore from '../../../../stores/Tags';
-import { useNav } from '../../../../utils/navigate';
+import { useNav } from '../../../../utils/url';
 
 interface ContactsListItemProps {
 	contact: IContact;

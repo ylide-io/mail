@@ -13,7 +13,7 @@ import { browserStorage } from '../../../stores/browserStorage';
 import domain from '../../../stores/Domain';
 import { FolderId } from '../../../stores/MailList';
 import { RoutePath } from '../../../stores/routePath';
-import { useNav } from '../../../utils/navigate';
+import { useNav } from '../../../utils/url';
 import { ActionButton, ActionButtonLook, ActionButtonSize } from '../../ActionButton/ActionButton';
 import { SidebarBurger } from '../sidebar/sidebarMenu';
 import { AccountsPopup } from './accountsPopup/accountsPopup';

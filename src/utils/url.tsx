@@ -3,6 +3,13 @@ import { URLSearchParamsInit } from 'react-router-dom/dist/dom';
 
 import AlertModal from '../modals/AlertModal';
 import domain from '../stores/Domain';
+import { filterObjectEntries } from './object';
+
+export function createCleanSerachParams(search: Record<string, any>) {
+	return createSearchParams(filterObjectEntries(search, (key, value) => value != null));
+}
+
+//
 
 interface UseNavParameters {
 	path?: string;
