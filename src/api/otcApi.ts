@@ -120,6 +120,60 @@ export namespace OtcApi {
 		offset?: number;
 		limit?: number;
 	}): Promise<IThreadResponse> {
-		return null as any;
+		const entries = [
+			{
+				type: 'message',
+				id: nanoid(),
+				isIncoming: false,
+				msg: 'Hey there! 🙌\nWhould you like to trade?\n\nCheers!',
+			},
+			{
+				type: 'message',
+				id: nanoid(),
+				isIncoming: true,
+				msg: 'Hi man!\nYeah, sure.',
+			},
+			{
+				type: 'message',
+				id: nanoid(),
+				isIncoming: false,
+				msg: 'Nice! 👍',
+			},
+			{
+				type: 'message',
+				id: nanoid(),
+				isIncoming: false,
+				msg: "Let's talk about the price...",
+			},
+			{
+				type: 'message',
+				id: nanoid(),
+				isIncoming: false,
+				msg: 'How much you want?',
+			},
+			{
+				type: 'message',
+				id: nanoid(),
+				isIncoming: true,
+				msg: 'Hm... Let me think...',
+			},
+			{
+				type: 'message',
+				id: nanoid(),
+				isIncoming: true,
+				msg: 'Maecenas elit ante, dictum at commodo ac, aliquam non felis. Integer et erat diam. Quisque faucibus est mattis, vehicula eros ut, congue mi. Vivamus ante lectus, vestibulum et venenatis nec, porta ut elit. Cras aliquam erat vitae laoreet mattis. Cras posuere pharetra eros eget elementum. Aliquam gravida, metus vitae venenatis blandit, augue mauris suscipit justo, quis ullamcorper purus tortor et arcu.',
+			},
+			{
+				type: 'message',
+				id: nanoid(),
+				isIncoming: false,
+				msg: 'Wtf?',
+			},
+		] as IMessage[];
+
+		return {
+			entries,
+			totalCount: entries.length,
+		};
 	}
 }

@@ -1,9 +1,18 @@
-import { useRef, useState } from 'react';
+import clsx from 'clsx';
+import { observer } from 'mobx-react';
+import React, { useRef, useState } from 'react';
+import { useQuery } from 'react-query';
 import { useParams } from 'react-router-dom';
 
+import { OtcApi } from '../../../api/otcApi';
+import { AccountSelect } from '../../../components/accountSelect/accountSelect';
 import { SendMailButton } from '../../../components/composeMailForm/sendMailButton/sendMailButton';
+import { ErrorMessage } from '../../../components/errorMessage/errorMessage';
+import { NlToBr } from '../../../components/nlToBr/nlToBr';
+import { YlideLoader } from '../../../components/ylideLoader/ylideLoader';
 import { AdaptiveAddress } from '../../../controls/adaptiveAddress/adaptiveAddress';
 import { ReactComponent as ContactSvg } from '../../../icons/ic20/contact.svg';
+import domain from '../../../stores/Domain';
 import { globalOutgoingMailData } from '../../../stores/outgoingMailData';
 import { invariant } from '../../../utils/invariant';
 import { useAutoSizeTextArea } from '../../../utils/useAutoSizeTextArea';
@@ -11,7 +20,30 @@ import { OtcLayout } from '../components/otcLayout/otcLayout';
 import css from './OtcChatPage.module.scss';
 import { TradingForm, TradingFormData } from './tradingForm/tradingForm';
 
-export function OtcChatPage() {
+interface ChatProps {
+	data: OtcApi.IThreadResponse;
+}
+
+export function Chat({ data }: ChatProps) {
+	return (
+		<div className={css.chat}>
+			{data.entries.map(entry => {
+				invariant(entry.type === 'message');
+
+				return (
+					<div
+						key={entry.id}
+						className={clsx(css.message, entry.isIncoming ? css.message_in : css.message_out)}
+					>
+						<NlToBr>{entry.msg}</NlToBr>
+					</div>
+				);
+			})}
+		</div>
+	);
+}
+
+export const OtcChatPage = observer(() => {
 	const { address } = useParams<{ address: string }>();
 	invariant(address);
 
@@ -25,6 +57,12 @@ export function OtcChatPage() {
 			token: 'BTC',
 		},
 	});
+
+	const [myAccount, setMyAccount] = useState(domain.accounts.activeAccounts[0]);
+
+	const { isError, data } = useQuery(['otc_chat', address], () =>
+		OtcApi.loadOtcThread({ myAddress: myAccount.account.address, recipientAddress: address }),
+	);
 
 	const textareaRef = useRef(null);
 	const [newMessage, setNewMessage] = useState('');
@@ -40,8 +78,23 @@ export function OtcChatPage() {
 			}
 			aside={<TradingForm data={tradingFormData} onChange={setTradingFormData} />}
 		>
-			<div className={css.chat}>
-				<div className={css.messages} />
+			<div className={css.body}>
+				{domain.accounts.activeAccounts.length > 1 && (
+					<div className={css.header}>
+						Your account
+						<AccountSelect activeAccount={myAccount} onChange={setMyAccount} />
+					</div>
+				)}
+
+				<div className={css.content}>
+					{data ? (
+						<Chat data={data} />
+					) : isError ? (
+						<ErrorMessage>Couldn't load messages</ErrorMessage>
+					) : (
+						<YlideLoader className={css.loader} reason="Loading messages ..." />
+					)}
+				</div>
 
 				<div className={css.footer}>
 					<textarea
@@ -58,4 +111,4 @@ export function OtcChatPage() {
 			</div>
 		</OtcLayout>
 	);
-}
+});
