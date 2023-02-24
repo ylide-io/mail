@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { ReactNode, useEffect, useState } from 'react';
 import { useQuery } from 'react-query';
 import { generatePath, useSearchParams } from 'react-router-dom';
 
@@ -28,25 +28,32 @@ export function OtcAssetsPage() {
 		OtcApi.queryAssets({ tokenQuery, chainQuery, offset: page * PAGE_SIZE, limit: PAGE_SIZE }),
 	);
 
+	const [aside, setAside] = useState<ReactNode>();
+	useEffect(() => {
+		setAside(prev =>
+			data ? (
+				<OtcAsideStatistics
+					rows={[
+						{
+							title: `${data.totalWallets} wallets`,
+							description: 'connected to Ylide',
+						},
+						{
+							title: `$${data.totalValue} value`,
+							description: 'connected to Ylide',
+						},
+					]}
+				/>
+			) : (
+				prev
+			),
+		);
+	}, [data]);
+
 	return (
 		<OtcLayout
 			title="Asset Explorer"
-			aside={
-				data && (
-					<OtcAsideStatistics
-						rows={[
-							{
-								title: `${data.totalWallets} wallets`,
-								description: 'connected to Ylide',
-							},
-							{
-								title: `$${data.totalValue} value`,
-								description: 'connected to Ylide',
-							},
-						]}
-					/>
-				)
-			}
+			aside={aside}
 			supContent="Discover assets owned by Ylide users and start a new deal"
 		>
 			{data ? (
