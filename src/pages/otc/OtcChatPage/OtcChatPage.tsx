@@ -60,7 +60,7 @@ export const OtcChatPage = observer(() => {
 
 	const [myAccount, setMyAccount] = useState(domain.accounts.activeAccounts[0]);
 
-	const { isError, data } = useQuery(['otc_chat', address], () =>
+	const { isError, data } = useQuery(['otc', 'chat', myAccount.account.address, address], () =>
 		OtcApi.loadOtcThread({ myAddress: myAccount.account.address, recipientAddress: address }),
 	);
 

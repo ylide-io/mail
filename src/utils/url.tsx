@@ -14,6 +14,15 @@ export function createCleanSerachParams(search: Record<string, any>) {
 interface UseNavParameters {
 	path?: string;
 	search?: URLSearchParamsInit;
+	hash?: string;
+}
+
+export function buildUrl(params: string | UseNavParameters) {
+	return typeof params === 'string'
+		? params
+		: `${params.path}${params.search ? `?${createSearchParams(params.search).toString()}` : ''}${
+				params.hash ? `#${params.hash}` : ''
+		  }`;
 }
 
 export const useNav = () => {
@@ -39,9 +48,6 @@ export const useNav = () => {
 			return;
 		}
 
-		navigate({
-			pathname: params.path,
-			search: params.search ? `?${createSearchParams(params.search).toString()}` : undefined,
-		});
+		navigate(buildUrl(params));
 	};
 };
