@@ -41,7 +41,7 @@ export function OtcWalletsPage() {
 								description: 'connected to Ylide',
 							},
 							{
-								title: `${data.totalValue} value`,
+								title: `$${data.totalValue} value`,
 								description: 'connected to Ylide',
 							},
 						]}
