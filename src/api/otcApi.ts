@@ -25,66 +25,68 @@ export namespace OtcApi {
 		offset?: number;
 		limit?: number;
 	}): Promise<IAssetsResponse> {
+		const assets = [
+			{
+				id: nanoid(),
+				blockchain: 'Ethereum',
+				token: 'USDC',
+				totalAmount: 29149,
+				totalValue: 29149,
+				totalWallets: 371,
+			},
+			{
+				id: nanoid(),
+				blockchain: 'Ethereum',
+				token: 'USDT',
+				totalAmount: 50123,
+				totalValue: 50123,
+				totalWallets: 567,
+			},
+			{
+				id: nanoid(),
+				blockchain: 'Bitcoin',
+				token: 'BTC',
+				totalAmount: 123123,
+				totalValue: 123123,
+				totalWallets: 123456,
+			},
+			{
+				id: nanoid(),
+				blockchain: 'Tron',
+				token: 'USDC',
+				totalAmount: 29149,
+				totalValue: 29149,
+				totalWallets: 371,
+			},
+			{
+				id: nanoid(),
+				blockchain: 'Tron',
+				token: 'USDT',
+				totalAmount: 50123,
+				totalValue: 50123,
+				totalWallets: 567,
+			},
+			{
+				id: nanoid(),
+				blockchain: 'Tron',
+				token: 'BTC',
+				totalAmount: 123123,
+				totalValue: 123123,
+				totalWallets: 123456,
+			},
+			{
+				id: nanoid(),
+				blockchain: 'Gnosis',
+				token: 'BTC',
+				totalAmount: 123123,
+				totalValue: 123123,
+				totalWallets: 123456,
+			},
+		];
+
 		return {
-			assets: [
-				{
-					id: nanoid(),
-					blockchain: 'Ethereum',
-					token: 'USDC',
-					totalAmount: 29149,
-					totalValue: 29149,
-					totalWallets: 371,
-				},
-				{
-					id: nanoid(),
-					blockchain: 'Ethereum',
-					token: 'USDT',
-					totalAmount: 50123,
-					totalValue: 50123,
-					totalWallets: 567,
-				},
-				{
-					id: nanoid(),
-					blockchain: 'Bitcoin',
-					token: 'BTC',
-					totalAmount: 123123,
-					totalValue: 123123,
-					totalWallets: 123456,
-				},
-				{
-					id: nanoid(),
-					blockchain: 'Tron',
-					token: 'USDC',
-					totalAmount: 29149,
-					totalValue: 29149,
-					totalWallets: 371,
-				},
-				{
-					id: nanoid(),
-					blockchain: 'Tron',
-					token: 'USDT',
-					totalAmount: 50123,
-					totalValue: 50123,
-					totalWallets: 567,
-				},
-				{
-					id: nanoid(),
-					blockchain: 'Tron',
-					token: 'BTC',
-					totalAmount: 123123,
-					totalValue: 123123,
-					totalWallets: 123456,
-				},
-				{
-					id: nanoid(),
-					blockchain: 'Gnosis',
-					token: 'BTC',
-					totalAmount: 123123,
-					totalValue: 123123,
-					totalWallets: 123456,
-				},
-			],
-			totalCount: 7,
+			assets,
+			totalCount: assets.length,
 			totalValue: 201120,
 			totalWallets: 2101,
 		};
@@ -112,40 +114,42 @@ export namespace OtcApi {
 		offset?: number;
 		limit?: number;
 	}): Promise<IWalletsResponse> {
+		const wallets = [
+			{
+				address: '0x52e316e323c35e5b222ba63311433f91d80545ee',
+				balance: 123,
+				value: 456,
+				blockchain: 'Ethereum',
+			},
+			{
+				address: '0x52e316e323c35e5b222ba63311433f91d80545te',
+				balance: 123,
+				value: 456,
+				blockchain: 'Tron',
+			},
+			{
+				address: '0x52e316e323c35e5b222ba63311433f91d80545sf',
+				balance: 123,
+				value: 456,
+				blockchain: 'Gnosis',
+			},
+			{
+				address: '0x52e316e323c35e5b222ba63311433f91d80545hf',
+				balance: 123,
+				value: 456,
+				blockchain: 'Bitcoin',
+			},
+			{
+				address: '0x52e316e323c35e5b222ba63311433f91d80545fh',
+				balance: 123,
+				value: 456,
+				blockchain: 'Gnosis',
+			},
+		];
+
 		return {
-			wallets: [
-				{
-					address: '0x52e316e323c35e5b222ba63311433f91d80545ee',
-					balance: 123,
-					value: 456,
-					blockchain: 'Ethereum',
-				},
-				{
-					address: '0x52e316e323c35e5b222ba63311433f91d80545te',
-					balance: 123,
-					value: 456,
-					blockchain: 'Tron',
-				},
-				{
-					address: '0x52e316e323c35e5b222ba63311433f91d80545sf',
-					balance: 123,
-					value: 456,
-					blockchain: 'Gnosis',
-				},
-				{
-					address: '0x52e316e323c35e5b222ba63311433f91d80545hf',
-					balance: 123,
-					value: 456,
-					blockchain: 'Bitcoin',
-				},
-				{
-					address: '0x52e316e323c35e5b222ba63311433f91d80545fh',
-					balance: 123,
-					value: 456,
-					blockchain: 'Gnosis',
-				},
-			],
-			totalCount: 5,
+			wallets,
+			totalCount: wallets.length,
 			totalValue: 456,
 		};
 	}
@@ -171,6 +175,102 @@ export namespace OtcApi {
 		limit?: number;
 	}): Promise<IThreadResponse> {
 		const entries = [
+			{
+				type: 'message',
+				id: nanoid(),
+				isIncoming: false,
+				msg: 'Hey there! 🙌\nWhould you like to trade?\n\nCheers!',
+			},
+			{
+				type: 'message',
+				id: nanoid(),
+				isIncoming: true,
+				msg: 'Hi man!\nYeah, sure.',
+			},
+			{
+				type: 'message',
+				id: nanoid(),
+				isIncoming: false,
+				msg: 'Nice! 👍',
+			},
+			{
+				type: 'message',
+				id: nanoid(),
+				isIncoming: false,
+				msg: "Let's talk about the price...",
+			},
+			{
+				type: 'message',
+				id: nanoid(),
+				isIncoming: false,
+				msg: 'How much you want?',
+			},
+			{
+				type: 'message',
+				id: nanoid(),
+				isIncoming: true,
+				msg: 'Hm... Let me think...',
+			},
+			{
+				type: 'message',
+				id: nanoid(),
+				isIncoming: true,
+				msg: 'Maecenas elit ante, dictum at commodo ac, aliquam non felis. Integer et erat diam. Quisque faucibus est mattis, vehicula eros ut, congue mi. Vivamus ante lectus, vestibulum et venenatis nec, porta ut elit. Cras aliquam erat vitae laoreet mattis. Cras posuere pharetra eros eget elementum. Aliquam gravida, metus vitae venenatis blandit, augue mauris suscipit justo, quis ullamcorper purus tortor et arcu.',
+			},
+			{
+				type: 'message',
+				id: nanoid(),
+				isIncoming: false,
+				msg: 'Wtf?',
+			},
+			{
+				type: 'message',
+				id: nanoid(),
+				isIncoming: false,
+				msg: 'Hey there! 🙌\nWhould you like to trade?\n\nCheers!',
+			},
+			{
+				type: 'message',
+				id: nanoid(),
+				isIncoming: true,
+				msg: 'Hi man!\nYeah, sure.',
+			},
+			{
+				type: 'message',
+				id: nanoid(),
+				isIncoming: false,
+				msg: 'Nice! 👍',
+			},
+			{
+				type: 'message',
+				id: nanoid(),
+				isIncoming: false,
+				msg: "Let's talk about the price...",
+			},
+			{
+				type: 'message',
+				id: nanoid(),
+				isIncoming: false,
+				msg: 'How much you want?',
+			},
+			{
+				type: 'message',
+				id: nanoid(),
+				isIncoming: true,
+				msg: 'Hm... Let me think...',
+			},
+			{
+				type: 'message',
+				id: nanoid(),
+				isIncoming: true,
+				msg: 'Maecenas elit ante, dictum at commodo ac, aliquam non felis. Integer et erat diam. Quisque faucibus est mattis, vehicula eros ut, congue mi. Vivamus ante lectus, vestibulum et venenatis nec, porta ut elit. Cras aliquam erat vitae laoreet mattis. Cras posuere pharetra eros eget elementum. Aliquam gravida, metus vitae venenatis blandit, augue mauris suscipit justo, quis ullamcorper purus tortor et arcu.',
+			},
+			{
+				type: 'message',
+				id: nanoid(),
+				isIncoming: false,
+				msg: 'Wtf?',
+			},
 			{
 				type: 'message',
 				id: nanoid(),

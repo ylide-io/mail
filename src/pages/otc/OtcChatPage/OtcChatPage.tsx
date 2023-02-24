@@ -1,6 +1,6 @@
 import clsx from 'clsx';
 import { observer } from 'mobx-react';
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useQuery } from 'react-query';
 import { useParams } from 'react-router-dom';
 
@@ -64,6 +64,14 @@ export const OtcChatPage = observer(() => {
 		OtcApi.loadOtcThread({ myAddress: myAccount.account.address, recipientAddress: address }),
 	);
 
+	const contentRef = useRef<HTMLDivElement>(null);
+
+	useEffect(() => {
+		if (contentRef.current) {
+			contentRef.current.scrollTop = Number.MAX_SAFE_INTEGER;
+		}
+	}, [data]);
+
 	const textareaRef = useRef(null);
 	const [newMessage, setNewMessage] = useState('');
 	useAutoSizeTextArea(textareaRef, newMessage, 200);
@@ -86,7 +94,7 @@ export const OtcChatPage = observer(() => {
 					</div>
 				)}
 
-				<div className={css.content}>
+				<div ref={contentRef} className={css.content}>
 					{data ? (
 						<Chat data={data} />
 					) : isError ? (
