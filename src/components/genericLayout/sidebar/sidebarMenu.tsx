@@ -1,13 +1,16 @@
-import { MenuFoldOutlined, MenuUnfoldOutlined } from '@ant-design/icons';
-import { Button } from 'antd';
 import clsx from 'clsx';
 import { observer } from 'mobx-react';
 import React, { PropsWithChildren, useEffect, useState } from 'react';
 import { generatePath, useLocation } from 'react-router-dom';
 
-import { CaretDown } from '../../../icons/CaretDown';
-import { CaretUp } from '../../../icons/CaretUp';
-import { ReactComponent as SettingsSvg } from '../../../icons/settings.svg';
+import { ReactComponent as ArchiveSvg } from '../../../icons/archive.svg';
+import { ReactComponent as ArrowDownSvg } from '../../../icons/ic20/arrowDown.svg';
+import { ReactComponent as ArrowUpSvg } from '../../../icons/ic20/arrowUp.svg';
+import { ReactComponent as SettingsSvg } from '../../../icons/ic20/settings.svg';
+import { ReactComponent as SidebarMenuSvg } from '../../../icons/ic28/sidebarMenu.svg';
+import { ReactComponent as SidebarMenuCloseSvg } from '../../../icons/ic28/sidebarMenu_close.svg';
+import { ReactComponent as InboxSvg } from '../../../icons/inbox.svg';
+import { ReactComponent as SentSvg } from '../../../icons/sent.svg';
 import { ReactComponent as DiscordSvg } from '../../../icons/social/discord.svg';
 import { ReactComponent as LinkedInSvg } from '../../../icons/social/linkedIn.svg';
 import { ReactComponent as MediumSvg } from '../../../icons/social/medium.svg';
@@ -29,6 +32,7 @@ import modals from '../../../stores/Modals';
 import { OutgoingMailData } from '../../../stores/outgoingMailData';
 import { RoutePath } from '../../../stores/routePath';
 import { useNav } from '../../../utils/navigate';
+import { ActionButton, ActionButtonLook, ActionButtonSize } from '../../ActionButton/ActionButton';
 import { useComposeMailPopup } from '../../composeMailPopup/composeMailPopup';
 import { FeedSettingsPopup } from '../../feedSettingsPopup/feedSettingsPopup';
 import { PropsWithClassName } from '../../propsWithClassName';
@@ -38,15 +42,17 @@ interface SidebarBurgerProps extends PropsWithClassName, PropsWithChildren {}
 
 export function SidebarBurger({ className, children }: SidebarBurgerProps) {
 	return (
-		<Button
-			className={clsx(css.burger, className)}
-			onClick={() => {
-				modals.sidebarOpen = !modals.sidebarOpen;
-			}}
-			icon={modals.sidebarOpen ? <MenuFoldOutlined /> : <MenuUnfoldOutlined />}
-		>
-			{children}
-		</Button>
+		<div className={clsx(css.burger, className)}>
+			<ActionButton
+				size={ActionButtonSize.Medium}
+				icon={modals.sidebarOpen ? <SidebarMenuCloseSvg /> : <SidebarMenuSvg />}
+				onClick={() => {
+					modals.sidebarOpen = !modals.sidebarOpen;
+				}}
+			>
+				{children}
+			</ActionButton>
+		</div>
 	);
 }
 
@@ -104,7 +110,7 @@ const SidebarMenu = observer(() => {
 							}}
 							onClick={() => setFeedOpen(v => !v)}
 						>
-							{feedOpen ? <CaretDown /> : <CaretUp />}
+							{feedOpen ? <ArrowUpSvg /> : <ArrowDownSvg />}
 						</div>
 					</div>
 
@@ -161,11 +167,12 @@ const SidebarMenu = observer(() => {
 							}}
 							onClick={() => setMailOpen(v => !v)}
 						>
-							{mailOpen ? <CaretDown /> : <CaretUp />}
+							{mailOpen ? <ArrowUpSvg /> : <ArrowDownSvg />}
 						</div>
 					</div>
 					<div className={clsx(css.sectionContent, mailOpen && css.sectionContent_open)}>
-						<div
+						<ActionButton
+							look={ActionButtonLook.PRIMARY}
 							className={css.sectionButton}
 							onClick={() => {
 								modals.sidebarOpen = false;
@@ -176,7 +183,7 @@ const SidebarMenu = observer(() => {
 							}}
 						>
 							Compose mail
-						</div>
+						</ActionButton>
 						<div
 							className={clsx(css.sectionLink, {
 								[css.sectionLink_active]:
@@ -189,28 +196,9 @@ const SidebarMenu = observer(() => {
 							}}
 						>
 							<div className={css.sectionLinkIconLeft}>
-								<i className="fa fa-inbox" />
+								<InboxSvg />
 							</div>
 							<div className={css.sectionLinkTitle}>Inbox</div>
-							<div className={css.sectionLinkIconRight}>
-								{/* <div
-									style={{
-										borderRadius: '50%',
-										width: 18,
-										height: 18,
-										display: 'flex',
-										flexDirection: 'row',
-										alignItems: 'center',
-										justifyContent: 'center',
-										background: 'transparent',
-										border: '1px solid #404040',
-										fontWeight: 'bold',
-										color: 'red',
-									}}
-								>
-									1
-								</div> */}
-							</div>
 						</div>
 						<div
 							className={clsx(css.sectionLink, {
@@ -224,7 +212,7 @@ const SidebarMenu = observer(() => {
 							}}
 						>
 							<div className={css.sectionLinkIconLeft}>
-								<i className="fa fa-share" />
+								<SentSvg />
 							</div>
 							<div className={css.sectionLinkTitle}>Sent</div>
 						</div>
@@ -240,7 +228,7 @@ const SidebarMenu = observer(() => {
 							}}
 						>
 							<div className={css.sectionLinkIconLeft}>
-								<i className="fa fa-trash-o" />
+								<ArchiveSvg />
 							</div>
 							<div className={css.sectionLinkTitle}>Archive</div>
 						</div>
@@ -257,11 +245,7 @@ const SidebarMenu = observer(() => {
 					<a href="https://twitter.com/ylide_" target="_blank noreferrer" title="Twitter">
 						<TwitterSvg />
 					</a>
-					<a
-						href="src/components/genericLayout/sidebar/sidebarMenu"
-						target="_blank noreferrer"
-						title="LinkedIn"
-					>
+					<a href="https://www.linkedin.com/company/ylide/" target="_blank noreferrer" title="LinkedIn">
 						<LinkedInSvg />
 					</a>
 					<a href="https://medium.com/@ylide" target="_blank noreferrer" title="Medium">

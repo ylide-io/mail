@@ -2,13 +2,13 @@ import { Fragment, useLayoutEffect, useMemo, useState } from 'react';
 import { useMutation, useQuery } from 'react-query';
 
 import { FeedServerApi } from '../../api/feedServerApi';
-import { ReactComponent as ExternalSvg } from '../../icons/external.svg';
-import { ReactComponent as SelectAllSvg } from '../../icons/selectAll.svg';
+import { ReactComponent as ExternalSvg } from '../../icons/ic20/external.svg';
+import { ReactComponent as SelectAllSvg } from '../../icons/ic20/selectAll.svg';
 import { browserStorage } from '../../stores/browserStorage';
 import { FeedCategory, FeedSource, getFeedCategoryName, nonSyntheticFeedCategories } from '../../stores/Feed';
 import { toggleArrayItem } from '../../utils/array';
 import { invariant } from '../../utils/invariant';
-import { ActionButton, ActionButtonStyle } from '../ActionButton/ActionButton';
+import { ActionButton, ActionButtonLook } from '../ActionButton/ActionButton';
 import { CheckBox } from '../checkBox/checkBox';
 import { ErrorMessage } from '../errorMessage/errorMessage';
 import { Modal } from '../modal/modal';
@@ -161,7 +161,7 @@ export function FeedSettingsPopup({ onClose }: FeedSettingsPopupProps) {
 			<div className={css.footer}>
 				<ActionButton
 					isDisabled={!selectedSourceIds?.length || createSourceListMutation.isLoading}
-					style={ActionButtonStyle.Primary}
+					look={ActionButtonLook.PRIMARY}
 					onClick={() => saveChanges()}
 				>
 					Save Settings
@@ -177,7 +177,7 @@ export function FeedSettingsPopup({ onClose }: FeedSettingsPopupProps) {
 					list && (
 						<ActionButton
 							className={css.footerRight}
-							style={ActionButtonStyle.Lite}
+							look={ActionButtonLook.LITE}
 							icon={<SelectAllSvg />}
 							title="Select All"
 							onClick={() => setSelectedSourceIds(isSelectedAll ? [] : allSourceIds)}

@@ -1,10 +1,10 @@
-import { PlusOutlined } from '@ant-design/icons';
 import { Button, Tabs } from 'antd';
 import { observer } from 'mobx-react';
 import React from 'react';
 import { Outlet, useLocation } from 'react-router-dom';
 
 import { GenericLayout } from '../../components/genericLayout/genericLayout';
+import { ReactComponent as PlusSvg } from '../../icons/ic20/plus.svg';
 import contacts from '../../stores/Contacts';
 import { RoutePath } from '../../stores/routePath';
 import tags from '../../stores/Tags';
@@ -32,7 +32,7 @@ export const ContactsPage = observer(() => {
 			<Button
 				onClick={addHandler}
 				style={{ marginLeft: location.pathname === '/mail/contacts' ? 10 : 0 }}
-				icon={<PlusOutlined />}
+				icon={<PlusSvg style={{ display: 'inline-block', verticalAlign: 'middle' }} />}
 			>
 				{location.pathname === '/mail/contacts' ? 'Add contact' : 'Add folder'}
 			</Button>

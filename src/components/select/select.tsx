@@ -1,7 +1,7 @@
 import clsx from 'clsx';
 import { ReactNode, useCallback, useRef, useState } from 'react';
 
-import { ReactComponent as ArrowDownSvg } from '../../icons/arrowDown.svg';
+import { ReactComponent as ArrowDownSvg } from '../../icons/ic20/arrowDown.svg';
 import { HorizontalAlignment } from '../../utils/alignment';
 import { DropDown } from '../dropDown/dropDown';
 import { PropsWithClassName } from '../propsWithClassName';

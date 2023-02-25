@@ -1,6 +1,6 @@
 import { useState } from 'react';
 
-import { ActionButton, ActionButtonStyle } from '../ActionButton/ActionButton';
+import { ActionButton, ActionButtonLook, ActionButtonSize } from '../ActionButton/ActionButton';
 import { Modal } from '../modal/modal';
 import { TextField } from '../textField/textField';
 import css from './forgotPasswordModal.module.scss';
@@ -77,14 +77,14 @@ export function ForgotPasswordModal({ onNewPassword, onCancel }: ForgotPasswordM
 									type="password"
 									placeholder="Enter Ylide password"
 									value={password}
-									onChange={setPassword}
+									onValueChange={setPassword}
 								/>
 
 								<TextField
 									type="password"
 									placeholder="Repeat your password"
 									value={passwordRepeat}
-									onChange={setPasswordRepeat}
+									onValueChange={setPasswordRepeat}
 								/>
 							</div>
 
@@ -105,12 +105,13 @@ export function ForgotPasswordModal({ onNewPassword, onCancel }: ForgotPasswordM
 					<>
 						<ActionButton
 							isMultiline
-							style={ActionButtonStyle.Dengerous}
+							size={ActionButtonSize.Medium}
+							look={ActionButtonLook.DENGEROUS}
 							onClick={() => setStep(Step.SECOND_WARNING)}
 						>
 							I understand I won't be able to read old messages
 						</ActionButton>
-						<ActionButton style={ActionButtonStyle.Lite} onClick={onCancel}>
+						<ActionButton size={ActionButtonSize.Medium} look={ActionButtonLook.LITE} onClick={onCancel}>
 							Cancel
 						</ActionButton>
 					</>
@@ -118,21 +119,27 @@ export function ForgotPasswordModal({ onNewPassword, onCancel }: ForgotPasswordM
 					<>
 						<ActionButton
 							isMultiline
-							style={ActionButtonStyle.Dengerous}
+							size={ActionButtonSize.Medium}
+							look={ActionButtonLook.DENGEROUS}
 							onClick={() => setStep(Step.ENTER_PASSWORD)}
 						>
 							I clearly understand the consequences
 						</ActionButton>
-						<ActionButton style={ActionButtonStyle.Lite} onClick={onCancel}>
+						<ActionButton size={ActionButtonSize.Medium} look={ActionButtonLook.LITE} onClick={onCancel}>
 							Cancel
 						</ActionButton>
 					</>
 				) : (
 					<>
-						<ActionButton isMultiline style={ActionButtonStyle.Primary} onClick={onSave}>
+						<ActionButton
+							isMultiline
+							size={ActionButtonSize.Medium}
+							look={ActionButtonLook.PRIMARY}
+							onClick={onSave}
+						>
 							Save Password
 						</ActionButton>
-						<ActionButton style={ActionButtonStyle.Lite} onClick={onCancel}>
+						<ActionButton size={ActionButtonSize.Medium} look={ActionButtonLook.LITE} onClick={onCancel}>
 							Cancel
 						</ActionButton>
 					</>

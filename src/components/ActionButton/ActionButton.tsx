@@ -1,44 +1,53 @@
 import clsx from 'clsx';
-import React, { forwardRef, PropsWithChildren, ReactNode, Ref } from 'react';
+import React, { ButtonHTMLAttributes, forwardRef, PropsWithChildren, ReactNode, Ref } from 'react';
 
 import { PropsWithClassName } from '../propsWithClassName';
 import css from './ActionButton.module.scss';
 
-export enum ActionButtonStyle {
-	Default,
-	Primary,
-	Dengerous,
-	Lite,
+export enum ActionButtonSize {
+	Small,
+	Medium,
 }
 
-interface ActionButtonProps extends PropsWithChildren, PropsWithClassName {
-	style?: ActionButtonStyle;
+export enum ActionButtonLook {
+	DEFAULT,
+	PRIMARY,
+	DENGEROUS,
+	LITE,
+}
+
+interface ActionButtonProps extends PropsWithChildren, PropsWithClassName, ButtonHTMLAttributes<HTMLButtonElement> {
+	size?: ActionButtonSize;
+	look?: ActionButtonLook;
 	icon?: ReactNode;
-	title?: string;
 	isDisabled?: boolean;
 	isMultiline?: boolean;
-	onClick?: React.MouseEventHandler<HTMLElement>;
 }
 
-// 'props' are needed to let AntD show Tooltips https://github.com/ant-design/ant-design/issues/15909
 export const ActionButton = forwardRef(
 	(
-		{ children, className, style, icon, title, isDisabled, isMultiline, onClick, ...props }: ActionButtonProps,
+		{ children, className, size, look, icon, isDisabled, isMultiline, ...props }: ActionButtonProps,
 		ref: Ref<HTMLButtonElement>,
 	) => {
-		const styleClass = {
-			[ActionButtonStyle.Default]: css.root_default,
-			[ActionButtonStyle.Primary]: css.root_primary,
-			[ActionButtonStyle.Dengerous]: css.root_dangerous,
-			[ActionButtonStyle.Lite]: css.root_lite,
-		}[style || ActionButtonStyle.Default];
+		const sizeClass = {
+			[ActionButtonSize.Small]: css.root_smallSize,
+			[ActionButtonSize.Medium]: css.root_mediumSize,
+		}[size || ActionButtonSize.Small];
+
+		const lookClass = {
+			[ActionButtonLook.DEFAULT]: css.root_defaultLook,
+			[ActionButtonLook.PRIMARY]: css.root_primaryLook,
+			[ActionButtonLook.DENGEROUS]: css.root_dangerousLook,
+			[ActionButtonLook.LITE]: css.root_liteLook,
+		}[look || ActionButtonLook.DEFAULT];
 
 		return (
 			<button
 				ref={ref}
 				className={clsx(
 					css.root,
-					styleClass,
+					sizeClass,
+					lookClass,
 					icon != null && css.root_hasIcon,
 					children != null && css.root_hasContent,
 					isDisabled && css.root_disabled,
@@ -46,11 +55,9 @@ export const ActionButton = forwardRef(
 					className,
 				)}
 				disabled={isDisabled}
-				title={title}
-				onClick={onClick}
 				{...props}
 			>
-				{icon}
+				{icon && <div className={css.icon}>{icon}</div>}
 				{children != null && <div className={css.content}>{children}</div>}
 			</button>
 		);

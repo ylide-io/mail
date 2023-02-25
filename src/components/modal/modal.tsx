@@ -1,7 +1,7 @@
 import clsx from 'clsx';
 import { PropsWithChildren } from 'react';
 
-import { ReactComponent as CrossSvg } from '../../icons/cross.svg';
+import { ReactComponent as CrossSvg } from '../../icons/ic20/cross.svg';
 import { alignAtViewportCenter } from '../../utils/alignment';
 import { Overlay } from '../overlay/overlay';
 import { Popup } from '../popup/popup';

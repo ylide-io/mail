@@ -2,13 +2,13 @@ import { Tooltip } from 'antd';
 import React, { useEffect, useMemo, useState } from 'react';
 import { createReactEditorJS } from 'react-editor-js';
 
-import { ActionButton, ActionButtonStyle } from '../../../components/ActionButton/ActionButton';
+import { ActionButton, ActionButtonLook } from '../../../components/ActionButton/ActionButton';
 import { ContactName } from '../../../components/contactName/contactName';
 import { ReadableDate } from '../../../components/readableDate/readableDate';
 import { Blockie } from '../../../controls/Blockie';
-import { ForwardIcon } from '../../../icons/ForwardIcon';
-import { ReplyIcon } from '../../../icons/ReplyIcon';
-import { TrashIcon } from '../../../icons/TrashIcon';
+import { ReactComponent as ForwardSvg } from '../../../icons/ic20/forward.svg';
+import { ReactComponent as ReplySvg } from '../../../icons/ic20/reply.svg';
+import { ReactComponent as TrashSvg } from '../../../icons/ic20/trash.svg';
 import { IMessageDecodedContent } from '../../../indexedDB/MessagesDB';
 import { FolderId, ILinkedMessage, useMailStore } from '../../../stores/MailList';
 import { DateFormatStyle } from '../../../utils/date';
@@ -61,19 +61,19 @@ export function MailMessage({
 			<div className={css.actions}>
 				{decoded ? (
 					<>
-						<ActionButton icon={<ReplyIcon />} onClick={() => onReplyClick()}>
+						<ActionButton icon={<ReplySvg />} onClick={() => onReplyClick()}>
 							Reply
 						</ActionButton>
 
 						<Tooltip title="Forward">
-							<ActionButton icon={<ForwardIcon />} onClick={() => onForwardClick()} />
+							<ActionButton icon={<ForwardSvg />} onClick={() => onForwardClick()} />
 						</Tooltip>
 
 						{folderId !== FolderId.Archive && (
 							<Tooltip title="Archive">
 								<ActionButton
-									style={ActionButtonStyle.Dengerous}
-									icon={<TrashIcon />}
+									look={ActionButtonLook.DENGEROUS}
+									icon={<TrashSvg />}
 									onClick={() => onDeleteClick()}
 								/>
 							</Tooltip>

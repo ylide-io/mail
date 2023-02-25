@@ -1,6 +1,8 @@
-import clsx from 'clsx';
 import React from 'react';
 
+import { ReactComponent as ArchiveSvg } from '../../../../icons/archive.svg';
+import { ReactComponent as InboxSvg } from '../../../../icons/inbox.svg';
+import { ReactComponent as SentSvg } from '../../../../icons/sent.svg';
 import css from './categories.module.scss';
 
 interface PermanentTagInterface {
@@ -13,13 +15,13 @@ const PermanentTag: React.FC<PermanentTagInterface> = ({ onClick, text, active }
 	const icon = (() => {
 		switch (text) {
 			case 'Inbox':
-				return 'fa-inbox';
+				return <InboxSvg />;
 			case 'Archive':
-				return 'fa-trash-o';
+				return <SentSvg />;
 			case 'Sent':
-				return 'fa-share';
+				return <ArchiveSvg />;
 			default:
-				return '';
+				throw new Error('Unknown tag');
 		}
 	})();
 
@@ -33,7 +35,7 @@ const PermanentTag: React.FC<PermanentTagInterface> = ({ onClick, text, active }
 	return (
 		<div className={css.listItem} onClick={onClick}>
 			<div className={css.listItemTitle} style={active ? { ...styles, ...activeStyles } : styles}>
-				<i className={clsx('fa', icon)} /> {text}
+				{icon} {text}
 			</div>
 		</div>
 	);

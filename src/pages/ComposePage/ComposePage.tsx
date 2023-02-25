@@ -2,11 +2,11 @@ import { observer } from 'mobx-react';
 import React, { useEffect } from 'react';
 import { generatePath } from 'react-router-dom';
 
-import { ActionButton, ActionButtonStyle } from '../../components/ActionButton/ActionButton';
+import { ActionButton, ActionButtonLook } from '../../components/ActionButton/ActionButton';
 import { ComposeMailForm } from '../../components/composeMailForm/composeMailForm';
 import { GenericLayout } from '../../components/genericLayout/genericLayout';
 import { OverlappingLoader } from '../../components/overlappingLoader/overlappingLoader';
-import { smallButtonIcons } from '../../components/smallButton/smallButton';
+import { ReactComponent as CrossSvg } from '../../icons/ic20/cross.svg';
 import { analytics } from '../../stores/Analytics';
 import mailer from '../../stores/Mailer';
 import { useMailStore } from '../../stores/MailList';
@@ -32,11 +32,11 @@ export const ComposePage = observer(() => {
 
 				<div className={css.headerActions}>
 					<ActionButton
-						style={ActionButtonStyle.Dengerous}
+						look={ActionButtonLook.DENGEROUS}
 						onClick={() => {
 							navigate(generatePath(RoutePath.MAIL_FOLDER, { folderId: lastActiveFolderId }));
 						}}
-						icon={<i className={`fa ${smallButtonIcons.cross}`} />}
+						icon={<CrossSvg />}
 					>
 						Discard
 					</ActionButton>

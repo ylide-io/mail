@@ -1,8 +1,10 @@
-import { DeleteOutlined, EditOutlined, SaveOutlined } from '@ant-design/icons';
 import React, { useState } from 'react';
 
-import { ActionButton, ActionButtonStyle } from '../../../../components/ActionButton/ActionButton';
+import { ActionButton, ActionButtonLook } from '../../../../components/ActionButton/ActionButton';
 import { TextField } from '../../../../components/textField/textField';
+import { ReactComponent as EditSvg } from '../../../../icons/ic20/edit.svg';
+import { ReactComponent as TickSvg } from '../../../../icons/ic20/tick.svg';
+import { ReactComponent as TrashSvg } from '../../../../icons/ic20/trash.svg';
 import { ITag } from '../../../../stores/models/ITag';
 import tags from '../../../../stores/Tags';
 import { allColors } from '../../../../utils/colors';
@@ -58,28 +60,24 @@ const TagsListItem: React.FC<TagsListItemProps> = ({ tag, isNew }) => {
 					</div>
 				</div>
 				<div className="contact-name">
-					<TextField placeholder="Type new folder name" value={name} onChange={setName} />
+					<TextField placeholder="Type new folder name" value={name} onValueChange={setName} />
 				</div>
 				<div className="contact-actions small-actions">
 					{!isNew ? (
 						<>
 							<ActionButton
-								style={ActionButtonStyle.Primary}
+								look={ActionButtonLook.PRIMARY}
 								onClick={saveClickHandler}
-								icon={<SaveOutlined />}
+								icon={<TickSvg />}
 							/>
 							<ActionButton
-								style={ActionButtonStyle.Dengerous}
+								look={ActionButtonLook.DENGEROUS}
 								onClick={deleteClickHandler}
-								icon={<DeleteOutlined />}
+								icon={<TrashSvg />}
 							/>
 						</>
 					) : (
-						<ActionButton
-							style={ActionButtonStyle.Primary}
-							onClick={saveClickHandler}
-							icon={<SaveOutlined />}
-						/>
+						<ActionButton look={ActionButtonLook.PRIMARY} onClick={saveClickHandler} icon={<TickSvg />} />
 					)}
 				</div>
 			</div>
@@ -93,7 +91,7 @@ const TagsListItem: React.FC<TagsListItemProps> = ({ tag, isNew }) => {
 			</div>
 			<div className="contact-name">{tag.name}</div>
 			<div className="contact-actions small-actions">
-				<ActionButton onClick={editClickHandler} icon={<EditOutlined />} />
+				<ActionButton onClick={editClickHandler} icon={<EditSvg />} />
 			</div>
 		</div>
 	);

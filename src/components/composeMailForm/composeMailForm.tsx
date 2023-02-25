@@ -31,7 +31,7 @@ export const ComposeMailForm = observer(({ className, mailData, onSent }: Compos
 				<TextField
 					placeholder={formatSubject()}
 					value={mailData.subject}
-					onChange={value => (mailData.subject = value)}
+					onValueChange={value => (mailData.subject = value)}
 				/>
 			</div>
 

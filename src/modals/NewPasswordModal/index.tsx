@@ -7,6 +7,7 @@ import { generatePath } from 'react-router-dom';
 
 import { ForgotPasswordModal } from '../../components/forgotPasswordModal/forgotPasswordModal';
 import { Modal } from '../../components/modal/modal';
+import { TextField, TextFieldLook } from '../../components/textField/textField';
 import { YlideLoader } from '../../components/ylideLoader/ylideLoader';
 import { blockchainsMap, calloutSvg, evmNameToNetwork } from '../../constants';
 import { WalletTag } from '../../controls/WalletTag';
@@ -264,68 +265,52 @@ export function NewPasswordModal({ faucetType, bonus, wallet, account, remoteKey
 								`This password will be used to encrypt and decrypt your mails.`
 							)}
 						</h4>
-						{!freshestKey ? (
+						{freshestKey ? (
 							<div className="wm-body">
 								<form
 									name="sign-up"
 									style={{
-										display: 'flex',
-										flexDirection: 'column',
-										alignItems: 'stretch',
-										justifyContent: 'flex-start',
+										display: 'grid',
+										gridGap: 12,
+										padding: '20px 16px 8px',
 									}}
 									action="/"
 									method="POST"
 									noValidate
 								>
-									<input
-										className="ylide-input ylide-password-input"
+									<TextField
+										look={TextFieldLook.PROMO}
 										type="password"
 										autoComplete="new-password"
-										name="password"
-										id="password"
 										placeholder="Enter Ylide password"
 										value={password}
-										onChange={e => setPassword(e.target.value)}
+										onValueChange={setPassword}
 									/>
-									<input
-										className="ylide-input ylide-password-input"
+									<TextField
+										look={TextFieldLook.PROMO}
 										type="password"
 										autoComplete="new-password"
-										name="repeat-password"
-										id="repeat-password"
 										placeholder="Repeat your password"
 										value={passwordRepeat}
-										onChange={e => setPasswordRepeat(e.target.value)}
+										onValueChange={setPasswordRepeat}
 									/>
 								</form>
 								<div className="ylide-callout">{calloutSvg}</div>
 							</div>
 						) : (
-							<div className="wm-body centered">
-								<input
-									style={{
-										fontSize: 16,
-										borderRadius: 40,
-										textAlign: 'center',
-										height: 36,
-										border: '1px solid #000000',
-										padding: '5px 10px',
-										marginLeft: 20,
-										marginRight: 20,
-										marginTop: 20,
-										marginBottom: 20,
-									}}
+							<div className="wm-body centered" style={{ padding: '0 20px' }}>
+								<TextField
+									look={TextFieldLook.PROMO}
+									autoFocus
 									value={password}
-									onChange={e => setPassword(e.target.value)}
+									onValueChange={setPassword}
 									type="password"
 									placeholder="Enter your Ylide password"
 								/>
 
 								<div
 									style={{
-										marginTop: -8,
-										marginRight: 20,
+										marginTop: 8,
 										textAlign: 'right',
 									}}
 								>

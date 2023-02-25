@@ -1,5 +1,4 @@
-import { EditOutlined, LogoutOutlined, PlusOutlined } from '@ant-design/icons';
-import { Button, Tooltip } from 'antd';
+import { Tooltip } from 'antd';
 import { observer } from 'mobx-react';
 import React, { RefObject } from 'react';
 import { generatePath } from 'react-router-dom';
@@ -7,10 +6,14 @@ import { generatePath } from 'react-router-dom';
 import { walletsMeta } from '../../../../constants';
 import { AdaptiveAddress } from '../../../../controls/adaptiveAddress/adaptiveAddress';
 import { Blockie } from '../../../../controls/Blockie';
+import { ReactComponent as EditSvg } from '../../../../icons/ic20/edit.svg';
+import { ReactComponent as PlusSvg } from '../../../../icons/ic20/plus.svg';
+import { ReactComponent as LogoutSvg } from '../../../../icons/ic28/logout.svg';
 import domain from '../../../../stores/Domain';
 import { RoutePath } from '../../../../stores/routePath';
 import { HorizontalAlignment } from '../../../../utils/alignment';
 import { useNav } from '../../../../utils/navigate';
+import { ActionButton, ActionButtonLook, ActionButtonSize } from '../../../ActionButton/ActionButton';
 import { AnchoredPopup } from '../../../popup/anchoredPopup/anchoredPopup';
 import css from './accountsPopup.module.scss';
 
@@ -38,17 +41,15 @@ export const AccountsPopup = observer(({ anchorRef, onClose }: AccountsPopupProp
 							<div className={css.itemName}>
 								<div className={css.itemNameInner}>{account.name}</div>
 								<Tooltip title="Rename">
-									<Button
+									<ActionButton
+										look={ActionButtonLook.LITE}
+										icon={<EditSvg />}
 										onClick={async () => {
 											const newName = prompt('Enter new account name: ', account.name);
 											if (newName) {
 												await account.rename(newName);
 											}
 										}}
-										style={{ marginLeft: 2, marginTop: 1, color: '#808080' }}
-										type="text"
-										size="small"
-										icon={<EditOutlined />}
 									/>
 								</Tooltip>
 							</div>
@@ -59,9 +60,10 @@ export const AccountsPopup = observer(({ anchorRef, onClose }: AccountsPopupProp
 						</div>
 						<div className={css.itemActions}>
 							<Tooltip title="Logout">
-								<Button
-									danger
-									icon={<LogoutOutlined />}
+								<ActionButton
+									size={ActionButtonSize.Medium}
+									look={ActionButtonLook.DENGEROUS}
+									icon={<LogoutSvg />}
 									onClick={async () => {
 										await account.wallet.disconnectAccount(account);
 										await domain.accounts.removeAccount(account);
@@ -76,9 +78,14 @@ export const AccountsPopup = observer(({ anchorRef, onClose }: AccountsPopupProp
 				))}
 
 				<div className={css.addAccountRow}>
-					<Button type="primary" icon={<PlusOutlined />} onClick={() => nav(RoutePath.WALLETS)}>
+					<ActionButton
+						size={ActionButtonSize.Medium}
+						look={ActionButtonLook.PRIMARY}
+						icon={<PlusSvg />}
+						onClick={() => nav(RoutePath.WALLETS)}
+					>
 						Connect account
-					</Button>
+					</ActionButton>
 				</div>
 			</div>
 		</AnchoredPopup>

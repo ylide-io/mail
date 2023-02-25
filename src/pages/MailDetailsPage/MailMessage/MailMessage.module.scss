@@ -29,9 +29,10 @@
 
 .sender {
 	display: grid;
-	grid-template-columns: auto 1fr;
-	grid-gap: 8px;
+	grid-template-columns: auto auto;
 	align-items: center;
+	justify-content: start;
+	grid-gap: 8px;
 }
 
 .senderLabel {

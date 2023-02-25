@@ -6,6 +6,7 @@ import { ReactNode, useMemo, useState } from 'react';
 import QRCode from 'react-qr-code';
 
 import { Modal } from '../../components/modal/modal';
+import { TextField, TextFieldLook } from '../../components/textField/textField';
 import { YlideLoader } from '../../components/ylideLoader/ylideLoader';
 import { supportedWallets, walletsMeta } from '../../constants';
 import { YlideButton } from '../../controls/YlideButton';
@@ -323,12 +324,12 @@ export const SelectWalletModal = observer(({ onClose }: SelectWalletModalProps) 
 										renderWalletConnectAlreadyUsed(domain.walletConnectState.walletName)
 									) : (
 										<>
-											<input
-												className="wallets-search"
-												value={search}
-												onChange={e => setSearch(e.target.value)}
-												placeholder="Search"
+											<TextField
+												look={TextFieldLook.LITE}
 												type="text"
+												placeholder="Search"
+												value={search}
+												onValueChange={setSearch}
 											/>
 
 											<div className="wallets-list">
@@ -390,12 +391,12 @@ export const SelectWalletModal = observer(({ onClose }: SelectWalletModalProps) 
 									renderWalletConnectAlreadyUsed(domain.walletConnectState.walletName)
 								) : (
 									<>
-										<input
-											className="wallets-search"
-											value={search}
-											onChange={e => setSearch(e.target.value)}
-											placeholder="Search"
+										<TextField
+											look={TextFieldLook.LITE}
 											type="text"
+											placeholder="Search"
+											value={search}
+											onValueChange={setSearch}
 										/>
 
 										<div className="wallets-list">
@@ -447,7 +448,13 @@ export const SelectWalletModal = observer(({ onClose }: SelectWalletModalProps) 
 							</>
 						) : activeTab === 'install' ? (
 							<>
-								<input className="wallets-search" placeholder="Search" type="text" />
+								<TextField
+									look={TextFieldLook.LITE}
+									type="text"
+									placeholder="Search"
+									value={search}
+									onValueChange={setSearch}
+								/>
 
 								<div className="wallets-list">
 									{walletsToInstall

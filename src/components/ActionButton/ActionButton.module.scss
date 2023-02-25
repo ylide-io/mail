@@ -3,20 +3,12 @@
 	grid-auto-flow: column;
 	grid-gap: 4px;
 	align-items: center;
-	min-width: 28px;
-	height: 28px;
 	border: 1px solid;
-	border-radius: 99px;
+	border-radius: 20px;
 
 	> i {
 		min-width: 20px;
 		text-align: center;
-	}
-
-	> svg {
-		width: 20px;
-		height: 20px;
-		fill: currentColor;
 	}
 
 	:global(.anticon) {
@@ -34,22 +26,22 @@
 	padding-right: 11px;
 	padding-left: 11px;
 }
-.root_hasIcon {
-	padding-left: 7px;
-}
-.root_hasIcon:not(.root_hasContent) {
-	padding-right: 3px;
-	padding-left: 3px;
-}
 .root_disabled {
 	pointer-events: none;
 	opacity: 0.5;
 }
-.root_multiline {
-	padding-top: 3px;
-	padding-bottom: 3px;
-	height: auto;
-	min-height: 28px;
+
+.icon {
+	position: relative;
+	width: 20px;
+	height: 20px;
+
+	> * {
+		position: absolute;
+		top: 50%;
+		left: 50%;
+		transform: translate(-50%, -50%);
+	}
 }
 
 .content {
@@ -61,19 +53,63 @@
 	@include truncate-text;
 }
 
-// STYLES
+// SIZE
 
-.root_default {
-	color: var(--primary-text-color);
-	border-color: var(--lite-button-border-color);
+.root_smallSize {
+	min-width: 28px;
+	height: 28px;
 
-	&:hover,
-	&:focus-visible {
-		background: var(--lite-button-hover-background-color);
+	&.root_multiline {
+		padding-top: 3px;
+		padding-bottom: 3px;
+		height: auto;
+		min-height: 28px;
+	}
+
+	&.root_hasIcon {
+		padding-left: 5px;
+	}
+
+	&.root_hasIcon:not(.root_hasContent) {
+		padding-right: 3px;
+		padding-left: 3px;
 	}
 }
 
-.root_primary {
+.root_mediumSize {
+	min-width: 32px;
+	height: 32px;
+
+	&.root_multiline {
+		padding-top: 3px;
+		padding-bottom: 3px;
+		height: auto;
+		min-height: 32px;
+	}
+
+	&.root_hasIcon {
+		padding-left: 7px;
+	}
+
+	&.root_hasIcon:not(.root_hasContent) {
+		padding-right: 5px;
+		padding-left: 5px;
+	}
+}
+
+// STYLE
+
+.root_defaultLook {
+	color: var(--primary-text-color);
+	border-color: rgba(var(--shade-rgb-color), 0.18);
+
+	&:hover,
+	&:focus-visible {
+		background: rgba(var(--shade-rgb-color), 0.05);
+	}
+}
+
+.root_primaryLook {
 	color: var(--on-accent2-color);
 	background: var(--accent2-color);
 	border-color: var(--accent2-color);
@@ -85,22 +121,22 @@
 	}
 }
 
-.root_dangerous {
+.root_dangerousLook {
 	color: var(--error-color);
-	border-color: var(--error-button-border-color);
+	border-color: rgba(var(--error-rgb-color), 0.35);
 
 	&:hover,
 	&:focus-visible {
-		background: var(--error-button-hover-background-color);
+		background: rgba(var(--error-rgb-color), 0.1);
 	}
 }
 
-.root_lite {
+.root_liteLook {
 	color: var(--primary-text-color);
 	border-color: transparent;
 
 	&:hover,
 	&:focus-visible {
-		background: var(--surface-hover-color);
+		background: rgba(var(--shade-rgb-color), 0.05);
 	}
 }
