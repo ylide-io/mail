@@ -39,13 +39,23 @@ export function MailMessage({
 }: MailMessageProps) {
 	const decodeMessage = useMailStore(state => state.decodeMessage);
 
-	const editorData = useMemo(() => decodeEditorData(decoded?.decodedTextData), [decoded?.decodedTextData]);
+	const editorData = useMemo(() => {
+		const json = decodeEditorData(decoded?.decodedTextData);
+		const isQamonMessage = !json?.blocks;
+		return isQamonMessage
+			? {
+					time: 1676587472156,
+					blocks: [{ id: '2cC8_Z_Rad', type: 'paragraph', data: { text: (json as any).body } }],
+					version: '2.26.5',
+			  }
+			: json;
+	}, [decoded?.decodedTextData]);
 
 	const onDecodeClick = () => {
 		decodeMessage(message);
 	};
 
-	const [isEditorReady, setEditorReady] = useState(!editorData?.blocks);
+	const [isEditorReady, setEditorReady] = useState(!editorData);
 	useEffect(() => {
 		if (isEditorReady) {
 			onReady?.();

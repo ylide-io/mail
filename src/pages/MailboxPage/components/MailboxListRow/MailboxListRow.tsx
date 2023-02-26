@@ -58,9 +58,12 @@ const MailboxListRow: React.FC<MailboxListRowProps> = observer(
 		}, [message.id]);
 
 		const preview = useMemo(() => {
-			return decodeEditorData(decoded?.decodedTextData)
-				?.blocks.map((b: any) => b.data.text)
-				.join('\n');
+			const json = decodeEditorData(decoded?.decodedTextData);
+			if (json?.blocks) {
+				return json?.blocks.map((b: any) => b.data.text).join('\n');
+			} else {
+				return (json as any)?.body;
+			}
 		}, [decoded]);
 
 		return (

@@ -50,7 +50,7 @@ const INDEXER_BLOCKCHAINS: string[] = [
 	'MOONBEAM',
 	'MOONRIVER',
 	'METIS',
-]; //['GNOSIS'];
+];
 
 // Ylide.registerBlockchainFactory(evmBlockchainFactories[EVMNetwork.LOCAL_HARDHAT]);
 Ylide.registerBlockchainFactory(evmBlockchainFactories[EVMNetwork.ETHEREUM]);
@@ -69,13 +69,13 @@ Ylide.registerBlockchainFactory(evmBlockchainFactories[EVMNetwork.MOONBEAM]);
 Ylide.registerBlockchainFactory(evmBlockchainFactories[EVMNetwork.MOONRIVER]);
 Ylide.registerBlockchainFactory(evmBlockchainFactories[EVMNetwork.METIS]);
 // Ylide.registerBlockchainFactory(evmBlockchainFactories[EVMNetwork.ASTAR]);
-// Ylide.registerBlockchainFactory(everscaleBlockchainFactory);
-// Ylide.registerWalletFactory(everscaleWalletFactory);
+Ylide.registerBlockchainFactory(everscaleBlockchainFactory);
+Ylide.registerWalletFactory(everscaleWalletFactory);
 Ylide.registerWalletFactory(evmWalletFactories.metamask);
-// Ylide.registerWalletFactory(evmWalletFactories.coinbase);
-// Ylide.registerWalletFactory(evmWalletFactories.trustwallet);
-// Ylide.registerWalletFactory(evmWalletFactories.binance);
-// Ylide.registerWalletFactory(evmWalletFactories.walletconnect);
+Ylide.registerWalletFactory(evmWalletFactories.coinbase);
+Ylide.registerWalletFactory(evmWalletFactories.trustwallet);
+Ylide.registerWalletFactory(evmWalletFactories.binance);
+Ylide.registerWalletFactory(evmWalletFactories.walletconnect);
 
 export class Domain {
 	savedPassword: string | null = null;

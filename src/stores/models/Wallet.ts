@@ -108,8 +108,18 @@ export class Wallet extends EventEmitter {
 		return this.accounts.some(a => a.account.address === account.address);
 	}
 
-	async constructLocalKey(account: IGenericAccount, password: string) {
+	async constructLocalKeyV2(account: IGenericAccount, password: string) {
 		return await this.domain.keystore.constructKeypair(
+			'New account connection',
+			this.factory.blockchainGroup,
+			this.factory.wallet,
+			account.address,
+			password,
+		);
+	}
+
+	async constructLocalKeyV1(account: IGenericAccount, password: string) {
+		return await this.domain.keystore.constructKeypairV1(
 			'New account connection',
 			this.factory.blockchainGroup,
 			this.factory.wallet,

@@ -191,7 +191,11 @@ export function NewPasswordModal({ faucetType, bonus, wallet, account, remoteKey
 
 		let tempLocalKey;
 		try {
-			tempLocalKey = await wallet.constructLocalKey(account, password);
+			if (!forceNew && freshestKey && freshestKey.key.keyVersion === 1) {
+				tempLocalKey = await wallet.constructLocalKeyV1(account, password);
+			} else {
+				tempLocalKey = await wallet.constructLocalKeyV2(account, password);
+			}
 		} catch (err) {
 			console.log('createLocalKey ', err);
 			setStep(Step.ENTER_PASSWORD);

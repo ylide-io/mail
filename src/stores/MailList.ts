@@ -119,6 +119,7 @@ export function useMailList(props?: UseMailListProps) {
 				return domain.ylide.core
 					.getListSources(readingSession, [
 						{
+							namespace: 'mailing',
 							type: BlockchainSourceType.DIRECT,
 							recipient,
 							sender,
@@ -332,7 +333,9 @@ export const useMailStore = create<MailStore>((set, get) => ({
 				return state.messagesContentById[pushMsg.msgId];
 			}
 
-			const content = await pushMsg.reader.retrieveMessageContent(pushMsg.msg);
+			// { $$meta: IEVMEnrichedEvent<GenericMessageContentEventObject> }
+
+			const content = await domain.ylide.core.getMessageContent(pushMsg.msg);
 			if (!content || content.corrupted) {
 				throw new Error('Content is not available or corrupted');
 			}
