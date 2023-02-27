@@ -8,6 +8,8 @@ import { YlideLoader } from '../../../components/ylideLoader/ylideLoader';
 import { AdaptiveAddress } from '../../../controls/adaptiveAddress/adaptiveAddress';
 import { RoutePath } from '../../../stores/routePath';
 import { invariant } from '../../../utils/invariant';
+import { formatMoney } from '../../../utils/money';
+import { formatNumber } from '../../../utils/number';
 import { buildUrl, useNav } from '../../../utils/url';
 import { OtcAsideStatistics } from '../components/otcAsideStatistics/otcAsideStatistics';
 import { OtcLayout } from '../components/otcLayout/otcLayout';
@@ -37,11 +39,11 @@ export function OtcWalletsPage() {
 				<OtcAsideStatistics
 					rows={[
 						{
-							title: `${data.totalCount} wallets`,
+							title: `${formatNumber(data.totalCount)} wallets`,
 							description: 'connected to Ylide',
 						},
 						{
-							title: `$${data.totalValue} value`,
+							title: `${formatMoney(data.totalValue)} value`,
 							description: 'connected to Ylide',
 						},
 					]}
@@ -86,8 +88,8 @@ export function OtcWalletsPage() {
 						data={data.wallets.map(wallet => ({
 							content: [
 								<AdaptiveAddress address={wallet.address} />,
-								wallet.balance,
-								wallet.value,
+								formatNumber(wallet.balance),
+								formatMoney(wallet.value),
 								wallet.blockchain,
 								<button
 									className={css.messageButton}

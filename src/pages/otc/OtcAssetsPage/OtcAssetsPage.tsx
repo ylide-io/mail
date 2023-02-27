@@ -6,6 +6,8 @@ import { OtcApi } from '../../../api/otcApi';
 import { ErrorMessage } from '../../../components/errorMessage/errorMessage';
 import { YlideLoader } from '../../../components/ylideLoader/ylideLoader';
 import { RoutePath } from '../../../stores/routePath';
+import { formatMoney } from '../../../utils/money';
+import { formatNumber } from '../../../utils/number';
 import { buildUrl, useNav } from '../../../utils/url';
 import { OtcAsideStatistics } from '../components/otcAsideStatistics/otcAsideStatistics';
 import { OtcLayout } from '../components/otcLayout/otcLayout';
@@ -35,11 +37,11 @@ export function OtcAssetsPage() {
 				<OtcAsideStatistics
 					rows={[
 						{
-							title: `${data.totalWallets} wallets`,
+							title: `${formatNumber(data.totalWallets)} wallets`,
 							description: 'connected to Ylide',
 						},
 						{
-							title: `$${data.totalValue} value`,
+							title: `${formatMoney(data.totalValue)} value`,
 							description: 'connected to Ylide',
 						},
 					]}
@@ -85,8 +87,8 @@ export function OtcAssetsPage() {
 							content: [
 								asset.token,
 								asset.totalWallets,
-								asset.totalAmount,
-								asset.totalValue,
+								formatNumber(asset.totalAmount),
+								formatMoney(asset.totalValue),
 								asset.blockchain,
 							],
 							onClick: () =>
