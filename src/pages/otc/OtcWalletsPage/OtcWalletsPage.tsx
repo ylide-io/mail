@@ -67,6 +67,7 @@ export function OtcWalletsPage() {
 							{
 								title: 'Wallet',
 								gridSize: '1fr',
+								className: css.addressRow,
 							},
 							{
 								title: 'Balance',
@@ -82,7 +83,8 @@ export function OtcWalletsPage() {
 							},
 							{
 								title: '',
-								gridSize: '1fr',
+								gridSize: 'minmax(100px, 0.5fr)',
+								className: css.messageRow,
 							},
 						]}
 						data={data.wallets.map(wallet => ({

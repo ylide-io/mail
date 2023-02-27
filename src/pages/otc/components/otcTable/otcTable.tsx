@@ -1,9 +1,10 @@
 import clsx from 'clsx';
 import { ReactNode } from 'react';
 
+import { PropsWithClassName } from '../../../../components/propsWithClassName';
 import css from './otcTable.module.scss';
 
-export interface ColumnProp {
+export interface ColumnProp extends PropsWithClassName {
 	title: ReactNode;
 	gridSize: string;
 }
@@ -37,7 +38,7 @@ export function OtcTable({ columns, data }: OtcTableProps) {
 					onClick={row.onClick}
 				>
 					{columns.map((column, i) => (
-						<div key={i} className={css.cell}>
+						<div key={i} className={clsx(css.cell, column.className)}>
 							{row.content[i]}
 						</div>
 					))}
