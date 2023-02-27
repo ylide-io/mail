@@ -26,7 +26,7 @@ specifiers:
   '@ylide/ethereum': link:../ethereum
   '@ylide/everscale': link:../everscale
   '@ylide/sdk': link:../sdk
-  '@ylide/smart-buffer': 0.0.10
+  '@ylide/smart-buffer': 0.0.11
   antd: ^4.21.5
   assert: ^2.0.0
   buffer: ^6.0.3
@@ -96,7 +96,7 @@ dependencies:
   '@ylide/ethereum': link:../ethereum
   '@ylide/everscale': link:../everscale
   '@ylide/sdk': link:../sdk
-  '@ylide/smart-buffer': 0.0.10
+  '@ylide/smart-buffer': 0.0.11
   antd: 4.24.5_sfoxds7t5ydpegc3knd667wn6m
   clsx: 1.2.1
   core-decorators: 0.20.0
@@ -3907,8 +3907,8 @@ packages:
     resolution: {integrity: sha512-NuHqBY1PB/D8xU6s/thBgOAiAP7HOYDQ32+BFZILJ8ivkUkAHQnWfn6WhL79Owj1qmUnoN/YPhktdIoucipkAQ==}
     dev: true
 
-  /@ylide/smart-buffer/0.0.10:
-    resolution: {integrity: sha512-hMDlUFdVxFpF+j0xFCBZrmMRLoaC/KqjsP9lX22Xk9VewhQ9qsPTk4i3vMruhzfLgyYwwHIeTidFAEEsf4nG0g==}
+  /@ylide/smart-buffer/0.0.11:
+    resolution: {integrity: sha512-5o7sCNGhkmxlZo/89Aw+RdspcskQtt6t8ADU3gSlylalCn7l9ZVAeeSyMEUwWObjiyWF2yjyAt51UyWHa0QjLQ==}
     dev: false
 
   /abab/2.0.6:
