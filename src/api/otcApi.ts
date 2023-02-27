@@ -19,8 +19,7 @@ export namespace OtcApi {
 	}
 
 	export async function queryAssets(params: {
-		tokenQuery: string;
-		chainQuery: string;
+		searchTerm: string;
 		sorting?: { key: 'totalWallets' | 'totalAmount' | 'totalValue'; direction: 'asc' | 'desc' };
 		offset?: number;
 		limit?: number;

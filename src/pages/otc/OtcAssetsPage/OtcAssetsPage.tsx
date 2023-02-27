@@ -4,11 +4,13 @@ import { generatePath, useSearchParams } from 'react-router-dom';
 
 import { OtcApi } from '../../../api/otcApi';
 import { ErrorMessage } from '../../../components/errorMessage/errorMessage';
+import { TextField, TextFieldLook } from '../../../components/textField/textField';
 import { YlideLoader } from '../../../components/ylideLoader/ylideLoader';
 import { RoutePath } from '../../../stores/routePath';
 import { formatMoney } from '../../../utils/money';
 import { formatNumber } from '../../../utils/number';
 import { buildUrl, useNav } from '../../../utils/url';
+import { useDebounce } from '../../../utils/useDebounce';
 import { OtcAsideStatistics } from '../components/otcAsideStatistics/otcAsideStatistics';
 import { OtcLayout } from '../components/otcLayout/otcLayout';
 import { OtcPagination } from '../components/otcPagination/otcPagination';
@@ -23,11 +25,13 @@ export function OtcAssetsPage() {
 	const [searchParams] = useSearchParams();
 	const page = Number(searchParams.get('page')) || 1;
 
-	const [tokenQuery, setTokenQuery] = useState('');
-	const [chainQuery, setChainQuery] = useState('');
+	const [searchTerm, setSearchTerm] = useState('');
+	const debouncedTerm = useDebounce(searchTerm.trim(), 500);
 
-	const { isError, data } = useQuery(['otc', 'assets', page], () =>
-		OtcApi.queryAssets({ tokenQuery, chainQuery, offset: page * PAGE_SIZE, limit: PAGE_SIZE }),
+	const { isError, data } = useQuery(
+		['otc', 'assets', page, debouncedTerm],
+		() => OtcApi.queryAssets({ searchTerm: debouncedTerm, offset: page * PAGE_SIZE, limit: PAGE_SIZE }),
+		{},
 	);
 
 	const [aside, setAside] = useState<ReactNode>();
@@ -55,6 +59,14 @@ export function OtcAssetsPage() {
 	return (
 		<OtcLayout
 			title="Asset Explorer"
+			titleRight={
+				<TextField
+					look={TextFieldLook.PROMO}
+					placeholder="Search for assets ..."
+					value={searchTerm}
+					onValueChange={setSearchTerm}
+				/>
+			}
 			aside={aside}
 			supContent="Discover assets owned by Ylide users and start a new deal"
 		>
