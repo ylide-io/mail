@@ -6,7 +6,7 @@ import css from './otcLayout.module.scss';
 export interface OtcLayoutProps extends PropsWithChildren {
 	title: ReactNode;
 	titleRight?: ReactNode;
-	aside: ReactNode;
+	aside?: ReactNode;
 	supContent?: ReactNode;
 }
 
