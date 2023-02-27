@@ -9,6 +9,7 @@ import {
 	ListSourceMultiplexer,
 	SourceReadingSession,
 	Uint256,
+	YLIDE_MAIN_FEED_ID,
 } from '@ylide/sdk';
 import { reaction } from 'mobx';
 import { useCallback, useEffect, useState } from 'react';
@@ -119,7 +120,7 @@ export function useMailList(props?: UseMailListProps) {
 				return domain.ylide.core
 					.getListSources(readingSession, [
 						{
-							namespace: 'mailing',
+							feedId: YLIDE_MAIN_FEED_ID,
 							type: BlockchainSourceType.DIRECT,
 							recipient,
 							sender,
@@ -353,8 +354,8 @@ export const useMailStore = create<MailStore>((set, get) => ({
 
 		const decodedMessage = {
 			msgId: pushMsg.msgId,
-			decodedSubject: result.subject,
-			decodedTextData: result.content,
+			decodedSubject: result.content.subject,
+			decodedTextData: result.content.content,
 		};
 
 		state.decodedMessagesById[pushMsg.msgId] = decodedMessage;

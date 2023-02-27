@@ -27,19 +27,23 @@ export const TVMDeployContractModal: FC<TVMDeployContractModalProps> = ({ contra
 		setLoading(true);
 		let address: string = '';
 		if (contract.title === 'MailerV5') {
-			address = await (account.wallet.controller as EverscaleWalletController).deployMailerV5(
+			address = await (account.wallet.controller as any as EverscaleWalletController).deployMailerV5(
 				account.account,
 				account.account.address,
 			);
 		} else if (contract.title === 'MailerV6') {
-			address = await (account.wallet.controller as EverscaleWalletController).deployMailerV6(
+			address = await (account.wallet.controller as any as EverscaleWalletController).deployMailerV6(
 				account.account,
 				account.account.address,
 			);
 		} else if (contract.title === 'RegistryV1') {
-			address = await (account.wallet.controller as EverscaleWalletController).deployRegistryV1(account.account);
+			address = await (account.wallet.controller as any as EverscaleWalletController).deployRegistryV1(
+				account.account,
+			);
 		} else if (contract.title === 'RegistryV2') {
-			address = await (account.wallet.controller as EverscaleWalletController).deployRegistryV2(account.account);
+			address = await (account.wallet.controller as any as EverscaleWalletController).deployRegistryV2(
+				account.account,
+			);
 		} else setAddress(address);
 	}, [account, contract]);
 
