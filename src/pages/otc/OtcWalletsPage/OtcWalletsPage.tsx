@@ -65,6 +65,7 @@ export function OtcWalletsPage() {
 			title={`${token} Wallets`}
 			aside={aside}
 			supContent="Discover assets owned by Ylide users and start a new deal"
+			contentClass={css.content}
 		>
 			{data ? (
 				<>

@@ -69,6 +69,7 @@ export function OtcAssetsPage() {
 			}
 			aside={aside}
 			supContent="Discover assets owned by Ylide users and start a new deal"
+			contentClass={css.content}
 		>
 			{data ? (
 				<>

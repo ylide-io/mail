@@ -1,3 +1,4 @@
+import clsx from 'clsx';
 import { PropsWithChildren, ReactNode } from 'react';
 
 import { GenericLayout } from '../../../../components/genericLayout/genericLayout';
@@ -8,9 +9,10 @@ export interface OtcLayoutProps extends PropsWithChildren {
 	titleRight?: ReactNode;
 	aside?: ReactNode;
 	supContent?: ReactNode;
+	contentClass?: string;
 }
 
-export function OtcLayout({ children, title, titleRight, aside, supContent }: OtcLayoutProps) {
+export function OtcLayout({ children, title, titleRight, aside, supContent, contentClass }: OtcLayoutProps) {
 	return (
 		<GenericLayout isCustomContent mainClass={css.root}>
 			<div className={css.main}>
@@ -24,7 +26,7 @@ export function OtcLayout({ children, title, titleRight, aside, supContent }: Ot
 				<div className={css.body}>
 					{supContent != null && <div className={css.supContent}>{supContent}</div>}
 
-					<div className={css.content}>{children}</div>
+					<div className={clsx(css.content, contentClass)}>{children}</div>
 				</div>
 			</div>
 		</GenericLayout>
