@@ -51,11 +51,11 @@ export const blockchainsMap: Record<
 		logo: (s = 16) => <EverscaleLogo size={s} />,
 	},
 	[EVM_NAMES[EVMNetwork.LOCAL_HARDHAT]]: {
-		title: 'Local Hardhat',
+		title: 'LocalNet',
 		logo: (s = 16) => <EthereumLogo size={s} />,
 		ethNetwork: {
 			chainId: '0x7A69',
-			chainName: 'Ethereum Mainnet',
+			chainName: 'Hardhat Local',
 			nativeCurrency: {
 				name: 'GoEther',
 				symbol: 'GO',

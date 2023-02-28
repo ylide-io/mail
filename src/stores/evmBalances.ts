@@ -35,8 +35,8 @@ class EvmBalances {
 
 		for (const bcName of Object.keys(rawBalances)) {
 			const network = evmNameToNetwork(bcName);
-			if (network) {
-				result[network] = rawBalances[bcName].number;
+			if (network !== undefined) {
+				result[network] = rawBalances[bcName].numeric;
 			}
 		}
 

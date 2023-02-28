@@ -118,7 +118,7 @@ export const SendMailButton = observer(({ mailData, onSent }: SendMailButtonProp
 								const currentBlockchainName =
 									await mailData.from!.wallet.controller.getCurrentBlockchain();
 								if (currentBlockchainName !== blockchainName) {
-									await domain.switchEVMChain(newNetwork!);
+									await domain.switchEVMChain(mailData.from?.wallet!, newNetwork!);
 									mailData.network = newNetwork;
 								}
 							}}

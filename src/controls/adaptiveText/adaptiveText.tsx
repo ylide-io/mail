@@ -8,9 +8,10 @@ import css from './adaptiveText.module.scss';
 
 interface AdaptiveTextProps extends PropsWithClassName {
 	text: string;
+	textAlign?: 'left' | 'right';
 }
 
-export function AdaptiveText({ className, text, ...props }: AdaptiveTextProps) {
+export function AdaptiveText({ className, text, textAlign = 'left', ...props }: AdaptiveTextProps) {
 	const rootRef = useRef<HTMLDivElement>(null);
 	const visibleRef = useRef<HTMLDivElement>(null);
 
@@ -45,7 +46,11 @@ export function AdaptiveText({ className, text, ...props }: AdaptiveTextProps) {
 	}, [text, size.clientWidth, size.scrollWidth]);
 
 	return (
-		<div ref={rootRef} className={clsx(css.root, className)} {...props}>
+		<div
+			ref={rootRef}
+			className={clsx(css.root, textAlign === 'left' ? css.textAlignLeft : css.textAlignRight, className)}
+			{...props}
+		>
 			<div className={css.invisible}>{text}</div>
 			<div ref={visibleRef} className={css.visible}>
 				{text}

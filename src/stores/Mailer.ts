@@ -1,5 +1,5 @@
 import { EVM_NAMES, EVMNetwork } from '@ylide/ethereum';
-import { MessageContentV3, ServiceCode } from '@ylide/sdk';
+import { MessageContentV3, SendMailResult, ServiceCode } from '@ylide/sdk';
 import { makeAutoObservable } from 'mobx';
 
 import messagesDB from '../indexedDB/MessagesDB';
@@ -70,7 +70,7 @@ class Mailer {
 		text: string,
 		recipients: string[],
 		network?: EVMNetwork,
-	): Promise<string | null> {
+	): Promise<SendMailResult | null> {
 		let error = false;
 		analytics.mailSentAttempt();
 		try {
@@ -86,7 +86,7 @@ class Mailer {
 				network = evmNetworks.find(n => n.name === blockchainName)?.network;
 			}
 
-			return await domain.ylide.sendMessage(
+			return await domain.ylide.core.sendMessage(
 				{
 					wallet: sender.wallet.controller,
 					sender: sender.account,

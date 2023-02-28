@@ -240,6 +240,7 @@ export const MailDetailsPage = () => {
 
 								return (
 									<div
+										key={message.message.id}
 										ref={isPrimaryItem ? primaryThreadItemRef : undefined}
 										className={css.messageThreadItem}
 									>

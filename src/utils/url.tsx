@@ -1,5 +1,4 @@
-import { createSearchParams, useNavigate } from 'react-router-dom';
-import { URLSearchParamsInit } from 'react-router-dom/dist/dom';
+import { createSearchParams, URLSearchParamsInit, useNavigate } from 'react-router-dom';
 
 import AlertModal from '../modals/AlertModal';
 import domain from '../stores/Domain';

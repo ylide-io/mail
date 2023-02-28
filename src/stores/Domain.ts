@@ -1,5 +1,6 @@
 import WalletConnectProvider from '@walletconnect/web3-provider';
 import {
+	EthereumWalletController,
 	EVM_CHAINS,
 	EVM_NAMES,
 	EVM_RPCS,
@@ -22,7 +23,7 @@ import {
 	Ylide,
 	YlideKeyStore,
 } from '@ylide/sdk';
-import { makeObservable, observable, toJS } from 'mobx';
+import { makeObservable, observable } from 'mobx';
 
 import { blockchainsMap, supportedWallets } from '../constants';
 import PasswordModal from '../modals/PasswordModal';
@@ -33,6 +34,24 @@ import { useMailStore } from './MailList';
 import { Wallet } from './models/Wallet';
 import { OTCStore } from './OTC';
 import tags from './Tags';
+
+const INDEXER_BLOCKCHAINS: string[] = [
+	'ETHEREUM',
+	'AVALANCHE',
+	'ARBITRUM',
+	'BNBCHAIN',
+	'OPTIMISM',
+	'POLYGON',
+	'FANTOM',
+	'KLAYTN',
+	'GNOSIS',
+	'AURORA',
+	'CELO',
+	'CRONOS',
+	'MOONBEAM',
+	'MOONRIVER',
+	'METIS',
+];
 
 // Ylide.registerBlockchainFactory(evmBlockchainFactories[EVMNetwork.LOCAL_HARDHAT]);
 Ylide.registerBlockchainFactory(evmBlockchainFactories[EVMNetwork.ETHEREUM]);
@@ -70,7 +89,7 @@ export class Domain {
 
 	@observable initialized = false;
 
-	ylide: Ylide = new Ylide(this.keystore);
+	ylide: Ylide = new Ylide(this.keystore, INDEXER_BLOCKCHAINS);
 
 	@observable txChain: 'fantom' | 'gnosis' | 'polygon' = 'polygon';
 	@observable txWithBonus: boolean = false;
@@ -173,6 +192,7 @@ export class Domain {
 			}
 		}
 		return await DynamicEncryptionRouter.findEncyptionRoute(
+			this.ylide.core,
 			actualRecipients,
 			this.getRegisteredBlockchains().map(b => b.reader),
 		);
@@ -191,6 +211,7 @@ export class Domain {
 			},
 		];
 		const route = await DynamicEncryptionRouter.findEncyptionRoute(
+			this.ylide.core,
 			actualRecipients,
 			blockchains.map(b => b.reader),
 		);
@@ -254,11 +275,11 @@ export class Domain {
 		}
 	}
 
-	async switchEVMChain(needNetwork: EVMNetwork) {
+	async switchEVMChain(wallet: Wallet, needNetwork: EVMNetwork) {
 		try {
 			const bData = blockchainsMap[EVM_NAMES[needNetwork]];
-			// @ts-ignore
-			await window.ethereum.request({
+
+			await (wallet.controller as EthereumWalletController).providerObject.request({
 				method: 'wallet_addEthereumChain',
 				params: [bData.ethNetwork!],
 			});
@@ -266,8 +287,7 @@ export class Domain {
 			console.log('error: ', error);
 		}
 		try {
-			// @ts-ignore
-			await window.ethereum.request({
+			await (wallet.controller as EthereumWalletController).providerObject.request({
 				method: 'wallet_switchEthereumChain',
 				params: [{ chainId: '0x' + Number(EVM_CHAINS[needNetwork]).toString(16) }], // chainId must be in hexadecimal numbers
 			});
@@ -316,7 +336,6 @@ export class Domain {
 				async open(uri, cb, opts?) {
 					// fired this method? means disconnected
 					isAvailable = false;
-					console.log('a1');
 					cb();
 				},
 				close() {
@@ -324,12 +343,10 @@ export class Domain {
 				},
 			},
 		});
-		console.log('a2');
+
 		try {
 			await wcTest.enable();
-			console.log('a3');
 		} catch (err) {
-			console.log('a4: ', err);
 			// no-op
 		}
 
@@ -340,7 +357,7 @@ export class Domain {
 				walletName: wcTest.wc.peerMeta?.name || '',
 				provider: wcTest,
 			};
-			console.log('wallet connect available on start: ', wcTest);
+			// console.log('wallet connect available on start: ', wcTest);
 			await this.extractWalletsData();
 		} else {
 			let resolve = (val: { walletName: string; provider: any }) => {};
@@ -357,7 +374,7 @@ export class Domain {
 								resolve = _resolve;
 							}),
 						};
-						console.log('a5: ', toJS(domain.walletConnectState));
+						// console.log('a5: ', toJS(domain.walletConnectState));
 					},
 					async close() {
 						domain.walletConnectState = {
@@ -366,7 +383,7 @@ export class Domain {
 							walletName: wcReal.wc.peerMeta?.name || '',
 							provider: wcReal,
 						};
-						console.log('wallet connect close (good close): ', wcReal);
+						// console.log('wallet connect close (good close): ', wcReal);
 						await self.extractWalletsData();
 						resolve({ walletName: wcReal.wc.peerMeta?.name || '', provider: wcReal });
 					},
@@ -376,10 +393,10 @@ export class Domain {
 			wcReal
 				.enable()
 				.then(result => {
-					console.log('wccReal enabled: ', result);
+					// console.log('wccReal enabled: ', result);
 				})
 				.catch(err => {
-					console.log('wcc error: ', err);
+					// console.log('wcc error: ', err);
 				});
 		}
 	}
@@ -392,7 +409,7 @@ export class Domain {
 		}
 		this.walletControllers[factory.blockchainGroup] = {
 			...(this.walletControllers[factory.blockchainGroup] || {}),
-			[factory.wallet]: await this.ylide.addWallet(factory.blockchainGroup, factory.wallet, {
+			[factory.wallet]: await this.ylide.controllers.addWallet(factory.blockchainGroup, factory.wallet, {
 				dev: false, //document.location.hostname === 'localhost',
 				onSwitchAccountRequest: this.handleSwitchRequest.bind(this, factory.wallet),
 				onNetworkSwitchRequest: async (
@@ -402,7 +419,10 @@ export class Domain {
 					needChainId: number,
 				) => {
 					try {
-						await this.switchEVMChain(needNetwork);
+						await this.switchEVMChain(
+							this.wallets.find(w => w.factory.wallet === factory.wallet)!,
+							needNetwork,
+						);
 					} catch (err) {
 						alert(
 							'Wrong network (' +
@@ -437,7 +457,7 @@ export class Domain {
 		}
 		for (const factory of this.registeredBlockchains) {
 			if (!this.blockchains[factory.blockchain]) {
-				this.blockchains[factory.blockchain] = await this.ylide.addBlockchain(factory.blockchain, {
+				this.blockchains[factory.blockchain] = await this.ylide.controllers.addBlockchain(factory.blockchain, {
 					dev: false, //document.location.hostname === 'localhost',
 					endpoints: ['https://mainnet.evercloud.dev/695e40eeac6b4e3fa4a11666f6e0d6af/graphql'],
 				});
@@ -505,23 +525,14 @@ export class Domain {
 		if (this.initialized) {
 			return;
 		}
-		console.log('d1');
 		this.availableWallets = await Ylide.getAvailableWallets();
-		console.log('d2');
 		await this.initWalletConnect();
-		console.log('d3');
 		await this.extractWalletsData();
-		console.log('d4');
 		await this.keystore.init();
-		console.log('d5');
 		await this.accounts.accountsProcessed;
-		console.log('d6');
 		await contacts.init();
-		console.log('d7');
 		await tags.getTags();
-		console.log('d8');
 		await useMailStore.getState().init();
-		console.log('d9');
 		this.initialized = true;
 	}
 

@@ -1,9 +1,6 @@
 import {
 	AbstractWalletController,
-	ExternalYlidePublicKey,
 	IGenericAccount,
-	PublicKey,
-	PublicKeyType,
 	WalletControllerFactory,
 	WalletEvent,
 	YlideKeyPair,
@@ -13,7 +10,6 @@ import EventEmitter from 'eventemitter3';
 import { computed, makeObservable, observable } from 'mobx';
 
 import { Domain } from '../Domain';
-import { useMailStore } from '../MailList';
 import { DomainAccount } from './DomainAccount';
 
 export class Wallet extends EventEmitter {
@@ -112,7 +108,7 @@ export class Wallet extends EventEmitter {
 		return this.accounts.some(a => a.account.address === account.address);
 	}
 
-	async constructLocalKey(account: IGenericAccount, password: string) {
+	async constructLocalKeyV2(account: IGenericAccount, password: string) {
 		return await this.domain.keystore.constructKeypair(
 			'New account connection',
 			this.factory.blockchainGroup,
@@ -122,71 +118,23 @@ export class Wallet extends EventEmitter {
 		);
 	}
 
-	async readRemoteKeys(account: IGenericAccount) {
-		//
-		const blockchainGroup = this.factory.blockchainGroup;
-		const blockchainFactories = this.domain.registeredBlockchains.filter(
-			b => b.blockchainGroup === blockchainGroup,
+	async constructLocalKeyV1(account: IGenericAccount, password: string) {
+		return await this.domain.keystore.constructKeypairV1(
+			'New account connection',
+			this.factory.blockchainGroup,
+			this.factory.wallet,
+			account.address,
+			password,
 		);
-		const blockchains = blockchainFactories.map(factory => ({
-			factory,
-			controller: this.domain.blockchains[factory.blockchain],
-		}));
-		const rawKeysRequest = async () => {
-			let remoteKey: ExternalYlidePublicKey | null = null;
-			const remoteKeys: Record<string, ExternalYlidePublicKey | null> = {};
-			await Promise.all(
-				blockchains.map(async ({ factory, controller }) => {
-					try {
-						const key = (await controller.extractPublicKeyFromAddress(account.address)) || null;
-						if (key) {
-							remoteKeys[factory.blockchain] = key;
-							remoteKey = key;
-						}
-					} catch (err) {
-						// so sad :(
-					}
-				}),
-			);
-			return {
-				remoteKey,
-				remoteKeys,
-			};
-		};
-		if (this.factory.blockchainGroup === 'evm') {
-			const readingSession = useMailStore.getState().readingSession;
+	}
 
-			return await readingSession.indexerHub.retryingOperation(
-				async () => {
-					let remoteKey: ExternalYlidePublicKey | null = null;
-					const remoteKeys: Record<string, ExternalYlidePublicKey | null> = {};
-					const results = await readingSession.indexerHub.requestMultipleKeys([account.address]);
-					console.log('results: ', results);
-					const rawRemoteKeys = await readingSession.indexerHub.requestKeys(account.address);
-					const bcs = Object.keys(rawRemoteKeys);
-					let timestamp = -1;
-					for (const bc of bcs) {
-						remoteKeys[bc] = {
-							...rawRemoteKeys[bc],
-							publicKey: PublicKey.fromBytes(PublicKeyType.YLIDE, rawRemoteKeys[bc].publicKey),
-						};
-						if (timestamp === -1 || rawRemoteKeys[bc].timestamp > timestamp) {
-							timestamp = rawRemoteKeys[bc].timestamp;
-							remoteKey = remoteKeys[bc];
-						}
-					}
-					return {
-						remoteKey,
-						remoteKeys,
-					};
-				},
-				async () => {
-					return rawKeysRequest();
-				},
-			);
-		} else {
-			return rawKeysRequest();
-		}
+	async readRemoteKeys(account: IGenericAccount) {
+		const result = await this.domain.ylide.core.getAddressKeys(account.address);
+
+		return {
+			remoteKey: result.freshestKey,
+			remoteKeys: result.remoteKeys,
+		};
 	}
 
 	async getCurrentAccount(): Promise<IGenericAccount | null> {
@@ -222,7 +170,7 @@ export class Wallet extends EventEmitter {
 		});
 	}
 
-	async getBalancesOf(address: string): Promise<Record<string, { original: string; number: number; e18: string }>> {
+	async getBalancesOf(address: string): Promise<Record<string, { original: string; numeric: number; e18: string }>> {
 		const chains = this.domain.registeredBlockchains.filter(
 			bc => bc.blockchainGroup === this.factory.blockchainGroup,
 		);
@@ -236,7 +184,7 @@ export class Wallet extends EventEmitter {
 				...p,
 				[c.blockchain]: balances[i],
 			}),
-			{} as Record<string, { original: string; number: number; e18: string }>,
+			{} as Record<string, { original: string; numeric: number; e18: string }>,
 		);
 	}
 

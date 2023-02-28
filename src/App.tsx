@@ -47,10 +47,11 @@ const App = observer(() => {
 
 	useEffect(() => {
 		if (location.pathname !== '/test') {
+			const start = Date.now();
 			domain
 				.init()
-				.catch(err => console.log('err: ', err))
-				.then(res => console.log('done'));
+				.catch(err => console.log('Initialization error: ', err))
+				.then(() => console.log(`Initialized in ${Date.now() - start}ms`));
 		}
 	}, [location.pathname]);
 

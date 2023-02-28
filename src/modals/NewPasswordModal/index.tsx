@@ -50,6 +50,7 @@ enum Step {
 	SELECT_NETWORK,
 	PUBLISH_KEY,
 	PUBLISHING_KEY,
+	OLD_KEY,
 	FINISH,
 }
 
@@ -191,7 +192,11 @@ export function NewPasswordModal({ faucetType, bonus, wallet, account, remoteKey
 
 		let tempLocalKey;
 		try {
-			tempLocalKey = await wallet.constructLocalKey(account, password);
+			if (!forceNew && freshestKey && freshestKey.key.keyVersion === 1) {
+				tempLocalKey = await wallet.constructLocalKeyV1(account, password);
+			} else {
+				tempLocalKey = await wallet.constructLocalKeyV2(account, password);
+			}
 		} catch (err) {
 			console.log('createLocalKey ', err);
 			setStep(Step.ENTER_PASSWORD);
@@ -213,7 +218,11 @@ export function NewPasswordModal({ faucetType, bonus, wallet, account, remoteKey
 		} else if (isBytesEqual(freshestKey.key.publicKey.bytes, tempLocalKey.publicKey)) {
 			await wallet.instantiateNewAccount(account, tempLocalKey);
 			analytics.walletConnected(wallet.factory.wallet, account.address, domain.accounts.accounts.length);
+			// if (freshestKey.key.keyVersion === 1) {
+			// 	setStep(Step.OLD_KEY);
+			// } else {
 			setStep(Step.FINISH);
+			// }
 		} else if (forceNew) {
 			const domainAccount = await wallet.instantiateNewAccount(account, tempLocalKey);
 			setDomainAccount(domainAccount);
@@ -552,6 +561,21 @@ export function NewPasswordModal({ faucetType, bonus, wallet, account, remoteKey
 							</div>
 							<h3 className="wm-title">Publishing the key</h3>
 							<h4 className="wm-subtitle">Please, wait for the transaction to be completed</h4>
+						</div>
+					</>
+				) : step === Step.OLD_KEY ? (
+					<>
+						<div className="wm-body centered">
+							<h3 className="wm-title">Your key is old</h3>
+							<h4 className="wm-subtitle">Create new one if you want to be modern!</h4>
+						</div>
+						<div className="wm-footer-vertical">
+							<YlideButton primary onClick={() => createLocalKey(password, true)}>
+								Create modern
+							</YlideButton>
+							<YlideButton nice onClick={() => setStep(Step.FINISH)}>
+								Skip for now
+							</YlideButton>
 						</div>
 					</>
 				) : step === Step.FINISH ? (
