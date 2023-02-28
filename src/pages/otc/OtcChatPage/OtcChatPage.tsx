@@ -12,7 +12,9 @@ import { NlToBr } from '../../../components/nlToBr/nlToBr';
 import { YlideLoader } from '../../../components/ylideLoader/ylideLoader';
 import { AdaptiveAddress } from '../../../controls/adaptiveAddress/adaptiveAddress';
 import { ReactComponent as ContactSvg } from '../../../icons/ic20/contact.svg';
+import { IMessageDecodedContent } from '../../../indexedDB/MessagesDB';
 import domain from '../../../stores/Domain';
+import { decodeMessage } from '../../../stores/MailList';
 import { globalOutgoingMailData } from '../../../stores/outgoingMailData';
 import { invariant } from '../../../utils/invariant';
 import { useAutoSizeTextArea } from '../../../utils/useAutoSizeTextArea';
@@ -20,8 +22,12 @@ import { OtcLayout } from '../components/otcLayout/otcLayout';
 import css from './OtcChatPage.module.scss';
 import { TradingForm, TradingFormData } from './tradingForm/tradingForm';
 
+interface ChatData extends OtcApi.IThreadResponse {
+	decodedMessagesById: Record<string, IMessageDecodedContent>;
+}
+
 interface ChatProps {
-	data: OtcApi.IThreadResponse;
+	data: ChatData;
 }
 
 export function Chat({ data }: ChatProps) {
@@ -30,12 +36,14 @@ export function Chat({ data }: ChatProps) {
 			{data.entries.map(entry => {
 				invariant(entry.type === 'message');
 
+				const decoded = data.decodedMessagesById[entry.id] || undefined;
+
 				return (
 					<div
 						key={entry.id}
 						className={clsx(css.message, entry.isIncoming ? css.message_in : css.message_out)}
 					>
-						<NlToBr text={entry.msg} />
+						<NlToBr text={decoded?.decodedTextData || '[Encrypted]'} />
 					</div>
 				);
 			})}
@@ -60,9 +68,29 @@ export const OtcChatPage = observer(() => {
 
 	const [myAccount, setMyAccount] = useState(domain.accounts.activeAccounts[0]);
 
-	const { isError, data } = useQuery(['otc', 'chat', myAccount.account.address, address], () =>
-		OtcApi.loadOtcThread({ myAddress: myAccount.account.address, recipientAddress: address }),
-	);
+	const { isError, data } = useQuery(['otc', 'chat', myAccount.account.address, address], async () => {
+		const thread = await OtcApi.loadOtcThread({ myAddress: myAccount.account.address, recipientAddress: address });
+
+		const decodedMessages = await Promise.all(
+			thread.entries
+				.filter(entry => entry.type === 'message')
+				.map(entry => {
+					invariant(entry.type === 'message');
+					return decodeMessage(entry.id, entry.msg, myAccount.account);
+				}),
+		);
+
+		return {
+			...thread,
+			decodedMessagesById: decodedMessages.reduce(
+				(p, c) => ({
+					...p,
+					[c.msgId]: c,
+				}),
+				{},
+			),
+		} as ChatData;
+	});
 
 	const contentRef = useRef<HTMLDivElement>(null);
 
