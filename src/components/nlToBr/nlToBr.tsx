@@ -1,13 +1,13 @@
 import React, { ReactNode } from 'react';
 
 interface NlToBrProps {
-	children: string;
+	text: string;
 }
 
-export function NlToBr({ children }: NlToBrProps) {
+export function NlToBr({ text }: NlToBrProps) {
 	return (
 		<>
-			{children.split('\n').reduce((prev, curr, i) => {
+			{text.split('\n').reduce((prev, curr, i) => {
 				if (prev.length) {
 					prev.push(<br key={i} />);
 				}

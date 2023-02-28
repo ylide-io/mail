@@ -35,7 +35,7 @@ export function Chat({ data }: ChatProps) {
 						key={entry.id}
 						className={clsx(css.message, entry.isIncoming ? css.message_in : css.message_out)}
 					>
-						<NlToBr>{entry.msg}</NlToBr>
+						<NlToBr text={entry.msg} />
 					</div>
 				);
 			})}
