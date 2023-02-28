@@ -38,7 +38,9 @@ const MailboxListRow: React.FC<MailboxListRowProps> = observer(
 
 		const messageClickHandler = async () => {
 			if (decoded) {
-				navigate(generatePath(RoutePath.MAIL_DETAILS, { folderId: folderId!, id: message.id }));
+				navigate(
+					generatePath(RoutePath.MAIL_DETAILS, { folderId: folderId!, id: encodeURIComponent(message.id) }),
+				);
 			} else {
 				setLoading(true);
 				try {
