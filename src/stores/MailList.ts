@@ -2,7 +2,6 @@ import {
 	AbstractBlockchainController,
 	BlockchainSourceType,
 	IMessage,
-	IMessageContent,
 	IMessageWithSource,
 	ISourceWithMeta,
 	ListSourceDrainer,
@@ -21,6 +20,7 @@ import contacts from './Contacts';
 import domain from './Domain';
 import { DomainAccount } from './models/DomainAccount';
 import tags from './Tags';
+import { invariant } from '../utils/invariant';
 
 export enum FolderId {
 	Inbox = 'inbox',
@@ -248,7 +248,6 @@ interface MailStore {
 
 	saveDecodedMessages: boolean;
 	setSaveDecodedSetting: (flag: boolean) => Promise<void>;
-	messagesContentById: Record<string, IMessageContent>;
 	decodedMessagesById: Record<string, IMessageDecodedContent>;
 	decodeMessage: (pushMsg: ILinkedMessage) => Promise<IMessageDecodedContent>;
 
@@ -318,7 +317,6 @@ export const useMailStore = create<MailStore>((set, get) => ({
 			await messagesDB.clearAllDecodedMessages();
 		}
 	},
-	messagesContentById: {},
 	decodedMessagesById: {},
 	decodeMessage: async pushMsg => {
 		const state = get();
@@ -329,27 +327,11 @@ export const useMailStore = create<MailStore>((set, get) => ({
 			return state.decodedMessagesById[pushMsg.msgId];
 		}
 
-		async function fetchMessageContent(pushMsg: ILinkedMessage) {
-			if (state.messagesContentById[pushMsg.msgId]) {
-				return state.messagesContentById[pushMsg.msgId];
-			}
-
-			// { $$meta: IEVMEnrichedEvent<GenericMessageContentEventObject> }
-
-			const content = await domain.ylide.core.getMessageContent(pushMsg.msg);
-			if (!content || content.corrupted) {
-				throw new Error('Content is not available or corrupted');
-			}
-
-			state.messagesContentById[pushMsg.msgId] = content;
-
-			return content;
-		}
-
-		const content = await fetchMessageContent(pushMsg);
+		const content = await domain.ylide.core.getMessageContent(pushMsg.msg);
+		invariant(content && !content.corrupted, 'Content is not available or corrupted')
 
 		const result = pushMsg.msg.isBroadcast
-			? await domain.ylide.core.decryptBroadcastContent(pushMsg.msg, content)
+			? domain.ylide.core.decryptBroadcastContent(pushMsg.msg, content)
 			: await domain.ylide.core.decryptMessageContent(pushMsg.recipient!.account, pushMsg.msg, content);
 
 		const decodedMessage = {
