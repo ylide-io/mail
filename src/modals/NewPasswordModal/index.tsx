@@ -263,6 +263,7 @@ export function NewPasswordModal({ faucetType, bonus, wallet, account, remoteKey
 				{step === Step.ENTER_PASSWORD ? (
 					<>
 						<h3 className="wm-title">{freshestKey ? `Enter password` : `Create password`}</h3>
+
 						<h4 className="wm-subtitle">
 							{freshestKey ? (
 								<>
@@ -274,7 +275,28 @@ export function NewPasswordModal({ faucetType, bonus, wallet, account, remoteKey
 								`This password will be used to encrypt and decrypt your mails.`
 							)}
 						</h4>
+
 						{freshestKey ? (
+							<div className="wm-body centered" style={{ padding: '0 20px' }}>
+								<TextField
+									look={TextFieldLook.PROMO}
+									autoFocus
+									value={password}
+									onValueChange={setPassword}
+									type="password"
+									placeholder="Enter your Ylide password"
+								/>
+
+								<div
+									style={{
+										marginTop: 8,
+										textAlign: 'right',
+									}}
+								>
+									<button onClick={() => setForgotPassword(true)}>Forgot Password?</button>
+								</div>
+							</div>
+						) : (
 							<div className="wm-body">
 								<form
 									name="sign-up"
@@ -306,27 +328,8 @@ export function NewPasswordModal({ faucetType, bonus, wallet, account, remoteKey
 								</form>
 								<div className="ylide-callout">{calloutSvg}</div>
 							</div>
-						) : (
-							<div className="wm-body centered" style={{ padding: '0 20px' }}>
-								<TextField
-									look={TextFieldLook.PROMO}
-									autoFocus
-									value={password}
-									onValueChange={setPassword}
-									type="password"
-									placeholder="Enter your Ylide password"
-								/>
-
-								<div
-									style={{
-										marginTop: 8,
-										textAlign: 'right',
-									}}
-								>
-									<button onClick={() => setForgotPassword(true)}>Forgot Password?</button>
-								</div>
-							</div>
 						)}
+
 						<div className="wm-footer">
 							<YlideButton
 								ghost
