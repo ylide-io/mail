@@ -120,8 +120,6 @@ export class Domain {
 			loading: true,
 		};
 
-	otc = new OTCStore(this);
-
 	constructor() {
 		makeObservable(this);
 
