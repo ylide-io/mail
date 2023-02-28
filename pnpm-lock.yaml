@@ -23,9 +23,9 @@ specifiers:
   '@walletconnect/qrcode-modal': ^1.8.0
   '@walletconnect/types': ^1.8.0
   '@walletconnect/web3-provider': ^1.8.0
-  '@ylide/ethereum': 0.8.0-beta.1
-  '@ylide/everscale': 0.8.0-beta.1
-  '@ylide/sdk': 0.8.0-beta.1
+  '@ylide/ethereum': 0.8.0-beta.2
+  '@ylide/everscale': 0.8.0-beta.2
+  '@ylide/sdk': 0.8.0-beta.2
   '@ylide/smart-buffer': 0.0.11
   antd: ^4.21.5
   assert: ^2.0.0
@@ -93,9 +93,9 @@ dependencies:
   '@walletconnect/qrcode-modal': 1.8.0
   '@walletconnect/types': 1.8.0
   '@walletconnect/web3-provider': 1.8.0
-  '@ylide/ethereum': 0.8.0-beta.1
-  '@ylide/everscale': 0.8.0-beta.1
-  '@ylide/sdk': 0.8.0-beta.1
+  '@ylide/ethereum': 0.8.0-beta.2
+  '@ylide/everscale': 0.8.0-beta.2
+  '@ylide/sdk': 0.8.0-beta.2
   '@ylide/smart-buffer': 0.0.11
   antd: 4.24.5_sfoxds7t5ydpegc3knd667wn6m
   clsx: 1.2.1
@@ -4086,14 +4086,14 @@ packages:
       - utf-8-validate
     dev: false
 
-  /@ylide/ethereum/0.8.0-beta.1:
-    resolution: {integrity: sha512-bdaRNesqryIiTD6ft14NKVP+ULwqZPTWhAXVq/Y4z/w6t0bSmTLkaTQJReKj3dqeC34kRqxm+18JC/tL/zSq8Q==}
+  /@ylide/ethereum/0.8.0-beta.2:
+    resolution: {integrity: sha512-qvPPUAp582UrVgYbYZb4mldDaFyv9Og9KgYI0BFV9QeeVff9SQPnVK+c0MfkVZljxxW/EJWv0U/F0yNZkLbSsA==}
     dependencies:
       '@ethersproject/abi': 5.7.0
       '@ethersproject/abstract-provider': 5.7.0
       '@ethersproject/providers': 5.7.2
       '@ylide/ethereum-contracts': 0.8.0-beta.0
-      '@ylide/sdk': 0.8.0-beta.1
+      '@ylide/sdk': 0.8.0-beta.2
       '@ylide/smart-buffer': 0.0.11
       ethers: 5.7.2
       eventemitter3: 5.0.0
@@ -4103,10 +4103,10 @@ packages:
       - utf-8-validate
     dev: false
 
-  /@ylide/everscale/0.8.0-beta.1:
-    resolution: {integrity: sha512-aJJy7+jP0ENQgC2fwXp3x+QWr8OCVnYGws7MYNy/7TBtudyT+Z62hhsnlEUVsW7Fs2zEpScLqKR8ZBXnHyXwWw==}
+  /@ylide/everscale/0.8.0-beta.2:
+    resolution: {integrity: sha512-MwUm4MdxYN4V9/XQYUKKfbsD0BBx3u7OhQsbq7kmYCHHijafPvjRSx/2iWs85A4yyMOs2Pl5E++94JBVjnTvTA==}
     dependencies:
-      '@ylide/sdk': 0.8.0-beta.1
+      '@ylide/sdk': 0.8.0-beta.2
       '@ylide/smart-buffer': 0.0.11
       chacha: 2.1.0
       everscale-inpage-provider: 0.3.52
@@ -4118,8 +4118,8 @@ packages:
       - encoding
     dev: false
 
-  /@ylide/sdk/0.8.0-beta.1:
-    resolution: {integrity: sha512-jCuLM5PhMXHOgfeAj5W9wUnvieKUm90X6gwxbOnF5l/qe81wTetHWK7/FVthVjQoyiW/L0ZpShQh1VI5E2jAAw==}
+  /@ylide/sdk/0.8.0-beta.2:
+    resolution: {integrity: sha512-jS9cCmCQWWNN/cKZ3FYheJxWfiy1GGcsKzXjs8eB8LMVGQho7iiYJk+1mAACDZHz9TswfGf36Jud74pSB6hIag==}
     dependencies:
       '@datastructures-js/binary-search-tree': 5.2.0
       '@datastructures-js/linked-list': 5.2.5
