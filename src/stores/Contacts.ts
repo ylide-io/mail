@@ -1,7 +1,8 @@
-import { IContact } from './models/IContact';
-import contactsDB from '../indexedDB/ContactsDB';
-import { makeAutoObservable } from 'mobx';
 import fuzzysort from 'fuzzysort';
+import { makeAutoObservable } from 'mobx';
+
+import contactsDB from '../indexedDB/ContactsDB';
+import { IContact } from './models/IContact';
 import { ITag } from './models/ITag';
 
 class Contacts {

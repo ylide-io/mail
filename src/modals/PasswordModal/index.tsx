@@ -1,7 +1,8 @@
-import { PureComponent } from 'react';
-import { observer } from 'mobx-react';
 import { makeObservable, observable } from 'mobx';
+import { observer } from 'mobx-react';
+import { PureComponent } from 'react';
 
+import { TextField } from '../../components/textField/textField';
 import modals from '../../stores/Modals';
 import YlideModal from '../YlideModal';
 
@@ -121,31 +122,24 @@ export default class PasswordModal extends PureComponent<PasswordModalProps> {
 						<form
 							name="sign-up"
 							style={{
-								display: 'flex',
-								flexDirection: 'column',
-								alignItems: 'stretch',
-								justifyContent: 'flex-start',
+								display: 'grid',
+								gridGap: 12,
+								padding: '20px 16px 8px',
 							}}
 							action="/"
 							method="POST"
 							noValidate
 						>
-							<input
-								className="ylide-input ylide-password-input"
+							<TextField
 								type="password"
 								autoComplete="new-password"
-								name="password"
-								id="password"
 								placeholder="Enter Ylide password"
 								value={this.value}
 								onChange={e => (this.value = e.target.value)}
 							/>
-							<input
-								className="ylide-input ylide-password-input"
+							<TextField
 								type="password"
 								autoComplete="new-password"
-								name="repeat-password"
-								id="repeat-password"
 								placeholder="Repeat your password"
 								value={this.passwordRepeat}
 								onChange={e => (this.passwordRepeat = e.target.value)}
@@ -154,25 +148,13 @@ export default class PasswordModal extends PureComponent<PasswordModalProps> {
 					</>
 				) : (
 					<>
-						<input
-							style={{
-								fontFamily: 'Lexend',
-								fontSize: 16,
-								borderRadius: 40,
-								height: 36,
-								border: '1px solid #000000',
-								padding: '5px 10px',
-								marginLeft: 20,
-								marginRight: 20,
-								marginTop: 20,
-								marginBottom: 20,
-							}}
+						<TextField
 							value={this.value}
 							onChange={e => (this.value = e.target.value)}
 							type="password"
 							placeholder="Enter your Ylide password"
 						/>
-						<div style={{ textAlign: 'right', marginTop: -10, marginRight: 25 }}>
+						<div style={{ textAlign: 'right', marginTop: 8, marginRight: 8 }}>
 							<a
 								href="#forgot"
 								onClick={() => {

@@ -1,8 +1,9 @@
-import React, { useEffect } from 'react';
-import tags from '../../../../stores/Tags';
 import { observer } from 'mobx-react';
-import TagsListItem from './TagsListItem';
+import React, { useEffect } from 'react';
+
+import tags from '../../../../stores/Tags';
 import TagsEmpty from './TagsEmpty';
+import TagsListItem from './TagsListItem';
 
 const TagsList = observer(() => {
 	useEffect(() => {

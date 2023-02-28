@@ -1,82 +1,127 @@
-@mixin flex-row($align-items, $justify-content) {
-	display: flex;
-	flex-direction: row;
-	align-items: $align-items;
-	justify-content: $justify-content;
+:root {
+	--primary-text-color: #111;
+	--secondary-text-color: #888;
+
+	--surface-color: #fff;
+	--surface-hover-color: #eee;
+	--secondary-surface-color: #f8f8f8;
+	--tertiary-surface-color: #eee;
+	--error-surface-color: rgba(255, 68, 85, 0.2);
+	--success-surface-color: rgb(0, 187, 68, 0.18);
+	--inverted-surface-color: #111;
+	--on-inverted-surface-color: #fff;
+
+	--border-color: rgba(0, 0, 0, 0.15);
+	--border-lite-color: rgba(0, 0, 0, 0.1);
+	--border-heavy-color: rgba(0, 0, 0, 0.3);
+
+	--link-color: #19f;
+	--link-hover-color: #4bf;
+
+	--field-border-color: rgba(0, 0, 0, 0.15);
+	--field-focus-border-color: #4bf;
+	--field-error-border-color: #f45;
+
+	--selected-text-color: #19f;
+	--selected-background-color: #8cf;
+	--selected-light-background-color: #d1ecff;
+
+	--accent-color: #1ab394;
+	--accent-hover-color: #0f947a;
+	--accent2-color: #9747ff;
+	--accent2-hover-color: #7d2ce7;
+	--on-accent2-color: #fff;
+
+	--error-color: #f45;
+	--error-rgb-color: 255, 68, 85;
+	--success-color: #0b4;
+
+	--shade-color: #000;
+	--shade-rgb-color: 0, 0, 0;
+	--popup-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
 }
 
-@mixin flex-column($align-items, $justify-content) {
-	display: flex;
-	flex-direction: column;
-	align-items: $align-items;
-	justify-content: $justify-content;
-}
-
-@mixin less980px() {
-	@media (max-width: 980px) {
-		@content;
-	}
-}
-
-@mixin less920px() {
-	@media (max-width: 920px) {
-		@content;
-	}
-}
-
-@mixin less720px() {
-	@media (max-width: 720px) {
-		@content;
-	}
-}
-
-@mixin less630px() {
-	@media (max-width: 630px) {
-		@content;
-	}
-}
-
-@mixin less480px() {
-	@media (max-width: 480px) {
-		@content;
-	}
+body,
+input,
+textarea,
+select,
+button {
+	// 1.25 - default Figma line-height for Lexend font
+	font: 13px/1.25 $font-family_main;
+	color: var(--primary-text-color);
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
 }
 
 body {
+	@include flex-column(stretch, flex-start);
 	margin: 0;
-	font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans',
-		'Droid Sans', 'Helvetica Neue', sans-serif;
-	-webkit-font-smoothing: antialiased;
-	-moz-osx-font-smoothing: grayscale;
+	min-width: 100%;
+	min-height: 100vh;
+	overflow-x: hidden;
 
-	font-family: 'Open Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif;
-	background-image: url(../assets/img/background-desktop.svg);
+	// background-image: url(../assets/img/background-desktop.svg);
+	background: linear-gradient(0deg, #f7f7ee, #f7f7ee), #ffffff;
+	background-image: url(../assets/img/background-desktop-2.svg);
 	background-size: cover;
 	background-position: center;
 	background-attachment: fixed;
 	background-repeat: no-repeat;
-	font-size: 13px;
-	color: #111111;
-	overflow-x: hidden;
-
-	min-width: 100vw;
-	min-height: 100vh;
-
-	@include flex-column(stretch, flex-start);
 }
 
-#root {
-	@include flex-column(stretch, flex-start);
+label {
+	cursor: pointer;
+}
 
-	min-width: 100vw;
-	min-height: 100vh;
+input,
+button {
+	appearance: none;
+	padding: 0;
+	background: none;
+	border: 0;
+}
 
-	flex-grow: 1;
-	flex-shrink: 1;
+input:focus,
+button:focus {
+	outline: none;
+}
+
+::placeholder {
+	color: var(--secondary-text-color);
+}
+
+button,
+[type='button'],
+[type='reset'],
+[type='submit'] {
+	cursor: pointer;
+}
+
+b,
+strong {
+	font-weight: bolder;
 }
 
 code {
-	font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace;
+	font-family: $font-family_code;
+}
+
+svg {
+	display: block;
+}
+
+hr {
+	margin: 0;
+	width: 100%;
+	border: solid var(--border-color);
+	border-width: 0 0 1px;
+}
+
+//
+
+#root {
+	min-width: 100%;
+	min-height: 100vh;
 }
 
 body.modal-body-catch {

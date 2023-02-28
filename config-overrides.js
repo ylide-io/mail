@@ -14,7 +14,7 @@ module.exports = function override(config) {
 	});
 	config.resolve.fallback = fallback;
 	config.plugins = (config.plugins || []).concat([
-		new BundleAnalyzerPlugin(),
+		// new BundleAnalyzerPlugin(),
 		new webpack.ProvidePlugin({
 			process: 'process/browser',
 			Buffer: ['buffer', 'Buffer'],
@@ -24,6 +24,20 @@ module.exports = function override(config) {
 		test: /\.(js|mjs|jsx|ts|tsx)$/,
 		use: ['source-map-loader'],
 		enforce: 'pre',
+	});
+	config.module.rules.push({
+		test: /\.(css|scss|sass)$/,
+		use: [
+			{
+				loader: 'sass-loader',
+				options: {
+					additionalData: "@import 'mixins.scss';",
+					sassOptions: {
+						includePaths: ['src/styles'],
+					},
+				},
+			},
+		],
 	});
 	// config.target.target = 'es2022';
 	return config;

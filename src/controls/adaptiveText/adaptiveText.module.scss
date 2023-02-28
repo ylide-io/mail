@@ -1,0 +1,25 @@
+.root {
+	position: relative;
+	overflow: hidden;
+
+	&.textAlignLeft {
+		.visible {
+			left: 0;
+		}
+	}
+
+	&.textAlignRight {
+		.visible {
+			right: 0;
+		}
+	}
+}
+
+.invisible {
+	visibility: hidden;
+}
+
+.visible {
+	position: absolute;
+	top: 0;
+}

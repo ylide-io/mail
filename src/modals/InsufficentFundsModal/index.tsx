@@ -1,11 +1,12 @@
-import { observer } from 'mobx-react';
-import { PureComponent } from 'react';
-import modals from '../../stores/Modals';
 import { autobind } from 'core-decorators';
 import { makeObservable, observable } from 'mobx';
+import { observer } from 'mobx-react';
+import { PureComponent } from 'react';
+
+import domain from '../../stores/Domain';
+import modals from '../../stores/Modals';
 import { DomainAccount } from '../../stores/models/DomainAccount';
 import YlideModal from '../YlideModal';
-import domain from '../../stores/Domain';
 
 export interface InsufficentFundsModalProps {
 	account: DomainAccount;

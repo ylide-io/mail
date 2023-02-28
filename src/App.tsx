@@ -1,33 +1,53 @@
-import React, { useEffect } from 'react';
 import { observer } from 'mobx-react';
-import { Navigate, Route, Routes, useLocation } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
+import { QueryClient, QueryClientProvider } from 'react-query';
+import { generatePath, Navigate, Route, Routes, useLocation } from 'react-router-dom';
 
-import domain from './stores/Domain';
-
-import ComposePage from './pages/ComposePage/ComposePage';
-import MailboxPage from './pages/MailboxPage/MailboxPage';
-import MailDetail from './pages/MailDetail';
-import ContactsPage from './pages/ContactsPage/ContactsPage';
-import SettingsPage from './pages/SettingsPage/SettingsPage';
-import ContactsTab from './pages/ContactsPage/components/Contacts/ContactsTab';
-import TagsTab from './pages/ContactsPage/components/Tags/TagsTab';
-import FirstTimePage from './pages/FirstTimePage/FirstTimePage';
-import ConnectWalletsPage from './pages/ConnectWalletsPage/ConnectWalletsPage';
-
-import modals from './stores/Modals';
-import { Loader } from './controls/Loader';
+import { PopupManager } from './components/popup/popupManager/popupManager';
+import { StaticComponentManager } from './components/staticComponentManager/staticComponentManager';
+import { YlideLoader } from './components/ylideLoader/ylideLoader';
 import { AdminPage } from './pages/AdminPage';
-import TestPage from './pages/TestPage/TestPage';
+import { ComposePage } from './pages/ComposePage/ComposePage';
+import { ContactsTab } from './pages/ContactsPage/components/Contacts/ContactsTab';
+import { TagsTab } from './pages/ContactsPage/components/Tags/TagsTab';
+import { ContactsPage } from './pages/ContactsPage/ContactsPage';
+import { FeedPage } from './pages/FeedPage/FeedPage';
+import { FeedPostPage } from './pages/FeedPostPage/FeedPostPage';
+import { MailboxPage } from './pages/MailboxPage/MailboxPage';
+import { MailDetailsPage } from './pages/MailDetailsPage/MailDetailsPage';
+import { NewWalletsPage } from './pages/NewWalletsPage';
+import { SettingsPage } from './pages/SettingsPage/SettingsPage';
+import { TestPage } from './pages/TestPage/TestPage';
+import { analytics } from './stores/Analytics';
+import { browserStorage } from './stores/browserStorage';
+import domain from './stores/Domain';
+import { FolderId } from './stores/MailList';
+import modals from './stores/Modals';
+import { RoutePath } from './stores/routePath';
+import walletConnect from './stores/WalletConnect';
 
 const App = observer(() => {
+	const [queryClient] = useState(
+		new QueryClient({
+			defaultOptions: {
+				queries: {
+					cacheTime: 0,
+					retry: false,
+					refetchOnWindowFocus: false,
+				},
+			},
+		}),
+	);
+
 	const location = useLocation();
 
 	useEffect(() => {
 		if (location.pathname !== '/test') {
+			const start = Date.now();
 			domain
 				.init()
-				.catch(err => console.log('err: ', err))
-				.then(res => console.log('done'));
+				.catch(err => console.log('Initialization error: ', err))
+				.then(() => console.log(`Initialized in ${Date.now() - start}ms`));
 		}
 	}, [location.pathname]);
 
@@ -40,58 +60,83 @@ const App = observer(() => {
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [modals.anythingVisible]);
 
+	useEffect(() => {
+		if (domain.accounts.isFirstTime) {
+			walletConnect.load();
+		}
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [domain.accounts.isFirstTime]);
+
+	useEffect(() => {
+		analytics.pageView(location.pathname);
+	}, [location.pathname]);
+
 	if (location.pathname !== '/test' && !domain.initialized) {
 		return (
 			<div
 				style={{
 					display: 'flex',
 					flexDirection: 'column',
-					flexGrow: 1,
+					justifyContent: 'center',
+					paddingBottom: '10vh',
 					width: '100vw',
 					height: '100vh',
-					alignItems: 'stretch',
-					textAlign: 'center',
 				}}
 			>
-				<Loader reason="Loading your accounts data from blockchain..." />
+				<YlideLoader reason="Loading your account data from blockchain ..." />
 			</div>
 		);
 	}
 
 	if (
-		location.pathname !== '/test' &&
 		domain.accounts.isFirstTime &&
-		location.pathname !== '/first-time' &&
+		location.pathname !== '/test' &&
+		location.pathname !== '/wallets' &&
 		location.pathname !== '/admin' &&
-		location.pathname !== '/connect-wallets'
+		(!location.pathname.startsWith('/feed/') || !browserStorage.canSkipRegistration)
 	) {
-		return <Navigate to="/first-time" state={{ from: location }} replace />;
+		return <Navigate to={`/wallets${location.search ? location.search : ''}`} state={{ from: location }} replace />;
 	}
 
 	return (
-		<>
-			<Routes>
-				<>
-					<Route path={'/'} element={<Navigate replace to="/inbox" />} />
-					<Route path={'/test'} element={<TestPage />} />
-					<Route path={'/first-time'} element={<FirstTimePage />} />
-					<Route path={'/connect-wallets'} element={<ConnectWalletsPage />} />
-					<Route path={'/compose'} element={<ComposePage />} />
-					<Route path={'/contacts'} element={<ContactsPage />}>
-						<Route index element={<ContactsTab />} />
-					</Route>
-					<Route path={'/folders'} element={<ContactsPage />}>
-						<Route index element={<TagsTab />} />
-					</Route>
-					<Route path={'/settings'} element={<SettingsPage />} />
-					<Route path={'/admin'} element={<AdminPage />} />
-					<Route path={'/:folderId'} element={<MailboxPage />} />
-					<Route path={'/:folderId/:id'} element={<MailDetail />} />
-					<Route path={'/*'} element={<Navigate replace to="/inbox" />} />
-				</>
-			</Routes>
-			{modals.render()}
-		</>
+		<QueryClientProvider client={queryClient}>
+			<PopupManager>
+				<StaticComponentManager>
+					<Routes>
+						<Route path={RoutePath.TEST} element={<TestPage />} />
+						<Route path={RoutePath.WALLETS} element={<NewWalletsPage />} />
+						<Route path={RoutePath.SETTINGS} element={<SettingsPage />} />
+						<Route path={RoutePath.ADMIN} element={<AdminPage />} />
+
+						<Route path={RoutePath.FEED} element={<FeedPage />} />
+						<Route path={RoutePath.FEED_POST} element={<FeedPostPage />} />
+						<Route path={RoutePath.FEED_CATEGORY} element={<FeedPage />} />
+
+						<Route path={RoutePath.MAIL_COMPOSE} element={<ComposePage />} />
+						<Route path={RoutePath.MAIL_CONTACTS} element={<ContactsPage />}>
+							<Route index element={<ContactsTab />} />
+						</Route>
+						<Route path={RoutePath.MAIL_FOLDERS} element={<ContactsPage />}>
+							<Route index element={<TagsTab />} />
+						</Route>
+						<Route path={RoutePath.MAIL_FOLDER} element={<MailboxPage />} />
+						<Route path={RoutePath.MAIL_DETAILS} element={<MailDetailsPage />} />
+
+						<Route
+							path={RoutePath.ANY}
+							element={
+								<Navigate
+									replace
+									to={generatePath(RoutePath.MAIL_FOLDER, { folderId: FolderId.Inbox })}
+								/>
+							}
+						/>
+					</Routes>
+
+					{modals.render()}
+				</StaticComponentManager>
+			</PopupManager>
+		</QueryClientProvider>
 	);
 });
 

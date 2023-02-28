@@ -1,16 +1,18 @@
-import React, { PureComponent } from 'react';
-import { observer } from 'mobx-react';
-import contacts from '../../../../stores/Contacts';
-import cn from 'classnames';
+import { Select, Spin, Tag, Tooltip } from 'antd';
+import clsx from 'clsx';
+import { autobind } from 'core-decorators';
 // import { IContact } from '../../../../stores/models/IContact';
 // import CreatableSelect from 'react-select/creatable';
 // import mailbox from '../../../../stores/Mailbox';
 // import domain from '../../../../stores/Domain';
 import { makeObservable, observable } from 'mobx';
-import { Select, Spin, Tag, Tooltip } from 'antd';
-import { autobind } from 'core-decorators';
+import { observer } from 'mobx-react';
+import React, { PureComponent } from 'react';
+
+import { walletsMeta } from '../../../../constants';
+import contacts from '../../../../stores/Contacts';
 import domain from '../../../../stores/Domain';
-import mailbox from '../../../../stores/Mailbox';
+import { globalOutgoingMailData } from '../../../../stores/outgoingMailData';
 
 export interface IRecipient {
 	loading: boolean;
@@ -135,7 +137,7 @@ export class Recipients extends PureComponent {
 		}
 		this.updateOptions();
 		// @ts-ignore
-		mailbox.recipients = this.recipients.filter(r => !!r.address).map(r => r.address);
+		globalOutgoingMailData.recipients = this.recipients.filter(r => !!r.address).map(r => r.address);
 	}
 
 	@autobind
@@ -154,8 +156,7 @@ export class Recipients extends PureComponent {
 						<Select style={{ width: '100%' }} value={'0'}>
 							{domain.accounts.activeAccounts.map((acc, idx) => (
 								<Select.Option value={String(idx)}>
-									{acc.account.address} [
-									{acc.wallet.factory.wallet === 'metamask' ? 'MetaMask' : 'EverWallet'}]
+									{acc.account.address} [{walletsMeta[acc.wallet.wallet].title}]
 								</Select.Option>
 							))}
 						</Select>
@@ -169,7 +170,7 @@ export class Recipients extends PureComponent {
 								const rec = this.recipients.find(r => r.input === props.value);
 								const content = (
 									<Tag
-										className={cn('recipient-tag', {
+										className={clsx('recipient-tag', {
 											'achievable': rec?.isAchievable === true,
 											'not-achievable': rec?.isAchievable === false,
 										})}

@@ -1,6 +1,7 @@
 import { IGenericAccount, YlideKey, YlideKeyStoreEvent } from '@ylide/sdk';
 import { autobind } from 'core-decorators';
 import { computed, makeObservable, observable } from 'mobx';
+
 import { Domain } from './Domain';
 import { DomainAccount } from './models/DomainAccount';
 

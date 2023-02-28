@@ -1,0 +1,29 @@
+.button {
+	display: grid;
+	grid-template-columns: 1fr auto;
+	align-items: center;
+	padding: 0 5px 0 7px;
+	width: 100%;
+	height: $interactive-elem-size;
+	text-align: left;
+	border: 1px solid var(--border-color);
+	border-radius: 4px;
+}
+
+.button:focus {
+	border-color: var(--field-focus-border-color);
+}
+
+.buttonText {
+	@include truncate-text;
+}
+
+.buttonArrow {
+	width: 20px;
+	height: 20px;
+	fill: var(--secondary-text-color);
+}
+
+.dropDown {
+	position: fixed;
+}

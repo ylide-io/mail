@@ -1,0 +1,86 @@
+.layout {
+	padding: 0 !important;
+}
+
+.root {
+	flex-grow: 1;
+	display: flex;
+	flex-direction: column;
+}
+
+.header {
+	display: grid;
+	grid-auto-flow: column;
+	grid-gap: 8px;
+	align-items: center;
+	justify-content: space-between;
+	padding: 0 12px;
+	height: 52px;
+	background: var(--secondary-surface-color);
+	border-radius: 10px 10px 0 0;
+}
+
+.headerSpinner {
+	margin: 0 4px 0 0;
+}
+
+.messagesFrom {
+	display: grid;
+	grid-template-columns: auto 1fr;
+	grid-gap: 4px;
+	align-items: center;
+	white-space: nowrap;
+}
+
+.messagesFromLebel {
+	color: var(--secondary-text-color);
+}
+
+.messageWrapper {
+	flex-grow: 1;
+	flex-basis: 0;
+	padding: 0 0 48px;
+	overflow-y: auto;
+}
+
+.messageThreadItem {
+	padding: 0 0 24px;
+	border-bottom: 1px solid var(--border-color);
+
+	&:last-child {
+		border: 0;
+	}
+
+	@include less720px {
+		&:last-child {
+			padding-bottom: 32px;
+		}
+	}
+}
+
+.deletedPlaceholder {
+	display: grid;
+	grid-template-columns: auto 1fr;
+	align-items: center;
+	grid-gap: 8px;
+	padding: 24px 24px 0 88px;
+	color: var(--secondary-text-color);
+
+	@include less720px {
+		padding-left: 24px;
+	}
+}
+
+.footer {
+	display: grid;
+	grid-auto-flow: column;
+	grid-gap: 8px;
+	align-items: center;
+	justify-content: end;
+	padding: 20px;
+	border-top: 1px solid var(--border-color);
+
+	@include less720px {
+		display: none;
+	}
+}

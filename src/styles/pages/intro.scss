@@ -1,21 +1,72 @@
 .intro-page {
-	@include flex-column(center, flex-start);
+	@include flex-column(stretch, flex-start);
 
-	padding-top: 5%;
-	height: 100vh;
 	width: 100vw;
-	flex-grow: 1;
+	min-height: 100%;
 	position: relative;
+
+	background-color: #fff;
+}
+
+.intro-header {
+	@include flex-row(center, flex-start);
+
+	border-bottom: 1px solid #d3d4db;
+	height: 64px;
+	flex-basis: 64px;
+	flex-grow: 0;
+	flex-shrink: 0;
+
+	padding-left: 16px;
+	padding-right: 16px;
+
+	margin-bottom: 60px;
+}
+
+.intro-body {
+	@include flex-column(center, flex-start);
+}
+
+.intro-main-title {
+	font-family: $font-family_wide;
+	font-style: normal;
+	font-weight: 400;
+	font-size: 44px;
+	line-height: 130%;
+	/* or 57px */
+
+	text-align: center;
+	letter-spacing: -0.09em;
+
+	color: #202020;
+
+	margin-bottom: 20px;
+}
+
+.intro-main-subtitle {
+	font-style: normal;
+	font-weight: 300;
+	font-size: 20px;
+	line-height: 28px;
+	/* or 140% */
+
+	text-align: center;
+
+	color: #000000;
+
+	max-width: 762px;
 }
 
 .intro-inner-block {
 	@include flex-column(center, flex-start);
 
+	align-self: center;
+	padding-top: 5%;
 	width: 350px;
 }
 
 .intro-title {
-	font-family: Lexend Exa;
+	font-family: $font-family_wide;
 	letter-spacing: -0.06em;
 	font-weight: 400;
 	text-align: center;
@@ -24,7 +75,6 @@
 }
 
 .intro-subtitle {
-	font-family: Lexend;
 	font-weight: 300;
 	text-align: center;
 	font-size: 16px;
@@ -43,4 +93,177 @@
 		margin-left: 10px;
 		margin-right: 10px;
 	}
+}
+
+.connected-wallets {
+	@include flex-row(center, center);
+
+	flex-wrap: wrap;
+
+	margin-top: 40px;
+
+	.cw-block {
+		@include flex-column(center, center);
+		width: 260px;
+		height: 120px;
+
+		margin-bottom: 15px;
+
+		position: relative;
+
+		border: 1px solid #000000;
+		border-radius: 22px;
+
+		margin-left: 20px;
+		margin-right: 20px;
+
+		@include less480px {
+			width: 180px;
+
+			margin-left: 6px;
+			margin-right: 6px;
+		}
+
+		&.notActive {
+			background-color: rgba(255, 0, 0, 0.03);
+			.cw-logo {
+				margin-bottom: 0px;
+			}
+
+			.ylide-button {
+				margin-top: 4px;
+				background-color: white;
+				line-height: 110%;
+				&:hover {
+					color: black;
+				}
+			}
+		}
+
+		&.emphaized {
+			background: var(--accent2-color);
+			border: 1px dashed white;
+			color: white;
+			cursor: pointer;
+
+			.cw-title {
+				@include flex-row(center, flex-start);
+
+				color: white;
+				font-style: normal;
+				font-weight: 400;
+				font-size: 16px;
+				line-height: 24px;
+			}
+
+			&:hover {
+				background: var(--accent2-hover-color);
+			}
+		}
+
+		.cw-logo {
+			@include flex-row(center, center);
+			width: 32px;
+			height: 32px;
+			position: relative;
+
+			margin-bottom: 10px;
+
+			.cw-blockchain {
+				@include flex-row(center, center);
+
+				width: 22px;
+				height: 22px;
+				flex-basis: 22px;
+				flex-grow: 0;
+				flex-shrink: 0;
+				border-radius: 11px;
+				border: 1px solid black;
+
+				position: absolute;
+				right: -10px;
+				bottom: -10px;
+
+				background-color: white;
+			}
+		}
+
+		.cw-title {
+			font-style: normal;
+			font-weight: 400;
+			font-size: 16px;
+			line-height: 24px;
+			text-align: center;
+
+			margin-bottom: 1px;
+
+			color: #000000;
+		}
+
+		.cw-subtitle {
+			max-width: 120px;
+			font-style: normal;
+			font-weight: 300;
+			font-size: 14px;
+			text-align: center;
+			color: var(--secondary-text-color);
+		}
+
+		.cw-delete {
+			@include flex-row(center, center);
+
+			position: absolute;
+			right: -5px;
+			top: -5px;
+			width: 20px;
+			height: 20px;
+			color: #fff;
+			border-radius: 10px;
+			background-color: black;
+			cursor: pointer;
+			&:hover {
+				background-color: #404040;
+			}
+		}
+	}
+}
+
+.intro-wallets-subtitle {
+	font-family: $font-family_wide;
+	font-style: normal;
+	font-weight: 400;
+	font-size: 32px;
+	line-height: 40px;
+	text-align: center;
+	letter-spacing: -0.09em;
+	margin-top: 40px;
+	margin-bottom: 30px;
+
+	color: #202020;
+}
+
+.intro-blockchains-list {
+	@include flex-row(center, center);
+	flex-wrap: wrap;
+	padding: 0 30px;
+	margin-bottom: 100px;
+
+	.bc-block {
+		display: grid;
+		justify-items: center;
+		grid-gap: 8px;
+		width: 140px;
+		padding: 20px;
+	}
+}
+
+.overall {
+	@include flex-column(center, center);
+	background-color: var(--inverted-surface-color);
+	color: var(--on-inverted-surface-color);
+	font-size: 18px;
+	text-align: center;
+	padding: 20px;
+	line-height: 140%;
+	border-radius: 10px;
 }

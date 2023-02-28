@@ -1,50 +1,55 @@
-import React from 'react';
-import GenericLayout from '../../layouts/GenericLayout';
-import { smallButtonColors, smallButtonIcons } from '../../components/smallButton/smallButton';
-import { useNav } from '../../utils/navigate';
-import mailer from '../../stores/Mailer';
 import { observer } from 'mobx-react';
-import mailList from '../../stores/MailList';
-import { OverlappingLoader } from '../../controls/OverlappingLoader';
-import { Button } from 'antd';
-import ComposeMailFooter from './components/Mailbox/ComposeMailFooter';
-import ComposeMailBody from './components/Mailbox/ComposeMailBody';
-import { MailComposeMeta } from './components/MailComposeMeta';
+import React, { useEffect } from 'react';
+import { generatePath } from 'react-router-dom';
 
-const ComposePage = observer(() => {
+import { ActionButton, ActionButtonLook } from '../../components/ActionButton/ActionButton';
+import { ComposeMailForm } from '../../components/composeMailForm/composeMailForm';
+import { GenericLayout } from '../../components/genericLayout/genericLayout';
+import { OverlappingLoader } from '../../components/overlappingLoader/overlappingLoader';
+import { ReactComponent as CrossSvg } from '../../icons/ic20/cross.svg';
+import { analytics } from '../../stores/Analytics';
+import mailer from '../../stores/Mailer';
+import { useMailStore } from '../../stores/MailList';
+import { globalOutgoingMailData } from '../../stores/outgoingMailData';
+import { RoutePath } from '../../stores/routePath';
+import { useNav } from '../../utils/navigate';
+import css from './ComposePage.module.scss';
+
+export const ComposePage = observer(() => {
 	const navigate = useNav();
+	const lastActiveFolderId = useMailStore(state => state.lastActiveFolderId);
+
+	useEffect(() => {
+		analytics.composeOpened();
+	}, []);
+
+	useEffect(() => () => globalOutgoingMailData.reset(), []);
 
 	return (
 		<GenericLayout>
-			<div className="mail-page animated fadeInRight">
-				<div className="mail-top compose-mail-top">
-					<div className="mail-header">
-						<h2 className="mailbox-title">Compose mail</h2>
-						<div className="mail-actions">
-							<Button
-								size="small"
-								type="dashed"
-								danger
-								onClick={() => {
-									navigate(`/${mailList.activeFolderId || 'inbox'}`);
-								}}
-								color={smallButtonColors.white}
-								icon={<i className={`fa ${smallButtonIcons.cross}`} />}
-							>
-								Discard
-							</Button>
-						</div>
-					</div>
-					<MailComposeMeta />
-				</div>
-				<div className="mail-body" style={{ position: 'relative' }}>
-					<ComposeMailBody />
-					<ComposeMailFooter />
-					{mailer.sending ? <OverlappingLoader text="Broadcasting your message to blockchain..." /> : null}
+			<div className={css.header}>
+				<div className={css.headerTitle}>Compose mail</div>
+
+				<div className={css.headerActions}>
+					<ActionButton
+						look={ActionButtonLook.DENGEROUS}
+						onClick={() => {
+							navigate(generatePath(RoutePath.MAIL_FOLDER, { folderId: lastActiveFolderId }));
+						}}
+						icon={<CrossSvg />}
+					>
+						Discard
+					</ActionButton>
 				</div>
 			</div>
+
+			<ComposeMailForm
+				className={css.form}
+				mailData={globalOutgoingMailData}
+				onSent={() => navigate(generatePath(RoutePath.MAIL_FOLDER, { folderId: lastActiveFolderId }))}
+			/>
+
+			{mailer.sending && <OverlappingLoader text="Broadcasting your message to blockchain..." />}
 		</GenericLayout>
 	);
 });
-
-export default ComposePage;

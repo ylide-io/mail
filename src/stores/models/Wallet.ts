@@ -1,17 +1,16 @@
-import { computed, makeObservable, observable } from 'mobx';
-import { autobind } from 'core-decorators';
-import EventEmitter from 'eventemitter3';
-
 import {
+	AbstractWalletController,
 	IGenericAccount,
 	WalletControllerFactory,
-	AbstractWalletController,
 	WalletEvent,
 	YlideKeyPair,
 } from '@ylide/sdk';
+import { autobind } from 'core-decorators';
+import EventEmitter from 'eventemitter3';
+import { computed, makeObservable, observable } from 'mobx';
+
 import { Domain } from '../Domain';
 import { DomainAccount } from './DomainAccount';
-import mailList from '../MailList';
 
 export class Wallet extends EventEmitter {
 	wallet: string;
@@ -26,15 +25,13 @@ export class Wallet extends EventEmitter {
 
 	constructor(
 		public readonly domain: Domain,
-		wallet: string,
 		factory: WalletControllerFactory,
 		controller: AbstractWalletController,
-		public readonly installLink: string,
 	) {
 		super();
 
 		makeObservable(this);
-		this.wallet = wallet;
+		this.wallet = factory.wallet;
 		this.factory = factory;
 		this.controller = controller;
 	}
@@ -111,7 +108,7 @@ export class Wallet extends EventEmitter {
 		return this.accounts.some(a => a.account.address === account.address);
 	}
 
-	async constructLocalKey(account: IGenericAccount, password: string) {
+	async constructLocalKeyV2(account: IGenericAccount, password: string) {
 		return await this.domain.keystore.constructKeypair(
 			'New account connection',
 			this.factory.blockchainGroup,
@@ -121,66 +118,23 @@ export class Wallet extends EventEmitter {
 		);
 	}
 
-	async readRemoteKeys(account: IGenericAccount) {
-		//
-		const blockchainGroup = this.factory.blockchainGroup;
-		const blockchainFactories = this.domain.registeredBlockchains.filter(
-			b => b.blockchainGroup === blockchainGroup,
+	async constructLocalKeyV1(account: IGenericAccount, password: string) {
+		return await this.domain.keystore.constructKeypairV1(
+			'New account connection',
+			this.factory.blockchainGroup,
+			this.factory.wallet,
+			account.address,
+			password,
 		);
-		const blockchains = blockchainFactories.map(factory => ({
-			factory,
-			controller: this.domain.blockchains[factory.blockchain],
-		}));
-		const rawKeysRequest = async () => {
-			let remoteKey: Uint8Array | null = null;
-			const remoteKeys: Record<string, Uint8Array> = {};
-			await Promise.all(
-				blockchains.map(async ({ factory, controller }) => {
-					try {
-						const key = (await controller.extractPublicKeyFromAddress(account.address))?.bytes || null;
-						if (key) {
-							remoteKeys[factory.blockchain] = key;
-							remoteKey = key;
-						}
-					} catch (err) {
-						// so sad :(
-					}
-				}),
-			);
-			return {
-				remoteKey,
-				remoteKeys,
-			};
+	}
+
+	async readRemoteKeys(account: IGenericAccount) {
+		const result = await this.domain.ylide.core.getAddressKeys(account.address);
+
+		return {
+			remoteKey: result.freshestKey,
+			remoteKeys: result.remoteKeys,
 		};
-		if (this.factory.blockchainGroup === 'evm') {
-			return await mailList.readingSession.indexerHub.retryingOperation(
-				async () => {
-					let remoteKey: Uint8Array | null = null;
-					const remoteKeys: Record<string, Uint8Array> = {};
-					const results = await mailList.readingSession.indexerHub.requestMultipleKeys([account.address]);
-					console.log('results: ', results);
-					const rawRemoteKeys = await mailList.readingSession.indexerHub.requestKeys(account.address);
-					const bcs = Object.keys(rawRemoteKeys);
-					let timestamp = -1;
-					for (const bc of bcs) {
-						remoteKeys[bc] = rawRemoteKeys[bc].publicKey;
-						if (timestamp === -1 || rawRemoteKeys[bc].timestamp > timestamp) {
-							timestamp = rawRemoteKeys[bc].timestamp;
-							remoteKey = rawRemoteKeys[bc].publicKey;
-						}
-					}
-					return {
-						remoteKey,
-						remoteKeys,
-					};
-				},
-				async () => {
-					return rawKeysRequest();
-				},
-			);
-		} else {
-			return rawKeysRequest();
-		}
 	}
 
 	async getCurrentAccount(): Promise<IGenericAccount | null> {
@@ -203,11 +157,35 @@ export class Wallet extends EventEmitter {
 
 	async instantiateNewAccount(account: IGenericAccount, keypair: YlideKeyPair) {
 		return new Promise<DomainAccount>(async (resolve, reject) => {
+			const existingAcc = this.domain.accounts.accounts.find(
+				acc => acc.account.address.toLowerCase() === account.address.toLowerCase(),
+			);
+			if (existingAcc) {
+				return resolve(existingAcc);
+			}
 			this.domain.accounts.onceNewAccount(account, acc => {
 				resolve(acc);
 			});
 			await this.domain.keystore.storeKey(keypair, this.factory.blockchainGroup, this.factory.wallet);
 		});
+	}
+
+	async getBalancesOf(address: string): Promise<Record<string, { original: string; numeric: number; e18: string }>> {
+		const chains = this.domain.registeredBlockchains.filter(
+			bc => bc.blockchainGroup === this.factory.blockchainGroup,
+		);
+		const balances = await Promise.all(
+			chains.map(async chain => {
+				return this.domain.blockchains[chain.blockchain].getBalance(address);
+			}),
+		);
+		return chains.reduce(
+			(p, c, i) => ({
+				...p,
+				[c.blockchain]: balances[i],
+			}),
+			{} as Record<string, { original: string; numeric: number; e18: string }>,
+		);
 	}
 
 	// async connectNonCurrentAccount() {

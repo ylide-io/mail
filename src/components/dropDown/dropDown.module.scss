@@ -1,0 +1,52 @@
+$shift: 4px;
+$contentPadding: 6px;
+
+.root {
+	position: fixed;
+	padding: $shift 0;
+}
+
+.content {
+	padding: $contentPadding 0;
+	height: 100%;
+	max-height: $interactive-elem-size * 8 + ($interactive-elem-size / 2) + $contentPadding;
+	background: var(--surface-color);
+	border-radius: 4px;
+	box-shadow: var(--popup-shadow);
+	overflow-y: auto;
+}
+
+//
+
+.item {
+	display: flex;
+	align-items: center;
+	padding: 0 12px;
+	height: $interactive-elem-size;
+	white-space: nowrap;
+	overflow: hidden;
+}
+
+.item_regular {
+	cursor: pointer;
+}
+
+.item_regular:hover,
+.item_regular:focus-visible {
+	background: var(--surface-hover-color);
+}
+
+.item_highlighted {
+	background: var(--selected-light-background-color);
+	cursor: pointer;
+}
+
+.item_selected {
+	background: var(--selected-background-color);
+	cursor: default;
+}
+
+.item_disabled {
+	color: var(--secondary-text-color);
+	cursor: default;
+}

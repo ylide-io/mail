@@ -1,10 +1,14 @@
 import React, { useState } from 'react';
+
+import { ActionButton, ActionButtonLook } from '../../../../components/ActionButton/ActionButton';
+import { TextField } from '../../../../components/textField/textField';
+import { ReactComponent as EditSvg } from '../../../../icons/ic20/edit.svg';
+import { ReactComponent as TickSvg } from '../../../../icons/ic20/tick.svg';
+import { ReactComponent as TrashSvg } from '../../../../icons/ic20/trash.svg';
 import { ITag } from '../../../../stores/models/ITag';
-import { allColors } from '../../../../utils/colors';
 import tags from '../../../../stores/Tags';
+import { allColors } from '../../../../utils/colors';
 import ColorPicker from './ColorPicker';
-import { DeleteOutlined, EditOutlined, SaveOutlined } from '@ant-design/icons';
-import { Button, Input } from 'antd';
 
 interface TagsListItemProps {
 	tag: ITag;
@@ -56,28 +60,24 @@ const TagsListItem: React.FC<TagsListItemProps> = ({ tag, isNew }) => {
 					</div>
 				</div>
 				<div className="contact-name">
-					<Input
-						type="text"
-						placeholder="Type new folder name"
-						value={name}
-						style={{ width: '100%' }}
-						onChange={e => setName(e.target.value)}
-					/>
+					<TextField placeholder="Type new folder name" value={name} onValueChange={setName} />
 				</div>
 				<div className="contact-actions small-actions">
 					{!isNew ? (
 						<>
-							<Button type="primary" size="small" onClick={saveClickHandler} icon={<SaveOutlined />} />
-							<Button
-								danger
-								type="dashed"
-								size="small"
+							<ActionButton
+								look={ActionButtonLook.PRIMARY}
+								onClick={saveClickHandler}
+								icon={<TickSvg />}
+							/>
+							<ActionButton
+								look={ActionButtonLook.DENGEROUS}
 								onClick={deleteClickHandler}
-								icon={<DeleteOutlined />}
+								icon={<TrashSvg />}
 							/>
 						</>
 					) : (
-						<Button type="primary" size="small" onClick={saveClickHandler} icon={<SaveOutlined />} />
+						<ActionButton look={ActionButtonLook.PRIMARY} onClick={saveClickHandler} icon={<TickSvg />} />
 					)}
 				</div>
 			</div>
@@ -91,7 +91,7 @@ const TagsListItem: React.FC<TagsListItemProps> = ({ tag, isNew }) => {
 			</div>
 			<div className="contact-name">{tag.name}</div>
 			<div className="contact-actions small-actions">
-				<Button type="dashed" size="small" onClick={editClickHandler} icon={<EditOutlined />} />
+				<ActionButton onClick={editClickHandler} icon={<EditSvg />} />
 			</div>
 		</div>
 	);

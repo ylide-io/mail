@@ -1,51 +1,38 @@
-import React, { useEffect, useMemo } from 'react';
-import { createReactEditorJS } from 'react-editor-js';
-import mailbox from '../../../../../stores/Mailbox';
 import './MailboxEditor.scss';
+
+import React, { useRef, useState } from 'react';
+import { createReactEditorJS } from 'react-editor-js';
+
+import { OutgoingMailData } from '../../../../../stores/outgoingMailData';
 import { EDITOR_JS_TOOLS } from '../../../../../utils/editorJs';
 
 const ReactEditorJS = createReactEditorJS();
 
-const MailboxEditor = () => {
-	const instanceRef = React.useRef<any>(null);
+interface MailboxEditorProps {
+	mailData: OutgoingMailData;
+}
 
-	useEffect(() => {
-		return () => {
-			mailbox.resetData();
-		};
-	}, []);
+export function MailboxEditor({ mailData }: MailboxEditorProps) {
+	const instanceRef = useRef<any>(null);
 
-	const initialTextData = useMemo(() => {
-		return mailbox.textEditorData;
-	}, []);
+	const [initialEditorData] = useState(() => mailData.editorData);
 
 	async function handleSave() {
-		if (instanceRef?.current) {
-			const savedData = await instanceRef!.current!.save();
-			mailbox.textEditorData = savedData;
+		if (instanceRef.current) {
+			mailData.editorData = await instanceRef.current.save();
 		}
 	}
 
 	return (
-		<div
-			style={{
-				padding: '25px 15px 0',
-				borderTop: '1px solid #e0e0e0',
-				flexGrow: 1,
+		<ReactEditorJS
+			tools={EDITOR_JS_TOOLS}
+			//@ts-ignore
+			data={initialEditorData}
+			onChange={handleSave}
+			instanceRef={(instance: any) => (instanceRef.current = instance)}
+			onInitialize={(instance: any) => {
+				instanceRef.current = instance;
 			}}
-		>
-			<ReactEditorJS
-				tools={EDITOR_JS_TOOLS}
-				//@ts-ignore
-				data={initialTextData}
-				onChange={handleSave}
-				instanceRef={(instance: any) => (instanceRef.current = instance)}
-				onInitialize={(instance: any) => {
-					instanceRef.current = instance;
-				}}
-			/>
-		</div>
+		/>
 	);
-};
-
-export default MailboxEditor;
+}

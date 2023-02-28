@@ -5,15 +5,11 @@
 
 	.contacts-list-item {
 		@include flex-row(center, flex-start);
+		flex-wrap: wrap;
+		padding: 8px 0;
 
-		height: 50px;
-		flex-basis: 50px;
-
-		@include less480px {
+		@include less920px {
 			@include flex-column(stretch, flex-start);
-
-			height: auto;
-			flex-basis: auto;
 		}
 
 		border-bottom: 1px solid #f3f3f3;
@@ -30,7 +26,7 @@
 				height: 30px;
 			}
 
-			@include less480px {
+			@include less920px {
 				display: none;
 			}
 		}
@@ -42,14 +38,17 @@
 			flex-grow: 1;
 			flex-shrink: 0;
 
+			padding: 0 8px 0 0;
+
 			font-size: 14px;
 			font-weight: 500;
 
-			@include less480px {
+			@include less920px {
 				font-size: 18px;
 
 				flex-basis: auto;
 				flex-grow: 0;
+				padding: 0;
 			}
 		}
 
@@ -60,12 +59,14 @@
 			flex-grow: 10;
 			flex-shrink: 0;
 
-			font-size: 14px;
-			font-family: monospace;
+			padding: 0 8px 0 0;
 
-			@include less480px {
+			font-size: 14px;
+			font-family: $font-family_code;
+
+			@include less920px {
 				flex-basis: auto;
-				margin-top: 10px;
+				padding: 8px 0 0;
 			}
 		}
 
@@ -74,34 +75,24 @@
 
 			flex-grow: 0;
 			flex-shrink: 0;
-			padding-left: 10px;
-			padding-right: 20px;
+			padding: 0 8px 0 0;
 
-			@include less480px {
-				padding: 0;
-				margin-top: 10px;
+			@include less920px {
+				padding: 8px 0 0;
 			}
 		}
 
 		.contact-actions {
-			@include flex-row(center, flex-end);
+			display: grid;
+			grid-auto-flow: column;
+			grid-gap: 8px;
+			justify-content: end;
+			padding: 0 0 0 8px;
 
-			flex-basis: 100px;
-			flex-grow: 0;
-			flex-shrink: 0;
-
-			&.small-actions {
-				flex-basis: 20px;
-			}
-
-			.ant-btn:not(:first-child) {
-				margin-left: 8px;
-			}
-
-			@include less480px {
+			@include less920px {
 				flex-basis: auto;
-				margin-top: 10px;
-				margin-bottom: 20px;
+				justify-content: start;
+				padding: 8px 0 16px;
 			}
 		}
 	}

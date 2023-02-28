@@ -1,8 +1,7 @@
 import React from 'react';
+
 import ContactsList from './ContactsList';
 
-const ContactsTab = () => {
+export const ContactsTab = () => {
 	return <ContactsList />;
 };
-
-export default ContactsTab;

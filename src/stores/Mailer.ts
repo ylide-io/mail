@@ -1,9 +1,11 @@
+import { EVM_NAMES, EVMNetwork } from '@ylide/ethereum';
+import { MessageContentV3, SendMailResult, ServiceCode } from '@ylide/sdk';
 import { makeAutoObservable } from 'mobx';
+
 import messagesDB from '../indexedDB/MessagesDB';
-import { MessageContentV3, ServiceCode } from '@ylide/sdk';
+import { analytics } from './Analytics';
 import domain from './Domain';
 import { DomainAccount } from './models/DomainAccount';
-import { EVM_NAMES, EVMNetwork } from '@ylide/ethereum';
 
 // interface filteringTypesInterface {
 // 	unread: (arg1: IMessage) => Promise<boolean>;
@@ -68,7 +70,9 @@ class Mailer {
 		text: string,
 		recipients: string[],
 		network?: EVMNetwork,
-	): Promise<string | null> {
+	): Promise<SendMailResult | null> {
+		let error = false;
+		analytics.mailSentAttempt();
 		try {
 			this.sending = true;
 			const content = MessageContentV3.plain(subject, text);
@@ -82,7 +86,7 @@ class Mailer {
 				network = evmNetworks.find(n => n.name === blockchainName)?.network;
 			}
 
-			return await domain.ylide.sendMessage(
+			return await domain.ylide.core.sendMessage(
 				{
 					wallet: sender.wallet.controller,
 					sender: sender.account,
@@ -95,8 +99,12 @@ class Mailer {
 				},
 			);
 		} catch (e) {
+			error = true;
 			throw e;
 		} finally {
+			if (!error) {
+				analytics.mailSentSuccessful();
+			}
 			this.sending = false;
 		}
 	}

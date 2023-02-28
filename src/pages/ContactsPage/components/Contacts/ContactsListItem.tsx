@@ -1,16 +1,24 @@
-import React, { ChangeEvent, useMemo, useState } from 'react';
-import { ITag } from '../../../../stores/models/ITag';
-import classNames from 'classnames';
-import contacts from '../../../../stores/Contacts';
-import { IContact } from '../../../../stores/models/IContact';
-import TagsStore from '../../../../stores/Tags';
-import mailbox from '../../../../stores/Mailbox';
-import { useNav } from '../../../../utils/navigate';
-import domain from '../../../../stores/Domain';
-import { Avatar, Button, Input, Select } from 'antd';
+import { Avatar, Select } from 'antd';
+import clsx from 'clsx';
+import React, { useMemo, useState } from 'react';
+
+import { ActionButton, ActionButtonLook } from '../../../../components/ActionButton/ActionButton';
+import { Recipients } from '../../../../components/recipientInput/recipientInput';
+import { TextField } from '../../../../components/textField/textField';
+import { AdaptiveAddress } from '../../../../controls/adaptiveAddress/adaptiveAddress';
 import { Blockie } from '../../../../controls/Blockie';
-import { DeleteOutlined, EditOutlined, MailOutlined, SaveOutlined } from '@ant-design/icons';
-import { AdaptiveAddress } from '../../../../controls/AdaptiveAddress';
+import { ReactComponent as EditSvg } from '../../../../icons/ic20/edit.svg';
+import { ReactComponent as MailSvg } from '../../../../icons/ic20/mail.svg';
+import { ReactComponent as TickSvg } from '../../../../icons/ic20/tick.svg';
+import { ReactComponent as TrashSvg } from '../../../../icons/ic20/trash.svg';
+import contacts from '../../../../stores/Contacts';
+import domain from '../../../../stores/Domain';
+import { IContact } from '../../../../stores/models/IContact';
+import { ITag } from '../../../../stores/models/ITag';
+import { globalOutgoingMailData } from '../../../../stores/outgoingMailData';
+import { RoutePath } from '../../../../stores/routePath';
+import TagsStore from '../../../../stores/Tags';
+import { useNav } from '../../../../utils/navigate';
 
 interface ContactsListItemProps {
 	contact: IContact;
@@ -28,18 +36,18 @@ const ContactsListItem: React.FC<ContactsListItemProps> = ({ contact, isNew }) =
 	const [editing, setEditing] = useState(isNew || false);
 	const [name, setName] = useState(contact.name);
 	const [address, setAddress] = useState(contact.address);
-	const [description, setDescription] = useState(contact.description);
+	const [description] = useState(contact.description);
 
 	const [nameError, setNameError] = useState(false);
 	const [addressError, setAddressError] = useState(false);
 
-	const onNameEdit = (e: ChangeEvent<HTMLInputElement>) => {
-		setName(e.target.value);
+	const onNameEdit = (value: string) => {
+		setName(value);
 		setNameError(false);
 	};
 
-	const onAddressEdit = (e: ChangeEvent<HTMLInputElement>) => {
-		setAddress(e.target.value);
+	const onAddressEdit = (value: string) => {
+		setAddress(value);
 		setAddressError(false);
 	};
 
@@ -125,16 +133,8 @@ const ContactsListItem: React.FC<ContactsListItemProps> = ({ contact, isNew }) =
 	};
 
 	const mailThisContact = () => {
-		mailbox.to = [
-			{
-				type: 'contact',
-				loading: false,
-				isAchievable: null,
-				input: contact.name,
-				address: contact.address,
-			},
-		];
-		navigate('/compose');
+		globalOutgoingMailData.to = new Recipients([contact.name]);
+		navigate(RoutePath.MAIL_COMPOSE);
 	};
 
 	if (editing) {
@@ -144,21 +144,19 @@ const ContactsListItem: React.FC<ContactsListItemProps> = ({ contact, isNew }) =
 					{contact.img ? <img alt="Avatar" src={contact.img} /> : <Avatar />}
 				</div>
 				<div className="contact-name">
-					<Input
-						type="text"
-						style={nameError ? { border: '1px solid red', width: '890%' } : { width: '90%' }}
+					<TextField
+						isError={nameError}
 						value={name}
 						placeholder={'Type contact name'}
-						onChange={onNameEdit}
+						onValueChange={onNameEdit}
 					/>
 				</div>
 				<div className="contact-address">
-					<Input
-						style={addressError ? { border: '1px solid red', width: '90%' } : { width: '90%' }}
+					<TextField
+						isError={addressError}
 						placeholder={'Type contact address'}
-						type="text"
 						value={address}
-						onChange={onAddressEdit}
+						onValueChange={onAddressEdit}
 					/>
 				</div>
 				<div className="contact-folders">
@@ -172,14 +170,12 @@ const ContactsListItem: React.FC<ContactsListItemProps> = ({ contact, isNew }) =
 					/>
 				</div>
 				<div className="contact-actions">
-					<Button type="primary" size="small" onClick={saveClickHandler} icon={<SaveOutlined />} />
+					<ActionButton look={ActionButtonLook.PRIMARY} onClick={saveClickHandler} icon={<TickSvg />} />
 					{!isNew ? (
-						<Button
-							type="dashed"
-							size="small"
-							danger
+						<ActionButton
+							look={ActionButtonLook.DENGEROUS}
 							onClick={deleteClickHandler}
-							icon={<DeleteOutlined />}
+							icon={<TrashSvg />}
 						/>
 					) : null}
 				</div>
@@ -202,22 +198,18 @@ const ContactsListItem: React.FC<ContactsListItemProps> = ({ contact, isNew }) =
 			</div>
 			<div style={{ textAlign: 'center' }} className="contact-folders">
 				{tags.map((tag, index) => (
-					<span
-						key={index}
-						style={{ marginLeft: '3px' }}
-						className={classNames(['label', `label-${tag.color}`])}
-					>
+					<span key={index} style={{ marginLeft: '3px' }} className={clsx(['label', `label-${tag.color}`])}>
 						{tag.name}
 					</span>
 				))}
 			</div>
 			<div className="contact-actions">
-				<Button type="dashed" size="small" onClick={mailThisContact} icon={<MailOutlined />}>
+				<ActionButton icon={<MailSvg />} onClick={mailThisContact}>
 					Compose
-				</Button>
-				<Button type="dashed" size="small" onClick={editClickHandler} icon={<EditOutlined />}>
+				</ActionButton>
+				<ActionButton icon={<EditSvg />} onClick={editClickHandler}>
 					Edit
-				</Button>
+				</ActionButton>
 			</div>
 		</div>
 	);

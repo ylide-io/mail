@@ -1,7 +1,8 @@
-import tags from '../../../stores/Tags';
-import contacts from '../../../stores/Contacts';
 import { Select } from 'antd';
 import { observer } from 'mobx-react';
+
+import contacts from '../../../stores/Contacts';
+import tags from '../../../stores/Tags';
 
 const TagsFilter = observer(() => {
 	const options = tags.tags.map(tag => ({ value: tag.id, label: tag.name }));

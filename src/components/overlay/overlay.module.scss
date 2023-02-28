@@ -1,0 +1,14 @@
+.root {
+	position: fixed;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	background: var(--shade-color);
+	opacity: 0;
+	transition: opacity 500ms;
+}
+
+.root_visible {
+	opacity: 0.5;
+}

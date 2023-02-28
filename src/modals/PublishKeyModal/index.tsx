@@ -1,5 +1,6 @@
 import { observer } from 'mobx-react';
 import { PureComponent } from 'react';
+
 import modals from '../../stores/Modals';
 import { Wallet } from '../../stores/models/Wallet';
 

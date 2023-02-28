@@ -2,39 +2,9 @@
 	background-color: #d1dade;
 	border-radius: 0.25em;
 	color: #5e5e5e;
-	font-family: Open Sans, Helvetica Neue, Helvetica, Arial, sans-serif;
 	font-weight: 600;
 	line-height: 1;
 	padding: 3px 8px;
 	text-shadow: none;
 	white-space: nowrap;
-}
-
-.mail-label {
-	@include flex-row(center, flex-start);
-
-	font-size: 80%;
-	background: rgb(221, 241, 255);
-	color: black;
-
-	.mail-label-title {
-		font-weight: 500;
-		margin-left: 4px;
-
-		@include less720px {
-			display: none;
-		}
-
-		@include less630px {
-			display: block;
-		}
-
-		@include less480px {
-			display: none;
-		}
-	}
-
-	.mail-label-icon {
-		@include flex-row(center, flex-start);
-	}
 }

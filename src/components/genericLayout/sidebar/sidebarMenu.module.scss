@@ -1,0 +1,182 @@
+.root {
+	padding: 0 0 20px;
+	overflow-y: auto;
+
+	@include less920px {
+		position: absolute;
+		z-index: 100;
+		top: 0;
+		bottom: 0;
+		left: -210px;
+		background-color: #fff;
+		box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+		width: 210px;
+		transition: left 0.2s;
+
+		&.root_open {
+			left: 0;
+		}
+	}
+}
+
+.container {
+	@include flex-column(stretch, flex-start);
+
+	padding: 12px 0 0 16px;
+
+	position: sticky;
+	top: 0;
+
+	@include less920px {
+		position: static;
+		padding: 15px 15px 0;
+	}
+}
+
+.mobileHeader {
+	display: none;
+
+	@include less920px {
+		@include flex-row(center, space-between);
+		align-self: center;
+		margin: 4px 0 32px;
+	}
+}
+
+.section {
+	margin-left: -15px;
+	@include flex-column(stretch, flex-start);
+}
+
+.sectionTitle {
+	@include flex-row(center, flex-start);
+	padding-left: 28px;
+
+	margin-bottom: 12px;
+
+	font-style: normal;
+	font-weight: 500;
+	font-size: 17px;
+	line-height: 24px;
+	color: #202020;
+
+	margin-right: 10px;
+}
+
+.sectionButton {
+	align-self: center;
+	margin: 0 0 8px;
+	width: 148px;
+}
+
+.sectionContent {
+	@include flex-column(stretch, flex-start);
+
+	margin-bottom: 18px;
+	max-height: 0;
+	overflow: hidden;
+	transition: max-height 0.2s;
+}
+
+.sectionContent_open {
+	max-height: 600px;
+}
+
+.sectionLink {
+	@include flex-row(center, flex-start);
+
+	padding: 6px 6px 6px 40px;
+	height: 32px;
+
+	&:hover {
+		cursor: pointer;
+
+		.sectionLinkTitle {
+			color: #606060;
+		}
+	}
+}
+
+.sectionLink_active {
+	background: rgba(151, 71, 255, 0.08);
+	border-radius: 0 30px 30px 0;
+
+	.sectionLinkTitle {
+		color: var(--accent2-color);
+	}
+}
+
+.sectionLinkIconLeft {
+	@include flex-row(center, center);
+	width: 18px;
+	margin-right: 9px;
+}
+
+.sectionLinkTitle {
+	font-style: normal;
+	font-weight: 400;
+	font-size: 13px;
+	line-height: 20px;
+	color: #202020;
+}
+
+.sectionLinkIconRight {
+	margin: 0 0 0 8px;
+	width: 24px;
+	height: 24px;
+	opacity: 0.2;
+
+	&:hover,
+	&:focus-visible {
+		opacity: 0.5;
+	}
+
+	> svg {
+		width: 100%;
+		height: 100%;
+	}
+}
+
+.socials {
+	display: grid;
+	grid-auto-flow: column;
+	justify-content: start;
+	grid-gap: 8px;
+	position: relative;
+	padding: 24px 0 0 24px;
+
+	&:before {
+		content: '';
+		position: absolute;
+		top: 0;
+		right: 8px;
+		left: 4px;
+		height: 1px;
+		background: var(--border-color);
+	}
+
+	a {
+		@include expand-click-area(4px);
+		color: var(--primary-text-color);
+
+		&:hover {
+			color: var(--link-hover-color);
+		}
+
+		svg {
+			fill: currentColor;
+		}
+	}
+
+	@include less920px {
+		padding-left: 14px;
+	}
+}
+
+.burger {
+	display: none;
+
+	@include less920px {
+		display: block;
+	}
+}

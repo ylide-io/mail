@@ -1,0 +1,80 @@
+$vPadding: 6px;
+$hPadding: 8px;
+$borderWidth: 1px;
+
+.root {
+	display: flex;
+	align-items: center;
+	flex-wrap: wrap;
+	padding: ($vPadding - $borderWidth) ($hPadding - $borderWidth) 0;
+	width: 100%;
+	min-height: $interactive-elem-size;
+	font-weight: $font-weight_light;
+	background: var(--surface-color);
+	border: 1px solid var(--border-color);
+	border-radius: 4px;
+	cursor: text;
+}
+
+.root_focused {
+	border-color: var(--field-focus-border-color);
+}
+
+.input {
+	flex: 1 1 120px;
+	margin: (-$vPadding + $borderWidth) 0 0;
+	min-width: 0;
+	height: $interactive-elem-size - 2;
+}
+
+//
+
+.tag {
+	display: grid;
+	grid-auto-flow: column;
+	align-items: center;
+	grid-gap: 4px;
+	margin: 0 8px ($vPadding - $borderWidth) 0;
+	padding: 0 8px;
+	max-width: 200px;
+	height: 20px;
+	border-radius: 4px;
+}
+
+.tag_default {
+	background: var(--tertiary-surface-color);
+}
+
+.tag_loading {
+	@include stripes-animation-background;
+}
+
+.tag_error {
+	background: var(--error-surface-color);
+}
+
+.tag_success {
+	background: var(--success-surface-color);
+}
+
+.tagContent {
+	@include truncate-text;
+}
+
+.tagRemoveButton {
+	@include expand-click-area(4px);
+	margin: 0 -4px 0 0;
+	width: 14px;
+	height: 14px;
+
+	> svg {
+		width: 100%;
+		height: 100%;
+		fill: var(--secondary-text-color);
+	}
+
+	&:hover > svg,
+	&:focus-visible > svg {
+		fill: var(--error-color);
+	}
+}

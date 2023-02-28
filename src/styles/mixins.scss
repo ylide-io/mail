@@ -1,0 +1,100 @@
+$font-family_main: Lexend, Verdana, Geneva, sans-serif;
+$font-family_wide: 'Lexend Exa', Verdana, Geneva, sans-serif;
+$font-family_code: source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace;
+
+$font-weight_normal: 400;
+$font-weight_bold: 700;
+$font-weight_light: 300;
+
+$interactive-elem-size_small: 28px;
+$interactive-elem-size: 32px;
+$interactive-elem-size_large: 36px;
+
+// MEDIA RULES
+
+@mixin less980px() {
+	@media (max-width: 980px) {
+		@content;
+	}
+}
+
+@mixin less920px() {
+	@media (max-width: 920px) {
+		@content;
+	}
+}
+
+@mixin less720px() {
+	@media (max-width: 720px) {
+		@content;
+	}
+}
+
+@mixin less670px() {
+	@media (max-width: 670px) {
+		@content;
+	}
+}
+
+@mixin less630px() {
+	@media (max-width: 630px) {
+		@content;
+	}
+}
+
+@mixin less480px() {
+	@media (max-width: 480px) {
+		@content;
+	}
+}
+
+// UTILS
+
+@mixin expand-click-area($size: 4px, $pseudo: before) {
+	position: relative;
+
+	&:#{$pseudo} {
+		content: '';
+		position: absolute;
+		top: -#{$size};
+		right: -#{$size};
+		bottom: -#{$size};
+		left: -#{$size};
+	}
+}
+
+@mixin truncate-text {
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+// MISC
+
+@mixin flex-row($align-items, $justify-content) {
+	display: flex;
+	flex-direction: row;
+	align-items: $align-items;
+	justify-content: $justify-content;
+}
+
+@mixin flex-column($align-items, $justify-content) {
+	display: flex;
+	flex-direction: column;
+	align-items: $align-items;
+	justify-content: $justify-content;
+}
+
+//
+
+@keyframes stripes-animation-background-keyframes {
+	to {
+		background-position-x: 69px;
+	}
+}
+
+@mixin stripes-animation-background {
+	background-image: repeating-linear-gradient(-60deg, #dbf8f4, #dbf8f4 10px, #edfffd 10px, #edfffd 20px);
+	background-size: 69px 40px;
+	animation: stripes-animation-background-keyframes 1s linear infinite;
+}
