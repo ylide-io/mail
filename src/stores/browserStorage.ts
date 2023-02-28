@@ -13,6 +13,7 @@ enum BrowserStorageKey {
 	QUEST3 = 'quest3',
 	FEED_SOURCE_SETTINGS = 'ylide_feedSourceSettings',
 	SIDEBAR_FOLDED_SECTIONS = 'ylide_sidebarFoldedSections',
+	SAVE_DECODED_MESSAGES = 'ylide_saveDecodedMessages',
 }
 
 class BrowserStorage {
@@ -98,6 +99,25 @@ class BrowserStorage {
 			newValue.length ? newValue.join(',') : undefined,
 		);
 		this._sidebarFoldedSections = newValue;
+	}
+
+	//
+
+	private _saveDecodedMessages =
+		BrowserStorage.getItem(
+			BrowserStorageKey.SAVE_DECODED_MESSAGES,
+		) !== 'false'
+
+	get saveDecodedMessages() {
+		return this._saveDecodedMessages
+	}
+
+	set saveDecodedMessages(value: boolean) {
+		BrowserStorage.setItem(
+			BrowserStorageKey.SAVE_DECODED_MESSAGES,
+			value,
+		);
+		this._saveDecodedMessages = value;
 	}
 }
 

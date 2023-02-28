@@ -21,6 +21,7 @@ import domain from './Domain';
 import { DomainAccount } from './models/DomainAccount';
 import tags from './Tags';
 import { invariant } from '../utils/invariant';
+import { browserStorage } from './browserStorage';
 
 export enum FolderId {
 	Inbox = 'inbox',
@@ -246,8 +247,6 @@ interface MailStore {
 	lastMessagesList: ILinkedMessage[];
 	setLastMessagesList: (messages: ILinkedMessage[]) => void;
 
-	saveDecodedMessages: boolean;
-	setSaveDecodedSetting: (flag: boolean) => Promise<void>;
 	decodedMessagesById: Record<string, IMessageDecodedContent>;
 	decodeMessage: (pushMsg: ILinkedMessage) => Promise<IMessageDecodedContent>;
 
@@ -309,14 +308,6 @@ export const useMailStore = create<MailStore>((set, get) => ({
 		set({ lastMessagesList: messages });
 	},
 
-	saveDecodedMessages: localStorage.getItem('saveDecodedMessages') !== 'false',
-	setSaveDecodedSetting: async flag => {
-		set({ saveDecodedMessages: flag });
-		localStorage.setItem('saveDecodedMessages', flag ? 'true' : 'false');
-		if (!flag) {
-			await messagesDB.clearAllDecodedMessages();
-		}
-	},
 	decodedMessagesById: {},
 	decodeMessage: async pushMsg => {
 		const state = get();
@@ -343,7 +334,7 @@ export const useMailStore = create<MailStore>((set, get) => ({
 		state.decodedMessagesById[pushMsg.msgId] = decodedMessage;
 		set({ decodedMessagesById: { ...state.decodedMessagesById } });
 
-		if (state.saveDecodedMessages) {
+		if (browserStorage.saveDecodedMessages) {
 			console.log('msg saved: ', pushMsg.msgId);
 			await messagesDB.saveDecodedMessage(decodedMessage);
 		}

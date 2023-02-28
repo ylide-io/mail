@@ -1,11 +1,9 @@
 import React from 'react';
 
 import { GenericLayout } from '../../components/genericLayout/genericLayout';
-import { useMailStore } from '../../stores/MailList';
+import { browserStorage } from '../../stores/browserStorage';
 
 export const SettingsPage = () => {
-	const { saveDecodedMessages, setSaveDecodedSetting } = useMailStore();
-
 	return (
 		<GenericLayout>
 			<div className="mail-page animated fadeInRight">
@@ -18,8 +16,8 @@ export const SettingsPage = () => {
 					<div style={{ marginTop: 30, display: 'flex', alignItems: 'center' }}>
 						<span style={{ marginRight: 50 }}>Save decoded mails to internal storage</span>
 						<input
-							checked={saveDecodedMessages}
-							onChange={() => setSaveDecodedSetting(!saveDecodedMessages)}
+							checked={browserStorage.saveDecodedMessages}
+							onChange={() => browserStorage.saveDecodedMessages = !browserStorage.saveDecodedMessages}
 							type="checkbox"
 						/>
 					</div>
