@@ -30,7 +30,7 @@ export function OtcAssetsPage() {
 
 	const { isError, data } = useQuery(
 		['otc', 'assets', page, debouncedTerm],
-		() => OtcApi.queryAssets({ searchTerm: debouncedTerm, offset: page * PAGE_SIZE, limit: PAGE_SIZE }),
+		() => OtcApi.queryAssets({ searchTerm: debouncedTerm, offset: (page - 1) * PAGE_SIZE, limit: PAGE_SIZE }),
 		{},
 	);
 

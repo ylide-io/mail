@@ -29,7 +29,13 @@ export function OtcWalletsPage() {
 	invariant(token && chain);
 
 	const { isError, data } = useQuery(['otc', 'wallets', page, token, chain], () =>
-		OtcApi.queryWalletsByToken({ token, chainQuery: chain, offset: page * PAGE_SIZE, limit: PAGE_SIZE }),
+		OtcApi.queryWalletsByToken({
+			token,
+			query: '',
+			chain: chain,
+			offset: (page - 1) * PAGE_SIZE,
+			limit: PAGE_SIZE,
+		}),
 	);
 
 	const [aside, setAside] = useState<ReactNode>();

@@ -31,6 +31,7 @@ import { Accounts } from './Accounts';
 import contacts from './Contacts';
 import { useMailStore } from './MailList';
 import { Wallet } from './models/Wallet';
+import { OTCStore } from './OTC';
 import tags from './Tags';
 
 // Ylide.registerBlockchainFactory(evmBlockchainFactories[EVMNetwork.LOCAL_HARDHAT]);
@@ -99,6 +100,8 @@ export class Domain {
 		{
 			loading: true,
 		};
+
+	otc = new OTCStore(this);
 
 	constructor() {
 		makeObservable(this);

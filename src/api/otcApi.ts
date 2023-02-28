@@ -1,4 +1,6 @@
+import { IMessage } from '@ylide/sdk';
 import { nanoid } from 'nanoid';
+import domain from '../stores/Domain';
 
 export namespace OtcApi {
 	export interface IAsset {
@@ -24,6 +26,12 @@ export namespace OtcApi {
 		offset?: number;
 		limit?: number;
 	}): Promise<IAssetsResponse> {
+		return domain.otc.queryAssets({
+			query: params.searchTerm,
+			sorting: params.sorting || null,
+			offset: params.offset || 0,
+			limit: params.limit || null,
+		});
 		const assets = [
 			{
 				id: nanoid(),
@@ -108,11 +116,21 @@ export namespace OtcApi {
 
 	export async function queryWalletsByToken(params: {
 		token: string;
-		chainQuery: string;
+		query: string;
+		chain: string;
 		sorting?: { key: 'balance' | 'value'; direction: 'asc' | 'desc' };
 		offset?: number;
 		limit?: number;
 	}): Promise<IWalletsResponse> {
+		return domain.otc.queryWalletsByToken({
+			token: params.token,
+			query: params.query,
+			chain: params.chain,
+			sorting: params.sorting || null,
+			offset: params.offset || 0,
+			limit: params.limit || null,
+		});
+
 		const wallets = [
 			{
 				address: '0x52e316e323c35e5b222ba63311433f91d80545ee',
@@ -155,7 +173,7 @@ export namespace OtcApi {
 
 	//
 
-	export type IMessage = any;
+	// export type IMessage = any;
 
 	export type IChatMessage =
 		| { type: 'message'; id: string; isIncoming: boolean; msg: IMessage }
@@ -173,157 +191,163 @@ export namespace OtcApi {
 		offset?: number;
 		limit?: number;
 	}): Promise<IThreadResponse> {
-		const entries = [
-			{
-				type: 'message',
-				id: nanoid(),
-				isIncoming: false,
-				msg: 'Hey there! 🙌\nWhould you like to trade?\n\nCheers!',
-			},
-			{
-				type: 'message',
-				id: nanoid(),
-				isIncoming: true,
-				msg: 'Hi man!\nYeah, sure.',
-			},
-			{
-				type: 'message',
-				id: nanoid(),
-				isIncoming: false,
-				msg: 'Nice! 👍',
-			},
-			{
-				type: 'message',
-				id: nanoid(),
-				isIncoming: false,
-				msg: "Let's talk about the price...",
-			},
-			{
-				type: 'message',
-				id: nanoid(),
-				isIncoming: false,
-				msg: 'How much you want?',
-			},
-			{
-				type: 'message',
-				id: nanoid(),
-				isIncoming: true,
-				msg: 'Hm... Let me think...',
-			},
-			{
-				type: 'message',
-				id: nanoid(),
-				isIncoming: true,
-				msg: 'Maecenas elit ante, dictum at commodo ac, aliquam non felis. Integer et erat diam. Quisque faucibus est mattis, vehicula eros ut, congue mi. Vivamus ante lectus, vestibulum et venenatis nec, porta ut elit. Cras aliquam erat vitae laoreet mattis. Cras posuere pharetra eros eget elementum. Aliquam gravida, metus vitae venenatis blandit, augue mauris suscipit justo, quis ullamcorper purus tortor et arcu.',
-			},
-			{
-				type: 'message',
-				id: nanoid(),
-				isIncoming: false,
-				msg: 'Wtf?',
-			},
-			{
-				type: 'message',
-				id: nanoid(),
-				isIncoming: false,
-				msg: 'Hey there! 🙌\nWhould you like to trade?\n\nCheers!',
-			},
-			{
-				type: 'message',
-				id: nanoid(),
-				isIncoming: true,
-				msg: 'Hi man!\nYeah, sure.',
-			},
-			{
-				type: 'message',
-				id: nanoid(),
-				isIncoming: false,
-				msg: 'Nice! 👍',
-			},
-			{
-				type: 'message',
-				id: nanoid(),
-				isIncoming: false,
-				msg: "Let's talk about the price...",
-			},
-			{
-				type: 'message',
-				id: nanoid(),
-				isIncoming: false,
-				msg: 'How much you want?',
-			},
-			{
-				type: 'message',
-				id: nanoid(),
-				isIncoming: true,
-				msg: 'Hm... Let me think...',
-			},
-			{
-				type: 'message',
-				id: nanoid(),
-				isIncoming: true,
-				msg: 'Maecenas elit ante, dictum at commodo ac, aliquam non felis. Integer et erat diam. Quisque faucibus est mattis, vehicula eros ut, congue mi. Vivamus ante lectus, vestibulum et venenatis nec, porta ut elit. Cras aliquam erat vitae laoreet mattis. Cras posuere pharetra eros eget elementum. Aliquam gravida, metus vitae venenatis blandit, augue mauris suscipit justo, quis ullamcorper purus tortor et arcu.',
-			},
-			{
-				type: 'message',
-				id: nanoid(),
-				isIncoming: false,
-				msg: 'Wtf?',
-			},
-			{
-				type: 'message',
-				id: nanoid(),
-				isIncoming: false,
-				msg: 'Hey there! 🙌\nWhould you like to trade?\n\nCheers!',
-			},
-			{
-				type: 'message',
-				id: nanoid(),
-				isIncoming: true,
-				msg: 'Hi man!\nYeah, sure.',
-			},
-			{
-				type: 'message',
-				id: nanoid(),
-				isIncoming: false,
-				msg: 'Nice! 👍',
-			},
-			{
-				type: 'message',
-				id: nanoid(),
-				isIncoming: false,
-				msg: "Let's talk about the price...",
-			},
-			{
-				type: 'message',
-				id: nanoid(),
-				isIncoming: false,
-				msg: 'How much you want?',
-			},
-			{
-				type: 'message',
-				id: nanoid(),
-				isIncoming: true,
-				msg: 'Hm... Let me think...',
-			},
-			{
-				type: 'message',
-				id: nanoid(),
-				isIncoming: true,
-				msg: 'Maecenas elit ante, dictum at commodo ac, aliquam non felis. Integer et erat diam. Quisque faucibus est mattis, vehicula eros ut, congue mi. Vivamus ante lectus, vestibulum et venenatis nec, porta ut elit. Cras aliquam erat vitae laoreet mattis. Cras posuere pharetra eros eget elementum. Aliquam gravida, metus vitae venenatis blandit, augue mauris suscipit justo, quis ullamcorper purus tortor et arcu.',
-			},
-			{
-				type: 'message',
-				id: nanoid(),
-				isIncoming: false,
-				msg: 'Wtf?',
-			},
-		] as IMessage[];
+		return domain.otc.loadOtcThread({
+			myAddress: params.myAddress,
+			recipientAddress: params.recipientAddress,
+			offset: params.offset || 0,
+			limit: params.limit || 100,
+		});
+		// const entries = [
+		// 	{
+		// 		type: 'message',
+		// 		id: nanoid(),
+		// 		isIncoming: false,
+		// 		msg: 'Hey there! 🙌\nWhould you like to trade?\n\nCheers!',
+		// 	},
+		// 	{
+		// 		type: 'message',
+		// 		id: nanoid(),
+		// 		isIncoming: true,
+		// 		msg: 'Hi man!\nYeah, sure.',
+		// 	},
+		// 	{
+		// 		type: 'message',
+		// 		id: nanoid(),
+		// 		isIncoming: false,
+		// 		msg: 'Nice! 👍',
+		// 	},
+		// 	{
+		// 		type: 'message',
+		// 		id: nanoid(),
+		// 		isIncoming: false,
+		// 		msg: "Let's talk about the price...",
+		// 	},
+		// 	{
+		// 		type: 'message',
+		// 		id: nanoid(),
+		// 		isIncoming: false,
+		// 		msg: 'How much you want?',
+		// 	},
+		// 	{
+		// 		type: 'message',
+		// 		id: nanoid(),
+		// 		isIncoming: true,
+		// 		msg: 'Hm... Let me think...',
+		// 	},
+		// 	{
+		// 		type: 'message',
+		// 		id: nanoid(),
+		// 		isIncoming: true,
+		// 		msg: 'Maecenas elit ante, dictum at commodo ac, aliquam non felis. Integer et erat diam. Quisque faucibus est mattis, vehicula eros ut, congue mi. Vivamus ante lectus, vestibulum et venenatis nec, porta ut elit. Cras aliquam erat vitae laoreet mattis. Cras posuere pharetra eros eget elementum. Aliquam gravida, metus vitae venenatis blandit, augue mauris suscipit justo, quis ullamcorper purus tortor et arcu.',
+		// 	},
+		// 	{
+		// 		type: 'message',
+		// 		id: nanoid(),
+		// 		isIncoming: false,
+		// 		msg: 'Wtf?',
+		// 	},
+		// 	{
+		// 		type: 'message',
+		// 		id: nanoid(),
+		// 		isIncoming: false,
+		// 		msg: 'Hey there! 🙌\nWhould you like to trade?\n\nCheers!',
+		// 	},
+		// 	{
+		// 		type: 'message',
+		// 		id: nanoid(),
+		// 		isIncoming: true,
+		// 		msg: 'Hi man!\nYeah, sure.',
+		// 	},
+		// 	{
+		// 		type: 'message',
+		// 		id: nanoid(),
+		// 		isIncoming: false,
+		// 		msg: 'Nice! 👍',
+		// 	},
+		// 	{
+		// 		type: 'message',
+		// 		id: nanoid(),
+		// 		isIncoming: false,
+		// 		msg: "Let's talk about the price...",
+		// 	},
+		// 	{
+		// 		type: 'message',
+		// 		id: nanoid(),
+		// 		isIncoming: false,
+		// 		msg: 'How much you want?',
+		// 	},
+		// 	{
+		// 		type: 'message',
+		// 		id: nanoid(),
+		// 		isIncoming: true,
+		// 		msg: 'Hm... Let me think...',
+		// 	},
+		// 	{
+		// 		type: 'message',
+		// 		id: nanoid(),
+		// 		isIncoming: true,
+		// 		msg: 'Maecenas elit ante, dictum at commodo ac, aliquam non felis. Integer et erat diam. Quisque faucibus est mattis, vehicula eros ut, congue mi. Vivamus ante lectus, vestibulum et venenatis nec, porta ut elit. Cras aliquam erat vitae laoreet mattis. Cras posuere pharetra eros eget elementum. Aliquam gravida, metus vitae venenatis blandit, augue mauris suscipit justo, quis ullamcorper purus tortor et arcu.',
+		// 	},
+		// 	{
+		// 		type: 'message',
+		// 		id: nanoid(),
+		// 		isIncoming: false,
+		// 		msg: 'Wtf?',
+		// 	},
+		// 	{
+		// 		type: 'message',
+		// 		id: nanoid(),
+		// 		isIncoming: false,
+		// 		msg: 'Hey there! 🙌\nWhould you like to trade?\n\nCheers!',
+		// 	},
+		// 	{
+		// 		type: 'message',
+		// 		id: nanoid(),
+		// 		isIncoming: true,
+		// 		msg: 'Hi man!\nYeah, sure.',
+		// 	},
+		// 	{
+		// 		type: 'message',
+		// 		id: nanoid(),
+		// 		isIncoming: false,
+		// 		msg: 'Nice! 👍',
+		// 	},
+		// 	{
+		// 		type: 'message',
+		// 		id: nanoid(),
+		// 		isIncoming: false,
+		// 		msg: "Let's talk about the price...",
+		// 	},
+		// 	{
+		// 		type: 'message',
+		// 		id: nanoid(),
+		// 		isIncoming: false,
+		// 		msg: 'How much you want?',
+		// 	},
+		// 	{
+		// 		type: 'message',
+		// 		id: nanoid(),
+		// 		isIncoming: true,
+		// 		msg: 'Hm... Let me think...',
+		// 	},
+		// 	{
+		// 		type: 'message',
+		// 		id: nanoid(),
+		// 		isIncoming: true,
+		// 		msg: 'Maecenas elit ante, dictum at commodo ac, aliquam non felis. Integer et erat diam. Quisque faucibus est mattis, vehicula eros ut, congue mi. Vivamus ante lectus, vestibulum et venenatis nec, porta ut elit. Cras aliquam erat vitae laoreet mattis. Cras posuere pharetra eros eget elementum. Aliquam gravida, metus vitae venenatis blandit, augue mauris suscipit justo, quis ullamcorper purus tortor et arcu.',
+		// 	},
+		// 	{
+		// 		type: 'message',
+		// 		id: nanoid(),
+		// 		isIncoming: false,
+		// 		msg: 'Wtf?',
+		// 	},
+		// ] as IMessage[];
 
-		return {
-			entries,
-			totalCount: entries.length,
-		};
+		// return {
+		// 	entries,
+		// 	totalCount: entries.length,
+		// };
 	}
 
 	//
