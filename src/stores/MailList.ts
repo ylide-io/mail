@@ -1,6 +1,7 @@
 import {
 	AbstractBlockchainController,
 	BlockchainSourceType,
+	IGenericAccount,
 	IMessage,
 	IMessageWithSource,
 	ISourceWithMeta,
@@ -15,13 +16,13 @@ import { useCallback, useEffect, useState } from 'react';
 import create from 'zustand';
 
 import messagesDB, { IMessageDecodedContent } from '../indexedDB/MessagesDB';
+import { invariant } from '../utils/invariant';
 import { analytics } from './Analytics';
+import { browserStorage } from './browserStorage';
 import contacts from './Contacts';
 import domain from './Domain';
 import { DomainAccount } from './models/DomainAccount';
 import tags from './Tags';
-import { invariant } from '../utils/invariant';
-import { browserStorage } from './browserStorage';
 
 export enum FolderId {
 	Inbox = 'inbox',
@@ -40,6 +41,23 @@ export function getFolderName(folderId: FolderId) {
 		const tag = tags.tags.find(t => String(t.id) === folderId);
 		return tag?.name || 'Unknown';
 	}
+}
+
+//
+
+export async function decodeMessage(msgId: string, msg: IMessage, recepient: IGenericAccount) {
+	const content = await domain.ylide.core.getMessageContent(msg);
+	invariant(content && !content.corrupted, 'Content is not available or corrupted')
+
+	const result = msg.isBroadcast
+		? domain.ylide.core.decryptBroadcastContent(msg, content)
+		: await domain.ylide.core.decryptMessageContent(recepient, msg, content);
+
+	return {
+		msgId,
+		decodedSubject: result.content.subject,
+		decodedTextData: result.content.content,
+	};
 }
 
 //
@@ -318,18 +336,7 @@ export const useMailStore = create<MailStore>((set, get) => ({
 			return state.decodedMessagesById[pushMsg.msgId];
 		}
 
-		const content = await domain.ylide.core.getMessageContent(pushMsg.msg);
-		invariant(content && !content.corrupted, 'Content is not available or corrupted')
-
-		const result = pushMsg.msg.isBroadcast
-			? domain.ylide.core.decryptBroadcastContent(pushMsg.msg, content)
-			: await domain.ylide.core.decryptMessageContent(pushMsg.recipient!.account, pushMsg.msg, content);
-
-		const decodedMessage = {
-			msgId: pushMsg.msgId,
-			decodedSubject: result.content.subject,
-			decodedTextData: result.content.content,
-		};
+		const decodedMessage = await decodeMessage(pushMsg.msgId, pushMsg.msg, pushMsg.recipient!.account)
 
 		state.decodedMessagesById[pushMsg.msgId] = decodedMessage;
 		set({ decodedMessagesById: { ...state.decodedMessagesById } });
