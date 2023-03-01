@@ -165,6 +165,18 @@
 	}
 }
 
+.root_secondaryLook {
+	color: var(--on-accent-color);
+	background: var(--accent-color);
+	border-color: var(--accent-color);
+
+	&:hover,
+	&:focus-visible {
+		background: var(--accent-hover-color);
+		border-color: var(--accent-hover-color);
+	}
+}
+
 .root_dangerousLook {
 	color: var(--error-color);
 	border-color: rgba(var(--error-rgb-color), 0.35);

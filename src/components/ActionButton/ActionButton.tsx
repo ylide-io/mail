@@ -13,6 +13,7 @@ export enum ActionButtonSize {
 export enum ActionButtonLook {
 	DEFAULT,
 	PRIMARY,
+	SECONDARY,
 	DENGEROUS,
 	LITE,
 }
@@ -39,6 +40,7 @@ export const ActionButton = forwardRef(
 		const lookClass = {
 			[ActionButtonLook.DEFAULT]: css.root_defaultLook,
 			[ActionButtonLook.PRIMARY]: css.root_primaryLook,
+			[ActionButtonLook.SECONDARY]: css.root_secondaryLook,
 			[ActionButtonLook.DENGEROUS]: css.root_dangerousLook,
 			[ActionButtonLook.LITE]: css.root_liteLook,
 		}[look || ActionButtonLook.DEFAULT];
