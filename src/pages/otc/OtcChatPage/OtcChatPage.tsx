@@ -65,29 +65,38 @@ export const OtcChatPage = observer(() => {
 
 	const [myAccount, setMyAccount] = useState(domain.accounts.activeAccounts[0]);
 
-	const { isError, data, refetch } = useQuery(['otc', 'chat', myAccount.account.address, address], async () => {
-		const thread = await OtcApi.loadOtcThread({ myAddress: myAccount.account.address, recipientAddress: address });
+	const { isError, data, refetch } = useQuery(
+		['otc', 'chat', myAccount.account.address, address],
+		async () => {
+			const thread = await OtcApi.loadOtcThread({
+				myAddress: myAccount.account.address,
+				recipientAddress: address,
+			});
 
-		const decodedMessages = await Promise.all(
-			thread.entries
-				.filter(entry => entry.type === 'message')
-				.map(entry => {
-					invariant(entry.type === 'message');
-					return decodeMessage(entry.id, entry.msg, myAccount.account);
-				}),
-		);
+			const decodedMessages = await Promise.all(
+				thread.entries
+					.filter(entry => entry.type === 'message')
+					.map(entry => {
+						invariant(entry.type === 'message');
+						return decodeMessage(entry.id, entry.msg, myAccount.account);
+					}),
+			);
 
-		return {
-			...thread,
-			decodedMessagesById: decodedMessages.reduce(
-				(p, c) => ({
-					...p,
-					[c.msgId]: c,
-				}),
-				{},
-			),
-		} as ChatData;
-	});
+			return {
+				...thread,
+				decodedMessagesById: decodedMessages.reduce(
+					(p, c) => ({
+						...p,
+						[c.msgId]: c,
+					}),
+					{},
+				),
+			} as ChatData;
+		},
+		{
+			refetchInterval: 5000,
+		},
+	);
 
 	const contentRef = useRef<HTMLDivElement>(null);
 
