@@ -44,7 +44,11 @@ export function Chat({ data }: ChatProps) {
 						key={entry.id}
 						className={clsx(css.message, entry.isIncoming ? css.message_in : css.message_out)}
 					>
-						<NlToBr text={decoded?.decodedTextData ? parseEditorjsJson(decoded?.decodedTextData) : '[Encrypted]'} />
+						<NlToBr
+							text={
+								decoded?.decodedTextData ? parseEditorjsJson(decoded?.decodedTextData) : '[Encrypted]'
+							}
+						/>
 					</div>
 				);
 			})}
@@ -107,6 +111,7 @@ export const OtcChatPage = observer(() => {
 
 	return (
 		<OtcLayout
+			isShrinkedToPageSize
 			title={
 				<div className={css.title}>
 					<ContactSvg width={32} height={32} />
@@ -114,37 +119,36 @@ export const OtcChatPage = observer(() => {
 				</div>
 			}
 			aside={<TradingForm data={tradingFormData} onChange={setTradingFormData} />}
+			contentClass={css.body}
 		>
-			<div className={css.body}>
-				{domain.accounts.activeAccounts.length > 1 && (
-					<div className={css.header}>
-						Your account
-						<AccountSelect activeAccount={myAccount} onChange={setMyAccount} />
-					</div>
+			{domain.accounts.activeAccounts.length > 1 && (
+				<div className={css.header}>
+					Your account
+					<AccountSelect activeAccount={myAccount} onChange={setMyAccount} />
+				</div>
+			)}
+
+			<div ref={contentRef} className={css.content}>
+				{data ? (
+					<Chat data={data} />
+				) : isError ? (
+					<ErrorMessage>Couldn't load messages</ErrorMessage>
+				) : (
+					<YlideLoader className={css.loader} reason="Loading messages ..." />
 				)}
+			</div>
 
-				<div ref={contentRef} className={css.content}>
-					{data ? (
-						<Chat data={data} />
-					) : isError ? (
-						<ErrorMessage>Couldn't load messages</ErrorMessage>
-					) : (
-						<YlideLoader className={css.loader} reason="Loading messages ..." />
-					)}
-				</div>
+			<div className={css.footer}>
+				<textarea
+					ref={textareaRef}
+					className={css.textarea}
+					rows={1}
+					placeholder="Type your message here"
+					value={newMessage}
+					onChange={e => setNewMessage(e.target.value)}
+				/>
 
-				<div className={css.footer}>
-					<textarea
-						ref={textareaRef}
-						className={css.textarea}
-						rows={1}
-						placeholder="Type your message here"
-						value={newMessage}
-						onChange={e => setNewMessage(e.target.value)}
-					/>
-
-					<SendMailButton mailData={globalOutgoingMailData} />
-				</div>
+				<SendMailButton mailData={globalOutgoingMailData} />
 			</div>
 		</OtcLayout>
 	);

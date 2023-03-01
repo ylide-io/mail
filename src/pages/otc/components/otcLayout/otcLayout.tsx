@@ -5,25 +5,24 @@ import { GenericLayout } from '../../../../components/genericLayout/genericLayou
 import css from './otcLayout.module.scss';
 
 export interface OtcLayoutProps extends PropsWithChildren {
+	isShrinkedToPageSize?: boolean;
 	title: ReactNode;
 	titleRight?: ReactNode;
 	aside?: ReactNode;
 	contentClass?: string;
 }
 
-export function OtcLayout({ children, title, titleRight, aside, contentClass }: OtcLayoutProps) {
+export function OtcLayout({ children, isShrinkedToPageSize, title, titleRight, aside, contentClass }: OtcLayoutProps) {
 	return (
-		<GenericLayout isCustomContent mainClass={css.root}>
-			<div className={css.main}>
-				<div className={css.title}>
-					<div className={css.titleText}>{title}</div>
-					<div className={css.titleActions}>{titleRight}</div>
-				</div>
-
-				<div className={css.aside}>{aside}</div>
-
-				<div className={clsx(css.content, contentClass)}>{children}</div>
+		<GenericLayout isCustomContent mainClass={clsx(css.main, isShrinkedToPageSize && css.main_shrinkedToPageSize)}>
+			<div className={css.title}>
+				<div className={css.titleText}>{title}</div>
+				<div className={css.titleActions}>{titleRight}</div>
 			</div>
+
+			<div className={css.aside}>{aside}</div>
+
+			<div className={clsx(css.content, contentClass)}>{children}</div>
 		</GenericLayout>
 	);
 }
