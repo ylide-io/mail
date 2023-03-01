@@ -78,11 +78,10 @@ export const SendMailButton = observer(({ mailData, onSent }: SendMailButtonProp
 			);
 
 			console.log('id: ', msgId);
-			alert('Your message has been sent successfully.');
-
 			onSent?.();
 		} catch (e) {
 			console.log('Error sending message', e);
+			alert("Couldn't send your message.");
 		}
 	};
 
