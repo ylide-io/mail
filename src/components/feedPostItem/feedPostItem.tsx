@@ -126,7 +126,7 @@ export function FeedPostItem({ isInFeed, post }: FeedPostItemProps) {
 	return (
 		<div ref={selfRef} className={clsx(css.root, { [css.root_collapsed]: collapsed })}>
 			<div className={css.ava}>
-				<Avatar size={48} icon={<ContactSvg width="100%" height="100%" />} />
+				<Avatar size={48} src={post.authorAvatar} icon={<ContactSvg width="100%" height="100%" />} />
 				<div className={css.avaSource}>{sourceIcon[post.sourceType]}</div>
 			</div>
 
