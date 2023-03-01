@@ -30,3 +30,10 @@
 .cell {
 	min-width: 0;
 }
+
+.empty {
+	padding: 40px 0;
+	font-size: 15px;
+	text-align: center;
+	color: var(--secondary-text-color);
+}

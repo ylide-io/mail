@@ -30,20 +30,24 @@ export function OtcTable({ columns, data }: OtcTableProps) {
 				))}
 			</div>
 
-			{data.map((row, i) => (
-				<div
-					key={i}
-					className={clsx(css.row, css.row_data, row.onClick && css.row_clickable)}
-					style={{ gridTemplateColumns }}
-					onClick={row.onClick}
-				>
-					{columns.map((column, i) => (
-						<div key={i} className={clsx(css.cell, column.className)}>
-							{row.content[i]}
-						</div>
-					))}
-				</div>
-			))}
+			{data.length ? (
+				data.map((row, i) => (
+					<div
+						key={i}
+						className={clsx(css.row, css.row_data, row.onClick && css.row_clickable)}
+						style={{ gridTemplateColumns }}
+						onClick={row.onClick}
+					>
+						{columns.map((column, i) => (
+							<div key={i} className={clsx(css.cell, column.className)}>
+								{row.content[i]}
+							</div>
+						))}
+					</div>
+				))
+			) : (
+				<div className={css.empty}>– No data –</div>
+			)}
 		</div>
 	);
 }
