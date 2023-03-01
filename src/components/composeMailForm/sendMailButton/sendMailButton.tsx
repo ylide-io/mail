@@ -14,6 +14,7 @@ import domain from '../../../stores/Domain';
 import { evmBalances } from '../../../stores/evmBalances';
 import mailer from '../../../stores/Mailer';
 import { OutgoingMailData } from '../../../stores/outgoingMailData';
+import { Spinner } from '../../spinner/spinner';
 
 export interface SendMailButtonProps {
 	mailData: OutgoingMailData;
@@ -98,9 +99,19 @@ export const SendMailButton = observer(({ mailData, onSent }: SendMailButtonProp
 			})}
 		>
 			<div className="send-btn-text" onClick={sendMailHandler}>
-				<ReplySvg style={{ marginRight: 6, fill: 'currentcolor' }} />
-				{text && <span className="send-btn-title">{text}</span>}
+				{mailer.sending ? (
+					<>
+						<Spinner style={{ marginRight: 6, color: 'currentcolor' }} />
+						<span className="send-btn-title">Sending ...</span>
+					</>
+				) : (
+					<>
+						<ReplySvg style={{ marginRight: 6, fill: 'currentcolor' }} />
+						{text && <span className="send-btn-title">{text}</span>}
+					</>
+				)}
 			</div>
+
 			{mailData.from?.wallet.factory.blockchainGroup === 'evm' ? (
 				<Dropdown
 					overlay={

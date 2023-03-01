@@ -9,14 +9,12 @@ import { AccountSelect } from '../../../components/accountSelect/accountSelect';
 import { SendMailButton } from '../../../components/composeMailForm/sendMailButton/sendMailButton';
 import { ErrorMessage } from '../../../components/errorMessage/errorMessage';
 import { NlToBr } from '../../../components/nlToBr/nlToBr';
-import { OverlappingLoader } from '../../../components/overlappingLoader/overlappingLoader';
 import { Recipients } from '../../../components/recipientInput/recipientInput';
 import { YlideLoader } from '../../../components/ylideLoader/ylideLoader';
 import { AdaptiveAddress } from '../../../controls/adaptiveAddress/adaptiveAddress';
 import { ReactComponent as ContactSvg } from '../../../icons/ic20/contact.svg';
 import { IMessageDecodedContent } from '../../../indexedDB/MessagesDB';
 import domain from '../../../stores/Domain';
-import mailer from '../../../stores/Mailer';
 import { decodeMessage } from '../../../stores/MailList';
 import { OutgoingMailData } from '../../../stores/outgoingMailData';
 import { invariant } from '../../../utils/invariant';
@@ -161,8 +159,6 @@ export const OtcChatPage = observer(() => {
 
 				<SendMailButton mailData={mailData} onSent={onSent} />
 			</div>
-
-			{mailer.sending && <OverlappingLoader text="Broadcasting your message to blockchain ..." />}
 		</OtcLayout>
 	);
 });
