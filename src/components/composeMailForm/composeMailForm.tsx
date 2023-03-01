@@ -2,7 +2,7 @@ import clsx from 'clsx';
 import { observer } from 'mobx-react';
 import React from 'react';
 
-import { MailboxEditor } from '../../pages/ComposePage/components/Mailbox/MailboxEditor/MailboxEditor';
+import { MailboxEditor } from '../../pages/ComposePage/mailboxEditor/mailboxEditor';
 import { OutgoingMailData } from '../../stores/outgoingMailData';
 import { formatSubject } from '../../utils/mail';
 import { AccountSelect } from '../accountSelect/accountSelect';
