@@ -21,7 +21,7 @@ import { parseEditorjsJson } from '../../../utils/parseEditorjsJson';
 import { useAutoSizeTextArea } from '../../../utils/useAutoSizeTextArea';
 import { OtcLayout } from '../components/otcLayout/otcLayout';
 import css from './OtcChatPage.module.scss';
-import { TradingForm, TradingFormData } from './tradingForm/tradingForm';
+import { TradingForm } from './tradingForm/tradingForm';
 
 interface ChatData extends OtcApi.IThreadResponse {
 	decodedMessagesById: Record<string, IMessageDecodedContent>;
@@ -59,17 +59,6 @@ export function Chat({ data }: ChatProps) {
 export const OtcChatPage = observer(() => {
 	const { address } = useParams<{ address: string }>();
 	invariant(address);
-
-	const [tradingFormData, setTradingFormData] = useState<TradingFormData>({
-		send: {
-			amount: '',
-			token: 'USDT',
-		},
-		receive: {
-			amount: '',
-			token: 'BTC',
-		},
-	});
 
 	const [myAccount, setMyAccount] = useState(domain.accounts.activeAccounts[0]);
 
@@ -118,7 +107,8 @@ export const OtcChatPage = observer(() => {
 					Chat with <AdaptiveAddress address={address} />
 				</div>
 			}
-			aside={<TradingForm data={tradingFormData} onChange={setTradingFormData} />}
+			isAsideCentered
+			aside={<TradingForm onTradeClick={() => {}} />}
 			contentClass={css.body}
 		>
 			{domain.accounts.activeAccounts.length > 1 && (

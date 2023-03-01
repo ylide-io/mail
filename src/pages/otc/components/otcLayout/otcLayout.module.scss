@@ -32,6 +32,12 @@
 	grid-row: 2/3;
 }
 
+.aside_centered {
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+}
+
 .content {
 	grid-column: 1/2;
 }
