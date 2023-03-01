@@ -164,7 +164,11 @@ export const OtcChatPage = observer(() => {
 
 			<div ref={contentRef} className={css.content}>
 				{data ? (
-					<Chat data={data} />
+					data.entries.length ? (
+						<Chat data={data} />
+					) : (
+						<div className={css.noMessages}>No messages yet ...</div>
+					)
 				) : isError ? (
 					<ErrorMessage>Couldn't load messages</ErrorMessage>
 				) : (
