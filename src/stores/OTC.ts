@@ -43,15 +43,10 @@ export interface IOTCThreadResponse {
 }
 
 export class OTCStore {
-	private _indexer: IndexerHub = new IndexerHub();
-
 	private endpoint = 'https://idx1.ylide.io';
+	// private endpoint = 'http://localhost:8495';
 
 	constructor(private readonly domain: Domain) {}
-
-	private get indexer() {
-		return this._indexer;
-	}
 
 	async request(url: string, body: any) {
 		const response = await fetch(`${this.endpoint}${url}`, {
@@ -96,6 +91,29 @@ export class OTCStore {
 					...m.msg,
 					key: new Uint8Array(m.msg.key),
 				},
+			})),
+		};
+	}
+
+	async loadOtcChats({
+		myAddress,
+		offset = 0,
+		limit = 100,
+	}: {
+		myAddress: string;
+		offset?: number;
+		limit?: number;
+	}): Promise<any> {
+		const data = await this.request('/otc-chats', {
+			myAddress,
+			offset,
+			limit,
+		});
+		return {
+			totalCount: data.totalCount,
+			entries: data.entries.map((m: any) => ({
+				address: m.address,
+				lastMessageDate: m.lastMessageTimestamp * 1000,
 			})),
 		};
 	}

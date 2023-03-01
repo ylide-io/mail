@@ -363,22 +363,25 @@ export namespace OtcApi {
 	}
 
 	export async function queryThreads(): Promise<IThreadsResponse> {
-		return {
-			entries: [
-				{
-					address: '0x52e316e323c35e5b222ba63311433f91d80545ee',
-					lastMessageDate: new Date(2023, 1, 27, 12, 5, 41).getTime(),
-				},
-				{
-					address: '0x52e316e323c35e5b222ba63311433f91d80545ab',
-					lastMessageDate: new Date(2023, 1, 5, 20, 8, 12).getTime(),
-				},
-				{
-					address: '0x52e316e323c35e5b222ba63311433f91d80545cd',
-					lastMessageDate: new Date(2022, 10, 7, 15, 28, 55).getTime(),
-				},
-			],
-			totalCount: 3,
-		};
+		return domain.otc.loadOtcChats({
+			myAddress: domain.accounts.activeAccounts[0].account.address,
+		});
+		// return {
+		// 	entries: [
+		// 		{
+		// 			address: '0x52e316e323c35e5b222ba63311433f91d80545ee',
+		// 			lastMessageDate: new Date(2023, 1, 27, 12, 5, 41).getTime(),
+		// 		},
+		// 		{
+		// 			address: '0x52e316e323c35e5b222ba63311433f91d80545ab',
+		// 			lastMessageDate: new Date(2023, 1, 5, 20, 8, 12).getTime(),
+		// 		},
+		// 		{
+		// 			address: '0x52e316e323c35e5b222ba63311433f91d80545cd',
+		// 			lastMessageDate: new Date(2022, 10, 7, 15, 28, 55).getTime(),
+		// 		},
+		// 	],
+		// 	totalCount: 3,
+		// };
 	}
 }

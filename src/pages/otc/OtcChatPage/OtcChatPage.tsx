@@ -17,6 +17,7 @@ import domain from '../../../stores/Domain';
 import { decodeMessage } from '../../../stores/MailList';
 import { globalOutgoingMailData } from '../../../stores/outgoingMailData';
 import { invariant } from '../../../utils/invariant';
+import { parseEditorjsJson } from '../../../utils/parseEditorjsJson';
 import { useAutoSizeTextArea } from '../../../utils/useAutoSizeTextArea';
 import { OtcLayout } from '../components/otcLayout/otcLayout';
 import css from './OtcChatPage.module.scss';
@@ -43,7 +44,7 @@ export function Chat({ data }: ChatProps) {
 						key={entry.id}
 						className={clsx(css.message, entry.isIncoming ? css.message_in : css.message_out)}
 					>
-						<NlToBr text={decoded?.decodedTextData || '[Encrypted]'} />
+						<NlToBr text={decoded?.decodedTextData ? parseEditorjsJson(decoded?.decodedTextData) : '[Encrypted]'} />
 					</div>
 				);
 			})}
