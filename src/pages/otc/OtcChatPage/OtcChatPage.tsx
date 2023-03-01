@@ -6,6 +6,7 @@ import { useParams } from 'react-router-dom';
 
 import { OtcApi } from '../../../api/otcApi';
 import { AccountSelect } from '../../../components/accountSelect/accountSelect';
+import { ActionButton, ActionButtonLook, ActionButtonSize } from '../../../components/ActionButton/ActionButton';
 import { SendMailButton } from '../../../components/composeMailForm/sendMailButton/sendMailButton';
 import { ErrorMessage } from '../../../components/errorMessage/errorMessage';
 import { NlToBr } from '../../../components/nlToBr/nlToBr';
@@ -21,9 +22,9 @@ import { invariant } from '../../../utils/invariant';
 import { parseEditorjsJson } from '../../../utils/parseEditorjsJson';
 import { useAutoSizeTextArea } from '../../../utils/useAutoSizeTextArea';
 import { OtcLayout } from '../components/otcLayout/otcLayout';
+import { ReactComponent as AirSwapSvg } from './airswap.svg';
 import { IframePopup } from './iframePopup/iframePopup';
 import css from './OtcChatPage.module.scss';
-import { TradingForm } from './tradingForm/tradingForm';
 
 interface ChatData extends OtcApi.IThreadResponse {
 	decodedMessagesById: Record<string, IMessageDecodedContent>;
@@ -114,7 +115,7 @@ export const OtcChatPage = observer(() => {
 	}, [address, mailData, myAccount, newMessage]);
 
 	const [isIframeOpen, setIframeOpen] = useState(false);
-	const [isIframeFolded, setIframeFolded] = useState(false);
+	const [isIframeMinimized, setIframeMinimized] = useState(false);
 
 	function onSent() {
 		setNewMessage('');
@@ -131,7 +132,27 @@ export const OtcChatPage = observer(() => {
 				</div>
 			}
 			isAsideCentered
-			aside={<TradingForm onTradeClick={() => setIframeOpen(true)} />}
+			aside={
+				<div>
+					<ActionButton
+						className={clsx(css.tradeButton, isIframeMinimized && css.tradeButton_active)}
+						size={ActionButtonSize.Large}
+						look={isIframeMinimized ? ActionButtonLook.SECONDARY : ActionButtonLook.PRIMARY}
+						onClick={() => {
+							setIframeOpen(true);
+							setIframeMinimized(false);
+						}}
+					>
+						{isIframeMinimized ? 'Continue ...' : 'Start a Trade'}
+					</ActionButton>
+
+					<div className={css.provider}>
+						<div className={css.providerTitle}>Powered by:</div>
+
+						<AirSwapSvg className={css.providerLogo} />
+					</div>
+				</div>
+			}
 			contentClass={css.body}
 		>
 			{domain.accounts.activeAccounts.length > 1 && (
@@ -166,8 +187,8 @@ export const OtcChatPage = observer(() => {
 
 			{isIframeOpen && (
 				<IframePopup
-					isFolded={isIframeFolded}
-					onFold={isFolded => setIframeFolded(isFolded)}
+					isMinimized={isIframeMinimized}
+					onMinimize={() => setIframeMinimized(true)}
 					onClose={() => setIframeOpen(false)}
 				/>
 			)}

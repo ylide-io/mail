@@ -2,15 +2,15 @@ import { Modal } from '../../../../components/modal/modal';
 import css from './iframePopup.module.scss';
 
 export interface IframePopupProps {
-	isFolded: boolean;
-	onFold: (isFolded: boolean) => void;
+	isMinimized: boolean;
+	onMinimize: () => void;
 
 	onClose: () => void;
 }
 
-export function IframePopup({ isFolded, onFold, onClose }: IframePopupProps) {
+export function IframePopup({ isMinimized, onMinimize, onClose }: IframePopupProps) {
 	return (
-		<Modal className={css.root} isFolded={isFolded} onFold={onFold} onClose={onClose}>
+		<Modal className={css.root} isMinimized={isMinimized} onMinimize={onMinimize} onClose={onClose}>
 			<iframe className={css.iframe} title="AirSwap" src="https://trader.airswap.io/" />
 		</Modal>
 	);
