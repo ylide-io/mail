@@ -1,6 +1,6 @@
 import clsx from 'clsx';
 import { observer } from 'mobx-react';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useQuery } from 'react-query';
 import { useParams } from 'react-router-dom';
 
@@ -9,13 +9,16 @@ import { AccountSelect } from '../../../components/accountSelect/accountSelect';
 import { SendMailButton } from '../../../components/composeMailForm/sendMailButton/sendMailButton';
 import { ErrorMessage } from '../../../components/errorMessage/errorMessage';
 import { NlToBr } from '../../../components/nlToBr/nlToBr';
+import { OverlappingLoader } from '../../../components/overlappingLoader/overlappingLoader';
+import { Recipients } from '../../../components/recipientInput/recipientInput';
 import { YlideLoader } from '../../../components/ylideLoader/ylideLoader';
 import { AdaptiveAddress } from '../../../controls/adaptiveAddress/adaptiveAddress';
 import { ReactComponent as ContactSvg } from '../../../icons/ic20/contact.svg';
 import { IMessageDecodedContent } from '../../../indexedDB/MessagesDB';
 import domain from '../../../stores/Domain';
+import mailer from '../../../stores/Mailer';
 import { decodeMessage } from '../../../stores/MailList';
-import { globalOutgoingMailData } from '../../../stores/outgoingMailData';
+import { OutgoingMailData } from '../../../stores/outgoingMailData';
 import { invariant } from '../../../utils/invariant';
 import { parseEditorjsJson } from '../../../utils/parseEditorjsJson';
 import { useAutoSizeTextArea } from '../../../utils/useAutoSizeTextArea';
@@ -62,7 +65,7 @@ export const OtcChatPage = observer(() => {
 
 	const [myAccount, setMyAccount] = useState(domain.accounts.activeAccounts[0]);
 
-	const { isError, data } = useQuery(['otc', 'chat', myAccount.account.address, address], async () => {
+	const { isError, data, refetch } = useQuery(['otc', 'chat', myAccount.account.address, address], async () => {
 		const thread = await OtcApi.loadOtcThread({ myAddress: myAccount.account.address, recipientAddress: address });
 
 		const decodedMessages = await Promise.all(
@@ -97,6 +100,24 @@ export const OtcChatPage = observer(() => {
 	const textareaRef = useRef(null);
 	const [newMessage, setNewMessage] = useState('');
 	useAutoSizeTextArea(textareaRef, newMessage, 200);
+
+	const mailData = useMemo(() => new OutgoingMailData(), []);
+	useEffect(() => {
+		if (mailData.from !== myAccount) {
+			mailData.from = myAccount;
+		}
+
+		if (!mailData.to.items.length || mailData.to.items[0].routing?.address !== address) {
+			mailData.to = new Recipients([address]);
+		}
+
+		mailData.plainTextData = newMessage;
+	}, [address, mailData, myAccount, newMessage]);
+
+	function onSent() {
+		setNewMessage('');
+		refetch().then();
+	}
 
 	return (
 		<OtcLayout
@@ -138,8 +159,10 @@ export const OtcChatPage = observer(() => {
 					onChange={e => setNewMessage(e.target.value)}
 				/>
 
-				<SendMailButton mailData={globalOutgoingMailData} />
+				<SendMailButton mailData={mailData} onSent={onSent} />
 			</div>
+
+			{mailer.sending && <OverlappingLoader text="Broadcasting your message to blockchain ..." />}
 		</OtcLayout>
 	);
 });

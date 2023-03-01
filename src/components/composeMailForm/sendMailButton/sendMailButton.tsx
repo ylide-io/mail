@@ -72,7 +72,7 @@ export const SendMailButton = observer(({ mailData, onSent }: SendMailButtonProp
 			const msgId = await mailer.sendMail(
 				acc,
 				mailData.subject,
-				JSON.stringify(mailData.editorData),
+				mailData.hasEditorData ? JSON.stringify(mailData.editorData) : mailData.plainTextData!.trim(),
 				mailData.to.items.map(r => r.routing?.address!),
 				mailData.network,
 			);
@@ -94,7 +94,7 @@ export const SendMailButton = observer(({ mailData, onSent }: SendMailButtonProp
 					!mailData.from ||
 					!mailData.to.items.length ||
 					mailData.to.items.some(r => r.isLoading) ||
-					!mailData.editorData?.blocks?.length,
+					(!mailData.hasEditorData && !mailData.hasPlainTextData),
 				withDropdown: mailData.from?.wallet.factory.blockchainGroup === 'evm',
 			})}
 		>

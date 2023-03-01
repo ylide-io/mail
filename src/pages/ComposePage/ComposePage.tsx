@@ -49,7 +49,7 @@ export const ComposePage = observer(() => {
 				onSent={() => navigate(generatePath(RoutePath.MAIL_FOLDER, { folderId: lastActiveFolderId }))}
 			/>
 
-			{mailer.sending && <OverlappingLoader text="Broadcasting your message to blockchain..." />}
+			{mailer.sending && <OverlappingLoader text="Broadcasting your message to blockchain ..." />}
 		</GenericLayout>
 	);
 });

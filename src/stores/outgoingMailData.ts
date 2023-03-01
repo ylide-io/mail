@@ -13,6 +13,7 @@ export class OutgoingMailData {
 
 	subject = '';
 	editorData?: OutputData;
+	plainTextData?: string;
 
 	constructor() {
 		makeAutoObservable(this);
@@ -22,6 +23,14 @@ export class OutgoingMailData {
 		});
 	}
 
+	get hasEditorData() {
+		return !!this.editorData?.blocks.length;
+	}
+
+	get hasPlainTextData() {
+		return !!this.plainTextData;
+	}
+
 	reset(data?: OutgoingMailData) {
 		this.from = data?.from || domain.accounts.activeAccounts[0];
 		this.to = data?.to || new Recipients();
@@ -29,6 +38,7 @@ export class OutgoingMailData {
 
 		this.subject = data?.subject || '';
 		this.editorData = data?.editorData;
+		this.plainTextData = data?.plainTextData;
 	}
 }
 
