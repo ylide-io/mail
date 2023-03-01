@@ -8,11 +8,10 @@ export interface OtcLayoutProps extends PropsWithChildren {
 	title: ReactNode;
 	titleRight?: ReactNode;
 	aside?: ReactNode;
-	supContent?: ReactNode;
 	contentClass?: string;
 }
 
-export function OtcLayout({ children, title, titleRight, aside, supContent, contentClass }: OtcLayoutProps) {
+export function OtcLayout({ children, title, titleRight, aside, contentClass }: OtcLayoutProps) {
 	return (
 		<GenericLayout isCustomContent mainClass={css.root}>
 			<div className={css.main}>
@@ -23,12 +22,16 @@ export function OtcLayout({ children, title, titleRight, aside, supContent, cont
 
 				<div className={css.aside}>{aside}</div>
 
-				<div className={css.body}>
-					{supContent != null && <div className={css.supContent}>{supContent}</div>}
-
-					<div className={clsx(css.content, contentClass)}>{children}</div>
-				</div>
+				<div className={clsx(css.content, contentClass)}>{children}</div>
 			</div>
 		</GenericLayout>
 	);
+}
+
+//
+
+export interface OtcSupContentTitleProps extends PropsWithChildren {}
+
+export function OtcSupContentTitle({ children }: OtcSupContentTitleProps) {
+	return <div className={css.supContentTitle}>{children}</div>;
 }

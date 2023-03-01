@@ -12,7 +12,7 @@ import { formatNumber } from '../../../utils/number';
 import { buildUrl, useNav } from '../../../utils/url';
 import { useDebounce } from '../../../utils/useDebounce';
 import { OtcAsideStatistics } from '../components/otcAsideStatistics/otcAsideStatistics';
-import { OtcLayout } from '../components/otcLayout/otcLayout';
+import { OtcLayout, OtcSupContentTitle } from '../components/otcLayout/otcLayout';
 import { OtcPagination } from '../components/otcPagination/otcPagination';
 import { OtcTable } from '../components/otcTable/otcTable';
 import css from './OtcAssetsPage.module.scss';
@@ -68,9 +68,10 @@ export function OtcAssetsPage() {
 				/>
 			}
 			aside={aside}
-			supContent="Discover assets owned by Ylide users and start a new deal"
 			contentClass={css.content}
 		>
+			<OtcSupContentTitle>Discover assets owned by Ylide users and start a new deal</OtcSupContentTitle>
+
 			{data ? (
 				<>
 					<OtcTable
