@@ -12,8 +12,8 @@ $interactive-elem-size_large: 36px;
 
 // MEDIA RULES
 
-@mixin less980px() {
-	@media (max-width: 980px) {
+@mixin less1280px() {
+	@media (max-width: 1280px) {
 		@content;
 	}
 }

@@ -21,6 +21,7 @@ import { invariant } from '../../../utils/invariant';
 import { parseEditorjsJson } from '../../../utils/parseEditorjsJson';
 import { useAutoSizeTextArea } from '../../../utils/useAutoSizeTextArea';
 import { OtcLayout } from '../components/otcLayout/otcLayout';
+import { IframePopup } from './iframePopup/iframePopup';
 import css from './OtcChatPage.module.scss';
 import { TradingForm } from './tradingForm/tradingForm';
 
@@ -112,6 +113,8 @@ export const OtcChatPage = observer(() => {
 		mailData.plainTextData = newMessage;
 	}, [address, mailData, myAccount, newMessage]);
 
+	const [isIframeOpen, setIframeOpen] = useState(false);
+
 	function onSent() {
 		setNewMessage('');
 		refetch().then();
@@ -127,7 +130,7 @@ export const OtcChatPage = observer(() => {
 				</div>
 			}
 			isAsideCentered
-			aside={<TradingForm onTradeClick={() => {}} />}
+			aside={<TradingForm onTradeClick={() => setIframeOpen(true)} />}
 			contentClass={css.body}
 		>
 			{domain.accounts.activeAccounts.length > 1 && (
@@ -159,6 +162,8 @@ export const OtcChatPage = observer(() => {
 
 				<SendMailButton mailData={mailData} onSent={onSent} />
 			</div>
+
+			{isIframeOpen && <IframePopup onClose={() => setIframeOpen(false)} />}
 		</OtcLayout>
 	);
 });
