@@ -6,11 +6,12 @@ import { Popup } from '../popup/popup';
 import css from './overlay.module.scss';
 
 export interface OverlayProps {
+	isHidden?: boolean;
 	onClick?: () => void;
 }
 
-export function Overlay({ onClick }: OverlayProps) {
+export function Overlay({ isHidden, onClick }: OverlayProps) {
 	const isVisible = useOnMountAnimation();
 
-	return <Popup className={clsx(css.root, isVisible && css.root_visible)} onClick={() => onClick?.()} />;
+	return <Popup className={clsx(css.root, !isHidden && isVisible && css.root_visible)} onClick={() => onClick?.()} />;
 }

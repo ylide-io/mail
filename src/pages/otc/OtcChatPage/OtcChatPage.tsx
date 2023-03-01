@@ -114,6 +114,7 @@ export const OtcChatPage = observer(() => {
 	}, [address, mailData, myAccount, newMessage]);
 
 	const [isIframeOpen, setIframeOpen] = useState(false);
+	const [isIframeFolded, setIframeFolded] = useState(false);
 
 	function onSent() {
 		setNewMessage('');
@@ -163,7 +164,13 @@ export const OtcChatPage = observer(() => {
 				<SendMailButton mailData={mailData} onSent={onSent} />
 			</div>
 
-			{isIframeOpen && <IframePopup onClose={() => setIframeOpen(false)} />}
+			{isIframeOpen && (
+				<IframePopup
+					isFolded={isIframeFolded}
+					onFold={isFolded => setIframeFolded(isFolded)}
+					onClose={() => setIframeOpen(false)}
+				/>
+			)}
 		</OtcLayout>
 	);
 });

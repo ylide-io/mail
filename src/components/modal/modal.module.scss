@@ -9,6 +9,10 @@
 	max-height: 100%;
 }
 
+.root_folded {
+	visibility: hidden;
+}
+
 .body {
 	width: 400px;
 	max-width: 100%;
@@ -19,14 +23,20 @@
 	overflow-y: auto;
 }
 
-.closeButton {
+.controls {
+	display: grid;
+	grid-auto-flow: column;
+	grid-gap: 4px;
+	position: absolute;
+	top: 0;
+	right: 0;
+}
+
+.button {
 	@include expand-click-area;
 	display: flex;
 	align-items: center;
 	justify-content: center;
-	position: absolute;
-	top: 0;
-	right: 0;
 	width: 28px;
 	height: 28px;
 	background: var(--inverted-surface-color);
@@ -40,4 +50,23 @@
 	> svg {
 		fill: var(--on-inverted-surface-color);
 	}
+}
+
+//
+
+.folded {
+	display: grid;
+	grid-auto-flow: column;
+	align-items: center;
+	justify-content: center;
+	grid-gap: 4px;
+	position: fixed;
+	width: 400px;
+	height: 40px;
+	padding: 0 20px;
+	color: var(--on-inverted-surface-color);
+	background: var(--inverted-surface-color);
+	border-radius: 20px 20px 0 0;
+	box-shadow: var(--popup-shadow);
+	cursor: pointer;
 }
