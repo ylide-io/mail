@@ -95,7 +95,7 @@ const SidebarMenu = observer(() => {
 					<SidebarBurger>Hide sidebar</SidebarBurger>
 				</div>
 
-				<div className={css.section}>
+				{/* <div className={css.section}>
 					<div className={css.sectionTitle}>
 						Feed
 						<ActionButton
@@ -155,7 +155,7 @@ const SidebarMenu = observer(() => {
 							);
 						})}
 					</div>
-				</div>
+				</div> */}
 
 				<div className={css.section}>
 					<div className={css.sectionTitle}>
@@ -209,7 +209,7 @@ const SidebarMenu = observer(() => {
 					</div>
 				</div>
 
-				<div className={css.section}>
+				{/* <div className={css.section}>
 					<div className={css.sectionTitle}>
 						Mail
 						<ActionButton
@@ -292,7 +292,7 @@ const SidebarMenu = observer(() => {
 							<div className={css.sectionLinkTitle}>Archive</div>
 						</div>
 					</div>
-				</div>
+				</div> */}
 
 				<div className={css.socials}>
 					<a href="https://t.me/ylide_chat" target="_blank noreferrer" title="Telegram">

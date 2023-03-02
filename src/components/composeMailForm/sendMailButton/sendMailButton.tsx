@@ -1,6 +1,7 @@
 import './sendMailButton.module.scss';
 
 import { EVM_NAMES, EVMNetwork } from '@ylide/ethereum';
+import { Uint256 } from '@ylide/sdk';
 import { Dropdown, Menu } from 'antd';
 import clsx from 'clsx';
 import { autorun } from 'mobx';
@@ -76,6 +77,7 @@ export const SendMailButton = observer(({ mailData, onSent }: SendMailButtonProp
 				mailData.hasEditorData ? JSON.stringify(mailData.editorData) : mailData.plainTextData!.trim(),
 				mailData.to.items.map(r => r.routing?.address!),
 				mailData.network,
+				'0000000000000000000000000000000000000000000000000000000000000001' as Uint256
 			);
 
 			console.log('id: ', msgId);

@@ -1,4 +1,4 @@
-import { IMessage, IndexerHub } from '@ylide/sdk';
+import { IMessage } from '@ylide/sdk';
 
 import { Domain } from './Domain';
 

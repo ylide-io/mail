@@ -28,17 +28,17 @@ const Header = observer(() => {
 
 			<div className={css.logo}>
 				<a
-					href={generatePath(RoutePath.MAIL_FOLDER, { folderId: FolderId.Inbox })}
+					href={generatePath(RoutePath.OTC_ASSETS)}
 					onClick={e => {
 						e.preventDefault();
-						nav(generatePath(RoutePath.MAIL_FOLDER, { folderId: FolderId.Inbox }));
+						nav(generatePath(RoutePath.OTC_ASSETS));
 					}}
 				>
 					<YlideLargeLogo className={css.logoImage} />
 				</a>
 			</div>
 			<div className={css.main}>
-				<div className={css.block}>
+				{/* <div className={css.block}>
 					<Tooltip title="Manage contacts and folders">
 						<ActionButton
 							size={ActionButtonSize.Medium}
@@ -50,7 +50,7 @@ const Header = observer(() => {
 							}}
 						/>
 					</Tooltip>
-				</div>
+				</div> */}
 				<div className={css.block}>
 					<button
 						ref={accountsPopupButtonRef}

@@ -599,11 +599,11 @@ export function NewPasswordModal({ faucetType, bonus, wallet, account, remoteKey
 							<YlideButton
 								primary
 								onClick={() => {
-									navigate(generatePath(RoutePath.FEED_CATEGORY, { category: FeedCategory.MAIN }));
+									navigate(generatePath(RoutePath.OTC_ASSETS));
 									onResolve('', false, false);
 								}}
 							>
-								Go to Social Hub
+								Go to Ylide OTC
 							</YlideButton>
 							<YlideButton nice onClick={() => onResolve('', false, false)}>
 								Add one more account

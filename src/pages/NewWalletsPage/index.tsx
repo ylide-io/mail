@@ -33,7 +33,7 @@ export const NewWalletsPage = observer(() => {
 				<h2 className="intro-main-title">Connect your wallets</h2>
 
 				<h3 className="intro-main-subtitle">
-					Ylide Social Hub supports multiple accounts being connected at once. Connect one by one the accounts
+					Ylide OTC supports multiple accounts being connected at once. Connect one by one the accounts
 					you want to aggregate and continue when done.
 				</h3>
 
@@ -41,7 +41,7 @@ export const NewWalletsPage = observer(() => {
 					<YlideButton
 						style={{ marginTop: 20 }}
 						onClick={() => {
-							navigate(generatePath(RoutePath.FEED_CATEGORY, { category: FeedCategory.MAIN }));
+							navigate(generatePath(RoutePath.OTC_ASSETS));
 						}}
 					>
 						Continue with connected accounts <NextSvg style={{ margin: '-4px -4px -4px 10px' }} />

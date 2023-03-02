@@ -112,19 +112,19 @@ const App = observer(() => {
 						<Route path={RoutePath.SETTINGS} element={<SettingsPage />} />
 						<Route path={RoutePath.ADMIN} element={<AdminPage />} />
 
-						<Route path={RoutePath.FEED} element={<FeedPage />} />
+						{/* <Route path={RoutePath.FEED} element={<FeedPage />} />
 						<Route path={RoutePath.FEED_POST} element={<FeedPostPage />} />
-						<Route path={RoutePath.FEED_CATEGORY} element={<FeedPage />} />
+						<Route path={RoutePath.FEED_CATEGORY} element={<FeedPage />} /> */}
 
-						<Route path={RoutePath.MAIL_COMPOSE} element={<ComposePage />} />
-						<Route path={RoutePath.MAIL_CONTACTS} element={<ContactsPage />}>
+						{/* <Route path={RoutePath.MAIL_COMPOSE} element={<ComposePage />} /> */}
+						{/* <Route path={RoutePath.MAIL_CONTACTS} element={<ContactsPage />}>
 							<Route index element={<ContactsTab />} />
 						</Route>
 						<Route path={RoutePath.MAIL_FOLDERS} element={<ContactsPage />}>
 							<Route index element={<TagsTab />} />
-						</Route>
-						<Route path={RoutePath.MAIL_FOLDER} element={<MailboxPage />} />
-						<Route path={RoutePath.MAIL_DETAILS} element={<MailDetailsPage />} />
+						</Route> */}
+						{/* <Route path={RoutePath.MAIL_FOLDER} element={<MailboxPage />} /> */}
+						{/* <Route path={RoutePath.MAIL_DETAILS} element={<MailDetailsPage />} /> */}
 
 						<Route path={RoutePath.OTC_ASSETS} element={<OtcAssetsPage />} />
 						<Route path={RoutePath.OTC_WALLETS} element={<OtcWalletsPage />} />
@@ -136,7 +136,8 @@ const App = observer(() => {
 							element={
 								<Navigate
 									replace
-									to={generatePath(RoutePath.MAIL_FOLDER, { folderId: FolderId.Inbox })}
+									to={generatePath(RoutePath.OTC_ASSETS)}
+									// generatePath(RoutePath.MAIL_FOLDER, { folderId: FolderId.Inbox })
 								/>
 							}
 						/>

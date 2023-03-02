@@ -1,5 +1,5 @@
 import { EVM_NAMES, EVMNetwork } from '@ylide/ethereum';
-import { MessageContentV3, SendMailResult, ServiceCode } from '@ylide/sdk';
+import { MessageContentV3, SendMailResult, ServiceCode, Uint256 } from '@ylide/sdk';
 import { makeAutoObservable } from 'mobx';
 
 import messagesDB from '../indexedDB/MessagesDB';
@@ -70,6 +70,7 @@ class Mailer {
 		text: string,
 		recipients: string[],
 		network?: EVMNetwork,
+		feedId?: Uint256
 	): Promise<SendMailResult | null> {
 		let error = false;
 		analytics.mailSentAttempt();
@@ -93,6 +94,7 @@ class Mailer {
 					content,
 					recipients,
 					serviceCode: ServiceCode.MAIL,
+					feedId,
 				},
 				{
 					network,
