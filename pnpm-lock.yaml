@@ -23,7 +23,7 @@ specifiers:
   '@walletconnect/qrcode-modal': ^1.8.0
   '@walletconnect/types': ^1.8.0
   '@walletconnect/web3-provider': ^1.8.0
-  '@ylide/ethereum': 0.8.0-beta.4
+  '@ylide/ethereum': 0.8.0-beta.5
   '@ylide/everscale': 0.8.0-beta.3
   '@ylide/sdk': 0.8.0-beta.3
   '@ylide/smart-buffer': 0.0.11
@@ -93,7 +93,7 @@ dependencies:
   '@walletconnect/qrcode-modal': 1.8.0
   '@walletconnect/types': 1.8.0
   '@walletconnect/web3-provider': 1.8.0
-  '@ylide/ethereum': 0.8.0-beta.4
+  '@ylide/ethereum': 0.8.0-beta.5
   '@ylide/everscale': 0.8.0-beta.3
   '@ylide/sdk': 0.8.0-beta.3
   '@ylide/smart-buffer': 0.0.11
@@ -4074,8 +4074,8 @@ packages:
       - utf-8-validate
     dev: false
 
-  /@ylide/ethereum/0.8.0-beta.4:
-    resolution: {integrity: sha512-jG3EIKmqS6wS1D+AEVjn5nKb/DTZxNw1jYkZkbGbPZThe+lVJg/78g21pba5W4XqX15OrohWeN5VE2Y3Cyi3nQ==}
+  /@ylide/ethereum/0.8.0-beta.5:
+    resolution: {integrity: sha512-xTy4/MFATV9UEKnmvn7s/uCzk3XoLt5EdjakVHcEXle74/xuM21BN2ZpGdyFhhzk3gp6u8g8qZi3BccjcG5HEA==}
     dependencies:
       '@ethersproject/abi': 5.7.0
       '@ethersproject/abstract-provider': 5.7.0
