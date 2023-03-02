@@ -6,7 +6,6 @@ const EverscaleLogo = ({ size = 20 }: { size?: number }) => {
 			height={size}
 			width={size}
 			version="1.1"
-			id="Layer_1"
 			xmlns="http://www.w3.org/2000/svg"
 			x="0px"
 			y="0px"
@@ -18,7 +17,6 @@ const EverscaleLogo = ({ size = 20 }: { size?: number }) => {
 					clipRule: 'evenodd',
 					fill: '#6347F5',
 				}}
-				className="st0"
 				d="M17.1,26.3l9.2-9.1V0H9.1L0,9.2h17.1L17.1,26.3z"
 			/>
 		</svg>

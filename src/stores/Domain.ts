@@ -8,7 +8,12 @@ import {
 	EVMNetwork,
 	evmWalletFactories,
 } from '@ylide/ethereum';
-import { everscaleBlockchainFactory, everscaleWalletFactory } from '@ylide/everscale';
+import {
+	everscaleBlockchainFactory,
+	everscaleWalletFactory,
+	venomBlockchainFactory,
+	venomWalletFactory,
+} from '@ylide/everscale';
 import {
 	AbstractBlockchainController,
 	AbstractNameService,
@@ -68,14 +73,19 @@ Ylide.registerBlockchainFactory(evmBlockchainFactories[EVMNetwork.CRONOS]);
 Ylide.registerBlockchainFactory(evmBlockchainFactories[EVMNetwork.MOONBEAM]);
 Ylide.registerBlockchainFactory(evmBlockchainFactories[EVMNetwork.MOONRIVER]);
 Ylide.registerBlockchainFactory(evmBlockchainFactories[EVMNetwork.METIS]);
-// Ylide.registerBlockchainFactory(evmBlockchainFactories[EVMNetwork.ASTAR]);
-Ylide.registerBlockchainFactory(everscaleBlockchainFactory);
-Ylide.registerWalletFactory(everscaleWalletFactory);
+// // Ylide.registerBlockchainFactory(evmBlockchainFactories[EVMNetwork.ASTAR]);
+
 Ylide.registerWalletFactory(evmWalletFactories.metamask);
 Ylide.registerWalletFactory(evmWalletFactories.coinbase);
 Ylide.registerWalletFactory(evmWalletFactories.trustwallet);
 Ylide.registerWalletFactory(evmWalletFactories.binance);
 Ylide.registerWalletFactory(evmWalletFactories.walletconnect);
+
+Ylide.registerBlockchainFactory(everscaleBlockchainFactory);
+Ylide.registerWalletFactory(everscaleWalletFactory);
+
+Ylide.registerBlockchainFactory(venomBlockchainFactory);
+Ylide.registerWalletFactory(venomWalletFactory);
 
 export class Domain {
 	savedPassword: string | null = null;
@@ -240,6 +250,7 @@ export class Domain {
 		currentAccount: IGenericAccount | null,
 		needAccount: IGenericAccount,
 	) {
+		console.log('handleSwitchRequest', walletName, currentAccount, needAccount);
 		const wallet = this.wallets.find(w => w.factory.wallet === walletName);
 		if (!wallet) {
 			return;
@@ -456,7 +467,10 @@ export class Domain {
 			if (!this.blockchains[factory.blockchain]) {
 				this.blockchains[factory.blockchain] = await this.ylide.controllers.addBlockchain(factory.blockchain, {
 					dev: false, //document.location.hostname === 'localhost',
-					endpoints: ['https://mainnet.evercloud.dev/695e40eeac6b4e3fa4a11666f6e0d6af/graphql'],
+					endpoints:
+						factory.blockchain === 'everscale'
+							? ['https://mainnet.evercloud.dev/695e40eeac6b4e3fa4a11666f6e0d6af/graphql']
+							: ['https://gql-testnet.venom.foundation/graphql'],
 				});
 			}
 		}
@@ -532,10 +546,6 @@ export class Domain {
 		await useMailStore.getState().init();
 		this.initialized = true;
 	}
-
-	// @computed get everscaleKey() {
-	// 	return domain.connectedKeys.find(t => t.blockchain === 'everscale')!;
-	// }
 }
 
 //@ts-ignore

@@ -42,6 +42,13 @@ export const SendMailButton = observer(({ mailData, onSent }: SendMailButtonProp
 				Send via {bData.logo(14)} {bData.title}
 			</>
 		);
+	} else if (mailData.from?.wallet.factory.blockchainGroup === 'venom-testnet') {
+		const bData = blockchainsMap['venom-testnet'];
+		text = (
+			<>
+				Send via {bData.logo(14)} {bData.title}
+			</>
+		);
 	} else if (mailData.from?.wallet.factory.blockchainGroup === 'evm' && mailData.network !== undefined) {
 		const bData = blockchainsMap[EVM_NAMES[mailData.network]];
 		if (bData) {
