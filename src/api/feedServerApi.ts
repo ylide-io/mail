@@ -15,7 +15,7 @@ export namespace FeedServerApi {
 
 	export function getUrl() {
 		return (
-			process.env.REACT_APP_FEED_SERVER ||
+			process.env.REACT_APP__FEED_SERVER ||
 			[
 				'https://fd1.ylide.io',
 				'https://fd2.ylide.io',
