@@ -6,6 +6,8 @@ import { generatePath, Navigate, Route, Routes, useLocation } from 'react-router
 import { PopupManager } from './components/popup/popupManager/popupManager';
 import { StaticComponentManager } from './components/staticComponentManager/staticComponentManager';
 import { YlideLoader } from './components/ylideLoader/ylideLoader';
+import { APP_NAME } from './constants';
+import { REACT_APP__OTC_MODE } from './env';
 import { AdminPage } from './pages/AdminPage';
 import { ComposePage } from './pages/ComposePage/ComposePage';
 import { ContactsTab } from './pages/ContactsPage/components/Contacts/ContactsTab';
@@ -16,12 +18,16 @@ import { FeedPostPage } from './pages/FeedPostPage/FeedPostPage';
 import { MailboxPage } from './pages/MailboxPage/MailboxPage';
 import { MailDetailsPage } from './pages/MailDetailsPage/MailDetailsPage';
 import { NewWalletsPage } from './pages/NewWalletsPage';
+import { OtcAssetsPage } from './pages/otc/OtcAssetsPage/OtcAssetsPage';
+import { OtcChatPage } from './pages/otc/OtcChatPage/OtcChatPage';
+import { OtcChatsPage } from './pages/otc/OtcChatsPage/OtcChatsPage';
+import { OtcWalletsPage } from './pages/otc/OtcWalletsPage/OtcWalletsPage';
 import { SettingsPage } from './pages/SettingsPage/SettingsPage';
 import { TestPage } from './pages/TestPage/TestPage';
 import { analytics } from './stores/Analytics';
 import { browserStorage } from './stores/browserStorage';
 import domain from './stores/Domain';
-import { FolderId } from './stores/MailList';
+import { FeedCategory } from './stores/Feed';
 import modals from './stores/Modals';
 import { RoutePath } from './stores/routePath';
 import walletConnect from './stores/WalletConnect';
@@ -40,6 +46,10 @@ const App = observer(() => {
 	);
 
 	const location = useLocation();
+
+	useEffect(() => {
+		document.title = APP_NAME;
+	}, []);
 
 	useEffect(() => {
 		if (location.pathname !== '/test') {
@@ -122,12 +132,21 @@ const App = observer(() => {
 						<Route path={RoutePath.MAIL_FOLDER} element={<MailboxPage />} />
 						<Route path={RoutePath.MAIL_DETAILS} element={<MailDetailsPage />} />
 
+						<Route path={RoutePath.OTC_ASSETS} element={<OtcAssetsPage />} />
+						<Route path={RoutePath.OTC_WALLETS} element={<OtcWalletsPage />} />
+						<Route path={RoutePath.OTC_CHATS} element={<OtcChatsPage />} />
+						<Route path={RoutePath.OTC_CHAT} element={<OtcChatPage />} />
+
 						<Route
 							path={RoutePath.ANY}
 							element={
 								<Navigate
 									replace
-									to={generatePath(RoutePath.MAIL_FOLDER, { folderId: FolderId.Inbox })}
+									to={
+										REACT_APP__OTC_MODE
+											? generatePath(RoutePath.OTC_ASSETS)
+											: generatePath(RoutePath.FEED_CATEGORY, { category: FeedCategory.MAIN })
+									}
 								/>
 							}
 						/>

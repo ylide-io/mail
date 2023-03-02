@@ -9,7 +9,7 @@ import { ReactComponent as MerkReadSvg } from '../../../icons/ic20/markRead.svg'
 import { ReactComponent as RestoreSvg } from '../../../icons/ic20/restore.svg';
 import { ReactComponent as TrashSvg } from '../../../icons/ic20/trash.svg';
 import { FolderId, getFolderName } from '../../../stores/MailList';
-import { useNav } from '../../../utils/navigate';
+import { useNav } from '../../../utils/url';
 
 interface MailboxHeaderProps {
 	folderId: FolderId;

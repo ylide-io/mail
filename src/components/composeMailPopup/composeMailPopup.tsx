@@ -8,7 +8,7 @@ import { ReactComponent as ExternalSvg } from '../../icons/ic20/external.svg';
 import mailer from '../../stores/Mailer';
 import { globalOutgoingMailData, OutgoingMailData } from '../../stores/outgoingMailData';
 import { RoutePath } from '../../stores/routePath';
-import { useNav } from '../../utils/navigate';
+import { useNav } from '../../utils/url';
 import { useOnMountAnimation } from '../../utils/useOnMountAnimation';
 import { ActionButton, ActionButtonLook } from '../ActionButton/ActionButton';
 import { ComposeMailForm } from '../composeMailForm/composeMailForm';

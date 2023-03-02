@@ -3,7 +3,7 @@ import { observer } from 'mobx-react';
 import { ReactNode, useState } from 'react';
 import { generatePath } from 'react-router-dom';
 
-import { blockchainsMap, walletsMeta } from '../../constants';
+import { APP_NAME, blockchainsMap, walletsMeta } from '../../constants';
 import { AdaptiveAddress } from '../../controls/adaptiveAddress/adaptiveAddress';
 import { YlideButton } from '../../controls/YlideButton';
 import { ReactComponent as CrossSvg } from '../../icons/ic20/cross.svg';
@@ -12,10 +12,9 @@ import { YlideLargeLogo } from '../../icons/YlideLargeLogo';
 import { NewPasswordModal } from '../../modals/NewPasswordModal';
 import { SelectWalletModal } from '../../modals/SelectWalletModal';
 import domain from '../../stores/Domain';
-import { FeedCategory } from '../../stores/Feed';
 import { RoutePath } from '../../stores/routePath';
 import { getQueryString } from '../../utils/getQueryString';
-import { useNav } from '../../utils/navigate';
+import { useNav } from '../../utils/url';
 
 export const NewWalletsPage = observer(() => {
 	const navigate = useNav();
@@ -33,15 +32,15 @@ export const NewWalletsPage = observer(() => {
 				<h2 className="intro-main-title">Connect your wallets</h2>
 
 				<h3 className="intro-main-subtitle">
-					Ylide Social Hub supports multiple accounts being connected at once. Connect one by one the accounts
-					you want to aggregate and continue when done.
+					{APP_NAME} supports multiple accounts being connected at once. Connect one by one the accounts you
+					want to aggregate and continue when done.
 				</h3>
 
 				{!!domain.accounts.activeAccounts.length && (
 					<YlideButton
 						style={{ marginTop: 20 }}
 						onClick={() => {
-							navigate(generatePath(RoutePath.FEED_CATEGORY, { category: FeedCategory.MAIN }));
+							navigate(generatePath(RoutePath.ROOT));
 						}}
 					>
 						Continue with connected accounts <NextSvg style={{ margin: '-4px -4px -4px 10px' }} />

@@ -1,8 +1,8 @@
 import {
 	AbstractBlockchainController,
 	BlockchainSourceType,
+	IGenericAccount,
 	IMessage,
-	IMessageContent,
 	IMessageWithSource,
 	ISourceWithMeta,
 	ListSourceDrainer,
@@ -16,7 +16,9 @@ import { useCallback, useEffect, useState } from 'react';
 import create from 'zustand';
 
 import messagesDB, { IMessageDecodedContent } from '../indexedDB/MessagesDB';
+import { invariant } from '../utils/invariant';
 import { analytics } from './Analytics';
+import { browserStorage } from './browserStorage';
 import contacts from './Contacts';
 import domain from './Domain';
 import { DomainAccount } from './models/DomainAccount';
@@ -39,6 +41,23 @@ export function getFolderName(folderId: FolderId) {
 		const tag = tags.tags.find(t => String(t.id) === folderId);
 		return tag?.name || 'Unknown';
 	}
+}
+
+//
+
+export async function decodeMessage(msgId: string, msg: IMessage, recepient: IGenericAccount) {
+	const content = await domain.ylide.core.getMessageContent(msg);
+	invariant(content && !content.corrupted, 'Content is not available or corrupted')
+
+	const result = msg.isBroadcast
+		? domain.ylide.core.decryptBroadcastContent(msg, content)
+		: await domain.ylide.core.decryptMessageContent(recepient, msg, content);
+
+	return {
+		msgId,
+		decodedSubject: result.content.subject,
+		decodedTextData: result.content.content,
+	};
 }
 
 //
@@ -246,9 +265,6 @@ interface MailStore {
 	lastMessagesList: ILinkedMessage[];
 	setLastMessagesList: (messages: ILinkedMessage[]) => void;
 
-	saveDecodedMessages: boolean;
-	setSaveDecodedSetting: (flag: boolean) => Promise<void>;
-	messagesContentById: Record<string, IMessageContent>;
 	decodedMessagesById: Record<string, IMessageDecodedContent>;
 	decodeMessage: (pushMsg: ILinkedMessage) => Promise<IMessageDecodedContent>;
 
@@ -310,15 +326,6 @@ export const useMailStore = create<MailStore>((set, get) => ({
 		set({ lastMessagesList: messages });
 	},
 
-	saveDecodedMessages: localStorage.getItem('saveDecodedMessages') !== 'false',
-	setSaveDecodedSetting: async flag => {
-		set({ saveDecodedMessages: flag });
-		localStorage.setItem('saveDecodedMessages', flag ? 'true' : 'false');
-		if (!flag) {
-			await messagesDB.clearAllDecodedMessages();
-		}
-	},
-	messagesContentById: {},
 	decodedMessagesById: {},
 	decodeMessage: async pushMsg => {
 		const state = get();
@@ -329,39 +336,12 @@ export const useMailStore = create<MailStore>((set, get) => ({
 			return state.decodedMessagesById[pushMsg.msgId];
 		}
 
-		async function fetchMessageContent(pushMsg: ILinkedMessage) {
-			if (state.messagesContentById[pushMsg.msgId]) {
-				return state.messagesContentById[pushMsg.msgId];
-			}
-
-			// { $$meta: IEVMEnrichedEvent<GenericMessageContentEventObject> }
-
-			const content = await domain.ylide.core.getMessageContent(pushMsg.msg);
-			if (!content || content.corrupted) {
-				throw new Error('Content is not available or corrupted');
-			}
-
-			state.messagesContentById[pushMsg.msgId] = content;
-
-			return content;
-		}
-
-		const content = await fetchMessageContent(pushMsg);
-
-		const result = pushMsg.msg.isBroadcast
-			? await domain.ylide.core.decryptBroadcastContent(pushMsg.msg, content)
-			: await domain.ylide.core.decryptMessageContent(pushMsg.recipient!.account, pushMsg.msg, content);
-
-		const decodedMessage = {
-			msgId: pushMsg.msgId,
-			decodedSubject: result.content.subject,
-			decodedTextData: result.content.content,
-		};
+		const decodedMessage = await decodeMessage(pushMsg.msgId, pushMsg.msg, pushMsg.recipient!.account)
 
 		state.decodedMessagesById[pushMsg.msgId] = decodedMessage;
 		set({ decodedMessagesById: { ...state.decodedMessagesById } });
 
-		if (state.saveDecodedMessages) {
+		if (browserStorage.saveDecodedMessages) {
 			console.log('msg saved: ', pushMsg.msgId);
 			await messagesDB.saveDecodedMessage(decodedMessage);
 		}

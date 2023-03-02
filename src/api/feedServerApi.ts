@@ -1,3 +1,4 @@
+import { REACT_APP__FEED_SERVER } from '../env';
 import { FeedPost, FeedSource } from '../stores/Feed';
 import { invariant } from '../utils/invariant';
 import { createCleanSerachParams } from '../utils/url';
@@ -15,7 +16,7 @@ export namespace FeedServerApi {
 
 	export function getUrl() {
 		return (
-			process.env.REACT_APP_FEED_SERVER ||
+			REACT_APP__FEED_SERVER ||
 			[
 				'https://fd1.ylide.io',
 				'https://fd2.ylide.io',

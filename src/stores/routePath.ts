@@ -2,6 +2,7 @@ export enum RoutePath {
 	TEST = '/test',
 	ADMIN = '/admin',
 
+	ROOT = '/',
 	ANY = '/*',
 
 	SETTINGS = '/settings',
@@ -18,4 +19,9 @@ export enum RoutePath {
 	FEED = '/feed',
 	FEED_POST = '/feed/post/:id',
 	FEED_CATEGORY = '/feed/:category',
+
+	OTC_ASSETS = '/otc/assets',
+	OTC_WALLETS = '/otc/wallets',
+	OTC_CHATS = '/otc/chats',
+	OTC_CHAT = '/otc/chats/:address',
 }

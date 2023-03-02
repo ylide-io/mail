@@ -1,6 +1,6 @@
 import { observer } from 'mobx-react';
 import React, { useEffect, useRef, useState } from 'react';
-import { useLocation, useParams } from 'react-router-dom';
+import { useParams, useSearchParams } from 'react-router-dom';
 
 import { ActionButton, ActionButtonLook } from '../../components/ActionButton/ActionButton';
 import { ErrorMessage } from '../../components/errorMessage/errorMessage';
@@ -12,8 +12,8 @@ import { ReactComponent as ArrowUpSvg } from '../../icons/ic20/arrowUp.svg';
 import { ReactComponent as CrossSvg } from '../../icons/ic20/cross.svg';
 import { browserStorage } from '../../stores/browserStorage';
 import feed, { FeedCategory } from '../../stores/Feed';
-import { useNav } from '../../utils/navigate';
 import { scrollWindowToTop } from '../../utils/ui';
+import { useNav } from '../../utils/url';
 import css from './FeedPage.module.scss';
 
 function isInViewport(element: HTMLDivElement) {
@@ -27,9 +27,8 @@ export const FeedPage = observer(() => {
 	const feedBodyRef = useRef<HTMLDivElement>(null);
 	const [newPostsVisible, setNewPostsVisible] = useState(false);
 	const { category } = useParams<{ category: FeedCategory }>();
-	const { search } = useLocation();
-	const searchParams = search.length > 1 ? new URLSearchParams(search.slice(1)) : undefined;
-	const sourceId = searchParams?.get('sourceId') || undefined;
+	const [searchParams] = useSearchParams();
+	const sourceId = searchParams.get('sourceId') || undefined;
 
 	const sourceListId = browserStorage.feedSourceSettings?.listId;
 	const [lastSourceListId, setLastSourceListId] = useState(sourceListId);

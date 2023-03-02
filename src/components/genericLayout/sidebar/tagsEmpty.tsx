@@ -2,7 +2,7 @@ import React from 'react';
 import { generatePath } from 'react-router-dom';
 
 import { RoutePath } from '../../../stores/routePath';
-import { useNav } from '../../../utils/navigate';
+import { useNav } from '../../../utils/url';
 
 const TagsEmpty = () => {
 	const navigate = useNav();

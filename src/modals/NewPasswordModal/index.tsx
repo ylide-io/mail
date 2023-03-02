@@ -9,20 +9,19 @@ import { ForgotPasswordModal } from '../../components/forgotPasswordModal/forgot
 import { Modal } from '../../components/modal/modal';
 import { TextField, TextFieldLook } from '../../components/textField/textField';
 import { YlideLoader } from '../../components/ylideLoader/ylideLoader';
-import { blockchainsMap, calloutSvg, evmNameToNetwork } from '../../constants';
+import { APP_NAME, blockchainsMap, calloutSvg, evmNameToNetwork } from '../../constants';
 import { WalletTag } from '../../controls/WalletTag';
 import { YlideButton } from '../../controls/YlideButton';
 import { analytics } from '../../stores/Analytics';
 import { browserStorage } from '../../stores/browserStorage';
 import domain from '../../stores/Domain';
 import { evmBalances } from '../../stores/evmBalances';
-import { FeedCategory } from '../../stores/Feed';
 import { DomainAccount } from '../../stores/models/DomainAccount';
 import { Wallet } from '../../stores/models/Wallet';
 import { RoutePath } from '../../stores/routePath';
 import { invariant } from '../../utils/invariant';
 import { isBytesEqual } from '../../utils/isBytesEqual';
-import { useNav } from '../../utils/navigate';
+import { useNav } from '../../utils/url';
 
 const txPrices: Record<EVMNetwork, number> = {
 	[EVMNetwork.LOCAL_HARDHAT]: 0.001,
@@ -599,11 +598,11 @@ export function NewPasswordModal({ faucetType, bonus, wallet, account, remoteKey
 							<YlideButton
 								primary
 								onClick={() => {
-									navigate(generatePath(RoutePath.FEED_CATEGORY, { category: FeedCategory.MAIN }));
+									navigate(generatePath(RoutePath.ROOT));
 									onResolve('', false, false);
 								}}
 							>
-								Go to Social Hub
+								Go to {APP_NAME}
 							</YlideButton>
 							<YlideButton nice onClick={() => onResolve('', false, false)}>
 								Add one more account

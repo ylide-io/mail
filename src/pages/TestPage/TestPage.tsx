@@ -73,6 +73,15 @@ export const TestPage = observer(() => {
 			</GridRow>
 
 			<GridRow>
+				large
+				<ActionButton size={ActionButtonSize.Large}>Text Only</ActionButton>
+				<ActionButton size={ActionButtonSize.Large} icon={<SettingsSvg style={{ width: 24, height: 24 }} />}>
+					With Icon
+				</ActionButton>
+				<ActionButton size={ActionButtonSize.Large} icon={<SettingsSvg style={{ width: 24, height: 24 }} />} />
+			</GridRow>
+
+			<GridRow>
 				multiline
 				<ActionButton isMultiline size={ActionButtonSize.Small}>
 					Multiline Small
@@ -122,8 +131,12 @@ export const TestPage = observer(() => {
 
 			<GridRow>
 				big icon
-				<ActionButton size={ActionButtonSize.Small} icon={<SettingsSvg style={{ width: 28, height: 28 }} />} />
-				<ActionButton size={ActionButtonSize.Small} icon={<SettingsSvg style={{ width: 28, height: 28 }} />}>
+				<ActionButton size={ActionButtonSize.Small} icon={<SettingsSvg style={{ width: 24, height: 24 }} />} />
+				<ActionButton size={ActionButtonSize.Small} icon={<SettingsSvg style={{ width: 24, height: 24 }} />}>
+					With Text
+				</ActionButton>
+				<ActionButton size={ActionButtonSize.Small} icon={<SettingsSvg style={{ width: 36, height: 36 }} />} />
+				<ActionButton size={ActionButtonSize.Small} icon={<SettingsSvg style={{ width: 36, height: 36 }} />}>
 					With Text
 				</ActionButton>
 			</GridRow>

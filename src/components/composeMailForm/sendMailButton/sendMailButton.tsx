@@ -1,6 +1,7 @@
 import './sendMailButton.module.scss';
 
 import { EVM_NAMES, EVMNetwork } from '@ylide/ethereum';
+import { Uint256 } from '@ylide/sdk';
 import { Dropdown, Menu } from 'antd';
 import clsx from 'clsx';
 import { autorun } from 'mobx';
@@ -8,12 +9,14 @@ import { observer } from 'mobx-react';
 import React, { ReactNode, useEffect } from 'react';
 
 import { blockchainsMap, evmNameToNetwork } from '../../../constants';
+import { REACT_APP__OTC_MODE } from '../../../env';
 import { ReactComponent as ArrowDownSvg } from '../../../icons/ic20/arrowDown.svg';
 import { ReactComponent as ReplySvg } from '../../../icons/ic20/reply.svg';
 import domain from '../../../stores/Domain';
 import { evmBalances } from '../../../stores/evmBalances';
 import mailer from '../../../stores/Mailer';
 import { OutgoingMailData } from '../../../stores/outgoingMailData';
+import { Spinner } from '../../spinner/spinner';
 
 export interface SendMailButtonProps {
 	mailData: OutgoingMailData;
@@ -72,17 +75,19 @@ export const SendMailButton = observer(({ mailData, onSent }: SendMailButtonProp
 			const msgId = await mailer.sendMail(
 				acc,
 				mailData.subject,
-				JSON.stringify(mailData.editorData),
+				mailData.hasEditorData ? JSON.stringify(mailData.editorData) : mailData.plainTextData!.trim(),
 				mailData.to.items.map(r => r.routing?.address!),
 				mailData.network,
+				REACT_APP__OTC_MODE
+					? ('0000000000000000000000000000000000000000000000000000000000000001' as Uint256)
+					: undefined,
 			);
 
 			console.log('id: ', msgId);
-			alert('Your message has been sent successfully.');
-
 			onSent?.();
 		} catch (e) {
 			console.log('Error sending message', e);
+			alert("Couldn't send your message.");
 		}
 	};
 
@@ -94,14 +99,24 @@ export const SendMailButton = observer(({ mailData, onSent }: SendMailButtonProp
 					!mailData.from ||
 					!mailData.to.items.length ||
 					mailData.to.items.some(r => r.isLoading) ||
-					!mailData.editorData?.blocks?.length,
+					(!mailData.hasEditorData && !mailData.hasPlainTextData),
 				withDropdown: mailData.from?.wallet.factory.blockchainGroup === 'evm',
 			})}
 		>
 			<div className="send-btn-text" onClick={sendMailHandler}>
-				<ReplySvg style={{ marginRight: 6, fill: 'currentcolor' }} />
-				{text && <span className="send-btn-title">{text}</span>}
+				{mailer.sending ? (
+					<>
+						<Spinner style={{ marginRight: 6, color: 'currentcolor' }} />
+						<span className="send-btn-title">Sending ...</span>
+					</>
+				) : (
+					<>
+						<ReplySvg style={{ marginRight: 6, fill: 'currentcolor' }} />
+						{text && <span className="send-btn-title">{text}</span>}
+					</>
+				)}
 			</div>
+
 			{mailData.from?.wallet.factory.blockchainGroup === 'evm' ? (
 				<Dropdown
 					overlay={

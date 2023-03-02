@@ -2,10 +2,26 @@ import { createSearchParams, URLSearchParamsInit, useNavigate } from 'react-rout
 
 import AlertModal from '../modals/AlertModal';
 import domain from '../stores/Domain';
+import { filterObjectEntries } from './object';
+
+export function createCleanSerachParams(search: Record<string, any>) {
+	return createSearchParams(filterObjectEntries(search, (key, value) => value != null));
+}
+
+//
 
 interface UseNavParameters {
 	path?: string;
 	search?: URLSearchParamsInit;
+	hash?: string;
+}
+
+export function buildUrl(params: string | UseNavParameters) {
+	return typeof params === 'string'
+		? params
+		: `${params.path}${params.search ? `?${createSearchParams(params.search).toString()}` : ''}${
+				params.hash ? `#${params.hash}` : ''
+		  }`;
 }
 
 export const useNav = () => {
@@ -31,9 +47,6 @@ export const useNav = () => {
 			return;
 		}
 
-		navigate({
-			pathname: params.path,
-			search: params.search ? `?${createSearchParams(params.search).toString()}` : undefined,
-		});
+		navigate(buildUrl(params));
 	};
 };

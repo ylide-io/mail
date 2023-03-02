@@ -12,7 +12,7 @@ import mailer from '../../stores/Mailer';
 import { useMailStore } from '../../stores/MailList';
 import { globalOutgoingMailData } from '../../stores/outgoingMailData';
 import { RoutePath } from '../../stores/routePath';
-import { useNav } from '../../utils/navigate';
+import { useNav } from '../../utils/url';
 import css from './ComposePage.module.scss';
 
 export const ComposePage = observer(() => {
@@ -49,7 +49,7 @@ export const ComposePage = observer(() => {
 				onSent={() => navigate(generatePath(RoutePath.MAIL_FOLDER, { folderId: lastActiveFolderId }))}
 			/>
 
-			{mailer.sending && <OverlappingLoader text="Broadcasting your message to blockchain..." />}
+			{mailer.sending && <OverlappingLoader text="Broadcasting your message to blockchain ..." />}
 		</GenericLayout>
 	);
 });
