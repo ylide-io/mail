@@ -13,6 +13,7 @@ import { NlToBr } from '../../../components/nlToBr/nlToBr';
 import { Recipients } from '../../../components/recipientInput/recipientInput';
 import { YlideLoader } from '../../../components/ylideLoader/ylideLoader';
 import { AdaptiveAddress } from '../../../controls/adaptiveAddress/adaptiveAddress';
+import { REACT_APP__OTC_PROVIDER } from '../../../env';
 import { ReactComponent as ContactSvg } from '../../../icons/ic20/contact.svg';
 import { IMessageDecodedContent } from '../../../indexedDB/MessagesDB';
 import domain from '../../../stores/Domain';
@@ -22,7 +23,7 @@ import { invariant } from '../../../utils/invariant';
 import { parseEditorjsJson } from '../../../utils/parseEditorjsJson';
 import { useAutoSizeTextArea } from '../../../utils/useAutoSizeTextArea';
 import { OtcLayout } from '../components/otcLayout/otcLayout';
-import { ReactComponent as AirSwapSvg } from './airswap.svg';
+import { getOtcProviderLogo } from '../otc';
 import { IframePopup } from './iframePopup/iframePopup';
 import css from './OtcChatPage.module.scss';
 
@@ -126,6 +127,8 @@ export const OtcChatPage = observer(() => {
 	const [isIframeOpen, setIframeOpen] = useState(false);
 	const [isIframeMinimized, setIframeMinimized] = useState(false);
 
+	const ProviderLogo = getOtcProviderLogo(REACT_APP__OTC_PROVIDER);
+
 	function onSent() {
 		setNewMessage('');
 		refetch().then();
@@ -158,7 +161,7 @@ export const OtcChatPage = observer(() => {
 					<div className={css.provider}>
 						<div className={css.providerTitle}>Powered by:</div>
 
-						<AirSwapSvg className={css.providerLogo} />
+						<ProviderLogo className={css.providerLogo} />
 					</div>
 				</div>
 			}
