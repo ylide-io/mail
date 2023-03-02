@@ -6,6 +6,7 @@ import { generatePath, Navigate, Route, Routes, useLocation } from 'react-router
 import { PopupManager } from './components/popup/popupManager/popupManager';
 import { StaticComponentManager } from './components/staticComponentManager/staticComponentManager';
 import { YlideLoader } from './components/ylideLoader/ylideLoader';
+import { REACT_APP__OTC_MODE } from './env';
 import { AdminPage } from './pages/AdminPage';
 import { ComposePage } from './pages/ComposePage/ComposePage';
 import { ContactsTab } from './pages/ContactsPage/components/Contacts/ContactsTab';
@@ -25,7 +26,7 @@ import { TestPage } from './pages/TestPage/TestPage';
 import { analytics } from './stores/Analytics';
 import { browserStorage } from './stores/browserStorage';
 import domain from './stores/Domain';
-import { FolderId } from './stores/MailList';
+import { FeedCategory } from './stores/Feed';
 import modals from './stores/Modals';
 import { RoutePath } from './stores/routePath';
 import walletConnect from './stores/WalletConnect';
@@ -112,19 +113,19 @@ const App = observer(() => {
 						<Route path={RoutePath.SETTINGS} element={<SettingsPage />} />
 						<Route path={RoutePath.ADMIN} element={<AdminPage />} />
 
-						{/* <Route path={RoutePath.FEED} element={<FeedPage />} />
+						<Route path={RoutePath.FEED} element={<FeedPage />} />
 						<Route path={RoutePath.FEED_POST} element={<FeedPostPage />} />
-						<Route path={RoutePath.FEED_CATEGORY} element={<FeedPage />} /> */}
+						<Route path={RoutePath.FEED_CATEGORY} element={<FeedPage />} />
 
-						{/* <Route path={RoutePath.MAIL_COMPOSE} element={<ComposePage />} /> */}
-						{/* <Route path={RoutePath.MAIL_CONTACTS} element={<ContactsPage />}>
+						<Route path={RoutePath.MAIL_COMPOSE} element={<ComposePage />} />
+						<Route path={RoutePath.MAIL_CONTACTS} element={<ContactsPage />}>
 							<Route index element={<ContactsTab />} />
 						</Route>
 						<Route path={RoutePath.MAIL_FOLDERS} element={<ContactsPage />}>
 							<Route index element={<TagsTab />} />
-						</Route> */}
-						{/* <Route path={RoutePath.MAIL_FOLDER} element={<MailboxPage />} /> */}
-						{/* <Route path={RoutePath.MAIL_DETAILS} element={<MailDetailsPage />} /> */}
+						</Route>
+						<Route path={RoutePath.MAIL_FOLDER} element={<MailboxPage />} />
+						<Route path={RoutePath.MAIL_DETAILS} element={<MailDetailsPage />} />
 
 						<Route path={RoutePath.OTC_ASSETS} element={<OtcAssetsPage />} />
 						<Route path={RoutePath.OTC_WALLETS} element={<OtcWalletsPage />} />
@@ -136,8 +137,11 @@ const App = observer(() => {
 							element={
 								<Navigate
 									replace
-									to={generatePath(RoutePath.OTC_ASSETS)}
-									// generatePath(RoutePath.MAIL_FOLDER, { folderId: FolderId.Inbox })
+									to={
+										REACT_APP__OTC_MODE
+											? generatePath(RoutePath.OTC_ASSETS)
+											: generatePath(RoutePath.FEED_CATEGORY, { category: FeedCategory.MAIN })
+									}
 								/>
 							}
 						/>

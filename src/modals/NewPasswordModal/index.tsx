@@ -12,11 +12,11 @@ import { YlideLoader } from '../../components/ylideLoader/ylideLoader';
 import { blockchainsMap, calloutSvg, evmNameToNetwork } from '../../constants';
 import { WalletTag } from '../../controls/WalletTag';
 import { YlideButton } from '../../controls/YlideButton';
+import { REACT_APP__OTC_MODE } from '../../env';
 import { analytics } from '../../stores/Analytics';
 import { browserStorage } from '../../stores/browserStorage';
 import domain from '../../stores/Domain';
 import { evmBalances } from '../../stores/evmBalances';
-import { FeedCategory } from '../../stores/Feed';
 import { DomainAccount } from '../../stores/models/DomainAccount';
 import { Wallet } from '../../stores/models/Wallet';
 import { RoutePath } from '../../stores/routePath';
@@ -599,11 +599,11 @@ export function NewPasswordModal({ faucetType, bonus, wallet, account, remoteKey
 							<YlideButton
 								primary
 								onClick={() => {
-									navigate(generatePath(RoutePath.OTC_ASSETS));
+									navigate(generatePath(RoutePath.ROOT));
 									onResolve('', false, false);
 								}}
 							>
-								Go to Ylide OTC
+								{REACT_APP__OTC_MODE ? 'Go to Ylide OTC' : 'Go to Social Hub'}
 							</YlideButton>
 							<YlideButton nice onClick={() => onResolve('', false, false)}>
 								Add one more account

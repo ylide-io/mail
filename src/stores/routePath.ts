@@ -2,6 +2,7 @@ export enum RoutePath {
 	TEST = '/test',
 	ADMIN = '/admin',
 
+	ROOT = '/',
 	ANY = '/*',
 
 	SETTINGS = '/settings',

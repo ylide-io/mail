@@ -9,6 +9,7 @@ import { observer } from 'mobx-react';
 import React, { ReactNode, useEffect } from 'react';
 
 import { blockchainsMap, evmNameToNetwork } from '../../../constants';
+import { REACT_APP__OTC_MODE } from '../../../env';
 import { ReactComponent as ArrowDownSvg } from '../../../icons/ic20/arrowDown.svg';
 import { ReactComponent as ReplySvg } from '../../../icons/ic20/reply.svg';
 import domain from '../../../stores/Domain';
@@ -77,7 +78,9 @@ export const SendMailButton = observer(({ mailData, onSent }: SendMailButtonProp
 				mailData.hasEditorData ? JSON.stringify(mailData.editorData) : mailData.plainTextData!.trim(),
 				mailData.to.items.map(r => r.routing?.address!),
 				mailData.network,
-				'0000000000000000000000000000000000000000000000000000000000000001' as Uint256
+				REACT_APP__OTC_MODE
+					? ('0000000000000000000000000000000000000000000000000000000000000001' as Uint256)
+					: undefined,
 			);
 
 			console.log('id: ', msgId);

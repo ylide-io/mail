@@ -4,11 +4,11 @@ import React, { useRef, useState } from 'react';
 import { generatePath } from 'react-router-dom';
 
 import { Blockie } from '../../../controls/Blockie';
+import { REACT_APP__OTC_MODE } from '../../../env';
 import { ReactComponent as ArrowDownSvg } from '../../../icons/ic20/arrowDown.svg';
 import { ReactComponent as ContactsSvg } from '../../../icons/ic28/contacts.svg';
 import { YlideLargeLogo } from '../../../icons/YlideLargeLogo';
 import domain from '../../../stores/Domain';
-import { FolderId } from '../../../stores/MailList';
 import { RoutePath } from '../../../stores/routePath';
 import { useNav } from '../../../utils/url';
 import { ActionButton, ActionButtonLook, ActionButtonSize } from '../../ActionButton/ActionButton';
@@ -28,29 +28,32 @@ const Header = observer(() => {
 
 			<div className={css.logo}>
 				<a
-					href={generatePath(RoutePath.OTC_ASSETS)}
+					href={generatePath(RoutePath.ROOT)}
 					onClick={e => {
 						e.preventDefault();
-						nav(generatePath(RoutePath.OTC_ASSETS));
+						nav(generatePath(RoutePath.ROOT));
 					}}
 				>
 					<YlideLargeLogo className={css.logoImage} />
 				</a>
 			</div>
 			<div className={css.main}>
-				{/* <div className={css.block}>
-					<Tooltip title="Manage contacts and folders">
-						<ActionButton
-							size={ActionButtonSize.Medium}
-							look={ActionButtonLook.LITE}
-							icon={<ContactsSvg />}
-							onClick={e => {
-								e.preventDefault();
-								nav(generatePath(RoutePath.MAIL_CONTACTS));
-							}}
-						/>
-					</Tooltip>
-				</div> */}
+				{REACT_APP__OTC_MODE || (
+					<div className={css.block}>
+						<Tooltip title="Manage contacts and folders">
+							<ActionButton
+								size={ActionButtonSize.Medium}
+								look={ActionButtonLook.LITE}
+								icon={<ContactsSvg />}
+								onClick={e => {
+									e.preventDefault();
+									nav(generatePath(RoutePath.MAIL_CONTACTS));
+								}}
+							/>
+						</Tooltip>
+					</div>
+				)}
+
 				<div className={css.block}>
 					<button
 						ref={accountsPopupButtonRef}

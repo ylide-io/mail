@@ -6,13 +6,13 @@ import { generatePath } from 'react-router-dom';
 import { blockchainsMap, walletsMeta } from '../../constants';
 import { AdaptiveAddress } from '../../controls/adaptiveAddress/adaptiveAddress';
 import { YlideButton } from '../../controls/YlideButton';
+import { REACT_APP__OTC_MODE } from '../../env';
 import { ReactComponent as CrossSvg } from '../../icons/ic20/cross.svg';
 import { ReactComponent as NextSvg } from '../../icons/ic28/next.svg';
 import { YlideLargeLogo } from '../../icons/YlideLargeLogo';
 import { NewPasswordModal } from '../../modals/NewPasswordModal';
 import { SelectWalletModal } from '../../modals/SelectWalletModal';
 import domain from '../../stores/Domain';
-import { FeedCategory } from '../../stores/Feed';
 import { RoutePath } from '../../stores/routePath';
 import { getQueryString } from '../../utils/getQueryString';
 import { useNav } from '../../utils/url';
@@ -33,15 +33,15 @@ export const NewWalletsPage = observer(() => {
 				<h2 className="intro-main-title">Connect your wallets</h2>
 
 				<h3 className="intro-main-subtitle">
-					Ylide OTC supports multiple accounts being connected at once. Connect one by one the accounts
-					you want to aggregate and continue when done.
+					Ylide {REACT_APP__OTC_MODE ? 'OTC' : 'Social Hub'} supports multiple accounts being connected at
+					once. Connect one by one the accounts you want to aggregate and continue when done.
 				</h3>
 
 				{!!domain.accounts.activeAccounts.length && (
 					<YlideButton
 						style={{ marginTop: 20 }}
 						onClick={() => {
-							navigate(generatePath(RoutePath.OTC_ASSETS));
+							navigate(generatePath(RoutePath.ROOT));
 						}}
 					>
 						Continue with connected accounts <NextSvg style={{ margin: '-4px -4px -4px 10px' }} />
