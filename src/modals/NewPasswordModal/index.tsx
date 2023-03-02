@@ -9,10 +9,9 @@ import { ForgotPasswordModal } from '../../components/forgotPasswordModal/forgot
 import { Modal } from '../../components/modal/modal';
 import { TextField, TextFieldLook } from '../../components/textField/textField';
 import { YlideLoader } from '../../components/ylideLoader/ylideLoader';
-import { blockchainsMap, calloutSvg, evmNameToNetwork } from '../../constants';
+import { APP_NAME, blockchainsMap, calloutSvg, evmNameToNetwork } from '../../constants';
 import { WalletTag } from '../../controls/WalletTag';
 import { YlideButton } from '../../controls/YlideButton';
-import { REACT_APP__OTC_MODE } from '../../env';
 import { analytics } from '../../stores/Analytics';
 import { browserStorage } from '../../stores/browserStorage';
 import domain from '../../stores/Domain';
@@ -603,7 +602,7 @@ export function NewPasswordModal({ faucetType, bonus, wallet, account, remoteKey
 									onResolve('', false, false);
 								}}
 							>
-								{REACT_APP__OTC_MODE ? 'Go to Ylide OTC' : 'Go to Social Hub'}
+								Go to {APP_NAME}
 							</YlideButton>
 							<YlideButton nice onClick={() => onResolve('', false, false)}>
 								Add one more account

@@ -1,5 +1,6 @@
 import { EVM_NAMES, EVMNetwork } from '@ylide/ethereum';
 
+import { REACT_APP__OTC_MODE } from './env';
 import { ArbitrumLogo } from './icons/ArbitrumLogo';
 import { AstarLogo } from './icons/AstarLogo';
 import { AuroraLogo } from './icons/AuroraLogo';
@@ -25,6 +26,8 @@ import { PolygonLogo } from './icons/PolygonLogo';
 import { SolanaLogo } from './icons/SolanaLogo';
 import { TrustWalletLogo } from './icons/TrustWalletLogo';
 import { WalletConnectLogo } from './icons/WalletConnectLogo';
+
+export const APP_NAME = REACT_APP__OTC_MODE ? 'Ylide OTC' : 'Ylide Social Hub';
 
 export interface IEthereumNetworkDescriptor {
 	chainId: string;

@@ -3,10 +3,9 @@ import { observer } from 'mobx-react';
 import { ReactNode, useState } from 'react';
 import { generatePath } from 'react-router-dom';
 
-import { blockchainsMap, walletsMeta } from '../../constants';
+import { APP_NAME, blockchainsMap, walletsMeta } from '../../constants';
 import { AdaptiveAddress } from '../../controls/adaptiveAddress/adaptiveAddress';
 import { YlideButton } from '../../controls/YlideButton';
-import { REACT_APP__OTC_MODE } from '../../env';
 import { ReactComponent as CrossSvg } from '../../icons/ic20/cross.svg';
 import { ReactComponent as NextSvg } from '../../icons/ic28/next.svg';
 import { YlideLargeLogo } from '../../icons/YlideLargeLogo';
@@ -33,8 +32,8 @@ export const NewWalletsPage = observer(() => {
 				<h2 className="intro-main-title">Connect your wallets</h2>
 
 				<h3 className="intro-main-subtitle">
-					Ylide {REACT_APP__OTC_MODE ? 'OTC' : 'Social Hub'} supports multiple accounts being connected at
-					once. Connect one by one the accounts you want to aggregate and continue when done.
+					{APP_NAME} supports multiple accounts being connected at once. Connect one by one the accounts you
+					want to aggregate and continue when done.
 				</h3>
 
 				{!!domain.accounts.activeAccounts.length && (

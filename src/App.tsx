@@ -6,6 +6,7 @@ import { generatePath, Navigate, Route, Routes, useLocation } from 'react-router
 import { PopupManager } from './components/popup/popupManager/popupManager';
 import { StaticComponentManager } from './components/staticComponentManager/staticComponentManager';
 import { YlideLoader } from './components/ylideLoader/ylideLoader';
+import { APP_NAME } from './constants';
 import { REACT_APP__OTC_MODE } from './env';
 import { AdminPage } from './pages/AdminPage';
 import { ComposePage } from './pages/ComposePage/ComposePage';
@@ -45,6 +46,10 @@ const App = observer(() => {
 	);
 
 	const location = useLocation();
+
+	useEffect(() => {
+		document.title = APP_NAME;
+	}, []);
 
 	useEffect(() => {
 		if (location.pathname !== '/test') {
