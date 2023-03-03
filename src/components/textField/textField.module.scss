@@ -39,7 +39,7 @@
 .root_liteLook {
 	padding: 0 11px;
 	height: $interactive-elem-size_small;
-	background: var(--tertiary-surface-color);
+	background: rgba(var(--shade-rgb-color), 0.08);
 	border: 1px solid transparent;
 	border-radius: $interactive-elem-size_small/2;
 
