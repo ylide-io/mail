@@ -112,8 +112,8 @@ const App = observer(() => {
 	return (
 		<QueryClientProvider client={queryClient}>
 			<PopupManager>
-				<StaticComponentManager>
-					<ToastManager>
+				<ToastManager>
+					<StaticComponentManager>
 						<Routes>
 							<Route path={RoutePath.TEST} element={<TestPage />} />
 							<Route path={RoutePath.WALLETS} element={<NewWalletsPage />} />
@@ -155,8 +155,8 @@ const App = observer(() => {
 						</Routes>
 
 						{modals.render()}
-					</ToastManager>
-				</StaticComponentManager>
+					</StaticComponentManager>
+				</ToastManager>
 			</PopupManager>
 		</QueryClientProvider>
 	);
