@@ -8,6 +8,7 @@ import { generatePath } from 'react-router-dom';
 import { ForgotPasswordModal } from '../../components/forgotPasswordModal/forgotPasswordModal';
 import { Modal } from '../../components/modal/modal';
 import { TextField, TextFieldLook } from '../../components/textField/textField';
+import { useToastManager } from '../../components/toast/toast';
 import { YlideLoader } from '../../components/ylideLoader/ylideLoader';
 import { APP_NAME, blockchainsMap, calloutSvg, evmNameToNetwork } from '../../constants';
 import { WalletTag } from '../../controls/WalletTag';
@@ -64,6 +65,7 @@ interface NewPasswordModalProps {
 
 export function NewPasswordModal({ faucetType, bonus, wallet, account, remoteKeys, onResolve }: NewPasswordModalProps) {
 	const navigate = useNav();
+	const { toast } = useToastManager();
 
 	const [step, setStep] = useState(Step.ENTER_PASSWORD);
 
@@ -182,7 +184,7 @@ export function NewPasswordModal({ faucetType, bonus, wallet, account, remoteKey
 			} else {
 				setStep(Step.ENTER_PASSWORD);
 			}
-			alert('Transaction was not published. Please, try again');
+			toast('Transaction was not published. Please, try again');
 		}
 	}
 
@@ -227,7 +229,7 @@ export function NewPasswordModal({ faucetType, bonus, wallet, account, remoteKey
 			setDomainAccount(domainAccount);
 			return await publishLocalKey(domainAccount);
 		} else {
-			alert('Ylide password was wrong, please, try again');
+			toast('Ylide password was wrong, please, try again');
 			setStep(Step.ENTER_PASSWORD);
 			return;
 		}

@@ -14,6 +14,7 @@ import { ErrorMessage } from '../errorMessage/errorMessage';
 import { Modal } from '../modal/modal';
 import { OverlappingLoader } from '../overlappingLoader/overlappingLoader';
 import { Spinner } from '../spinner/spinner';
+import { useToastManager } from '../toast/toast';
 import css from './feedSettingsPopup.module.scss';
 
 interface SourceItemProps {
@@ -44,6 +45,8 @@ export interface FeedSettingsPopupProps {
 }
 
 export function FeedSettingsPopup({ onClose }: FeedSettingsPopupProps) {
+	const { toast } = useToastManager();
+
 	const { isLoading, data } = useQuery('feed-sources', FeedServerApi.getSources);
 
 	const createSourceListMutation = useMutation((sourceIds: string[]) => FeedServerApi.createSourceList(sourceIds), {
@@ -57,7 +60,7 @@ export function FeedSettingsPopup({ onClose }: FeedSettingsPopupProps) {
 
 			onClose?.();
 		},
-		onError: () => alert("Couldn't save your feed settings. Please try again."),
+		onError: () => toast("Couldn't save your feed settings. Please try again."),
 	});
 
 	const list = useMemo<Record<FeedCategory, FeedSource[]> | undefined>(() => {

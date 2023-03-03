@@ -17,6 +17,7 @@ import { evmBalances } from '../../../stores/evmBalances';
 import mailer from '../../../stores/Mailer';
 import { OutgoingMailData } from '../../../stores/outgoingMailData';
 import { Spinner } from '../../spinner/spinner';
+import { useToastManager } from '../../toast/toast';
 
 export interface SendMailButtonProps {
 	mailData: OutgoingMailData;
@@ -24,6 +25,8 @@ export interface SendMailButtonProps {
 }
 
 export const SendMailButton = observer(({ mailData, onSent }: SendMailButtonProps) => {
+	const { toast } = useToastManager();
+
 	useEffect(
 		() =>
 			autorun(async () => {
@@ -61,7 +64,7 @@ export const SendMailButton = observer(({ mailData, onSent }: SendMailButtonProp
 	const sendMailHandler = async () => {
 		try {
 			if (mailData.to.items.some(r => !r.routing?.details)) {
-				return alert("For some of your recipients we didn't find keys on the blockchain.");
+				return toast("For some of your recipients we didn't find keys on the blockchain.");
 			}
 
 			mailer.sending = true;
@@ -84,10 +87,11 @@ export const SendMailButton = observer(({ mailData, onSent }: SendMailButtonProp
 			);
 
 			console.log('id: ', msgId);
+			toast('Your message has been sent successfully 🔥');
 			onSent?.();
 		} catch (e) {
 			console.log('Error sending message', e);
-			alert("Couldn't send your message.");
+			toast("Couldn't send your message 😒");
 		}
 	};
 

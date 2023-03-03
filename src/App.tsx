@@ -5,6 +5,7 @@ import { generatePath, Navigate, Route, Routes, useLocation } from 'react-router
 
 import { PopupManager } from './components/popup/popupManager/popupManager';
 import { StaticComponentManager } from './components/staticComponentManager/staticComponentManager';
+import { ToastManager } from './components/toast/toast';
 import { YlideLoader } from './components/ylideLoader/ylideLoader';
 import { APP_NAME } from './constants';
 import { REACT_APP__OTC_MODE } from './env';
@@ -112,47 +113,49 @@ const App = observer(() => {
 		<QueryClientProvider client={queryClient}>
 			<PopupManager>
 				<StaticComponentManager>
-					<Routes>
-						<Route path={RoutePath.TEST} element={<TestPage />} />
-						<Route path={RoutePath.WALLETS} element={<NewWalletsPage />} />
-						<Route path={RoutePath.SETTINGS} element={<SettingsPage />} />
-						<Route path={RoutePath.ADMIN} element={<AdminPage />} />
+					<ToastManager>
+						<Routes>
+							<Route path={RoutePath.TEST} element={<TestPage />} />
+							<Route path={RoutePath.WALLETS} element={<NewWalletsPage />} />
+							<Route path={RoutePath.SETTINGS} element={<SettingsPage />} />
+							<Route path={RoutePath.ADMIN} element={<AdminPage />} />
 
-						<Route path={RoutePath.FEED} element={<FeedPage />} />
-						<Route path={RoutePath.FEED_POST} element={<FeedPostPage />} />
-						<Route path={RoutePath.FEED_CATEGORY} element={<FeedPage />} />
+							<Route path={RoutePath.FEED} element={<FeedPage />} />
+							<Route path={RoutePath.FEED_POST} element={<FeedPostPage />} />
+							<Route path={RoutePath.FEED_CATEGORY} element={<FeedPage />} />
 
-						<Route path={RoutePath.MAIL_COMPOSE} element={<ComposePage />} />
-						<Route path={RoutePath.MAIL_CONTACTS} element={<ContactsPage />}>
-							<Route index element={<ContactsTab />} />
-						</Route>
-						<Route path={RoutePath.MAIL_FOLDERS} element={<ContactsPage />}>
-							<Route index element={<TagsTab />} />
-						</Route>
-						<Route path={RoutePath.MAIL_FOLDER} element={<MailboxPage />} />
-						<Route path={RoutePath.MAIL_DETAILS} element={<MailDetailsPage />} />
+							<Route path={RoutePath.MAIL_COMPOSE} element={<ComposePage />} />
+							<Route path={RoutePath.MAIL_CONTACTS} element={<ContactsPage />}>
+								<Route index element={<ContactsTab />} />
+							</Route>
+							<Route path={RoutePath.MAIL_FOLDERS} element={<ContactsPage />}>
+								<Route index element={<TagsTab />} />
+							</Route>
+							<Route path={RoutePath.MAIL_FOLDER} element={<MailboxPage />} />
+							<Route path={RoutePath.MAIL_DETAILS} element={<MailDetailsPage />} />
 
-						<Route path={RoutePath.OTC_ASSETS} element={<OtcAssetsPage />} />
-						<Route path={RoutePath.OTC_WALLETS} element={<OtcWalletsPage />} />
-						<Route path={RoutePath.OTC_CHATS} element={<OtcChatsPage />} />
-						<Route path={RoutePath.OTC_CHAT} element={<OtcChatPage />} />
+							<Route path={RoutePath.OTC_ASSETS} element={<OtcAssetsPage />} />
+							<Route path={RoutePath.OTC_WALLETS} element={<OtcWalletsPage />} />
+							<Route path={RoutePath.OTC_CHATS} element={<OtcChatsPage />} />
+							<Route path={RoutePath.OTC_CHAT} element={<OtcChatPage />} />
 
-						<Route
-							path={RoutePath.ANY}
-							element={
-								<Navigate
-									replace
-									to={
-										REACT_APP__OTC_MODE
-											? generatePath(RoutePath.OTC_ASSETS)
-											: generatePath(RoutePath.FEED_CATEGORY, { category: FeedCategory.MAIN })
-									}
-								/>
-							}
-						/>
-					</Routes>
+							<Route
+								path={RoutePath.ANY}
+								element={
+									<Navigate
+										replace
+										to={
+											REACT_APP__OTC_MODE
+												? generatePath(RoutePath.OTC_ASSETS)
+												: generatePath(RoutePath.FEED_CATEGORY, { category: FeedCategory.MAIN })
+										}
+									/>
+								}
+							/>
+						</Routes>
 
-					{modals.render()}
+						{modals.render()}
+					</ToastManager>
 				</StaticComponentManager>
 			</PopupManager>
 		</QueryClientProvider>

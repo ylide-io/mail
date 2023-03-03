@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { ActionButton, ActionButtonLook, ActionButtonSize } from '../ActionButton/ActionButton';
 import { Modal } from '../modal/modal';
 import { TextField } from '../textField/textField';
+import { useToastManager } from '../toast/toast';
 import css from './forgotPasswordModal.module.scss';
 
 enum Step {
@@ -17,6 +18,8 @@ export interface ForgotPasswordModalProps {
 }
 
 export function ForgotPasswordModal({ onNewPassword, onCancel }: ForgotPasswordModalProps) {
+	const { toast } = useToastManager();
+
 	const [step, setStep] = useState(Step.FIRST_WARNING);
 
 	const [password, setPassword] = useState('');
@@ -24,9 +27,9 @@ export function ForgotPasswordModal({ onNewPassword, onCancel }: ForgotPasswordM
 
 	function onSave() {
 		if (password.length < 5) {
-			alert('Minimal length is 5 symbols');
+			toast('Minimal length is 5 symbols');
 		} else if (password !== passwordRepeat) {
-			alert(`Passwords don't match`);
+			toast(`Passwords don't match`);
 		} else {
 			onNewPassword(password);
 		}

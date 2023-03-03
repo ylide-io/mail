@@ -1,0 +1,26 @@
+.root {
+	position: fixed;
+	top: 16px;
+	left: 50%;
+	padding: 20px;
+	width: 400px;
+	max-width: 95%;
+	color: var(--on-inverted-surface-color);
+	background: var(--inverted-surface-color);
+	border-radius: 8px;
+	box-shadow: var(--inverted-popup-shadow);
+	transform: translate(-50%, -20%);
+	opacity: 0;
+	transition: all 200ms;
+}
+
+.root_visible {
+	transform: translate(-50%, 0);
+	opacity: 0.85;
+}
+
+.root_hidden {
+	transform: translate(-50%, 20%);
+	opacity: 0;
+	pointer-events: none;
+}
