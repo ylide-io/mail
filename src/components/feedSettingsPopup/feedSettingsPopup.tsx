@@ -5,7 +5,7 @@ import { FeedServerApi } from '../../api/feedServerApi';
 import { ReactComponent as ExternalSvg } from '../../icons/ic20/external.svg';
 import { ReactComponent as SelectAllSvg } from '../../icons/ic20/selectAll.svg';
 import { browserStorage } from '../../stores/browserStorage';
-import { FeedCategory, FeedSource, getFeedCategoryName, nonSyntheticFeedCategories } from '../../stores/Feed';
+import { FeedCategory, getFeedCategoryName, nonSyntheticFeedCategories } from '../../stores/Feed';
 import { toggleArrayItem } from '../../utils/array';
 import { invariant } from '../../utils/invariant';
 import { ActionButton, ActionButtonLook } from '../ActionButton/ActionButton';
@@ -16,6 +16,7 @@ import { OverlappingLoader } from '../overlappingLoader/overlappingLoader';
 import { Spinner } from '../spinner/spinner';
 import { useToastManager } from '../toast/toast';
 import css from './feedSettingsPopup.module.scss';
+import FeedSource = FeedServerApi.FeedSource;
 
 interface SourceItemProps {
 	name: string;

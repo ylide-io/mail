@@ -1,5 +1,5 @@
 import { REACT_APP__FEED_SERVER } from '../env';
-import { FeedPost, FeedSource } from '../stores/Feed';
+import { FeedCategory, FeedPost } from '../stores/Feed';
 import { invariant } from '../utils/invariant';
 import { createCleanSerachParams } from '../utils/url';
 
@@ -74,6 +74,15 @@ export namespace FeedServerApi {
 	}
 
 	//
+
+	export interface FeedSource {
+		id: string;
+		category: FeedCategory;
+		name: string;
+		origin?: string;
+		link: string;
+		type: string;
+	}
 
 	export type GetSourcesResponse = { sources: FeedSource[] };
 
