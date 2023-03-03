@@ -4,7 +4,10 @@
 	"private": true,
 	"scripts": {
 		"start": "react-app-rewired start",
-		"build": "react-app-rewired build",
+		"build-hub": "react-app-rewired build",
+		"build-airswap": "REACT_APP__OTC_MODE=1 REACT_APP__OTC_PROVIDER=AIRSWAP react-app-rewired build",
+		"build-paraswap": "REACT_APP__OTC_MODE=1 REACT_APP__OTC_PROVIDER=PARASWAP react-app-rewired build",
+		"build-1inch": "REACT_APP__OTC_MODE=1 REACT_APP__OTC_PROVIDER=ONEINCH react-app-rewired build",
 		"test": "react-app-rewired test",
 		"eject": "react-app-rewired eject"
 	},
