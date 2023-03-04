@@ -194,7 +194,7 @@ export function NewPasswordModal({ faucetType, bonus, wallet, account, remoteKey
 		let tempLocalKey;
 		try {
 			if (!forceNew && freshestKey && freshestKey.key.keyVersion === 1) {
-				tempLocalKey = await wallet.constructLocalKeyV1(account, password);
+				tempLocalKey = await wallet.constructLocalKeyV2(account, password); //wallet.constructLocalKeyV1(account, password);
 			} else {
 				tempLocalKey = await wallet.constructLocalKeyV2(account, password);
 			}
