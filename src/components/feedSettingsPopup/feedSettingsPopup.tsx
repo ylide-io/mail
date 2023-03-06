@@ -1,45 +1,55 @@
-import { Fragment, useLayoutEffect, useMemo, useState } from 'react';
+import Avatar from 'antd/lib/avatar/avatar';
+import clsx from 'clsx';
+import React, { useCallback, useState } from 'react';
 import { useMutation, useQuery } from 'react-query';
 
 import { FeedServerApi } from '../../api/feedServerApi';
-import { ReactComponent as ExternalSvg } from '../../icons/ic20/external.svg';
-import { ReactComponent as SelectAllSvg } from '../../icons/ic20/selectAll.svg';
+import { ReactComponent as ContactSvg } from '../../icons/ic20/contact.svg';
+import { ReactComponent as SearchSvg } from '../../icons/ic28/search.svg';
 import { browserStorage } from '../../stores/browserStorage';
-import { FeedCategory, getFeedCategoryName, nonSyntheticFeedCategories } from '../../stores/Feed';
 import { toggleArrayItem } from '../../utils/array';
+import { formatFeedLinkType } from '../../utils/feed';
 import { invariant } from '../../utils/invariant';
 import { ActionButton, ActionButtonLook } from '../ActionButton/ActionButton';
 import { CheckBox } from '../checkBox/checkBox';
 import { ErrorMessage } from '../errorMessage/errorMessage';
+import { FeedLinkTypeIcon } from '../feedLinkTypeIcon/feedLinkTypeIcon';
 import { Modal } from '../modal/modal';
 import { OverlappingLoader } from '../overlappingLoader/overlappingLoader';
 import { Spinner } from '../spinner/spinner';
+import { TextField, TextFieldLook } from '../textField/textField';
 import { useToastManager } from '../toast/toast';
 import css from './feedSettingsPopup.module.scss';
-import FeedSource = FeedServerApi.FeedSource;
 
-interface SourceItemProps {
-	name: string;
-	link?: string;
-	isChecked?: boolean;
-	onChange?: (isChecked: boolean) => void;
+interface RowProps {
+	source: FeedServerApi.FeedSource;
+	isSelected: boolean;
+	onSelect: (sourceId: string, isSelected: boolean) => void;
 }
 
-export function SourceItem({ name, link, isChecked, onChange }: SourceItemProps) {
-	return (
-		<label className={css.item}>
-			<CheckBox isChecked={isChecked} onChange={onChange} />
+export const Row = React.memo(({ source, isSelected, onSelect }: RowProps) => (
+	<div key={source.id} className={clsx(css.row, css.row_data)}>
+		<div className={css.checkBoxCell}>
+			<CheckBox isChecked={isSelected} onChange={isChecked => onSelect(source.id, isChecked)} />
+		</div>
+		<div>
+			<div className={css.sourceName}>
+				<Avatar size={24} src={source.avatar} icon={<ContactSvg width="100%" height="100%" />} />
 
-			<div className={css.itemText}>{name}</div>
+				<div className={css.sourceNameText}>{source.name}</div>
+			</div>
+		</div>
+		<div>{source.origin}</div>
+		<div>
+			<a className={css.sourceLink} href={source.link} target="_blank" rel="noreferrer">
+				<FeedLinkTypeIcon size={16} linkType={source.type} />
+				{formatFeedLinkType(source.type)}
+			</a>
+		</div>
+	</div>
+));
 
-			{link && (
-				<a className={css.itemLink} href={link} target="_blank" rel="noreferrer">
-					<ExternalSvg />
-				</a>
-			)}
-		</label>
-	);
-}
+//
 
 export interface FeedSettingsPopupProps {
 	onClose?: () => void;
@@ -48,7 +58,22 @@ export interface FeedSettingsPopupProps {
 export function FeedSettingsPopup({ onClose }: FeedSettingsPopupProps) {
 	const { toast } = useToastManager();
 
-	const { isLoading, data } = useQuery('feed-sources', FeedServerApi.getSources);
+	const { isLoading, data } = useQuery('feed-sources', async () => {
+		const res = await FeedServerApi.getSources();
+		res.sources.sort(
+			(a, b) =>
+				b.type.localeCompare(a.type) ||
+				(a.origin || '').localeCompare(b.origin || '') ||
+				a.name.localeCompare(b.name),
+		);
+
+		const allSourceIds = res.sources.map(s => s.id);
+		setAllSourceIds(allSourceIds);
+
+		setSelectedSourceIds(browserStorage.feedSourceSettings?.sourceIds || allSourceIds);
+
+		return res;
+	});
 
 	const createSourceListMutation = useMutation((sourceIds: string[]) => FeedServerApi.createSourceList(sourceIds), {
 		onSuccess: data => {
@@ -64,40 +89,17 @@ export function FeedSettingsPopup({ onClose }: FeedSettingsPopupProps) {
 		onError: () => toast("Couldn't save your feed settings. Please try again."),
 	});
 
-	const list = useMemo<Record<FeedCategory, FeedSource[]> | undefined>(() => {
-		const categoryToSourceList = data?.sources.reduce((prev, curr) => {
-			if (nonSyntheticFeedCategories.includes(curr.category)) {
-				prev[curr.category] = prev[curr.category] || [];
-				prev[curr.category].push(curr);
-			}
-
-			return prev;
-		}, {} as Record<FeedCategory, FeedSource[]>);
-
-		if (categoryToSourceList) {
-			Object.values(categoryToSourceList).map(list =>
-				list.sort((a, b) => (a.name && b.name ? a.name.localeCompare(b.name) : a.id.localeCompare(b.id))),
-			);
-		}
-
-		return categoryToSourceList;
-	}, [data?.sources]);
-
-	const [selectedSourceIds, setSelectedSourceIds] = useState(browserStorage.feedSourceSettings?.sourceIds);
-
-	const allSourceIds = useMemo(
-		() => list && Object.values(list).reduce((prev, curr) => prev.concat(curr.map(s => s.id)), [] as string[]),
-		[list],
-	);
+	const [allSourceIds, setAllSourceIds] = useState<string[]>([]);
+	const [selectedSourceIds, setSelectedSourceIds] = useState<string[]>([]);
 
 	const isSelectedAll = selectedSourceIds?.length === allSourceIds?.length;
 
-	// Populate selected-source-ids
-	useLayoutEffect(() => {
-		if (selectedSourceIds == null && allSourceIds) {
-			setSelectedSourceIds(allSourceIds);
-		}
-	}, [allSourceIds, selectedSourceIds]);
+	const [isSearchOpen, setSearchOpen] = useState(false);
+	const [searchTerm, setSearchTerm] = useState('');
+
+	const onRowSelect = useCallback((sourceId: string, isSelected: boolean) => {
+		setSelectedSourceIds(prev => toggleArrayItem(prev, sourceId, isSelected));
+	}, []);
 
 	const saveChanges = () => {
 		invariant(selectedSourceIds);
@@ -110,51 +112,48 @@ export function FeedSettingsPopup({ onClose }: FeedSettingsPopupProps) {
 		}
 	};
 
+	const filteredSources = data?.sources.filter(source => {
+		const term = searchTerm.trim().toLowerCase();
+		if (!term) return true;
+
+		return source.name.toLowerCase().includes(term) || source.origin?.toLowerCase().includes(term);
+	});
+
 	return (
 		<Modal className={css.root} onClose={onClose}>
-			<div className={css.title}>My Feed Settings</div>
-			<div className={css.description}>Select sources you want to see in your Feed</div>
+			<div className={css.header}>
+				<div className={css.title}>My Feed Settings</div>
+				<div className={css.description}>Select sources you want to see in your Feed</div>
+			</div>
 
 			<div className={css.list}>
-				{list ? (
-					nonSyntheticFeedCategories.map(category => {
-						const sources = list[category];
-						const sourceIds = sources.map(s => s.id);
-						const isAllSelectedInCategory = sourceIds.every(id => selectedSourceIds?.includes(id));
-
-						return (
-							<Fragment key={category}>
-								<SourceItem
-									name={getFeedCategoryName(category)}
-									isChecked={isAllSelectedInCategory}
-									onChange={isChecked => {
-										const categoryUnselected =
-											selectedSourceIds?.filter(id => !sourceIds.includes(id)) || [];
-
-										setSelectedSourceIds(
-											isChecked ? categoryUnselected.concat(sourceIds) : categoryUnselected,
-										);
-									}}
-								/>
-
-								<div className={css.subList}>
-									{sources.map(source => (
-										<SourceItem
-											key={source.id}
-											name={source.name}
-											link={source.link}
-											isChecked={selectedSourceIds?.includes(source.id) || false}
-											onChange={isChecked =>
-												setSelectedSourceIds(
-													toggleArrayItem(selectedSourceIds || [], source.id, isChecked),
-												)
-											}
-										/>
-									))}
+				{data ? (
+					filteredSources?.length ? (
+						<>
+							<div className={clsx(css.row, css.row_header)}>
+								<div className={css.checkBoxCell}>
+									<CheckBox
+										isChecked={isSelectedAll}
+										onChange={isChecked => setSelectedSourceIds(isChecked ? allSourceIds : [])}
+									/>
 								</div>
-							</Fragment>
-						);
-					})
+								<div>Name</div>
+								<div>Origin / Username</div>
+								<div>Link</div>
+							</div>
+
+							{filteredSources.map(source => (
+								<Row
+									key={source.id}
+									source={source}
+									isSelected={selectedSourceIds.includes(source.id)}
+									onSelect={onRowSelect}
+								/>
+							))}
+						</>
+					) : (
+						<div className={css.noData}>- No sources found -</div>
+					)
 				) : isLoading ? (
 					<OverlappingLoader text="Loading sources ..." />
 				) : (
@@ -163,31 +162,42 @@ export function FeedSettingsPopup({ onClose }: FeedSettingsPopupProps) {
 			</div>
 
 			<div className={css.footer}>
-				<ActionButton
-					isDisabled={!selectedSourceIds?.length || createSourceListMutation.isLoading}
-					look={ActionButtonLook.PRIMARY}
-					onClick={() => saveChanges()}
-				>
-					Save Settings
-				</ActionButton>
+				<div className={css.footerLeft}>
+					<ActionButton
+						isDisabled={!selectedSourceIds.length || createSourceListMutation.isLoading}
+						look={ActionButtonLook.PRIMARY}
+						onClick={() => saveChanges()}
+					>
+						Save Settings
+					</ActionButton>
 
-				<ActionButton isDisabled={createSourceListMutation.isLoading} onClick={() => onClose?.()}>
-					Cancel
-				</ActionButton>
+					<ActionButton isDisabled={createSourceListMutation.isLoading} onClick={() => onClose?.()}>
+						Cancel
+					</ActionButton>
+				</div>
 
-				{createSourceListMutation.isLoading ? (
-					<Spinner className={css.footerRight} />
-				) : (
-					list && (
-						<ActionButton
-							className={css.footerRight}
-							look={ActionButtonLook.LITE}
-							icon={<SelectAllSvg />}
-							title="Select All"
-							onClick={() => setSelectedSourceIds(isSelectedAll ? [] : allSourceIds)}
-						/>
-					)
-				)}
+				<div className={css.footerRight}>
+					{createSourceListMutation.isLoading ? (
+						<Spinner />
+					) : data ? (
+						isSearchOpen ? (
+							<TextField
+								look={TextFieldLook.LITE}
+								autoFocus
+								placeholder="Search"
+								value={searchTerm}
+								onValueChange={setSearchTerm}
+							/>
+						) : (
+							<ActionButton
+								look={ActionButtonLook.LITE}
+								icon={<SearchSvg />}
+								title="Search"
+								onClick={() => setSearchOpen(true)}
+							/>
+						)
+					) : undefined}
+				</div>
 			</div>
 		</Modal>
 	);

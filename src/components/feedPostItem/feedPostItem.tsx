@@ -1,30 +1,17 @@
 import Avatar from 'antd/lib/avatar/avatar';
 import clsx from 'clsx';
-import React, { MouseEvent, ReactNode, useEffect, useRef, useState } from 'react';
+import React, { MouseEvent, useEffect, useRef, useState } from 'react';
 import { generatePath } from 'react-router-dom';
 
 import { ReactComponent as ContactSvg } from '../../icons/ic20/contact.svg';
 import { ReactComponent as ExternalSvg } from '../../icons/ic20/external.svg';
-import { discordSourceIcon } from '../../icons/static/discordSourceIcon';
-import { mirrorSourceIcon } from '../../icons/static/mirrorSourceIcon';
-import { telegramSourceIcon } from '../../icons/static/telegramSourceIcon';
-import { twitterSourceIcon } from '../../icons/static/twitterSourceIcon';
 import GalleryModal from '../../modals/GalleryModal';
 import { FeedCategory, FeedPost, LinkType } from '../../stores/Feed';
 import { RoutePath } from '../../stores/routePath';
 import { useNav } from '../../utils/url';
+import { FeedLinkTypeIcon } from '../feedLinkTypeIcon/feedLinkTypeIcon';
 import { ReadableDate } from '../readableDate/readableDate';
 import css from './feedPostItem.module.scss';
-
-const sourceIcon: Record<LinkType, ReactNode> = {
-	[LinkType.TWITTER]: twitterSourceIcon,
-	[LinkType.MIRROR]: mirrorSourceIcon,
-	[LinkType.DISCORD]: discordSourceIcon,
-	[LinkType.TELEGRAM]: telegramSourceIcon,
-	[LinkType.MEDIUM]: <></>,
-};
-
-//
 
 interface FeedPostContentProps {
 	post: FeedPost;
@@ -127,7 +114,7 @@ export function FeedPostItem({ isInFeed, post }: FeedPostItemProps) {
 		<div ref={selfRef} className={clsx(css.root, { [css.root_collapsed]: collapsed })}>
 			<div className={css.ava}>
 				<Avatar size={48} src={post.authorAvatar} icon={<ContactSvg width="100%" height="100%" />} />
-				<div className={css.avaSource}>{sourceIcon[post.sourceType]}</div>
+				<FeedLinkTypeIcon className={css.avaSource} linkType={post.sourceType} />
 			</div>
 
 			<div className={css.meta}>
@@ -138,7 +125,7 @@ export function FeedPostItem({ isInFeed, post }: FeedPostItemProps) {
 						<>
 							<div>in</div>
 							<div className={css.sourceName}>
-								<div>{discordSourceIcon}</div>
+								<FeedLinkTypeIcon linkType={post.sourceType} size={16} />
 								<div>{post.sourceName}</div>
 							</div>
 						</>
