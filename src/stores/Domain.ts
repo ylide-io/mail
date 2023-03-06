@@ -8,7 +8,12 @@ import {
 	EVMNetwork,
 	evmWalletFactories,
 } from '@ylide/ethereum';
-import { everscaleBlockchainFactory, everscaleWalletFactory } from '@ylide/everscale';
+import {
+	everscaleBlockchainFactory,
+	everscaleWalletFactory,
+	venomBlockchainFactory,
+	venomWalletFactory,
+} from '@ylide/everscale';
 import {
 	AbstractBlockchainController,
 	AbstractNameService,
@@ -87,6 +92,9 @@ if (REACT_APP__OTC_MODE) {
 
 	Ylide.registerBlockchainFactory(everscaleBlockchainFactory);
 	Ylide.registerWalletFactory(everscaleWalletFactory);
+
+	Ylide.registerBlockchainFactory(venomBlockchainFactory);
+	Ylide.registerWalletFactory(venomWalletFactory);
 
 	Ylide.registerWalletFactory(evmWalletFactories.metamask);
 	Ylide.registerWalletFactory(evmWalletFactories.coinbase);
@@ -478,7 +486,10 @@ export class Domain {
 			if (!this.blockchains[factory.blockchain]) {
 				this.blockchains[factory.blockchain] = await this.ylide.controllers.addBlockchain(factory.blockchain, {
 					dev: false, //document.location.hostname === 'localhost',
-					endpoints: ['https://mainnet.evercloud.dev/695e40eeac6b4e3fa4a11666f6e0d6af/graphql'],
+					endpoints:
+						factory.blockchain === 'everscale'
+							? ['https://mainnet.evercloud.dev/695e40eeac6b4e3fa4a11666f6e0d6af/graphql']
+							: ['https://gql-testnet.venom.foundation/graphql'],
 				});
 			}
 		}

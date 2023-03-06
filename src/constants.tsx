@@ -25,6 +25,7 @@ import { PhantomLogo } from './icons/PhantomLogo';
 import { PolygonLogo } from './icons/PolygonLogo';
 import { SolanaLogo } from './icons/SolanaLogo';
 import { TrustWalletLogo } from './icons/TrustWalletLogo';
+import VenomLogo from './icons/VenomLogo';
 import { WalletConnectLogo } from './icons/WalletConnectLogo';
 
 export const APP_NAME = REACT_APP__OTC_MODE ? 'Ylide OTC' : 'Ylide Social Hub';
@@ -49,9 +50,13 @@ export const blockchainsMap: Record<
 		ethNetwork?: IEthereumNetworkDescriptor;
 	}
 > = {
-	everscale: {
+	'everscale': {
 		title: 'Everscale',
 		logo: (s = 16) => <EverscaleLogo size={s} />,
+	},
+	'venom-testnet': {
+		title: 'Venom Testnet',
+		logo: (s = 16) => <VenomLogo size={s} />,
 	},
 	[EVM_NAMES[EVMNetwork.LOCAL_HARDHAT]]: {
 		title: 'LocalNet',
@@ -431,11 +436,11 @@ export const blockchainsMap: Record<
 			blockExplorerUrls: ['https://astar.subscan.io'],
 		},
 	},
-	solana: {
+	'solana': {
 		title: 'Solana',
 		logo: (s = 16) => <SolanaLogo size={s} />,
 	},
-	near: {
+	'near': {
 		title: 'Near',
 		logo: (s = 16) => <NearLogo size={30} />,
 	},
@@ -477,6 +482,11 @@ export const walletsMeta: Record<string, WalletMeta> = {
 		title: 'EverWallet',
 		logo: (s = 30) => <EverscaleLogo size={s} />,
 		link: 'https://everwallet.net/',
+	},
+	venomwallet: {
+		title: 'Venom Wallet',
+		logo: (s = 30) => <VenomLogo size={s} />,
+		link: 'https://venom.foundation/wallet',
 	},
 	phantom: {
 		title: 'Phantom',
@@ -589,6 +599,10 @@ export const supportedWallets: { wallet: string; blockchains: string[] }[] = [
 	{
 		wallet: 'everwallet',
 		blockchains: ['everscale'],
+	},
+	{
+		wallet: 'venomwallet',
+		blockchains: ['venom-testnet'],
 	},
 ];
 
