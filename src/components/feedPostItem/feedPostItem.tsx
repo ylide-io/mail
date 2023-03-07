@@ -5,12 +5,15 @@ import { generatePath } from 'react-router-dom';
 
 import { ReactComponent as ContactSvg } from '../../icons/ic20/contact.svg';
 import { ReactComponent as ExternalSvg } from '../../icons/ic20/external.svg';
+import { ReactComponent as ShareSvg } from '../../icons/ic20/share.svg';
 import GalleryModal from '../../modals/GalleryModal';
 import { FeedCategory, FeedPost, LinkType } from '../../stores/Feed';
 import { RoutePath } from '../../stores/routePath';
+import { HorizontalAlignment } from '../../utils/alignment';
 import { useNav } from '../../utils/url';
 import { FeedLinkTypeIcon } from '../feedLinkTypeIcon/feedLinkTypeIcon';
 import { ReadableDate } from '../readableDate/readableDate';
+import { SharePopup } from '../sharePopup/sharePopup';
 import css from './feedPostItem.module.scss';
 
 interface FeedPostContentProps {
@@ -97,6 +100,9 @@ export function FeedPostItem({ isInFeed, post }: FeedPostItemProps) {
 	const [collapsed, setCollapsed] = useState(false);
 	const navigate = useNav();
 
+	const shareButtonRef = useRef(null);
+	const [isSharePopupOpen, setSharePopupOpen] = useState(false);
+
 	useEffect(() => {
 		if (isInFeed && selfRef.current && selfRef.current.getBoundingClientRect().height > 600) {
 			setCollapsed(true);
@@ -132,22 +138,52 @@ export function FeedPostItem({ isInFeed, post }: FeedPostItemProps) {
 					)}
 				</div>
 
-				<a
-					className={css.date}
-					href={generatePath(RoutePath.FEED_POST, { id: post.id })}
-					onClick={e => {
-						e.preventDefault();
-						navigate(generatePath(RoutePath.FEED_POST, { id: post.id }));
-					}}
-				>
-					<ReadableDate value={Date.parse(post.date)} />
-				</a>
-
-				{!!post.sourceLink && (
-					<a className={css.externalButton} href={post.sourceLink} target="_blank" rel="noreferrer">
-						<ExternalSvg />
+				<div className={css.metaRight}>
+					<a
+						className={css.date}
+						href={generatePath(RoutePath.FEED_POST, { id: post.id })}
+						onClick={e => {
+							e.preventDefault();
+							navigate(generatePath(RoutePath.FEED_POST, { id: post.id }));
+						}}
+					>
+						<ReadableDate value={Date.parse(post.date)} />
 					</a>
-				)}
+
+					{isInFeed && (
+						<>
+							<button
+								ref={shareButtonRef}
+								className={css.metaButton}
+								title="Share this post"
+								onClick={() => setSharePopupOpen(!isSharePopupOpen)}
+							>
+								<ShareSvg />
+							</button>
+
+							{isSharePopupOpen && (
+								<SharePopup
+									anchorRef={shareButtonRef}
+									horizontalAlign={HorizontalAlignment.END}
+									onClose={() => setSharePopupOpen(false)}
+									subject="Check out this post on Ylide!"
+								/>
+							)}
+						</>
+					)}
+
+					{!!post.sourceLink && (
+						<a
+							className={css.metaButton}
+							href={post.sourceLink}
+							title="Open post source"
+							target="_blank"
+							rel="noreferrer"
+						>
+							<ExternalSvg />
+						</a>
+					)}
+				</div>
 			</div>
 
 			<div className={css.body}>
