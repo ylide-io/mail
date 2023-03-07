@@ -13,6 +13,7 @@ import { YlideButton } from '../../controls/YlideButton';
 import domain from '../../stores/Domain';
 import { Wallet } from '../../stores/models/Wallet';
 import walletConnect from '../../stores/WalletConnect';
+import { copyToClipboard } from '../../utils/clipboard';
 import { getQueryString } from '../../utils/getQueryString';
 import { NewPasswordModal } from '../NewPasswordModal';
 import SwitchModal from '../SwitchModal';
@@ -302,12 +303,12 @@ export const SelectWalletModal = observer(({ onClose }: SelectWalletModalProps) 
 											<a
 												href="#copy-link"
 												onClick={() => {
-													navigator.clipboard.writeText(
+													copyToClipboard(
 														!domain.walletConnectState.loading &&
 															!domain.walletConnectState.connected
 															? domain.walletConnectState.url
 															: '',
-													);
+													).then();
 													setCopy(true);
 													setTimeout(() => setCopy(false), 1000);
 												}}

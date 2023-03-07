@@ -9,9 +9,12 @@ import {
 
 import { OutgoingMailData } from '../../stores/outgoingMailData';
 import { HorizontalAlignment } from '../../utils/alignment';
+import { copyToClipboard } from '../../utils/clipboard';
 import { plainTextToEditorData } from '../../utils/editorJs';
 import { useComposeMailPopup } from '../composeMailPopup/composeMailPopup';
 import { AnchoredPopup } from '../popup/anchoredPopup/anchoredPopup';
+import { useToastManager } from '../toast/toast';
+import { ReactComponent as ClipboardSvg } from './icons/clipboard.svg';
 import { ReactComponent as FacebookSvg } from './icons/facebook.svg';
 import { ReactComponent as MailSvg } from './icons/mail.svg';
 import { ReactComponent as TelegramSvg } from './icons/telegram.svg';
@@ -33,6 +36,7 @@ export function SharePopup({ anchorRef, horizontalAlign, onClose, url, subject }
 	const realUrl = url || window.location.toString();
 
 	const composeMailPopup = useComposeMailPopup();
+	const { toast } = useToastManager();
 
 	return (
 		<AnchoredPopup
@@ -42,6 +46,17 @@ export function SharePopup({ anchorRef, horizontalAlign, onClose, url, subject }
 			onCloseRequest={onClose}
 		>
 			<div className={css.content}>
+				<button
+					className={css.button}
+					title="Copy link to clipboard"
+					onClick={() => {
+						copyToClipboard(realUrl).then();
+						toast('Link copied to clipboard 👍');
+					}}
+				>
+					<ClipboardSvg />
+				</button>
+
 				<button
 					className={css.button}
 					title="Share via Ylide"

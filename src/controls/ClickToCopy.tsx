@@ -1,12 +1,14 @@
 import { Tooltip } from 'antd';
 import React, { PropsWithChildren, useState } from 'react';
 
+import { copyToClipboard } from '../utils/clipboard';
+
 const ClickToCopy: React.FC<PropsWithChildren<{ dataToCopy: string }>> = ({ children, dataToCopy }) => {
 	const [status, setStatus] = useState<'None' | 'Copied' | 'Hover'>('None');
 
 	const copyHandler = async (data: string) => {
 		try {
-			await navigator.clipboard.writeText(data);
+			await copyToClipboard(data);
 			setStatus('Copied');
 			setTimeout(() => {
 				setStatus('None');
