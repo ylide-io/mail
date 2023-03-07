@@ -46,52 +46,59 @@ export function SharePopup({ anchorRef, horizontalAlign, onClose, url, subject }
 			onCloseRequest={onClose}
 		>
 			<div className={css.content}>
-				<button
-					className={css.button}
-					title="Copy link to clipboard"
-					onClick={() => {
-						copyToClipboard(realUrl).then();
-						toast('Link copied to clipboard 👍');
-					}}
-				>
-					<ClipboardSvg />
-				</button>
+				<div className={css.primaryButtons}>
+					<button
+						className={css.primaryButton}
+						onClick={() => {
+							const mailData = new OutgoingMailData();
+							mailData.subject = subject;
+							mailData.editorData = plainTextToEditorData(realUrl);
 
-				<button
-					className={css.button}
-					title="Share via Ylide"
-					onClick={() => {
-						const mailData = new OutgoingMailData();
-						mailData.subject = subject;
-						mailData.editorData = plainTextToEditorData(realUrl);
+							composeMailPopup({ mailData });
 
-						composeMailPopup({ mailData });
+							onClose();
+						}}
+					>
+						<YlideSvg className={css.icon} />
+						Share via Ylide Mail
+					</button>
 
-						onClose();
-					}}
-				>
-					<YlideSvg />
-				</button>
+					<button
+						className={css.primaryButton}
+						onClick={() => {
+							copyToClipboard(realUrl).then();
+							toast('Link copied to clipboard 👍');
+							onClose();
+						}}
+					>
+						<ClipboardSvg className={css.icon} />
+						Copy link to clipboard
+					</button>
+				</div>
 
-				<FacebookShareButton className={css.button} url={realUrl} quote={subject}>
-					<FacebookSvg />
-				</FacebookShareButton>
+				<div className={css.divider} />
 
-				<TelegramShareButton className={css.button} url={realUrl} title={subject}>
-					<TelegramSvg />
-				</TelegramShareButton>
+				<div className={css.bottomButtons}>
+					<FacebookShareButton className={css.bottomButton} url={realUrl} quote={subject}>
+						<FacebookSvg className={css.icon} />
+					</FacebookShareButton>
 
-				<TwitterShareButton className={css.button} url={realUrl} title={subject}>
-					<TwitterSvg />
-				</TwitterShareButton>
+					<TelegramShareButton className={css.bottomButton} url={realUrl} title={subject}>
+						<TelegramSvg className={css.icon} />
+					</TelegramShareButton>
 
-				<WhatsappShareButton className={css.button} url={realUrl} title={subject}>
-					<WhatsappSvg />
-				</WhatsappShareButton>
+					<TwitterShareButton className={css.bottomButton} url={realUrl} title={subject}>
+						<TwitterSvg className={css.icon} />
+					</TwitterShareButton>
 
-				<EmailShareButton className={css.button} url={realUrl} subject={subject}>
-					<MailSvg />
-				</EmailShareButton>
+					<WhatsappShareButton className={css.bottomButton} url={realUrl} title={subject}>
+						<WhatsappSvg className={css.icon} />
+					</WhatsappShareButton>
+
+					<EmailShareButton className={css.bottomButton} url={realUrl} subject={subject}>
+						<MailSvg className={css.icon} />
+					</EmailShareButton>
+				</div>
 			</div>
 		</AnchoredPopup>
 	);

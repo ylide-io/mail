@@ -5,27 +5,54 @@
 
 .content {
 	display: grid;
-	grid-auto-flow: column;
-	grid-gap: 8px;
+	grid-gap: 12px;
 	padding: 16px;
 	background: var(--surface-color);
-	border-radius: 4px;
+	border-radius: 8px;
 	box-shadow: var(--popup-shadow);
 }
 
-.button {
-	@include expand-click-area;
-	width: 32px;
-	height: 32px;
-	border-radius: 100%;
+.icon {
+	width: 24px;
+	height: 24px;
+}
+
+.primaryButtons {
+	display: grid;
+	grid-gap: 8px;
+}
+
+.primaryButton {
+	@include expand-click-area(4px);
+	display: grid;
+	grid-template-columns: auto 1fr;
+	align-items: center;
+	justify-items: start;
+	grid-gap: 8px;
+
+	&:hover,
+	&:focus-visible {
+		color: var(--link-color);
+	}
+}
+
+.divider {
+	height: 1px;
+	background: var(--border-color);
+}
+
+.bottomButtons {
+	display: grid;
+	grid-auto-flow: column;
+	justify-content: center;
+	grid-gap: 8px;
+}
+
+.bottomButton {
+	@include expand-click-area(2px);
 
 	&:hover,
 	&:focus-visible {
 		opacity: 0.8;
-	}
-
-	> svg {
-		width: 100%;
-		height: 100%;
 	}
 }
