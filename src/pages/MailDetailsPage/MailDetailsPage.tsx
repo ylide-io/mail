@@ -1,4 +1,3 @@
-import { OutputBlockData } from '@editorjs/editorjs';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { generatePath, useParams } from 'react-router-dom';
 
@@ -17,7 +16,7 @@ import { FolderId, ILinkedMessage, useMailList, useMailStore } from '../../store
 import { globalOutgoingMailData, OutgoingMailData } from '../../stores/outgoingMailData';
 import { RoutePath } from '../../stores/routePath';
 import { DateFormatStyle, formatDate } from '../../utils/date';
-import { decodeEditorData, generateEditorJsId } from '../../utils/editorJs';
+import { decodeEditorData, plainTextToEditorData } from '../../utils/editorJs';
 import { formatSubject } from '../../utils/mail';
 import { useNav } from '../../utils/url';
 import css from './MailDetailsPage.module.scss';
@@ -148,37 +147,17 @@ export const MailDetailsPage = () => {
 	const onForwardClick = (message: ILinkedMessage, decodedTextData: string | null, subject: string | null) => {
 		const editorData = decodeEditorData(decodedTextData);
 		if (editorData) {
-			const forwardedBlocks: OutputBlockData[] = [
-				{
-					id: generateEditorJsId(),
-					type: 'paragraph',
-					data: {
-						text: '',
-					},
-				},
-				{
-					id: generateEditorJsId(),
-					type: 'paragraph',
-					data: {
-						text: [
-							'---------- Forwarded message ---------',
-							`From: ${message.msg.senderAddress}`,
-							`Date: ${formatDate(message.msg.createdAt * 1000, DateFormatStyle.LONG)}`,
-							`Subject: ${formatSubject(subject)}`,
-							`To: ${message.recipient?.account.address || message.msg.recipientAddress}`,
-						].join('<br>'),
-					},
-				},
-				{
-					id: generateEditorJsId(),
-					type: 'paragraph',
-					data: {
-						text: '',
-					},
-				},
-			];
+			const forwardedData = plainTextToEditorData(
+				`\n${[
+					'---------- Forwarded message ---------',
+					`From: ${message.msg.senderAddress}`,
+					`Date: ${formatDate(message.msg.createdAt * 1000, DateFormatStyle.LONG)}`,
+					`Subject: ${formatSubject(subject)}`,
+					`To: ${message.recipient?.account.address || message.msg.recipientAddress}`,
+				].join('<br>')}\n`,
+			);
 
-			editorData.blocks = [...forwardedBlocks, ...editorData.blocks];
+			editorData.blocks = [...forwardedData.blocks, ...editorData.blocks];
 		}
 
 		globalOutgoingMailData.editorData = editorData;

@@ -18,3 +18,15 @@ export function decodeEditorData(data: any): OutputData | undefined {
 }
 
 export const generateEditorJsId = () => nanoid(10);
+
+export function plainTextToEditorData(text: string): OutputData {
+	return {
+		blocks: text.split('\n').map(line => ({
+			id: generateEditorJsId(),
+			type: 'paragraph',
+			data: {
+				text: line,
+			},
+		})),
+	};
+}
