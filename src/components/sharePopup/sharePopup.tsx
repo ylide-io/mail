@@ -36,10 +36,6 @@ export function SharePopup({ anchorRef, horizontalAlign, onClose, url, subject }
 			onCloseRequest={onClose}
 		>
 			<div className={css.content}>
-				<EmailShareButton className={css.button} url={realUrl} subject={subject}>
-					<EmailSvg />
-				</EmailShareButton>
-
 				<FacebookShareButton className={css.button} url={realUrl} quote={subject}>
 					<FacebookSvg />
 				</FacebookShareButton>
@@ -55,6 +51,10 @@ export function SharePopup({ anchorRef, horizontalAlign, onClose, url, subject }
 				<WhatsappShareButton className={css.button} url={realUrl} title={subject}>
 					<WhatsappSvg />
 				</WhatsappShareButton>
+
+				<EmailShareButton className={css.button} url={realUrl} subject={subject}>
+					<EmailSvg />
+				</EmailShareButton>
 			</div>
 		</AnchoredPopup>
 	);
