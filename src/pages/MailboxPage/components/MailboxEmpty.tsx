@@ -1,17 +1,21 @@
 import { observer } from 'mobx-react';
 import React from 'react';
+import { generatePath } from 'react-router-dom';
 
-import { LinkButton, LinkButtonType } from '../../../components/genericLayout/sidebar/linkButton';
+import { ActionButton, ActionButtonLook, ActionButtonSize } from '../../../components/ActionButton/ActionButton';
 import ClickToCopy from '../../../controls/ClickToCopy';
 import domain from '../../../stores/Domain';
 import { FolderId } from '../../../stores/MailList';
 import { RoutePath } from '../../../stores/routePath';
+import { useNav } from '../../../utils/url';
 
 interface MailboxEmptyProps {
 	folderId: FolderId;
 }
 
 const MailboxEmpty = observer(({ folderId }: MailboxEmptyProps) => {
+	const navigate = useNav();
+
 	return (
 		<div
 			style={{
@@ -44,7 +48,13 @@ const MailboxEmpty = observer(({ folderId }: MailboxEmptyProps) => {
 						Send a message to your friend now.
 					</h3>
 
-					<LinkButton type={LinkButtonType.PRIMARY} text="Compose Mail" link={RoutePath.MAIL_COMPOSE} />
+					<ActionButton
+						size={ActionButtonSize.Medium}
+						look={ActionButtonLook.PRIMARY}
+						onClick={() => navigate(generatePath(RoutePath.MAIL_COMPOSE))}
+					>
+						Compose Mail
+					</ActionButton>
 				</>
 			) : (
 				<h3>No messages here.</h3>

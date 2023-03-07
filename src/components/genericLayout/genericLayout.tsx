@@ -3,10 +3,11 @@ import { observer } from 'mobx-react';
 import React, { ReactNode, useEffect } from 'react';
 
 import domain from '../../stores/Domain';
+import { useNav } from '../../utils/url';
+import { ActionButton, ActionButtonLook, ActionButtonSize } from '../ActionButton/ActionButton';
 import { TransactionPopup } from '../TransactionPopup/TransactionPopup';
 import css from './genericLayout.module.scss';
 import Header from './header/header';
-import { LinkButton } from './sidebar/linkButton';
 import SidebarMenu from './sidebar/sidebarMenu';
 
 interface GenericLayoutProps {
@@ -21,6 +22,8 @@ interface GenericLayoutProps {
 
 export const GenericLayout = observer(
 	({ children, mainClass, isCustomContent, mobileTopButtonProps }: GenericLayoutProps) => {
+		const navigate = useNav();
+
 		useEffect(() => {
 			setTimeout(() => {
 				// @ts-ignore
@@ -44,11 +47,14 @@ export const GenericLayout = observer(
 
 					<div className={clsx(css.content, isCustomContent && css.content_custom, mainClass)}>
 						{!!mobileTopButtonProps && (
-							<LinkButton
+							<ActionButton
 								className={css.linkButton}
-								text={mobileTopButtonProps.text}
-								link={mobileTopButtonProps.link}
-							/>
+								size={ActionButtonSize.Large}
+								look={ActionButtonLook.PRIMARY}
+								onClick={() => navigate(mobileTopButtonProps.link)}
+							>
+								{mobileTopButtonProps.text}
+							</ActionButton>
 						)}
 
 						{children}
