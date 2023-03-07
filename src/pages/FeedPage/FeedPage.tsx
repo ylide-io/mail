@@ -2,7 +2,7 @@ import { observer } from 'mobx-react';
 import React, { useEffect, useRef, useState } from 'react';
 import { useParams, useSearchParams } from 'react-router-dom';
 
-import { ActionButton, ActionButtonLook } from '../../components/ActionButton/ActionButton';
+import { ActionButton, ActionButtonLook, ActionButtonSize } from '../../components/ActionButton/ActionButton';
 import { ErrorMessage } from '../../components/errorMessage/errorMessage';
 import { FeedLayout } from '../../components/feedLayout/feedLayout';
 import { FeedPostItem } from '../../components/feedPostItem/feedPostItem';
@@ -105,9 +105,13 @@ export const FeedPage = observer(() => {
 				)
 			}
 		>
-			<div className={css.scrollToTop} onClick={() => scrollWindowToTop()}>
-				<ArrowUpSvg style={{ width: 40, height: 40 }} />
-			</div>
+			<ActionButton
+				className={css.scrollToTop}
+				size={ActionButtonSize.LARGE}
+				look={ActionButtonLook.SECONDARY}
+				icon={<ArrowUpSvg />}
+				onClick={() => scrollWindowToTop()}
+			/>
 
 			<div className={css.feedBody} ref={feedBodyRef}>
 				{newPostsVisible && !!feed.newPosts && (
