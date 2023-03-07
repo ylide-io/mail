@@ -5,9 +5,9 @@ import { PropsWithClassName } from '../propsWithClassName';
 import css from './ActionButton.module.scss';
 
 export enum ActionButtonSize {
-	Small,
-	Medium,
-	Large,
+	SMALL,
+	MEDIUM,
+	LARGE,
 }
 
 export enum ActionButtonLook {
@@ -32,10 +32,10 @@ export const ActionButton = forwardRef(
 		ref: Ref<HTMLButtonElement>,
 	) => {
 		const sizeClass = {
-			[ActionButtonSize.Small]: css.root_smallSize,
-			[ActionButtonSize.Medium]: css.root_mediumSize,
-			[ActionButtonSize.Large]: css.root_largeSize,
-		}[size || ActionButtonSize.Small];
+			[ActionButtonSize.SMALL]: css.root_smallSize,
+			[ActionButtonSize.MEDIUM]: css.root_mediumSize,
+			[ActionButtonSize.LARGE]: css.root_largeSize,
+		}[size || ActionButtonSize.SMALL];
 
 		const lookClass = {
 			[ActionButtonLook.DEFAULT]: css.root_defaultLook,

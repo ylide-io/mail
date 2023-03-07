@@ -49,7 +49,7 @@ const MailboxEmpty = observer(({ folderId }: MailboxEmptyProps) => {
 					</h3>
 
 					<ActionButton
-						size={ActionButtonSize.Medium}
+						size={ActionButtonSize.MEDIUM}
 						look={ActionButtonLook.PRIMARY}
 						onClick={() => navigate(generatePath(RoutePath.MAIL_COMPOSE))}
 					>

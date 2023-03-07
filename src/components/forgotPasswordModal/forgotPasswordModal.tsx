@@ -108,13 +108,13 @@ export function ForgotPasswordModal({ onNewPassword, onCancel }: ForgotPasswordM
 					<>
 						<ActionButton
 							isMultiline
-							size={ActionButtonSize.Medium}
+							size={ActionButtonSize.MEDIUM}
 							look={ActionButtonLook.DENGEROUS}
 							onClick={() => setStep(Step.SECOND_WARNING)}
 						>
 							I understand I won't be able to read old messages
 						</ActionButton>
-						<ActionButton size={ActionButtonSize.Medium} look={ActionButtonLook.LITE} onClick={onCancel}>
+						<ActionButton size={ActionButtonSize.MEDIUM} look={ActionButtonLook.LITE} onClick={onCancel}>
 							Cancel
 						</ActionButton>
 					</>
@@ -122,13 +122,13 @@ export function ForgotPasswordModal({ onNewPassword, onCancel }: ForgotPasswordM
 					<>
 						<ActionButton
 							isMultiline
-							size={ActionButtonSize.Medium}
+							size={ActionButtonSize.MEDIUM}
 							look={ActionButtonLook.DENGEROUS}
 							onClick={() => setStep(Step.ENTER_PASSWORD)}
 						>
 							I clearly understand the consequences
 						</ActionButton>
-						<ActionButton size={ActionButtonSize.Medium} look={ActionButtonLook.LITE} onClick={onCancel}>
+						<ActionButton size={ActionButtonSize.MEDIUM} look={ActionButtonLook.LITE} onClick={onCancel}>
 							Cancel
 						</ActionButton>
 					</>
@@ -136,13 +136,13 @@ export function ForgotPasswordModal({ onNewPassword, onCancel }: ForgotPasswordM
 					<>
 						<ActionButton
 							isMultiline
-							size={ActionButtonSize.Medium}
+							size={ActionButtonSize.MEDIUM}
 							look={ActionButtonLook.PRIMARY}
 							onClick={onSave}
 						>
 							Save Password
 						</ActionButton>
-						<ActionButton size={ActionButtonSize.Medium} look={ActionButtonLook.LITE} onClick={onCancel}>
+						<ActionButton size={ActionButtonSize.MEDIUM} look={ActionButtonLook.LITE} onClick={onCancel}>
 							Cancel
 						</ActionButton>
 					</>

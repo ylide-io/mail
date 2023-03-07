@@ -61,7 +61,7 @@ export const AccountsPopup = observer(({ anchorRef, onClose }: AccountsPopupProp
 						<div className={css.itemActions}>
 							<Tooltip title="Logout">
 								<ActionButton
-									size={ActionButtonSize.Medium}
+									size={ActionButtonSize.MEDIUM}
 									look={ActionButtonLook.DENGEROUS}
 									icon={<LogoutSvg />}
 									onClick={async () => {
@@ -79,7 +79,7 @@ export const AccountsPopup = observer(({ anchorRef, onClose }: AccountsPopupProp
 
 				<div className={css.addAccountRow}>
 					<ActionButton
-						size={ActionButtonSize.Medium}
+						size={ActionButtonSize.MEDIUM}
 						look={ActionButtonLook.PRIMARY}
 						icon={<PlusSvg />}
 						onClick={() => nav(RoutePath.WALLETS)}

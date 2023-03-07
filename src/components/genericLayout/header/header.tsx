@@ -42,7 +42,7 @@ const Header = observer(() => {
 					<div className={css.block}>
 						<Tooltip title="Manage contacts and folders">
 							<ActionButton
-								size={ActionButtonSize.Medium}
+								size={ActionButtonSize.MEDIUM}
 								look={ActionButtonLook.LITE}
 								icon={<ContactsSvg />}
 								onClick={e => {

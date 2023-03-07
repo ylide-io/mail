@@ -49,7 +49,7 @@ export const GenericLayout = observer(
 						{!!mobileTopButtonProps && (
 							<ActionButton
 								className={css.linkButton}
-								size={ActionButtonSize.Large}
+								size={ActionButtonSize.LARGE}
 								look={ActionButtonLook.PRIMARY}
 								onClick={() => navigate(mobileTopButtonProps.link)}
 							>

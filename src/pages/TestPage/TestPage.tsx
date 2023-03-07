@@ -56,45 +56,45 @@ export const TestPage = observer(() => {
 
 			<GridRow>
 				small
-				<ActionButton size={ActionButtonSize.Small}>Text Only</ActionButton>
-				<ActionButton size={ActionButtonSize.Small} icon={<SettingsSvg />}>
+				<ActionButton size={ActionButtonSize.SMALL}>Text Only</ActionButton>
+				<ActionButton size={ActionButtonSize.SMALL} icon={<SettingsSvg />}>
 					With Icon
 				</ActionButton>
-				<ActionButton size={ActionButtonSize.Small} icon={<SettingsSvg />} />
+				<ActionButton size={ActionButtonSize.SMALL} icon={<SettingsSvg />} />
 			</GridRow>
 
 			<GridRow>
 				medium
-				<ActionButton size={ActionButtonSize.Medium}>Text Only</ActionButton>
-				<ActionButton size={ActionButtonSize.Medium} icon={<SettingsSvg />}>
+				<ActionButton size={ActionButtonSize.MEDIUM}>Text Only</ActionButton>
+				<ActionButton size={ActionButtonSize.MEDIUM} icon={<SettingsSvg />}>
 					With Icon
 				</ActionButton>
-				<ActionButton size={ActionButtonSize.Medium} icon={<SettingsSvg />} />
+				<ActionButton size={ActionButtonSize.MEDIUM} icon={<SettingsSvg />} />
 			</GridRow>
 
 			<GridRow>
 				large
-				<ActionButton size={ActionButtonSize.Large}>Text Only</ActionButton>
-				<ActionButton size={ActionButtonSize.Large} icon={<SettingsSvg style={{ width: 24, height: 24 }} />}>
+				<ActionButton size={ActionButtonSize.LARGE}>Text Only</ActionButton>
+				<ActionButton size={ActionButtonSize.LARGE} icon={<SettingsSvg style={{ width: 24, height: 24 }} />}>
 					With Icon
 				</ActionButton>
-				<ActionButton size={ActionButtonSize.Large} icon={<SettingsSvg style={{ width: 24, height: 24 }} />} />
+				<ActionButton size={ActionButtonSize.LARGE} icon={<SettingsSvg style={{ width: 24, height: 24 }} />} />
 			</GridRow>
 
 			<GridRow>
 				multiline
-				<ActionButton isMultiline size={ActionButtonSize.Small}>
+				<ActionButton isMultiline size={ActionButtonSize.SMALL}>
 					Multiline Small
 				</ActionButton>
-				<ActionButton isMultiline size={ActionButtonSize.Medium}>
+				<ActionButton isMultiline size={ActionButtonSize.MEDIUM}>
 					Multiline Medium
 				</ActionButton>
-				<ActionButton isMultiline size={ActionButtonSize.Small}>
+				<ActionButton isMultiline size={ActionButtonSize.SMALL}>
 					Multiline
 					<br />
 					Small
 				</ActionButton>
-				<ActionButton isMultiline size={ActionButtonSize.Medium}>
+				<ActionButton isMultiline size={ActionButtonSize.MEDIUM}>
 					Multiline
 					<br />
 					Medium
@@ -103,24 +103,24 @@ export const TestPage = observer(() => {
 
 			<GridRow>
 				multiline
-				<ActionButton isMultiline size={ActionButtonSize.Small} icon={<SettingsSvg />}>
+				<ActionButton isMultiline size={ActionButtonSize.SMALL} icon={<SettingsSvg />}>
 					Multiline
 					<br />
 					Small
 				</ActionButton>
-				<ActionButton isMultiline size={ActionButtonSize.Medium} icon={<SettingsSvg />}>
+				<ActionButton isMultiline size={ActionButtonSize.MEDIUM} icon={<SettingsSvg />}>
 					Multiline
 					<br />
 					Medium
 				</ActionButton>
-				<ActionButton isMultiline size={ActionButtonSize.Small}>
+				<ActionButton isMultiline size={ActionButtonSize.SMALL}>
 					Multiline
 					<br />
 					Small
 					<br />
 					Button
 				</ActionButton>
-				<ActionButton isMultiline size={ActionButtonSize.Medium}>
+				<ActionButton isMultiline size={ActionButtonSize.MEDIUM}>
 					Multiline
 					<br />
 					Medium
@@ -131,12 +131,12 @@ export const TestPage = observer(() => {
 
 			<GridRow>
 				big icon
-				<ActionButton size={ActionButtonSize.Small} icon={<SettingsSvg style={{ width: 24, height: 24 }} />} />
-				<ActionButton size={ActionButtonSize.Small} icon={<SettingsSvg style={{ width: 24, height: 24 }} />}>
+				<ActionButton size={ActionButtonSize.SMALL} icon={<SettingsSvg style={{ width: 24, height: 24 }} />} />
+				<ActionButton size={ActionButtonSize.SMALL} icon={<SettingsSvg style={{ width: 24, height: 24 }} />}>
 					With Text
 				</ActionButton>
-				<ActionButton size={ActionButtonSize.Small} icon={<SettingsSvg style={{ width: 36, height: 36 }} />} />
-				<ActionButton size={ActionButtonSize.Small} icon={<SettingsSvg style={{ width: 36, height: 36 }} />}>
+				<ActionButton size={ActionButtonSize.SMALL} icon={<SettingsSvg style={{ width: 36, height: 36 }} />} />
+				<ActionButton size={ActionButtonSize.SMALL} icon={<SettingsSvg style={{ width: 36, height: 36 }} />}>
 					With Text
 				</ActionButton>
 			</GridRow>

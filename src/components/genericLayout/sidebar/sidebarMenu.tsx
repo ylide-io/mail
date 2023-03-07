@@ -46,7 +46,7 @@ export function SidebarBurger({ className, children }: SidebarBurgerProps) {
 	return (
 		<div className={clsx(css.burger, className)}>
 			<ActionButton
-				size={ActionButtonSize.Medium}
+				size={ActionButtonSize.MEDIUM}
 				icon={modals.sidebarOpen ? <SidebarMenuCloseSvg /> : <SidebarMenuSvg />}
 				onClick={() => {
 					modals.sidebarOpen = !modals.sidebarOpen;
