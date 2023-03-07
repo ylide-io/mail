@@ -87,7 +87,7 @@ export const MailboxPage = () => {
 	const isAllSelected = !!messages.length && messages.every(it => selectedMessageIds.has(it.id));
 
 	const { windowWidth } = useWindowSize();
-	const isHighRow = windowWidth <= 630;
+	const isHighRow = windowWidth <= 720;
 	const itemSize = isHighRow ? 80 : 40;
 
 	const [scrollParams, setScrollParams] = useState({

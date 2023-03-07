@@ -89,7 +89,7 @@
 	text-align: right;
 }
 
-@include less630px {
+@include less720px {
 	.root {
 		grid-template-columns: auto 1fr auto;
 		grid-gap: 4px;
