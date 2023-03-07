@@ -9,8 +9,8 @@ import {
 
 import { HorizontalAlignment } from '../../utils/alignment';
 import { AnchoredPopup } from '../popup/anchoredPopup/anchoredPopup';
-import { ReactComponent as EmailSvg } from './icons/email.svg';
 import { ReactComponent as FacebookSvg } from './icons/facebook.svg';
+import { ReactComponent as MailSvg } from './icons/mail.svg';
 import { ReactComponent as TelegramSvg } from './icons/telegram.svg';
 import { ReactComponent as TwitterSvg } from './icons/twitter.svg';
 import { ReactComponent as WhatsappSvg } from './icons/whatsapp.svg';
@@ -53,7 +53,7 @@ export function SharePopup({ anchorRef, horizontalAlign, onClose, url, subject }
 				</WhatsappShareButton>
 
 				<EmailShareButton className={css.button} url={realUrl} subject={subject}>
-					<EmailSvg />
+					<MailSvg />
 				</EmailShareButton>
 			</div>
 		</AnchoredPopup>

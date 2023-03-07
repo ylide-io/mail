@@ -17,4 +17,15 @@
 	@include expand-click-area;
 	width: 32px;
 	height: 32px;
+	border-radius: 100%;
+
+	&:hover,
+	&:focus-visible {
+		opacity: 0.8;
+	}
+
+	> svg {
+		width: 100%;
+		height: 100%;
+	}
 }
