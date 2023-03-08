@@ -1,6 +1,6 @@
 import clsx from 'clsx';
 import { observer } from 'mobx-react';
-import React, { ReactNode, useEffect } from 'react';
+import React, { createContext, ReactNode, useContext, useEffect, useMemo, useRef } from 'react';
 
 import domain from '../../stores/Domain';
 import { useNav } from '../../utils/url';
@@ -9,6 +9,16 @@ import { TransactionPopup } from '../TransactionPopup/TransactionPopup';
 import css from './genericLayout.module.scss';
 import Header from './header/header';
 import SidebarMenu from './sidebar/sidebarMenu';
+
+interface GenericLayoutApi {
+	scrollToTop: () => void;
+}
+
+const GenericLayoutApiContext = createContext<GenericLayoutApi | undefined>(undefined);
+
+export const useGenericLayoutApi = () => useContext(GenericLayoutApiContext)!;
+
+//
 
 interface GenericLayoutProps {
 	children: ReactNode;
@@ -38,29 +48,44 @@ export const GenericLayout = observer(
 			}, 10000);
 		}, []);
 
+		const mainRef = useRef<HTMLDivElement>(null);
+
+		const api: GenericLayoutApi = useMemo(
+			() => ({
+				scrollToTop: () => {
+					if (mainRef.current) {
+						mainRef.current.scrollTo({ top: 0, behavior: 'smooth' });
+					}
+				},
+			}),
+			[],
+		);
+
 		return (
-			<div className={css.root}>
-				<Header />
-				{domain.txPlateVisible ? <TransactionPopup /> : null}
-				<div className={css.main}>
-					<SidebarMenu />
+			<GenericLayoutApiContext.Provider value={api}>
+				<div className={css.root}>
+					<Header />
+					{domain.txPlateVisible ? <TransactionPopup /> : null}
+					<div className={css.main} ref={mainRef}>
+						<SidebarMenu />
 
-					<div className={clsx(css.content, isCustomContent && css.content_custom, mainClass)}>
-						{!!mobileTopButtonProps && (
-							<ActionButton
-								className={css.linkButton}
-								size={ActionButtonSize.LARGE}
-								look={ActionButtonLook.PRIMARY}
-								onClick={() => navigate(mobileTopButtonProps.link)}
-							>
-								{mobileTopButtonProps.text}
-							</ActionButton>
-						)}
+						<div className={clsx(css.content, isCustomContent && css.content_custom, mainClass)}>
+							{!!mobileTopButtonProps && (
+								<ActionButton
+									className={css.linkButton}
+									size={ActionButtonSize.LARGE}
+									look={ActionButtonLook.PRIMARY}
+									onClick={() => navigate(mobileTopButtonProps.link)}
+								>
+									{mobileTopButtonProps.text}
+								</ActionButton>
+							)}
 
-						{children}
+							{children}
+						</div>
 					</div>
 				</div>
-			</div>
+			</GenericLayoutApiContext.Provider>
 		);
 	},
 );
