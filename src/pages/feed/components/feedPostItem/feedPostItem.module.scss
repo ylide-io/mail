@@ -34,7 +34,8 @@
 	bottom: -8px;
 	width: 26px;
 	height: 26px;
-	border: 2px solid #fff;
+	background: var(--surface-color);
+	border: 2px solid var(--surface-color);
 	border-radius: 50%;
 }
 
