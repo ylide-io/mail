@@ -27,6 +27,8 @@ import { sidePolicyIcon } from '../../../icons/static/sidePolicyIcon';
 import { sideProjectsIcon } from '../../../icons/static/sideProjectsIcon';
 import { sideSecurityIcon } from '../../../icons/static/sideSecurityIcon';
 import { sideTechnologyIcon } from '../../../icons/static/sideTechnologyIcon';
+import { FeedSettingsPopup } from '../../../pages/feed/components/feedSettingsPopup/feedSettingsPopup';
+import { useComposeMailPopup } from '../../../pages/mail/components/composeMailPopup/composeMailPopup';
 import { browserStorage } from '../../../stores/browserStorage';
 import { FeedCategory, getFeedCategoryName } from '../../../stores/Feed';
 import { FolderId } from '../../../stores/MailList';
@@ -35,8 +37,6 @@ import { OutgoingMailData } from '../../../stores/outgoingMailData';
 import { RoutePath } from '../../../stores/routePath';
 import { useNav } from '../../../utils/url';
 import { ActionButton, ActionButtonLook, ActionButtonSize } from '../../ActionButton/ActionButton';
-import { useComposeMailPopup } from '../../composeMailPopup/composeMailPopup';
-import { FeedSettingsPopup } from '../../feedSettingsPopup/feedSettingsPopup';
 import { PropsWithClassName } from '../../propsWithClassName';
 import css from './sidebarMenu.module.scss';
 

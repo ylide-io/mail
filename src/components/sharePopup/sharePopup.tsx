@@ -7,11 +7,11 @@ import {
 	WhatsappShareButton,
 } from 'react-share';
 
+import { useComposeMailPopup } from '../../pages/mail/components/composeMailPopup/composeMailPopup';
 import { OutgoingMailData } from '../../stores/outgoingMailData';
 import { HorizontalAlignment } from '../../utils/alignment';
 import { copyToClipboard } from '../../utils/clipboard';
 import { plainTextToEditorData } from '../../utils/editorJs';
-import { useComposeMailPopup } from '../composeMailPopup/composeMailPopup';
 import { AnchoredPopup } from '../popup/anchoredPopup/anchoredPopup';
 import { useToastManager } from '../toast/toast';
 import { ReactComponent as ClipboardSvg } from './icons/clipboard.svg';
