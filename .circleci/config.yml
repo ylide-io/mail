@@ -49,12 +49,17 @@ jobs:
             - run:
                   name: Install Wrangler
                   command: |
-                      npm install -g wrangler
+                      npm install -g wrangler@2.12.0
+            - run:
+                  name: Upload build through Wrangler
+                  command: |
+                      wrangler pages publish build --project-name=ylide-mail
 
 workflows:
     build_and_test:
         jobs:
             - build
+            - deploy
             # - test:
             #     requires:
             #       - build
