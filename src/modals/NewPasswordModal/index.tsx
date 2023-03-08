@@ -13,6 +13,7 @@ import { YlideLoader } from '../../components/ylideLoader/ylideLoader';
 import { APP_NAME, blockchainsMap, calloutSvg, evmNameToNetwork } from '../../constants';
 import { WalletTag } from '../../controls/WalletTag';
 import { YlideButton } from '../../controls/YlideButton';
+import { REACT_APP__OTC_MODE } from '../../env';
 import { analytics } from '../../stores/Analytics';
 import { browserStorage } from '../../stores/browserStorage';
 import domain from '../../stores/Domain';
@@ -116,6 +117,7 @@ export function NewPasswordModal({ faucetType, bonus, wallet, account, remoteKey
 		account: DomainAccount,
 		faucetType: 'polygon' | 'gnosis' | 'fantom',
 		bonus: boolean,
+		doWait: boolean,
 	) {
 		browserStorage.canSkipRegistration = true;
 		console.log('public key: ', '0x' + new SmartBuffer(account.key.keypair.publicKey).toHexString());
@@ -127,7 +129,7 @@ export function NewPasswordModal({ faucetType, bonus, wallet, account, remoteKey
 		domain.txChain = faucetType;
 		domain.txPlateVisible = true;
 		domain.txWithBonus = bonus;
-		fetch(`https://faucet.ylide.io/${faucetType}`, {
+		const promise = fetch(`https://faucet.ylide.io/${faucetType}`, {
 			method: 'POST',
 			body: JSON.stringify({
 				address: account.account.address.toLowerCase(),
@@ -143,7 +145,11 @@ export function NewPasswordModal({ faucetType, bonus, wallet, account, remoteKey
 			.then(response => response.json())
 			.then(async result => {
 				if (result && result.data && result.data.txHash) {
-					await asyncDelay(20000);
+					if (doWait) {
+						await asyncDelay(20000);
+					} else {
+						await asyncDelay(7000);
+					}
 					await account.init();
 					domain.publishingTxHash = result.data.txHash;
 					domain.isTxPublishing = false;
@@ -166,6 +172,10 @@ export function NewPasswordModal({ faucetType, bonus, wallet, account, remoteKey
 				domain.isTxPublishing = false;
 				domain.txPlateVisible = false;
 			});
+
+		if (doWait) {
+			await promise;
+		}
 
 		setStep(Step.FINISH);
 	}
@@ -208,7 +218,7 @@ export function NewPasswordModal({ faucetType, bonus, wallet, account, remoteKey
 			const domainAccount = await wallet.instantiateNewAccount(account, tempLocalKey);
 			setDomainAccount(domainAccount);
 			if (faucetType && wallet.factory.blockchainGroup === 'evm') {
-				await publishThroughFaucet(domainAccount, faucetType, bonus);
+				await publishThroughFaucet(domainAccount, faucetType, bonus, REACT_APP__OTC_MODE);
 			} else {
 				if (wallet.factory.blockchainGroup === 'evm') {
 					setStep(Step.SELECT_NETWORK);
