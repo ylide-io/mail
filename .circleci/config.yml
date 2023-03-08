@@ -101,7 +101,7 @@ jobs:
             - restore_build_cache:
                   cache_key: hub
             - wrangler:
-                  project_name: ylide-mail-staging
+                  project_name: ylide-mail
     build_airswap:
         docker:
             - image: node:16
