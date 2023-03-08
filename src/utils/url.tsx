@@ -4,6 +4,10 @@ import AlertModal from '../modals/AlertModal';
 import domain from '../stores/Domain';
 import { filterObjectEntries } from './object';
 
+export function toAbsoluteUrl(path: string) {
+	return new URL(path, window.location.origin).href;
+}
+
 export function createCleanSerachParams(search: Record<string, any>) {
 	return createSearchParams(filterObjectEntries(search, (key, value) => value != null));
 }

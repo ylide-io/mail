@@ -12,7 +12,7 @@ import GalleryModal from '../../../../modals/GalleryModal';
 import { FeedCategory, FeedPost, LinkType } from '../../../../stores/Feed';
 import { RoutePath } from '../../../../stores/routePath';
 import { HorizontalAlignment } from '../../../../utils/alignment';
-import { useNav } from '../../../../utils/url';
+import { toAbsoluteUrl, useNav } from '../../../../utils/url';
 import { FeedLinkTypeIcon } from '../feedLinkTypeIcon/feedLinkTypeIcon';
 import css from './feedPostItem.module.scss';
 
@@ -99,6 +99,7 @@ export function FeedPostItem({ isInFeed, post }: FeedPostItemProps) {
 	const selfRef = useRef<HTMLDivElement>(null);
 	const [collapsed, setCollapsed] = useState(false);
 	const navigate = useNav();
+	const postPath = generatePath(RoutePath.FEED_POST, { id: post.id });
 
 	const shareButtonRef = useRef(null);
 	const [isSharePopupOpen, setSharePopupOpen] = useState(false);
@@ -141,10 +142,10 @@ export function FeedPostItem({ isInFeed, post }: FeedPostItemProps) {
 				<div className={css.metaRight}>
 					<a
 						className={css.date}
-						href={generatePath(RoutePath.FEED_POST, { id: post.id })}
+						href={postPath}
 						onClick={e => {
 							e.preventDefault();
-							navigate(generatePath(RoutePath.FEED_POST, { id: post.id }));
+							navigate(postPath);
 						}}
 					>
 						<ReadableDate value={Date.parse(post.date)} />
@@ -167,6 +168,7 @@ export function FeedPostItem({ isInFeed, post }: FeedPostItemProps) {
 									horizontalAlign={HorizontalAlignment.END}
 									onClose={() => setSharePopupOpen(false)}
 									subject="Check out this post on Ylide!"
+									url={toAbsoluteUrl(postPath)}
 								/>
 							)}
 						</>
