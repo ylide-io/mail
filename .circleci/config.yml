@@ -28,7 +28,7 @@ jobs:
             - run:
                   name: Build project
                   command: |
-                      pnpm run build-hub
+                      CI=false pnpm run build-hub
             - save_cache:
                   key: build-output-{{ .Environment.CIRCLE_SHA1 }}
                   paths:
