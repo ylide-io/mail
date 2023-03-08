@@ -4,6 +4,8 @@ import { useParams, useSearchParams } from 'react-router-dom';
 
 import { ActionButton, ActionButtonLook, ActionButtonSize } from '../../../components/ActionButton/ActionButton';
 import { ErrorMessage } from '../../../components/errorMessage/errorMessage';
+import { NarrowContent } from '../../../components/genericLayout/content/narrowContent/narrowContent';
+import { GenericLayout } from '../../../components/genericLayout/genericLayout';
 import { YlideLoader } from '../../../components/ylideLoader/ylideLoader';
 import { YlideButton } from '../../../controls/YlideButton';
 import { ReactComponent as ArrowUpSvg } from '../../../icons/ic20/arrowUp.svg';
@@ -12,7 +14,6 @@ import { browserStorage } from '../../../stores/browserStorage';
 import feed, { FeedCategory } from '../../../stores/Feed';
 import { scrollWindowToTop } from '../../../utils/ui';
 import { useNav } from '../../../utils/url';
-import { FeedLayout } from '../components/feedLayout/feedLayout';
 import { FeedPostItem } from '../components/feedPostItem/feedPostItem';
 import css from './feedPage.module.scss';
 
@@ -84,64 +85,68 @@ export const FeedPage = observer(() => {
 	}
 
 	return (
-		<FeedLayout
-			title={title}
-			titleSubItem={
-				!!sourceId && (
-					<ActionButton
-						look={ActionButtonLook.PRIMARY}
-						icon={<CrossSvg />}
-						onClick={() => navigate({ search: {} })}
-					>
-						Clear filter
-					</ActionButton>
-				)
-			}
-			titleRight={
-				!!feed.newPosts && (
-					<YlideButton size="small" nice onClick={showNewPosts}>
-						Show {feed.newPosts} new posts
-					</YlideButton>
-				)
-			}
-		>
-			<ActionButton
-				className={css.scrollToTop}
-				size={ActionButtonSize.LARGE}
-				look={ActionButtonLook.SECONDARY}
-				icon={<ArrowUpSvg />}
-				onClick={() => scrollWindowToTop()}
-			/>
-
-			<div className={css.feedBody} ref={feedBodyRef}>
-				{newPostsVisible && !!feed.newPosts && (
-					<div className={css.newPosts}>
-						<YlideButton className={css.feedNewPostsButton} size="small" nice onClick={showNewPosts}>
+		<GenericLayout>
+			<NarrowContent
+				title={title}
+				titleSubItem={
+					!!sourceId && (
+						<ActionButton
+							look={ActionButtonLook.PRIMARY}
+							icon={<CrossSvg />}
+							onClick={() => navigate({ search: {} })}
+						>
+							Clear filter
+						</ActionButton>
+					)
+				}
+				titleRight={
+					!!feed.newPosts && (
+						<YlideButton size="small" nice onClick={showNewPosts}>
 							Show {feed.newPosts} new posts
 						</YlideButton>
-					</div>
-				)}
+					)
+				}
+			>
+				<ActionButton
+					className={css.scrollToTop}
+					size={ActionButtonSize.LARGE}
+					look={ActionButtonLook.SECONDARY}
+					icon={<ArrowUpSvg />}
+					onClick={() => scrollWindowToTop()}
+				/>
 
-				{feed.loaded ? (
-					<>
-						{feed.posts.map(post => (
-							<FeedPostItem isInFeed post={post} key={post.id} />
-						))}
+				<div className={css.feedBody} ref={feedBodyRef}>
+					{newPostsVisible && !!feed.newPosts && (
+						<div className={css.newPosts}>
+							<YlideButton className={css.feedNewPostsButton} size="small" nice onClick={showNewPosts}>
+								Show {feed.newPosts} new posts
+							</YlideButton>
+						</div>
+					)}
 
-						{feed.moreAvailable && (
-							<div className={css.loader} ref={lastPostView}>
-								{feed.loading && <YlideLoader reason="Loading more posts ..." />}
-							</div>
-						)}
-					</>
-				) : feed.errorLoading ? (
-					<ErrorMessage>Sorry, an error occured during feed loading. Please, try again later.</ErrorMessage>
-				) : (
-					<div className={css.loader}>
-						<YlideLoader reason="Your feed is loading ..." />
-					</div>
-				)}
-			</div>
-		</FeedLayout>
+					{feed.loaded ? (
+						<>
+							{feed.posts.map(post => (
+								<FeedPostItem isInFeed post={post} key={post.id} />
+							))}
+
+							{feed.moreAvailable && (
+								<div className={css.loader} ref={lastPostView}>
+									{feed.loading && <YlideLoader reason="Loading more posts ..." />}
+								</div>
+							)}
+						</>
+					) : feed.errorLoading ? (
+						<ErrorMessage>
+							Sorry, an error occured during feed loading. Please, try again later.
+						</ErrorMessage>
+					) : (
+						<div className={css.loader}>
+							<YlideLoader reason="Your feed is loading ..." />
+						</div>
+					)}
+				</div>
+			</NarrowContent>
+		</GenericLayout>
 	);
 });

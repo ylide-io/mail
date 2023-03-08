@@ -3,6 +3,7 @@ import { observer } from 'mobx-react';
 import React from 'react';
 import { Outlet, useLocation } from 'react-router-dom';
 
+import { FullPageContent } from '../../../components/genericLayout/content/fullPageContent/fullPageContent';
 import { GenericLayout } from '../../../components/genericLayout/genericLayout';
 import { ReactComponent as PlusSvg } from '../../../icons/ic20/plus.svg';
 import contacts from '../../../stores/Contacts';
@@ -41,42 +42,44 @@ export const ContactsPage = observer(() => {
 
 	return (
 		<GenericLayout>
-			<div className="mail-page animated fadeInRight">
-				<div className="mail-top contacts-mail-top">
-					<div className="mail-header">
-						<h2 className="mailbox-title">
-							{location.pathname === '/mail/contacts' ? 'Contacts' : 'Folders'}
-						</h2>
-						{location.pathname !== '/mail/folders' && (
-							<div className="mail-actions">
-								<div className="input-group">
-									<ContactsSearcher />
+			<FullPageContent>
+				<div className="mail-page animated fadeInRight">
+					<div className="mail-top contacts-mail-top">
+						<div className="mail-header">
+							<h2 className="mailbox-title">
+								{location.pathname === '/mail/contacts' ? 'Contacts' : 'Folders'}
+							</h2>
+							{location.pathname !== '/mail/folders' && (
+								<div className="mail-actions">
+									<div className="input-group">
+										<ContactsSearcher />
+									</div>
 								</div>
-							</div>
-						)}
-					</div>
-					{windowWidth <= 480 ? (
-						<div
-							style={{
-								marginLeft: 10,
-							}}
-						>
-							{extraContent}
+							)}
 						</div>
-					) : null}
+						{windowWidth <= 480 ? (
+							<div
+								style={{
+									marginLeft: 10,
+								}}
+							>
+								{extraContent}
+							</div>
+						) : null}
+					</div>
+					<div className="page-body">
+						<Tabs
+							activeKey={`/${location.pathname.split('/')[1]}`}
+							onTabClick={key => nav(key)}
+							tabBarExtraContent={windowWidth > 480 ? extraContent : null}
+						>
+							<Tabs.TabPane tab="Contacts" key={RoutePath.MAIL_CONTACTS} />
+							<Tabs.TabPane tab="Folders" key={RoutePath.MAIL_FOLDERS} />
+						</Tabs>
+						<Outlet />
+					</div>
 				</div>
-				<div className="page-body">
-					<Tabs
-						activeKey={`/${location.pathname.split('/')[1]}`}
-						onTabClick={key => nav(key)}
-						tabBarExtraContent={windowWidth > 480 ? extraContent : null}
-					>
-						<Tabs.TabPane tab="Contacts" key={RoutePath.MAIL_CONTACTS} />
-						<Tabs.TabPane tab="Folders" key={RoutePath.MAIL_FOLDERS} />
-					</Tabs>
-					<Outlet />
-				</div>
-			</div>
+			</FullPageContent>
 		</GenericLayout>
 	);
 });

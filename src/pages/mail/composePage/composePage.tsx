@@ -3,6 +3,7 @@ import React, { useEffect } from 'react';
 import { generatePath } from 'react-router-dom';
 
 import { ActionButton, ActionButtonLook } from '../../../components/ActionButton/ActionButton';
+import { FullPageContent } from '../../../components/genericLayout/content/fullPageContent/fullPageContent';
 import { GenericLayout } from '../../../components/genericLayout/genericLayout';
 import { OverlappingLoader } from '../../../components/overlappingLoader/overlappingLoader';
 import { ReactComponent as CrossSvg } from '../../../icons/ic20/cross.svg';
@@ -27,29 +28,31 @@ export const ComposePage = observer(() => {
 
 	return (
 		<GenericLayout>
-			<div className={css.header}>
-				<div className={css.headerTitle}>Compose mail</div>
+			<FullPageContent>
+				<div className={css.header}>
+					<div className={css.headerTitle}>Compose mail</div>
 
-				<div className={css.headerActions}>
-					<ActionButton
-						look={ActionButtonLook.DENGEROUS}
-						onClick={() => {
-							navigate(generatePath(RoutePath.MAIL_FOLDER, { folderId: lastActiveFolderId }));
-						}}
-						icon={<CrossSvg />}
-					>
-						Discard
-					</ActionButton>
+					<div className={css.headerActions}>
+						<ActionButton
+							look={ActionButtonLook.DENGEROUS}
+							onClick={() => {
+								navigate(generatePath(RoutePath.MAIL_FOLDER, { folderId: lastActiveFolderId }));
+							}}
+							icon={<CrossSvg />}
+						>
+							Discard
+						</ActionButton>
+					</div>
 				</div>
-			</div>
 
-			<ComposeMailForm
-				className={css.form}
-				mailData={globalOutgoingMailData}
-				onSent={() => navigate(generatePath(RoutePath.MAIL_FOLDER, { folderId: lastActiveFolderId }))}
-			/>
+				<ComposeMailForm
+					className={css.form}
+					mailData={globalOutgoingMailData}
+					onSent={() => navigate(generatePath(RoutePath.MAIL_FOLDER, { folderId: lastActiveFolderId }))}
+				/>
 
-			{mailer.sending && <OverlappingLoader text="Broadcasting your message to blockchain ..." />}
+				{mailer.sending && <OverlappingLoader text="Broadcasting your message to blockchain ..." />}
+			</FullPageContent>
 		</GenericLayout>
 	);
 });

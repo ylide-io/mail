@@ -15,35 +15,10 @@
 
 	@include less920px {
 		grid-template-columns: 1fr;
-		padding: 16px 16px 0;
+		padding: 16px;
 	}
 
 	@include less720px {
 		padding: 0;
-	}
-}
-
-.content:not(.content_custom) {
-	display: flex;
-	flex-direction: column;
-	min-width: 0;
-	min-height: 0;
-	position: relative;
-	padding: 12px 0 0;
-	background-color: white;
-	border-radius: 10px;
-	box-shadow: var(--layout-shadow);
-
-	@include less720px {
-		border-radius: 0;
-	}
-}
-
-.linkButton {
-	display: none;
-	margin: 0 12px 12px;
-
-	@include less920px {
-		display: block;
 	}
 }

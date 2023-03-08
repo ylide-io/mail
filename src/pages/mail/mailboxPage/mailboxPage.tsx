@@ -3,6 +3,7 @@ import { useParams, useSearchParams } from 'react-router-dom';
 import AutoSizer from 'react-virtualized-auto-sizer';
 import { FixedSizeList, ListChildComponentProps } from 'react-window';
 
+import { FullPageContent } from '../../../components/genericLayout/content/fullPageContent/fullPageContent';
 import { GenericLayout } from '../../../components/genericLayout/genericLayout';
 import { YlideLoader } from '../../../components/ylideLoader/ylideLoader';
 import { analytics } from '../../../stores/Analytics';
@@ -104,86 +105,88 @@ export const MailboxPage = () => {
 	}, [itemSize, scrollParams, isLoading, messages.length, isNextPageAvailable, loadNextPage]);
 
 	return (
-		<GenericLayout mobileTopButtonProps={{ text: 'Compose Mail', link: RoutePath.MAIL_COMPOSE }}>
-			<div className="mailbox-page animated fadeInRight">
-				<MailboxHeader
-					folderId={folderId!}
-					filterBySender={filterBySender}
-					isAllSelected={isAllSelected}
-					onSelectAllCheckBoxClick={isChecked => {
-						setSelectedMessageIds(isChecked ? new Set(messages.map(it => it.id)) : new Set());
-					}}
-					isActionButtonsDisabled={!selectedMessageIds.size}
-					onMarkReadClick={() => {
-						markMessagesAsReaded(Array.from(selectedMessageIds)).then();
-						setSelectedMessageIds(new Set());
-					}}
-					onDeleteClick={() => {
-						markMessagesAsDeleted(messages.filter(it => selectedMessageIds.has(it.id))).then();
-						setSelectedMessageIds(new Set());
-					}}
-					onRestoreClick={() => {
-						markMessagesAsNotDeleted(messages.filter(it => selectedMessageIds.has(it.id))).then();
-						setSelectedMessageIds(new Set());
-					}}
-				/>
+		<GenericLayout>
+			<FullPageContent mobileTopButtonProps={{ text: 'Compose Mail', link: RoutePath.MAIL_COMPOSE }}>
+				<div className="mailbox-page animated fadeInRight">
+					<MailboxHeader
+						folderId={folderId!}
+						filterBySender={filterBySender}
+						isAllSelected={isAllSelected}
+						onSelectAllCheckBoxClick={isChecked => {
+							setSelectedMessageIds(isChecked ? new Set(messages.map(it => it.id)) : new Set());
+						}}
+						isActionButtonsDisabled={!selectedMessageIds.size}
+						onMarkReadClick={() => {
+							markMessagesAsReaded(Array.from(selectedMessageIds)).then();
+							setSelectedMessageIds(new Set());
+						}}
+						onDeleteClick={() => {
+							markMessagesAsDeleted(messages.filter(it => selectedMessageIds.has(it.id))).then();
+							setSelectedMessageIds(new Set());
+						}}
+						onRestoreClick={() => {
+							markMessagesAsNotDeleted(messages.filter(it => selectedMessageIds.has(it.id))).then();
+							setSelectedMessageIds(new Set());
+						}}
+					/>
 
-				<div className="mailbox">
-					{isLoading && !messages.length ? (
-						<div style={{ padding: '40px 0' }}>
-							<YlideLoader
-								reason={`Retrieving your mails from ${
-									Object.keys(domain.blockchains).length
-								} blockchains`}
-							/>
-						</div>
-					) : messages.length ? (
-						<AutoSizer>
-							{({ width, height }) => {
-								// noinspection JSUnusedGlobalSymbols
-								return (
-									<FixedSizeList<MailboxListItemData>
-										itemSize={itemSize}
-										width={width}
-										height={height}
-										style={{ padding: '0 0 12px' }}
-										itemData={{
-											messages,
-											itemSize,
-											isSelected: (messageId: string) => selectedMessageIds.has(messageId),
-											onSelectClick: (messageId: string, isSelected: boolean) => {
-												const newSet = new Set(selectedMessageIds.values());
-												isSelected ? newSet.add(messageId) : newSet.delete(messageId);
+					<div className="mailbox">
+						{isLoading && !messages.length ? (
+							<div style={{ padding: '40px 0' }}>
+								<YlideLoader
+									reason={`Retrieving your mails from ${
+										Object.keys(domain.blockchains).length
+									} blockchains`}
+								/>
+							</div>
+						) : messages.length ? (
+							<AutoSizer>
+								{({ width, height }) => {
+									// noinspection JSUnusedGlobalSymbols
+									return (
+										<FixedSizeList<MailboxListItemData>
+											itemSize={itemSize}
+											width={width}
+											height={height}
+											style={{ padding: '0 0 12px' }}
+											itemData={{
+												messages,
+												itemSize,
+												isSelected: (messageId: string) => selectedMessageIds.has(messageId),
+												onSelectClick: (messageId: string, isSelected: boolean) => {
+													const newSet = new Set(selectedMessageIds.values());
+													isSelected ? newSet.add(messageId) : newSet.delete(messageId);
 
-												setSelectedMessageIds(newSet);
-											},
-											onFilterBySenderClick:
-												folderId === FolderId.Inbox && !filterBySender
-													? (senderAddress: string) => {
-															navigate({
-																search: { sender: senderAddress },
-															});
-													  }
-													: undefined,
-										}}
-										onScroll={props => {
-											setScrollParams({
-												offset: props.scrollOffset,
-												height,
-											});
-										}}
-										itemCount={messages.length + (isNextPageAvailable ? 1 : 0)}
-									>
-										{MailboxListItem}
-									</FixedSizeList>
-								);
-							}}
-						</AutoSizer>
-					) : (
-						<MailboxEmpty folderId={folderId!} />
-					)}
+													setSelectedMessageIds(newSet);
+												},
+												onFilterBySenderClick:
+													folderId === FolderId.Inbox && !filterBySender
+														? (senderAddress: string) => {
+																navigate({
+																	search: { sender: senderAddress },
+																});
+														  }
+														: undefined,
+											}}
+											onScroll={props => {
+												setScrollParams({
+													offset: props.scrollOffset,
+													height,
+												});
+											}}
+											itemCount={messages.length + (isNextPageAvailable ? 1 : 0)}
+										>
+											{MailboxListItem}
+										</FixedSizeList>
+									);
+								}}
+							</AutoSizer>
+						) : (
+							<MailboxEmpty folderId={folderId!} />
+						)}
+					</div>
 				</div>
-			</div>
+			</FullPageContent>
 		</GenericLayout>
 	);
 };

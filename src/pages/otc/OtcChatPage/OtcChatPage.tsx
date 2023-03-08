@@ -136,7 +136,6 @@ export const OtcChatPage = observer(() => {
 
 	return (
 		<OtcLayout
-			isShrinkedToPageSize
 			title={
 				<div className={css.title}>
 					<ContactSvg width={32} height={32} />

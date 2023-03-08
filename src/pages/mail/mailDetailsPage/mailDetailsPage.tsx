@@ -3,6 +3,7 @@ import { generatePath, useParams } from 'react-router-dom';
 
 import { ActionButton } from '../../../components/ActionButton/ActionButton';
 import { ContactName } from '../../../components/contactName/contactName';
+import { FullPageContent } from '../../../components/genericLayout/content/fullPageContent/fullPageContent';
 import { GenericLayout } from '../../../components/genericLayout/genericLayout';
 import { Recipients } from '../../../components/recipientInput/recipientInput';
 import { Spinner } from '../../../components/spinner/spinner';
@@ -189,121 +190,129 @@ export const MailDetailsPage = () => {
 	//
 
 	return (
-		<GenericLayout mainClass={css.layout}>
-			{initialMessage && initialDecodedContent && (
-				<div className={css.root}>
-					<div className={css.header}>
-						<ActionButton onClick={onBackClick} icon={<ArrowLeftSvg />} />
+		<GenericLayout>
+			<FullPageContent className={css.layout}>
+				{initialMessage && initialDecodedContent && (
+					<div className={css.root}>
+						<div className={css.header}>
+							<ActionButton onClick={onBackClick} icon={<ArrowLeftSvg />} />
 
-						{isLoadingThread || isDecodingThread ? (
-							<Spinner className={css.headerSpinner} />
-						) : isThreadOpen ? (
-							<div className={css.messagesFrom}>
-								<div className={css.messagesFromLebel}>Messages from</div>
-								<ContactName address={initialMessage.msg.senderAddress} />
-							</div>
-						) : (
-							wrappedThreadMessages.length > 1 && (
-								<ActionButton icon={<ContactSvg />} onClick={onOpenThreadClick}>
-									{wrappedThreadMessages.length} messages from this sender
-								</ActionButton>
-							)
-						)}
-					</div>
-
-					<div className={css.messageWrapper}>
-						{isThreadOpen ? (
-							wrappedThreadMessages.map(message => {
-								const decoded = decodedMessagesById[message.message.msgId];
-								const isPrimaryItem = message.message.id === initialMessage.id;
-
-								return (
-									<div
-										key={message.message.id}
-										ref={isPrimaryItem ? primaryThreadItemRef : undefined}
-										className={css.messageThreadItem}
-									>
-										{message.isDeleted ? (
-											<div className={css.deletedPlaceholder}>
-												This message was archived
-												<div>
-													<ActionButton onClick={() => onRestoreClick(message.message)}>
-														Restore
-													</ActionButton>
-												</div>
-											</div>
-										) : (
-											<MailMessage
-												message={message.message}
-												decoded={decoded}
-												folderId={folderId}
-												onReady={isPrimaryItem ? onPrimaryThreadMessageReady : undefined}
-												onReplyClick={() =>
-													onReplyClick(
-														message.message.msg.senderAddress,
-														decoded.decodedSubject,
-													)
-												}
-												onForwardClick={() =>
-													onForwardClick(
-														message.message,
-														decoded.decodedTextData,
-														decoded.decodedSubject,
-													)
-												}
-												onDeleteClick={() => onDeleteClick(message.message)}
-											/>
-										)}
-									</div>
-								);
-							})
-						) : (
-							<MailMessage
-								message={initialMessage}
-								decoded={initialDecodedContent}
-								folderId={folderId}
-								onReplyClick={() =>
-									onReplyClick(initialMessage.msg.senderAddress, initialDecodedContent.decodedSubject)
-								}
-								onForwardClick={() =>
-									onForwardClick(
-										initialMessage,
-										initialDecodedContent.decodedTextData,
-										initialDecodedContent.decodedSubject,
-									)
-								}
-								onDeleteClick={() => onDeleteClick(initialMessage)}
-							/>
-						)}
-					</div>
-
-					{isThreadOpen || (
-						<div className={css.footer}>
-							<ActionButton
-								onClick={() =>
-									onReplyClick(initialMessage.msg.senderAddress, initialDecodedContent.decodedSubject)
-								}
-								icon={<ReplySvg />}
-							>
-								Reply
-							</ActionButton>
-
-							<ActionButton
-								onClick={() =>
-									onForwardClick(
-										initialMessage,
-										initialDecodedContent.decodedTextData,
-										initialDecodedContent.decodedSubject,
-									)
-								}
-								icon={<ForwardSvg />}
-							>
-								Forward
-							</ActionButton>
+							{isLoadingThread || isDecodingThread ? (
+								<Spinner className={css.headerSpinner} />
+							) : isThreadOpen ? (
+								<div className={css.messagesFrom}>
+									<div className={css.messagesFromLebel}>Messages from</div>
+									<ContactName address={initialMessage.msg.senderAddress} />
+								</div>
+							) : (
+								wrappedThreadMessages.length > 1 && (
+									<ActionButton icon={<ContactSvg />} onClick={onOpenThreadClick}>
+										{wrappedThreadMessages.length} messages from this sender
+									</ActionButton>
+								)
+							)}
 						</div>
-					)}
-				</div>
-			)}
+
+						<div className={css.messageWrapper}>
+							{isThreadOpen ? (
+								wrappedThreadMessages.map(message => {
+									const decoded = decodedMessagesById[message.message.msgId];
+									const isPrimaryItem = message.message.id === initialMessage.id;
+
+									return (
+										<div
+											key={message.message.id}
+											ref={isPrimaryItem ? primaryThreadItemRef : undefined}
+											className={css.messageThreadItem}
+										>
+											{message.isDeleted ? (
+												<div className={css.deletedPlaceholder}>
+													This message was archived
+													<div>
+														<ActionButton onClick={() => onRestoreClick(message.message)}>
+															Restore
+														</ActionButton>
+													</div>
+												</div>
+											) : (
+												<MailMessage
+													message={message.message}
+													decoded={decoded}
+													folderId={folderId}
+													onReady={isPrimaryItem ? onPrimaryThreadMessageReady : undefined}
+													onReplyClick={() =>
+														onReplyClick(
+															message.message.msg.senderAddress,
+															decoded.decodedSubject,
+														)
+													}
+													onForwardClick={() =>
+														onForwardClick(
+															message.message,
+															decoded.decodedTextData,
+															decoded.decodedSubject,
+														)
+													}
+													onDeleteClick={() => onDeleteClick(message.message)}
+												/>
+											)}
+										</div>
+									);
+								})
+							) : (
+								<MailMessage
+									message={initialMessage}
+									decoded={initialDecodedContent}
+									folderId={folderId}
+									onReplyClick={() =>
+										onReplyClick(
+											initialMessage.msg.senderAddress,
+											initialDecodedContent.decodedSubject,
+										)
+									}
+									onForwardClick={() =>
+										onForwardClick(
+											initialMessage,
+											initialDecodedContent.decodedTextData,
+											initialDecodedContent.decodedSubject,
+										)
+									}
+									onDeleteClick={() => onDeleteClick(initialMessage)}
+								/>
+							)}
+						</div>
+
+						{isThreadOpen || (
+							<div className={css.footer}>
+								<ActionButton
+									onClick={() =>
+										onReplyClick(
+											initialMessage.msg.senderAddress,
+											initialDecodedContent.decodedSubject,
+										)
+									}
+									icon={<ReplySvg />}
+								>
+									Reply
+								</ActionButton>
+
+								<ActionButton
+									onClick={() =>
+										onForwardClick(
+											initialMessage,
+											initialDecodedContent.decodedTextData,
+											initialDecodedContent.decodedSubject,
+										)
+									}
+									icon={<ForwardSvg />}
+								>
+									Forward
+								</ActionButton>
+							</div>
+						)}
+					</div>
+				)}
+			</FullPageContent>
 		</GenericLayout>
 	);
 };
