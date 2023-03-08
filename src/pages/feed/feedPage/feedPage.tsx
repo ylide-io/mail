@@ -5,14 +5,13 @@ import { useParams, useSearchParams } from 'react-router-dom';
 import { ActionButton, ActionButtonLook, ActionButtonSize } from '../../../components/ActionButton/ActionButton';
 import { ErrorMessage } from '../../../components/errorMessage/errorMessage';
 import { NarrowContent } from '../../../components/genericLayout/content/narrowContent/narrowContent';
-import { GenericLayout } from '../../../components/genericLayout/genericLayout';
+import { GenericLayout, useGenericLayoutApi } from '../../../components/genericLayout/genericLayout';
 import { YlideLoader } from '../../../components/ylideLoader/ylideLoader';
 import { YlideButton } from '../../../controls/YlideButton';
 import { ReactComponent as ArrowUpSvg } from '../../../icons/ic20/arrowUp.svg';
 import { ReactComponent as CrossSvg } from '../../../icons/ic20/cross.svg';
 import { browserStorage } from '../../../stores/browserStorage';
 import feed, { FeedCategory } from '../../../stores/Feed';
-import { scrollWindowToTop } from '../../../utils/ui';
 import { useNav } from '../../../utils/url';
 import { FeedPostItem } from '../components/feedPostItem/feedPostItem';
 import css from './feedPage.module.scss';
@@ -22,8 +21,10 @@ function isInViewport(element: HTMLDivElement) {
 	return rect.top >= -100 && rect.top <= (window.innerHeight || document.documentElement.clientHeight);
 }
 
-export const FeedPage = observer(() => {
+const FeedPageContent = observer(() => {
 	const navigate = useNav();
+	const genericLayoutApi = useGenericLayoutApi();
+
 	const lastPostView = useRef<HTMLDivElement>(null);
 	const feedBodyRef = useRef<HTMLDivElement>(null);
 	const [newPostsVisible, setNewPostsVisible] = useState(false);
@@ -36,7 +37,7 @@ export const FeedPage = observer(() => {
 
 	// Re-load when category changes
 	useEffect(() => {
-		scrollWindowToTop();
+		genericLayoutApi.scrollToTop();
 		feed.loadCategory(category!, sourceId).then();
 	}, [category, sourceId]);
 
@@ -46,7 +47,7 @@ export const FeedPage = observer(() => {
 			setLastSourceListId(sourceListId);
 
 			if (category === FeedCategory.MAIN) {
-				scrollWindowToTop();
+				genericLayoutApi.scrollToTop();
 				feed.loadCategory(category, sourceId).then();
 			}
 		}
@@ -70,7 +71,7 @@ export const FeedPage = observer(() => {
 	}, [feed.loading, feed.moreAvailable]);
 
 	const showNewPosts = async () => {
-		scrollWindowToTop();
+		genericLayoutApi.scrollToTop();
 		await feed.loadNew();
 	};
 
@@ -85,68 +86,70 @@ export const FeedPage = observer(() => {
 	}
 
 	return (
-		<GenericLayout>
-			<NarrowContent
-				title={title}
-				titleSubItem={
-					!!sourceId && (
-						<ActionButton
-							look={ActionButtonLook.PRIMARY}
-							icon={<CrossSvg />}
-							onClick={() => navigate({ search: {} })}
-						>
-							Clear filter
-						</ActionButton>
-					)
-				}
-				titleRight={
-					!!feed.newPosts && (
-						<YlideButton size="small" nice onClick={showNewPosts}>
+		<NarrowContent
+			title={title}
+			titleSubItem={
+				!!sourceId && (
+					<ActionButton
+						look={ActionButtonLook.PRIMARY}
+						icon={<CrossSvg />}
+						onClick={() => navigate({ search: {} })}
+					>
+						Clear filter
+					</ActionButton>
+				)
+			}
+			titleRight={
+				!!feed.newPosts && (
+					<YlideButton size="small" nice onClick={showNewPosts}>
+						Show {feed.newPosts} new posts
+					</YlideButton>
+				)
+			}
+		>
+			<ActionButton
+				className={css.scrollToTop}
+				size={ActionButtonSize.LARGE}
+				look={ActionButtonLook.SECONDARY}
+				icon={<ArrowUpSvg />}
+				onClick={() => genericLayoutApi.scrollToTop()}
+			/>
+
+			<div className={css.feedBody} ref={feedBodyRef}>
+				{newPostsVisible && !!feed.newPosts && (
+					<div className={css.newPosts}>
+						<YlideButton className={css.feedNewPostsButton} size="small" nice onClick={showNewPosts}>
 							Show {feed.newPosts} new posts
 						</YlideButton>
-					)
-				}
-			>
-				<ActionButton
-					className={css.scrollToTop}
-					size={ActionButtonSize.LARGE}
-					look={ActionButtonLook.SECONDARY}
-					icon={<ArrowUpSvg />}
-					onClick={() => scrollWindowToTop()}
-				/>
+					</div>
+				)}
 
-				<div className={css.feedBody} ref={feedBodyRef}>
-					{newPostsVisible && !!feed.newPosts && (
-						<div className={css.newPosts}>
-							<YlideButton className={css.feedNewPostsButton} size="small" nice onClick={showNewPosts}>
-								Show {feed.newPosts} new posts
-							</YlideButton>
-						</div>
-					)}
+				{feed.loaded ? (
+					<>
+						{feed.posts.map(post => (
+							<FeedPostItem isInFeed post={post} key={post.id} />
+						))}
 
-					{feed.loaded ? (
-						<>
-							{feed.posts.map(post => (
-								<FeedPostItem isInFeed post={post} key={post.id} />
-							))}
-
-							{feed.moreAvailable && (
-								<div className={css.loader} ref={lastPostView}>
-									{feed.loading && <YlideLoader reason="Loading more posts ..." />}
-								</div>
-							)}
-						</>
-					) : feed.errorLoading ? (
-						<ErrorMessage>
-							Sorry, an error occured during feed loading. Please, try again later.
-						</ErrorMessage>
-					) : (
-						<div className={css.loader}>
-							<YlideLoader reason="Your feed is loading ..." />
-						</div>
-					)}
-				</div>
-			</NarrowContent>
-		</GenericLayout>
+						{feed.moreAvailable && (
+							<div className={css.loader} ref={lastPostView}>
+								{feed.loading && <YlideLoader reason="Loading more posts ..." />}
+							</div>
+						)}
+					</>
+				) : feed.errorLoading ? (
+					<ErrorMessage>Sorry, an error occured during feed loading. Please, try again later.</ErrorMessage>
+				) : (
+					<div className={css.loader}>
+						<YlideLoader reason="Your feed is loading ..." />
+					</div>
+				)}
+			</div>
+		</NarrowContent>
 	);
 });
+
+export const FeedPage = () => (
+	<GenericLayout>
+		<FeedPageContent />
+	</GenericLayout>
+);
