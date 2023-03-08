@@ -101,7 +101,7 @@ jobs:
             - restore_build_cache:
                   cache_key: hub
             - wrangler:
-                  project_name: mail-staging
+                  project_name: ylide-mail-staging
     build_airswap:
         docker:
             - image: node:16
@@ -121,7 +121,7 @@ jobs:
             - restore_build_cache:
                   cache_key: airswap
             - wrangler:
-                  project_name: otc-airswap
+                  project_name: ylide-otc-airswap
     build_1inch:
         docker:
             - image: node:16
@@ -141,7 +141,7 @@ jobs:
             - restore_build_cache:
                   cache_key: 1inch
             - wrangler:
-                  project_name: otc-1inch
+                  project_name: ylide-otc-1inch
     build_paraswap:
         docker:
             - image: node:16
@@ -161,7 +161,7 @@ jobs:
             - restore_build_cache:
                   cache_key: paraswap
             - wrangler:
-                  project_name: otc-paraswap
+                  project_name: ylide-otc-paraswap
 
 workflows:
     build_and_test:
