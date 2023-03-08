@@ -1,10 +1,5 @@
 version: 2.1
 
-orbs:
-    node: circleci/node@5.1.0
-
-version: 2.1
-
 jobs:
     build: # this can be any name you choose
         docker:
@@ -13,25 +8,25 @@ jobs:
         parallelism: 10
 
         steps:
-        - checkout
-        - restore_cache:
-            name: Restore pnpm Package Cache
-            keys:
-                - pnpm-packages-{{ checksum "pnpm-lock.yaml" }}
-        - run:
-            name: Install pnpm package manager
-            command: |
-                corepack enable
-                corepack prepare pnpm@latest-7 --activate
-        - run:
-            name: Install Dependencies
-            command: |
-                pnpm install
-        - save_cache:
-            name: Save pnpm Package Cache
-            key: pnpm-packages-{{ checksum "pnpm-lock.yaml" }}
-            paths:
-                - node_modules
+            - checkout
+            - restore_cache:
+                  name: Restore pnpm Package Cache
+                  keys:
+                      - pnpm-packages-{{ checksum "pnpm-lock.yaml" }}
+            - run:
+                  name: Install pnpm package manager
+                  command: |
+                      corepack enable
+                      corepack prepare pnpm@latest-7 --activate
+            - run:
+                  name: Install Dependencies
+                  command: |
+                      pnpm install
+            - save_cache:
+                  name: Save pnpm Package Cache
+                  key: pnpm-packages-{{ checksum "pnpm-lock.yaml" }}
+                  paths:
+                      - node_modules
 
 workflows:
     build_and_test:
