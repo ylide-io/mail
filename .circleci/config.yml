@@ -53,13 +53,15 @@ jobs:
             - run:
                   name: Upload build through Wrangler
                   command: |
-                      wrangler pages publish build --project-name=ylide-mail
+                      wrangler pages publish build --project-name=ylide-mail-staging
 
 workflows:
     build_and_test:
         jobs:
             - build
-            - deploy
+            - deploy:
+                  requires:
+                      - build
             # - test:
             #     requires:
             #       - build
