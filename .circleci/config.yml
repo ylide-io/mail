@@ -1,0 +1,40 @@
+version: 2.1
+
+# Define the jobs we want to run for this project
+jobs:
+    build:
+        docker:
+            - image: 'cimg/base:stable'
+        steps:
+            - checkout
+            - node/install:
+                  node-version: '16.14.0'
+            - node/install-packages
+            - run:
+                  command: npm run build-hub
+    # deploy:
+    #   docker:
+    #     - image: cimg/<language>:<version TAG>
+    #       auth:
+    #         username: mydockerhub-user
+    #         password: $DOCKERHUB_PASSWORD  # context / project UI env-var reference
+    #   steps:
+    #     - checkout
+    #     - run: my-deploy-commands
+
+# Orchestrate our job run sequence
+workflows:
+    build_and_test:
+        jobs:
+            - build
+            # - test:
+            #     requires:
+            #       - build
+            # - hold:
+            #     type: approval
+            #     requires:
+            #       - build
+            #       - test
+            # - deploy:
+            #     requires:
+            #       - hold
