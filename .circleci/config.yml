@@ -1,7 +1,7 @@
 version: 2.1
 
 jobs:
-    build: # this can be any name you choose
+    set_up: # this can be any name you choose
         docker:
             - image: node:16
         resource_class: large
@@ -27,6 +27,29 @@ jobs:
                   key: pnpm-packages-{{ checksum "pnpm-lock.yaml" }}
                   paths:
                       - node_modules
+    build:
+        docker:
+            - image: node:16
+        resource_class: large
+        parallelism: 10
+
+        steps:
+            - checkout
+            - restore_cache:
+                  name: Restore pnpm Package Cache
+                  keys:
+                      - pnpm-packages-{{ checksum "pnpm-lock.yaml" }}
+            - run:
+                  name: Build project
+                  command: |
+                      pnpm run build-hub
+            - save_cache:
+                  key: build-output-{{ .Environment.CIRCLE_SHA1 }}
+                  paths:
+                      - build
+            - store_artifacts:
+                  path: build
+                  destination: build
 
 workflows:
     build_and_test:
