@@ -1,20 +1,10 @@
-.newPosts {
-	@include flex-row(center, center);
+.newPostsButton {
 	position: fixed;
-	top: 30px;
+	z-index: 1;
+	top: 50px;
 	left: 50%;
-	width: 200px;
-	margin-left: -100px;
-	z-index: 20;
-
-	.feedNewPostsButton {
-		background-color: white;
-		box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
-
-		&:hover {
-			color: black;
-		}
-	}
+	transform: translateX(-50%);
+	box-shadow: var(--popup-shadow);
 }
 
 .loader {
@@ -29,4 +19,5 @@
 	z-index: 1;
 	right: 20px;
 	bottom: 20px;
+	box-shadow: var(--popup-shadow);
 }

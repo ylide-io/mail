@@ -7,7 +7,6 @@ import { ErrorMessage } from '../../../components/errorMessage/errorMessage';
 import { NarrowContent } from '../../../components/genericLayout/content/narrowContent/narrowContent';
 import { GenericLayout, useGenericLayoutApi } from '../../../components/genericLayout/genericLayout';
 import { YlideLoader } from '../../../components/ylideLoader/ylideLoader';
-import { YlideButton } from '../../../controls/YlideButton';
 import { ReactComponent as ArrowUpSvg } from '../../../icons/ic20/arrowUp.svg';
 import { ReactComponent as CrossSvg } from '../../../icons/ic20/cross.svg';
 import { browserStorage } from '../../../stores/browserStorage';
@@ -101,9 +100,9 @@ const FeedPageContent = observer(() => {
 			}
 			titleRight={
 				!!feed.newPosts && (
-					<YlideButton size="small" nice onClick={showNewPosts}>
+					<ActionButton look={ActionButtonLook.SECONDARY} onClick={showNewPosts}>
 						Show {feed.newPosts} new posts
-					</YlideButton>
+					</ActionButton>
 				)
 			}
 		>
@@ -117,11 +116,13 @@ const FeedPageContent = observer(() => {
 
 			<div className={css.feedBody} ref={feedBodyRef}>
 				{newPostsVisible && !!feed.newPosts && (
-					<div className={css.newPosts}>
-						<YlideButton className={css.feedNewPostsButton} size="small" nice onClick={showNewPosts}>
-							Show {feed.newPosts} new posts
-						</YlideButton>
-					</div>
+					<ActionButton
+						look={ActionButtonLook.SECONDARY}
+						className={css.newPostsButton}
+						onClick={showNewPosts}
+					>
+						Show {feed.newPosts} new posts
+					</ActionButton>
 				)}
 
 				{feed.loaded ? (
