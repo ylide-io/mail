@@ -54,6 +54,19 @@ commands:
             - store_artifacts:
                   path: build
                   destination: build
+    wrangler:
+        parameters:
+            project_name:
+                type: string
+        steps:
+            - run:
+                  name: Install Wrangler
+                  command: |
+                      npm install -g wrangler@2.12.0
+            - run:
+                  name: Upload build through Wrangler
+                  command: |
+                      wrangler pages publish build --project-name=<< parameters.project_name >>
 
 jobs:
     install: # this can be any name you choose
@@ -69,61 +82,136 @@ jobs:
                   command: |
                       pnpm install
             - save_pnpm_cache
-    build:
+    build_hub:
         docker:
             - image: node:16
-        parameters:
-            cache_key:
-                type: string
-            build_cmd:
-                type: string
         steps:
             - checkout
             - restore_pnpm_cache
             - install_pnpm
             - ylide_build:
-                  build_cmd: << parameters.build_cmd >>
+                  build_cmd: build-hub
             - save_build_cache:
-                  cache_key: << parameters.cache_key >>
+                  cache_key: hub
             - ylide_store_artifacts
-    deploy:
+    deploy_hub:
         docker:
             - image: node:16
-        parameters:
-            cache_key:
-                type: string
-            project_name:
-                type: string
+        steps:
+            - restore_build_cache:
+                  cache_key: hub
+            - wrangler:
+                  project_name: mail-staging
+    build_airswap:
+        docker:
+            - image: node:16
         steps:
             - checkout
+            - restore_pnpm_cache
+            - install_pnpm
+            - ylide_build:
+                  build_cmd: build-airswap
+            - save_build_cache:
+                  cache_key: airswap
+            - ylide_store_artifacts
+    deploy_airswap:
+        docker:
+            - image: node:16
+        steps:
             - restore_build_cache:
-                  cache_key: << parameters.cache_key >>
-            - run:
-                  name: Install Wrangler
-                  command: |
-                      npm install -g wrangler@2.12.0
-            - run:
-                  name: Upload build through Wrangler
-                  command: |
-                      wrangler pages publish build --project-name=<< parameters.project_name >>
+                  cache_key: airswap
+            - wrangler:
+                  project_name: otc-airswap
+    build_1inch:
+        docker:
+            - image: node:16
+        steps:
+            - checkout
+            - restore_pnpm_cache
+            - install_pnpm
+            - ylide_build:
+                  build_cmd: build-1inch
+            - save_build_cache:
+                  cache_key: 1inch
+            - ylide_store_artifacts
+    deploy_1inch:
+        docker:
+            - image: node:16
+        steps:
+            - restore_build_cache:
+                  cache_key: 1inch
+            - wrangler:
+                  project_name: otc-1inch
+    build_paraswap:
+        docker:
+            - image: node:16
+        steps:
+            - checkout
+            - restore_pnpm_cache
+            - install_pnpm
+            - ylide_build:
+                  build_cmd: build-paraswap
+            - save_build_cache:
+                  cache_key: paraswap
+            - ylide_store_artifacts
+    deploy_paraswap:
+        docker:
+            - image: node:16
+        steps:
+            - restore_build_cache:
+                  cache_key: paraswap
+            - wrangler:
+                  project_name: otc-paraswap
 
 workflows:
     build_and_test:
         jobs:
             - install
-            - build:
-                  cache_key: hub
-                  build_cmd: build-hub
+            - build_hub:
                   filters:
                       branches:
                           only:
                               - hub-release
-            - deploy:
-                  cache_key: hub
-                  project_name: ylide-mail-staging
+            - deploy_hub:
                   requires:
-                      - build
+                      - build_hub
                   filters:
                       branches:
                           only:
                               - hub-release
+            - build_airswap:
+                  filters:
+                      branches:
+                          only:
+                              - otc-release
+            - deploy_airswap:
+                  requires:
+                      - build_airswap
+                  filters:
+                      branches:
+                          only:
+                              - otc-release
+            - build_1inch:
+                  filters:
+                      branches:
+                          only:
+                              - otc-release
+            - deploy_1inch:
+                  requires:
+                      - build_1inch
+                  filters:
+                      branches:
+                          only:
+                              - otc-release
+            - build_paraswap:
+                  filters:
+                      branches:
+                          only:
+                              - otc-release
+            - deploy_paraswap:
+                  requires:
+                      - build_paraswap
+                  filters:
+                      branches:
+                          only:
+                              - otc-release
