@@ -6,7 +6,7 @@ import { Dropdown, Menu } from 'antd';
 import clsx from 'clsx';
 import { autorun } from 'mobx';
 import { observer } from 'mobx-react';
-import React, { ReactNode, useEffect } from 'react';
+import React, { ReactNode, useEffect, useState } from 'react';
 
 import { Spinner } from '../../../../../components/spinner/spinner';
 import { useToastManager } from '../../../../../components/toast/toast';
@@ -14,6 +14,7 @@ import { blockchainsMap, evmNameToNetwork } from '../../../../../constants';
 import { REACT_APP__OTC_MODE } from '../../../../../env';
 import { ReactComponent as ArrowDownSvg } from '../../../../../icons/ic20/arrowDown.svg';
 import { ReactComponent as ReplySvg } from '../../../../../icons/ic20/reply.svg';
+import { SelectWalletModal } from '../../../../../modals/SelectWalletModal';
 import domain from '../../../../../stores/Domain';
 import { evmBalances } from '../../../../../stores/evmBalances';
 import mailer from '../../../../../stores/Mailer';
@@ -68,7 +69,13 @@ export const SendMailButton = observer(({ mailData, onSent }: SendMailButtonProp
 		}
 	}
 
+	const [isSelectWalletModalOpen, setSelectWalletModalOpen] = useState(false);
+
 	const sendMailHandler = async () => {
+		if (!mailData.from) {
+			return setSelectWalletModalOpen(true);
+		}
+
 		try {
 			if (mailData.to.items.some(r => !r.routing?.details)) {
 				return toast("For some of your recipients we didn't find keys on the blockchain.");
@@ -109,7 +116,6 @@ export const SendMailButton = observer(({ mailData, onSent }: SendMailButtonProp
 			className={clsx('send-btn', {
 				disabled:
 					mailer.sending ||
-					!mailData.from ||
 					!mailData.to.items.length ||
 					mailData.to.items.some(r => r.isLoading) ||
 					(!mailData.hasEditorData && !mailData.hasPlainTextData),
@@ -130,7 +136,7 @@ export const SendMailButton = observer(({ mailData, onSent }: SendMailButtonProp
 				)}
 			</div>
 
-			{mailData.from?.wallet.factory.blockchainGroup === 'evm' ? (
+			{mailData.from?.wallet.factory.blockchainGroup === 'evm' && (
 				<Dropdown
 					overlay={
 						<Menu
@@ -179,7 +185,16 @@ export const SendMailButton = observer(({ mailData, onSent }: SendMailButtonProp
 						<ArrowDownSvg />
 					</div>
 				</Dropdown>
-			) : null}
+			)}
+
+			{isSelectWalletModalOpen && (
+				<SelectWalletModal
+					onClose={() => {
+						setSelectWalletModalOpen(false);
+						sendMailHandler();
+					}}
+				/>
+			)}
 		</div>
 	);
 });
