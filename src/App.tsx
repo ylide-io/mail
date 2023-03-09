@@ -73,11 +73,11 @@ const App = observer(() => {
 	}, [modals.anythingVisible]);
 
 	useEffect(() => {
-		if (domain.accounts.isFirstTime) {
+		if (!domain.accounts.hasActiveAccounts) {
 			walletConnect.load();
 		}
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [domain.accounts.isFirstTime]);
+	}, [domain.accounts.hasActiveAccounts]);
 
 	useEffect(() => {
 		analytics.pageView(location.pathname);
@@ -101,7 +101,7 @@ const App = observer(() => {
 	}
 
 	if (
-		domain.accounts.isFirstTime &&
+		!domain.accounts.hasActiveAccounts &&
 		location.pathname !== generatePath(RoutePath.TEST) &&
 		location.pathname !== generatePath(RoutePath.WALLETS) &&
 		location.pathname !== generatePath(RoutePath.ADMIN) &&

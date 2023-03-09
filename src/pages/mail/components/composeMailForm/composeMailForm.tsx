@@ -6,6 +6,7 @@ import { AccountSelect } from '../../../../components/accountSelect/accountSelec
 import { PropsWithClassName } from '../../../../components/propsWithClassName';
 import { RecipientInput } from '../../../../components/recipientInput/recipientInput';
 import { TextField } from '../../../../components/textField/textField';
+import domain from '../../../../stores/Domain';
 import { OutgoingMailData } from '../../../../stores/outgoingMailData';
 import { formatSubject } from '../../../../utils/mail';
 import { MailboxEditor } from '../../composePage/mailboxEditor/mailboxEditor';
@@ -21,8 +22,12 @@ export const ComposeMailForm = observer(({ className, mailData, onSent }: Compos
 	return (
 		<div className={clsx(css.root, className)}>
 			<div className={css.meta}>
-				<div className={css.metaLabel}>From</div>
-				<AccountSelect activeAccount={mailData.from} onChange={account => (mailData.from = account)} />
+				{domain.accounts.hasActiveAccounts && (
+					<>
+						<div className={css.metaLabel}>From</div>
+						<AccountSelect activeAccount={mailData.from} onChange={account => (mailData.from = account)} />
+					</>
+				)}
 
 				<div className={css.metaLabel}>To</div>
 				<RecipientInput value={mailData.to} />

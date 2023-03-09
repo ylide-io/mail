@@ -97,15 +97,11 @@ export class Accounts {
 		await this.domain.keystore.delete(account.key);
 	}
 
-	@computed get areThereAccounts() {
-		return !!this.activeAccounts.length;
-	}
-
-	@computed get isFirstTime() {
-		return this.activeAccounts.length === 0;
-	}
-
 	@computed get activeAccounts() {
 		return this.accounts.filter(a => a.isLocalKeyRegistered);
+	}
+
+	@computed get hasActiveAccounts() {
+		return !!this.activeAccounts.length;
 	}
 }
