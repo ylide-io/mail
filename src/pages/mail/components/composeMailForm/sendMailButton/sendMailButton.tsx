@@ -99,6 +99,8 @@ export const SendMailButton = observer(({ mailData, onSent }: SendMailButtonProp
 		} catch (e) {
 			console.log('Error sending message', e);
 			toast("Couldn't send your message 😒");
+		} finally {
+			mailer.sending = false;
 		}
 	};
 
