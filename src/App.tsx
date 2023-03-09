@@ -105,6 +105,7 @@ const App = observer(() => {
 		location.pathname !== generatePath(RoutePath.TEST) &&
 		location.pathname !== generatePath(RoutePath.WALLETS) &&
 		location.pathname !== generatePath(RoutePath.ADMIN) &&
+		!location.pathname.startsWith(generatePath(RoutePath.WIDGET)) &&
 		(!location.pathname.startsWith(generatePath(RoutePath.FEED)) || !browserStorage.canSkipRegistration)
 	) {
 		return (

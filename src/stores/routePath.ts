@@ -29,5 +29,6 @@ export enum RoutePath {
 
 	// WIDGETS
 
+	WIDGET = '/widget',
 	SEND_MESSAGE_WIDGET = '/widget/send-message',
 }
