@@ -29,7 +29,6 @@ export function useComposeMailPopup() {
 
 		const newPopup = (
 			<ComposeMailPopup
-				key={Date.now()}
 				{...props}
 				onClose={() => {
 					staticComponentManager.remove(newPopup);

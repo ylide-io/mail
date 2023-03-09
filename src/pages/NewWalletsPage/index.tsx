@@ -10,7 +10,7 @@ import { ReactComponent as CrossSvg } from '../../icons/ic20/cross.svg';
 import { ReactComponent as NextSvg } from '../../icons/ic28/next.svg';
 import { YlideLargeLogo } from '../../icons/YlideLargeLogo';
 import { NewPasswordModal } from '../../modals/NewPasswordModal';
-import { SelectWalletModal } from '../../modals/SelectWalletModal';
+import { useSelectWalletModal } from '../../modals/SelectWalletModal';
 import domain from '../../stores/Domain';
 import { RoutePath } from '../../stores/routePath';
 import { getQueryString } from '../../utils/getQueryString';
@@ -19,7 +19,7 @@ import { useNav } from '../../utils/url';
 export const NewWalletsPage = observer(() => {
 	const navigate = useNav();
 
-	const [isSelectWalletModalOpen, setSelectWalletModalOpen] = useState(false);
+	const selectWalletModal = useSelectWalletModal();
 
 	const [passwordModal, setPasswordModal] = useState<ReactNode>();
 
@@ -128,7 +128,7 @@ export const NewWalletsPage = observer(() => {
 						);
 					})}
 
-					<div className="cw-block emphaized" onClick={() => setSelectWalletModalOpen(true)}>
+					<div className="cw-block emphaized" onClick={() => selectWalletModal()}>
 						<div className="cw-logo">
 							<svg
 								width="28"
@@ -160,8 +160,6 @@ export const NewWalletsPage = observer(() => {
 					))}
 				</div>
 			</div>
-
-			{isSelectWalletModalOpen && <SelectWalletModal onClose={() => setSelectWalletModalOpen(false)} />}
 
 			{passwordModal}
 		</div>
