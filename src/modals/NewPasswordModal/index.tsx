@@ -159,11 +159,11 @@ export function NewPasswordModal({ faucetType, bonus, wallet, account, remoteKey
 						alert(
 							`Your address has been already registered or the previous transaction is in progress. Please try connecting another address or wait for transaction to finalize (1-2 minutes).`,
 						);
-						document.location.href = '/wallets';
+						document.location.href = generatePath(RoutePath.WALLETS);
 						return;
 					}
 					alert('Something went wrong with key publishing :(\n\n' + JSON.stringify(result, null, '\t'));
-					document.location.href = '/wallets';
+					document.location.href = generatePath(RoutePath.WALLETS);
 					return;
 				}
 			})

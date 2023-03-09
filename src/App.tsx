@@ -53,7 +53,7 @@ const App = observer(() => {
 	}, []);
 
 	useEffect(() => {
-		if (location.pathname !== '/test') {
+		if (location.pathname !== generatePath(RoutePath.TEST)) {
 			const start = Date.now();
 			domain
 				.init()
@@ -82,7 +82,7 @@ const App = observer(() => {
 		analytics.pageView(location.pathname);
 	}, [location.pathname]);
 
-	if (location.pathname !== '/test' && !domain.initialized) {
+	if (location.pathname !== generatePath(RoutePath.TEST) && !domain.initialized) {
 		return (
 			<div
 				style={{
@@ -101,12 +101,18 @@ const App = observer(() => {
 
 	if (
 		domain.accounts.isFirstTime &&
-		location.pathname !== '/test' &&
-		location.pathname !== '/wallets' &&
-		location.pathname !== '/admin' &&
-		(!location.pathname.startsWith('/feed/') || !browserStorage.canSkipRegistration)
+		location.pathname !== generatePath(RoutePath.TEST) &&
+		location.pathname !== generatePath(RoutePath.WALLETS) &&
+		location.pathname !== generatePath(RoutePath.ADMIN) &&
+		(!location.pathname.startsWith(generatePath(RoutePath.FEED)) || !browserStorage.canSkipRegistration)
 	) {
-		return <Navigate to={`/wallets${location.search ? location.search : ''}`} state={{ from: location }} replace />;
+		return (
+			<Navigate
+				to={`${generatePath(RoutePath.WALLETS)}${location.search ? location.search : ''}`}
+				state={{ from: location }}
+				replace
+			/>
+		);
 	}
 
 	return (
