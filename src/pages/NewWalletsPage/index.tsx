@@ -128,7 +128,7 @@ export const NewWalletsPage = observer(() => {
 						);
 					})}
 
-					<div className="cw-block emphaized" onClick={() => selectWalletModal()}>
+					<div className="cw-block emphaized" onClick={() => selectWalletModal({})}>
 						<div className="cw-logo">
 							<svg
 								width="28"

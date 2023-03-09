@@ -80,7 +80,7 @@ export const SendMailButton = observer(({ mailData, onSent }: SendMailButtonProp
 			mailer.sending = true;
 
 			if (!mailData.from) {
-				await selectWalletModal();
+				await selectWalletModal({});
 				invariant(mailData.from);
 			}
 

@@ -6,7 +6,7 @@ import React, { ReactNode, useMemo, useState } from 'react';
 import QRCode from 'react-qr-code';
 
 import { Modal } from '../../components/modal/modal';
-import { useStaticComponentManager } from '../../components/staticComponentManager/staticComponentManager';
+import { createSingletonStaticComponentHook } from '../../components/staticComponentManager/staticComponentManager';
 import { TextField, TextFieldLook } from '../../components/textField/textField';
 import { YlideLoader } from '../../components/ylideLoader/ylideLoader';
 import { supportedWallets, walletsMeta } from '../../constants';
@@ -19,32 +19,15 @@ import { getQueryString } from '../../utils/getQueryString';
 import { NewPasswordModal } from '../NewPasswordModal';
 import SwitchModal from '../SwitchModal';
 
-let currentModal: ReactNode = undefined;
-
-export function useSelectWalletModal() {
-	const staticComponentManager = useStaticComponentManager();
-
-	return (props?: SelectWalletModalProps) =>
-		new Promise<void>(resolve => {
-			if (currentModal) {
-				staticComponentManager.remove(currentModal);
-			}
-
-			const newPopup = (
-				<SelectWalletModal
-					{...props}
-					onClose={() => {
-						staticComponentManager.remove(newPopup);
-						props?.onClose?.();
-						resolve();
-					}}
-				/>
-			);
-
-			currentModal = newPopup;
-			staticComponentManager.attach(newPopup);
-		});
-}
+export const useSelectWalletModal = createSingletonStaticComponentHook<SelectWalletModalProps>((props, onRemove) => (
+	<SelectWalletModal
+		{...props}
+		onClose={() => {
+			onRemove();
+			props?.onClose?.();
+		}}
+	/>
+));
 
 //
 

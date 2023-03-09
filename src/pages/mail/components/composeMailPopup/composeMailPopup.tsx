@@ -1,12 +1,12 @@
 import clsx from 'clsx';
 import { observer } from 'mobx-react';
-import React, { ReactNode } from 'react';
+import React from 'react';
 import { generatePath } from 'react-router-dom';
 
 import { ActionButton, ActionButtonLook } from '../../../../components/ActionButton/ActionButton';
 import { OverlappingLoader } from '../../../../components/overlappingLoader/overlappingLoader';
 import { Popup } from '../../../../components/popup/popup';
-import { useStaticComponentManager } from '../../../../components/staticComponentManager/staticComponentManager';
+import { createSingletonStaticComponentHook } from '../../../../components/staticComponentManager/staticComponentManager';
 import { ReactComponent as CrossSvg } from '../../../../icons/ic20/cross.svg';
 import { ReactComponent as ExternalSvg } from '../../../../icons/ic20/external.svg';
 import mailer from '../../../../stores/Mailer';
@@ -17,30 +17,15 @@ import { useOnMountAnimation } from '../../../../utils/useOnMountAnimation';
 import { ComposeMailForm } from '../composeMailForm/composeMailForm';
 import css from './composeMailPopup.module.scss';
 
-let currentPopup: ReactNode = undefined;
-
-export function useComposeMailPopup() {
-	const staticComponentManager = useStaticComponentManager();
-
-	return (props: ComposeMailPopupProps) => {
-		if (currentPopup) {
-			staticComponentManager.remove(currentPopup);
-		}
-
-		const newPopup = (
-			<ComposeMailPopup
-				{...props}
-				onClose={() => {
-					staticComponentManager.remove(newPopup);
-					props.onClose?.();
-				}}
-			/>
-		);
-
-		currentPopup = newPopup;
-		staticComponentManager.attach(newPopup);
-	};
-}
+export const useComposeMailPopup = createSingletonStaticComponentHook<ComposeMailPopupProps>((props, onRemove) => (
+	<ComposeMailPopup
+		{...props}
+		onClose={() => {
+			onRemove();
+			props?.onClose?.();
+		}}
+	/>
+));
 
 //
 

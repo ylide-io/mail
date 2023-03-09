@@ -1,4 +1,15 @@
-import { createContext, Fragment, PropsWithChildren, ReactNode, useContext, useMemo, useState } from 'react';
+import {
+	createContext,
+	createRef,
+	Fragment,
+	MutableRefObject,
+	PropsWithChildren,
+	ReactNode,
+	useContext,
+	useMemo,
+	useRef,
+	useState,
+} from 'react';
 
 interface StaticComponentManagerApi {
 	attach: (node: ReactNode) => void;
@@ -8,6 +19,45 @@ interface StaticComponentManagerApi {
 export const StaticComponentManagerContext = createContext<StaticComponentManagerApi | undefined>(undefined);
 
 export const useStaticComponentManager = () => useContext(StaticComponentManagerContext)!;
+
+//
+
+let singletonStaticComponentKey = 0;
+
+export function createSingletonStaticComponentHook<P>(factory: (props: P, onRemove: () => void) => ReactNode) {
+	const nodeRef = createRef() as MutableRefObject<ReactNode>;
+
+	return () => {
+		const staticComponentManager = useStaticComponentManager();
+		const resolveRef = useRef<() => void>();
+
+		return (props: P) => {
+			return new Promise<void>(resolve => {
+				function removeCurrent() {
+					if (nodeRef.current) {
+						staticComponentManager.remove(nodeRef.current);
+						nodeRef.current = undefined;
+					}
+
+					if (resolveRef.current) {
+						resolveRef.current();
+						resolveRef.current = undefined;
+					}
+				}
+
+				removeCurrent();
+
+				resolveRef.current = resolve;
+
+				const node = factory({ key: `${Date.now()}${++singletonStaticComponentKey}`, ...props }, removeCurrent);
+				nodeRef.current = node;
+				staticComponentManager.attach(node);
+			});
+		};
+	};
+}
+
+//
 
 export function StaticComponentManager({ children }: PropsWithChildren) {
 	const [nodes, setNodes] = useState<ReactNode[]>([]);
