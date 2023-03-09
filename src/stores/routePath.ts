@@ -5,6 +5,8 @@ export enum RoutePath {
 	ROOT = '/',
 	ANY = '/*',
 
+	// APP
+
 	SETTINGS = '/settings',
 
 	WALLETS = '/wallets',
@@ -24,4 +26,8 @@ export enum RoutePath {
 	OTC_WALLETS = '/otc/wallets',
 	OTC_CHATS = '/otc/chats',
 	OTC_CHAT = '/otc/chats/:address',
+
+	// WIDGETS
+
+	SEND_MESSAGE_WIDGET = '/widget/send-message',
 }
