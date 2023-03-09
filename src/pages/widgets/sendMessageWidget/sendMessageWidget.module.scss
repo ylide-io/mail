@@ -1,3 +1,22 @@
 .root {
-	visibility: visible;
+	display: grid;
+	grid-template-rows: 40px 1fr;
+	height: 100%;
+}
+
+.header {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	padding: 0 12px 0 16px;
+	background: var(--secondary-surface-color);
+}
+
+.headerActions {
+	display: flex;
+}
+
+.form {
+	min-height: 0;
+	background: var(--surface-color);
 }
