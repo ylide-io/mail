@@ -1,3 +1,4 @@
+import { observer } from 'mobx-react';
 import React from 'react';
 
 import { walletsMeta } from '../../constants';
@@ -19,26 +20,24 @@ interface AccountSelectProps extends PropsWithClassName {
 	onChange?: (account: DomainAccount) => void;
 }
 
-export function AccountSelect({ className, activeAccount, onChange }: AccountSelectProps) {
-	return (
-		<Select
-			className={className}
-			text={activeAccount && formatDomainAccount(activeAccount)}
-			placeholder="Select account"
-		>
-			{onSelect =>
-				domain.accounts.activeAccounts.map((account, i) => (
-					<DropDownItem
-						key={i}
-						onSelect={() => {
-							onSelect();
-							onChange?.(account);
-						}}
-					>
-						{formatDomainAccount(account)}
-					</DropDownItem>
-				))
-			}
-		</Select>
-	);
-}
+export const AccountSelect = observer(({ className, activeAccount, onChange }: AccountSelectProps) => (
+	<Select
+		className={className}
+		text={activeAccount && formatDomainAccount(activeAccount)}
+		placeholder="Select account"
+	>
+		{onSelect =>
+			domain.accounts.activeAccounts.map((account, i) => (
+				<DropDownItem
+					key={i}
+					onSelect={() => {
+						onSelect();
+						onChange?.(account);
+					}}
+				>
+					{formatDomainAccount(account)}
+				</DropDownItem>
+			))
+		}
+	</Select>
+));
