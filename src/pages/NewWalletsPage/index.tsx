@@ -3,9 +3,9 @@ import { observer } from 'mobx-react';
 import { ReactNode, useState } from 'react';
 import { generatePath } from 'react-router-dom';
 
+import { ActionButton, ActionButtonLook, ActionButtonSize } from '../../components/ActionButton/ActionButton';
 import { APP_NAME, blockchainsMap, walletsMeta } from '../../constants';
 import { AdaptiveAddress } from '../../controls/adaptiveAddress/adaptiveAddress';
-import { YlideButton } from '../../controls/YlideButton';
 import { ReactComponent as CrossSvg } from '../../icons/ic20/cross.svg';
 import { ReactComponent as NextSvg } from '../../icons/ic28/next.svg';
 import { YlideLargeLogo } from '../../icons/YlideLargeLogo';
@@ -37,14 +37,19 @@ export const NewWalletsPage = observer(() => {
 				</h3>
 
 				{!!domain.accounts.activeAccounts.length && (
-					<YlideButton
+					<ActionButton
+						size={ActionButtonSize.LARGE}
+						look={ActionButtonLook.PRIMARY}
 						style={{ marginTop: 20 }}
 						onClick={() => {
 							navigate(generatePath(RoutePath.ROOT));
 						}}
 					>
-						Continue with connected accounts <NextSvg style={{ margin: '-4px -4px -4px 10px' }} />
-					</YlideButton>
+						<div style={{ display: 'grid', gridAutoFlow: 'column', alignItems: 'center', gridGap: 8 }}>
+							Continue with connected accounts
+							<NextSvg />
+						</div>
+					</ActionButton>
 				)}
 
 				<div className="connected-wallets">
@@ -75,34 +80,31 @@ export const NewWalletsPage = observer(() => {
 								</div>
 
 								{!isActive && (
-									<div>
-										<YlideButton
-											size="small"
-											nice
-											onClick={async () => {
-												const wallet = acc.wallet;
-												const remoteKeys = await wallet.readRemoteKeys(acc.account);
-												const qqs = getQueryString();
+									<ActionButton
+										look={ActionButtonLook.SECONDARY}
+										onClick={async () => {
+											const wallet = acc.wallet;
+											const remoteKeys = await wallet.readRemoteKeys(acc.account);
+											const qqs = getQueryString();
 
-												setPasswordModal(
-													<NewPasswordModal
-														faucetType={
-															['polygon', 'fantom', 'gnosis'].includes(qqs.faucet)
-																? (qqs.faucet as any)
-																: 'gnosis'
-														}
-														bonus={qqs.bonus === 'true'}
-														wallet={wallet}
-														account={acc.account}
-														remoteKeys={remoteKeys.remoteKeys}
-														onResolve={() => setPasswordModal(undefined)}
-													/>,
-												);
-											}}
-										>
-											Activate
-										</YlideButton>
-									</div>
+											setPasswordModal(
+												<NewPasswordModal
+													faucetType={
+														['polygon', 'fantom', 'gnosis'].includes(qqs.faucet)
+															? (qqs.faucet as any)
+															: 'gnosis'
+													}
+													bonus={qqs.bonus === 'true'}
+													wallet={wallet}
+													account={acc.account}
+													remoteKeys={remoteKeys.remoteKeys}
+													onResolve={() => setPasswordModal(undefined)}
+												/>,
+											);
+										}}
+									>
+										Activate
+									</ActionButton>
 								)}
 
 								<div
