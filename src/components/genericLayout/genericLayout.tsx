@@ -57,7 +57,7 @@ export const GenericLayout = observer(({ children }: GenericLayoutProps) => {
 				<div className={css.main} ref={mainRef}>
 					<SidebarMenu />
 
-					<div>{children}</div>
+					<div className={css.content}>{children}</div>
 				</div>
 			</div>
 		</GenericLayoutApiContext.Provider>
