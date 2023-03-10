@@ -113,7 +113,7 @@ export const SelectWalletModal = observer(({ onClose }: SelectWalletModalProps) 
 		}
 		currentAccount = await wallet.getCurrentAccount();
 		if (currentAccount && wallet.isAccountRegistered(currentAccount)) {
-			alert('This account is already registered. Please, chose a different one');
+			alert('This account is already connected. Please choose a different one.');
 			return null;
 		} else {
 			return await wallet.connectAccount();
