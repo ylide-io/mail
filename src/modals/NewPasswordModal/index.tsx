@@ -5,6 +5,7 @@ import clsx from 'clsx';
 import { useEffect, useMemo, useState } from 'react';
 import { generatePath } from 'react-router-dom';
 
+import { ActionButton, ActionButtonLook, ActionButtonSize } from '../../components/ActionButton/ActionButton';
 import { ForgotPasswordModal } from '../../components/forgotPasswordModal/forgotPasswordModal';
 import { Modal } from '../../components/modal/modal';
 import { TextField, TextFieldLook } from '../../components/textField/textField';
@@ -12,7 +13,6 @@ import { useToastManager } from '../../components/toast/toast';
 import { YlideLoader } from '../../components/ylideLoader/ylideLoader';
 import { APP_NAME, blockchainsMap, calloutSvg, evmNameToNetwork } from '../../constants';
 import { WalletTag } from '../../controls/WalletTag';
-import { YlideButton } from '../../controls/YlideButton';
 import { REACT_APP__OTC_MODE } from '../../env';
 import { analytics } from '../../stores/Analytics';
 import { browserStorage } from '../../stores/browserStorage';
@@ -342,18 +342,21 @@ export function NewPasswordModal({ faucetType, bonus, wallet, account, remoteKey
 						)}
 
 						<div className="wm-footer">
-							<YlideButton
-								ghost
-								style={{ width: 128 }}
+							<ActionButton
+								size={ActionButtonSize.LARGE}
 								onClick={() => {
 									onResolve('', false, false);
 								}}
 							>
 								Back
-							</YlideButton>
-							<YlideButton primary style={{ width: 216 }} onClick={() => createLocalKey(password)}>
+							</ActionButton>
+							<ActionButton
+								size={ActionButtonSize.LARGE}
+								look={ActionButtonLook.PRIMARY}
+								onClick={() => createLocalKey(password)}
+							>
 								Continue
-							</YlideButton>
+							</ActionButton>
 						</div>
 					</>
 				) : step === Step.GENERATE_KEY ? (
@@ -416,10 +419,10 @@ export function NewPasswordModal({ faucetType, bonus, wallet, account, remoteKey
 							</>
 						)}
 
-						<div className="wm-footer" style={{ justifyContent: 'center' }}>
-							<YlideButton ghost style={{ width: 128 }} onClick={() => setStep(Step.ENTER_PASSWORD)}>
+						<div className="wm-footer">
+							<ActionButton size={ActionButtonSize.LARGE} onClick={() => setStep(Step.ENTER_PASSWORD)}>
 								Back
-							</YlideButton>
+							</ActionButton>
 						</div>
 					</>
 				) : step === Step.SELECT_NETWORK ? (
@@ -544,10 +547,9 @@ export function NewPasswordModal({ faucetType, bonus, wallet, account, remoteKey
 								Please sign the transaction in your wallet to publish your unique communication key
 							</h4>
 						</div>
-						<div className="wm-footer" style={{ justifyContent: 'center' }}>
-							<YlideButton
-								ghost
-								style={{ width: 128 }}
+						<div className="wm-footer">
+							<ActionButton
+								size={ActionButtonSize.LARGE}
 								onClick={() =>
 									setStep(
 										wallet.factory.blockchainGroup === 'evm'
@@ -557,7 +559,7 @@ export function NewPasswordModal({ faucetType, bonus, wallet, account, remoteKey
 								}
 							>
 								Back
-							</YlideButton>
+							</ActionButton>
 						</div>
 					</>
 				) : step === Step.PUBLISHING_KEY ? (
@@ -584,12 +586,16 @@ export function NewPasswordModal({ faucetType, bonus, wallet, account, remoteKey
 							<h4 className="wm-subtitle">Create new one if you want to be modern!</h4>
 						</div>
 						<div className="wm-footer-vertical">
-							<YlideButton primary onClick={() => createLocalKey(password, true)}>
+							<ActionButton
+								size={ActionButtonSize.LARGE}
+								look={ActionButtonLook.PRIMARY}
+								onClick={() => createLocalKey(password, true)}
+							>
 								Create modern
-							</YlideButton>
-							<YlideButton nice onClick={() => setStep(Step.FINISH)}>
+							</ActionButton>
+							<ActionButton size={ActionButtonSize.LARGE} onClick={() => setStep(Step.FINISH)}>
 								Skip for now
-							</YlideButton>
+							</ActionButton>
 						</div>
 					</>
 				) : step === Step.FINISH ? (
@@ -607,18 +613,19 @@ export function NewPasswordModal({ faucetType, bonus, wallet, account, remoteKey
 						</div>
 
 						<div className="wm-footer-vertical">
-							<YlideButton
-								primary
+							<ActionButton
+								size={ActionButtonSize.LARGE}
+								look={ActionButtonLook.PRIMARY}
 								onClick={() => {
 									navigate(generatePath(RoutePath.ROOT));
 									onResolve('', false, false);
 								}}
 							>
 								Go to {APP_NAME}
-							</YlideButton>
-							<YlideButton nice onClick={() => onResolve('', false, false)}>
+							</ActionButton>
+							<ActionButton size={ActionButtonSize.LARGE} onClick={() => onResolve('', false, false)}>
 								Add one more account
-							</YlideButton>
+							</ActionButton>
 						</div>
 					</>
 				) : null}

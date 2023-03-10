@@ -55,23 +55,16 @@
 }
 
 .wm-footer {
-	@include flex-row(center, space-between);
-
-	padding-top: 16px;
-	padding-bottom: 16px;
-	justify-self: flex-end;
+	display: grid;
+	grid-auto-flow: column;
+	grid-gap: 8px;
+	padding: 16px 0;
 }
 
 .wm-footer-vertical {
-	@include flex-column(stretch, flex-end);
-
-	padding-top: 0;
-	padding-bottom: 16px;
-	justify-self: flex-end;
-
-	.ylide-button {
-		margin-top: 8px;
-	}
+	display: grid;
+	grid-gap: 8px;
+	padding: 16px 0;
 }
 
 .modal-header {
