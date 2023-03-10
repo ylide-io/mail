@@ -46,6 +46,7 @@ export const SelectWalletModal = observer(({ onClose }: SelectWalletModalProps) 
 
 	useEffect(() => {
 		const reloadWallets = async () => {
+			console.log('Reload wallets');
 			await domain.reloadAvailableWallets();
 			await domain.extractWalletsData();
 		};
