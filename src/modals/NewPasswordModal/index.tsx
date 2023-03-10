@@ -51,7 +51,6 @@ enum Step {
 	SELECT_NETWORK,
 	PUBLISH_KEY,
 	PUBLISHING_KEY,
-	OLD_KEY,
 	FINISH,
 }
 
@@ -572,25 +571,6 @@ export function NewPasswordModal({ faucetType, bonus, wallet, account, remoteKey
 							</div>
 							<h3 className="wm-title">Publishing the key</h3>
 							<h4 className="wm-subtitle">Please, wait for the transaction to be completed</h4>
-						</div>
-					</>
-				) : step === Step.OLD_KEY ? (
-					<>
-						<div className="wm-body centered">
-							<h3 className="wm-title">Your key is old</h3>
-							<h4 className="wm-subtitle">Create new one if you want to be modern!</h4>
-						</div>
-						<div className="wm-footer-vertical">
-							<ActionButton
-								size={ActionButtonSize.LARGE}
-								look={ActionButtonLook.PRIMARY}
-								onClick={() => createLocalKey(password, true)}
-							>
-								Create modern
-							</ActionButton>
-							<ActionButton size={ActionButtonSize.LARGE} onClick={() => setStep(Step.FINISH)}>
-								Skip for now
-							</ActionButton>
 						</div>
 					</>
 				) : step === Step.FINISH ? (
