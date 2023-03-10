@@ -102,6 +102,14 @@ jobs:
                   cache_key: hub
             - wrangler:
                   project_name: ylide-mail
+    deploy_hub_staging:
+        docker:
+            - image: node:16
+        steps:
+            - restore_build_cache:
+                  cache_key: hub
+            - wrangler:
+                  project_name: ylide-mail-staging
     build_airswap:
         docker:
             - image: node:16
@@ -177,6 +185,7 @@ workflows:
                       branches:
                           only:
                               - hub-release
+                              - dev
             - deploy_hub:
                   requires:
                       - build_hub
@@ -184,6 +193,13 @@ workflows:
                       branches:
                           only:
                               - hub-release
+            - deploy_hub_staging:
+                  requires:
+                      - build_hub
+                  filters:
+                      branches:
+                          only:
+                              - dev
             - build_airswap:
                   filters:
                       branches:
