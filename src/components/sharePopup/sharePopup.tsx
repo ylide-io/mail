@@ -43,6 +43,9 @@ export function SharePopup({ anchorRef, horizontalAlign, onClose, url, subject }
 			anchorRef={anchorRef}
 			className={css.root}
 			horizontalAlign={horizontalAlign}
+			alignerOptions={{
+				fitLeftToViewport: true,
+			}}
 			onCloseRequest={onClose}
 		>
 			<div className={css.content}>
