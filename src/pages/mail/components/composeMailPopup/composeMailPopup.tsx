@@ -17,11 +17,11 @@ import { useOnMountAnimation } from '../../../../utils/useOnMountAnimation';
 import { ComposeMailForm } from '../composeMailForm/composeMailForm';
 import css from './composeMailPopup.module.scss';
 
-export const useComposeMailPopup = createSingletonStaticComponentHook<ComposeMailPopupProps>((props, onRemove) => (
+export const useComposeMailPopup = createSingletonStaticComponentHook<ComposeMailPopupProps>((props, resolve) => (
 	<ComposeMailPopup
 		{...props}
 		onClose={() => {
-			onRemove();
+			resolve();
 			props.onClose?.();
 		}}
 	/>

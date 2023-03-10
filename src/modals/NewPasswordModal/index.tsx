@@ -26,11 +26,11 @@ import { assertUnreachable, invariant } from '../../utils/assert';
 import { isBytesEqual } from '../../utils/isBytesEqual';
 import { useNav } from '../../utils/url';
 
-export const useNewPasswordModal = createSingletonStaticComponentHook<NewPasswordModalProps>((props, onRemove) => (
+export const useNewPasswordModal = createSingletonStaticComponentHook<NewPasswordModalProps>((props, resolve) => (
 	<NewPasswordModal
 		{...props}
 		onResolve={() => {
-			onRemove();
+			resolve();
 			props.onResolve?.();
 		}}
 	/>

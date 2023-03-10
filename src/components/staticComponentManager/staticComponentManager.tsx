@@ -24,32 +24,37 @@ export const useStaticComponentManager = () => useContext(StaticComponentManager
 
 let singletonStaticComponentKey = 0;
 
-export function createSingletonStaticComponentHook<P>(factory: (props: P, onRemove: () => void) => ReactNode) {
+export function createSingletonStaticComponentHook<Props, Result = undefined>(
+	factory: (props: Props, resolve: (data?: Result) => void) => ReactNode,
+) {
 	const nodeRef = createRef() as MutableRefObject<ReactNode>;
 
 	return () => {
 		const staticComponentManager = useStaticComponentManager();
-		const resolveRef = useRef<() => void>();
+		const resolveRef = useRef<(data: Result | undefined) => void>();
 
-		return (props: P) => {
-			return new Promise<void>(resolve => {
-				function removeCurrent() {
+		return (props: Props) => {
+			return new Promise<Result | undefined>(resolve => {
+				function resolveCurrent(data?: Result) {
 					if (nodeRef.current) {
 						staticComponentManager.remove(nodeRef.current);
 						nodeRef.current = undefined;
 					}
 
 					if (resolveRef.current) {
-						resolveRef.current();
+						resolveRef.current(data);
 						resolveRef.current = undefined;
 					}
 				}
 
-				removeCurrent();
+				resolveCurrent();
 
 				resolveRef.current = resolve;
 
-				const node = factory({ key: `${Date.now()}${++singletonStaticComponentKey}`, ...props }, removeCurrent);
+				const node = factory(
+					{ key: `${Date.now()}${++singletonStaticComponentKey}`, ...props },
+					resolveCurrent,
+				);
 				nodeRef.current = node;
 				staticComponentManager.attach(node);
 			});

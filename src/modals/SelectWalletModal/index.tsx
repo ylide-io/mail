@@ -19,11 +19,11 @@ import { getQueryString } from '../../utils/getQueryString';
 import { useNewPasswordModal } from '../NewPasswordModal';
 import SwitchModal from '../SwitchModal';
 
-export const useSelectWalletModal = createSingletonStaticComponentHook<SelectWalletModalProps>((props, onRemove) => (
+export const useSelectWalletModal = createSingletonStaticComponentHook<SelectWalletModalProps>((props, resolve) => (
 	<SelectWalletModal
 		{...props}
 		onClose={() => {
-			onRemove();
+			resolve();
 			props.onClose?.();
 		}}
 	/>

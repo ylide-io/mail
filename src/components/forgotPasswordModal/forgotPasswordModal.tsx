@@ -7,16 +7,16 @@ import { TextField } from '../textField/textField';
 import { useToastManager } from '../toast/toast';
 import css from './forgotPasswordModal.module.scss';
 
-export const useForgotPasswordModal = createSingletonStaticComponentHook<ForgotPasswordModalProps>(
-	(props, onRemove) => (
+export const useForgotPasswordModal = createSingletonStaticComponentHook<ForgotPasswordModalProps, string>(
+	(props, resolve) => (
 		<ForgotPasswordModal
 			{...props}
 			onNewPassword={password => {
-				onRemove();
-				props.onNewPassword(password);
+				resolve(password);
+				props.onNewPassword?.(password);
 			}}
 			onCancel={() => {
-				onRemove();
+				resolve();
 				props.onCancel?.();
 			}}
 		/>
@@ -32,7 +32,7 @@ enum Step {
 }
 
 export interface ForgotPasswordModalProps {
-	onNewPassword: (password: string) => void;
+	onNewPassword?: (password: string) => void;
 	onCancel?: () => void;
 }
 
@@ -50,7 +50,7 @@ export function ForgotPasswordModal({ onNewPassword, onCancel }: ForgotPasswordM
 		} else if (password !== passwordRepeat) {
 			toast(`Passwords don't match`);
 		} else {
-			onNewPassword(password);
+			onNewPassword?.(password);
 		}
 	}
 
