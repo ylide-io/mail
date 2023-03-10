@@ -12,7 +12,7 @@ import { createSingletonStaticComponentHook } from '../../components/staticCompo
 import { TextField, TextFieldLook } from '../../components/textField/textField';
 import { useToastManager } from '../../components/toast/toast';
 import { YlideLoader } from '../../components/ylideLoader/ylideLoader';
-import { APP_NAME, blockchainsMap, calloutSvg, evmNameToNetwork } from '../../constants';
+import { blockchainsMap, calloutSvg, evmNameToNetwork } from '../../constants';
 import { WalletTag } from '../../controls/WalletTag';
 import { REACT_APP__OTC_MODE } from '../../env';
 import { analytics } from '../../stores/Analytics';
@@ -24,17 +24,18 @@ import { Wallet } from '../../stores/models/Wallet';
 import { RoutePath } from '../../stores/routePath';
 import { assertUnreachable, invariant } from '../../utils/assert';
 import { isBytesEqual } from '../../utils/isBytesEqual';
-import { useNav } from '../../utils/url';
 
-export const useNewPasswordModal = createSingletonStaticComponentHook<NewPasswordModalProps>((props, resolve) => (
-	<NewPasswordModal
-		{...props}
-		onResolve={() => {
-			resolve();
-			props.onResolve?.();
-		}}
-	/>
-));
+export const useNewPasswordModal = createSingletonStaticComponentHook<NewPasswordModalProps, boolean>(
+	(props, resolve) => (
+		<NewPasswordModal
+			{...props}
+			onClose={success => {
+				resolve(success);
+				props.onClose?.(success);
+			}}
+		/>
+	),
+);
 
 //
 
@@ -64,7 +65,6 @@ enum Step {
 	SELECT_NETWORK,
 	PUBLISH_KEY,
 	PUBLISHING_KEY,
-	FINISH,
 }
 
 interface NewPasswordModalProps {
@@ -73,11 +73,10 @@ interface NewPasswordModalProps {
 	wallet: Wallet;
 	account: IGenericAccount;
 	remoteKeys: Record<string, ExternalYlidePublicKey | null>;
-	onResolve?: () => void;
+	onClose?: (success: boolean) => void;
 }
 
-export function NewPasswordModal({ faucetType, bonus, wallet, account, remoteKeys, onResolve }: NewPasswordModalProps) {
-	const navigate = useNav();
+export function NewPasswordModal({ faucetType, bonus, wallet, account, remoteKeys, onClose }: NewPasswordModalProps) {
 	const { toast } = useToastManager();
 
 	const [step, setStep] = useState(Step.ENTER_PASSWORD);
@@ -189,7 +188,7 @@ export function NewPasswordModal({ faucetType, bonus, wallet, account, remoteKey
 			await promise;
 		}
 
-		setStep(Step.FINISH);
+		onClose?.(true);
 	}
 
 	async function publishLocalKey(account: DomainAccount) {
@@ -199,7 +198,7 @@ export function NewPasswordModal({ faucetType, bonus, wallet, account, remoteKey
 			await asyncDelay(7000);
 			await account.init();
 			analytics.walletRegistered(wallet.factory.wallet, account.account.address, domain.accounts.accounts.length);
-			setStep(Step.FINISH);
+			onClose?.(true);
 		} catch (err) {
 			if (wallet.factory.blockchainGroup === 'evm') {
 				setStep(Step.SELECT_NETWORK);
@@ -244,7 +243,7 @@ export function NewPasswordModal({ faucetType, bonus, wallet, account, remoteKey
 			// if (freshestKey.key.keyVersion === 1) {
 			// 	setStep(Step.OLD_KEY);
 			// } else {
-			setStep(Step.FINISH);
+			onClose?.(true);
 			// }
 		} else if (forceNew) {
 			const domainAccount = await wallet.instantiateNewAccount(account, tempLocalKey);
@@ -269,7 +268,7 @@ export function NewPasswordModal({ faucetType, bonus, wallet, account, remoteKey
 	}
 
 	return (
-		<Modal className="account-modal wallet-modal" onClose={() => onResolve?.()}>
+		<Modal className="account-modal wallet-modal" onClose={() => onClose?.(false)}>
 			<div
 				style={{
 					padding: 24,
@@ -363,7 +362,7 @@ export function NewPasswordModal({ faucetType, bonus, wallet, account, remoteKey
 					)}
 
 					<div className="wm-footer">
-						<ActionButton size={ActionButtonSize.LARGE} onClick={() => onResolve?.()}>
+						<ActionButton size={ActionButtonSize.LARGE} onClick={() => onClose?.(false)}>
 							Back
 						</ActionButton>
 						<ActionButton
@@ -586,36 +585,6 @@ export function NewPasswordModal({ faucetType, bonus, wallet, account, remoteKey
 						</div>
 						<h3 className="wm-title">Publishing the key</h3>
 						<h4 className="wm-subtitle">Please, wait for the transaction to be completed</h4>
-					</div>
-				</>
-			) : step === Step.FINISH ? (
-				<>
-					<h3 className="wm-title" style={{ marginBottom: 10 }}>
-						Your account is ready
-					</h3>
-
-					<div className="wm-body">
-						<img
-							src={require('../../assets/img/success.png')}
-							alt="Success"
-							style={{ marginLeft: -24, marginRight: -24, marginBottom: 14 }}
-						/>
-					</div>
-
-					<div className="wm-footer-vertical">
-						<ActionButton
-							size={ActionButtonSize.LARGE}
-							look={ActionButtonLook.PRIMARY}
-							onClick={() => {
-								onResolve?.();
-								navigate(generatePath(RoutePath.ROOT));
-							}}
-						>
-							Go to {APP_NAME}
-						</ActionButton>
-						<ActionButton size={ActionButtonSize.LARGE} onClick={() => onResolve?.()}>
-							Add one more account
-						</ActionButton>
 					</div>
 				</>
 			) : (

@@ -16,6 +16,7 @@ import { Wallet } from '../../stores/models/Wallet';
 import walletConnect from '../../stores/WalletConnect';
 import { copyToClipboard } from '../../utils/clipboard';
 import { getQueryString } from '../../utils/getQueryString';
+import { useAccountConnectedModal } from '../accountConnectedModal/accountConnectedModal';
 import { useNewPasswordModal } from '../NewPasswordModal';
 import SwitchModal from '../SwitchModal';
 
@@ -93,6 +94,7 @@ export const SelectWalletModal = observer(({ onClose }: SelectWalletModalProps) 
 	);
 
 	const newPasswordModal = useNewPasswordModal();
+	const accountConnectedModal = useAccountConnectedModal();
 
 	async function connectWalletAccount(wallet: Wallet) {
 		let currentAccount = await wallet.getCurrentAccount();
@@ -133,13 +135,17 @@ export const SelectWalletModal = observer(({ onClose }: SelectWalletModalProps) 
 
 			onClose?.();
 
-			await newPasswordModal({
+			const success = await newPasswordModal({
 				faucetType: ['polygon', 'fantom', 'gnosis'].includes(qqs.faucet) ? (qqs.faucet as any) : 'gnosis',
 				bonus: qqs.bonus === 'true',
 				wallet: domainWallet,
 				account,
 				remoteKeys: remoteKeys.remoteKeys,
 			});
+
+			if (success) {
+				await accountConnectedModal({});
+			}
 		} finally {
 		}
 	}
