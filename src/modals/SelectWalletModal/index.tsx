@@ -45,10 +45,15 @@ export const SelectWalletModal = observer(({ onClose }: SelectWalletModalProps) 
 	);
 
 	useEffect(() => {
-		(async () => {
+		const reloadWallets = async () => {
 			await domain.reloadAvailableWallets();
 			await domain.extractWalletsData();
-		})();
+		};
+
+		// such a shit. fuck VenomWallet :(
+		reloadWallets();
+		setTimeout(reloadWallets, 1000);
+		setTimeout(reloadWallets, 2000);
 	}, []);
 
 	const [copy, setCopy] = useState(false);
