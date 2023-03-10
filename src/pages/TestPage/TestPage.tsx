@@ -49,7 +49,7 @@ export const TestPage = observer(() => {
 				<ActionButton look={ActionButtonLook.LITE} icon={<SettingsSvg />}>
 					Lite
 				</ActionButton>
-				<ActionButton look={ActionButtonLook.DENGEROUS} icon={<SettingsSvg />}>
+				<ActionButton look={ActionButtonLook.DANGEROUS} icon={<SettingsSvg />}>
 					Dengerous
 				</ActionButton>
 			</GridRow>

@@ -62,7 +62,7 @@ export const AccountsPopup = observer(({ anchorRef, onClose }: AccountsPopupProp
 							<Tooltip title="Logout">
 								<ActionButton
 									size={ActionButtonSize.MEDIUM}
-									look={ActionButtonLook.DENGEROUS}
+									look={ActionButtonLook.DANGEROUS}
 									icon={<LogoutSvg />}
 									onClick={async () => {
 										await account.wallet.disconnectAccount(account);

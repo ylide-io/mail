@@ -82,7 +82,7 @@ export function MailMessage({
 						{folderId !== FolderId.Archive && (
 							<Tooltip title="Archive">
 								<ActionButton
-									look={ActionButtonLook.DENGEROUS}
+									look={ActionButtonLook.DANGEROUS}
 									icon={<TrashSvg />}
 									onClick={() => onDeleteClick()}
 								/>

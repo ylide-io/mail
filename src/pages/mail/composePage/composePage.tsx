@@ -34,7 +34,7 @@ export const ComposePage = observer(() => {
 
 					<div className={css.headerActions}>
 						<ActionButton
-							look={ActionButtonLook.DENGEROUS}
+							look={ActionButtonLook.DANGEROUS}
 							onClick={() => {
 								navigate(generatePath(RoutePath.MAIL_FOLDER, { folderId: lastActiveFolderId }));
 							}}

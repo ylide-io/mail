@@ -173,7 +173,7 @@ const ContactsListItem: React.FC<ContactsListItemProps> = ({ contact, isNew }) =
 					<ActionButton look={ActionButtonLook.PRIMARY} onClick={saveClickHandler} icon={<TickSvg />} />
 					{!isNew ? (
 						<ActionButton
-							look={ActionButtonLook.DENGEROUS}
+							look={ActionButtonLook.DANGEROUS}
 							onClick={deleteClickHandler}
 							icon={<TrashSvg />}
 						/>

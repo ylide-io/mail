@@ -109,7 +109,7 @@ export function ForgotPasswordModal({ onNewPassword, onCancel }: ForgotPasswordM
 						<ActionButton
 							isMultiline
 							size={ActionButtonSize.MEDIUM}
-							look={ActionButtonLook.DENGEROUS}
+							look={ActionButtonLook.DANGEROUS}
 							onClick={() => setStep(Step.SECOND_WARNING)}
 						>
 							I understand I won't be able to read old messages
@@ -123,7 +123,7 @@ export function ForgotPasswordModal({ onNewPassword, onCancel }: ForgotPasswordM
 						<ActionButton
 							isMultiline
 							size={ActionButtonSize.MEDIUM}
-							look={ActionButtonLook.DENGEROUS}
+							look={ActionButtonLook.DANGEROUS}
 							onClick={() => setStep(Step.ENTER_PASSWORD)}
 						>
 							I clearly understand the consequences

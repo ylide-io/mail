@@ -71,7 +71,7 @@ const TagsListItem: React.FC<TagsListItemProps> = ({ tag, isNew }) => {
 								icon={<TickSvg />}
 							/>
 							<ActionButton
-								look={ActionButtonLook.DENGEROUS}
+								look={ActionButtonLook.DANGEROUS}
 								onClick={deleteClickHandler}
 								icon={<TrashSvg />}
 							/>
