@@ -8,6 +8,7 @@ import { AdaptiveAddress } from '../../controls/adaptiveAddress/adaptiveAddress'
 import { ReactComponent as CrossSvg } from '../../icons/ic20/cross.svg';
 import { ReactComponent as NextSvg } from '../../icons/ic28/next.svg';
 import { YlideLargeLogo } from '../../icons/YlideLargeLogo';
+import { useAccountConnectedModal } from '../../modals/accountConnectedModal/accountConnectedModal';
 import { useNewPasswordModal } from '../../modals/NewPasswordModal';
 import { useSelectWalletModal } from '../../modals/SelectWalletModal';
 import domain from '../../stores/Domain';
@@ -19,8 +20,8 @@ export const NewWalletsPage = observer(() => {
 	const navigate = useNav();
 
 	const selectWalletModal = useSelectWalletModal();
-
 	const newPasswordModal = useNewPasswordModal();
+	const accountConnectedModal = useAccountConnectedModal();
 
 	return (
 		<div className="intro-page">
@@ -122,7 +123,15 @@ export const NewWalletsPage = observer(() => {
 						);
 					})}
 
-					<div className="cw-block emphaized" onClick={() => selectWalletModal({})}>
+					<div
+						className="cw-block emphaized"
+						onClick={async () => {
+							const success = await selectWalletModal({});
+							if (success) {
+								await accountConnectedModal({});
+							}
+						}}
+					>
 						<div className="cw-logo">
 							<svg
 								width="28"

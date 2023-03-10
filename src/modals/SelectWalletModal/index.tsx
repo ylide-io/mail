@@ -16,24 +16,25 @@ import { Wallet } from '../../stores/models/Wallet';
 import walletConnect from '../../stores/WalletConnect';
 import { copyToClipboard } from '../../utils/clipboard';
 import { getQueryString } from '../../utils/getQueryString';
-import { useAccountConnectedModal } from '../accountConnectedModal/accountConnectedModal';
 import { useNewPasswordModal } from '../NewPasswordModal';
 import SwitchModal from '../SwitchModal';
 
-export const useSelectWalletModal = createSingletonStaticComponentHook<SelectWalletModalProps>((props, resolve) => (
-	<SelectWalletModal
-		{...props}
-		onClose={() => {
-			resolve();
-			props.onClose?.();
-		}}
-	/>
-));
+export const useSelectWalletModal = createSingletonStaticComponentHook<SelectWalletModalProps, boolean>(
+	(props, resolve) => (
+		<SelectWalletModal
+			{...props}
+			onClose={success => {
+				resolve(success);
+				props.onClose?.(success);
+			}}
+		/>
+	),
+);
 
 //
 
 interface SelectWalletModalProps {
-	onClose?: () => void;
+	onClose?: (success: boolean) => void;
 }
 
 export const SelectWalletModal = observer(({ onClose }: SelectWalletModalProps) => {
@@ -94,7 +95,6 @@ export const SelectWalletModal = observer(({ onClose }: SelectWalletModalProps) 
 	);
 
 	const newPasswordModal = useNewPasswordModal();
-	const accountConnectedModal = useAccountConnectedModal();
 
 	async function connectWalletAccount(wallet: Wallet) {
 		let currentAccount = await wallet.getCurrentAccount();
@@ -123,17 +123,15 @@ export const SelectWalletModal = observer(({ onClose }: SelectWalletModalProps) 
 	}
 
 	async function connectAccount(wallet: string) {
-		const domainWallet = domain.wallets.find(w => w.factory.wallet === wallet)!;
-
 		try {
+			const domainWallet = domain.wallets.find(w => w.factory.wallet === wallet)!;
+
 			const account = await connectWalletAccount(domainWallet);
 			if (!account) {
 				return;
 			}
 			const remoteKeys = await domainWallet.readRemoteKeys(account);
 			const qqs = getQueryString();
-
-			onClose?.();
 
 			const success = await newPasswordModal({
 				faucetType: ['polygon', 'fantom', 'gnosis'].includes(qqs.faucet) ? (qqs.faucet as any) : 'gnosis',
@@ -143,9 +141,7 @@ export const SelectWalletModal = observer(({ onClose }: SelectWalletModalProps) 
 				remoteKeys: remoteKeys.remoteKeys,
 			});
 
-			if (success) {
-				await accountConnectedModal({});
-			}
+			onClose?.(!!success);
 		} finally {
 		}
 	}
@@ -179,7 +175,7 @@ export const SelectWalletModal = observer(({ onClose }: SelectWalletModalProps) 
 	}
 
 	return (
-		<Modal className="wallet-modal" onClose={onClose}>
+		<Modal className="wallet-modal" onClose={() => onClose?.(false)}>
 			<h3 className="wm-title">Select wallet</h3>
 
 			{!!availableBrowserWallets.length && (
