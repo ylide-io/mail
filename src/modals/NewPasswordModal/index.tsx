@@ -8,6 +8,7 @@ import { generatePath } from 'react-router-dom';
 import { ActionButton, ActionButtonLook, ActionButtonSize } from '../../components/ActionButton/ActionButton';
 import { ForgotPasswordModal } from '../../components/forgotPasswordModal/forgotPasswordModal';
 import { Modal } from '../../components/modal/modal';
+import { createSingletonStaticComponentHook } from '../../components/staticComponentManager/staticComponentManager';
 import { TextField, TextFieldLook } from '../../components/textField/textField';
 import { useToastManager } from '../../components/toast/toast';
 import { YlideLoader } from '../../components/ylideLoader/ylideLoader';
@@ -24,6 +25,18 @@ import { RoutePath } from '../../stores/routePath';
 import { assertUnreachable, invariant } from '../../utils/assert';
 import { isBytesEqual } from '../../utils/isBytesEqual';
 import { useNav } from '../../utils/url';
+
+export const useNewPasswordModal = createSingletonStaticComponentHook<NewPasswordModalProps>((props, onRemove) => (
+	<NewPasswordModal
+		{...props}
+		onResolve={() => {
+			onRemove();
+			props.onResolve?.();
+		}}
+	/>
+));
+
+//
 
 const txPrices: Record<EVMNetwork, number> = {
 	[EVMNetwork.LOCAL_HARDHAT]: 0.001,
@@ -60,7 +73,7 @@ interface NewPasswordModalProps {
 	wallet: Wallet;
 	account: IGenericAccount;
 	remoteKeys: Record<string, ExternalYlidePublicKey | null>;
-	onResolve: () => void;
+	onResolve?: () => void;
 }
 
 export function NewPasswordModal({ faucetType, bonus, wallet, account, remoteKeys, onResolve }: NewPasswordModalProps) {
@@ -257,7 +270,7 @@ export function NewPasswordModal({ faucetType, bonus, wallet, account, remoteKey
 
 	return (
 		<>
-			<Modal className="account-modal wallet-modal" onClose={() => onResolve()}>
+			<Modal className="account-modal wallet-modal" onClose={() => onResolve?.()}>
 				<div
 					style={{
 						padding: 24,
@@ -341,7 +354,7 @@ export function NewPasswordModal({ faucetType, bonus, wallet, account, remoteKey
 						)}
 
 						<div className="wm-footer">
-							<ActionButton size={ActionButtonSize.LARGE} onClick={() => onResolve()}>
+							<ActionButton size={ActionButtonSize.LARGE} onClick={() => onResolve?.()}>
 								Back
 							</ActionButton>
 							<ActionButton
@@ -592,13 +605,13 @@ export function NewPasswordModal({ faucetType, bonus, wallet, account, remoteKey
 								size={ActionButtonSize.LARGE}
 								look={ActionButtonLook.PRIMARY}
 								onClick={() => {
-									onResolve();
+									onResolve?.();
 									navigate(generatePath(RoutePath.ROOT));
 								}}
 							>
 								Go to {APP_NAME}
 							</ActionButton>
-							<ActionButton size={ActionButtonSize.LARGE} onClick={() => onResolve()}>
+							<ActionButton size={ActionButtonSize.LARGE} onClick={() => onResolve?.()}>
 								Add one more account
 							</ActionButton>
 						</div>

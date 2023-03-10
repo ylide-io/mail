@@ -1,6 +1,5 @@
 import clsx from 'clsx';
 import { observer } from 'mobx-react';
-import { ReactNode, useState } from 'react';
 import { generatePath } from 'react-router-dom';
 
 import { ActionButton, ActionButtonLook, ActionButtonSize } from '../../components/ActionButton/ActionButton';
@@ -9,7 +8,7 @@ import { AdaptiveAddress } from '../../controls/adaptiveAddress/adaptiveAddress'
 import { ReactComponent as CrossSvg } from '../../icons/ic20/cross.svg';
 import { ReactComponent as NextSvg } from '../../icons/ic28/next.svg';
 import { YlideLargeLogo } from '../../icons/YlideLargeLogo';
-import { NewPasswordModal } from '../../modals/NewPasswordModal';
+import { useNewPasswordModal } from '../../modals/NewPasswordModal';
 import { useSelectWalletModal } from '../../modals/SelectWalletModal';
 import domain from '../../stores/Domain';
 import { RoutePath } from '../../stores/routePath';
@@ -21,7 +20,7 @@ export const NewWalletsPage = observer(() => {
 
 	const selectWalletModal = useSelectWalletModal();
 
-	const [passwordModal, setPasswordModal] = useState<ReactNode>();
+	const newPasswordModal = useNewPasswordModal();
 
 	return (
 		<div className="intro-page">
@@ -87,20 +86,15 @@ export const NewWalletsPage = observer(() => {
 											const remoteKeys = await wallet.readRemoteKeys(acc.account);
 											const qqs = getQueryString();
 
-											setPasswordModal(
-												<NewPasswordModal
-													faucetType={
-														['polygon', 'fantom', 'gnosis'].includes(qqs.faucet)
-															? (qqs.faucet as any)
-															: 'gnosis'
-													}
-													bonus={qqs.bonus === 'true'}
-													wallet={wallet}
-													account={acc.account}
-													remoteKeys={remoteKeys.remoteKeys}
-													onResolve={() => setPasswordModal(undefined)}
-												/>,
-											);
+											await newPasswordModal({
+												faucetType: ['polygon', 'fantom', 'gnosis'].includes(qqs.faucet)
+													? (qqs.faucet as any)
+													: 'gnosis',
+												bonus: qqs.bonus === 'true',
+												wallet,
+												account: acc.account,
+												remoteKeys: remoteKeys.remoteKeys,
+											});
 										}}
 									>
 										Activate
@@ -160,8 +154,6 @@ export const NewWalletsPage = observer(() => {
 					))}
 				</div>
 			</div>
-
-			{passwordModal}
 		</div>
 	);
 });
