@@ -61,7 +61,7 @@ interface NewPasswordModalProps {
 	wallet: Wallet;
 	account: IGenericAccount;
 	remoteKeys: Record<string, ExternalYlidePublicKey | null>;
-	onResolve: (value: null | string, remember: boolean, forceNew: boolean) => void;
+	onResolve: () => void;
 }
 
 export function NewPasswordModal({ faucetType, bonus, wallet, account, remoteKeys, onResolve }: NewPasswordModalProps) {
@@ -258,7 +258,7 @@ export function NewPasswordModal({ faucetType, bonus, wallet, account, remoteKey
 
 	return (
 		<>
-			<Modal className="account-modal wallet-modal" onClose={() => onResolve(null, false, false)}>
+			<Modal className="account-modal wallet-modal" onClose={() => onResolve()}>
 				<div
 					style={{
 						padding: 24,
@@ -342,12 +342,7 @@ export function NewPasswordModal({ faucetType, bonus, wallet, account, remoteKey
 						)}
 
 						<div className="wm-footer">
-							<ActionButton
-								size={ActionButtonSize.LARGE}
-								onClick={() => {
-									onResolve('', false, false);
-								}}
-							>
+							<ActionButton size={ActionButtonSize.LARGE} onClick={() => onResolve()}>
 								Back
 							</ActionButton>
 							<ActionButton
@@ -617,13 +612,13 @@ export function NewPasswordModal({ faucetType, bonus, wallet, account, remoteKey
 								size={ActionButtonSize.LARGE}
 								look={ActionButtonLook.PRIMARY}
 								onClick={() => {
+									onResolve();
 									navigate(generatePath(RoutePath.ROOT));
-									onResolve('', false, false);
 								}}
 							>
 								Go to {APP_NAME}
 							</ActionButton>
-							<ActionButton size={ActionButtonSize.LARGE} onClick={() => onResolve('', false, false)}>
+							<ActionButton size={ActionButtonSize.LARGE} onClick={() => onResolve()}>
 								Add one more account
 							</ActionButton>
 						</div>
