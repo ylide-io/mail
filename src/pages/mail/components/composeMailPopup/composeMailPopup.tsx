@@ -6,9 +6,7 @@ import { generatePath } from 'react-router-dom';
 import { ActionButton, ActionButtonLook } from '../../../../components/ActionButton/ActionButton';
 import { OverlappingLoader } from '../../../../components/overlappingLoader/overlappingLoader';
 import { Popup } from '../../../../components/popup/popup';
-import {
-	createSingletonStaticComponentHook,
-} from '../../../../components/staticComponentManager/staticComponentManager';
+import { createSingletonStaticComponentHook } from '../../../../components/staticComponentManager/staticComponentManager';
 import { ReactComponent as CrossSvg } from '../../../../icons/ic20/cross.svg';
 import { ReactComponent as ExternalSvg } from '../../../../icons/ic20/external.svg';
 import mailer from '../../../../stores/Mailer';

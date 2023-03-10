@@ -6,7 +6,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { generatePath } from 'react-router-dom';
 
 import { ActionButton, ActionButtonLook, ActionButtonSize } from '../../components/ActionButton/ActionButton';
-import { ForgotPasswordModal } from '../../components/forgotPasswordModal/forgotPasswordModal';
+import { useForgotPasswordModal } from '../../components/forgotPasswordModal/forgotPasswordModal';
 import { Modal } from '../../components/modal/modal';
 import { createSingletonStaticComponentHook } from '../../components/staticComponentManager/staticComponentManager';
 import { TextField, TextFieldLook } from '../../components/textField/textField';
@@ -85,7 +85,7 @@ export function NewPasswordModal({ faucetType, bonus, wallet, account, remoteKey
 	const [password, setPassword] = useState('');
 	const [passwordRepeat, setPasswordRepeat] = useState('');
 
-	const [forgotPassword, setForgotPassword] = useState(false);
+	const forgotPasswordModal = useForgotPasswordModal();
 
 	const [network, setNetwork] = useState<EVMNetwork>();
 	useEffect(() => {
@@ -269,367 +269,358 @@ export function NewPasswordModal({ faucetType, bonus, wallet, account, remoteKey
 	}
 
 	return (
-		<>
-			<Modal className="account-modal wallet-modal" onClose={() => onResolve?.()}>
-				<div
-					style={{
-						padding: 24,
-						paddingTop: 12,
-						display: 'flex',
-						alignItems: 'center',
-						justifyContent: 'center',
-					}}
-				>
-					<WalletTag wallet={wallet.factory.wallet} address={account.address} />
-				</div>
+		<Modal className="account-modal wallet-modal" onClose={() => onResolve?.()}>
+			<div
+				style={{
+					padding: 24,
+					paddingTop: 12,
+					display: 'flex',
+					alignItems: 'center',
+					justifyContent: 'center',
+				}}
+			>
+				<WalletTag wallet={wallet.factory.wallet} address={account.address} />
+			</div>
 
-				{step === Step.ENTER_PASSWORD ? (
-					<>
-						<h3 className="wm-title">{freshestKey ? `Enter password` : `Create password`}</h3>
+			{step === Step.ENTER_PASSWORD ? (
+				<>
+					<h3 className="wm-title">{freshestKey ? `Enter password` : `Create password`}</h3>
 
-						<h4 className="wm-subtitle">
-							{freshestKey ? (
-								<>
-									We found your key in the {blockchainsMap[freshestKey.blockchain].logo(12)}{' '}
-									<b>{blockchainsMap[freshestKey.blockchain].title}</b> blockchain. Please, enter your
-									Ylide Password to access it.
-								</>
-							) : (
-								`This password will be used to encrypt and decrypt your mails.`
-							)}
-						</h4>
-
+					<h4 className="wm-subtitle">
 						{freshestKey ? (
-							<div className="wm-body centered" style={{ padding: '0 20px' }}>
+							<>
+								We found your key in the {blockchainsMap[freshestKey.blockchain].logo(12)}{' '}
+								<b>{blockchainsMap[freshestKey.blockchain].title}</b> blockchain. Please, enter your
+								Ylide Password to access it.
+							</>
+						) : (
+							`This password will be used to encrypt and decrypt your mails.`
+						)}
+					</h4>
+
+					{freshestKey ? (
+						<div className="wm-body centered" style={{ padding: '0 20px' }}>
+							<TextField
+								look={TextFieldLook.PROMO}
+								autoFocus
+								value={password}
+								onValueChange={setPassword}
+								type="password"
+								placeholder="Enter your Ylide password"
+							/>
+
+							<div
+								style={{
+									marginTop: 8,
+									textAlign: 'right',
+								}}
+							>
+								<button
+									onClick={() =>
+										forgotPasswordModal({
+											onNewPassword: password => {
+												createLocalKey(password, true).then();
+											},
+										})
+									}
+								>
+									Forgot Password?
+								</button>
+							</div>
+						</div>
+					) : (
+						<div className="wm-body">
+							<form
+								name="sign-up"
+								style={{
+									display: 'grid',
+									gridGap: 12,
+									padding: '20px 16px 8px',
+								}}
+								action="/"
+								method="POST"
+								noValidate
+							>
 								<TextField
 									look={TextFieldLook.PROMO}
-									autoFocus
+									type="password"
+									autoComplete="new-password"
+									placeholder="Enter Ylide password"
 									value={password}
 									onValueChange={setPassword}
-									type="password"
-									placeholder="Enter your Ylide password"
 								/>
+								<TextField
+									look={TextFieldLook.PROMO}
+									type="password"
+									autoComplete="new-password"
+									placeholder="Repeat your password"
+									value={passwordRepeat}
+									onValueChange={setPasswordRepeat}
+								/>
+							</form>
+							<div className="ylide-callout">{calloutSvg}</div>
+						</div>
+					)}
 
+					<div className="wm-footer">
+						<ActionButton size={ActionButtonSize.LARGE} onClick={() => onResolve?.()}>
+							Back
+						</ActionButton>
+						<ActionButton
+							size={ActionButtonSize.LARGE}
+							look={ActionButtonLook.PRIMARY}
+							onClick={() => createLocalKey(password)}
+						>
+							Continue
+						</ActionButton>
+					</div>
+				</>
+			) : step === Step.GENERATE_KEY ? (
+				<>
+					{pleaseWait ? (
+						<>
+							<div className="wm-body centered">
+								<h3 className="wm-title">Please, wait</h3>
+								<h4 className="wm-subtitle">Your transaction is being confirmed</h4>
+							</div>
+						</>
+					) : (
+						<>
+							<div className="wm-body centered">
 								<div
 									style={{
-										marginTop: 8,
-										textAlign: 'right',
+										display: 'flex',
+										flexDirection: 'row',
+										alignItems: 'flex-start',
+										justifyContent: 'flex-end',
+										paddingRight: 24,
+										paddingBottom: 20,
 									}}
 								>
-									<button onClick={() => setForgotPassword(true)}>Forgot Password?</button>
-								</div>
-							</div>
-						) : (
-							<div className="wm-body">
-								<form
-									name="sign-up"
-									style={{
-										display: 'grid',
-										gridGap: 12,
-										padding: '20px 16px 8px',
-									}}
-									action="/"
-									method="POST"
-									noValidate
-								>
-									<TextField
-										look={TextFieldLook.PROMO}
-										type="password"
-										autoComplete="new-password"
-										placeholder="Enter Ylide password"
-										value={password}
-										onValueChange={setPassword}
-									/>
-									<TextField
-										look={TextFieldLook.PROMO}
-										type="password"
-										autoComplete="new-password"
-										placeholder="Repeat your password"
-										value={passwordRepeat}
-										onValueChange={setPasswordRepeat}
-									/>
-								</form>
-								<div className="ylide-callout">{calloutSvg}</div>
-							</div>
-						)}
-
-						<div className="wm-footer">
-							<ActionButton size={ActionButtonSize.LARGE} onClick={() => onResolve?.()}>
-								Back
-							</ActionButton>
-							<ActionButton
-								size={ActionButtonSize.LARGE}
-								look={ActionButtonLook.PRIMARY}
-								onClick={() => createLocalKey(password)}
-							>
-								Continue
-							</ActionButton>
-						</div>
-					</>
-				) : step === Step.GENERATE_KEY ? (
-					<>
-						{pleaseWait ? (
-							<>
-								<div className="wm-body centered">
-									<h3 className="wm-title">Please, wait</h3>
-									<h4 className="wm-subtitle">Your transaction is being confirmed</h4>
-								</div>
-							</>
-						) : (
-							<>
-								<div className="wm-body centered">
-									<div
-										style={{
-											display: 'flex',
-											flexDirection: 'row',
-											alignItems: 'flex-start',
-											justifyContent: 'flex-end',
-											paddingRight: 24,
-											paddingBottom: 20,
-										}}
+									<svg
+										width="164"
+										height="104"
+										viewBox="0 0 164 104"
+										fill="none"
+										xmlns="http://www.w3.org/2000/svg"
 									>
-										<svg
-											width="164"
-											height="104"
-											viewBox="0 0 164 104"
-											fill="none"
-											xmlns="http://www.w3.org/2000/svg"
-										>
-											<path
-												d="M2 102.498C2 61.4999 69.5 15.4999 162 10.4785M162 10.4785L133.5 1.50183M162 10.4785L141.562 31.6153"
-												stroke="url(#paint0_linear_54_5088)"
-												strokeWidth="3"
-												strokeLinecap="round"
-												strokeLinejoin="round"
-											/>
-											<defs>
-												<linearGradient
-													id="paint0_linear_54_5088"
-													x1="82"
-													y1="1.50183"
-													x2="82"
-													y2="102.498"
-													gradientUnits="userSpaceOnUse"
-												>
-													<stop stopColor="#97A1FF" />
-													<stop offset="1" stopColor="#FFB571" />
-												</linearGradient>
-											</defs>
-										</svg>
-									</div>
-									<h3 className="wm-title">Confirm the message</h3>
-									<h4 className="wm-subtitle">
-										We need you to sign your password so we can generate you a unique communication
-										key
-									</h4>
+										<path
+											d="M2 102.498C2 61.4999 69.5 15.4999 162 10.4785M162 10.4785L133.5 1.50183M162 10.4785L141.562 31.6153"
+											stroke="url(#paint0_linear_54_5088)"
+											strokeWidth="3"
+											strokeLinecap="round"
+											strokeLinejoin="round"
+										/>
+										<defs>
+											<linearGradient
+												id="paint0_linear_54_5088"
+												x1="82"
+												y1="1.50183"
+												x2="82"
+												y2="102.498"
+												gradientUnits="userSpaceOnUse"
+											>
+												<stop stopColor="#97A1FF" />
+												<stop offset="1" stopColor="#FFB571" />
+											</linearGradient>
+										</defs>
+									</svg>
 								</div>
-							</>
-						)}
+								<h3 className="wm-title">Confirm the message</h3>
+								<h4 className="wm-subtitle">
+									We need you to sign your password so we can generate you a unique communication key
+								</h4>
+							</div>
+						</>
+					)}
 
-						<div className="wm-footer">
-							<ActionButton size={ActionButtonSize.LARGE} onClick={() => setStep(Step.ENTER_PASSWORD)}>
-								Back
-							</ActionButton>
-						</div>
-					</>
-				) : step === Step.SELECT_NETWORK ? (
-					<>
-						<h3 className="wm-title">Choose network</h3>
-						<div
-							className="wm-body"
-							style={{
-								marginTop: -24,
-								paddingTop: 24,
-								marginLeft: -24,
-								marginRight: -24,
-								paddingLeft: 24,
-								paddingRight: 24,
-								overflowY: 'scroll',
-								maxHeight: 390,
-							}}
-						>
-							{domain.registeredBlockchains
-								.filter(f => f.blockchainGroup === 'evm')
-								.sort((a, b) => {
-									const aBalance = Number(
-										evmBalances.balances[evmNameToNetwork(a.blockchain)!].toFixed(4),
-									);
-									const bBalance = Number(
-										evmBalances.balances[evmNameToNetwork(b.blockchain)!].toFixed(4),
-									);
-									const aTx = txPrices[evmNameToNetwork(a.blockchain)!];
-									const bTx = txPrices[evmNameToNetwork(b.blockchain)!];
-									if (aBalance === bBalance) {
-										return aTx - bTx;
-									} else {
-										return bBalance - aBalance;
-									}
-								})
-								.map((bc, idx) => {
-									const bData = blockchainsMap[bc.blockchain];
-									return (
-										<div
-											className={clsx('wmn-plate', {
-												disabled:
-													Number(
-														evmBalances.balances[evmNameToNetwork(bc.blockchain)!].toFixed(
-															4,
-														),
-													) === 0,
-											})}
-											onClick={() => networkSelect(evmNameToNetwork(bc.blockchain)!)}
-										>
-											<div className="wmn-icon">{bData.logo(32)}</div>
-											<div className="wmn-title">
-												<div className="wmn-blockchain">{bData.title}</div>
+					<div className="wm-footer">
+						<ActionButton size={ActionButtonSize.LARGE} onClick={() => setStep(Step.ENTER_PASSWORD)}>
+							Back
+						</ActionButton>
+					</div>
+				</>
+			) : step === Step.SELECT_NETWORK ? (
+				<>
+					<h3 className="wm-title">Choose network</h3>
+					<div
+						className="wm-body"
+						style={{
+							marginTop: -24,
+							paddingTop: 24,
+							marginLeft: -24,
+							marginRight: -24,
+							paddingLeft: 24,
+							paddingRight: 24,
+							overflowY: 'scroll',
+							maxHeight: 390,
+						}}
+					>
+						{domain.registeredBlockchains
+							.filter(f => f.blockchainGroup === 'evm')
+							.sort((a, b) => {
+								const aBalance = Number(
+									evmBalances.balances[evmNameToNetwork(a.blockchain)!].toFixed(4),
+								);
+								const bBalance = Number(
+									evmBalances.balances[evmNameToNetwork(b.blockchain)!].toFixed(4),
+								);
+								const aTx = txPrices[evmNameToNetwork(a.blockchain)!];
+								const bTx = txPrices[evmNameToNetwork(b.blockchain)!];
+								if (aBalance === bBalance) {
+									return aTx - bTx;
+								} else {
+									return bBalance - aBalance;
+								}
+							})
+							.map((bc, idx) => {
+								const bData = blockchainsMap[bc.blockchain];
+								return (
+									<div
+										className={clsx('wmn-plate', {
+											disabled:
+												Number(
+													evmBalances.balances[evmNameToNetwork(bc.blockchain)!].toFixed(4),
+												) === 0,
+										})}
+										onClick={() => networkSelect(evmNameToNetwork(bc.blockchain)!)}
+									>
+										<div className="wmn-icon">{bData.logo(32)}</div>
+										<div className="wmn-title">
+											<div className="wmn-blockchain">{bData.title}</div>
+											{Number(evmBalances.balances[evmNameToNetwork(bc.blockchain)!].toFixed(4)) >
+												0 && idx === 0 ? (
+												<div className="wmn-optimal">Optimal</div>
+											) : null}
+										</div>
+										<div className="wmn-balance">
+											<div className="wmn-wallet-balance">
 												{Number(
 													evmBalances.balances[evmNameToNetwork(bc.blockchain)!].toFixed(4),
-												) > 0 && idx === 0 ? (
-													<div className="wmn-optimal">Optimal</div>
-												) : null}
+												)}{' '}
+												{bData.ethNetwork?.nativeCurrency.symbol || 'ETH'}
 											</div>
-											<div className="wmn-balance">
-												<div className="wmn-wallet-balance">
-													{Number(
-														evmBalances.balances[evmNameToNetwork(bc.blockchain)!].toFixed(
-															4,
-														),
-													)}{' '}
-													{bData.ethNetwork?.nativeCurrency.symbol || 'ETH'}
-												</div>
-												<div className="wmn-transaction-price">
-													Transaction = 0.0004{' '}
-													{bData.ethNetwork?.nativeCurrency.symbol || 'ETH'}
-												</div>
+											<div className="wmn-transaction-price">
+												Transaction = 0.0004 {bData.ethNetwork?.nativeCurrency.symbol || 'ETH'}
 											</div>
 										</div>
-									);
-								})}
-						</div>
-					</>
-				) : step === Step.PUBLISH_KEY ? (
-					<>
-						<div className="wm-body centered">
-							<div
-								style={{
-									display: 'flex',
-									flexDirection: 'row',
-									alignItems: 'flex-start',
-									justifyContent: 'flex-end',
-									paddingRight: 24,
-									paddingBottom: 20,
-								}}
+									</div>
+								);
+							})}
+					</div>
+				</>
+			) : step === Step.PUBLISH_KEY ? (
+				<>
+					<div className="wm-body centered">
+						<div
+							style={{
+								display: 'flex',
+								flexDirection: 'row',
+								alignItems: 'flex-start',
+								justifyContent: 'flex-end',
+								paddingRight: 24,
+								paddingBottom: 20,
+							}}
+						>
+							<svg
+								width="164"
+								height="104"
+								viewBox="0 0 164 104"
+								fill="none"
+								xmlns="http://www.w3.org/2000/svg"
 							>
-								<svg
-									width="164"
-									height="104"
-									viewBox="0 0 164 104"
-									fill="none"
-									xmlns="http://www.w3.org/2000/svg"
-								>
-									<path
-										d="M2 102.498C2 61.4999 69.5 15.4999 162 10.4785M162 10.4785L133.5 1.50183M162 10.4785L141.562 31.6153"
-										stroke="url(#paint0_linear_54_5088)"
-										strokeWidth="3"
-										strokeLinecap="round"
-										strokeLinejoin="round"
-									/>
-									<defs>
-										<linearGradient
-											id="paint0_linear_54_5088"
-											x1="82"
-											y1="1.50183"
-											x2="82"
-											y2="102.498"
-											gradientUnits="userSpaceOnUse"
-										>
-											<stop stopColor="#97A1FF" />
-											<stop offset="1" stopColor="#FFB571" />
-										</linearGradient>
-									</defs>
-								</svg>
-							</div>
-							<h3 className="wm-title">Confirm the transaction</h3>
-							<h4 className="wm-subtitle">
-								Please sign the transaction in your wallet to publish your unique communication key
-							</h4>
+								<path
+									d="M2 102.498C2 61.4999 69.5 15.4999 162 10.4785M162 10.4785L133.5 1.50183M162 10.4785L141.562 31.6153"
+									stroke="url(#paint0_linear_54_5088)"
+									strokeWidth="3"
+									strokeLinecap="round"
+									strokeLinejoin="round"
+								/>
+								<defs>
+									<linearGradient
+										id="paint0_linear_54_5088"
+										x1="82"
+										y1="1.50183"
+										x2="82"
+										y2="102.498"
+										gradientUnits="userSpaceOnUse"
+									>
+										<stop stopColor="#97A1FF" />
+										<stop offset="1" stopColor="#FFB571" />
+									</linearGradient>
+								</defs>
+							</svg>
 						</div>
-						<div className="wm-footer">
-							<ActionButton
-								size={ActionButtonSize.LARGE}
-								onClick={() =>
-									setStep(
-										wallet.factory.blockchainGroup === 'evm'
-											? Step.SELECT_NETWORK
-											: Step.ENTER_PASSWORD,
-									)
-								}
-							>
-								Back
-							</ActionButton>
+						<h3 className="wm-title">Confirm the transaction</h3>
+						<h4 className="wm-subtitle">
+							Please sign the transaction in your wallet to publish your unique communication key
+						</h4>
+					</div>
+					<div className="wm-footer">
+						<ActionButton
+							size={ActionButtonSize.LARGE}
+							onClick={() =>
+								setStep(
+									wallet.factory.blockchainGroup === 'evm'
+										? Step.SELECT_NETWORK
+										: Step.ENTER_PASSWORD,
+								)
+							}
+						>
+							Back
+						</ActionButton>
+					</div>
+				</>
+			) : step === Step.PUBLISHING_KEY ? (
+				<>
+					<div className="wm-body centered">
+						<div
+							style={{
+								display: 'flex',
+								alignItems: 'center',
+								justifyContent: 'center',
+								paddingBottom: 40,
+							}}
+						>
+							<YlideLoader />
 						</div>
-					</>
-				) : step === Step.PUBLISHING_KEY ? (
-					<>
-						<div className="wm-body centered">
-							<div
-								style={{
-									display: 'flex',
-									alignItems: 'center',
-									justifyContent: 'center',
-									paddingBottom: 40,
-								}}
-							>
-								<YlideLoader />
-							</div>
-							<h3 className="wm-title">Publishing the key</h3>
-							<h4 className="wm-subtitle">Please, wait for the transaction to be completed</h4>
-						</div>
-					</>
-				) : step === Step.FINISH ? (
-					<>
-						<h3 className="wm-title" style={{ marginBottom: 10 }}>
-							Your account is ready
-						</h3>
+						<h3 className="wm-title">Publishing the key</h3>
+						<h4 className="wm-subtitle">Please, wait for the transaction to be completed</h4>
+					</div>
+				</>
+			) : step === Step.FINISH ? (
+				<>
+					<h3 className="wm-title" style={{ marginBottom: 10 }}>
+						Your account is ready
+					</h3>
 
-						<div className="wm-body">
-							<img
-								src={require('../../assets/img/success.png')}
-								alt="Success"
-								style={{ marginLeft: -24, marginRight: -24, marginBottom: 14 }}
-							/>
-						</div>
+					<div className="wm-body">
+						<img
+							src={require('../../assets/img/success.png')}
+							alt="Success"
+							style={{ marginLeft: -24, marginRight: -24, marginBottom: 14 }}
+						/>
+					</div>
 
-						<div className="wm-footer-vertical">
-							<ActionButton
-								size={ActionButtonSize.LARGE}
-								look={ActionButtonLook.PRIMARY}
-								onClick={() => {
-									onResolve?.();
-									navigate(generatePath(RoutePath.ROOT));
-								}}
-							>
-								Go to {APP_NAME}
-							</ActionButton>
-							<ActionButton size={ActionButtonSize.LARGE} onClick={() => onResolve?.()}>
-								Add one more account
-							</ActionButton>
-						</div>
-					</>
-				) : (
-					assertUnreachable(step)
-				)}
-			</Modal>
-
-			{forgotPassword && (
-				<ForgotPasswordModal
-					onNewPassword={password => {
-						setForgotPassword(false);
-						createLocalKey(password, true);
-					}}
-					onCancel={() => setForgotPassword(false)}
-				/>
+					<div className="wm-footer-vertical">
+						<ActionButton
+							size={ActionButtonSize.LARGE}
+							look={ActionButtonLook.PRIMARY}
+							onClick={() => {
+								onResolve?.();
+								navigate(generatePath(RoutePath.ROOT));
+							}}
+						>
+							Go to {APP_NAME}
+						</ActionButton>
+						<ActionButton size={ActionButtonSize.LARGE} onClick={() => onResolve?.()}>
+							Add one more account
+						</ActionButton>
+					</div>
+				</>
+			) : (
+				assertUnreachable(step)
 			)}
-		</>
+		</Modal>
 	);
 }
