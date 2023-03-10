@@ -70,7 +70,7 @@ export const SelectWalletModal = observer(({ onClose }: SelectWalletModalProps) 
 				.filter(w => {
 					return w !== 'walletconnect' && !!domain.availableWallets.find(ww => ww.wallet === w);
 				}),
-		[],
+		[domain.availableWallets],
 	);
 
 	const walletsToInstall = useMemo(
@@ -80,7 +80,7 @@ export const SelectWalletModal = observer(({ onClose }: SelectWalletModalProps) 
 				.filter(w => {
 					return w !== 'walletconnect' && !domain.availableWallets.find(ww => ww.wallet === w);
 				}),
-		[],
+		[domain.availableWallets],
 	);
 
 	reaction(
