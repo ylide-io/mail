@@ -16,8 +16,8 @@ import { ReactComponent as ContactSvg } from '../../../../icons/ic20/contact.svg
 import { ReactComponent as SearchSvg } from '../../../../icons/ic28/search.svg';
 import { browserStorage } from '../../../../stores/browserStorage';
 import { toggleArrayItem } from '../../../../utils/array';
+import { invariant } from '../../../../utils/assert';
 import { formatFeedLinkType } from '../../../../utils/feed';
-import { invariant } from '../../../../utils/invariant';
 import { FeedLinkTypeIcon } from '../feedLinkTypeIcon/feedLinkTypeIcon';
 import css from './feedSettingsPopup.module.scss';
 

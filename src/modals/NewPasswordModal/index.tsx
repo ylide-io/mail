@@ -21,7 +21,7 @@ import { evmBalances } from '../../stores/evmBalances';
 import { DomainAccount } from '../../stores/models/DomainAccount';
 import { Wallet } from '../../stores/models/Wallet';
 import { RoutePath } from '../../stores/routePath';
-import { invariant } from '../../utils/invariant';
+import { assertUnreachable, invariant } from '../../utils/assert';
 import { isBytesEqual } from '../../utils/isBytesEqual';
 import { useNav } from '../../utils/url';
 
@@ -603,7 +603,9 @@ export function NewPasswordModal({ faucetType, bonus, wallet, account, remoteKey
 							</ActionButton>
 						</div>
 					</>
-				) : null}
+				) : (
+					assertUnreachable(step)
+				)}
 			</Modal>
 
 			{forgotPassword && (

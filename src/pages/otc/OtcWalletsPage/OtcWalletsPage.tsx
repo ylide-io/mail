@@ -7,7 +7,7 @@ import { ErrorMessage } from '../../../components/errorMessage/errorMessage';
 import { YlideLoader } from '../../../components/ylideLoader/ylideLoader';
 import { AdaptiveAddress } from '../../../controls/adaptiveAddress/adaptiveAddress';
 import { RoutePath } from '../../../stores/routePath';
-import { invariant } from '../../../utils/invariant';
+import { invariant } from '../../../utils/assert';
 import { formatMoney } from '../../../utils/money';
 import { formatNumber } from '../../../utils/number';
 import { buildUrl, useNav } from '../../../utils/url';

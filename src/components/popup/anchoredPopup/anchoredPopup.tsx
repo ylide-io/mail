@@ -8,7 +8,7 @@ import {
 	HorizontalAlignment,
 	VerticalAlignment,
 } from '../../../utils/alignment';
-import { invariant } from '../../../utils/invariant';
+import { invariant } from '../../../utils/assert';
 import { PropsWithClassName } from '../../propsWithClassName';
 import { Popup } from '../popup';
 

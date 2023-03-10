@@ -16,7 +16,7 @@ import { useCallback, useEffect, useState } from 'react';
 import create from 'zustand';
 
 import messagesDB, { IMessageDecodedContent } from '../indexedDB/MessagesDB';
-import { invariant } from '../utils/invariant';
+import { invariant } from '../utils/assert';
 import { analytics } from './Analytics';
 import { browserStorage } from './browserStorage';
 import contacts from './Contacts';
@@ -47,7 +47,7 @@ export function getFolderName(folderId: FolderId) {
 
 export async function decodeMessage(msgId: string, msg: IMessage, recepient: IGenericAccount) {
 	const content = await domain.ylide.core.getMessageContent(msg);
-	invariant(content && !content.corrupted, 'Content is not available or corrupted')
+	invariant(content && !content.corrupted, 'Content is not available or corrupted');
 
 	const result = msg.isBroadcast
 		? domain.ylide.core.decryptBroadcastContent(msg, content)
@@ -336,7 +336,7 @@ export const useMailStore = create<MailStore>((set, get) => ({
 			return state.decodedMessagesById[pushMsg.msgId];
 		}
 
-		const decodedMessage = await decodeMessage(pushMsg.msgId, pushMsg.msg, pushMsg.recipient!.account)
+		const decodedMessage = await decodeMessage(pushMsg.msgId, pushMsg.msg, pushMsg.recipient!.account);
 
 		state.decodedMessagesById[pushMsg.msgId] = decodedMessage;
 		set({ decodedMessagesById: { ...state.decodedMessagesById } });

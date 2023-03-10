@@ -19,7 +19,7 @@ import domain from '../../../../../stores/Domain';
 import { evmBalances } from '../../../../../stores/evmBalances';
 import mailer from '../../../../../stores/Mailer';
 import { OutgoingMailData } from '../../../../../stores/outgoingMailData';
-import { invariant } from '../../../../../utils/invariant';
+import { invariant } from '../../../../../utils/assert';
 
 export interface SendMailButtonProps {
 	mailData: OutgoingMailData;

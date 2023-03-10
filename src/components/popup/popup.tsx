@@ -1,6 +1,6 @@
 import React, { PropsWithChildren, useContext, useLayoutEffect, useRef } from 'react';
 
-import { invariant } from '../../utils/invariant';
+import { invariant } from '../../utils/assert';
 import { useEscPress } from '../../utils/useEscPress';
 import { useOutsideClick } from '../../utils/useOutsideClick';
 import { PropsWithClassName } from '../propsWithClassName';

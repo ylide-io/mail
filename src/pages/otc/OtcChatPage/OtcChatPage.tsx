@@ -18,7 +18,7 @@ import { IMessageDecodedContent } from '../../../indexedDB/MessagesDB';
 import domain from '../../../stores/Domain';
 import { decodeMessage } from '../../../stores/MailList';
 import { OutgoingMailData } from '../../../stores/outgoingMailData';
-import { invariant } from '../../../utils/invariant';
+import { invariant } from '../../../utils/assert';
 import { parseEditorjsJson } from '../../../utils/parseEditorjsJson';
 import { useAutoSizeTextArea } from '../../../utils/useAutoSizeTextArea';
 import { SendMailButton } from '../../mail/components/composeMailForm/sendMailButton/sendMailButton';

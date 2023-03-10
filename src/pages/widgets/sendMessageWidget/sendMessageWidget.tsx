@@ -5,7 +5,7 @@ import { ActionButton, ActionButtonLook } from '../../../components/ActionButton
 import { Recipients } from '../../../components/recipientInput/recipientInput';
 import { ReactComponent as CrossSvg } from '../../../icons/ic20/cross.svg';
 import { OutgoingMailData } from '../../../stores/outgoingMailData';
-import { invariant } from '../../../utils/invariant';
+import { invariant } from '../../../utils/assert';
 import { ComposeMailForm } from '../../mail/components/composeMailForm/composeMailForm';
 import css from './sendMessageWidget.module.scss';
 

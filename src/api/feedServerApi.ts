@@ -1,6 +1,6 @@
 import { REACT_APP__FEED_SERVER } from '../env';
 import { FeedCategory, FeedPost, LinkType } from '../stores/Feed';
-import { invariant } from '../utils/invariant';
+import { invariant } from '../utils/assert';
 import { createCleanSerachParams } from '../utils/url';
 
 export namespace FeedServerApi {
