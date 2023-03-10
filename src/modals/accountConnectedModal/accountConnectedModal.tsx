@@ -6,6 +6,7 @@ import { createSingletonStaticComponentHook } from '../../components/staticCompo
 import { APP_NAME } from '../../constants';
 import { RoutePath } from '../../stores/routePath';
 import { useNav } from '../../utils/url';
+import { useSelectWalletModal } from '../SelectWalletModal';
 
 export const useAccountConnectedModal = createSingletonStaticComponentHook<AccountConnectedModalProps>(
 	(props, resolve) => (
@@ -27,6 +28,7 @@ interface AccountConnectedModalProps {
 
 export function AccountConnectedModal({ onClose }: AccountConnectedModalProps) {
 	const navigate = useNav();
+	const selectWalletModal = useSelectWalletModal();
 
 	return (
 		<Modal className="account-modal wallet-modal" onClose={() => onClose?.()}>
@@ -53,7 +55,13 @@ export function AccountConnectedModal({ onClose }: AccountConnectedModalProps) {
 				>
 					Go to {APP_NAME}
 				</ActionButton>
-				<ActionButton size={ActionButtonSize.LARGE} onClick={() => onClose?.()}>
+				<ActionButton
+					size={ActionButtonSize.LARGE}
+					onClick={async () => {
+						onClose?.();
+						await selectWalletModal({});
+					}}
+				>
 					Add one more account
 				</ActionButton>
 			</div>
