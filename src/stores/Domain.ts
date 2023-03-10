@@ -551,11 +551,15 @@ export class Domain {
 		// 	.map(t => t!);
 	}
 
+	async reloadAvailableWallets() {
+		this.availableWallets = await Ylide.getAvailableWallets();
+	}
+
 	async init() {
 		if (this.initialized) {
 			return;
 		}
-		this.availableWallets = await Ylide.getAvailableWallets();
+		await this.reloadAvailableWallets();
 		await this.initWalletConnect();
 		await this.extractWalletsData();
 		await this.keystore.init();

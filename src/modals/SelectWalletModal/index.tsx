@@ -2,7 +2,7 @@ import * as browserUtils from '@walletconnect/browser-utils';
 import clsx from 'clsx';
 import { reaction, toJS } from 'mobx';
 import { observer } from 'mobx-react';
-import React, { ReactNode, useMemo, useState } from 'react';
+import React, { ReactNode, useEffect, useMemo, useState } from 'react';
 import QRCode from 'react-qr-code';
 
 import { Modal } from '../../components/modal/modal';
@@ -43,6 +43,13 @@ export const SelectWalletModal = observer(({ onClose }: SelectWalletModalProps) 
 	const links = browserUtils.getMobileLinkRegistry(
 		browserUtils.formatMobileRegistry(walletConnect.registry, platform),
 	);
+
+	useEffect(() => {
+		(async () => {
+			await domain.reloadAvailableWallets();
+			await domain.extractWalletsData();
+		})();
+	}, []);
 
 	const [copy, setCopy] = useState(false);
 	const [activeTab, setActiveTab] = useState<'qr' | 'desktop' | 'install'>(
