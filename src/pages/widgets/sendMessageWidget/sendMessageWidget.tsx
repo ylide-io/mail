@@ -27,7 +27,7 @@ export function SendMessageWidget() {
 				</div>
 			</div>
 
-			<ComposeMailForm className={css.form} mailData={mailData} />
+			<ComposeMailForm className={css.form} isRecipientInputDisabled mailData={mailData} />
 		</div>
 	);
 }

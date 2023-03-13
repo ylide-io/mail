@@ -10,7 +10,7 @@ import { HorizontalAlignment } from '../../utils/alignment';
 import { isAddress, isEns } from '../../utils/blockchain';
 import { constrain } from '../../utils/number';
 import { DropDown, DropDownItem, DropDownItemMode } from '../dropDown/dropDown';
-import { TagInput, TagInputItem, TagInputItemStyle } from '../tagInput/tagInput';
+import { TagInput, TagInputItem, TagInputItemLook } from '../tagInput/tagInput';
 
 let itemIdCounter = Date.now();
 
@@ -102,10 +102,11 @@ interface DropDownOption {
 }
 
 interface RecipientInputProps {
+	isReadOnly?: boolean;
 	value: Recipients;
 }
 
-export const RecipientInput = observer(({ value }: RecipientInputProps) => {
+export const RecipientInput = observer(({ isReadOnly, value }: RecipientInputProps) => {
 	const tagInputRef = useRef(null);
 
 	const [search, setSearch] = useState('');
@@ -208,6 +209,7 @@ export const RecipientInput = observer(({ value }: RecipientInputProps) => {
 		<>
 			<TagInput
 				ref={tagInputRef}
+				isReadOnly={isReadOnly}
 				placeholder={!value.items.length ? 'Enter address or ENS domain here' : undefined}
 				search={search}
 				onSearchChange={setSearch}
@@ -229,16 +231,16 @@ export const RecipientInput = observer(({ value }: RecipientInputProps) => {
 					return (
 						<Tooltip key={i} title={tooltip}>
 							<TagInputItem
-								style={
+								look={
 									item.isLoading == null
-										? TagInputItemStyle.DEFAULT
+										? TagInputItemLook.DEFAULT
 										: item.isLoading
-										? TagInputItemStyle.LOADING
+										? TagInputItemLook.LOADING
 										: routing?.details
-										? TagInputItemStyle.SUCCESS
-										: TagInputItemStyle.ERROR
+										? TagInputItemLook.SUCCESS
+										: TagInputItemLook.ERROR
 								}
-								onRemove={() => onRemove(item)}
+								onRemove={isReadOnly ? undefined : () => onRemove(item)}
 							>
 								<AdaptiveText text={item.name} />
 							</TagInputItem>

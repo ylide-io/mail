@@ -5,7 +5,7 @@ import { ReactComponent as CrossSvg } from '../../icons/ic20/cross.svg';
 import { PropsWithClassName } from '../propsWithClassName';
 import css from './tagInput.module.scss';
 
-export enum TagInputItemStyle {
+export enum TagInputItemLook {
 	DEFAULT,
 	LOADING,
 	ERROR,
@@ -13,17 +13,17 @@ export enum TagInputItemStyle {
 }
 
 interface TagInputItemProps extends PropsWithChildren, PropsWithClassName {
-	style?: TagInputItemStyle;
+	look?: TagInputItemLook;
 	onRemove?: () => void;
 }
 
-export function TagInputItem({ children, className, style, onRemove, ...props }: TagInputItemProps) {
+export function TagInputItem({ children, className, look, onRemove, ...props }: TagInputItemProps) {
 	const styleClass = {
-		[TagInputItemStyle.DEFAULT]: css.tag_default,
-		[TagInputItemStyle.LOADING]: css.tag_loading,
-		[TagInputItemStyle.ERROR]: css.tag_error,
-		[TagInputItemStyle.SUCCESS]: css.tag_success,
-	}[style || TagInputItemStyle.DEFAULT];
+		[TagInputItemLook.DEFAULT]: css.tag_default,
+		[TagInputItemLook.LOADING]: css.tag_loading,
+		[TagInputItemLook.ERROR]: css.tag_error,
+		[TagInputItemLook.SUCCESS]: css.tag_success,
+	}[look || TagInputItemLook.DEFAULT];
 
 	return (
 		<div className={clsx(css.tag, styleClass, className)} onMouseUp={e => e.stopPropagation()} {...props}>
@@ -32,6 +32,7 @@ export function TagInputItem({ children, className, style, onRemove, ...props }:
 			{onRemove && (
 				<button
 					className={css.tagRemoveButton}
+					disabled={!onRemove}
 					title="Remove"
 					onMouseDown={e => e.preventDefault()}
 					onClick={() => onRemove()}
@@ -46,6 +47,7 @@ export function TagInputItem({ children, className, style, onRemove, ...props }:
 //
 
 interface TagInputProps extends PropsWithChildren, PropsWithClassName {
+	isReadOnly?: boolean;
 	placeholder?: string;
 	search?: string;
 	onSearchChange?: (search: string) => void;
@@ -56,7 +58,17 @@ interface TagInputProps extends PropsWithChildren, PropsWithClassName {
 
 export const TagInput = forwardRef(
 	(
-		{ children, className, placeholder, search, onSearchChange, onFocus, onBlur, onKeyDown }: TagInputProps,
+		{
+			children,
+			className,
+			isReadOnly,
+			placeholder,
+			search,
+			onSearchChange,
+			onFocus,
+			onBlur,
+			onKeyDown,
+		}: TagInputProps,
 		ref: Ref<HTMLDivElement>,
 	) => {
 		const inputRef = useRef<HTMLInputElement>(null);
@@ -74,6 +86,7 @@ export const TagInput = forwardRef(
 				<input
 					ref={inputRef}
 					className={css.input}
+					disabled={isReadOnly}
 					placeholder={placeholder}
 					value={search}
 					onChange={e => onSearchChange?.(e.target.value)}
