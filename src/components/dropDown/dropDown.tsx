@@ -58,6 +58,7 @@ export enum DropDownItemMode {
 	HIGHLIGHTED = 'HIGHLIGHTED',
 	SELECTED = 'SELECTED',
 	DISABLED = 'DISABLED',
+	WRAPPER = 'WRAPPER',
 }
 
 interface DropDownItemProps extends PropsWithChildren {
@@ -84,6 +85,7 @@ export function DropDownItem({ children, mode = DropDownItemMode.REGULAR, onSele
 					[DropDownItemMode.HIGHLIGHTED]: css.item_highlighted,
 					[DropDownItemMode.SELECTED]: css.item_selected,
 					[DropDownItemMode.DISABLED]: css.item_disabled,
+					[DropDownItemMode.WRAPPER]: css.item_wrapper,
 				}[mode || DropDownItemMode.REGULAR],
 			)}
 			onClick={() => {

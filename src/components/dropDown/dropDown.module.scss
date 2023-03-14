@@ -50,3 +50,9 @@ $contentPadding: 6px;
 	color: var(--secondary-text-color);
 	cursor: default;
 }
+
+.item_wrapper {
+	padding: 4px 12px;
+	height: auto;
+	min-height: $interactive-elem-size;
+}

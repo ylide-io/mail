@@ -84,7 +84,7 @@ export const TVMDeployContractModal: FC<TVMDeployContractModalProps> = ({ contra
 			<div className={css.row}>
 				<div className={css.label}>Deployer wallet</div>
 				<div className={css.value}>
-					<AccountSelect activeAccount={account} onChange={account => setAccount(account)} />
+					<AccountSelect activeAccount={account} onChange={setAccount} />
 				</div>
 			</div>
 			<div className={css.divider} />
