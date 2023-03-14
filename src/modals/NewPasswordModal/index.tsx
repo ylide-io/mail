@@ -12,7 +12,7 @@ import { createSingletonStaticComponentHook } from '../../components/staticCompo
 import { TextField, TextFieldLook } from '../../components/textField/textField';
 import { useToastManager } from '../../components/toast/toast';
 import { YlideLoader } from '../../components/ylideLoader/ylideLoader';
-import { blockchainsMap, calloutSvg, evmNameToNetwork } from '../../constants';
+import { blockchainsMap, evmNameToNetwork } from '../../constants';
 import { WalletTag } from '../../controls/WalletTag';
 import { REACT_APP__OTC_MODE } from '../../env';
 import { analytics } from '../../stores/Analytics';
@@ -357,7 +357,16 @@ export function NewPasswordModal({ faucetType, bonus, wallet, account, remoteKey
 									onValueChange={setPasswordRepeat}
 								/>
 							</form>
-							<div className="ylide-callout">{calloutSvg}</div>
+							<div className="ylide-callout">
+								<div>
+									Ylide <b>doesn't save</b> your password anywhere.
+								</div>
+								<br />
+								<div>
+									Please, save it securely, because if you lose it, you will not be able to access
+									your mail.
+								</div>
+							</div>
 						</div>
 					)}
 

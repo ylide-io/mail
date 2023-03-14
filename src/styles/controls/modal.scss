@@ -111,6 +111,7 @@
 
 .ylide-callout {
 	@include flex-column(flex-start, center);
+	font-size: 14px;
 	background: #83ffd2;
 	border-radius: 22px;
 	padding: 16px 20px;
