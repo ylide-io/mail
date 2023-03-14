@@ -1,7 +1,8 @@
-import { EVM_NAMES, EVMNetwork } from '@ylide/ethereum';
+import { EVMNetwork } from '@ylide/ethereum';
 import { MessageContentV3, SendMailResult, ServiceCode, Uint256 } from '@ylide/sdk';
 import { makeAutoObservable } from 'mobx';
 
+import { evmNetworks } from '../constants';
 import messagesDB from '../indexedDB/MessagesDB';
 import { analytics } from './Analytics';
 import domain from './Domain';
@@ -70,7 +71,7 @@ class Mailer {
 		text: string,
 		recipients: string[],
 		network?: EVMNetwork,
-		feedId?: Uint256
+		feedId?: Uint256,
 	): Promise<SendMailResult | null> {
 		let error = false;
 		analytics.mailSentAttempt();
@@ -79,10 +80,6 @@ class Mailer {
 			const content = MessageContentV3.plain(subject, text);
 
 			if (!network && sender.wallet.factory.blockchainGroup === 'evm') {
-				const evmNetworks = (Object.keys(EVM_NAMES) as unknown as EVMNetwork[]).map((network: EVMNetwork) => ({
-					name: EVM_NAMES[network],
-					network: Number(network) as EVMNetwork,
-				}));
 				const blockchainName = await sender.wallet.controller.getCurrentBlockchain();
 				network = evmNetworks.find(n => n.name === blockchainName)?.network;
 			}

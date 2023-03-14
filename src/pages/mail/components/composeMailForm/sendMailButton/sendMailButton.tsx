@@ -1,6 +1,6 @@
 import './sendMailButton.module.scss';
 
-import { EVM_NAMES, EVMNetwork } from '@ylide/ethereum';
+import { EVM_NAMES } from '@ylide/ethereum';
 import { Uint256 } from '@ylide/sdk';
 import { Dropdown, Menu } from 'antd';
 import clsx from 'clsx';
@@ -10,7 +10,7 @@ import React, { ReactNode, useEffect } from 'react';
 
 import { Spinner } from '../../../../../components/spinner/spinner';
 import { useToastManager } from '../../../../../components/toast/toast';
-import { blockchainsMap, evmNameToNetwork } from '../../../../../constants';
+import { blockchainsMap, evmNameToNetwork, evmNetworks } from '../../../../../constants';
 import { REACT_APP__OTC_MODE } from '../../../../../env';
 import { ReactComponent as ArrowDownSvg } from '../../../../../icons/ic20/arrowDown.svg';
 import { ReactComponent as ReplySvg } from '../../../../../icons/ic20/reply.svg';
@@ -142,12 +142,6 @@ export const SendMailButton = observer(({ mailData, onSent }: SendMailButtonProp
 					overlay={
 						<Menu
 							onClick={async info => {
-								const evmNetworks = (Object.keys(EVM_NAMES) as unknown as EVMNetwork[]).map(
-									(network: EVMNetwork) => ({
-										name: EVM_NAMES[network],
-										network: Number(network) as EVMNetwork,
-									}),
-								);
 								const blockchainName = info.key;
 								const newNetwork = evmNetworks.find(n => n.name === blockchainName)?.network;
 								const currentBlockchainName =

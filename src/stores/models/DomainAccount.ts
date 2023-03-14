@@ -1,4 +1,4 @@
-import { EVM_NAMES, EVMNetwork } from '@ylide/ethereum';
+import { EVMNetwork } from '@ylide/ethereum';
 import {
 	ExternalYlidePublicKey,
 	IGenericAccount,
@@ -9,6 +9,7 @@ import {
 } from '@ylide/sdk';
 import { computed, makeAutoObservable, observable } from 'mobx';
 
+import { evmNetworks } from '../../constants';
 import { isBytesEqual } from '../../utils/isBytesEqual';
 import { Wallet } from './Wallet';
 
@@ -87,10 +88,6 @@ export class DomainAccount {
 	}
 
 	async attachRemoteKey(preferredNetwork?: EVMNetwork) {
-		const evmNetworks = (Object.keys(EVM_NAMES) as unknown as EVMNetwork[]).map((network: EVMNetwork) => ({
-			name: EVM_NAMES[network],
-			network: Number(network) as EVMNetwork,
-		}));
 		const blockchainName = await this.wallet.controller.getCurrentBlockchain();
 		const network =
 			preferredNetwork === undefined
