@@ -37,6 +37,7 @@ export const AccountSelect = observer(({ className, activeAccount, onChange }: A
 					{domain.accounts.activeAccounts.map((account, i) => (
 						<DropDownItem
 							key={i}
+							mode={account === activeAccount ? DropDownItemMode.HIGHLIGHTED : undefined}
 							onSelect={() => {
 								onSelect();
 								onChange?.(account);
