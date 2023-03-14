@@ -84,11 +84,13 @@ export const SendMailButton = observer(({ mailData, onSent }: SendMailButtonProp
 				mailData.from = await selectWalletModal({});
 				invariant(mailData.from);
 
-				mailData.network = await selectNetworkModal({
-					wallet: mailData.from.wallet,
-					account: mailData.from.account,
-				});
-				invariant(mailData.network);
+				if (mailData.from.wallet.factory.blockchainGroup === 'evm') {
+					mailData.network = await selectNetworkModal({
+						wallet: mailData.from.wallet,
+						account: mailData.from.account,
+					});
+					invariant(mailData.network);
+				}
 			}
 
 			const curr = await mailData.from.wallet.getCurrentAccount();
