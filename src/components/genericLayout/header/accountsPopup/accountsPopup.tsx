@@ -8,6 +8,7 @@ import { Blockie } from '../../../../controls/Blockie';
 import { ReactComponent as EditSvg } from '../../../../icons/ic20/edit.svg';
 import { ReactComponent as PlusSvg } from '../../../../icons/ic20/plus.svg';
 import { ReactComponent as LogoutSvg } from '../../../../icons/ic28/logout.svg';
+import { useSelectWalletModal } from '../../../../modals/SelectWalletModal';
 import domain from '../../../../stores/Domain';
 import { RoutePath } from '../../../../stores/routePath';
 import { HorizontalAlignment } from '../../../../utils/alignment';
@@ -24,6 +25,7 @@ interface AccountsPopupProps {
 
 export const AccountsPopup = observer(({ anchorRef, onClose }: AccountsPopupProps) => {
 	const nav = useNav();
+	const selectWalletModal = useSelectWalletModal();
 
 	return (
 		<AnchoredPopup
@@ -82,7 +84,10 @@ export const AccountsPopup = observer(({ anchorRef, onClose }: AccountsPopupProp
 						size={ActionButtonSize.MEDIUM}
 						look={ActionButtonLook.PRIMARY}
 						icon={<PlusSvg />}
-						onClick={() => nav(RoutePath.WALLETS)}
+						onClick={async () => {
+							onClose();
+							await selectWalletModal({});
+						}}
 					>
 						Connect account
 					</ActionButton>
