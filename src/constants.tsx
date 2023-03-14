@@ -27,6 +27,8 @@ import { SolanaLogo } from './icons/SolanaLogo';
 import { TrustWalletLogo } from './icons/TrustWalletLogo';
 import VenomLogo from './icons/VenomLogo';
 import { WalletConnectLogo } from './icons/WalletConnectLogo';
+import { Wallet } from './stores/models/Wallet';
+import { invariant } from './utils/assert';
 
 export const APP_NAME = REACT_APP__OTC_MODE ? 'Ylide OTC' : 'Ylide Social Hub';
 
@@ -613,4 +615,11 @@ export const evmNetworks = (Object.keys(EVM_NAMES) as unknown as EVMNetwork[]).m
 
 export function evmNameToNetwork(name: string) {
 	return evmNetworks.find(n => n.name === name)?.network;
+}
+
+export async function getEvmWalletNetwork(wallet: Wallet) {
+	invariant(wallet.factory.blockchainGroup === 'evm', 'Not an EVM wallet');
+
+	const blockchainName = await wallet.controller.getCurrentBlockchain();
+	return evmNameToNetwork(blockchainName);
 }

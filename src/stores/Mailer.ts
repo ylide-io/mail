@@ -2,7 +2,7 @@ import { EVMNetwork } from '@ylide/ethereum';
 import { MessageContentV3, SendMailResult, ServiceCode, Uint256 } from '@ylide/sdk';
 import { makeAutoObservable } from 'mobx';
 
-import { evmNetworks } from '../constants';
+import { getEvmWalletNetwork } from '../constants';
 import messagesDB from '../indexedDB/MessagesDB';
 import { analytics } from './Analytics';
 import domain from './Domain';
@@ -80,8 +80,7 @@ class Mailer {
 			const content = MessageContentV3.plain(subject, text);
 
 			if (!network && sender.wallet.factory.blockchainGroup === 'evm') {
-				const blockchainName = await sender.wallet.controller.getCurrentBlockchain();
-				network = evmNetworks.find(n => n.name === blockchainName)?.network;
+				network = await getEvmWalletNetwork(sender.wallet);
 			}
 
 			return await domain.ylide.core.sendMessage(

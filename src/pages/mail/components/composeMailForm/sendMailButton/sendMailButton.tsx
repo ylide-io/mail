@@ -10,7 +10,7 @@ import React, { ReactNode, useEffect } from 'react';
 
 import { Spinner } from '../../../../../components/spinner/spinner';
 import { useToastManager } from '../../../../../components/toast/toast';
-import { blockchainsMap, evmNameToNetwork, evmNetworks } from '../../../../../constants';
+import { blockchainsMap, evmNameToNetwork, getEvmWalletNetwork } from '../../../../../constants';
 import { REACT_APP__OTC_MODE } from '../../../../../env';
 import { ReactComponent as ArrowDownSvg } from '../../../../../icons/ic20/arrowDown.svg';
 import { ReactComponent as ReplySvg } from '../../../../../icons/ic20/reply.svg';
@@ -34,9 +34,7 @@ export const SendMailButton = observer(({ mailData, onSent }: SendMailButtonProp
 		() =>
 			autorun(async () => {
 				if (mailData.from?.wallet.factory.blockchainGroup === 'evm') {
-					const blockchainName = await mailData.from.wallet.controller.getCurrentBlockchain();
-					mailData.network = evmNameToNetwork(blockchainName);
-
+					mailData.network = await getEvmWalletNetwork(mailData.from.wallet);
 					await evmBalances.updateBalances(mailData.from.wallet, mailData.from.account.address);
 				}
 			}),
@@ -143,7 +141,7 @@ export const SendMailButton = observer(({ mailData, onSent }: SendMailButtonProp
 						<Menu
 							onClick={async info => {
 								const blockchainName = info.key;
-								const newNetwork = evmNetworks.find(n => n.name === blockchainName)?.network;
+								const newNetwork = evmNameToNetwork(blockchainName);
 								const currentBlockchainName =
 									await mailData.from!.wallet.controller.getCurrentBlockchain();
 								if (currentBlockchainName !== blockchainName) {

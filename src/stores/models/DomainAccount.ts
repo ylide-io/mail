@@ -9,7 +9,7 @@ import {
 } from '@ylide/sdk';
 import { computed, makeAutoObservable, observable } from 'mobx';
 
-import { evmNetworks } from '../../constants';
+import { getEvmWalletNetwork } from '../../constants';
 import { isBytesEqual } from '../../utils/isBytesEqual';
 import { Wallet } from './Wallet';
 
@@ -88,11 +88,8 @@ export class DomainAccount {
 	}
 
 	async attachRemoteKey(preferredNetwork?: EVMNetwork) {
-		const blockchainName = await this.wallet.controller.getCurrentBlockchain();
-		const network =
-			preferredNetwork === undefined
-				? evmNetworks.find(n => n.name === blockchainName)?.network
-				: preferredNetwork;
+		const network = preferredNetwork == null ? await getEvmWalletNetwork(this.wallet) : preferredNetwork;
+
 		await this.wallet.controller.attachPublicKey(
 			this.account,
 			this.key.keypair.publicKey,

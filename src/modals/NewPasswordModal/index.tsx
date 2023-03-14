@@ -12,7 +12,7 @@ import { createSingletonStaticComponentHook } from '../../components/staticCompo
 import { TextField, TextFieldLook } from '../../components/textField/textField';
 import { useToastManager } from '../../components/toast/toast';
 import { YlideLoader } from '../../components/ylideLoader/ylideLoader';
-import { blockchainsMap, evmNameToNetwork } from '../../constants';
+import { blockchainsMap, evmNameToNetwork, getEvmWalletNetwork } from '../../constants';
 import { WalletTag } from '../../controls/WalletTag';
 import { REACT_APP__OTC_MODE } from '../../env';
 import { analytics } from '../../stores/Analytics';
@@ -89,10 +89,8 @@ export function NewPasswordModal({ faucetType, bonus, wallet, account, remoteKey
 	const [network, setNetwork] = useState<EVMNetwork>();
 	useEffect(() => {
 		if (wallet.factory.blockchainGroup === 'evm') {
-			wallet.controller.getCurrentBlockchain().then(blockchainName => {
-				setNetwork(evmNameToNetwork(blockchainName));
-				evmBalances.updateBalances(wallet, account.address).then();
-			});
+			getEvmWalletNetwork(wallet).then(setNetwork);
+			evmBalances.updateBalances(wallet, account.address).then();
 		}
 	}, [account.address, wallet]);
 
