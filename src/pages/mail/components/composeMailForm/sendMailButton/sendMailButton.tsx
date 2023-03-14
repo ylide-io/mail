@@ -10,7 +10,6 @@ import React, { ReactNode, useEffect } from 'react';
 
 import { Spinner } from '../../../../../components/spinner/spinner';
 import { useToastManager } from '../../../../../components/toast/toast';
-import { blockchainsMap, evmNameToNetwork, getEvmWalletNetwork } from '../../../../../constants';
 import { REACT_APP__OTC_MODE } from '../../../../../env';
 import { ReactComponent as ArrowDownSvg } from '../../../../../icons/ic20/arrowDown.svg';
 import { ReactComponent as ReplySvg } from '../../../../../icons/ic20/reply.svg';
@@ -20,6 +19,8 @@ import { evmBalances } from '../../../../../stores/evmBalances';
 import mailer from '../../../../../stores/Mailer';
 import { OutgoingMailData } from '../../../../../stores/outgoingMailData';
 import { invariant } from '../../../../../utils/assert';
+import { blockchainMeta, evmNameToNetwork } from '../../../../../utils/blockchain';
+import { getEvmWalletNetwork } from '../../../../../utils/wallet';
 
 export interface SendMailButtonProps {
 	mailData: OutgoingMailData;
@@ -43,21 +44,21 @@ export const SendMailButton = observer(({ mailData, onSent }: SendMailButtonProp
 
 	let text: ReactNode = 'Send';
 	if (mailData.from?.wallet.factory.blockchainGroup === 'everscale') {
-		const bData = blockchainsMap.everscale;
+		const bData = blockchainMeta.everscale;
 		text = (
 			<>
 				Send via {bData.logo(14)} {bData.title}
 			</>
 		);
 	} else if (mailData.from?.wallet.factory.blockchainGroup === 'venom-testnet') {
-		const bData = blockchainsMap['venom-testnet'];
+		const bData = blockchainMeta['venom-testnet'];
 		text = (
 			<>
 				Send via {bData.logo(14)} {bData.title}
 			</>
 		);
 	} else if (mailData.from?.wallet.factory.blockchainGroup === 'evm' && mailData.network !== undefined) {
-		const bData = blockchainsMap[EVM_NAMES[mailData.network]];
+		const bData = blockchainMeta[EVM_NAMES[mailData.network]];
 		if (bData) {
 			text = (
 				<>
@@ -152,7 +153,7 @@ export const SendMailButton = observer(({ mailData, onSent }: SendMailButtonProp
 							items={domain.registeredBlockchains
 								.filter(f => f.blockchainGroup === 'evm')
 								.map(bc => {
-									const bData = blockchainsMap[bc.blockchain];
+									const bData = blockchainMeta[bc.blockchain];
 									return {
 										key: bc.blockchain,
 										disabled:

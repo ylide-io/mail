@@ -1,4 +1,4 @@
-import { walletsMeta } from '../../constants';
+import { walletsMeta } from '../../utils/wallet';
 import { AdaptiveAddress } from '../adaptiveAddress/adaptiveAddress';
 
 export function WalletTag({ wallet, address }: { wallet: string; address: string }) {

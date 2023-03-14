@@ -1,36 +1,36 @@
 import { EVM_NAMES, EVMNetwork } from '@ylide/ethereum';
 
-import { REACT_APP__OTC_MODE } from './env';
-import { ArbitrumLogo } from './icons/ArbitrumLogo';
-import { AstarLogo } from './icons/AstarLogo';
-import { AuroraLogo } from './icons/AuroraLogo';
-import { AvalancheLogo } from './icons/AvalancheLogo';
-import { BinanceWalletLogo } from './icons/BinanceWalletLogo';
-import { BNBChainLogo } from './icons/BNBChainLogo';
-import { CeloLogo } from './icons/CeloLogo';
-import { CoinbaseWalletLogo } from './icons/CoinbaseWalletLogo';
-import { CronosLogo } from './icons/CronosLogo';
-import { EthereumLogo } from './icons/EthereumLogo';
-import EverscaleLogo from './icons/EverscaleLogo';
-import { FantomLogo } from './icons/FantomLogo';
-import { GnosisLogo } from './icons/GnosisLogo';
-import { KlaytnLogo } from './icons/KlaytnLogo';
-import { MetaMaskLogo } from './icons/MetaMaskLogo';
-import { MetisLogo } from './icons/MetisLogo';
-import { MoonbeamLogo } from './icons/MoonbeamLogo';
-import { MoonriverLogo } from './icons/MoonriverLogo';
-import { NearLogo } from './icons/NearLogo';
-import { OptimismLogo } from './icons/OptimismLogo';
-import { PhantomLogo } from './icons/PhantomLogo';
-import { PolygonLogo } from './icons/PolygonLogo';
-import { SolanaLogo } from './icons/SolanaLogo';
-import { TrustWalletLogo } from './icons/TrustWalletLogo';
-import VenomLogo from './icons/VenomLogo';
-import { WalletConnectLogo } from './icons/WalletConnectLogo';
-import { Wallet } from './stores/models/Wallet';
-import { invariant } from './utils/assert';
+import { ArbitrumLogo } from '../icons/ArbitrumLogo';
+import { AstarLogo } from '../icons/AstarLogo';
+import { AuroraLogo } from '../icons/AuroraLogo';
+import { AvalancheLogo } from '../icons/AvalancheLogo';
+import { BNBChainLogo } from '../icons/BNBChainLogo';
+import { CeloLogo } from '../icons/CeloLogo';
+import { CronosLogo } from '../icons/CronosLogo';
+import { EthereumLogo } from '../icons/EthereumLogo';
+import EverscaleLogo from '../icons/EverscaleLogo';
+import { FantomLogo } from '../icons/FantomLogo';
+import { GnosisLogo } from '../icons/GnosisLogo';
+import { KlaytnLogo } from '../icons/KlaytnLogo';
+import { MetisLogo } from '../icons/MetisLogo';
+import { MoonbeamLogo } from '../icons/MoonbeamLogo';
+import { MoonriverLogo } from '../icons/MoonriverLogo';
+import { NearLogo } from '../icons/NearLogo';
+import { OptimismLogo } from '../icons/OptimismLogo';
+import { PolygonLogo } from '../icons/PolygonLogo';
+import { SolanaLogo } from '../icons/SolanaLogo';
+import VenomLogo from '../icons/VenomLogo';
+import domain from '../stores/Domain';
 
-export const APP_NAME = REACT_APP__OTC_MODE ? 'Ylide OTC' : 'Ylide Social Hub';
+export function isAddress(input: string): boolean {
+	return domain.getBlockchainsForAddress(input.toLowerCase()).length > 0;
+}
+
+export function isEns(input: string): boolean {
+	return input.toLowerCase().endsWith('.eth');
+}
+
+//
 
 export interface IEthereumNetworkDescriptor {
 	chainId: string;
@@ -44,7 +44,7 @@ export interface IEthereumNetworkDescriptor {
 	blockExplorerUrls: string[];
 }
 
-export const blockchainsMap: Record<
+export const blockchainMeta: Record<
 	string,
 	{
 		title: string;
@@ -448,165 +448,7 @@ export const blockchainsMap: Record<
 	},
 };
 
-export interface WalletMeta {
-	title: string;
-	link: string;
-	logo: (size?: number) => JSX.Element;
-}
-
-export const walletsMeta: Record<string, WalletMeta> = {
-	metamask: {
-		title: 'MetaMask',
-		logo: (s = 30) => <MetaMaskLogo size={s} />,
-		link: 'https://metamask.io/',
-	},
-	walletconnect: {
-		title: 'WalletConnect',
-		logo: (s = 30) => <WalletConnectLogo size={s} />,
-		link: 'https://walletconnect.com/',
-	},
-	coinbase: {
-		title: 'Coinbase',
-		logo: (s = 30) => <CoinbaseWalletLogo size={s} />,
-		link: 'https://www.coinbase.com/wallet',
-	},
-	trustwallet: {
-		title: 'TrustWallet',
-		logo: (s = 30) => <TrustWalletLogo size={s} />,
-		link: 'https://trustwallet.com/',
-	},
-	binance: {
-		title: 'BinanceWallet',
-		logo: (s = 30) => <BinanceWalletLogo size={s} />,
-		link: 'https://chrome.google.com/webstore/detail/binance-wallet/fhbohimaelbohpjbbldcngcnapndodjp',
-	},
-	everwallet: {
-		title: 'EverWallet',
-		logo: (s = 30) => <EverscaleLogo size={s} />,
-		link: 'https://everwallet.net/',
-	},
-	venomwallet: {
-		title: 'Venom Wallet',
-		logo: (s = 30) => <VenomLogo size={s} />,
-		link: 'https://venom.foundation/wallet',
-	},
-	phantom: {
-		title: 'Phantom',
-		logo: (s = 30) => <PhantomLogo size={s} />,
-		link: 'https://l1.broxus.com/freeton/wallet',
-	},
-};
-
-export const supportedWallets: { wallet: string; blockchains: string[] }[] = [
-	{
-		wallet: 'metamask',
-		blockchains: [
-			EVM_NAMES[EVMNetwork.ETHEREUM],
-			EVM_NAMES[EVMNetwork.BNBCHAIN],
-			EVM_NAMES[EVMNetwork.POLYGON],
-			EVM_NAMES[EVMNetwork.AVALANCHE],
-			EVM_NAMES[EVMNetwork.OPTIMISM],
-			EVM_NAMES[EVMNetwork.ARBITRUM],
-			EVM_NAMES[EVMNetwork.FANTOM],
-			EVM_NAMES[EVMNetwork.KLAYTN],
-			EVM_NAMES[EVMNetwork.GNOSIS],
-			EVM_NAMES[EVMNetwork.AURORA],
-			EVM_NAMES[EVMNetwork.CELO],
-			EVM_NAMES[EVMNetwork.MOONBEAM],
-			EVM_NAMES[EVMNetwork.MOONRIVER],
-			EVM_NAMES[EVMNetwork.METIS],
-			EVM_NAMES[EVMNetwork.ASTAR],
-		],
-	},
-	{
-		wallet: 'walletconnect',
-		blockchains: [
-			EVM_NAMES[EVMNetwork.ETHEREUM],
-			EVM_NAMES[EVMNetwork.BNBCHAIN],
-			EVM_NAMES[EVMNetwork.POLYGON],
-			EVM_NAMES[EVMNetwork.AVALANCHE],
-			EVM_NAMES[EVMNetwork.OPTIMISM],
-			EVM_NAMES[EVMNetwork.ARBITRUM],
-			EVM_NAMES[EVMNetwork.FANTOM],
-			EVM_NAMES[EVMNetwork.KLAYTN],
-			EVM_NAMES[EVMNetwork.GNOSIS],
-			EVM_NAMES[EVMNetwork.AURORA],
-			EVM_NAMES[EVMNetwork.CELO],
-			EVM_NAMES[EVMNetwork.MOONBEAM],
-			EVM_NAMES[EVMNetwork.MOONRIVER],
-			EVM_NAMES[EVMNetwork.METIS],
-			EVM_NAMES[EVMNetwork.ASTAR],
-		],
-	},
-	{
-		wallet: 'coinbase',
-		blockchains: [
-			EVM_NAMES[EVMNetwork.ETHEREUM],
-			EVM_NAMES[EVMNetwork.BNBCHAIN],
-			EVM_NAMES[EVMNetwork.POLYGON],
-			EVM_NAMES[EVMNetwork.AVALANCHE],
-			EVM_NAMES[EVMNetwork.OPTIMISM],
-			EVM_NAMES[EVMNetwork.ARBITRUM],
-			EVM_NAMES[EVMNetwork.FANTOM],
-			EVM_NAMES[EVMNetwork.KLAYTN],
-			EVM_NAMES[EVMNetwork.GNOSIS],
-			EVM_NAMES[EVMNetwork.AURORA],
-			EVM_NAMES[EVMNetwork.CELO],
-			EVM_NAMES[EVMNetwork.MOONBEAM],
-			EVM_NAMES[EVMNetwork.MOONRIVER],
-			EVM_NAMES[EVMNetwork.METIS],
-			EVM_NAMES[EVMNetwork.ASTAR],
-		],
-	},
-	{
-		wallet: 'trustwallet',
-		blockchains: [
-			EVM_NAMES[EVMNetwork.ETHEREUM],
-			EVM_NAMES[EVMNetwork.BNBCHAIN],
-			EVM_NAMES[EVMNetwork.POLYGON],
-			EVM_NAMES[EVMNetwork.AVALANCHE],
-			EVM_NAMES[EVMNetwork.OPTIMISM],
-			EVM_NAMES[EVMNetwork.ARBITRUM],
-			EVM_NAMES[EVMNetwork.FANTOM],
-			EVM_NAMES[EVMNetwork.KLAYTN],
-			EVM_NAMES[EVMNetwork.GNOSIS],
-			EVM_NAMES[EVMNetwork.AURORA],
-			EVM_NAMES[EVMNetwork.CELO],
-			EVM_NAMES[EVMNetwork.MOONBEAM],
-			EVM_NAMES[EVMNetwork.MOONRIVER],
-			EVM_NAMES[EVMNetwork.METIS],
-			EVM_NAMES[EVMNetwork.ASTAR],
-		],
-	},
-	{
-		wallet: 'binance',
-		blockchains: [
-			EVM_NAMES[EVMNetwork.ETHEREUM],
-			EVM_NAMES[EVMNetwork.BNBCHAIN],
-			EVM_NAMES[EVMNetwork.POLYGON],
-			EVM_NAMES[EVMNetwork.AVALANCHE],
-			EVM_NAMES[EVMNetwork.OPTIMISM],
-			EVM_NAMES[EVMNetwork.ARBITRUM],
-			EVM_NAMES[EVMNetwork.FANTOM],
-			EVM_NAMES[EVMNetwork.KLAYTN],
-			EVM_NAMES[EVMNetwork.GNOSIS],
-			EVM_NAMES[EVMNetwork.AURORA],
-			EVM_NAMES[EVMNetwork.CELO],
-			EVM_NAMES[EVMNetwork.MOONBEAM],
-			EVM_NAMES[EVMNetwork.MOONRIVER],
-			EVM_NAMES[EVMNetwork.METIS],
-			EVM_NAMES[EVMNetwork.ASTAR],
-		],
-	},
-	{
-		wallet: 'everwallet',
-		blockchains: ['everscale'],
-	},
-	{
-		wallet: 'venomwallet',
-		blockchains: ['venom-testnet'],
-	},
-];
+//
 
 export const evmNetworks = (Object.keys(EVM_NAMES) as unknown as EVMNetwork[]).map((network: EVMNetwork) => ({
 	name: EVM_NAMES[network],
@@ -615,11 +457,4 @@ export const evmNetworks = (Object.keys(EVM_NAMES) as unknown as EVMNetwork[]).m
 
 export function evmNameToNetwork(name: string) {
 	return evmNetworks.find(n => n.name === name)?.network;
-}
-
-export async function getEvmWalletNetwork(wallet: Wallet) {
-	invariant(wallet.factory.blockchainGroup === 'evm', 'Not an EVM wallet');
-
-	const blockchainName = await wallet.controller.getCurrentBlockchain();
-	return evmNameToNetwork(blockchainName);
 }

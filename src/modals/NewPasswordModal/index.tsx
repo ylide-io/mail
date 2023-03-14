@@ -12,7 +12,6 @@ import { createSingletonStaticComponentHook } from '../../components/staticCompo
 import { TextField, TextFieldLook } from '../../components/textField/textField';
 import { useToastManager } from '../../components/toast/toast';
 import { YlideLoader } from '../../components/ylideLoader/ylideLoader';
-import { blockchainsMap, evmNameToNetwork, getEvmWalletNetwork } from '../../constants';
 import { WalletTag } from '../../controls/WalletTag';
 import { REACT_APP__OTC_MODE } from '../../env';
 import { analytics } from '../../stores/Analytics';
@@ -23,7 +22,9 @@ import { DomainAccount } from '../../stores/models/DomainAccount';
 import { Wallet } from '../../stores/models/Wallet';
 import { RoutePath } from '../../stores/routePath';
 import { assertUnreachable, invariant } from '../../utils/assert';
+import { blockchainMeta, evmNameToNetwork } from '../../utils/blockchain';
 import { isBytesEqual } from '../../utils/isBytesEqual';
+import { getEvmWalletNetwork } from '../../utils/wallet';
 
 export const useNewPasswordModal = createSingletonStaticComponentHook<NewPasswordModalProps, boolean>(
 	(props, resolve) => (
@@ -286,8 +287,8 @@ export function NewPasswordModal({ faucetType, bonus, wallet, account, remoteKey
 					<h4 className="wm-subtitle">
 						{freshestKey ? (
 							<>
-								We found your key in the {blockchainsMap[freshestKey.blockchain].logo(12)}{' '}
-								<b>{blockchainsMap[freshestKey.blockchain].title}</b> blockchain. Please, enter your
+								We found your key in the {blockchainMeta[freshestKey.blockchain].logo(12)}{' '}
+								<b>{blockchainMeta[freshestKey.blockchain].title}</b> blockchain. Please, enter your
 								Ylide Password to access it.
 							</>
 						) : (
@@ -480,7 +481,7 @@ export function NewPasswordModal({ faucetType, bonus, wallet, account, remoteKey
 								}
 							})
 							.map((bc, idx) => {
-								const bData = blockchainsMap[bc.blockchain];
+								const bData = blockchainMeta[bc.blockchain];
 								return (
 									<div
 										className={clsx('wmn-plate', {

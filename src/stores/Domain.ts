@@ -30,10 +30,11 @@ import {
 } from '@ylide/sdk';
 import { makeObservable, observable } from 'mobx';
 
-import { blockchainsMap, supportedWallets } from '../constants';
 import { REACT_APP__OTC_MODE } from '../env';
 import PasswordModal from '../modals/PasswordModal';
 import SwitchModal from '../modals/SwitchModal';
+import { blockchainMeta } from '../utils/blockchain';
+import { supportedWallets } from '../utils/wallet';
 import { Accounts } from './Accounts';
 import contacts from './Contacts';
 import { useMailStore } from './MailList';
@@ -304,7 +305,7 @@ export class Domain {
 
 	async switchEVMChain(wallet: Wallet, needNetwork: EVMNetwork) {
 		try {
-			const bData = blockchainsMap[EVM_NAMES[needNetwork]];
+			const bData = blockchainMeta[EVM_NAMES[needNetwork]];
 
 			await (wallet.controller as EthereumWalletController).providerObject.request({
 				method: 'wallet_addEthereumChain',

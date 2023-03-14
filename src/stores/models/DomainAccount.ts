@@ -9,8 +9,8 @@ import {
 } from '@ylide/sdk';
 import { computed, makeAutoObservable, observable } from 'mobx';
 
-import { getEvmWalletNetwork } from '../../constants';
 import { isBytesEqual } from '../../utils/isBytesEqual';
+import { getEvmWalletNetwork } from '../../utils/wallet';
 import { Wallet } from './Wallet';
 
 export class DomainAccount {

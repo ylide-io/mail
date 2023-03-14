@@ -2,8 +2,8 @@ import { EVMNetwork } from '@ylide/ethereum';
 import { MessageContentV3, SendMailResult, ServiceCode, Uint256 } from '@ylide/sdk';
 import { makeAutoObservable } from 'mobx';
 
-import { getEvmWalletNetwork } from '../constants';
 import messagesDB from '../indexedDB/MessagesDB';
+import { getEvmWalletNetwork } from '../utils/wallet';
 import { analytics } from './Analytics';
 import domain from './Domain';
 import { DomainAccount } from './models/DomainAccount';

@@ -5,10 +5,10 @@ import { FC, useCallback, useState } from 'react';
 import { AccountSelect } from '../../../components/accountSelect/accountSelect';
 import { Modal } from '../../../components/modal/modal';
 import { YlideLoader } from '../../../components/ylideLoader/ylideLoader';
-import { blockchainsMap } from '../../../constants';
 import { YlideButton } from '../../../controls/YlideButton';
 import domain from '../../../stores/Domain';
 import { DomainAccount } from '../../../stores/models/DomainAccount';
+import { blockchainMeta } from '../../../utils/blockchain';
 import css from './deployModal.module.scss';
 
 export interface TVMDeployContractModalProps {
@@ -56,7 +56,7 @@ export const TVMDeployContractModal: FC<TVMDeployContractModalProps> = ({ contra
 			<div className={css.row}>
 				<div className={css.label}>Network</div>
 				<div className={css.value}>
-					{blockchainsMap.everscale.logo(14)}{' '}
+					{blockchainMeta.everscale.logo(14)}{' '}
 					<span className={css.blockchainName}>{dev ? 'Everscale Local' : 'Everscale Mainnet'}</span>
 				</div>
 			</div>

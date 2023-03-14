@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { blockchainsMap } from '../../constants';
+import { blockchainMeta } from '../../utils/blockchain';
 import css from './BlockChainLabel.module.scss';
 
 export interface BlockChainLabelProps {
@@ -10,7 +10,7 @@ export interface BlockChainLabelProps {
 export function BlockChainLabel({ blockchain }: BlockChainLabelProps) {
 	return (
 		<div className={css.root}>
-			{blockchainsMap[blockchain].logo(12)}
+			{blockchainMeta[blockchain].logo(12)}
 			{blockchain.toUpperCase()}
 		</div>
 	);

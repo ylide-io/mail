@@ -9,13 +9,13 @@ import { Modal } from '../../components/modal/modal';
 import { createSingletonStaticComponentHook } from '../../components/staticComponentManager/staticComponentManager';
 import { TextField, TextFieldLook } from '../../components/textField/textField';
 import { YlideLoader } from '../../components/ylideLoader/ylideLoader';
-import { supportedWallets, walletsMeta } from '../../constants';
 import { YlideButton } from '../../controls/YlideButton';
 import domain from '../../stores/Domain';
 import { Wallet } from '../../stores/models/Wallet';
 import walletConnect from '../../stores/WalletConnect';
 import { copyToClipboard } from '../../utils/clipboard';
 import { getQueryString } from '../../utils/getQueryString';
+import { supportedWallets, walletsMeta } from '../../utils/wallet';
 import { useNewPasswordModal } from '../NewPasswordModal';
 import SwitchModal from '../SwitchModal';
 

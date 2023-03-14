@@ -3,7 +3,7 @@ import { observer } from 'mobx-react';
 import { generatePath } from 'react-router-dom';
 
 import { ActionButton, ActionButtonLook, ActionButtonSize } from '../../components/ActionButton/ActionButton';
-import { APP_NAME, blockchainsMap, walletsMeta } from '../../constants';
+import { APP_NAME } from '../../constants';
 import { AdaptiveAddress } from '../../controls/adaptiveAddress/adaptiveAddress';
 import { ReactComponent as CrossSvg } from '../../icons/ic20/cross.svg';
 import { ReactComponent as NextSvg } from '../../icons/ic28/next.svg';
@@ -13,8 +13,10 @@ import { useNewPasswordModal } from '../../modals/NewPasswordModal';
 import { useSelectWalletModal } from '../../modals/SelectWalletModal';
 import domain from '../../stores/Domain';
 import { RoutePath } from '../../stores/routePath';
+import { blockchainMeta } from '../../utils/blockchain';
 import { getQueryString } from '../../utils/getQueryString';
 import { useNav } from '../../utils/url';
+import { walletsMeta } from '../../utils/wallet';
 
 export const NewWalletsPage = observer(() => {
 	const navigate = useNav();
@@ -157,8 +159,8 @@ export const NewWalletsPage = observer(() => {
 				<div className="intro-blockchains-list">
 					{domain.getRegisteredBlockchains().map(bc => (
 						<div className="bc-block" key={bc.blockchain}>
-							<div className="bc-logo">{blockchainsMap[bc.blockchain].logo(32)}</div>
-							<div className="bc-title">{blockchainsMap[bc.blockchain].title}</div>
+							<div className="bc-logo">{blockchainMeta[bc.blockchain].logo(32)}</div>
+							<div className="bc-title">{blockchainMeta[bc.blockchain].title}</div>
 						</div>
 					))}
 				</div>

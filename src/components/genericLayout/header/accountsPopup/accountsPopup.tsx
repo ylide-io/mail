@@ -3,7 +3,6 @@ import { observer } from 'mobx-react';
 import React, { RefObject } from 'react';
 import { generatePath } from 'react-router-dom';
 
-import { walletsMeta } from '../../../../constants';
 import { AdaptiveAddress } from '../../../../controls/adaptiveAddress/adaptiveAddress';
 import { Blockie } from '../../../../controls/Blockie';
 import { ReactComponent as EditSvg } from '../../../../icons/ic20/edit.svg';
@@ -13,6 +12,7 @@ import domain from '../../../../stores/Domain';
 import { RoutePath } from '../../../../stores/routePath';
 import { HorizontalAlignment } from '../../../../utils/alignment';
 import { useNav } from '../../../../utils/url';
+import { walletsMeta } from '../../../../utils/wallet';
 import { ActionButton, ActionButtonLook, ActionButtonSize } from '../../../ActionButton/ActionButton';
 import { AnchoredPopup } from '../../../popup/anchoredPopup/anchoredPopup';
 import css from './accountsPopup.module.scss';

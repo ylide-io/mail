@@ -11,10 +11,10 @@ import { FC, useCallback, useState } from 'react';
 import { AccountSelect } from '../../../components/accountSelect/accountSelect';
 import { Modal } from '../../../components/modal/modal';
 import { YlideLoader } from '../../../components/ylideLoader/ylideLoader';
-import { blockchainsMap } from '../../../constants';
 import { YlideButton } from '../../../controls/YlideButton';
 import domain from '../../../stores/Domain';
 import { DomainAccount } from '../../../stores/models/DomainAccount';
+import { blockchainMeta } from '../../../utils/blockchain';
 import css from './deployModal.module.scss';
 
 export interface EVMDeployContractModalProps {
@@ -77,7 +77,7 @@ export const EVMDeployContractModal: FC<EVMDeployContractModalProps> = ({ contra
 			<div className={css.row}>
 				<div className={css.label}>Network</div>
 				<div className={css.value}>
-					{blockchainsMap[EVM_NAMES[network]].logo(14)}{' '}
+					{blockchainMeta[EVM_NAMES[network]].logo(14)}{' '}
 					<span className={css.blockchainName}>{EVM_NAMES[network]}</span>
 				</div>
 			</div>

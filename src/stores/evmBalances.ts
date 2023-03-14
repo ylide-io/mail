@@ -1,7 +1,7 @@
 import { EVMNetwork } from '@ylide/ethereum';
 import { makeAutoObservable } from 'mobx';
 
-import { evmNameToNetwork } from '../constants';
+import { evmNameToNetwork } from '../utils/blockchain';
 import { Wallet } from './models/Wallet';
 
 class EvmBalances {

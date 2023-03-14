@@ -20,8 +20,8 @@ import clsx from 'clsx';
 import { observer } from 'mobx-react';
 import { FC, PureComponent, useState } from 'react';
 
-import { blockchainsMap, evmNameToNetwork } from '../../constants';
 import { AdaptiveAddress } from '../../controls/adaptiveAddress/adaptiveAddress';
+import { blockchainMeta, evmNameToNetwork } from '../../utils/blockchain';
 import css from './adminPage.module.scss';
 import { EVMDeployContractModal } from './contract-modals/evmDeployModal';
 import { TVMDeployContractModal } from './contract-modals/tvmDeployModal';
@@ -37,7 +37,7 @@ export const EthereumContractPlate: FC<EthereumContractPlateProps> = ({ contract
 	const [, setManageModalVisible] = useState(false);
 
 	const name = EVM_NAMES[network];
-	const scan = blockchainsMap[name].ethNetwork!.blockExplorerUrls[0]!;
+	const scan = blockchainMeta[name].ethNetwork!.blockExplorerUrls[0]!;
 
 	const isDeployed = !!contract.contract;
 	const isVerified = contract.contract && contract.contract.verified;
@@ -219,8 +219,8 @@ export class EthereumContractsRow extends PureComponent<{ network: EVMNetwork }>
 		return (
 			<div className={css.networkItem}>
 				<div className={css.networkTitle}>
-					<div className={css.networkLogo}>{blockchainsMap[name].logo(30)}</div>
-					<div className={css.networkName}>{blockchainsMap[name].title}</div>
+					<div className={css.networkLogo}>{blockchainMeta[name].logo(30)}</div>
+					<div className={css.networkName}>{blockchainMeta[name].title}</div>
 				</div>
 				{contractGroups.map(group => (
 					<div
@@ -292,8 +292,8 @@ export class EverscaleContractsRow extends PureComponent<{ dev: boolean }> {
 		return (
 			<div className={css.networkItem}>
 				<div className={css.networkTitle}>
-					<div className={css.networkLogo}>{blockchainsMap[name].logo(30)}</div>
-					<div className={css.networkName}>{blockchainsMap[name].title}</div>
+					<div className={css.networkLogo}>{blockchainMeta[name].logo(30)}</div>
+					<div className={css.networkName}>{blockchainMeta[name].title}</div>
 				</div>
 				{contractGroups.map(group => (
 					<div
@@ -326,12 +326,12 @@ export class EverscaleContractsRow extends PureComponent<{ dev: boolean }> {
 @observer
 export class AdminPage extends PureComponent {
 	render() {
-		const networks = Object.keys(blockchainsMap); // .filter(e => e !== 'LOCAL_HARDHAT');
+		const networks = Object.keys(blockchainMeta); // .filter(e => e !== 'LOCAL_HARDHAT');
 
 		const groups = [
 			{
 				title: 'EVM',
-				blockchains: networks.filter(n => !!blockchainsMap[n].ethNetwork),
+				blockchains: networks.filter(n => !!blockchainMeta[n].ethNetwork),
 			},
 			{
 				title: 'Everscale',
