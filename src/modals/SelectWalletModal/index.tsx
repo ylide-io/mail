@@ -11,33 +11,38 @@ import { TextField, TextFieldLook } from '../../components/textField/textField';
 import { YlideLoader } from '../../components/ylideLoader/ylideLoader';
 import { YlideButton } from '../../controls/YlideButton';
 import domain from '../../stores/Domain';
+import { DomainAccount } from '../../stores/models/DomainAccount';
 import { Wallet } from '../../stores/models/Wallet';
 import walletConnect from '../../stores/WalletConnect';
+import { invariant } from '../../utils/assert';
 import { copyToClipboard } from '../../utils/clipboard';
 import { getQueryString } from '../../utils/getQueryString';
 import { supportedWallets, walletsMeta } from '../../utils/wallet';
 import { useNewPasswordModal } from '../NewPasswordModal';
 import SwitchModal from '../SwitchModal';
 
-export const useSelectWalletModal = createSingletonStaticComponentHook<SelectWalletModalProps, boolean>(
+export const useSelectWalletModal = createSingletonStaticComponentHook<SelectWalletModalProps, DomainAccount>(
 	(props, resolve) => (
 		<SelectWalletModal
 			{...props}
-			onClose={success => {
-				resolve(success);
-				props.onClose?.(success);
+			onSuccess={account => {
+				resolve(account);
+				props.onSuccess?.(account);
+			}}
+			onCancel={() => {
+				resolve();
+				props.onCancel?.();
 			}}
 		/>
 	),
 );
 
-//
-
 interface SelectWalletModalProps {
-	onClose?: (success: boolean) => void;
+	onSuccess?: (account: DomainAccount) => void;
+	onCancel?: () => void;
 }
 
-export const SelectWalletModal = observer(({ onClose }: SelectWalletModalProps) => {
+export const SelectWalletModal = observer(({ onSuccess, onCancel }: SelectWalletModalProps) => {
 	const isMobile = browserUtils.isMobile();
 	const isDesktop = !isMobile;
 
@@ -127,22 +132,23 @@ export const SelectWalletModal = observer(({ onClose }: SelectWalletModalProps) 
 			const domainWallet = domain.wallets.find(w => w.factory.wallet === wallet)!;
 
 			const account = await connectWalletAccount(domainWallet);
-			if (!account) {
-				return;
-			}
+			invariant(account);
+
 			const remoteKeys = await domainWallet.readRemoteKeys(account);
 			const qqs = getQueryString();
 
-			const success = await newPasswordModal({
+			const domainAccount = await newPasswordModal({
 				faucetType: ['polygon', 'fantom', 'gnosis'].includes(qqs.faucet) ? (qqs.faucet as any) : 'gnosis',
 				bonus: qqs.bonus === 'true',
 				wallet: domainWallet,
 				account,
 				remoteKeys: remoteKeys.remoteKeys,
 			});
+			invariant(domainAccount);
 
-			onClose?.(!!success);
-		} finally {
+			onSuccess?.(domainAccount);
+		} catch (e) {
+			onCancel?.();
 		}
 	}
 
@@ -175,7 +181,7 @@ export const SelectWalletModal = observer(({ onClose }: SelectWalletModalProps) 
 	}
 
 	return (
-		<Modal className="wallet-modal" onClose={() => onClose?.(false)}>
+		<Modal className="wallet-modal" onClose={() => onCancel?.()}>
 			<h3 className="wm-title">Select wallet</h3>
 
 			{!!availableBrowserWallets.length && (

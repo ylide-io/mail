@@ -156,7 +156,7 @@ export class Wallet extends EventEmitter {
 	}
 
 	async instantiateNewAccount(account: IGenericAccount, keypair: YlideKeyPair) {
-		return new Promise<DomainAccount>(async (resolve, reject) => {
+		return new Promise<DomainAccount>(async resolve => {
 			const existingAcc = this.domain.accounts.accounts.find(
 				acc => acc.account.address.toLowerCase() === account.address.toLowerCase(),
 			);

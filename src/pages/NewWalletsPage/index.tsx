@@ -128,8 +128,7 @@ export const NewWalletsPage = observer(() => {
 					<div
 						className="cw-block emphaized"
 						onClick={async () => {
-							const success = await selectWalletModal({});
-							if (success) {
+							if (await selectWalletModal({})) {
 								await accountConnectedModal({});
 							}
 						}}

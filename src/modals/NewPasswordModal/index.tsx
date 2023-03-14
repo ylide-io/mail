@@ -26,13 +26,17 @@ import { blockchainMeta } from '../../utils/blockchain';
 import { isBytesEqual } from '../../utils/isBytesEqual';
 import { getEvmWalletNetwork } from '../../utils/wallet';
 
-export const useNewPasswordModal = createSingletonStaticComponentHook<NewPasswordModalProps, boolean>(
+export const useNewPasswordModal = createSingletonStaticComponentHook<NewPasswordModalProps, DomainAccount>(
 	(props, resolve) => (
 		<NewPasswordModal
 			{...props}
-			onClose={success => {
-				resolve(success);
-				props.onClose?.(success);
+			onSuccess={account => {
+				resolve(account);
+				props.onSuccess?.(account);
+			}}
+			onCancel={() => {
+				resolve();
+				props.onCancel?.();
 			}}
 		/>
 	),
@@ -54,10 +58,19 @@ interface NewPasswordModalProps {
 	wallet: Wallet;
 	account: IGenericAccount;
 	remoteKeys: Record<string, ExternalYlidePublicKey | null>;
-	onClose?: (success: boolean) => void;
+	onSuccess?: (account: DomainAccount) => void;
+	onCancel?: () => void;
 }
 
-export function NewPasswordModal({ faucetType, bonus, wallet, account, remoteKeys, onClose }: NewPasswordModalProps) {
+export function NewPasswordModal({
+	faucetType,
+	bonus,
+	wallet,
+	account,
+	remoteKeys,
+	onSuccess,
+	onCancel,
+}: NewPasswordModalProps) {
 	const { toast } = useToastManager();
 
 	const [step, setStep] = useState(Step.ENTER_PASSWORD);
@@ -167,7 +180,7 @@ export function NewPasswordModal({ faucetType, bonus, wallet, account, remoteKey
 			await promise;
 		}
 
-		onClose?.(true);
+		onSuccess?.(account);
 	}
 
 	async function publishLocalKey(account: DomainAccount) {
@@ -177,7 +190,7 @@ export function NewPasswordModal({ faucetType, bonus, wallet, account, remoteKey
 			await asyncDelay(7000);
 			await account.init();
 			analytics.walletRegistered(wallet.factory.wallet, account.account.address, domain.accounts.accounts.length);
-			onClose?.(true);
+			onSuccess?.(account);
 		} catch (err) {
 			if (wallet.factory.blockchainGroup === 'evm') {
 				setStep(Step.SELECT_NETWORK);
@@ -217,13 +230,9 @@ export function NewPasswordModal({ faucetType, bonus, wallet, account, remoteKey
 				}
 			}
 		} else if (isBytesEqual(freshestKey.key.publicKey.bytes, tempLocalKey.publicKey)) {
-			await wallet.instantiateNewAccount(account, tempLocalKey);
+			const domainAccount = await wallet.instantiateNewAccount(account, tempLocalKey);
 			analytics.walletConnected(wallet.factory.wallet, account.address, domain.accounts.accounts.length);
-			// if (freshestKey.key.keyVersion === 1) {
-			// 	setStep(Step.OLD_KEY);
-			// } else {
-			onClose?.(true);
-			// }
+			onSuccess?.(domainAccount);
 		} else if (forceNew) {
 			const domainAccount = await wallet.instantiateNewAccount(account, tempLocalKey);
 			setDomainAccount(domainAccount);
@@ -252,13 +261,13 @@ export function NewPasswordModal({ faucetType, bonus, wallet, account, remoteKey
 				wallet={wallet}
 				account={account}
 				onSelect={network => networkSelect(network)}
-				onCancel={() => onClose?.(false)}
+				onCancel={() => onCancel?.()}
 			/>
 		);
 	}
 
 	return (
-		<Modal className="account-modal wallet-modal" onClose={() => onClose?.(false)}>
+		<Modal className="account-modal wallet-modal" onClose={() => onCancel?.()}>
 			<div
 				style={{
 					padding: 24,
@@ -361,7 +370,7 @@ export function NewPasswordModal({ faucetType, bonus, wallet, account, remoteKey
 					)}
 
 					<div className="wm-footer">
-						<ActionButton size={ActionButtonSize.LARGE} onClick={() => onClose?.(false)}>
+						<ActionButton size={ActionButtonSize.LARGE} onClick={() => onCancel?.()}>
 							Back
 						</ActionButton>
 						<ActionButton

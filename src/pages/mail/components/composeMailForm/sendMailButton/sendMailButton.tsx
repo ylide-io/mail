@@ -8,6 +8,7 @@ import { autorun } from 'mobx';
 import { observer } from 'mobx-react';
 import React, { ReactNode, useEffect } from 'react';
 
+import { useSelectNetworkModal } from '../../../../../components/selectNetworkModal/selectNetworkModal';
 import { Spinner } from '../../../../../components/spinner/spinner';
 import { useToastManager } from '../../../../../components/toast/toast';
 import { REACT_APP__OTC_MODE } from '../../../../../env';
@@ -30,6 +31,7 @@ export interface SendMailButtonProps {
 export const SendMailButton = observer(({ mailData, onSent }: SendMailButtonProps) => {
 	const { toast } = useToastManager();
 	const selectWalletModal = useSelectWalletModal();
+	const selectNetworkModal = useSelectNetworkModal();
 
 	useEffect(
 		() =>
@@ -79,18 +81,23 @@ export const SendMailButton = observer(({ mailData, onSent }: SendMailButtonProp
 			mailer.sending = true;
 
 			if (!mailData.from) {
-				await selectWalletModal({});
+				mailData.from = await selectWalletModal({});
 				invariant(mailData.from);
+
+				mailData.network = await selectNetworkModal({
+					wallet: mailData.from.wallet,
+					account: mailData.from.account,
+				});
+				invariant(mailData.network);
 			}
 
-			const acc = mailData.from!;
-			const curr = await acc.wallet.getCurrentAccount();
-			if (curr?.address !== acc.account.address) {
-				await domain.handleSwitchRequest(acc.wallet.factory.wallet, curr, acc.account);
+			const curr = await mailData.from.wallet.getCurrentAccount();
+			if (curr?.address !== mailData.from.account.address) {
+				await domain.handleSwitchRequest(mailData.from.wallet.factory.wallet, curr, mailData.from.account);
 			}
 
 			const msgId = await mailer.sendMail(
-				acc,
+				mailData.from,
 				mailData.subject,
 				mailData.hasEditorData ? JSON.stringify(mailData.editorData) : mailData.plainTextData!.trim(),
 				mailData.to.items.map(r => r.routing?.address!),
