@@ -1,13 +1,13 @@
 import { EthereumWalletController, EVMNetwork } from '@ylide/ethereum';
 import { asyncDelay, ExternalYlidePublicKey, IGenericAccount } from '@ylide/sdk';
 import SmartBuffer from '@ylide/smart-buffer';
-import clsx from 'clsx';
 import { useEffect, useMemo, useState } from 'react';
 import { generatePath } from 'react-router-dom';
 
 import { ActionButton, ActionButtonLook, ActionButtonSize } from '../../components/ActionButton/ActionButton';
 import { useForgotPasswordModal } from '../../components/forgotPasswordModal/forgotPasswordModal';
 import { Modal } from '../../components/modal/modal';
+import { SelectNetworkModal } from '../../components/selectNetworkModal/selectNetworkModal';
 import { createSingletonStaticComponentHook } from '../../components/staticComponentManager/staticComponentManager';
 import { TextField, TextFieldLook } from '../../components/textField/textField';
 import { useToastManager } from '../../components/toast/toast';
@@ -22,7 +22,7 @@ import { DomainAccount } from '../../stores/models/DomainAccount';
 import { Wallet } from '../../stores/models/Wallet';
 import { RoutePath } from '../../stores/routePath';
 import { assertUnreachable, invariant } from '../../utils/assert';
-import { blockchainMeta, evmNameToNetwork } from '../../utils/blockchain';
+import { blockchainMeta } from '../../utils/blockchain';
 import { isBytesEqual } from '../../utils/isBytesEqual';
 import { getEvmWalletNetwork } from '../../utils/wallet';
 
@@ -39,26 +39,6 @@ export const useNewPasswordModal = createSingletonStaticComponentHook<NewPasswor
 );
 
 //
-
-const txPrices: Record<EVMNetwork, number> = {
-	[EVMNetwork.LOCAL_HARDHAT]: 0.001,
-	[EVMNetwork.ETHEREUM]: 0.001,
-	[EVMNetwork.BNBCHAIN]: 0.001,
-	[EVMNetwork.POLYGON]: 0.001,
-	[EVMNetwork.ARBITRUM]: 0.001,
-	[EVMNetwork.OPTIMISM]: 0.001,
-	[EVMNetwork.AVALANCHE]: 0.001,
-	[EVMNetwork.FANTOM]: 0.001,
-	[EVMNetwork.KLAYTN]: 0.001,
-	[EVMNetwork.GNOSIS]: 0.001,
-	[EVMNetwork.AURORA]: 0.001,
-	[EVMNetwork.CELO]: 0.001,
-	[EVMNetwork.CRONOS]: 0.001,
-	[EVMNetwork.MOONBEAM]: 0.001,
-	[EVMNetwork.MOONRIVER]: 0.001,
-	[EVMNetwork.METIS]: 0.001,
-	[EVMNetwork.ASTAR]: 0.001,
-};
 
 enum Step {
 	ENTER_PASSWORD,
@@ -266,6 +246,17 @@ export function NewPasswordModal({ faucetType, bonus, wallet, account, remoteKey
 		}
 	}
 
+	if (step === Step.SELECT_NETWORK) {
+		return (
+			<SelectNetworkModal
+				wallet={wallet}
+				account={account}
+				onSelect={network => networkSelect(network)}
+				onCancel={() => onClose?.(false)}
+			/>
+		);
+	}
+
 	return (
 		<Modal className="account-modal wallet-modal" onClose={() => onClose?.(false)}>
 			<div
@@ -445,75 +436,6 @@ export function NewPasswordModal({ faucetType, bonus, wallet, account, remoteKey
 						<ActionButton size={ActionButtonSize.LARGE} onClick={() => setStep(Step.ENTER_PASSWORD)}>
 							Back
 						</ActionButton>
-					</div>
-				</>
-			) : step === Step.SELECT_NETWORK ? (
-				<>
-					<h3 className="wm-title">Choose network</h3>
-					<div
-						className="wm-body"
-						style={{
-							marginTop: -24,
-							paddingTop: 24,
-							marginLeft: -24,
-							marginRight: -24,
-							paddingLeft: 24,
-							paddingRight: 24,
-							overflowY: 'scroll',
-							maxHeight: 390,
-						}}
-					>
-						{domain.registeredBlockchains
-							.filter(f => f.blockchainGroup === 'evm')
-							.sort((a, b) => {
-								const aBalance = Number(
-									evmBalances.balances[evmNameToNetwork(a.blockchain)!].toFixed(4),
-								);
-								const bBalance = Number(
-									evmBalances.balances[evmNameToNetwork(b.blockchain)!].toFixed(4),
-								);
-								const aTx = txPrices[evmNameToNetwork(a.blockchain)!];
-								const bTx = txPrices[evmNameToNetwork(b.blockchain)!];
-								if (aBalance === bBalance) {
-									return aTx - bTx;
-								} else {
-									return bBalance - aBalance;
-								}
-							})
-							.map((bc, idx) => {
-								const bData = blockchainMeta[bc.blockchain];
-								return (
-									<div
-										className={clsx('wmn-plate', {
-											disabled:
-												Number(
-													evmBalances.balances[evmNameToNetwork(bc.blockchain)!].toFixed(4),
-												) === 0,
-										})}
-										onClick={() => networkSelect(evmNameToNetwork(bc.blockchain)!)}
-									>
-										<div className="wmn-icon">{bData.logo(32)}</div>
-										<div className="wmn-title">
-											<div className="wmn-blockchain">{bData.title}</div>
-											{Number(evmBalances.balances[evmNameToNetwork(bc.blockchain)!].toFixed(4)) >
-												0 && idx === 0 ? (
-												<div className="wmn-optimal">Optimal</div>
-											) : null}
-										</div>
-										<div className="wmn-balance">
-											<div className="wmn-wallet-balance">
-												{Number(
-													evmBalances.balances[evmNameToNetwork(bc.blockchain)!].toFixed(4),
-												)}{' '}
-												{bData.ethNetwork?.nativeCurrency.symbol || 'ETH'}
-											</div>
-											<div className="wmn-transaction-price">
-												Transaction = 0.0004 {bData.ethNetwork?.nativeCurrency.symbol || 'ETH'}
-											</div>
-										</div>
-									</div>
-								);
-							})}
 					</div>
 				</>
 			) : step === Step.PUBLISH_KEY ? (

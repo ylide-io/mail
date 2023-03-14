@@ -1,4 +1,5 @@
 import { EVM_NAMES, EVMNetwork } from '@ylide/ethereum';
+
 import { BinanceWalletLogo } from '../icons/BinanceWalletLogo';
 import { CoinbaseWalletLogo } from '../icons/CoinbaseWalletLogo';
 import EverscaleLogo from '../icons/EverscaleLogo';
