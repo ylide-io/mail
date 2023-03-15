@@ -12,13 +12,15 @@ import css from './sendMessageWidget.module.scss';
 export function SendMessageWidget() {
 	const [searchParams] = useSearchParams();
 	const toAddress = searchParams.get('to');
+	const subject = searchParams.get('subject') || '';
 	invariant(toAddress, 'to-address required');
 
 	const mailData = useMemo(() => {
 		const data = new OutgoingMailData();
 		data.to = new Recipients(toAddress ? [toAddress] : undefined);
+		data.subject = subject;
 		return data;
-	}, [toAddress]);
+	}, [subject, toAddress]);
 
 	return (
 		<div className={css.root}>
