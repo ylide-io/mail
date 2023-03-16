@@ -5,11 +5,11 @@ import { observer } from 'mobx-react';
 import React, { useEffect, useMemo, useState } from 'react';
 import QRCode from 'react-qr-code';
 
+import { ActionButton, ActionButtonLook, ActionButtonSize } from '../../components/ActionButton/ActionButton';
 import { Modal } from '../../components/modal/modal';
 import { createSingletonStaticComponentHook } from '../../components/staticComponentManager/staticComponentManager';
 import { TextField, TextFieldLook } from '../../components/textField/textField';
 import { YlideLoader } from '../../components/ylideLoader/ylideLoader';
-import { YlideButton } from '../../controls/YlideButton';
 import domain from '../../stores/Domain';
 import { DomainAccount } from '../../stores/models/DomainAccount';
 import { Wallet } from '../../stores/models/Wallet';
@@ -175,7 +175,15 @@ export const SelectWalletModal = observer(({ onSuccess, onCancel }: SelectWallet
 				connection.
 				<br />
 				<br />
-				<YlideButton onClick={disconnectWalletConnect}>Disconnect WalletConnect ({walletName})</YlideButton>
+				<ActionButton
+					isMultiline
+					size={ActionButtonSize.MEDIUM}
+					look={ActionButtonLook.SECONDARY}
+					onClick={disconnectWalletConnect}
+				>
+					Disconnect WalletConnect
+					<br />({walletName})
+				</ActionButton>
 			</div>
 		);
 	}

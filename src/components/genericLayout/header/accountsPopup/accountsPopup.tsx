@@ -2,8 +2,6 @@ import { Tooltip } from 'antd';
 import { observer } from 'mobx-react';
 import React, { RefObject } from 'react';
 
-import { AdaptiveAddress } from '../../../../controls/adaptiveAddress/adaptiveAddress';
-import { Blockie } from '../../../../controls/Blockie';
 import { ReactComponent as EditSvg } from '../../../../icons/ic20/edit.svg';
 import { ReactComponent as PlusSvg } from '../../../../icons/ic20/plus.svg';
 import { ReactComponent as LogoutSvg } from '../../../../icons/ic28/logout.svg';
@@ -12,6 +10,8 @@ import domain from '../../../../stores/Domain';
 import { HorizontalAlignment } from '../../../../utils/alignment';
 import { walletsMeta } from '../../../../utils/wallet';
 import { ActionButton, ActionButtonLook, ActionButtonSize } from '../../../ActionButton/ActionButton';
+import { AdaptiveAddress } from '../../../adaptiveAddress/adaptiveAddress';
+import { Blockie } from '../../../blockie/blockie';
 import { AnchoredPopup } from '../../../popup/anchoredPopup/anchoredPopup';
 import css from './accountsPopup.module.scss';
 

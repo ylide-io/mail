@@ -1,6 +1,6 @@
 import { PureComponent, ReactNode } from 'react';
 
-import { YlideButton } from '../../controls/YlideButton';
+import { ActionButton, ActionButtonLook, ActionButtonSize } from '../../components/ActionButton/ActionButton';
 
 export interface YlideModalProps {
 	title?: string;
@@ -65,12 +65,18 @@ export default class YlideModal extends PureComponent<YlideModalProps> {
 					) : null}
 					<div className="modal-footer" style={{ borderTop: '1px solid #e0e0e0', marginTop: 40 }}>
 						{this.props.cancelContent ? (
-							<YlideButton ghost onClick={this.props.onCancel}>
+							<ActionButton size={ActionButtonSize.XLARGE} onClick={this.props.onCancel}>
 								{this.props.cancelContent}
-							</YlideButton>
+							</ActionButton>
 						) : null}
 						{this.props.confirmContent ? (
-							<YlideButton onClick={this.props.onConfirm}>{this.props.confirmContent}</YlideButton>
+							<ActionButton
+								size={ActionButtonSize.XLARGE}
+								look={ActionButtonLook.PRIMARY}
+								onClick={this.props.onConfirm}
+							>
+								{this.props.confirmContent}
+							</ActionButton>
 						) : null}
 					</div>
 				</div>

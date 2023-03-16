@@ -2,9 +2,9 @@ import { useQuery } from 'react-query';
 import { generatePath } from 'react-router-dom';
 
 import { OtcApi } from '../../../api/otcApi';
+import { AdaptiveAddress } from '../../../components/adaptiveAddress/adaptiveAddress';
 import { ErrorMessage } from '../../../components/errorMessage/errorMessage';
 import { YlideLoader } from '../../../components/ylideLoader/ylideLoader';
-import { AdaptiveAddress } from '../../../controls/adaptiveAddress/adaptiveAddress';
 import { RoutePath } from '../../../stores/routePath';
 import { DateFormatStyle, formatDate } from '../../../utils/date';
 import { useNav } from '../../../utils/url';

@@ -3,8 +3,8 @@ import { observer } from 'mobx-react';
 import { generatePath } from 'react-router-dom';
 
 import { ActionButton, ActionButtonLook, ActionButtonSize } from '../../components/ActionButton/ActionButton';
+import { AdaptiveAddress } from '../../components/adaptiveAddress/adaptiveAddress';
 import { APP_NAME } from '../../constants';
-import { AdaptiveAddress } from '../../controls/adaptiveAddress/adaptiveAddress';
 import { ReactComponent as CrossSvg } from '../../icons/ic20/cross.svg';
 import { ReactComponent as NextSvg } from '../../icons/ic28/next.svg';
 import { YlideLargeLogo } from '../../icons/YlideLargeLogo';

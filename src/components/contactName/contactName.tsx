@@ -1,8 +1,8 @@
 import { observer } from 'mobx-react';
 
-import { AdaptiveAddress } from '../../controls/adaptiveAddress/adaptiveAddress';
-import { AdaptiveText } from '../../controls/adaptiveText/adaptiveText';
 import contacts from '../../stores/Contacts';
+import { AdaptiveAddress } from '../adaptiveAddress/adaptiveAddress';
+import { AdaptiveText } from '../adaptiveText/adaptiveText';
 import { PropsWithClassName } from '../propsWithClassName';
 
 export interface ContactNameProps extends PropsWithClassName {

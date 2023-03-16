@@ -2,8 +2,8 @@ import clsx from 'clsx';
 import { observer } from 'mobx-react';
 import { useEffect, useState } from 'react';
 
-import { YlideButton } from '../../controls/YlideButton';
 import domain from '../../stores/Domain';
+import { ActionButton } from '../ActionButton/ActionButton';
 import css from './TransactionPopup.module.scss';
 
 const cross = (
@@ -81,8 +81,7 @@ export const TransactionPopup = observer(() => {
 								  } has been sent`
 								: `Successfully processed`}
 						</div>
-						<YlideButton
-							nice
+						<ActionButton
 							onClick={() => {
 								if (domain.txChain === 'fantom') {
 									window.open(`https://ftmscan.com/tx/${domain.publishingTxHash}`, '_blank');
@@ -94,7 +93,7 @@ export const TransactionPopup = observer(() => {
 							}}
 						>
 							Link to the transaction
-						</YlideButton>
+						</ActionButton>
 					</>
 				) : (
 					<>

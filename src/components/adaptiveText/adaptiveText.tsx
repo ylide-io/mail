@@ -2,8 +2,8 @@ import useResizeObserver from '@react-hook/resize-observer';
 import clsx from 'clsx';
 import { useEffect, useRef, useState } from 'react';
 
-import { PropsWithClassName } from '../../components/propsWithClassName';
 import { truncateInMiddle } from '../../utils/string';
+import { PropsWithClassName } from '../propsWithClassName';
 import css from './adaptiveText.module.scss';
 
 interface AdaptiveTextProps extends PropsWithClassName {

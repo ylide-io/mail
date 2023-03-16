@@ -1,7 +1,7 @@
 import makeBlockie from 'ethereum-blockies-base64';
 import { useEffect, useState } from 'react';
 
-import { PropsWithClassName } from '../components/propsWithClassName';
+import { PropsWithClassName } from '../propsWithClassName';
 
 interface BlockieProps extends PropsWithClassName {
 	address: string;

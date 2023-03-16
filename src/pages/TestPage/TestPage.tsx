@@ -3,10 +3,10 @@ import { observer } from 'mobx-react';
 import React, { PropsWithChildren } from 'react';
 
 import { ActionButton, ActionButtonLook, ActionButtonSize } from '../../components/ActionButton/ActionButton';
+import { AdaptiveAddress } from '../../components/adaptiveAddress/adaptiveAddress';
 import { CheckBox } from '../../components/checkBox/checkBox';
 import { TagInput, TagInputItem } from '../../components/tagInput/tagInput';
 import { TextField, TextFieldLook } from '../../components/textField/textField';
-import { AdaptiveAddress } from '../../controls/adaptiveAddress/adaptiveAddress';
 import { ReactComponent as SettingsSvg } from '../../icons/ic20/settings.svg';
 import css from './TestPage.module.scss';
 

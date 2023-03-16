@@ -20,7 +20,7 @@ import clsx from 'clsx';
 import { observer } from 'mobx-react';
 import { FC, PureComponent, useState } from 'react';
 
-import { AdaptiveAddress } from '../../controls/adaptiveAddress/adaptiveAddress';
+import { AdaptiveAddress } from '../../components/adaptiveAddress/adaptiveAddress';
 import { blockchainMeta, evmNameToNetwork } from '../../utils/blockchain';
 import css from './adminPage.module.scss';
 import { EVMDeployContractModal } from './contract-modals/evmDeployModal';

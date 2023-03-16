@@ -3,9 +3,9 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { createReactEditorJS } from 'react-editor-js';
 
 import { ActionButton, ActionButtonLook } from '../../../../components/ActionButton/ActionButton';
+import { Blockie } from '../../../../components/blockie/blockie';
 import { ContactName } from '../../../../components/contactName/contactName';
 import { ReadableDate } from '../../../../components/readableDate/readableDate';
-import { Blockie } from '../../../../controls/Blockie';
 import { ReactComponent as ForwardSvg } from '../../../../icons/ic20/forward.svg';
 import { ReactComponent as ReplySvg } from '../../../../icons/ic20/reply.svg';
 import { ReactComponent as TrashSvg } from '../../../../icons/ic20/trash.svg';

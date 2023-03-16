@@ -3,12 +3,12 @@ import { autorun, makeAutoObservable } from 'mobx';
 import { observer } from 'mobx-react';
 import { KeyboardEvent, useEffect, useRef, useState } from 'react';
 
-import { AdaptiveText } from '../../controls/adaptiveText/adaptiveText';
 import contacts from '../../stores/Contacts';
 import domain from '../../stores/Domain';
 import { HorizontalAlignment } from '../../utils/alignment';
 import { isAddress, isEns } from '../../utils/blockchain';
 import { constrain } from '../../utils/number';
+import { AdaptiveText } from '../adaptiveText/adaptiveText';
 import { DropDown, DropDownItem, DropDownItemMode } from '../dropDown/dropDown';
 import { TagInput, TagInputItem, TagInputItemLook } from '../tagInput/tagInput';
 

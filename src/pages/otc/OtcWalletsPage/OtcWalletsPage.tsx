@@ -3,9 +3,9 @@ import { useQuery } from 'react-query';
 import { generatePath, useSearchParams } from 'react-router-dom';
 
 import { OtcApi } from '../../../api/otcApi';
+import { AdaptiveAddress } from '../../../components/adaptiveAddress/adaptiveAddress';
 import { ErrorMessage } from '../../../components/errorMessage/errorMessage';
 import { YlideLoader } from '../../../components/ylideLoader/ylideLoader';
-import { AdaptiveAddress } from '../../../controls/adaptiveAddress/adaptiveAddress';
 import { RoutePath } from '../../../stores/routePath';
 import { invariant } from '../../../utils/assert';
 import { formatMoney } from '../../../utils/money';

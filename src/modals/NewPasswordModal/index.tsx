@@ -11,8 +11,8 @@ import { SelectNetworkModal } from '../../components/selectNetworkModal/selectNe
 import { createSingletonStaticComponentHook } from '../../components/staticComponentManager/staticComponentManager';
 import { TextField, TextFieldLook } from '../../components/textField/textField';
 import { useToastManager } from '../../components/toast/toast';
+import { WalletTag } from '../../components/walletTag/walletTag';
 import { YlideLoader } from '../../components/ylideLoader/ylideLoader';
-import { WalletTag } from '../../controls/WalletTag';
 import { REACT_APP__OTC_MODE } from '../../env';
 import { analytics } from '../../stores/Analytics';
 import { browserStorage } from '../../stores/browserStorage';

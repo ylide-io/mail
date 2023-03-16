@@ -3,7 +3,6 @@ import { observer } from 'mobx-react';
 import React, { useRef, useState } from 'react';
 import { generatePath } from 'react-router-dom';
 
-import { Blockie } from '../../../controls/Blockie';
 import { REACT_APP__OTC_MODE } from '../../../env';
 import { ReactComponent as ArrowDownSvg } from '../../../icons/ic20/arrowDown.svg';
 import { ReactComponent as PlusSvg } from '../../../icons/ic20/plus.svg';
@@ -14,6 +13,7 @@ import domain from '../../../stores/Domain';
 import { RoutePath } from '../../../stores/routePath';
 import { useNav } from '../../../utils/url';
 import { ActionButton, ActionButtonLook, ActionButtonSize } from '../../ActionButton/ActionButton';
+import { Blockie } from '../../blockie/blockie';
 import { SidebarBurger } from '../sidebar/sidebarMenu';
 import { AccountsPopup } from './accountsPopup/accountsPopup';
 import css from './header.module.scss';

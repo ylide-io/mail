@@ -2,13 +2,13 @@ import { EVMNetwork } from '@ylide/ethereum';
 import { IGenericAccount } from '@ylide/sdk';
 import clsx from 'clsx';
 
-import { WalletTag } from '../../controls/WalletTag';
 import domain from '../../stores/Domain';
 import { evmBalances } from '../../stores/evmBalances';
 import { Wallet } from '../../stores/models/Wallet';
 import { blockchainMeta, evmNameToNetwork } from '../../utils/blockchain';
 import { Modal } from '../modal/modal';
 import { createSingletonStaticComponentHook } from '../staticComponentManager/staticComponentManager';
+import { WalletTag } from '../walletTag/walletTag';
 
 const txPrices: Record<EVMNetwork, number> = {
 	[EVMNetwork.LOCAL_HARDHAT]: 0.001,

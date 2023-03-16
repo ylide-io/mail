@@ -3,10 +3,10 @@ import clsx from 'clsx';
 import React, { useMemo, useState } from 'react';
 
 import { ActionButton, ActionButtonLook } from '../../../../components/ActionButton/ActionButton';
+import { AdaptiveAddress } from '../../../../components/adaptiveAddress/adaptiveAddress';
+import { Blockie } from '../../../../components/blockie/blockie';
 import { Recipients } from '../../../../components/recipientInput/recipientInput';
 import { TextField } from '../../../../components/textField/textField';
-import { AdaptiveAddress } from '../../../../controls/adaptiveAddress/adaptiveAddress';
-import { Blockie } from '../../../../controls/Blockie';
 import { ReactComponent as EditSvg } from '../../../../icons/ic20/edit.svg';
 import { ReactComponent as MailSvg } from '../../../../icons/ic20/mail.svg';
 import { ReactComponent as TickSvg } from '../../../../icons/ic20/tick.svg';

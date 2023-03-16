@@ -3,9 +3,9 @@ import clsx from 'clsx';
 import { FC, useCallback, useState } from 'react';
 
 import { AccountSelect } from '../../../components/accountSelect/accountSelect';
+import { ActionButton, ActionButtonSize } from '../../../components/ActionButton/ActionButton';
 import { Modal } from '../../../components/modal/modal';
 import { YlideLoader } from '../../../components/ylideLoader/ylideLoader';
-import { YlideButton } from '../../../controls/YlideButton';
 import domain from '../../../stores/Domain';
 import { DomainAccount } from '../../../stores/models/DomainAccount';
 import { blockchainMeta } from '../../../utils/blockchain';
@@ -95,7 +95,12 @@ export const TVMDeployContractModal: FC<TVMDeployContractModalProps> = ({ contra
 				</div>
 			) : (
 				<div className={css.actionRow}>
-					<YlideButton className={clsx({ [css.disabled]: loading })} onClick={deployContract}>
+					<ActionButton
+						isMultiline
+						isDisabled={loading}
+						size={ActionButtonSize.XLARGE}
+						onClick={deployContract}
+					>
 						{loading ? (
 							<div style={{ display: 'flex', flexDirection: 'row' }}>
 								<div style={{ zoom: '0.25' }}>
@@ -106,7 +111,7 @@ export const TVMDeployContractModal: FC<TVMDeployContractModalProps> = ({ contra
 						) : (
 							'Deploy'
 						)}
-					</YlideButton>
+					</ActionButton>
 				</div>
 			)}
 		</Modal>
