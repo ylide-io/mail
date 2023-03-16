@@ -147,7 +147,7 @@ export const OtcChatPage = observer(() => {
 				<div>
 					<ActionButton
 						className={clsx(css.tradeButton, isIframeMinimized && css.tradeButton_active)}
-						size={ActionButtonSize.LARGE}
+						size={ActionButtonSize.XLARGE}
 						look={isIframeMinimized ? ActionButtonLook.SECONDARY : ActionButtonLook.PRIMARY}
 						onClick={() => {
 							setIframeOpen(true);

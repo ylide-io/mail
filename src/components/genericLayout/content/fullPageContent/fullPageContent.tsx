@@ -21,7 +21,7 @@ export function FullPageContent({ children, className, mobileTopButtonProps }: F
 			{!!mobileTopButtonProps && (
 				<ActionButton
 					className={css.linkButton}
-					size={ActionButtonSize.LARGE}
+					size={ActionButtonSize.XLARGE}
 					look={ActionButtonLook.PRIMARY}
 					onClick={() => navigate(mobileTopButtonProps.link)}
 				>

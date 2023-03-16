@@ -108,7 +108,7 @@ const FeedPageContent = observer(() => {
 		>
 			<ActionButton
 				className={css.scrollToTop}
-				size={ActionButtonSize.LARGE}
+				size={ActionButtonSize.XLARGE}
 				look={ActionButtonLook.SECONDARY}
 				icon={<ArrowUpSvg />}
 				onClick={() => genericLayoutApi.scrollToTop()}

@@ -8,6 +8,7 @@ export enum ActionButtonSize {
 	SMALL,
 	MEDIUM,
 	LARGE,
+	XLARGE,
 }
 
 export enum ActionButtonLook {
@@ -35,6 +36,7 @@ export const ActionButton = forwardRef(
 			[ActionButtonSize.SMALL]: css.root_smallSize,
 			[ActionButtonSize.MEDIUM]: css.root_mediumSize,
 			[ActionButtonSize.LARGE]: css.root_largeSize,
+			[ActionButtonSize.XLARGE]: css.root_xlargeSize,
 		}[size || ActionButtonSize.SMALL];
 
 		const lookClass = {

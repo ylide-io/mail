@@ -370,11 +370,11 @@ export function NewPasswordModal({
 					)}
 
 					<div className="wm-footer">
-						<ActionButton size={ActionButtonSize.LARGE} onClick={() => onCancel?.()}>
+						<ActionButton size={ActionButtonSize.XLARGE} onClick={() => onCancel?.()}>
 							Back
 						</ActionButton>
 						<ActionButton
-							size={ActionButtonSize.LARGE}
+							size={ActionButtonSize.XLARGE}
 							look={ActionButtonLook.PRIMARY}
 							onClick={() => createLocalKey(password)}
 						>
@@ -442,7 +442,7 @@ export function NewPasswordModal({
 					)}
 
 					<div className="wm-footer">
-						<ActionButton size={ActionButtonSize.LARGE} onClick={() => setStep(Step.ENTER_PASSWORD)}>
+						<ActionButton size={ActionButtonSize.XLARGE} onClick={() => setStep(Step.ENTER_PASSWORD)}>
 							Back
 						</ActionButton>
 					</div>
@@ -496,7 +496,7 @@ export function NewPasswordModal({
 					</div>
 					<div className="wm-footer">
 						<ActionButton
-							size={ActionButtonSize.LARGE}
+							size={ActionButtonSize.XLARGE}
 							onClick={() =>
 								setStep(
 									wallet.factory.blockchainGroup === 'evm'

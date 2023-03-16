@@ -40,7 +40,7 @@ export const NewWalletsPage = observer(() => {
 
 				{!!domain.accounts.activeAccounts.length && (
 					<ActionButton
-						size={ActionButtonSize.LARGE}
+						size={ActionButtonSize.XLARGE}
 						look={ActionButtonLook.PRIMARY}
 						style={{ marginTop: 20 }}
 						onClick={() => {

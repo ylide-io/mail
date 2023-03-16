@@ -46,7 +46,7 @@ export function AccountConnectedModal({ onClose }: AccountConnectedModalProps) {
 
 			<div className="wm-footer-vertical">
 				<ActionButton
-					size={ActionButtonSize.LARGE}
+					size={ActionButtonSize.XLARGE}
 					look={ActionButtonLook.PRIMARY}
 					onClick={() => {
 						onClose?.();
@@ -56,7 +56,7 @@ export function AccountConnectedModal({ onClose }: AccountConnectedModalProps) {
 					Go to {APP_NAME}
 				</ActionButton>
 				<ActionButton
-					size={ActionButtonSize.LARGE}
+					size={ActionButtonSize.XLARGE}
 					onClick={async () => {
 						onClose?.();
 						await selectWalletModal({});

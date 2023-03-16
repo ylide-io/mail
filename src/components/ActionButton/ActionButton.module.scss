@@ -52,7 +52,7 @@
 // SIZE
 
 .root_smallSize {
-	$size: 28px;
+	$size: $interactive-elem-size_small;
 
 	min-width: $size;
 	height: $size;
@@ -84,7 +84,7 @@
 }
 
 .root_mediumSize {
-	$size: 32px;
+	$size: $interactive-elem-size;
 
 	min-width: $size;
 	height: $size;
@@ -116,7 +116,44 @@
 }
 
 .root_largeSize {
-	$size: 40px;
+	$size: $interactive-elem-size_large;
+
+	min-width: $size;
+	height: $size;
+
+	&.root_multiline {
+		padding-top: 3px;
+		padding-bottom: 3px;
+		height: auto;
+		min-height: $size;
+	}
+
+	&.root_hasContent {
+		padding-right: 15px;
+		padding-left: 15px;
+	}
+
+	&.root_hasIcon {
+		padding-left: 7px;
+	}
+
+	&.root_hasIcon:not(.root_hasContent) {
+		padding-right: 5px;
+		padding-left: 5px;
+	}
+
+	.icon {
+		width: 28px;
+		height: 28px;
+	}
+
+	.content {
+		font-size: 14px;
+	}
+}
+
+.root_xlargeSize {
+	$size: $interactive-elem-size_xlarge;
 
 	min-width: $size;
 	height: $size;
