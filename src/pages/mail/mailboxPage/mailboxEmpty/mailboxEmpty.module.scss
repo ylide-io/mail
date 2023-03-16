@@ -1,0 +1,18 @@
+.root {
+	display: grid;
+	align-content: start;
+	justify-items: center;
+	grid-gap: 20px;
+	padding: 10vh 0;
+}
+
+.title {
+	font-size: 20px;
+}
+
+.addresses {
+	display: grid;
+	grid-template-columns: auto 1fr;
+	align-items: center;
+	grid-gap: 8px;
+}

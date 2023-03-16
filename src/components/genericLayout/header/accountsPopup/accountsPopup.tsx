@@ -1,7 +1,6 @@
 import { Tooltip } from 'antd';
 import { observer } from 'mobx-react';
 import React, { RefObject } from 'react';
-import { generatePath } from 'react-router-dom';
 
 import { AdaptiveAddress } from '../../../../controls/adaptiveAddress/adaptiveAddress';
 import { Blockie } from '../../../../controls/Blockie';
@@ -10,9 +9,7 @@ import { ReactComponent as PlusSvg } from '../../../../icons/ic20/plus.svg';
 import { ReactComponent as LogoutSvg } from '../../../../icons/ic28/logout.svg';
 import { useSelectWalletModal } from '../../../../modals/SelectWalletModal';
 import domain from '../../../../stores/Domain';
-import { RoutePath } from '../../../../stores/routePath';
 import { HorizontalAlignment } from '../../../../utils/alignment';
-import { useNav } from '../../../../utils/url';
 import { walletsMeta } from '../../../../utils/wallet';
 import { ActionButton, ActionButtonLook, ActionButtonSize } from '../../../ActionButton/ActionButton';
 import { AnchoredPopup } from '../../../popup/anchoredPopup/anchoredPopup';
@@ -24,7 +21,6 @@ interface AccountsPopupProps {
 }
 
 export const AccountsPopup = observer(({ anchorRef, onClose }: AccountsPopupProps) => {
-	const nav = useNav();
 	const selectWalletModal = useSelectWalletModal();
 
 	return (
@@ -69,8 +65,9 @@ export const AccountsPopup = observer(({ anchorRef, onClose }: AccountsPopupProp
 									onClick={async () => {
 										await account.wallet.disconnectAccount(account);
 										await domain.accounts.removeAccount(account);
-										if (domain.accounts.activeAccounts.length === 0) {
-											nav(generatePath(RoutePath.WALLETS));
+
+										if (!domain.accounts.hasActiveAccounts) {
+											onClose();
 										}
 									}}
 								/>

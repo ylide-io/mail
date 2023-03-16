@@ -3,17 +3,17 @@ import { observer } from 'mobx-react';
 import React, { CSSProperties, useEffect, useMemo, useState } from 'react';
 import { generatePath, useParams } from 'react-router-dom';
 
-import { BlockChainLabel } from '../../../../../components/BlockChainLabel/BlockChainLabel';
-import { CheckBox } from '../../../../../components/checkBox/checkBox';
-import { ContactName } from '../../../../../components/contactName/contactName';
-import { ReadableDate } from '../../../../../components/readableDate/readableDate';
-import { ReactComponent as FilterSvg } from '../../../../../icons/ic20/filter.svg';
-import domain from '../../../../../stores/Domain';
-import { FolderId, ILinkedMessage, useMailStore } from '../../../../../stores/MailList';
-import { RoutePath } from '../../../../../stores/routePath';
-import { decodeEditorData } from '../../../../../utils/editorJs';
-import { formatSubject } from '../../../../../utils/mail';
-import { useNav } from '../../../../../utils/url';
+import { BlockChainLabel } from '../../../../components/BlockChainLabel/BlockChainLabel';
+import { CheckBox } from '../../../../components/checkBox/checkBox';
+import { ContactName } from '../../../../components/contactName/contactName';
+import { ReadableDate } from '../../../../components/readableDate/readableDate';
+import { ReactComponent as FilterSvg } from '../../../../icons/ic20/filter.svg';
+import domain from '../../../../stores/Domain';
+import { FolderId, ILinkedMessage, useMailStore } from '../../../../stores/MailList';
+import { RoutePath } from '../../../../stores/routePath';
+import { decodeEditorData } from '../../../../utils/editorJs';
+import { formatSubject } from '../../../../utils/mail';
+import { useNav } from '../../../../utils/url';
 import css from './mailboxListRow.module.scss';
 
 interface MailboxListRowProps {

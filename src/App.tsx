@@ -27,7 +27,6 @@ import { SettingsPage } from './pages/SettingsPage/SettingsPage';
 import { TestPage } from './pages/TestPage/TestPage';
 import { SendMessageWidget } from './pages/widgets/sendMessageWidget/sendMessageWidget';
 import { analytics } from './stores/Analytics';
-import { browserStorage } from './stores/browserStorage';
 import domain from './stores/Domain';
 import { FeedCategory } from './stores/Feed';
 import modals from './stores/Modals';
@@ -97,23 +96,6 @@ const App = observer(() => {
 			>
 				<YlideLoader reason="Loading your account data from blockchain ..." />
 			</div>
-		);
-	}
-
-	if (
-		!domain.accounts.hasActiveAccounts &&
-		location.pathname !== generatePath(RoutePath.TEST) &&
-		location.pathname !== generatePath(RoutePath.WALLETS) &&
-		location.pathname !== generatePath(RoutePath.ADMIN) &&
-		!location.pathname.startsWith(generatePath(RoutePath.WIDGET)) &&
-		(!location.pathname.startsWith(generatePath(RoutePath.FEED)) || !browserStorage.canSkipRegistration)
-	) {
-		return (
-			<Navigate
-				to={`${generatePath(RoutePath.WALLETS)}${location.search ? location.search : ''}`}
-				state={{ from: location }}
-				replace
-			/>
 		);
 	}
 

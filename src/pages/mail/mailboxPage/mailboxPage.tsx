@@ -12,13 +12,13 @@ import { FolderId, ILinkedMessage, useMailList, useMailStore } from '../../../st
 import { RoutePath } from '../../../stores/routePath';
 import { useNav } from '../../../utils/url';
 import { useWindowSize } from '../../../utils/useWindowSize';
-import MailboxEmpty from './components/mailboxEmpty';
-import { MailboxHeader } from './components/mailboxHeader';
-import MailboxListRow from './components/mailboxListRow/mailboxListRow';
+import MailboxEmpty from './mailboxEmpty/mailboxEmpty';
+import { MailboxHeader } from './mailboxHeader/mailboxHeader';
+import MailboxListRow from './mailboxListRow/mailboxListRow';
 
 /*
-Rendering lists using FixedSizeList requires that rows doen't access any variables from the parent component.
-Otherwise all rows will be re-mounted on every render.
+Rendering lists using FixedSizeList requires that rows doesn't access any variables from the parent component.
+Otherwise, all rows will be re-mounted on every render.
 That's why we extracted it into a separate component.
  */
 interface MailboxListItemData {
