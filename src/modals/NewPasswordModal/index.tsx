@@ -1,5 +1,5 @@
-import { EthereumWalletController, EVMNetwork } from '@ylide/ethereum';
-import { asyncDelay, ExternalYlidePublicKey, IGenericAccount } from '@ylide/sdk';
+import { constructFaucetMsg, EthereumWalletController, EVMNetwork } from '@ylide/ethereum';
+import { asyncDelay, ExternalYlidePublicKey, IGenericAccount, YlideKeyPair } from '@ylide/sdk';
 import SmartBuffer from '@ylide/smart-buffer';
 import { useEffect, useMemo, useState } from 'react';
 import { generatePath } from 'react-router-dom';
@@ -104,8 +104,16 @@ export function NewPasswordModal({
 
 	const [pleaseWait, setPleaseWait] = useState(false);
 
-	async function requestFaucetSignature(account: DomainAccount) {
-		const msg = new SmartBuffer(account.key.keypair.publicKey).toHexString();
+	async function requestFaucetSignature(
+		account: DomainAccount,
+		chainId: number,
+		registrar: number,
+		timestampLock: number,
+	) {
+		const publicKey = account.key.keypair.publicKey;
+
+		const msg = constructFaucetMsg(publicKey, registrar, chainId, timestampLock);
+
 		try {
 			const signature = await (wallet.controller as EthereumWalletController).signString(account.account, msg);
 			console.log('signature: ', signature);
@@ -118,6 +126,7 @@ export function NewPasswordModal({
 
 	async function publishThroughFaucet(
 		account: DomainAccount,
+		keyVersion: number,
 		faucetType: 'polygon' | 'gnosis' | 'fantom',
 		bonus: boolean,
 		doWait: boolean,
@@ -125,19 +134,35 @@ export function NewPasswordModal({
 		browserStorage.canSkipRegistration = true;
 		console.log('public key: ', '0x' + new SmartBuffer(account.key.keypair.publicKey).toHexString());
 		setStep(Step.GENERATE_KEY);
-		const signature = await requestFaucetSignature(account);
+		let chainId;
+		if (faucetType === 'polygon') {
+			chainId = 137;
+		} else if (faucetType === 'gnosis') {
+			chainId = 100;
+		} else if (faucetType === 'fantom') {
+			chainId = 250;
+		} else {
+			throw new Error('Invalid faucet type');
+		}
+		const timestampLock = Math.floor(Date.now() / 1000) - 90;
+		const registrar = 1;
+		const signature = await requestFaucetSignature(account, chainId, registrar, timestampLock);
 		setPleaseWait(true);
 		domain.isTxPublishing = true;
 		analytics.walletRegistered(wallet.factory.wallet, account.account.address, domain.accounts.accounts.length);
 		domain.txChain = faucetType;
 		domain.txPlateVisible = true;
 		domain.txWithBonus = bonus;
-		const promise = fetch(`https://faucet.ylide.io/${faucetType}`, {
+		let faucetUrl = `https://faucet.ylide.io/${faucetType}`;
+		// faucetUrl = `http://localhost:8392/${faucetType}`;
+		const promise = fetch(faucetUrl, {
 			method: 'POST',
 			body: JSON.stringify({
 				address: account.account.address.toLowerCase(),
 				referrer: '0x0000000000000000000000000000000000000000',
 				payBonus: bonus ? '1' : '0',
+				registrar,
+				timestampLock,
 				publicKey: '0x' + new SmartBuffer(account.key.keypair.publicKey).toHexString(),
 				keyVersion: 2,
 				_r: signature.r,
@@ -204,12 +229,15 @@ export function NewPasswordModal({
 	async function createLocalKey(password: string, forceNew?: boolean) {
 		setStep(Step.GENERATE_KEY);
 
-		let tempLocalKey;
+		let tempLocalKey: YlideKeyPair;
+		let keyVersion;
 		try {
 			if (!forceNew && freshestKey && freshestKey.key.keyVersion === 1) {
 				tempLocalKey = await wallet.constructLocalKeyV2(account, password); //wallet.constructLocalKeyV1(account, password);
+				keyVersion = 2;
 			} else {
 				tempLocalKey = await wallet.constructLocalKeyV2(account, password);
+				keyVersion = 2;
 			}
 		} catch (err) {
 			console.log('createLocalKey ', err);
@@ -221,7 +249,7 @@ export function NewPasswordModal({
 			const domainAccount = await wallet.instantiateNewAccount(account, tempLocalKey);
 			setDomainAccount(domainAccount);
 			if (faucetType && wallet.factory.blockchainGroup === 'evm') {
-				await publishThroughFaucet(domainAccount, faucetType, bonus, REACT_APP__OTC_MODE);
+				await publishThroughFaucet(domainAccount, keyVersion, faucetType, bonus, REACT_APP__OTC_MODE);
 			} else {
 				if (wallet.factory.blockchainGroup === 'evm') {
 					setStep(Step.SELECT_NETWORK);

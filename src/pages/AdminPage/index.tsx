@@ -24,6 +24,8 @@ import { AdaptiveAddress } from '../../components/adaptiveAddress/adaptiveAddres
 import { blockchainMeta, evmNameToNetwork } from '../../utils/blockchain';
 import css from './adminPage.module.scss';
 import { EVMDeployContractModal } from './contract-modals/evmDeployModal';
+import { EVMMailerV8Modal } from './contract-modals/EVMMailerV8Modal';
+import { EVMRegistryV6Modal } from './contract-modals/EVMRegistryV6Modal';
 import { TVMDeployContractModal } from './contract-modals/tvmDeployModal';
 
 export interface EthereumContractPlateProps {
@@ -34,7 +36,7 @@ export interface EthereumContractPlateProps {
 
 export const EthereumContractPlate: FC<EthereumContractPlateProps> = ({ contract, isModern, network }) => {
 	const [deployModalVisible, setDeployModalVisible] = useState(false);
-	const [, setManageModalVisible] = useState(false);
+	const [manageModalVisible, setManageModalVisible] = useState(false);
 
 	const name = EVM_NAMES[network];
 	const scan = blockchainMeta[name].ethNetwork!.blockExplorerUrls[0]!;
@@ -50,6 +52,14 @@ export const EthereumContractPlate: FC<EthereumContractPlateProps> = ({ contract
 					network={network}
 					isModern={isModern}
 					onClose={() => setDeployModalVisible(false)}
+				/>
+			)}
+			{manageModalVisible && (
+				<EVMRegistryV6Modal
+					contract={contract as any}
+					network={network}
+					isModern={isModern}
+					onClose={() => setManageModalVisible(false)}
 				/>
 			)}
 			<div
