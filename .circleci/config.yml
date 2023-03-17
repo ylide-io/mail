@@ -181,6 +181,8 @@ workflows:
                               - hub-release
                               - otc-release
             - build_hub:
+                  requires:
+                      - install
                   filters:
                       branches:
                           only:
@@ -201,6 +203,8 @@ workflows:
                           only:
                               - dev
             - build_airswap:
+                  requires:
+                      - install
                   filters:
                       branches:
                           only:
@@ -213,6 +217,8 @@ workflows:
                           only:
                               - otc-release
             - build_1inch:
+                  requires:
+                      - install
                   filters:
                       branches:
                           only:
@@ -225,6 +231,8 @@ workflows:
                           only:
                               - otc-release
             - build_paraswap:
+                  requires:
+                      - install
                   filters:
                       branches:
                           only:
