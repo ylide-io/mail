@@ -180,6 +180,7 @@ workflows:
                           only:
                               - hub-release
                               - otc-release
+                              - dev
             - build_hub:
                   requires:
                       - install
