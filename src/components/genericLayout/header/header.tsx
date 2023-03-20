@@ -11,6 +11,7 @@ import { YlideLargeLogo } from '../../../icons/YlideLargeLogo';
 import { useSelectWalletModal } from '../../../modals/SelectWalletModal';
 import domain from '../../../stores/Domain';
 import { RoutePath } from '../../../stores/routePath';
+import { useOpenMailCopmpose } from '../../../utils/mail';
 import { useNav } from '../../../utils/url';
 import { ActionButton, ActionButtonLook, ActionButtonSize } from '../../ActionButton/ActionButton';
 import { Blockie } from '../../blockie/blockie';
@@ -20,6 +21,7 @@ import css from './header.module.scss';
 
 const Header = observer(() => {
 	const navigate = useNav();
+	const openMailCopmpose = useOpenMailCopmpose();
 
 	const selectWalletModal = useSelectWalletModal();
 
@@ -29,6 +31,16 @@ const Header = observer(() => {
 	return (
 		<div className={css.root}>
 			<SidebarBurger className={css.burger} />
+
+			{domain.accounts.hasActiveAccounts && (
+				<ActionButton
+					className={css.composeButton}
+					look={ActionButtonLook.PRIMARY}
+					onClick={() => openMailCopmpose()}
+				>
+					Compose Mail
+				</ActionButton>
+			)}
 
 			<div className={css.logo}>
 				<a

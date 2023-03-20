@@ -1,3 +1,4 @@
+import { observer } from 'mobx-react';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { generatePath, useParams } from 'react-router-dom';
 
@@ -17,9 +18,8 @@ import { globalOutgoingMailData, OutgoingMailData } from '../../../stores/outgoi
 import { RoutePath } from '../../../stores/routePath';
 import { DateFormatStyle, formatDate } from '../../../utils/date';
 import { decodeEditorData, plainTextToEditorData } from '../../../utils/editorJs';
-import { formatSubject } from '../../../utils/mail';
+import { formatSubject, useOpenMailCopmpose } from '../../../utils/mail';
 import { useNav } from '../../../utils/url';
-import { useComposeMailPopup } from '../components/composeMailPopup/composeMailPopup';
 import css from './mailDetailsPage.module.scss';
 import { MailMessage } from './mailMessage/mailMessage';
 
@@ -28,11 +28,11 @@ interface WrappedThreadMessage {
 	isDeleted: boolean;
 }
 
-export const MailDetailsPage = () => {
+export const MailDetailsPage = observer(() => {
 	const navigate = useNav();
 	const { folderId, id } = useParams<{ folderId: FolderId; id: string }>();
 
-	const composeMailPopup = useComposeMailPopup();
+	const openMailCopmpose = useOpenMailCopmpose();
 
 	const {
 		lastMessagesList,
@@ -142,7 +142,7 @@ export const MailDetailsPage = () => {
 		mailData.to = new Recipients([senderAddress]);
 		mailData.subject = formatSubject(subject || '', 'Re: ');
 
-		composeMailPopup({ mailData });
+		openMailCopmpose({ mailData });
 	};
 
 	const onForwardClick = (message: ILinkedMessage, decodedTextData: string | null, subject: string | null) => {
@@ -168,7 +168,7 @@ export const MailDetailsPage = () => {
 	};
 
 	const onDeleteClick = (m: ILinkedMessage) => {
-		markMessagesAsDeleted([m]);
+		markMessagesAsDeleted([m]).then();
 
 		if (isThreadOpen) {
 			setWrappedThreadMessages(
@@ -180,7 +180,7 @@ export const MailDetailsPage = () => {
 	};
 
 	const onRestoreClick = (m: ILinkedMessage) => {
-		markMessagesAsNotDeleted([m]);
+		markMessagesAsNotDeleted([m]).then();
 
 		setWrappedThreadMessages(
 			wrappedThreadMessages.map(it => (it.message.msgId === m.msgId ? { ...it, isDeleted: false } : it)),
@@ -315,4 +315,4 @@ export const MailDetailsPage = () => {
 			</FullPageContent>
 		</GenericLayout>
 	);
-};
+});

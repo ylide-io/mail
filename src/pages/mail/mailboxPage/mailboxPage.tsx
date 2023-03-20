@@ -1,3 +1,4 @@
+import { observer } from 'mobx-react';
 import React, { useCallback, useEffect, useState } from 'react';
 import { useParams, useSearchParams } from 'react-router-dom';
 import AutoSizer from 'react-virtualized-auto-sizer';
@@ -9,7 +10,6 @@ import { YlideLoader } from '../../../components/ylideLoader/ylideLoader';
 import { analytics } from '../../../stores/Analytics';
 import domain from '../../../stores/Domain';
 import { FolderId, ILinkedMessage, useMailList, useMailStore } from '../../../stores/MailList';
-import { RoutePath } from '../../../stores/routePath';
 import { useNav } from '../../../utils/url';
 import { useWindowSize } from '../../../utils/useWindowSize';
 import MailboxEmpty from './mailboxEmpty/mailboxEmpty';
@@ -49,7 +49,7 @@ export function MailboxListItem({ index, style, data }: ListChildComponentProps<
 	);
 }
 
-export const MailboxPage = () => {
+export const MailboxPage = observer(() => {
 	const navigate = useNav();
 	const { setLastActiveFolderId, setLastMessagesList, markMessagesAsReaded } = useMailStore();
 
@@ -106,7 +106,7 @@ export const MailboxPage = () => {
 
 	return (
 		<GenericLayout>
-			<FullPageContent mobileTopButtonProps={{ text: 'Compose Mail', link: RoutePath.MAIL_COMPOSE }}>
+			<FullPageContent>
 				<div className="mailbox-page animated fadeInRight">
 					<MailboxHeader
 						folderId={folderId!}
@@ -189,4 +189,4 @@ export const MailboxPage = () => {
 			</FullPageContent>
 		</GenericLayout>
 	);
-};
+});

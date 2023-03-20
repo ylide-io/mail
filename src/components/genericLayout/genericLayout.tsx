@@ -5,7 +5,7 @@ import domain from '../../stores/Domain';
 import { TransactionPopup } from '../TransactionPopup/TransactionPopup';
 import css from './genericLayout.module.scss';
 import Header from './header/header';
-import SidebarMenu from './sidebar/sidebarMenu';
+import { SidebarMenu } from './sidebar/sidebarMenu';
 
 interface GenericLayoutApi {
 	scrollToTop: () => void;

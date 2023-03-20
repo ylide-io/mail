@@ -28,13 +28,13 @@ import { sideProjectsIcon } from '../../../icons/static/sideProjectsIcon';
 import { sideSecurityIcon } from '../../../icons/static/sideSecurityIcon';
 import { sideTechnologyIcon } from '../../../icons/static/sideTechnologyIcon';
 import { FeedSettingsPopup } from '../../../pages/feed/components/feedSettingsPopup/feedSettingsPopup';
-import { useComposeMailPopup } from '../../../pages/mail/components/composeMailPopup/composeMailPopup';
+import { WidgetId } from '../../../pages/widgets/widgets';
 import { browserStorage } from '../../../stores/browserStorage';
 import { FeedCategory, getFeedCategoryName } from '../../../stores/Feed';
 import { FolderId } from '../../../stores/MailList';
 import modals from '../../../stores/Modals';
-import { OutgoingMailData } from '../../../stores/outgoingMailData';
 import { RoutePath } from '../../../stores/routePath';
+import { useOpenMailCopmpose } from '../../../utils/mail';
 import { useNav } from '../../../utils/url';
 import { ActionButton, ActionButtonLook, ActionButtonSize } from '../../ActionButton/ActionButton';
 import { PropsWithClassName } from '../../propsWithClassName';
@@ -42,21 +42,19 @@ import css from './sidebarMenu.module.scss';
 
 interface SidebarBurgerProps extends PropsWithClassName, PropsWithChildren {}
 
-export function SidebarBurger({ className, children }: SidebarBurgerProps) {
-	return (
-		<div className={clsx(css.burger, className)}>
-			<ActionButton
-				size={ActionButtonSize.MEDIUM}
-				icon={modals.sidebarOpen ? <SidebarMenuCloseSvg /> : <SidebarMenuSvg />}
-				onClick={() => {
-					modals.sidebarOpen = !modals.sidebarOpen;
-				}}
-			>
-				{children}
-			</ActionButton>
-		</div>
-	);
-}
+export const SidebarBurger = observer(({ className, children }: SidebarBurgerProps) => (
+	<div className={clsx(css.burger, className)}>
+		<ActionButton
+			size={ActionButtonSize.MEDIUM}
+			icon={modals.sidebarOpen ? <SidebarMenuCloseSvg /> : <SidebarMenuSvg />}
+			onClick={() => {
+				modals.sidebarOpen = !modals.sidebarOpen;
+			}}
+		>
+			{children}
+		</ActionButton>
+	</div>
+));
 
 //
 
@@ -81,13 +79,12 @@ const getFeedCategoryIcon = (category: FeedCategory) => {
 	}[category];
 };
 
-const SidebarMenu = observer(() => {
+export const SidebarMenu = observer(() => {
 	const location = useLocation();
 	const navigate = useNav();
+	const openMailCopmpose = useOpenMailCopmpose();
 
 	const [isFeedSettingsOpen, setFeedSettingsOpen] = useState(false);
-
-	const composeMailPopup = useComposeMailPopup();
 
 	return (
 		<div className={clsx(css.root, { [css.root_open]: modals.sidebarOpen })}>
@@ -150,70 +147,76 @@ const SidebarMenu = observer(() => {
 					</div>
 				) : (
 					<>
-						<div className={css.section}>
-							<div className={css.sectionTitle}>
-								Feed
-								<ActionButton
-									look={ActionButtonLook.LITE}
-									icon={
-										browserStorage.isSidebarSectionFolded(SidebarSection.FEED) ? (
-											<ArrowDownSvg />
-										) : (
-											<ArrowUpSvg />
-										)
-									}
-									onClick={() => browserStorage.toggleSidebarSectionFolding(SidebarSection.FEED)}
-								/>
-							</div>
+						{browserStorage.widgetId !== WidgetId.INBOX && (
+							<div className={css.section}>
+								<div className={css.sectionTitle}>
+									Feed
+									<ActionButton
+										look={ActionButtonLook.LITE}
+										icon={
+											browserStorage.isSidebarSectionFolded(SidebarSection.FEED) ? (
+												<ArrowDownSvg />
+											) : (
+												<ArrowUpSvg />
+											)
+										}
+										onClick={() => browserStorage.toggleSidebarSectionFolding(SidebarSection.FEED)}
+									/>
+								</div>
 
-							<div
-								className={clsx(
-									css.sectionContent,
-									browserStorage.isSidebarSectionFolded(SidebarSection.FEED) ||
-										css.sectionContent_open,
-								)}
-							>
-								{Object.values(FeedCategory).map(category => {
-									const path = generatePath(RoutePath.FEED_CATEGORY, { category });
+								<div
+									className={clsx(
+										css.sectionContent,
+										browserStorage.isSidebarSectionFolded(SidebarSection.FEED) ||
+											css.sectionContent_open,
+									)}
+								>
+									{Object.values(FeedCategory).map(category => {
+										const path = generatePath(RoutePath.FEED_CATEGORY, { category });
 
-									return (
-										<div
-											key={category}
-											className={clsx(css.sectionLink, {
-												[css.sectionLink_active]: location.pathname === path,
-											})}
-											onClick={() => {
-												modals.sidebarOpen = false;
-												navigate(path);
-											}}
-										>
-											<div className={css.sectionLinkIconLeft}>
-												{getFeedCategoryIcon(category)}
+										return (
+											<div
+												key={category}
+												className={clsx(css.sectionLink, {
+													[css.sectionLink_active]: location.pathname === path,
+												})}
+												onClick={() => {
+													modals.sidebarOpen = false;
+													navigate(path);
+												}}
+											>
+												<div className={css.sectionLinkIconLeft}>
+													{getFeedCategoryIcon(category)}
+												</div>
+												<div className={css.sectionLinkTitle}>
+													{getFeedCategoryName(category)}
+												</div>
+
+												{category === FeedCategory.MAIN && (
+													<>
+														<ActionButton
+															className={css.sectionRightButton}
+															look={ActionButtonLook.LITE}
+															icon={<SettingsSvg />}
+															onClick={e => {
+																e.stopPropagation();
+																setFeedSettingsOpen(!isFeedSettingsOpen);
+															}}
+														/>
+
+														{isFeedSettingsOpen && (
+															<FeedSettingsPopup
+																onClose={() => setFeedSettingsOpen(false)}
+															/>
+														)}
+													</>
+												)}
 											</div>
-											<div className={css.sectionLinkTitle}>{getFeedCategoryName(category)}</div>
-
-											{category === FeedCategory.MAIN && (
-												<>
-													<ActionButton
-														className={css.sectionRightButton}
-														look={ActionButtonLook.LITE}
-														icon={<SettingsSvg />}
-														onClick={e => {
-															e.stopPropagation();
-															setFeedSettingsOpen(!isFeedSettingsOpen);
-														}}
-													/>
-
-													{isFeedSettingsOpen && (
-														<FeedSettingsPopup onClose={() => setFeedSettingsOpen(false)} />
-													)}
-												</>
-											)}
-										</div>
-									);
-								})}
+										);
+									})}
+								</div>
 							</div>
-						</div>
+						)}
 
 						<div className={css.section}>
 							<div className={css.sectionTitle}>
@@ -242,10 +245,7 @@ const SidebarMenu = observer(() => {
 									className={css.sectionButton}
 									onClick={() => {
 										modals.sidebarOpen = false;
-
-										if (location.pathname !== generatePath(RoutePath.MAIL_COMPOSE)) {
-											composeMailPopup({ mailData: new OutgoingMailData() });
-										}
+										openMailCopmpose();
 									}}
 								>
 									Compose mail
@@ -324,5 +324,3 @@ const SidebarMenu = observer(() => {
 		</div>
 	);
 });
-
-export default SidebarMenu;
