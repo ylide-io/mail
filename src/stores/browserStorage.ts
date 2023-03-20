@@ -21,20 +21,24 @@ class BrowserStorage {
 		makeAutoObservable(this);
 	}
 
-	private static getItem(key: BrowserStorageKey) {
-		return localStorage.getItem(key) || undefined;
+	private static getItem(key: BrowserStorageKey, storage: Storage = localStorage) {
+		return storage.getItem(key) || undefined;
 	}
 
-	private static getItemWithTransform<T>(key: BrowserStorageKey, transform: (item: string) => T): T | undefined {
-		const item = localStorage.getItem(key) || undefined;
+	private static getItemWithTransform<T>(
+		key: BrowserStorageKey,
+		transform: (item: string) => T,
+		storage: Storage = localStorage,
+	): T | undefined {
+		const item = storage.getItem(key) || undefined;
 		return item ? transform(item) : undefined;
 	}
 
-	private static setItem(key: BrowserStorageKey, value: any) {
+	private static setItem(key: BrowserStorageKey, value: any, storage: Storage = localStorage) {
 		if (value != null) {
-			localStorage.setItem(key, value.toString());
+			storage.setItem(key, value.toString());
 		} else {
-			localStorage.removeItem(key);
+			storage.removeItem(key);
 		}
 	}
 
