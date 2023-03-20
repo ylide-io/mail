@@ -48,9 +48,7 @@
 
 .account-modal {
 	height: 520px;
-	padding: 24px;
-	padding-top: 12px;
-	padding-bottom: 0px;
+	padding: 12px 24px 0;
 }
 
 .available-wallets {
@@ -251,6 +249,10 @@
 
 		color: var(--accent2-color);
 	}
+}
+
+.wm-tab-search {
+	flex-shrink: 0;
 }
 
 .cross-button {

@@ -362,6 +362,7 @@ export const SelectWalletModal = observer(({ onSuccess, onCancel }: SelectWallet
 							) : (
 								<>
 									<TextField
+										className="wm-tab-search"
 										look={TextFieldLook.LITE}
 										type="text"
 										placeholder="Search"
@@ -425,6 +426,7 @@ export const SelectWalletModal = observer(({ onSuccess, onCancel }: SelectWallet
 						) : (
 							<>
 								<TextField
+									className="wm-tab-search"
 									look={TextFieldLook.LITE}
 									type="text"
 									placeholder="Search"
@@ -482,6 +484,7 @@ export const SelectWalletModal = observer(({ onSuccess, onCancel }: SelectWallet
 				) : activeTab === 'install' ? (
 					<>
 						<TextField
+							className="wm-tab-search"
 							look={TextFieldLook.LITE}
 							type="text"
 							placeholder="Search"
