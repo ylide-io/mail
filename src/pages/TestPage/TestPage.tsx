@@ -46,6 +46,9 @@ export const TestPage = observer(() => {
 				<ActionButton look={ActionButtonLook.PRIMARY} icon={<SettingsSvg />}>
 					Primary
 				</ActionButton>
+				<ActionButton look={ActionButtonLook.SECONDARY} icon={<SettingsSvg />}>
+					Secondary
+				</ActionButton>
 				<ActionButton look={ActionButtonLook.LITE} icon={<SettingsSvg />}>
 					Lite
 				</ActionButton>
