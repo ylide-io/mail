@@ -25,6 +25,7 @@ import { OtcChatsPage } from './pages/otc/OtcChatsPage/OtcChatsPage';
 import { OtcWalletsPage } from './pages/otc/OtcWalletsPage/OtcWalletsPage';
 import { SettingsPage } from './pages/SettingsPage/SettingsPage';
 import { TestPage } from './pages/TestPage/TestPage';
+import { MailboxWidget } from './pages/widgets/mailboxWidget/mailboxWidget';
 import { SendMessageWidget } from './pages/widgets/sendMessageWidget/sendMessageWidget';
 import { analytics } from './stores/Analytics';
 import domain from './stores/Domain';
@@ -144,6 +145,7 @@ const App = observer(() => {
 							/>
 
 							<Route path={RoutePath.SEND_MESSAGE_WIDGET} element={<SendMessageWidget />} />
+							<Route path={RoutePath.MAILBOX_WIDGET} element={<MailboxWidget />} />
 						</Routes>
 
 						{modals.render()}

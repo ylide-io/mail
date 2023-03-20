@@ -1,4 +1,4 @@
-import { createSearchParams, URLSearchParamsInit, useNavigate } from 'react-router-dom';
+import { createSearchParams, NavigateOptions, URLSearchParamsInit, useNavigate } from 'react-router-dom';
 
 import { filterObjectEntries } from './object';
 
@@ -29,9 +29,9 @@ export function buildUrl(params: string | UseNavParameters) {
 export const useNav = () => {
 	const navigate = useNavigate();
 
-	return (value: string | UseNavParameters) => {
+	return (value: string | UseNavParameters, options?: NavigateOptions) => {
 		const params: UseNavParameters = typeof value === 'string' ? { path: value } : value;
 
-		navigate(buildUrl(params));
+		navigate(buildUrl(params), options);
 	};
 };

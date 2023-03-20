@@ -1,6 +1,7 @@
 import { makeAutoObservable } from 'mobx';
 
 import { SidebarSection } from '../components/genericLayout/sidebar/sidebarMenu';
+import { WidgetId } from '../pages/widgets/widgets';
 import { toggleArrayItem } from '../utils/array';
 
 export interface FeedSourceSettings {
@@ -14,6 +15,7 @@ enum BrowserStorageKey {
 	FEED_SOURCE_SETTINGS = 'ylide_feedSourceSettings',
 	SIDEBAR_FOLDED_SECTIONS = 'ylide_sidebarFoldedSections',
 	SAVE_DECODED_MESSAGES = 'ylide_saveDecodedMessages',
+	WIDGET_ID = 'ylide_widgetId',
 }
 
 class BrowserStorage {
@@ -107,21 +109,28 @@ class BrowserStorage {
 
 	//
 
-	private _saveDecodedMessages =
-		BrowserStorage.getItem(
-			BrowserStorageKey.SAVE_DECODED_MESSAGES,
-		) !== 'false'
+	private _saveDecodedMessages = BrowserStorage.getItem(BrowserStorageKey.SAVE_DECODED_MESSAGES) !== 'false';
 
 	get saveDecodedMessages() {
-		return this._saveDecodedMessages
+		return this._saveDecodedMessages;
 	}
 
 	set saveDecodedMessages(value: boolean) {
-		BrowserStorage.setItem(
-			BrowserStorageKey.SAVE_DECODED_MESSAGES,
-			value,
-		);
+		BrowserStorage.setItem(BrowserStorageKey.SAVE_DECODED_MESSAGES, value);
 		this._saveDecodedMessages = value;
+	}
+
+	//
+
+	private _widgetId = BrowserStorage.getItem(BrowserStorageKey.WIDGET_ID, sessionStorage) as WidgetId | undefined;
+
+	get widgetId() {
+		return this._widgetId;
+	}
+
+	set widgetId(value: WidgetId | undefined) {
+		BrowserStorage.setItem(BrowserStorageKey.WIDGET_ID, value, sessionStorage);
+		this._widgetId = value;
 	}
 }
 
