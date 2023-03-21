@@ -55,7 +55,7 @@
 		"@walletconnect/qrcode-modal": "^1.8.0",
 		"@walletconnect/types": "^1.8.0",
 		"@walletconnect/web3-provider": "^1.8.0",
-		"@ylide/ethereum": "0.8.0-beta.15",
+		"@ylide/ethereum": "0.8.0-beta.17",
 		"@ylide/everscale": "0.8.0-beta.6",
 		"@ylide/sdk": "0.8.0-beta.4",
 		"@ylide/smart-buffer": "0.0.11",

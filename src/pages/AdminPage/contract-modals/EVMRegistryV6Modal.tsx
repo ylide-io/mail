@@ -2,7 +2,6 @@ import {
 	EthereumWalletController,
 	EVM_NAMES,
 	EVMNetwork,
-	IEVMMailerContractLink,
 	IEVMRegistryContractLink,
 	EthereumRegistryV6Wrapper,
 	EVM_CONTRACTS,

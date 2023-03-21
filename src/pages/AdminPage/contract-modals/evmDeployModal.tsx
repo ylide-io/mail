@@ -112,7 +112,7 @@ export const EVMDeployContractModal: FC<EVMDeployContractModalProps> = ({ contra
 			{address ? (
 				<div className={css.row}>
 					<div className={css.label}>Deployed address</div>
-					<div className={css.value}>{address}</div>
+					<div className={css.value}>{address.toLowerCase()}</div>
 				</div>
 			) : (
 				<div className={css.actionRow}>
