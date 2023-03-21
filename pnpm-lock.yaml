@@ -23,7 +23,7 @@ specifiers:
   '@walletconnect/qrcode-modal': ^1.8.0
   '@walletconnect/types': ^1.8.0
   '@walletconnect/web3-provider': ^1.8.0
-  '@ylide/ethereum': 0.8.0-beta.18
+  '@ylide/ethereum': 0.8.0-beta.19
   '@ylide/everscale': 0.8.0-beta.6
   '@ylide/sdk': 0.8.0-beta.4
   '@ylide/smart-buffer': 0.0.11
@@ -93,7 +93,7 @@ dependencies:
   '@walletconnect/qrcode-modal': 1.8.0
   '@walletconnect/types': 1.8.0
   '@walletconnect/web3-provider': 1.8.0
-  '@ylide/ethereum': 0.8.0-beta.18
+  '@ylide/ethereum': 0.8.0-beta.19
   '@ylide/everscale': 0.8.0-beta.6
   '@ylide/sdk': 0.8.0-beta.4
   '@ylide/smart-buffer': 0.0.11
@@ -4087,8 +4087,8 @@ packages:
     resolution: {integrity: sha512-NuHqBY1PB/D8xU6s/thBgOAiAP7HOYDQ32+BFZILJ8ivkUkAHQnWfn6WhL79Owj1qmUnoN/YPhktdIoucipkAQ==}
     dev: true
 
-  /@ylide/ethereum-contracts/0.8.0-beta.10:
-    resolution: {integrity: sha512-urV41k5PR3SY9OyfhUejWAfcbLGM4sqpnTbZZ2RaRz5jnol33YIAswcy/kHRrGtOmxM0TJnZZzExetlVKRNmYw==}
+  /@ylide/ethereum-contracts/0.8.0-beta.11:
+    resolution: {integrity: sha512-+G/iqLbCQb5eZYKq7ELM6Unmdlyy1bd8tjn+6IDkN4NC06y8la5hwjHrgdTIk5Y+mBf/2vOtqpZ8m+28ZWgjvw==}
     dependencies:
       '@ethersproject/abi': 5.7.0
       '@ethersproject/providers': 5.7.2
@@ -4098,13 +4098,13 @@ packages:
       - utf-8-validate
     dev: false
 
-  /@ylide/ethereum/0.8.0-beta.18:
-    resolution: {integrity: sha512-LBfyUPqkkUSRPTAxyO7jYhL7mKZyl2fB1b2+4Dn7g8OA6tOgmDWh038BeU4a4WMCupooE3ptbk4e0gsjZBtwHQ==}
+  /@ylide/ethereum/0.8.0-beta.19:
+    resolution: {integrity: sha512-PNW0ZZrEjcBBiCjA6rUwQshharqiocMUM+GAn27gVkTQJxkNzkw1KKw1CZBlL8X7376EodmXQSH8ju3xp3UhCw==}
     dependencies:
       '@ethersproject/abi': 5.7.0
       '@ethersproject/abstract-provider': 5.7.0
       '@ethersproject/providers': 5.7.2
-      '@ylide/ethereum-contracts': 0.8.0-beta.10
+      '@ylide/ethereum-contracts': 0.8.0-beta.11
       '@ylide/sdk': 0.8.0-beta.4
       '@ylide/smart-buffer': 0.0.11
       ethers: 5.7.2
