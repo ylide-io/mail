@@ -66,12 +66,8 @@ body {
 	overflow-x: hidden;
 
 	// background-image: url(../assets/img/background-desktop.svg);
-	background: linear-gradient(0deg, #f7f7ee, #f7f7ee), #ffffff;
-	background-image: url(../assets/img/background-desktop-2.svg);
+	background: #f7f7ee url(../assets/img/background-desktop-2.svg) no-repeat fixed center;
 	background-size: cover;
-	background-position: center;
-	background-attachment: fixed;
-	background-repeat: no-repeat;
 }
 
 label {
