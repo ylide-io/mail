@@ -4,9 +4,6 @@ import { createContext, PropsWithChildren, ReactNode, useContext, useMemo, useSt
 import { Popup } from '../popup/popup';
 import css from './toast.module.scss';
 
-const DISPLAY_TIME = 5000;
-const HIDING_TIME = 1000;
-
 let toastId = 0;
 
 enum ToastState {
@@ -57,10 +54,13 @@ export function ToastManager({ children }: PropsWithChildren) {
 									: { ...it, state: ToastState.HIDING },
 							),
 						),
-					DISPLAY_TIME,
+					Toast.DISPLAY_TIME,
 				);
 
-				setTimeout(() => setToasts(prev => prev.filter(it => it.id !== id)), DISPLAY_TIME + HIDING_TIME);
+				setTimeout(
+					() => setToasts(prev => prev.filter(it => it.id !== id)),
+					Toast.DISPLAY_TIME + Toast.HIDING_TIME,
+				);
 			},
 		}),
 		[],
@@ -98,3 +98,6 @@ export function Toast({ children, state }: ToastProps) {
 		</Popup>
 	);
 }
+
+Toast.DISPLAY_TIME = 5000;
+Toast.HIDING_TIME = 1000;
