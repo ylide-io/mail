@@ -10,7 +10,7 @@
 	display: grid;
 	grid-template-columns: 226px 1fr;
 	grid-gap: 16px;
-	padding: 24px 16px 16px 0;
+	padding: 24px 16px 0 0;
 	overflow-y: auto;
 
 	@include less920px {
@@ -24,5 +24,10 @@
 }
 
 .content {
+	padding: 0 0 16px;
 	min-height: 0;
+
+	@include less920px {
+		padding: 0;
+	}
 }
