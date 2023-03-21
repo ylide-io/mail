@@ -24,7 +24,6 @@ import { AdaptiveAddress } from '../../components/adaptiveAddress/adaptiveAddres
 import { blockchainMeta, evmNameToNetwork } from '../../utils/blockchain';
 import css from './adminPage.module.scss';
 import { EVMDeployContractModal } from './contract-modals/evmDeployModal';
-import { EVMMailerV8Modal } from './contract-modals/EVMMailerV8Modal';
 import { EVMRegistryV6Modal } from './contract-modals/EVMRegistryV6Modal';
 import { TVMDeployContractModal } from './contract-modals/tvmDeployModal';
 
@@ -112,7 +111,7 @@ export interface EverscaleContractPlateProps {
 
 export const EverscaleContractPlate: FC<EverscaleContractPlateProps> = ({ contract, isModern, dev }) => {
 	const [deployModalVisible, setDeployModalVisible] = useState(false);
-	const [, setManageModalVisible] = useState(false);
+	const [,] = useState(false);
 
 	const scan = dev ? '#' : 'https://ever.live/accounts/accountDetails?id=';
 

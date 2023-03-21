@@ -12,9 +12,7 @@ import clsx from 'clsx';
 import { FC, useCallback, useEffect, useState } from 'react';
 
 import { AccountSelect } from '../../../components/accountSelect/accountSelect';
-import { ActionButton } from '../../../components/ActionButton/ActionButton';
 import { Modal } from '../../../components/modal/modal';
-import { YlideLoader } from '../../../components/ylideLoader/ylideLoader';
 import domain from '../../../stores/Domain';
 import { DomainAccount } from '../../../stores/models/DomainAccount';
 import { blockchainMeta } from '../../../utils/blockchain';
@@ -113,7 +111,7 @@ export const EVMRegistryV6Modal: FC<EVMRegistryV6ModalProps> = ({ contract, isMo
 			<div className={css.row}>
 				<div className={css.label}>Address</div>
 				<div className={clsx(css.value, css.withModificator)}>
-					<a href={`${scan}/address/${contract.contract!.address}`} target="_blank">
+					<a href={`${scan}/address/${contract.contract!.address}`} target="_blank" rel="noreferrer">
 						{contract.contract!.address}
 					</a>
 				</div>
@@ -124,7 +122,7 @@ export const EVMRegistryV6Modal: FC<EVMRegistryV6ModalProps> = ({ contract, isMo
 					{loading ? (
 						<Spin size="small" />
 					) : (
-						<a href={`${scan}/address/${params.owner}`} target="_blank">
+						<a href={`${scan}/address/${params.owner}`} target="_blank" rel="noreferrer">
 							{params.owner}
 						</a>
 					)}
