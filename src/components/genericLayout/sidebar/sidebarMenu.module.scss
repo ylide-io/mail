@@ -10,11 +10,13 @@
 		padding: 0 0 20px;
 		background-color: var(--surface-color);
 		box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+		opacity: 0;
 		width: 210px;
-		transition: left 0.2s;
+		transition: all 0.2s;
 
 		&.root_open {
 			left: 0;
+			opacity: 1;
 		}
 	}
 }
