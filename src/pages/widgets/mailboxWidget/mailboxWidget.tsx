@@ -11,7 +11,7 @@ export function MailboxWidget() {
 	const navigate = useNav();
 
 	useEffect(() => {
-		browserStorage.widgetId = WidgetId.INBOX;
+		browserStorage.widgetId = WidgetId.MAILBOX;
 		navigate(generatePath(RoutePath.MAIL_FOLDER, { folderId: FolderId.Inbox }), { replace: true });
 	}, [navigate]);
 

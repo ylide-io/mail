@@ -1,6 +1,6 @@
 export enum WidgetId {
 	SEND_MESSAGE = 'SEND_MESSAGE',
-	INBOX = 'INBOX',
+	MAILBOX = 'MAILBOX',
 }
 
 export enum WidgetEvent {

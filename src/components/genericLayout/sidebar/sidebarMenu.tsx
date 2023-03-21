@@ -147,7 +147,7 @@ export const SidebarMenu = observer(() => {
 					</div>
 				) : (
 					<>
-						{browserStorage.widgetId !== WidgetId.INBOX && (
+						{browserStorage.widgetId !== WidgetId.MAILBOX && (
 							<div className={css.section}>
 								<div className={css.sectionTitle}>
 									Feed

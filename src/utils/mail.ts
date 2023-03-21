@@ -18,7 +18,7 @@ export function useOpenMailCopmpose() {
 
 	return ({ mailData }: { mailData?: OutgoingMailData } = {}) => {
 		if (location.pathname !== generatePath(RoutePath.MAIL_COMPOSE)) {
-			if (browserStorage.widgetId === WidgetId.INBOX) {
+			if (browserStorage.widgetId === WidgetId.MAILBOX) {
 				globalOutgoingMailData.reset(mailData);
 				navigate(generatePath(RoutePath.MAIL_COMPOSE));
 			} else {
