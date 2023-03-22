@@ -44,6 +44,8 @@ import tags from './Tags';
 
 import { NFT3NameService } from '../api/nft3DID';
 
+import '../api/ipfs';
+
 let INDEXER_BLOCKCHAINS: string[];
 
 if (REACT_APP__OTC_MODE) {

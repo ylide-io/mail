@@ -218,9 +218,15 @@ export function NewPasswordModal({
 				tempLocalKey = await wallet.constructLocalKeyV2(account, password);
 				keyVersion = 2;
 			} else if (freshestKey?.key.keyVersion === 1) {
-				// strange... I'm not sure Qamon keys work here
-				tempLocalKey = await wallet.constructLocalKeyV2(account, password); //wallet.constructLocalKeyV1(account, password);
-				keyVersion = 2;
+				if (freshestKey?.blockchain === 'venom-testnet') {
+					// strange... I'm not sure Qamon keys work here
+					tempLocalKey = await wallet.constructLocalKeyV2(account, password); //wallet.constructLocalKeyV1(account, password);
+					keyVersion = 2;
+				} else {
+					// strange... I'm not sure Qamon keys work here
+					tempLocalKey = await wallet.constructLocalKeyV1(account, password); //wallet.constructLocalKeyV1(account, password);
+					keyVersion = 1;
+				}
 			} else if (freshestKey?.key.keyVersion === 2) {
 				// if user already using password - we should use it too
 				tempLocalKey = await wallet.constructLocalKeyV2(account, password);
