@@ -42,6 +42,8 @@ import { Wallet } from './models/Wallet';
 import { OTCStore } from './OTC';
 import tags from './Tags';
 
+import { NFT3NameService } from '../api/nft3DID';
+
 let INDEXER_BLOCKCHAINS: string[];
 
 if (REACT_APP__OTC_MODE) {
@@ -148,6 +150,10 @@ export class Domain {
 			loading: true,
 		};
 
+	genericNameServices: { blockchain: string; service: AbstractNameService }[] = [
+		{ blockchain: 'ETHEREUM', service: new NFT3NameService() },
+	];
+
 	otc = new OTCStore(this);
 
 	constructor() {
@@ -192,7 +198,7 @@ export class Domain {
 	getNSBlockchainsForAddress(
 		name: string,
 	): { blockchain: string; reader: AbstractBlockchainController; service: AbstractNameService }[] {
-		return Object.keys(this.blockchains)
+		const chainedNameServices = Object.keys(this.blockchains)
 			.filter(bc => {
 				const service = this.blockchains[bc].defaultNameService();
 				return service && service.isCandidate(name);
@@ -205,6 +211,16 @@ export class Domain {
 					reader: this.blockchains[blockchain],
 				};
 			});
+		if (chainedNameServices.length) {
+			return chainedNameServices;
+		}
+		return this.genericNameServices
+			.filter(ns => this.blockchains[ns.blockchain] && ns.service.isCandidate(name))
+			.map(ns => ({
+				blockchain: ns.blockchain,
+				service: ns.service,
+				reader: this.blockchains[ns.blockchain],
+			}));
 	}
 
 	async identifyRouteToAddresses(addresses: string[]) {

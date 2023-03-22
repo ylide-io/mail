@@ -6,7 +6,7 @@ import { KeyboardEvent, useEffect, useRef, useState } from 'react';
 import contacts from '../../stores/Contacts';
 import domain from '../../stores/Domain';
 import { HorizontalAlignment } from '../../utils/alignment';
-import { isAddress, isEns } from '../../utils/blockchain';
+import { isAddress } from '../../utils/blockchain';
 import { constrain } from '../../utils/number';
 import { AdaptiveText } from '../adaptiveText/adaptiveText';
 import { DropDown, DropDownItem, DropDownItemMode } from '../dropDown/dropDown';
@@ -64,7 +64,9 @@ export class Recipients {
 			if (contact) {
 				item.name = contact.name;
 				item.routing = { address: contact.address };
-			} else if (isEns(item.name)) {
+			} else if (isAddress(item.name)) {
+				item.routing = { address: item.name };
+			} else {
 				const nss = domain.getNSBlockchainsForAddress(item.name);
 				for (const ns of nss) {
 					const address = (await ns.service.resolve(item.name)) || undefined;
@@ -73,11 +75,6 @@ export class Recipients {
 						break;
 					}
 				}
-			} else if (isAddress(item.name)) {
-				item.routing = { address: item.name };
-			} else {
-				item.routing = null;
-				return;
 			}
 		}
 
