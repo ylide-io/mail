@@ -18,6 +18,7 @@ import { analytics } from '../../stores/Analytics';
 import { browserStorage } from '../../stores/browserStorage';
 import domain from '../../stores/Domain';
 import { evmBalances } from '../../stores/evmBalances';
+import { chainIdByFaucetType, publishKeyThroughFaucet, requestFaucetSignature } from '../../stores/KeyManagement';
 import { DomainAccount } from '../../stores/models/DomainAccount';
 import { Wallet } from '../../stores/models/Wallet';
 import { RoutePath } from '../../stores/routePath';
@@ -73,6 +74,30 @@ export function NewPasswordModal({
 }: NewPasswordModalProps) {
 	const { toast } = useToastManager();
 
+	const freshestKey: { key: ExternalYlidePublicKey; blockchain: string } | undefined = useMemo(
+		() =>
+			Object.keys(remoteKeys)
+				.filter(t => !!remoteKeys[t])
+				.map(t => ({
+					key: remoteKeys[t]!,
+					blockchain: t,
+				}))
+				.sort((a, b) => b.key.timestamp - a.key.timestamp)[0],
+		[remoteKeys],
+	);
+
+	const keyParams = useMemo(
+		() => ({
+			keyExists: !!freshestKey,
+			keyVersion: freshestKey ? freshestKey.key.keyVersion : 0,
+			isPasswordNeeded: freshestKey
+				? freshestKey.key.keyVersion === 1 || freshestKey.key.keyVersion === 2
+				: false,
+			registrar: freshestKey ? freshestKey.key.registrar : 0,
+		}),
+		[freshestKey],
+	);
+
 	const [step, setStep] = useState(Step.ENTER_PASSWORD);
 
 	const [password, setPassword] = useState('');
@@ -88,41 +113,9 @@ export function NewPasswordModal({
 		}
 	}, [account.address, wallet]);
 
-	const freshestKey = useMemo(
-		() =>
-			Object.keys(remoteKeys)
-				.filter(t => !!remoteKeys[t])
-				.map(t => ({
-					key: remoteKeys[t]!,
-					blockchain: t,
-				}))
-				.sort((a, b) => b.key.timestamp - a.key.timestamp)[0],
-		[remoteKeys],
-	);
-
 	const [domainAccount, setDomainAccount] = useState<DomainAccount>();
 
 	const [pleaseWait, setPleaseWait] = useState(false);
-
-	async function requestFaucetSignature(
-		account: DomainAccount,
-		chainId: number,
-		registrar: number,
-		timestampLock: number,
-	) {
-		const publicKey = account.key.keypair.publicKey;
-
-		const msg = constructFaucetMsg(publicKey, registrar, chainId, timestampLock);
-
-		try {
-			const signature = await (wallet.controller as EthereumWalletController).signString(account.account, msg);
-			console.log('signature: ', signature);
-			return signature;
-		} catch (err) {
-			console.error('aasdasdas: ', err);
-			throw err;
-		}
-	}
 
 	async function publishThroughFaucet(
 		account: DomainAccount,
@@ -134,69 +127,58 @@ export function NewPasswordModal({
 		browserStorage.canSkipRegistration = true;
 		console.log('public key: ', '0x' + new SmartBuffer(account.key.keypair.publicKey).toHexString());
 		setStep(Step.GENERATE_KEY);
-		let chainId;
-		if (faucetType === 'polygon') {
-			chainId = 137;
-		} else if (faucetType === 'gnosis') {
-			chainId = 100;
-		} else if (faucetType === 'fantom') {
-			chainId = 250;
-		} else {
-			throw new Error('Invalid faucet type');
-		}
+		const chainId = chainIdByFaucetType(faucetType);
 		const timestampLock = Math.floor(Date.now() / 1000) - 90;
 		const registrar = 1;
-		const signature = await requestFaucetSignature(account, chainId, registrar, timestampLock);
+		const signature = await requestFaucetSignature(
+			account.wallet,
+			account.key.keypair.publicKey,
+			account.account,
+			chainId,
+			registrar,
+			timestampLock,
+		);
 		setPleaseWait(true);
 		domain.isTxPublishing = true;
 		analytics.walletRegistered(wallet.factory.wallet, account.account.address, domain.accounts.accounts.length);
 		domain.txChain = faucetType;
 		domain.txPlateVisible = true;
 		domain.txWithBonus = bonus;
-		let faucetUrl = `https://faucet.ylide.io/${faucetType}`;
-		// faucetUrl = `http://localhost:8392/${faucetType}`;
-		const promise = fetch(faucetUrl, {
-			method: 'POST',
-			body: JSON.stringify({
-				address: account.account.address.toLowerCase(),
-				referrer: '0x0000000000000000000000000000000000000000',
-				payBonus: bonus ? '1' : '0',
-				registrar,
-				timestampLock,
-				publicKey: '0x' + new SmartBuffer(account.key.keypair.publicKey).toHexString(),
-				keyVersion: 2,
-				_r: signature.r,
-				_s: signature.s,
-				_v: signature.v,
-			}),
-		})
-			.then(response => response.json())
+
+		const promise = publishKeyThroughFaucet(
+			faucetType,
+			account.key.keypair.publicKey,
+			account.account,
+			signature,
+			registrar,
+			timestampLock,
+			keyVersion,
+		)
 			.then(async result => {
-				if (result && result.data && result.data.txHash) {
+				if (result.result) {
 					if (doWait) {
 						await asyncDelay(20000);
 					} else {
 						await asyncDelay(7000);
 					}
 					await account.init();
-					domain.publishingTxHash = result.data.txHash;
+					domain.publishingTxHash = result.hash;
 					domain.isTxPublishing = false;
 				} else {
 					domain.isTxPublishing = false;
-					if (result.error === 'Already exists') {
+					if (result.errorCode === 'ALREADY_EXISTS') {
 						alert(
 							`Your address has been already registered or the previous transaction is in progress. Please try connecting another address or wait for transaction to finalize (1-2 minutes).`,
 						);
 						document.location.href = generatePath(RoutePath.WALLETS);
-						return;
+					} else {
+						alert('Something went wrong with key publishing :(\n\n' + JSON.stringify(result, null, '\t'));
+						document.location.href = generatePath(RoutePath.WALLETS);
 					}
-					alert('Something went wrong with key publishing :(\n\n' + JSON.stringify(result, null, '\t'));
-					document.location.href = generatePath(RoutePath.WALLETS);
-					return;
 				}
 			})
 			.catch(err => {
-				console.log('fetch', err);
+				console.log('faucet publication error: ', err);
 				domain.isTxPublishing = false;
 				domain.txPlateVisible = false;
 			});
@@ -232,12 +214,25 @@ export function NewPasswordModal({
 		let tempLocalKey: YlideKeyPair;
 		let keyVersion;
 		try {
-			if (!forceNew && freshestKey && freshestKey.key.keyVersion === 1) {
-				tempLocalKey = await wallet.constructLocalKeyV2(account, password); //wallet.constructLocalKeyV1(account, password);
-				keyVersion = 2;
-			} else {
+			if (forceNew) {
 				tempLocalKey = await wallet.constructLocalKeyV2(account, password);
 				keyVersion = 2;
+			} else if (freshestKey?.key.keyVersion === 1) {
+				// strange... I'm not sure Qamon keys work here
+				tempLocalKey = await wallet.constructLocalKeyV2(account, password); //wallet.constructLocalKeyV1(account, password);
+				keyVersion = 2;
+			} else if (freshestKey?.key.keyVersion === 2) {
+				// if user already using password - we should use it too
+				tempLocalKey = await wallet.constructLocalKeyV2(account, password);
+				keyVersion = 2;
+			} else if (freshestKey?.key.keyVersion === 3) {
+				// if user is not using password - we should not use it too
+				tempLocalKey = await wallet.constructLocalKeyV3(account);
+				keyVersion = 3;
+			} else {
+				// user have no key at all - use passwordless version
+				tempLocalKey = await wallet.constructLocalKeyV3(account);
+				keyVersion = 3;
 			}
 		} catch (err) {
 			console.log('createLocalKey ', err);
@@ -310,90 +305,116 @@ export function NewPasswordModal({
 
 			{step === Step.ENTER_PASSWORD ? (
 				<>
-					<h3 className="wm-title">{freshestKey ? `Enter password` : `Create password`}</h3>
+					<h3 className="wm-title">
+						{keyParams.isPasswordNeeded
+							? keyParams.keyExists
+								? `Enter password`
+								: `Create password`
+							: 'Sign authorization message'}
+					</h3>
 
 					<h4 className="wm-subtitle">
-						{freshestKey ? (
+						{keyParams.isPasswordNeeded ? (
+							keyParams.keyExists ? (
+								<>
+									We found your key in the {blockchainMeta[freshestKey.blockchain].logo(12)}{' '}
+									<b>{blockchainMeta[freshestKey.blockchain].title}</b> blockchain. Please, enter your
+									Ylide Password to access it.
+								</>
+							) : (
+								`This password will be used to encrypt and decrypt your mails.`
+							)
+						) : keyParams.keyExists ? (
 							<>
 								We found your key in the {blockchainMeta[freshestKey.blockchain].logo(12)}{' '}
-								<b>{blockchainMeta[freshestKey.blockchain].title}</b> blockchain. Please, enter your
-								Ylide Password to access it.
+								<b>{blockchainMeta[freshestKey.blockchain].title}</b> blockchain. Please, sign
+								authroization message to access it.
 							</>
 						) : (
-							`This password will be used to encrypt and decrypt your mails.`
+							''
 						)}
 					</h4>
 
-					{freshestKey ? (
-						<div className="wm-body centered" style={{ padding: '0 20px' }}>
-							<TextField
-								look={TextFieldLook.PROMO}
-								autoFocus
-								value={password}
-								onValueChange={setPassword}
-								type="password"
-								placeholder="Enter your Ylide password"
-							/>
-
-							<div
-								style={{
-									marginTop: 8,
-									textAlign: 'right',
-								}}
-							>
-								<button
-									onClick={() =>
-										forgotPasswordModal({
-											onNewPassword: password => {
-												createLocalKey(password, true).then();
-											},
-										})
-									}
-								>
-									Forgot Password?
-								</button>
-							</div>
-						</div>
-					) : (
-						<div className="wm-body">
-							<form
-								name="sign-up"
-								style={{
-									display: 'grid',
-									gridGap: 12,
-									padding: '20px 16px 8px',
-								}}
-								action="/"
-								method="POST"
-								noValidate
-							>
+					{keyParams.isPasswordNeeded ? (
+						keyParams.keyExists ? (
+							<div className="wm-body centered" style={{ padding: '0 20px' }}>
 								<TextField
 									look={TextFieldLook.PROMO}
-									type="password"
-									autoComplete="new-password"
-									placeholder="Enter Ylide password"
+									autoFocus
 									value={password}
 									onValueChange={setPassword}
-								/>
-								<TextField
-									look={TextFieldLook.PROMO}
 									type="password"
-									autoComplete="new-password"
-									placeholder="Repeat your password"
-									value={passwordRepeat}
-									onValueChange={setPasswordRepeat}
+									placeholder="Enter your Ylide password"
 								/>
-							</form>
-							<div className="ylide-callout">
-								<div>
-									Ylide <b>doesn't save</b> your password anywhere.
-								</div>
-								<br />
-								<div>
-									Please, save it securely, because if you lose it, you will not be able to access
-									your mail.
+
+								<div
+									style={{
+										marginTop: 8,
+										textAlign: 'right',
+									}}
+								>
+									<button
+										onClick={() =>
+											forgotPasswordModal({
+												onNewPassword: password => {
+													createLocalKey(password, true).then();
+												},
+											})
+										}
+									>
+										Forgot Password?
+									</button>
 								</div>
 							</div>
+						) : (
+							<div className="wm-body">
+								<form
+									name="sign-up"
+									style={{
+										display: 'grid',
+										gridGap: 12,
+										padding: '20px 16px 8px',
+									}}
+									action="/"
+									method="POST"
+									noValidate
+								>
+									<TextField
+										look={TextFieldLook.PROMO}
+										type="password"
+										autoComplete="new-password"
+										placeholder="Enter Ylide password"
+										value={password}
+										onValueChange={setPassword}
+									/>
+									<TextField
+										look={TextFieldLook.PROMO}
+										type="password"
+										autoComplete="new-password"
+										placeholder="Repeat your password"
+										value={passwordRepeat}
+										onValueChange={setPasswordRepeat}
+									/>
+								</form>
+								<div className="ylide-callout">
+									<div>
+										Ylide <b>doesn't save</b> your password anywhere.
+									</div>
+									<br />
+									<div>
+										Please, save it securely, because if you lose it, you will not be able to access
+										your mail.
+									</div>
+								</div>
+							</div>
+						)
+					) : (
+						<div
+							className="wm-body centered"
+							style={{ textAlign: 'center', fontSize: 14, lineHeight: '150%' }}
+						>
+							To get your private Ylide communication key, please, press "Sign" button below and sign the
+							authorization message in your wallet.
 						</div>
 					)}
 
@@ -406,7 +427,7 @@ export function NewPasswordModal({
 							look={ActionButtonLook.PRIMARY}
 							onClick={() => createLocalKey(password)}
 						>
-							Continue
+							{keyParams.isPasswordNeeded ? 'Continue' : 'Sign'}
 						</ActionButton>
 					</div>
 				</>
@@ -463,14 +484,19 @@ export function NewPasswordModal({
 								</div>
 								<h3 className="wm-title">Confirm the message</h3>
 								<h4 className="wm-subtitle">
-									We need you to sign your password so we can generate you a unique communication key
+									{keyParams.isPasswordNeeded
+										? 'We need you to sign your password so we can generate you a unique communication key'
+										: 'We need you to sign authorization message so we can generate you a unique communication key'}
 								</h4>
 							</div>
 						</>
 					)}
 
 					<div className="wm-footer">
-						<ActionButton size={ActionButtonSize.XLARGE} onClick={() => setStep(Step.ENTER_PASSWORD)}>
+						<ActionButton
+							size={ActionButtonSize.XLARGE}
+							onClick={() => (keyParams.isPasswordNeeded ? setStep(Step.ENTER_PASSWORD) : onCancel?.())}
+						>
 							Back
 						</ActionButton>
 					</div>
@@ -529,7 +555,9 @@ export function NewPasswordModal({
 								setStep(
 									wallet.factory.blockchainGroup === 'evm'
 										? Step.SELECT_NETWORK
-										: Step.ENTER_PASSWORD,
+										: keyParams.isPasswordNeeded
+										? Step.ENTER_PASSWORD
+										: Step.GENERATE_KEY,
 								)
 							}
 						>
