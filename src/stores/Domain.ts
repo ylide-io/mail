@@ -44,8 +44,6 @@ import tags from './Tags';
 
 import { NFT3NameService } from '../api/nft3DID';
 
-import '../api/ipfs';
-
 let INDEXER_BLOCKCHAINS: string[];
 
 if (REACT_APP__OTC_MODE) {
@@ -530,44 +528,6 @@ export class Domain {
 				this.wallets.push(newWallet);
 			}
 		}
-
-		// for (const blockchain of Object.keys(this.walletControllers)) {
-		// 	for (const wallet of Object.keys(this.walletControllers[blockchain])) {
-		// 		const sender = this.walletControllers[blockchain][wallet];
-		// 		const account = await sender.getAuthenticatedAccount();
-		// 		if (account) {
-		// 			this.connectedWallets.push({
-		// 				blockchain,
-		// 				wallet,
-		// 				account,
-		// 			});
-		// 		}
-		// 	}
-		// }
-		// for (const { blockchain } of this.availableBlockchains) {
-		// 	if (!this.blockchains[blockchain]) {
-		// 		this.blockchains[blockchain] = await this.ylide.addBlockchain(blockchain, {
-		// 			dev: false, //document.location.hostname === 'localhost',
-		// 		});
-		// 	}
-		// }
-		// this.connectedKeys = this.keystore.keys
-		// 	.map(key => {
-		// 		const cw = this.connectedWallets.find(
-		// 			w => w.blockchain === key.blockchain && w.account.address === key.address,
-		// 		);
-		// 		if (!cw) {
-		// 			return null;
-		// 		}
-		// 		return {
-		// 			blockchain: key.blockchain,
-		// 			address: key.address,
-		// 			key: key.key,
-		// 			wallet: this.walletControllers[cw.blockchain][cw.wallet],
-		// 		};
-		// 	})
-		// 	.filter(t => !!t)
-		// 	.map(t => t!);
 	}
 
 	async reloadAvailableWallets() {
@@ -588,10 +548,6 @@ export class Domain {
 		await useMailStore.getState().init();
 		this.initialized = true;
 	}
-
-	// @computed get everscaleKey() {
-	// 	return domain.connectedKeys.find(t => t.blockchain === 'everscale')!;
-	// }
 }
 
 //@ts-ignore

@@ -1,4 +1,4 @@
-import { IMessage } from '@ylide/sdk';
+import { IMessage, Uint256 } from '@ylide/sdk';
 
 import { Domain } from './Domain';
 
