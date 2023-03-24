@@ -1,3 +1,4 @@
+import { YMF } from '@ylide/sdk';
 import clsx from 'clsx';
 import { observer } from 'mobx-react';
 import React, { CSSProperties, useEffect, useMemo, useState } from 'react';
@@ -12,6 +13,7 @@ import domain from '../../../../stores/Domain';
 import { FolderId, ILinkedMessage, useMailStore } from '../../../../stores/MailList';
 import { RoutePath } from '../../../../stores/routePath';
 import { decodeEditorData } from '../../../../utils/editorJs';
+import { ymfToEditorJs } from '../../../../utils/editorjsJson';
 import { formatSubject } from '../../../../utils/mail';
 import { useNav } from '../../../../utils/url';
 import css from './mailboxListRow.module.scss';
@@ -60,11 +62,20 @@ const MailboxListRow: React.FC<MailboxListRowProps> = observer(
 		}, [message.id]);
 
 		const preview = useMemo(() => {
-			const json = decodeEditorData(decoded?.decodedTextData);
-			if (json?.blocks) {
-				return json?.blocks.map((b: any) => b.data.text).join('\n');
+			if (!decoded) {
+				return null;
+			}
+			if (decoded.decodedTextData?.type === 'YMF') {
+				const val = YMF.fromYMFText(decoded.decodedTextData.value).toPlainText();
+				console.log('val: ', val);
+				return val;
 			} else {
-				return (json as any)?.body;
+				const json = decodeEditorData(decoded?.decodedTextData?.value);
+				if (json?.blocks) {
+					return json?.blocks.map((b: any) => b.data.text).join('\n');
+				} else {
+					return (json as any)?.body;
+				}
 			}
 		}, [decoded]);
 

@@ -3,9 +3,9 @@ import { toJS } from 'mobx';
 
 import { IndexedDB } from './IndexedDB';
 
-export interface IMessageDecodedContent {
+export interface IMessageDecodedSerializedContent {
 	msgId: string;
-	decodedTextData: string | null;
+	decodedTextData: { type: 'plain'; value: string } | { type: 'YMF'; value: string } | null;
 	decodedSubject: string | null;
 }
 
@@ -30,17 +30,17 @@ class MessagesDB extends IndexedDB {
 		await db.clear('messages');
 	}
 
-	async saveDecodedMessage(msg: IMessageDecodedContent) {
+	async saveDecodedMessage(msg: IMessageDecodedSerializedContent) {
 		const db = await this.getDB();
 		await db.put('decodedMessages', toJS(msg));
 	}
 
-	async retrieveAllDecodedMessages(): Promise<IMessageDecodedContent[]> {
+	async retrieveAllDecodedMessages(): Promise<IMessageDecodedSerializedContent[]> {
 		const db = await this.getDB();
 		return await db.getAll('decodedMessages');
 	}
 
-	async retrieveDecodedMessageById(id: string): Promise<IMessageDecodedContent | null> {
+	async retrieveDecodedMessageById(id: string): Promise<IMessageDecodedSerializedContent | null> {
 		const db = await this.getDB();
 		return (await db.get('decodedMessages', id)) || null;
 	}

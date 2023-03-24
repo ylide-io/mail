@@ -1,5 +1,5 @@
 import { EVMNetwork } from '@ylide/ethereum';
-import { MessageContentV3, SendMailResult, ServiceCode, Uint256 } from '@ylide/sdk';
+import { MessageContentV4, SendMailResult, ServiceCode, Uint256, YMF } from '@ylide/sdk';
 import { makeAutoObservable } from 'mobx';
 
 import messagesDB from '../indexedDB/MessagesDB';
@@ -68,7 +68,7 @@ class Mailer {
 	async sendMail(
 		sender: DomainAccount,
 		subject: string,
-		text: string,
+		text: YMF,
 		recipients: string[],
 		network?: EVMNetwork,
 		feedId?: Uint256,
@@ -77,7 +77,16 @@ class Mailer {
 		analytics.mailSentAttempt();
 		try {
 			this.sending = true;
-			const content = MessageContentV3.plain(subject, text);
+
+			const content = new MessageContentV4({
+				sendingAgentName: 'ysh',
+				sendingAgentVersion: { major: 1, minor: 0, patch: 0 },
+				subject,
+				content: text,
+				attachments: [], // MessageAttachment[];
+				extraBytes: new Uint8Array(0),
+				extraJson: {},
+			});
 
 			if (!network && sender.wallet.factory.blockchainGroup === 'evm') {
 				network = await getEvmWalletNetwork(sender.wallet);

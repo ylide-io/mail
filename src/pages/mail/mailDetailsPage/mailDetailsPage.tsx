@@ -12,7 +12,7 @@ import { ReactComponent as ArrowLeftSvg } from '../../../icons/ic20/arrowLeft.sv
 import { ReactComponent as ContactSvg } from '../../../icons/ic20/contact.svg';
 import { ReactComponent as ForwardSvg } from '../../../icons/ic20/forward.svg';
 import { ReactComponent as ReplySvg } from '../../../icons/ic20/reply.svg';
-import { IMessageDecodedContent } from '../../../indexedDB/MessagesDB';
+import { IMessageDecodedSerializedContent } from '../../../indexedDB/MessagesDB';
 import { FolderId, ILinkedMessage, useMailList, useMailStore } from '../../../stores/MailList';
 import { globalOutgoingMailData, OutgoingMailData } from '../../../stores/outgoingMailData';
 import { RoutePath } from '../../../stores/routePath';
@@ -45,7 +45,7 @@ export const MailDetailsPage = observer(() => {
 	} = useMailStore();
 
 	const initialMessage = lastMessagesList.find(m => m.id === id!);
-	const initialDecodedContent: IMessageDecodedContent | undefined =
+	const initialDecodedContent: IMessageDecodedSerializedContent | undefined =
 		initialMessage && decodedMessagesById[initialMessage.msgId];
 
 	useEffect(() => {
@@ -249,7 +249,11 @@ export const MailDetailsPage = observer(() => {
 													onForwardClick={() =>
 														onForwardClick(
 															message.message,
-															decoded.decodedTextData,
+															decoded.decodedTextData
+																? decoded.decodedTextData.type === 'YMF'
+																	? decoded.decodedTextData.value.toString()
+																	: decoded.decodedTextData.value
+																: null,
 															decoded.decodedSubject,
 														)
 													}
@@ -273,7 +277,11 @@ export const MailDetailsPage = observer(() => {
 									onForwardClick={() =>
 										onForwardClick(
 											initialMessage,
-											initialDecodedContent.decodedTextData,
+											initialDecodedContent.decodedTextData
+												? initialDecodedContent.decodedTextData.type === 'YMF'
+													? initialDecodedContent.decodedTextData.value.toString()
+													: initialDecodedContent.decodedTextData.value
+												: null,
 											initialDecodedContent.decodedSubject,
 										)
 									}
@@ -300,7 +308,11 @@ export const MailDetailsPage = observer(() => {
 									onClick={() =>
 										onForwardClick(
 											initialMessage,
-											initialDecodedContent.decodedTextData,
+											initialDecodedContent.decodedTextData
+												? initialDecodedContent.decodedTextData.type === 'YMF'
+													? initialDecodedContent.decodedTextData.value.toString()
+													: initialDecodedContent.decodedTextData.value
+												: null,
 											initialDecodedContent.decodedSubject,
 										)
 									}

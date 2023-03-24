@@ -30,6 +30,7 @@ import {
 } from '@ylide/sdk';
 import { makeObservable, observable } from 'mobx';
 
+import { NFT3NameService } from '../api/nft3DID';
 import { REACT_APP__OTC_MODE } from '../env';
 import PasswordModal from '../modals/PasswordModal';
 import SwitchModal from '../modals/SwitchModal';
@@ -41,8 +42,6 @@ import { useMailStore } from './MailList';
 import { Wallet } from './models/Wallet';
 import { OTCStore } from './OTC';
 import tags from './Tags';
-
-import { NFT3NameService } from '../api/nft3DID';
 
 let INDEXER_BLOCKCHAINS: string[];
 

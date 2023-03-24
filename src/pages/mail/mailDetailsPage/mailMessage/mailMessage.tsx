@@ -1,3 +1,4 @@
+import { YMF } from '@ylide/sdk';
 import { Tooltip } from 'antd';
 import React, { useEffect, useMemo, useState } from 'react';
 import { createReactEditorJS } from 'react-editor-js';
@@ -9,10 +10,11 @@ import { ReadableDate } from '../../../../components/readableDate/readableDate';
 import { ReactComponent as ForwardSvg } from '../../../../icons/ic20/forward.svg';
 import { ReactComponent as ReplySvg } from '../../../../icons/ic20/reply.svg';
 import { ReactComponent as TrashSvg } from '../../../../icons/ic20/trash.svg';
-import { IMessageDecodedContent } from '../../../../indexedDB/MessagesDB';
+import { IMessageDecodedSerializedContent } from '../../../../indexedDB/MessagesDB';
 import { FolderId, ILinkedMessage, useMailStore } from '../../../../stores/MailList';
 import { DateFormatStyle } from '../../../../utils/date';
 import { decodeEditorData, EDITOR_JS_TOOLS } from '../../../../utils/editorJs';
+import { ymfToEditorJs } from '../../../../utils/editorjsJson';
 import { formatSubject } from '../../../../utils/mail';
 import css from './mailMessage.module.scss';
 
@@ -20,7 +22,7 @@ const ReactEditorJS = createReactEditorJS();
 
 export interface MailMessageProps {
 	message: ILinkedMessage;
-	decoded?: IMessageDecodedContent;
+	decoded?: IMessageDecodedSerializedContent;
 	folderId?: FolderId;
 	onReady?: () => void;
 	onReplyClick: () => void;
@@ -40,15 +42,20 @@ export function MailMessage({
 	const decodeMessage = useMailStore(state => state.decodeMessage);
 
 	const editorData = useMemo(() => {
-		const json = decodeEditorData(decoded?.decodedTextData);
-		const isQamonMessage = !json?.blocks;
-		return isQamonMessage
-			? {
-					time: 1676587472156,
-					blocks: [{ id: '2cC8_Z_Rad', type: 'paragraph', data: { text: (json as any).body } }],
-					version: '2.26.5',
-			  }
-			: json;
+		if (!decoded?.decodedTextData) return null;
+		if (decoded.decodedTextData.type === 'plain') {
+			const json = decodeEditorData(decoded.decodedTextData.value);
+			const isQamonMessage = !json?.blocks;
+			return isQamonMessage
+				? {
+						time: 1676587472156,
+						blocks: [{ id: '2cC8_Z_Rad', type: 'paragraph', data: { text: (json as any).body } }],
+						version: '2.26.5',
+				  }
+				: json;
+		} else {
+			return ymfToEditorJs(YMF.fromYMFText(decoded.decodedTextData.value));
+		}
 	}, [decoded?.decodedTextData]);
 
 	const onDecodeClick = () => {

@@ -14,12 +14,12 @@ import { Recipients } from '../../../components/recipientInput/recipientInput';
 import { YlideLoader } from '../../../components/ylideLoader/ylideLoader';
 import { REACT_APP__OTC_PROVIDER } from '../../../env';
 import { ReactComponent as ContactSvg } from '../../../icons/ic20/contact.svg';
-import { IMessageDecodedContent } from '../../../indexedDB/MessagesDB';
+import { IMessageDecodedSerializedContent } from '../../../indexedDB/MessagesDB';
 import domain from '../../../stores/Domain';
 import { decodeMessage } from '../../../stores/MailList';
 import { OutgoingMailData } from '../../../stores/outgoingMailData';
 import { invariant } from '../../../utils/assert';
-import { parseEditorjsJson } from '../../../utils/parseEditorjsJson';
+import { parseEditorjsJson } from '../../../utils/editorjsJson';
 import { useAutoSizeTextArea } from '../../../utils/useAutoSizeTextArea';
 import { SendMailButton } from '../../mail/components/composeMailForm/sendMailButton/sendMailButton';
 import { OtcLayout } from '../components/otcLayout/otcLayout';
@@ -28,7 +28,7 @@ import { IframePopup } from './iframePopup/iframePopup';
 import css from './OtcChatPage.module.scss';
 
 interface ChatData extends OtcApi.IThreadResponse {
-	decodedMessagesById: Record<string, IMessageDecodedContent>;
+	decodedMessagesById: Record<string, IMessageDecodedSerializedContent>;
 }
 
 interface ChatProps {

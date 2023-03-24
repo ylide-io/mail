@@ -1,6 +1,7 @@
 import { constructFaucetMsg, EthereumWalletController } from '@ylide/ethereum';
 import { IGenericAccount } from '@ylide/sdk';
 import SmartBuffer from '@ylide/smart-buffer';
+
 import { Wallet } from './models/Wallet';
 
 export const requestFaucetSignature = async (

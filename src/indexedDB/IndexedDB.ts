@@ -3,7 +3,7 @@ import { DBSchema, IDBPDatabase, openDB } from 'idb';
 
 import { IContact } from '../stores/models/IContact';
 import { ITag } from '../stores/models/ITag';
-import { IMessageDecodedContent } from './MessagesDB';
+import { IMessageDecodedSerializedContent } from './MessagesDB';
 
 interface DBInterface extends DBSchema {
 	messages: {
@@ -18,7 +18,7 @@ interface DBInterface extends DBSchema {
 		key: string;
 	};
 	decodedMessages: {
-		value: IMessageDecodedContent;
+		value: IMessageDecodedSerializedContent;
 		key: string;
 	};
 	deletedMessages: {
@@ -46,7 +46,7 @@ export class IndexedDB {
 	db: IDBPDatabase<DBInterface> | null = null;
 
 	private async openDB() {
-		return await openDB<DBInterface>('mail-1', 1, {
+		return await openDB<DBInterface>('mail-2', 1, {
 			upgrade(db) {
 				const messagesStore = db.createObjectStore('messages', {
 					keyPath: 'msgId',

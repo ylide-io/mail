@@ -1,7 +1,7 @@
 import './sendMailButton.module.scss';
 
 import { EVM_NAMES } from '@ylide/ethereum';
-import { Uint256 } from '@ylide/sdk';
+import { Uint256, YMF } from '@ylide/sdk';
 import { Dropdown, Menu } from 'antd';
 import clsx from 'clsx';
 import { autorun } from 'mobx';
@@ -21,6 +21,7 @@ import mailer from '../../../../../stores/Mailer';
 import { OutgoingMailData } from '../../../../../stores/outgoingMailData';
 import { invariant } from '../../../../../utils/assert';
 import { blockchainMeta, evmNameToNetwork } from '../../../../../utils/blockchain';
+import { editorJsToYMF } from '../../../../../utils/editorjsJson';
 import { getEvmWalletNetwork } from '../../../../../utils/wallet';
 
 export interface SendMailButtonProps {
@@ -98,10 +99,18 @@ export const SendMailButton = observer(({ mailData, onSent }: SendMailButtonProp
 				await domain.handleSwitchRequest(mailData.from.wallet.factory.wallet, curr, mailData.from.account);
 			}
 
+			let content: YMF;
+			if (mailData.hasEditorData) {
+				const ymfText = editorJsToYMF(mailData.editorData);
+				content = YMF.fromYMFText(ymfText);
+			} else {
+				content = YMF.fromPlainText(mailData.plainTextData!.trim());
+			}
+
 			const msgId = await mailer.sendMail(
 				mailData.from,
 				mailData.subject,
-				mailData.hasEditorData ? JSON.stringify(mailData.editorData) : mailData.plainTextData!.trim(),
+				content,
 				mailData.to.items.map(r => r.routing?.address!),
 				mailData.network,
 				REACT_APP__OTC_MODE

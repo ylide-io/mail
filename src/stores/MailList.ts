@@ -10,12 +10,13 @@ import {
 	SourceReadingSession,
 	Uint256,
 	YLIDE_MAIN_FEED_ID,
+	YMF,
 } from '@ylide/sdk';
 import { reaction } from 'mobx';
 import { useCallback, useEffect, useState } from 'react';
 import create from 'zustand';
 
-import messagesDB, { IMessageDecodedContent } from '../indexedDB/MessagesDB';
+import messagesDB, { IMessageDecodedSerializedContent } from '../indexedDB/MessagesDB';
 import { invariant } from '../utils/assert';
 import { analytics } from './Analytics';
 import { browserStorage } from './browserStorage';
@@ -23,6 +24,11 @@ import contacts from './Contacts';
 import domain from './Domain';
 import { DomainAccount } from './models/DomainAccount';
 import tags from './Tags';
+
+export interface IMessageDecodedContent {
+	decodedSubject: string | null;
+	decodedTextData: { type: 'plain'; value: string } | { type: 'YMF'; value: YMF } | null;
+}
 
 export enum FolderId {
 	Inbox = 'inbox',
@@ -265,8 +271,8 @@ interface MailStore {
 	lastMessagesList: ILinkedMessage[];
 	setLastMessagesList: (messages: ILinkedMessage[]) => void;
 
-	decodedMessagesById: Record<string, IMessageDecodedContent>;
-	decodeMessage: (pushMsg: ILinkedMessage) => Promise<IMessageDecodedContent>;
+	decodedMessagesById: Record<string, IMessageDecodedSerializedContent>;
+	decodeMessage: (pushMsg: ILinkedMessage) => Promise<void>;
 
 	readMessageIds: Set<string>;
 	markMessagesAsReaded: (ids: string[]) => Promise<void>;
@@ -332,21 +338,29 @@ export const useMailStore = create<MailStore>((set, get) => ({
 
 		analytics.mailOpened(state.lastActiveFolderId || 'null');
 
-		if (state.decodedMessagesById[pushMsg.msgId]) {
-			return state.decodedMessagesById[pushMsg.msgId];
-		}
-
 		const decodedMessage = await decodeMessage(pushMsg.msgId, pushMsg.msg, pushMsg.recipient!.account);
 
-		state.decodedMessagesById[pushMsg.msgId] = decodedMessage;
+		const serializedMsg = {
+			...decodedMessage,
+			decodedTextData:
+				decodedMessage.decodedTextData instanceof YMF
+					? {
+							type: 'YMF' as const,
+							value: decodedMessage.decodedTextData.toString(),
+					  }
+					: {
+							type: 'plain' as const,
+							value: decodedMessage.decodedTextData,
+					  },
+		};
+
+		state.decodedMessagesById[pushMsg.msgId] = serializedMsg;
 		set({ decodedMessagesById: { ...state.decodedMessagesById } });
 
 		if (browserStorage.saveDecodedMessages) {
 			console.log('msg saved: ', pushMsg.msgId);
-			await messagesDB.saveDecodedMessage(decodedMessage);
+			await messagesDB.saveDecodedMessage(serializedMsg);
 		}
-
-		return decodedMessage;
 	},
 
 	readMessageIds: new Set(),
