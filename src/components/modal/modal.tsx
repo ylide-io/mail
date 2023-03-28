@@ -9,7 +9,7 @@ import { Popup } from '../popup/popup';
 import { PropsWithClassName } from '../propsWithClassName';
 import css from './modal.module.scss';
 
-export interface ModalProps extends PropsWithChildren, PropsWithClassName {
+export interface ModalProps extends PropsWithChildren<{}>, PropsWithClassName {
 	isMinimized?: boolean;
 	onMinimize?: () => void;
 

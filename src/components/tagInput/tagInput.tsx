@@ -12,7 +12,7 @@ export enum TagInputItemLook {
 	SUCCESS,
 }
 
-interface TagInputItemProps extends PropsWithChildren, PropsWithClassName {
+interface TagInputItemProps extends PropsWithChildren<{}>, PropsWithClassName {
 	look?: TagInputItemLook;
 	onRemove?: () => void;
 }
@@ -46,7 +46,7 @@ export function TagInputItem({ children, className, look, onRemove, ...props }: 
 
 //
 
-interface TagInputProps extends PropsWithChildren, PropsWithClassName {
+interface TagInputProps extends PropsWithChildren<{}>, PropsWithClassName {
 	isReadOnly?: boolean;
 	placeholder?: string;
 	search?: string;

@@ -64,7 +64,7 @@ export function createSingletonStaticComponentHook<Props, Result = undefined>(
 
 //
 
-export function StaticComponentManager({ children }: PropsWithChildren) {
+export function StaticComponentManager({ children }: PropsWithChildren<{}>) {
 	const [nodes, setNodes] = useState<ReactNode[]>([]);
 
 	const api = useMemo<StaticComponentManagerApi>(

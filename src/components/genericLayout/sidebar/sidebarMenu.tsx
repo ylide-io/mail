@@ -40,7 +40,7 @@ import { ActionButton, ActionButtonLook, ActionButtonSize } from '../../ActionBu
 import { PropsWithClassName } from '../../propsWithClassName';
 import css from './sidebarMenu.module.scss';
 
-interface SidebarBurgerProps extends PropsWithClassName, PropsWithChildren {}
+interface SidebarBurgerProps extends PropsWithClassName, PropsWithChildren<{}> {}
 
 export const SidebarBurger = observer(({ className, children }: SidebarBurgerProps) => (
 	<div className={clsx(css.burger, className)}>

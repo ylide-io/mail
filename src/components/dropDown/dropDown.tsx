@@ -19,7 +19,7 @@ const alignerOptions: DefaultAnchoredElementAlignerOptions = {
 	fitWidthToViewport: true,
 };
 
-export interface DropDownProps extends PropsWithChildren, PropsWithClassName {
+export interface DropDownProps extends PropsWithChildren<{}>, PropsWithClassName {
 	anchorRef: RefObject<HTMLElement>;
 	horizontalAlign?: HorizontalAlignment;
 	verticalAlign?: VerticalAlignment;
@@ -61,7 +61,7 @@ export enum DropDownItemMode {
 	WRAPPER = 'WRAPPER',
 }
 
-interface DropDownItemProps extends PropsWithChildren {
+interface DropDownItemProps extends PropsWithChildren<{}> {
 	mode?: DropDownItemMode;
 	onSelect?: () => void;
 }

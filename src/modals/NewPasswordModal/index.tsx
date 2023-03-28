@@ -1,5 +1,5 @@
 import { constructFaucetMsg, EthereumWalletController, EVMNetwork } from '@ylide/ethereum';
-import { asyncDelay, ExternalYlidePublicKey, IGenericAccount, YlideKeyPair } from '@ylide/sdk';
+import { asyncDelay, ExternalYlidePublicKey, IGenericAccount, YlideKeyPair, YlidePublicKeyVersion } from '@ylide/sdk';
 import SmartBuffer from '@ylide/smart-buffer';
 import { useEffect, useMemo, useState } from 'react';
 import { generatePath } from 'react-router-dom';
@@ -199,6 +199,7 @@ export function NewPasswordModal({
 			analytics.walletRegistered(wallet.factory.wallet, account.account.address, domain.accounts.accounts.length);
 			onSuccess?.(account);
 		} catch (err) {
+			console.error('Publish error: ', err);
 			if (wallet.factory.blockchainGroup === 'evm') {
 				setStep(Step.SELECT_NETWORK);
 			} else {
@@ -216,29 +217,29 @@ export function NewPasswordModal({
 		try {
 			if (forceNew) {
 				tempLocalKey = await wallet.constructLocalKeyV2(account, password);
-				keyVersion = 2;
-			} else if (freshestKey?.key.keyVersion === 1) {
+				keyVersion = YlidePublicKeyVersion.KEY_V2;
+			} else if (freshestKey?.key.keyVersion === YlidePublicKeyVersion.INSECURE_KEY_V1) {
 				if (freshestKey?.blockchain === 'venom-testnet') {
 					// strange... I'm not sure Qamon keys work here
 					tempLocalKey = await wallet.constructLocalKeyV2(account, password); //wallet.constructLocalKeyV1(account, password);
-					keyVersion = 2;
+					keyVersion = YlidePublicKeyVersion.KEY_V2;
 				} else {
 					// strange... I'm not sure Qamon keys work here
 					tempLocalKey = await wallet.constructLocalKeyV1(account, password); //wallet.constructLocalKeyV1(account, password);
-					keyVersion = 1;
+					keyVersion = YlidePublicKeyVersion.INSECURE_KEY_V1;
 				}
-			} else if (freshestKey?.key.keyVersion === 2) {
+			} else if (freshestKey?.key.keyVersion === YlidePublicKeyVersion.KEY_V2) {
 				// if user already using password - we should use it too
 				tempLocalKey = await wallet.constructLocalKeyV2(account, password);
-				keyVersion = 2;
-			} else if (freshestKey?.key.keyVersion === 3) {
+				keyVersion = YlidePublicKeyVersion.KEY_V2;
+			} else if (freshestKey?.key.keyVersion === YlidePublicKeyVersion.KEY_V3) {
 				// if user is not using password - we should not use it too
 				tempLocalKey = await wallet.constructLocalKeyV3(account);
-				keyVersion = 3;
+				keyVersion = YlidePublicKeyVersion.KEY_V3;
 			} else {
 				// user have no key at all - use passwordless version
 				tempLocalKey = await wallet.constructLocalKeyV3(account);
-				keyVersion = 3;
+				keyVersion = YlidePublicKeyVersion.KEY_V3;
 			}
 		} catch (err) {
 			console.log('createLocalKey ', err);
@@ -247,7 +248,7 @@ export function NewPasswordModal({
 		}
 
 		if (!freshestKey) {
-			const domainAccount = await wallet.instantiateNewAccount(account, tempLocalKey);
+			const domainAccount = await wallet.instantiateNewAccount(account, tempLocalKey, keyVersion);
 			setDomainAccount(domainAccount);
 			if (faucetType && wallet.factory.blockchainGroup === 'evm') {
 				await publishThroughFaucet(domainAccount, keyVersion, faucetType, bonus, REACT_APP__OTC_MODE);
@@ -259,11 +260,11 @@ export function NewPasswordModal({
 				}
 			}
 		} else if (isBytesEqual(freshestKey.key.publicKey.bytes, tempLocalKey.publicKey)) {
-			const domainAccount = await wallet.instantiateNewAccount(account, tempLocalKey);
+			const domainAccount = await wallet.instantiateNewAccount(account, tempLocalKey, keyVersion);
 			analytics.walletConnected(wallet.factory.wallet, account.address, domain.accounts.accounts.length);
 			onSuccess?.(domainAccount);
 		} else if (forceNew) {
-			const domainAccount = await wallet.instantiateNewAccount(account, tempLocalKey);
+			const domainAccount = await wallet.instantiateNewAccount(account, tempLocalKey, keyVersion);
 			setDomainAccount(domainAccount);
 			return await publishLocalKey(domainAccount);
 		} else {

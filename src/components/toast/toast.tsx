@@ -20,7 +20,7 @@ export const ToastManagerContext = createContext<ToastManagerApi | undefined>(un
 
 export const useToastManager = () => useContext(ToastManagerContext)!;
 
-export function ToastManager({ children }: PropsWithChildren) {
+export function ToastManager({ children }: PropsWithChildren<{}>) {
 	const [toasts, setToasts] = useState<Array<{ id: number; content: ReactNode; state: ToastState }>>([]);
 
 	const api: ToastManagerApi = useMemo(
@@ -81,7 +81,7 @@ export function ToastManager({ children }: PropsWithChildren) {
 
 //
 
-interface ToastProps extends PropsWithChildren {
+interface ToastProps extends PropsWithChildren<{}> {
 	state: ToastState;
 }
 

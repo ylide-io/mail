@@ -6,7 +6,7 @@ import { useOutsideClick } from '../../utils/useOutsideClick';
 import { PropsWithClassName } from '../propsWithClassName';
 import { PopupManagerContext } from './popupManager/popupManager';
 
-interface PopupProps extends PropsWithChildren, PropsWithClassName {
+interface PopupProps extends PropsWithChildren<{}>, PropsWithClassName {
 	align?: (popupElem: HTMLElement) => void;
 	onClick?: (e: React.MouseEvent<HTMLElement>) => void;
 	closeOnOutsideClick?: boolean;

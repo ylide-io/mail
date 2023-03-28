@@ -12,7 +12,7 @@ import { invariant } from '../../../utils/assert';
 import { PropsWithClassName } from '../../propsWithClassName';
 import { Popup } from '../popup';
 
-interface PopupProps extends PropsWithChildren, PropsWithClassName {
+interface PopupProps extends PropsWithChildren<{}>, PropsWithClassName {
 	anchorRef: RefObject<HTMLElement>;
 	horizontalAlign?: HorizontalAlignment;
 	verticalAlign?: VerticalAlignment;

@@ -1,34 +1,28 @@
 import { EVMNetwork } from '@ylide/ethereum';
-import {
-	ExternalYlidePublicKey,
-	IGenericAccount,
-	ServiceCode,
-	YlideCore,
-	YlideKey,
-	YlidePublicKeyVersion,
-} from '@ylide/sdk';
+import { ExternalYlidePublicKey, IGenericAccount, ServiceCode, YlideCore, YlideKey } from '@ylide/sdk';
 import { computed, makeAutoObservable, observable } from 'mobx';
 
 import { isBytesEqual } from '../../utils/isBytesEqual';
-import { getEvmWalletNetwork } from '../../utils/wallet';
 import { Wallet } from './Wallet';
 
 export class DomainAccount {
 	readonly wallet: Wallet;
 	readonly account: IGenericAccount;
 	readonly key: YlideKey;
+	readonly keyVersion: number;
 	private _name: string;
 
 	@observable remoteKey: ExternalYlidePublicKey | null = null;
 
 	@observable remoteKeys: Record<string, ExternalYlidePublicKey | null> = {};
 
-	constructor(wallet: Wallet, account: IGenericAccount, key: YlideKey, name: string) {
+	constructor(wallet: Wallet, account: IGenericAccount, key: YlideKey, keyVersion: number, name: string) {
 		makeAutoObservable(this);
 
 		this.wallet = wallet;
 		this.account = account;
 		this.key = key;
+		this.keyVersion = keyVersion;
 		this._name = name;
 	}
 
@@ -88,15 +82,13 @@ export class DomainAccount {
 	}
 
 	async attachRemoteKey(preferredNetwork?: EVMNetwork) {
-		const network = preferredNetwork == null ? await getEvmWalletNetwork(this.wallet) : preferredNetwork;
-
 		await this.wallet.controller.attachPublicKey(
 			this.account,
 			this.key.keypair.publicKey,
-			YlidePublicKeyVersion.KEY_V2,
+			this.keyVersion,
 			ServiceCode.MAIL,
 			{
-				network,
+				network: preferredNetwork,
 			},
 		);
 	}

@@ -120,8 +120,14 @@ export const SelectWalletModal = observer(({ onSuccess, onCancel }: SelectWallet
 		}
 		currentAccount = await wallet.getCurrentAccount();
 		if (currentAccount && wallet.isAccountRegistered(currentAccount)) {
-			alert('This account is already connected. Please choose a different one.');
-			return null;
+			const domainAccount = wallet.accounts.find(a => a.account.address === currentAccount!.address)!;
+			if (domainAccount.isLocalKeyRegistered) {
+				alert('This account is already connected. Please choose a different one.');
+				return null;
+			} else {
+				await domain.accounts.removeAccount(domainAccount);
+				return await wallet.connectAccount();
+			}
 		} else {
 			return await wallet.connectAccount();
 		}

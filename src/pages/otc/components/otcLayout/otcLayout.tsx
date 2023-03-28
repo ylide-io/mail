@@ -4,7 +4,7 @@ import { PropsWithChildren, ReactNode } from 'react';
 import { GenericLayout } from '../../../../components/genericLayout/genericLayout';
 import css from './otcLayout.module.scss';
 
-export interface OtcLayoutProps extends PropsWithChildren {
+export interface OtcLayoutProps extends PropsWithChildren<{}> {
 	title: ReactNode;
 	titleRight?: ReactNode;
 	isAsideCentered?: boolean;
@@ -31,7 +31,7 @@ export function OtcLayout({ children, title, titleRight, isAsideCentered, aside,
 
 //
 
-export interface OtcSupContentTitleProps extends PropsWithChildren {}
+export interface OtcSupContentTitleProps extends PropsWithChildren<{}> {}
 
 export function OtcSupContentTitle({ children }: OtcSupContentTitleProps) {
 	return <div className={css.supContentTitle}>{children}</div>;

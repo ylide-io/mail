@@ -19,7 +19,7 @@ export enum ActionButtonLook {
 	LITE,
 }
 
-interface ActionButtonProps extends PropsWithChildren, PropsWithClassName, ButtonHTMLAttributes<HTMLButtonElement> {
+interface ActionButtonProps extends PropsWithChildren<{}>, PropsWithClassName, ButtonHTMLAttributes<HTMLButtonElement> {
 	size?: ActionButtonSize;
 	look?: ActionButtonLook;
 	icon?: ReactNode;

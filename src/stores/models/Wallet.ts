@@ -4,6 +4,7 @@ import {
 	WalletControllerFactory,
 	WalletEvent,
 	YlideKeyPair,
+	YlidePublicKeyVersion,
 } from '@ylide/sdk';
 import { autobind } from 'core-decorators';
 import EventEmitter from 'eventemitter3';
@@ -109,17 +110,16 @@ export class Wallet extends EventEmitter {
 	}
 
 	async constructLocalKeyV3(account: IGenericAccount) {
-		return await this.domain.keystore.constructKeypair(
+		return await this.domain.keystore.constructKeypairV3(
 			'New account connection',
 			this.factory.blockchainGroup,
 			this.factory.wallet,
 			account.address,
-			'no-password', // V3 keys don't need a password
 		);
 	}
 
 	async constructLocalKeyV2(account: IGenericAccount, password: string) {
-		return await this.domain.keystore.constructKeypair(
+		return await this.domain.keystore.constructKeypairV2(
 			'New account connection',
 			this.factory.blockchainGroup,
 			this.factory.wallet,
@@ -165,7 +165,7 @@ export class Wallet extends EventEmitter {
 		return acc;
 	}
 
-	async instantiateNewAccount(account: IGenericAccount, keypair: YlideKeyPair) {
+	async instantiateNewAccount(account: IGenericAccount, keypair: YlideKeyPair, keyVersion: YlidePublicKeyVersion) {
 		return new Promise<DomainAccount>(async resolve => {
 			const existingAcc = this.domain.accounts.accounts.find(
 				acc => acc.account.address.toLowerCase() === account.address.toLowerCase(),
@@ -176,7 +176,7 @@ export class Wallet extends EventEmitter {
 			this.domain.accounts.onceNewAccount(account, acc => {
 				resolve(acc);
 			});
-			await this.domain.keystore.storeKey(keypair, this.factory.blockchainGroup, this.factory.wallet);
+			await this.domain.keystore.storeKey(keypair, keyVersion, this.factory.blockchainGroup, this.factory.wallet);
 		});
 	}
 

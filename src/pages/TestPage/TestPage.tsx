@@ -10,7 +10,7 @@ import { TextField, TextFieldLook } from '../../components/textField/textField';
 import { ReactComponent as SettingsSvg } from '../../icons/ic20/settings.svg';
 import css from './TestPage.module.scss';
 
-export function GridRow({ children }: PropsWithChildren) {
+export function GridRow({ children }: PropsWithChildren<{}>) {
 	return (
 		<div
 			style={{

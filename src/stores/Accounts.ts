@@ -45,6 +45,7 @@ export class Accounts {
 								blockchain: key.blockchainGroup,
 							},
 							key,
+							key.keyVersion,
 							(await this.domain.storage.readString('yld1_accName_' + key.address)) || 'New Account',
 						);
 					}
@@ -61,13 +62,13 @@ export class Accounts {
 		});
 	}
 
-	async addAccount(account: IGenericAccount, key: YlideKey, name: string) {
+	async addAccount(account: IGenericAccount, key: YlideKey, keyVersion: number, name: string) {
 		const wallet = this.domain.wallets.find(w => w.factory.wallet === key.wallet);
 		if (!wallet) {
 			return;
 		}
 
-		const domainAccount = new DomainAccount(wallet, account, key, name);
+		const domainAccount = new DomainAccount(wallet, account, key, keyVersion, name);
 		await domainAccount.init();
 
 		wallet.accounts.push(domainAccount);

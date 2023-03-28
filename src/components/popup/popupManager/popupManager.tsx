@@ -7,7 +7,7 @@ interface PopupManagerApi {
 
 export const PopupManagerContext = createContext<PopupManagerApi | undefined>(undefined);
 
-export function PopupManager({ children }: PropsWithChildren) {
+export function PopupManager({ children }: PropsWithChildren<{}>) {
 	const mainRef = useRef<HTMLDivElement>(null);
 
 	const api = useMemo<PopupManagerApi>(

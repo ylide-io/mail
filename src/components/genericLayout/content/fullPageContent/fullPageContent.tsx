@@ -6,7 +6,7 @@ import { ActionButton, ActionButtonLook, ActionButtonSize } from '../../../Actio
 import { PropsWithClassName } from '../../../propsWithClassName';
 import css from './fullPageContent.module.scss';
 
-export interface FullPageContentProps extends PropsWithChildren, PropsWithClassName {
+export interface FullPageContentProps extends PropsWithChildren<{}>, PropsWithClassName {
 	mobileTopButtonProps?: {
 		text: string;
 		link: string;

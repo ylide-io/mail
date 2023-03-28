@@ -2,7 +2,7 @@ import { PropsWithChildren, ReactNode } from 'react';
 
 import css from './narrowContent.module.scss';
 
-export interface NarrowContentProps extends PropsWithChildren {
+export interface NarrowContentProps extends PropsWithChildren<{}> {
 	title: ReactNode;
 	titleSubItem?: ReactNode;
 	titleRight?: ReactNode;
