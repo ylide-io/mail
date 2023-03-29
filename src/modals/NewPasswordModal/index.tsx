@@ -215,17 +215,20 @@ export function NewPasswordModal({
 		let tempLocalKey: YlideKeyPair;
 		let keyVersion;
 		try {
-			if (forceNew) {
+			if (wallet.factory.blockchainGroup === 'everscale') {
+				tempLocalKey = await wallet.constructLocalKeyV1(account, password);
+				keyVersion = YlidePublicKeyVersion.INSECURE_KEY_V1;
+			} else if (forceNew) {
 				tempLocalKey = await wallet.constructLocalKeyV2(account, password);
 				keyVersion = YlidePublicKeyVersion.KEY_V2;
 			} else if (freshestKey?.key.keyVersion === YlidePublicKeyVersion.INSECURE_KEY_V1) {
 				if (freshestKey?.blockchain === 'venom-testnet') {
 					// strange... I'm not sure Qamon keys work here
-					tempLocalKey = await wallet.constructLocalKeyV2(account, password); //wallet.constructLocalKeyV1(account, password);
+					tempLocalKey = await wallet.constructLocalKeyV2(account, password);
 					keyVersion = YlidePublicKeyVersion.KEY_V2;
 				} else {
 					// strange... I'm not sure Qamon keys work here
-					tempLocalKey = await wallet.constructLocalKeyV1(account, password); //wallet.constructLocalKeyV1(account, password);
+					tempLocalKey = await wallet.constructLocalKeyV1(account, password);
 					keyVersion = YlidePublicKeyVersion.INSECURE_KEY_V1;
 				}
 			} else if (freshestKey?.key.keyVersion === YlidePublicKeyVersion.KEY_V2) {
