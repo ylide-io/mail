@@ -13,7 +13,6 @@ import domain from '../../../../stores/Domain';
 import { FolderId, ILinkedMessage, useMailStore } from '../../../../stores/MailList';
 import { RoutePath } from '../../../../stores/routePath';
 import { decodeEditorData } from '../../../../utils/editorJs';
-import { ymfToEditorJs } from '../../../../utils/editorjsJson';
 import { formatSubject } from '../../../../utils/mail';
 import { useNav } from '../../../../utils/url';
 import css from './mailboxListRow.module.scss';
