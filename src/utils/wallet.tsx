@@ -1,13 +1,13 @@
 import { EVM_NAMES, EVMNetwork } from '@ylide/ethereum';
 
-import { BinanceWalletLogo } from '../icons/BinanceWalletLogo';
-import { CoinbaseWalletLogo } from '../icons/CoinbaseWalletLogo';
-import EverscaleLogo from '../icons/EverscaleLogo';
-import { MetaMaskLogo } from '../icons/MetaMaskLogo';
-import { PhantomLogo } from '../icons/PhantomLogo';
-import { TrustWalletLogo } from '../icons/TrustWalletLogo';
-import VenomLogo from '../icons/VenomLogo';
-import { WalletConnectLogo } from '../icons/WalletConnectLogo';
+import { BinanceWalletLogo } from '../icons/wallets/BinanceWalletLogo';
+import { CoinbaseWalletLogo } from '../icons/wallets/CoinbaseWalletLogo';
+import { EverscaleLogo } from '../icons/wallets/EverscaleLogo';
+import { MetaMaskLogo } from '../icons/wallets/MetaMaskLogo';
+import { PhantomLogo } from '../icons/wallets/PhantomLogo';
+import { TrustWalletLogo } from '../icons/wallets/TrustWalletLogo';
+import { VenomLogo } from '../icons/wallets/VenomLogo';
+import { WalletConnectLogo } from '../icons/wallets/WalletConnectLogo';
 import { Wallet } from '../stores/models/Wallet';
 import { invariant } from './assert';
 import { evmNameToNetwork } from './blockchain';

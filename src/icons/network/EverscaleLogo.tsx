@@ -1,6 +1,6 @@
 import React from 'react';
 
-const EverscaleLogo = ({ size = 20 }: { size?: number }) => {
+export const EverscaleLogo = ({ size = 20 }: { size?: number }) => {
 	return (
 		<svg
 			height={size}
@@ -24,5 +24,3 @@ const EverscaleLogo = ({ size = 20 }: { size?: number }) => {
 		</svg>
 	);
 };
-
-export default EverscaleLogo;

@@ -1,25 +1,25 @@
 import { EVM_NAMES, EVMNetwork } from '@ylide/ethereum';
 
-import { ArbitrumLogo } from '../icons/ArbitrumLogo';
-import { AstarLogo } from '../icons/AstarLogo';
-import { AuroraLogo } from '../icons/AuroraLogo';
-import { AvalancheLogo } from '../icons/AvalancheLogo';
-import { BNBChainLogo } from '../icons/BNBChainLogo';
-import { CeloLogo } from '../icons/CeloLogo';
-import { CronosLogo } from '../icons/CronosLogo';
-import { EthereumLogo } from '../icons/EthereumLogo';
-import EverscaleLogo from '../icons/EverscaleLogo';
-import { FantomLogo } from '../icons/FantomLogo';
-import { GnosisLogo } from '../icons/GnosisLogo';
-import { KlaytnLogo } from '../icons/KlaytnLogo';
-import { MetisLogo } from '../icons/MetisLogo';
-import { MoonbeamLogo } from '../icons/MoonbeamLogo';
-import { MoonriverLogo } from '../icons/MoonriverLogo';
-import { NearLogo } from '../icons/NearLogo';
-import { OptimismLogo } from '../icons/OptimismLogo';
-import { PolygonLogo } from '../icons/PolygonLogo';
-import { SolanaLogo } from '../icons/SolanaLogo';
-import VenomLogo from '../icons/VenomLogo';
+import { ArbitrumLogo } from '../icons/network/ArbitrumLogo';
+import { AstarLogo } from '../icons/network/AstarLogo';
+import { AuroraLogo } from '../icons/network/AuroraLogo';
+import { AvalancheLogo } from '../icons/network/AvalancheLogo';
+import { BNBChainLogo } from '../icons/network/BNBChainLogo';
+import { CeloLogo } from '../icons/network/CeloLogo';
+import { CronosLogo } from '../icons/network/CronosLogo';
+import { EthereumLogo } from '../icons/network/EthereumLogo';
+import { EverscaleLogo } from '../icons/network/EverscaleLogo';
+import { FantomLogo } from '../icons/network/FantomLogo';
+import { GnosisLogo } from '../icons/network/GnosisLogo';
+import { KlaytnLogo } from '../icons/network/KlaytnLogo';
+import { MetisLogo } from '../icons/network/MetisLogo';
+import { MoonbeamLogo } from '../icons/network/MoonbeamLogo';
+import { MoonriverLogo } from '../icons/network/MoonriverLogo';
+import { NearLogo } from '../icons/network/NearLogo';
+import { OptimismLogo } from '../icons/network/OptimismLogo';
+import { PolygonLogo } from '../icons/network/PolygonLogo';
+import { SolanaLogo } from '../icons/network/SolanaLogo';
+import { VenomLogo } from '../icons/network/VenomLogo';
 import domain from '../stores/Domain';
 
 export function isAddress(input: string): boolean {
