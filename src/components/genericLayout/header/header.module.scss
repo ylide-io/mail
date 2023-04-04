@@ -39,6 +39,10 @@
 	grid-gap: 20px;
 	align-items: center;
 	margin: 0 0 0 auto;
+
+	@include less720px {
+		grid-gap: 8px;
+	}
 }
 
 .users {
