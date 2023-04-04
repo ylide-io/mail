@@ -3,8 +3,9 @@ import { useSearchParams } from 'react-router-dom';
 
 import { ActionButton, ActionButtonLook } from '../../../components/ActionButton/ActionButton';
 import { Recipients } from '../../../components/recipientInput/recipientInput';
-import { Toast } from '../../../components/toast/toast';
+import { Toast, useToastManager } from '../../../components/toast/toast';
 import { ReactComponent as CrossSvg } from '../../../icons/ic20/cross.svg';
+import mailer from '../../../stores/Mailer';
 import { OutgoingMailData } from '../../../stores/outgoingMailData';
 import { invariant } from '../../../utils/assert';
 import { ComposeMailForm } from '../../mail/components/composeMailForm/composeMailForm';
@@ -17,6 +18,8 @@ export function SendMessageWidget() {
 	const subject = searchParams.get('subject') || '';
 	invariant(toAddress, 'to-address required');
 
+	const { toast } = useToastManager();
+
 	const mailData = useMemo(() => {
 		const data = new OutgoingMailData();
 		data.to = new Recipients(toAddress ? [toAddress] : undefined);
@@ -24,8 +27,12 @@ export function SendMessageWidget() {
 		return data;
 	}, [subject, toAddress]);
 
-	const postCloseMessage = () => {
-		postWidgetMessage(WidgetId.SEND_MESSAGE, WidgetEvent.CLOSE);
+	const closeWidget = () => {
+		if (mailer.sending) {
+			toast('Please wait. Sending is in progress 👌');
+		} else {
+			postWidgetMessage(WidgetId.SEND_MESSAGE, WidgetEvent.CLOSE);
+		}
 	};
 
 	return (
@@ -37,7 +44,7 @@ export function SendMessageWidget() {
 						look={ActionButtonLook.LITE}
 						icon={<CrossSvg />}
 						title="Close"
-						onClick={postCloseMessage}
+						onClick={closeWidget}
 					/>
 				</div>
 			</div>
@@ -48,7 +55,7 @@ export function SendMessageWidget() {
 				mailData={mailData}
 				onSent={() =>
 					setTimeout(() => {
-						postCloseMessage();
+						closeWidget();
 					}, Toast.DISPLAY_TIME)
 				}
 			/>

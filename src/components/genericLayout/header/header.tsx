@@ -13,17 +13,20 @@ import { useSelectWalletModal } from '../../../modals/SelectWalletModal';
 import { postWidgetMessage, WidgetEvent, WidgetId } from '../../../pages/widgets/widgets';
 import { browserStorage } from '../../../stores/browserStorage';
 import domain from '../../../stores/Domain';
+import mailer from '../../../stores/Mailer';
 import { RoutePath } from '../../../stores/routePath';
 import { useOpenMailCopmpose } from '../../../utils/mail';
 import { useNav } from '../../../utils/url';
 import { ActionButton, ActionButtonLook, ActionButtonSize } from '../../ActionButton/ActionButton';
 import { Blockie } from '../../blockie/blockie';
+import { useToastManager } from '../../toast/toast';
 import { SidebarBurger } from '../sidebar/sidebarMenu';
 import { AccountsPopup } from './accountsPopup/accountsPopup';
 import css from './header.module.scss';
 
 const Header = observer(() => {
 	const navigate = useNav();
+	const { toast } = useToastManager();
 	const openMailCopmpose = useOpenMailCopmpose();
 
 	const selectWalletModal = useSelectWalletModal();
@@ -121,7 +124,13 @@ const Header = observer(() => {
 						look={ActionButtonLook.LITE}
 						icon={<CrossSvg style={{ width: 28, height: 28 }} />}
 						title="Close"
-						onClick={() => postWidgetMessage(WidgetId.MAILBOX, WidgetEvent.CLOSE)}
+						onClick={() => {
+							if (mailer.sending) {
+								toast('Please wait. Sending is in progress 👌');
+							} else {
+								postWidgetMessage(WidgetId.MAILBOX, WidgetEvent.CLOSE);
+							}
+						}}
 					/>
 				)}
 			</div>
