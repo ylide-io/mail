@@ -1,5 +1,4 @@
 import { IGenericAccount } from '@ylide/sdk';
-import Modal from 'antd/lib/modal/Modal';
 import { autobind } from 'core-decorators';
 import { makeObservable, observable } from 'mobx';
 import { observer } from 'mobx-react';
@@ -7,8 +6,10 @@ import { PureComponent } from 'react';
 
 import metamaskSwitchVideo from '../../assets/video/metamask-switch.mp4';
 import { ErrorMessage } from '../../components/errorMessage/errorMessage';
+import { Modal } from '../../components/modal/modal';
 import modals from '../../stores/Modals';
 import { Wallet } from '../../stores/models/Wallet';
+import { truncateInMiddle } from '../../utils/string';
 
 export interface SwitchModalProps {
 	type: 'account' | 'network';
@@ -146,24 +147,30 @@ export default class SwitchModal extends PureComponent<SwitchModalProps> {
 		}
 
 		return (
-			<Modal
-				cancelText="Cancel"
-				visible={true}
-				closable={false}
-				okButtonProps={{ style: { display: 'none' } }}
-				title="Switch account"
-				onCancel={() => this.props.onConfirm(false)}
-			>
-				<div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%' }}>
-					<p>Please unlock you wallet and make sure that both account and network are selected correctly.</p>
+			<Modal onClose={() => this.props.onConfirm(false)}>
+				<div
+					style={{
+						display: 'grid',
+						justifyItems: 'center',
+						gridGap: 16,
+						padding: 32,
+						width: '100%',
+					}}
+				>
+					<div style={{ fontSize: 20 }}>Switch account</div>
 
-					{this.props.needAccount && <p>Account: {this.props.needAccount.address}</p>}
-					{this.props.needNetwork && <p>Network: {this.props.needNetwork}</p>}
+					<div>
+						Please unlock you wallet and make sure that both account and network are selected correctly.
+					</div>
+
+					{this.props.needAccount && (
+						<div>Account: {truncateInMiddle(this.props.needAccount.address, 16, '..')}</div>
+					)}
+					{this.props.needNetwork && <div>Network: {this.props.needNetwork}</div>}
 
 					{this.error && <ErrorMessage>{this.error}</ErrorMessage>}
 
-					<br />
-					<video src={metamaskSwitchVideo} autoPlay loop style={{ maxWidth: 300 }} />
+					<video src={metamaskSwitchVideo} autoPlay loop style={{ width: 300, maxWidth: '100%' }} />
 				</div>
 			</Modal>
 		);
