@@ -5,10 +5,13 @@ import { generatePath } from 'react-router-dom';
 
 import { REACT_APP__OTC_MODE } from '../../../env';
 import { ReactComponent as ArrowDownSvg } from '../../../icons/ic20/arrowDown.svg';
+import { ReactComponent as CrossSvg } from '../../../icons/ic20/cross.svg';
 import { ReactComponent as PlusSvg } from '../../../icons/ic20/plus.svg';
 import { ReactComponent as ContactsSvg } from '../../../icons/ic28/contacts.svg';
 import { YlideLargeLogo } from '../../../icons/YlideLargeLogo';
 import { useSelectWalletModal } from '../../../modals/SelectWalletModal';
+import { postWidgetMessage, WidgetEvent, WidgetId } from '../../../pages/widgets/widgets';
+import { browserStorage } from '../../../stores/browserStorage';
 import domain from '../../../stores/Domain';
 import { RoutePath } from '../../../stores/routePath';
 import { useOpenMailCopmpose } from '../../../utils/mail';
@@ -110,6 +113,16 @@ const Header = observer(() => {
 					>
 						Connect account
 					</ActionButton>
+				)}
+
+				{browserStorage.widgetId === WidgetId.MAILBOX && (
+					<ActionButton
+						size={ActionButtonSize.LARGE}
+						look={ActionButtonLook.LITE}
+						icon={<CrossSvg style={{ width: 28, height: 28 }} />}
+						title="Close"
+						onClick={() => postWidgetMessage(WidgetId.MAILBOX, WidgetEvent.CLOSE)}
+					/>
 				)}
 			</div>
 		</div>

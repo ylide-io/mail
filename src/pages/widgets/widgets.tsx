@@ -22,3 +22,7 @@ export function stringifyWidgetMessage<Payload>(widget: WidgetId, event: WidgetE
 		payload,
 	} as WidgetMessage<Payload>);
 }
+
+export function postWidgetMessage<Payload>(widget: WidgetId, event: WidgetEvent, payload?: Payload) {
+	window.parent.postMessage(stringifyWidgetMessage(widget, event, payload), '*');
+}

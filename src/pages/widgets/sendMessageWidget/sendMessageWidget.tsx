@@ -8,7 +8,7 @@ import { ReactComponent as CrossSvg } from '../../../icons/ic20/cross.svg';
 import { OutgoingMailData } from '../../../stores/outgoingMailData';
 import { invariant } from '../../../utils/assert';
 import { ComposeMailForm } from '../../mail/components/composeMailForm/composeMailForm';
-import { stringifyWidgetMessage, WidgetEvent, WidgetId } from '../widgets';
+import { postWidgetMessage, WidgetEvent, WidgetId } from '../widgets';
 import css from './sendMessageWidget.module.scss';
 
 export function SendMessageWidget() {
@@ -25,7 +25,7 @@ export function SendMessageWidget() {
 	}, [subject, toAddress]);
 
 	const postCloseMessage = () => {
-		window.parent.postMessage(stringifyWidgetMessage(WidgetId.SEND_MESSAGE, WidgetEvent.CLOSE), '*');
+		postWidgetMessage(WidgetId.SEND_MESSAGE, WidgetEvent.CLOSE);
 	};
 
 	return (
