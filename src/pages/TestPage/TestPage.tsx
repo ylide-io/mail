@@ -76,6 +76,15 @@ export const TestPage = observer(() => {
 			</GridRow>
 
 			<GridRow>
+				large
+				<ActionButton size={ActionButtonSize.LARGE}>Text Only</ActionButton>
+				<ActionButton size={ActionButtonSize.LARGE} icon={<SettingsSvg style={{ width: 24, height: 24 }} />}>
+					With Icon
+				</ActionButton>
+				<ActionButton size={ActionButtonSize.LARGE} icon={<SettingsSvg style={{ width: 24, height: 24 }} />} />
+			</GridRow>
+
+			<GridRow>
 				xlarge
 				<ActionButton size={ActionButtonSize.XLARGE}>Text Only</ActionButton>
 				<ActionButton size={ActionButtonSize.XLARGE} icon={<SettingsSvg style={{ width: 24, height: 24 }} />}>
