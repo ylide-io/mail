@@ -3,6 +3,7 @@ import React from 'react';
 import { generatePath } from 'react-router-dom';
 
 import { ActionButton, ActionButtonLook, ActionButtonSize } from '../../../../components/ActionButton/ActionButton';
+import { AdaptiveAddress } from '../../../../components/adaptiveAddress/adaptiveAddress';
 import { useToastManager } from '../../../../components/toast/toast';
 import { ReactComponent as ClipboardSvg } from '../../../../icons/ic20/clipboard.svg';
 import { ReactComponent as PlusSvg } from '../../../../icons/ic20/plus.svg';
@@ -58,7 +59,7 @@ const MailboxEmpty = observer(({ folderId }: MailboxEmptyProps) => {
 									}}
 								/>
 
-								<div className={css.addressText}>{a.account.address}</div>
+								<AdaptiveAddress address={a.account.address} />
 							</>
 						))}
 					</div>
