@@ -78,7 +78,12 @@ export class Recipients {
 			}
 		}
 
-		if (!item.routing?.details && item.routing?.address) {
+		if (!item.routing) {
+			item.routing = null;
+			return;
+		}
+
+		if (item.routing.address && !item.routing.details) {
 			const achievability = await domain.identifyAddressAchievability(item.routing.address);
 			if (achievability) {
 				item.routing.details = {
@@ -147,13 +152,12 @@ export const RecipientInput = observer(({ isReadOnly, value }: RecipientInputPro
 	};
 
 	const onBlur = () => {
-		setFocused(false);
-
 		const cleanSearch = search.trim();
 		if (cleanSearch && !value.items.some(it => it.name === cleanSearch || it.routing?.address === cleanSearch)) {
 			value.items = [...value.items, Recipients.createItem(cleanSearch)];
 		}
 
+		setFocused(false);
 		setSearch('');
 	};
 
