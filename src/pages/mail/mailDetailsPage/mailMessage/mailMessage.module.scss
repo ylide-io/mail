@@ -28,15 +28,21 @@
 }
 
 .sender {
-	display: grid;
-	grid-template-columns: auto auto;
+	display: flex;
 	align-items: center;
-	justify-content: start;
-	grid-gap: 8px;
+	min-width: 0;
+
+	> :not(:first-child) {
+		margin-left: 8px;
+	}
 }
 
 .senderLabel {
 	color: var(--secondary-text-color);
+}
+
+.addContactButton {
+	margin: -99px 0;
 }
 
 .date {

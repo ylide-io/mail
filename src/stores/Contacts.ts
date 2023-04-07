@@ -2,6 +2,7 @@ import fuzzysort from 'fuzzysort';
 import { makeAutoObservable } from 'mobx';
 
 import contactsDB from '../indexedDB/ContactsDB';
+import { invariant } from '../utils/assert';
 import { IContact } from './models/IContact';
 import { ITag } from './models/ITag';
 
@@ -44,6 +45,8 @@ class Contacts {
 	}
 
 	async saveContact(contact: IContact): Promise<void> {
+		invariant(!this.contacts.some(c => c.address === contact.address));
+
 		this.contacts.unshift(contact);
 		this.contactsByAddress[contact.address] = contact;
 		await contactsDB.saveContact(contact);

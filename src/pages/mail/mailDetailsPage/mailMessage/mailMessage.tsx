@@ -7,11 +7,16 @@ import { ActionButton, ActionButtonLook } from '../../../../components/ActionBut
 import { Blockie } from '../../../../components/blockie/blockie';
 import { ContactName } from '../../../../components/contactName/contactName';
 import { ReadableDate } from '../../../../components/readableDate/readableDate';
+import { Spinner } from '../../../../components/spinner/spinner';
+import { useToastManager } from '../../../../components/toast/toast';
+import { ReactComponent as AddContactSvg } from '../../../../icons/ic20/addContact.svg';
 import { ReactComponent as ForwardSvg } from '../../../../icons/ic20/forward.svg';
 import { ReactComponent as ReplySvg } from '../../../../icons/ic20/reply.svg';
 import { ReactComponent as TrashSvg } from '../../../../icons/ic20/trash.svg';
 import { IMessageDecodedSerializedContent } from '../../../../indexedDB/MessagesDB';
+import contacts from '../../../../stores/Contacts';
 import { FolderId, ILinkedMessage, useMailStore } from '../../../../stores/MailList';
+import { IContact } from '../../../../stores/models/IContact';
 import { DateFormatStyle } from '../../../../utils/date';
 import { decodeEditorData, EDITOR_JS_TOOLS } from '../../../../utils/editorJs';
 import { ymfToEditorJs } from '../../../../utils/editorjsJson';
@@ -39,6 +44,11 @@ export function MailMessage({
 	onForwardClick,
 	onDeleteClick,
 }: MailMessageProps) {
+	const { toast } = useToastManager();
+
+	const contact = contacts.contactsByAddress[message.msg.senderAddress];
+	const [isSavingContact, setSavingContact] = useState(false);
+
 	const decodeMessage = useMailStore(state => state.decodeMessage);
 
 	const editorData = useMemo(() => {
@@ -104,6 +114,33 @@ export function MailMessage({
 			<div className={css.sender}>
 				<div className={css.senderLabel}>Sender:</div>
 				<ContactName address={message.msg.senderAddress} />
+
+				{!contact && (
+					<ActionButton
+						className={css.addContactButton}
+						isDisabled={isSavingContact}
+						icon={isSavingContact ? <Spinner /> : <AddContactSvg />}
+						title="Create contact"
+						onClick={() => {
+							const name = prompt('Enter contact name:')?.trim();
+							if (!name) return;
+
+							const contact: IContact = {
+								name,
+								description: '',
+								address: message.msg.senderAddress,
+								tags: [],
+							};
+
+							setSavingContact(true);
+
+							contacts
+								.saveContact(contact)
+								.catch(() => toast("Couldn't save 😒"))
+								.finally(() => setSavingContact(false));
+						}}
+					/>
+				)}
 			</div>
 
 			<ReadableDate className={css.date} style={DateFormatStyle.LONG} value={message.msg.createdAt * 1000} />
