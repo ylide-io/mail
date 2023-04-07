@@ -7,7 +7,7 @@ import tags from '../../../../stores/Tags';
 
 export const TagsFilter = observer(() => {
 	return (
-		<Select placeholder="Filter by folder">
+		<Select placeholder="Filter by tag">
 			{onSelect => (
 				<>
 					<DropDownItem
@@ -17,7 +17,7 @@ export const TagsFilter = observer(() => {
 							contacts.setFilterByTag(null);
 						}}
 					>
-						All folders
+						All tags
 					</DropDownItem>
 
 					{tags.tags.map(tag => (

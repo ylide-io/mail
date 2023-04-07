@@ -62,7 +62,7 @@ const Header = observer(() => {
 
 			<div className={css.main}>
 				{REACT_APP__OTC_MODE || !domain.accounts.hasActiveAccounts || (
-					<Tooltip title="Manage contacts and folders">
+					<Tooltip title="Contacts">
 						<ActionButton
 							size={ActionButtonSize.MEDIUM}
 							look={ActionButtonLook.LITE}

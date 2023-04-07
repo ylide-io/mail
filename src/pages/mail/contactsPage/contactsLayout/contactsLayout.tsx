@@ -32,7 +32,7 @@ export function ContactsLayout({ children, activeTab, title, titleRight }: Conta
 
 				<Tabs activeKey={activeTab} onTabClick={key => navigate(generatePath(key))}>
 					<Tabs.TabPane tab="Contacts" key={RoutePath.MAIL_CONTACTS} />
-					<Tabs.TabPane tab="Folders" key={RoutePath.MAIL_FOLDERS} />
+					<Tabs.TabPane tab="Tags" key={RoutePath.MAIL_CONTACT_TAGS} />
 				</Tabs>
 
 				<div>{children}</div>

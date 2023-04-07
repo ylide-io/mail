@@ -16,7 +16,7 @@ export const ContactTagsPage = observer(() => {
 	return (
 		<ContactsLayout
 			activeTab={ContactsTab.TAGS}
-			title="Folders"
+			title="Tags"
 			titleRight={
 				<ActionButton
 					size={ActionButtonSize.MEDIUM}
@@ -24,7 +24,7 @@ export const ContactTagsPage = observer(() => {
 					icon={<PlusSvg style={{ display: 'inline-block', verticalAlign: 'middle' }} />}
 					onClick={() => tags.generateNewTag()}
 				>
-					New folder
+					New tag
 				</ActionButton>
 			}
 		>

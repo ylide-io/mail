@@ -60,7 +60,7 @@ const TagsListItem: React.FC<TagsListItemProps> = ({ tag, isNew }) => {
 					</div>
 				</div>
 				<div className="contact-name">
-					<TextField placeholder="Type new folder name" value={name} onValueChange={setName} />
+					<TextField placeholder="Tag name" value={name} onValueChange={setName} />
 				</div>
 				<div className="contact-actions small-actions">
 					{!isNew ? (

@@ -41,7 +41,7 @@ export const ContactListPage = observer(() => {
 			}
 		>
 			{!cleanSearchTerm && !contactsList.length && !contacts.newContact ? (
-				<ContactsEmpty isTagFilter={!!contacts.contacts.length} />
+				<ContactsEmpty />
 			) : (
 				<div className="contacts-list">
 					{contacts.newContact && <ContactsListItem isNew={true} contact={{ ...contacts.newContact }} />}

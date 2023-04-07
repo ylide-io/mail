@@ -116,7 +116,7 @@ const App = observer(() => {
 
 							<Route path={RoutePath.MAIL_COMPOSE} element={<ComposePage />} />
 							<Route path={RoutePath.MAIL_CONTACTS} element={<ContactListPage />} />
-							<Route path={RoutePath.MAIL_FOLDERS} element={<ContactTagsPage />} />
+							<Route path={RoutePath.MAIL_CONTACT_TAGS} element={<ContactTagsPage />} />
 							<Route path={RoutePath.MAIL_FOLDER} element={<MailboxPage />} />
 							<Route path={RoutePath.MAIL_DETAILS} element={<MailDetailsPage />} />
 

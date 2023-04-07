@@ -167,7 +167,7 @@ export const ContactsListItem: React.FC<ContactsListItemProps> = observer(({ con
 						options={options}
 						defaultValue={defaultOptions}
 						onChange={selectHandler}
-						placeholder="Select folders"
+						placeholder="Tags"
 					/>
 				</div>
 				<div className="contact-actions">
