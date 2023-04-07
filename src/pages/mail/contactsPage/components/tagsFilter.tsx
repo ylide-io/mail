@@ -1,31 +1,38 @@
-import { Select } from 'antd';
 import { observer } from 'mobx-react';
 
+import { DropDownItem, DropDownItemMode } from '../../../../components/dropDown/dropDown';
+import { Select } from '../../../../components/select/select';
 import contacts from '../../../../stores/Contacts';
 import tags from '../../../../stores/Tags';
 
-const TagsFilter = observer(() => {
-	const options = tags.tags.map(tag => ({ value: tag.id, label: tag.name }));
-
-	const selectHandler = (option: number) => {
-		if (option) {
-			const tag = tags.tags.find(tag => tag.id === option);
-			if (tag) {
-				contacts.setFilterByTag(tag);
-				return;
-			}
-		}
-		contacts.setFilterByTag(null);
-	};
-
+export const TagsFilter = observer(() => {
 	return (
-		<Select
-			placeholder={'Filter by folder'}
-			options={[{ value: 0, label: 'All folders' }, ...options]}
-			value={contacts.filterByTag ? contacts.filterByTag.id : 0}
-			onChange={selectHandler}
-		/>
+		<Select placeholder="Filter by folder">
+			{onSelect => (
+				<>
+					<DropDownItem
+						mode={!contacts.filterByTag ? DropDownItemMode.SELECTED : undefined}
+						onSelect={() => {
+							onSelect();
+							contacts.setFilterByTag(null);
+						}}
+					>
+						All folders
+					</DropDownItem>
+
+					{tags.tags.map(tag => (
+						<DropDownItem
+							mode={contacts.filterByTag?.id === tag.id ? DropDownItemMode.SELECTED : undefined}
+							onSelect={() => {
+								onSelect();
+								contacts.setFilterByTag(tag);
+							}}
+						>
+							{tag.name}
+						</DropDownItem>
+					))}
+				</>
+			)}
+		</Select>
 	);
 });
-
-export default TagsFilter;

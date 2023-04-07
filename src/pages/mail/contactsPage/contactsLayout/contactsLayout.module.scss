@@ -1,0 +1,32 @@
+.root {
+	padding: 20px;
+}
+
+.header {
+	display: grid;
+	grid-template-columns: auto 1fr;
+	grid-gap: 8px;
+	align-items: center;
+	margin: 0 0 8px;
+
+	@include less920px {
+		grid-template-columns: 1fr;
+		grid-gap: 12px;
+	}
+}
+
+.title {
+	font-size: 32px;
+}
+
+.titleRight {
+	justify-self: end;
+	display: grid;
+	grid-auto-flow: column;
+	grid-gap: 8px;
+	align-items: center;
+
+	@include less920px {
+		justify-self: start;
+	}
+}

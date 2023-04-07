@@ -13,9 +13,8 @@ import { AdminPage } from './pages/AdminPage';
 import { FeedPage } from './pages/feed/feedPage/feedPage';
 import { FeedPostPage } from './pages/feed/feedPostPage/feedPostPage';
 import { ComposePage } from './pages/mail/composePage/composePage';
-import { ContactsTab } from './pages/mail/contactsPage/components/contactsTab';
-import { TagsTab } from './pages/mail/contactsPage/components/tagsTab';
-import { ContactsPage } from './pages/mail/contactsPage/contactsPage';
+import { ContactListPage } from './pages/mail/contactsPage/components/contactListPage';
+import { ContactTagsPage } from './pages/mail/contactsPage/components/contactTagsPage';
 import { MailboxPage } from './pages/mail/mailboxPage/mailboxPage';
 import { MailDetailsPage } from './pages/mail/mailDetailsPage/mailDetailsPage';
 import { NewWalletsPage } from './pages/NewWalletsPage';
@@ -116,12 +115,8 @@ const App = observer(() => {
 							<Route path={RoutePath.FEED_CATEGORY} element={<FeedPage />} />
 
 							<Route path={RoutePath.MAIL_COMPOSE} element={<ComposePage />} />
-							<Route path={RoutePath.MAIL_CONTACTS} element={<ContactsPage />}>
-								<Route index element={<ContactsTab />} />
-							</Route>
-							<Route path={RoutePath.MAIL_FOLDERS} element={<ContactsPage />}>
-								<Route index element={<TagsTab />} />
-							</Route>
+							<Route path={RoutePath.MAIL_CONTACTS} element={<ContactListPage />} />
+							<Route path={RoutePath.MAIL_FOLDERS} element={<ContactTagsPage />} />
 							<Route path={RoutePath.MAIL_FOLDER} element={<MailboxPage />} />
 							<Route path={RoutePath.MAIL_DETAILS} element={<MailDetailsPage />} />
 

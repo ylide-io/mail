@@ -1,0 +1,52 @@
+import { observer } from 'mobx-react';
+import React from 'react';
+
+import { ActionButton, ActionButtonLook, ActionButtonSize } from '../../../../components/ActionButton/ActionButton';
+import { ReactComponent as PlusSvg } from '../../../../icons/ic20/plus.svg';
+import contacts from '../../../../stores/Contacts';
+import tags from '../../../../stores/Tags';
+import { ContactsLayout, ContactsTab } from '../contactsLayout/contactsLayout';
+import ContactsEmpty from './contactsEmpty';
+import { ContactsListItem } from './contactsListItem';
+import ContactsSearcher from './contactsSearcher';
+import { TagsFilter } from './tagsFilter';
+
+export const ContactListPage = observer(() => {
+	const contactsList = contacts.contacts.filter(
+		c => !contacts.filterByTag || c.tags.includes(contacts.filterByTag.id),
+	);
+
+	return (
+		<ContactsLayout
+			activeTab={ContactsTab.CONTACTS}
+			title="Contacts"
+			titleRight={
+				<>
+					<ContactsSearcher />
+
+					{!!tags.tags.length && <TagsFilter />}
+
+					<ActionButton
+						size={ActionButtonSize.MEDIUM}
+						look={ActionButtonLook.PRIMARY}
+						icon={<PlusSvg style={{ display: 'inline-block', verticalAlign: 'middle' }} />}
+						onClick={() => contacts.generateNewContact()}
+					>
+						New contact
+					</ActionButton>
+				</>
+			}
+		>
+			{!contactsList.length && !contacts.newContact ? (
+				<ContactsEmpty isTagFilter={!!contacts.contacts.length} />
+			) : (
+				<div className="contacts-list">
+					{contacts.newContact && <ContactsListItem isNew={true} contact={{ ...contacts.newContact }} />}
+					{contactsList.map(contact => (
+						<ContactsListItem key={contact.address} contact={{ ...contact }} />
+					))}
+				</div>
+			)}
+		</ContactsLayout>
+	);
+});
