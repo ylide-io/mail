@@ -131,7 +131,7 @@ export const OtcChatPage = observer(() => {
 
 	function onSent() {
 		setNewMessage('');
-		refetch().then();
+		refetch();
 	}
 
 	return (

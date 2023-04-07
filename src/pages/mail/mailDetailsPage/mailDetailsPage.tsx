@@ -168,7 +168,7 @@ export const MailDetailsPage = observer(() => {
 	};
 
 	const onDeleteClick = (m: ILinkedMessage) => {
-		markMessagesAsDeleted([m]).then();
+		markMessagesAsDeleted([m]);
 
 		if (isThreadOpen) {
 			setWrappedThreadMessages(
@@ -180,7 +180,7 @@ export const MailDetailsPage = observer(() => {
 	};
 
 	const onRestoreClick = (m: ILinkedMessage) => {
-		markMessagesAsNotDeleted([m]).then();
+		markMessagesAsNotDeleted([m]);
 
 		setWrappedThreadMessages(
 			wrappedThreadMessages.map(it => (it.message.msgId === m.msgId ? { ...it, isDeleted: false } : it)),

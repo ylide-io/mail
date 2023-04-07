@@ -350,7 +350,7 @@ export const SelectWalletModal = observer(({ onSuccess, onCancel }: SelectWallet
 													!domain.walletConnectState.connected
 													? domain.walletConnectState.url
 													: '',
-											).then();
+											);
 											setCopy(true);
 											setTimeout(() => setCopy(false), 1000);
 										}}

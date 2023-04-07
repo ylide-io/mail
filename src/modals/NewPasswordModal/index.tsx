@@ -1,4 +1,4 @@
-import { constructFaucetMsg, EthereumWalletController, EVMNetwork } from '@ylide/ethereum';
+import { EVMNetwork } from '@ylide/ethereum';
 import { asyncDelay, ExternalYlidePublicKey, IGenericAccount, YlideKeyPair, YlidePublicKeyVersion } from '@ylide/sdk';
 import SmartBuffer from '@ylide/smart-buffer';
 import { useEffect, useMemo, useState } from 'react';
@@ -109,7 +109,7 @@ export function NewPasswordModal({
 	useEffect(() => {
 		if (wallet.factory.blockchainGroup === 'evm') {
 			getEvmWalletNetwork(wallet).then(setNetwork);
-			evmBalances.updateBalances(wallet, account.address).then();
+			evmBalances.updateBalances(wallet, account.address);
 		}
 	}, [account.address, wallet]);
 
@@ -367,7 +367,7 @@ export function NewPasswordModal({
 										onClick={() =>
 											forgotPasswordModal({
 												onNewPassword: password => {
-													createLocalKey(password, true).then();
+													createLocalKey(password, true);
 												},
 											})
 										}

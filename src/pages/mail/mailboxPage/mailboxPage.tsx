@@ -117,15 +117,15 @@ export const MailboxPage = observer(() => {
 						}}
 						isActionButtonsDisabled={!selectedMessageIds.size}
 						onMarkReadClick={() => {
-							markMessagesAsReaded(Array.from(selectedMessageIds)).then();
+							markMessagesAsReaded(Array.from(selectedMessageIds));
 							setSelectedMessageIds(new Set());
 						}}
 						onDeleteClick={() => {
-							markMessagesAsDeleted(messages.filter(it => selectedMessageIds.has(it.id))).then();
+							markMessagesAsDeleted(messages.filter(it => selectedMessageIds.has(it.id)));
 							setSelectedMessageIds(new Set());
 						}}
 						onRestoreClick={() => {
-							markMessagesAsNotDeleted(messages.filter(it => selectedMessageIds.has(it.id))).then();
+							markMessagesAsNotDeleted(messages.filter(it => selectedMessageIds.has(it.id)));
 							setSelectedMessageIds(new Set());
 						}}
 					/>

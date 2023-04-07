@@ -22,7 +22,7 @@ export function useOpenMailCopmpose() {
 				globalOutgoingMailData.reset(mailData);
 				navigate(generatePath(RoutePath.MAIL_COMPOSE));
 			} else {
-				composeMailPopup({ mailData: mailData || new OutgoingMailData() }).then();
+				composeMailPopup({ mailData: mailData || new OutgoingMailData() });
 			}
 		}
 	};

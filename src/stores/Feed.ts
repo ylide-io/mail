@@ -87,7 +87,7 @@ class Feed {
 
 	constructor() {
 		makeObservable(this);
-		this.loadCategory(FeedCategory.MAIN).then();
+		this.loadCategory(FeedCategory.MAIN);
 	}
 
 	private async genericLoad(

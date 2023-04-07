@@ -69,7 +69,7 @@ export function SharePopup({ anchorRef, horizontalAlign, onClose, url, subject }
 					<button
 						className={css.primaryButton}
 						onClick={() => {
-							copyToClipboard(realUrl).then();
+							copyToClipboard(realUrl);
 							toast('Link copied to clipboard 👍');
 							onClose();
 						}}

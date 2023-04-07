@@ -37,7 +37,7 @@ const FeedPageContent = observer(() => {
 	// Re-load when category changes
 	useEffect(() => {
 		genericLayoutApi.scrollToTop();
-		feed.loadCategory(category!, sourceId).then();
+		feed.loadCategory(category!, sourceId);
 	}, [category, sourceId]);
 
 	// Re-load when source-list changes
@@ -47,7 +47,7 @@ const FeedPageContent = observer(() => {
 
 			if (category === FeedCategory.MAIN) {
 				genericLayoutApi.scrollToTop();
-				feed.loadCategory(category, sourceId).then();
+				feed.loadCategory(category, sourceId);
 			}
 		}
 	}, [category, lastSourceListId, sourceId, sourceListId]);
