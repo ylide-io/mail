@@ -47,11 +47,10 @@
 
 .users {
 	@include expand-click-area;
-	display: grid;
-	grid-auto-flow: column;
+	display: flex;
 	align-items: center;
-	grid-gap: 8px;
 	height: $interactive-elem-size_large;
+	white-space: nowrap;
 	background-color: var(--surface-color);
 	border: 1px solid var(--border-color);
 	border-radius: 20px;
@@ -59,6 +58,10 @@
 	&:hover,
 	&:focus-visible {
 		border-color: var(--border-heavy-color);
+	}
+
+	> * {
+		margin-right: 8px;
 	}
 }
 
@@ -81,10 +84,14 @@
 			display: none;
 		}
 	}
+
+	@include less480px {
+		display: none;
+	}
 }
 
 .usersIcon {
-	margin: 0 8px 0 -2px;
+	margin-left: -2px;
 	width: 20px;
 	height: 20px;
 	fill: currentColor;

@@ -97,6 +97,7 @@ const Header = observer(() => {
 								{domain.accounts.accounts.length > 1 ? 's' : ''}
 								<span>&nbsp;connected</span>
 							</div>
+
 							<ArrowDownSvg className={css.usersIcon} />
 						</button>
 
