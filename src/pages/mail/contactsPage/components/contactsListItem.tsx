@@ -1,5 +1,6 @@
 import { Avatar, Select } from 'antd';
 import clsx from 'clsx';
+import { observer } from 'mobx-react';
 import React, { useMemo, useState } from 'react';
 
 import { ActionButton, ActionButtonLook } from '../../../../components/ActionButton/ActionButton';
@@ -30,7 +31,7 @@ interface Option {
 	label: string;
 }
 
-const ContactsListItem: React.FC<ContactsListItemProps> = ({ contact, isNew }) => {
+export const ContactsListItem: React.FC<ContactsListItemProps> = observer(({ contact, isNew }) => {
 	const navigate = useNav();
 
 	const [editing, setEditing] = useState(isNew || false);
@@ -69,7 +70,7 @@ const ContactsListItem: React.FC<ContactsListItemProps> = ({ contact, isNew }) =
 
 		if (isNew) {
 			contacts.resetNewContact();
-			contacts.saveContact(newContact);
+			contacts.createContact(newContact);
 		} else {
 			contacts.updateContact(newContact);
 		}
@@ -213,6 +214,4 @@ const ContactsListItem: React.FC<ContactsListItemProps> = ({ contact, isNew }) =
 			</div>
 		</div>
 	);
-};
-
-export default ContactsListItem;
+});

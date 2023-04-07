@@ -3,9 +3,9 @@ import React from 'react';
 
 import contacts from '../../../../stores/Contacts';
 import ContactsEmpty from './contactsEmpty';
-import ContactsListItem from './contactsListItem';
+import { ContactsListItem } from './contactsListItem';
 
-const ContactsList = observer(() => {
+export const ContactsList = observer(() => {
 	const contactsList = contacts.contacts.filter(
 		c => !contacts.filterByTag || c.tags.includes(contacts.filterByTag.id),
 	);
@@ -25,5 +25,3 @@ const ContactsList = observer(() => {
 		</div>
 	);
 });
-
-export default ContactsList;

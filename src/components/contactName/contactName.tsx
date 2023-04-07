@@ -10,7 +10,7 @@ export interface ContactNameProps extends PropsWithClassName {
 }
 
 export const ContactName = observer(({ className, address }: ContactNameProps) => {
-	const contact = contacts.contactsByAddress[address];
+	const contact = contacts.find({ address });
 
 	return (
 		<>

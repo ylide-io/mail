@@ -46,7 +46,7 @@ export function MailMessage({
 }: MailMessageProps) {
 	const { toast } = useToastManager();
 
-	const contact = contacts.contactsByAddress[message.msg.senderAddress];
+	const contact = contacts.find({ address: message.msg.senderAddress });
 	const [isSavingContact, setSavingContact] = useState(false);
 
 	const decodeMessage = useMailStore(state => state.decodeMessage);
@@ -135,7 +135,7 @@ export function MailMessage({
 							setSavingContact(true);
 
 							contacts
-								.saveContact(contact)
+								.createContact(contact)
 								.catch(() => toast("Couldn't save 😒"))
 								.finally(() => setSavingContact(false));
 						}}

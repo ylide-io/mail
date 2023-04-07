@@ -10,7 +10,6 @@ class Contacts {
 	loading = false;
 	loaded = false;
 	contacts: IContact[] = [];
-	contactsByAddress: Record<string, IContact> = {};
 
 	filteredContacts: IContact[] | null = [];
 	newContact: IContact | null = null;
@@ -35,25 +34,29 @@ class Contacts {
 		const dbContacts = await contactsDB.retrieveAllContacts();
 
 		this.contacts = dbContacts.reverse();
-		this.contactsByAddress = this.contacts.reduce(
-			(p, c) => ({
-				...p,
-				[c.address]: c,
-			}),
-			{},
-		);
 	}
 
-	async saveContact(contact: IContact): Promise<void> {
+	async createContact(contact: IContact): Promise<void> {
 		invariant(!this.contacts.some(c => c.address === contact.address));
 
 		this.contacts.unshift(contact);
-		this.contactsByAddress[contact.address] = contact;
 		await contactsDB.saveContact(contact);
 	}
 
 	async updateContact(contact: IContact): Promise<void> {
+		this.contacts = this.contacts.map(c => (c.address === contact.address ? contact : c));
 		await contactsDB.saveContact(contact);
+	}
+
+	async deleteContact(address: string): Promise<void> {
+		this.contacts = this.contacts.filter(elem => elem.address !== address);
+		await contactsDB.deleteContact(address);
+	}
+
+	find(options: { address?: string }) {
+		if (options.address) {
+			return this.contacts.find(c => c.address === options.address);
+		}
 	}
 
 	filterContacts(searchingText: string) {
@@ -90,12 +93,6 @@ class Contacts {
 
 	resetNewContact() {
 		this.newContact = null;
-	}
-
-	async deleteContact(address: string): Promise<void> {
-		this.contacts = this.contacts.filter(elem => elem.address !== address);
-		delete this.contactsByAddress[address];
-		await contactsDB.deleteContact(address);
 	}
 }
 
