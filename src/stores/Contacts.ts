@@ -11,7 +11,6 @@ class Contacts {
 	loaded = false;
 	contacts: IContact[] = [];
 
-	filteredContacts: IContact[] | null = [];
 	newContact: IContact | null = null;
 
 	filterByTag: ITag | null = null;
@@ -59,23 +58,8 @@ class Contacts {
 		}
 	}
 
-	filterContacts(searchingText: string) {
-		const contacts = this.contacts;
-		const results = fuzzysort.go(searchingText, contacts, { key: 'name' });
-
-		const resultContacts = results.map(res => res.obj);
-
-		if (!searchingText) {
-			this.setFilteredContacts([]);
-		} else if (resultContacts.length) {
-			this.setFilteredContacts(resultContacts);
-		} else {
-			this.setFilteredContacts(null);
-		}
-	}
-
-	setFilteredContacts(contacts: IContact[] | null) {
-		this.filteredContacts = contacts;
+	search(term: string) {
+		return fuzzysort.go(term, this.contacts, { keys: ['name', 'address'] }).map(res => res.obj);
 	}
 
 	setFilterByTag(tag: ITag | null) {

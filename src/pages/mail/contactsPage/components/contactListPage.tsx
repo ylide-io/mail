@@ -1,18 +1,21 @@
 import { observer } from 'mobx-react';
-import React from 'react';
+import React, { useState } from 'react';
 
 import { ActionButton, ActionButtonLook, ActionButtonSize } from '../../../../components/ActionButton/ActionButton';
+import { TextField } from '../../../../components/textField/textField';
 import { ReactComponent as PlusSvg } from '../../../../icons/ic20/plus.svg';
 import contacts from '../../../../stores/Contacts';
 import tags from '../../../../stores/Tags';
 import { ContactsLayout, ContactsTab } from '../contactsLayout/contactsLayout';
 import ContactsEmpty from './contactsEmpty';
 import { ContactsListItem } from './contactsListItem';
-import ContactsSearcher from './contactsSearcher';
 import { TagsFilter } from './tagsFilter';
 
 export const ContactListPage = observer(() => {
-	const contactsList = contacts.contacts.filter(
+	const [searchTerm, setSearchTerm] = useState('');
+	const cleanSearchTerm = searchTerm.trim();
+
+	const contactsList = (cleanSearchTerm ? contacts.search(searchTerm) : contacts.contacts).filter(
 		c => !contacts.filterByTag || c.tags.includes(contacts.filterByTag.id),
 	);
 
@@ -22,7 +25,7 @@ export const ContactListPage = observer(() => {
 			title="Contacts"
 			titleRight={
 				<>
-					<ContactsSearcher />
+					<TextField value={searchTerm} onValueChange={setSearchTerm} placeholder="Search contacts" />
 
 					{!!tags.tags.length && <TagsFilter />}
 
@@ -37,7 +40,7 @@ export const ContactListPage = observer(() => {
 				</>
 			}
 		>
-			{!contactsList.length && !contacts.newContact ? (
+			{!cleanSearchTerm && !contactsList.length && !contacts.newContact ? (
 				<ContactsEmpty isTagFilter={!!contacts.contacts.length} />
 			) : (
 				<div className="contacts-list">
