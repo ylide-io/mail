@@ -12,6 +12,13 @@ import { AdaptiveText } from '../adaptiveText/adaptiveText';
 import { DropDown, DropDownItem, DropDownItemMode } from '../dropDown/dropDown';
 import { TagInput, TagInputItem, TagInputItemLook } from '../tagInput/tagInput';
 
+function splitSearchValue(search: string) {
+	// 0x52e316e323c35e5b222ba63311433f91d80545ee
+	// 0:d38e9ee2bbd975bb7c8f1e68c5ea3c2fb514e34073d2efbc0d296a2b439a3cc2
+	// team.ylide
+	return search.split(/[^\w:.-]/);
+}
+
 let itemIdCounter = Date.now();
 
 export interface RecipientInputItem {
@@ -147,16 +154,37 @@ export const RecipientInput = observer(({ isReadOnly, value }: RecipientInputPro
 		);
 	}, [isFocused, search, value.items]);
 
+	//
+
+	const addItems = (rawTerms: string[]) => {
+		const cleanTerms = rawTerms.map(it => it.trim()).filter(Boolean);
+
+		const items = cleanTerms
+			.filter((term, i) => cleanTerms.indexOf(term) === i)
+			.filter(item => !value.items.some(it => it.name === item || it.routing?.address === item))
+			.map(item => Recipients.createItem(item));
+
+		if (items.length) {
+			value.items = [...value.items, ...items];
+		}
+	};
+
+	const onSearchChange = (newSearch: string) => {
+		const items = splitSearchValue(newSearch);
+		if (items.length > 1) {
+			addItems(items);
+			setSearch('');
+		} else {
+			setSearch(newSearch);
+		}
+	};
+
 	const onFocus = () => {
 		setFocused(true);
 	};
 
 	const onBlur = () => {
-		const cleanSearch = search.trim();
-		if (cleanSearch && !value.items.some(it => it.name === cleanSearch || it.routing?.address === cleanSearch)) {
-			value.items = [...value.items, Recipients.createItem(cleanSearch)];
-		}
-
+		addItems(splitSearchValue(search));
 		setFocused(false);
 		setSearch('');
 	};
@@ -213,7 +241,7 @@ export const RecipientInput = observer(({ isReadOnly, value }: RecipientInputPro
 				isReadOnly={isReadOnly}
 				placeholder={!value.items.length ? 'Enter address or ENS domain here' : undefined}
 				search={search}
-				onSearchChange={setSearch}
+				onSearchChange={onSearchChange}
 				onFocus={onFocus}
 				onBlur={onBlur}
 				onKeyDown={onKeyDown}

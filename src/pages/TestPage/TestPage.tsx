@@ -5,20 +5,19 @@ import React, { PropsWithChildren } from 'react';
 import { ActionButton, ActionButtonLook, ActionButtonSize } from '../../components/ActionButton/ActionButton';
 import { AdaptiveAddress } from '../../components/adaptiveAddress/adaptiveAddress';
 import { CheckBox } from '../../components/checkBox/checkBox';
+import { RecipientInput, Recipients } from '../../components/recipientInput/recipientInput';
 import { TagInput, TagInputItem } from '../../components/tagInput/tagInput';
 import { TextField, TextFieldLook } from '../../components/textField/textField';
 import { ReactComponent as SettingsSvg } from '../../icons/ic20/settings.svg';
 import css from './TestPage.module.scss';
 
-export function GridRow({ children }: PropsWithChildren<{}>) {
+export function Row({ children }: PropsWithChildren<{}>) {
 	return (
 		<div
 			style={{
-				display: 'grid',
-				gridAutoFlow: 'column',
-				gridGap: 8,
+				display: 'flex',
+				gap: 8,
 				alignItems: 'center',
-				justifyContent: 'start',
 			}}
 		>
 			{children}
@@ -31,14 +30,14 @@ export function GridRow({ children }: PropsWithChildren<{}>) {
 export const TestPage = observer(() => {
 	return (
 		<div className={css.verticalGrid} style={{ padding: 50 }}>
-			<GridRow>
+			<Row>
 				content
 				<ActionButton>Text Only</ActionButton>
 				<ActionButton icon={<SettingsSvg />}>With Icon</ActionButton>
 				<ActionButton icon={<SettingsSvg />} />
-			</GridRow>
+			</Row>
 
-			<GridRow>
+			<Row>
 				look
 				<ActionButton look={ActionButtonLook.DEFAULT} icon={<SettingsSvg />}>
 					Default
@@ -55,45 +54,45 @@ export const TestPage = observer(() => {
 				<ActionButton look={ActionButtonLook.DANGEROUS} icon={<SettingsSvg />}>
 					Dengerous
 				</ActionButton>
-			</GridRow>
+			</Row>
 
-			<GridRow>
+			<Row>
 				small
 				<ActionButton size={ActionButtonSize.SMALL}>Text Only</ActionButton>
 				<ActionButton size={ActionButtonSize.SMALL} icon={<SettingsSvg />}>
 					With Icon
 				</ActionButton>
 				<ActionButton size={ActionButtonSize.SMALL} icon={<SettingsSvg />} />
-			</GridRow>
+			</Row>
 
-			<GridRow>
+			<Row>
 				medium
 				<ActionButton size={ActionButtonSize.MEDIUM}>Text Only</ActionButton>
 				<ActionButton size={ActionButtonSize.MEDIUM} icon={<SettingsSvg />}>
 					With Icon
 				</ActionButton>
 				<ActionButton size={ActionButtonSize.MEDIUM} icon={<SettingsSvg />} />
-			</GridRow>
+			</Row>
 
-			<GridRow>
+			<Row>
 				large
 				<ActionButton size={ActionButtonSize.LARGE}>Text Only</ActionButton>
 				<ActionButton size={ActionButtonSize.LARGE} icon={<SettingsSvg style={{ width: 24, height: 24 }} />}>
 					With Icon
 				</ActionButton>
 				<ActionButton size={ActionButtonSize.LARGE} icon={<SettingsSvg style={{ width: 24, height: 24 }} />} />
-			</GridRow>
+			</Row>
 
-			<GridRow>
+			<Row>
 				xlarge
 				<ActionButton size={ActionButtonSize.XLARGE}>Text Only</ActionButton>
 				<ActionButton size={ActionButtonSize.XLARGE} icon={<SettingsSvg style={{ width: 24, height: 24 }} />}>
 					With Icon
 				</ActionButton>
 				<ActionButton size={ActionButtonSize.XLARGE} icon={<SettingsSvg style={{ width: 24, height: 24 }} />} />
-			</GridRow>
+			</Row>
 
-			<GridRow>
+			<Row>
 				multiline
 				<ActionButton isMultiline size={ActionButtonSize.SMALL}>
 					Multiline Small
@@ -111,9 +110,9 @@ export const TestPage = observer(() => {
 					<br />
 					Medium
 				</ActionButton>
-			</GridRow>
+			</Row>
 
-			<GridRow>
+			<Row>
 				multiline
 				<ActionButton isMultiline size={ActionButtonSize.SMALL} icon={<SettingsSvg />}>
 					Multiline
@@ -139,9 +138,9 @@ export const TestPage = observer(() => {
 					<br />
 					Button
 				</ActionButton>
-			</GridRow>
+			</Row>
 
-			<GridRow>
+			<Row>
 				big icon
 				<ActionButton size={ActionButtonSize.SMALL} icon={<SettingsSvg style={{ width: 24, height: 24 }} />} />
 				<ActionButton size={ActionButtonSize.SMALL} icon={<SettingsSvg style={{ width: 24, height: 24 }} />}>
@@ -151,32 +150,32 @@ export const TestPage = observer(() => {
 				<ActionButton size={ActionButtonSize.SMALL} icon={<SettingsSvg style={{ width: 36, height: 36 }} />}>
 					With Text
 				</ActionButton>
-			</GridRow>
+			</Row>
 
 			<hr style={{ margin: '32px 0' }} />
 
-			<GridRow>
+			<Row>
 				TextField
 				<TextField look={TextFieldLook.DEFAULT} placeholder="Default" />
 				<TextField look={TextFieldLook.PROMO} placeholder="Promo" />
 				<TextField look={TextFieldLook.LITE} placeholder="Lite" />
-			</GridRow>
+			</Row>
 
-			<GridRow>
+			<Row>
 				error
 				<TextField look={TextFieldLook.DEFAULT} isError placeholder="Default" />
 				<TextField look={TextFieldLook.PROMO} isError placeholder="Promo" />
 				<TextField look={TextFieldLook.LITE} isError placeholder="Lite" />
-			</GridRow>
+			</Row>
 
 			<hr style={{ margin: '32px 0' }} />
 
-			<GridRow>
+			<Row>
 				TagInput
 				<TagInput placeholder="Enter something" />
-			</GridRow>
+			</Row>
 
-			<GridRow>
+			<Row>
 				TagInput
 				<TagInput>
 					<TagInputItem>12345678</TagInputItem>
@@ -184,23 +183,30 @@ export const TestPage = observer(() => {
 						<AdaptiveAddress address="0x15a33D60283e3D20751D6740162D1212c1ad2a2d" />
 					</TagInputItem>
 				</TagInput>
-			</GridRow>
+			</Row>
 
 			<hr style={{ margin: '32px 0' }} />
 
-			<GridRow>
+			<Row>
+				RecipientInput
+				<RecipientInput value={new Recipients()} />
+			</Row>
+
+			<hr style={{ margin: '32px 0' }} />
+
+			<Row>
 				CheckBox
 				<CheckBox isChecked />
 				<CheckBox />
-			</GridRow>
+			</Row>
 
-			<GridRow>
+			<Row>
 				with label
 				<label style={{ display: 'grid', gridAutoFlow: 'column', alignItems: 'center', gridGap: 4 }}>
 					<CheckBox isChecked />
 					Label
 				</label>
-			</GridRow>
+			</Row>
 
 			<hr style={{ margin: '32px 0' }} />
 
