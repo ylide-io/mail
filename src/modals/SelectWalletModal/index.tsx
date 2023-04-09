@@ -2,7 +2,7 @@ import * as browserUtils from '@walletconnect/browser-utils';
 import clsx from 'clsx';
 import { reaction, toJS } from 'mobx';
 import { observer } from 'mobx-react';
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import QRCode from 'react-qr-code';
 
 import { ActionButton, ActionButtonLook, ActionButtonSize } from '../../components/ActionButton/ActionButton';
@@ -70,14 +70,16 @@ export const SelectWalletModal = observer(({ onSuccess, onCancel }: SelectWallet
 	);
 	const [search, setSearch] = useState('');
 
+	const availableWallets = domain.availableWallets;
+
 	const availableBrowserWallets = useMemo(
 		() =>
 			supportedWallets
 				.map(w => w.wallet)
 				.filter(w => {
-					return w !== 'walletconnect' && !!domain.availableWallets.find(ww => ww.wallet === w);
+					return w !== 'walletconnect' && !!availableWallets.find(ww => ww.wallet === w);
 				}),
-		[domain.availableWallets],
+		[availableWallets],
 	);
 
 	const walletsToInstall = useMemo(
@@ -85,21 +87,53 @@ export const SelectWalletModal = observer(({ onSuccess, onCancel }: SelectWallet
 			supportedWallets
 				.map(w => w.wallet)
 				.filter(w => {
-					return w !== 'walletconnect' && !domain.availableWallets.find(ww => ww.wallet === w);
+					return w !== 'walletconnect' && !availableWallets.find(ww => ww.wallet === w);
 				}),
-		[domain.availableWallets],
-	);
-
-	reaction(
-		() => domain.wallets && domain.wallets.find(w => w.factory.wallet === 'walletconnect'),
-		(wc, prev) => {
-			if (!prev && wc) {
-				connectAccount('walletconnect');
-			}
-		},
+		[availableWallets],
 	);
 
 	const newPasswordModal = useNewPasswordModal();
+
+	const connectAccount = useCallback(
+		async (wallet: string) => {
+			try {
+				const domainWallet = domain.wallets.find(w => w.factory.wallet === wallet)!;
+
+				const account = await connectWalletAccount(domainWallet);
+				invariant(account);
+
+				const remoteKeys = await domainWallet.readRemoteKeys(account);
+				const qqs = getQueryString();
+
+				const domainAccount = await newPasswordModal({
+					faucetType: ['polygon', 'fantom', 'gnosis'].includes(qqs.faucet) ? (qqs.faucet as any) : 'gnosis',
+					bonus: qqs.bonus === 'true',
+					wallet: domainWallet,
+					account,
+					remoteKeys: remoteKeys.remoteKeys,
+				});
+				invariant(domainAccount);
+
+				onSuccess?.(domainAccount);
+			} catch (e) {
+				onCancel?.();
+			}
+		},
+		[newPasswordModal, onCancel, onSuccess],
+	);
+
+	useEffect(
+		() =>
+			reaction(
+				() => domain.wallets && domain.wallets.find(w => w.factory.wallet === 'walletconnect'),
+				(wc, prev) => {
+					if (!prev && wc) {
+						connectAccount('walletconnect');
+					}
+				},
+			),
+		[connectAccount],
+	);
 
 	async function connectWalletAccount(wallet: Wallet) {
 		let currentAccount = await wallet.getCurrentAccount();
@@ -130,31 +164,6 @@ export const SelectWalletModal = observer(({ onSuccess, onCancel }: SelectWallet
 			}
 		} else {
 			return await wallet.connectAccount();
-		}
-	}
-
-	async function connectAccount(wallet: string) {
-		try {
-			const domainWallet = domain.wallets.find(w => w.factory.wallet === wallet)!;
-
-			const account = await connectWalletAccount(domainWallet);
-			invariant(account);
-
-			const remoteKeys = await domainWallet.readRemoteKeys(account);
-			const qqs = getQueryString();
-
-			const domainAccount = await newPasswordModal({
-				faucetType: ['polygon', 'fantom', 'gnosis'].includes(qqs.faucet) ? (qqs.faucet as any) : 'gnosis',
-				bonus: qqs.bonus === 'true',
-				wallet: domainWallet,
-				account,
-				remoteKeys: remoteKeys.remoteKeys,
-			});
-			invariant(domainAccount);
-
-			onSuccess?.(domainAccount);
-		} catch (e) {
-			onCancel?.();
 		}
 	}
 

@@ -84,15 +84,23 @@ export function useMailList(props?: UseMailListProps) {
 	const filter = props?.filter;
 
 	const [activeAccounts, setActiveAccounts] = useState(domain.accounts.activeAccounts);
-	reaction(
-		() => domain.accounts.activeAccounts,
-		() => setActiveAccounts(domain.accounts.activeAccounts),
+	useEffect(
+		() =>
+			reaction(
+				() => domain.accounts.activeAccounts,
+				() => setActiveAccounts(domain.accounts.activeAccounts),
+			),
+		[],
 	);
 
 	const [blockchains, setBlockchains] = useState(domain.blockchains);
-	reaction(
-		() => domain.blockchains,
-		() => setBlockchains(domain.blockchains),
+	useEffect(
+		() =>
+			reaction(
+				() => domain.blockchains,
+				() => setBlockchains(domain.blockchains),
+			),
+		[],
 	);
 
 	const [stream, setStream] = useState<ListSourceDrainer | undefined>();
