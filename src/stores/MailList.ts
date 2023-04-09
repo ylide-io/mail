@@ -12,7 +12,7 @@ import {
 	YLIDE_MAIN_FEED_ID,
 	YMF,
 } from '@ylide/sdk';
-import { makeAutoObservable, reaction } from 'mobx';
+import { makeAutoObservable } from 'mobx';
 import { useCallback, useEffect, useState } from 'react';
 
 import messagesDB, { IMessageDecodedSerializedContent } from '../indexedDB/MessagesDB';
@@ -83,26 +83,6 @@ export function useMailList(props?: UseMailListProps) {
 	const sender = props?.sender;
 	const filter = props?.filter;
 
-	const [activeAccounts, setActiveAccounts] = useState(domain.accounts.activeAccounts);
-	useEffect(
-		() =>
-			reaction(
-				() => domain.accounts.activeAccounts,
-				() => setActiveAccounts(domain.accounts.activeAccounts),
-			),
-		[],
-	);
-
-	const [blockchains, setBlockchains] = useState(domain.blockchains);
-	useEffect(
-		() =>
-			reaction(
-				() => domain.blockchains,
-				() => setBlockchains(domain.blockchains),
-			),
-		[],
-	);
-
 	const [stream, setStream] = useState<ListSourceDrainer | undefined>();
 	const [messages, setMessages] = useState<ILinkedMessage[]>([]);
 	const [isLoading, setLoading] = useState(false);
@@ -120,6 +100,9 @@ export function useMailList(props?: UseMailListProps) {
 			reader: domain.ylide.controllers.blockchainsMap[p.msg.blockchain],
 		};
 	}, []);
+
+	const activeAccounts = domain.accounts.activeAccounts;
+	const blockchains = domain.blockchains;
 
 	useEffect(() => {
 		if (!folderId) return;
