@@ -116,7 +116,6 @@ export function useMailList(props?: UseMailListProps) {
 	useEffect(() => {
 		if (!folderId) return;
 
-		console.log(`build stream`);
 		let isDestroyed = false;
 
 		setStream(undefined);
@@ -173,23 +172,14 @@ export function useMailList(props?: UseMailListProps) {
 
 		listSourceDrainer.on('messages', onNewMessages);
 
-		listSourceDrainer
-			.resume()
-			.then(() => {
-				console.log(`build stream: then`);
-				if (!isDestroyed) {
-					console.log(`build stream: setStream`);
-					setStream(listSourceDrainer);
-					loadNextPage();
-				}
-			})
-			.catch(err => {
-				console.log(`build stream: catch: `, err);
-			});
+		listSourceDrainer.resume().then(() => {
+			if (!isDestroyed) {
+				setStream(listSourceDrainer);
+				loadNextPage();
+			}
+		});
 
 		return () => {
-			console.log(`build stream: destroy`);
-
 			isDestroyed = true;
 			setStream(undefined);
 
@@ -202,7 +192,6 @@ export function useMailList(props?: UseMailListProps) {
 		let isDestroyed = false;
 
 		if (stream && !stream.paused) {
-			console.log(`resetFilter`);
 			stream.resetFilter(m => {
 				if (!filter) return true;
 
@@ -210,7 +199,6 @@ export function useMailList(props?: UseMailListProps) {
 				return filter(linkedMessage);
 			});
 
-			console.log(`resetFilter: readMore`);
 			stream.readMore(MailPageSize).then(m => {
 				if (!isDestroyed) {
 					setMessages(m.map(wrapMessage));
@@ -225,16 +213,10 @@ export function useMailList(props?: UseMailListProps) {
 	}, [filter, stream, wrapMessage]);
 
 	useEffect(() => {
-		console.log(`loading: check`, isNextPageAvailable, isNeedMore, !!stream, !isLoading);
 		if (isNextPageAvailable && isNeedMore && stream && !stream.paused && !isLoading) {
-			console.log(`loading: start`);
-
 			setLoading(true);
 
-			// debugger;
-
 			stream.readMore(MailPageSize).then(messages => {
-				console.log(`loading: end`);
 				setMessages(messages.map(wrapMessage));
 				setNextPageAvailable(!stream.drained);
 				setLoading(false);
@@ -315,7 +297,6 @@ class MailStore {
 		this.decodedMessagesById[pushMsg.msgId] = serializedMsg;
 
 		if (browserStorage.saveDecodedMessages) {
-			console.log('msg saved: ', pushMsg.msgId);
 			await messagesDB.saveDecodedMessage(serializedMsg);
 		}
 	}
