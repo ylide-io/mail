@@ -12,9 +12,8 @@ import {
 	YLIDE_MAIN_FEED_ID,
 	YMF,
 } from '@ylide/sdk';
-import { reaction } from 'mobx';
+import { makeAutoObservable, reaction } from 'mobx';
 import { useCallback, useEffect, useState } from 'react';
-import create from 'zustand';
 
 import messagesDB, { IMessageDecodedSerializedContent } from '../indexedDB/MessagesDB';
 import { invariant } from '../utils/assert';
@@ -24,11 +23,6 @@ import contacts from './Contacts';
 import domain from './Domain';
 import { DomainAccount } from './models/DomainAccount';
 import tags from './Tags';
-
-export interface IMessageDecodedContent {
-	decodedSubject: string | null;
-	decodedTextData: { type: 'plain'; value: string } | { type: 'YMF'; value: YMF } | null;
-}
 
 export enum FolderId {
 	Inbox = 'inbox',
@@ -88,8 +82,6 @@ export function useMailList(props?: UseMailListProps) {
 	const folderId = props?.folderId;
 	const sender = props?.sender;
 	const filter = props?.filter;
-
-	const readingSession = useMailStore(state => state.readingSession);
 
 	const [activeAccounts, setActiveAccounts] = useState(domain.accounts.activeAccounts);
 	reaction(
@@ -172,7 +164,7 @@ export function useMailList(props?: UseMailListProps) {
 		}
 
 		const listSourceDrainer = new ListSourceDrainer(
-			new ListSourceMultiplexer(buildSources(activeAccounts, readingSession, folderId, sender)),
+			new ListSourceMultiplexer(buildSources(activeAccounts, mailStore.readingSession, folderId, sender)),
 		);
 
 		async function onNewMessages({ messages }: { messages: IMessageWithSource[] }) {
@@ -204,7 +196,7 @@ export function useMailList(props?: UseMailListProps) {
 			listSourceDrainer.pause();
 			listSourceDrainer.off('messages', onNewMessages);
 		};
-	}, [activeAccounts, blockchains, folderId, loadNextPage, readingSession, sender, wrapMessage]);
+	}, [activeAccounts, blockchains, folderId, loadNextPage, sender, wrapMessage]);
 
 	useEffect(() => {
 		let isDestroyed = false;
@@ -260,32 +252,24 @@ export function useMailList(props?: UseMailListProps) {
 
 //
 
-interface MailStore {
-	init: () => Promise<void>;
+class MailStore {
+	readingSession = new SourceReadingSession();
 
-	readingSession: SourceReadingSession;
+	lastActiveFolderId: FolderId = FolderId.Inbox;
+	lastMessagesList: ILinkedMessage[] = [];
 
-	lastActiveFolderId: FolderId;
-	setLastActiveFolderId: (folderId: FolderId) => void;
+	decodedMessagesById: Record<string, IMessageDecodedSerializedContent> = {};
+	readMessageIds = new Set<string>();
 
-	lastMessagesList: ILinkedMessage[];
-	setLastMessagesList: (messages: ILinkedMessage[]) => void;
+	deletedMessageIds: Record<string, Set<string>> = {};
 
-	decodedMessagesById: Record<string, IMessageDecodedSerializedContent>;
-	decodeMessage: (pushMsg: ILinkedMessage) => Promise<void>;
+	constructor() {
+		makeAutoObservable(this);
+	}
 
-	readMessageIds: Set<string>;
-	markMessagesAsReaded: (ids: string[]) => Promise<void>;
-
-	deletedMessageIds: Record<string, Set<string>>;
-	markMessagesAsDeleted: (messages: ILinkedMessage[]) => Promise<void>;
-	markMessagesAsNotDeleted: (messages: ILinkedMessage[]) => Promise<void>;
-}
-
-export const useMailStore = create<MailStore>((set, get) => ({
-	init: async () => {
+	async init() {
 		const dbDecodedMessages = await messagesDB.retrieveAllDecodedMessages();
-		const decodedMessagesById = dbDecodedMessages.reduce(
+		this.decodedMessagesById = dbDecodedMessages.reduce(
 			(p, c) => ({
 				...p,
 				[c.msgId]: c,
@@ -293,8 +277,12 @@ export const useMailStore = create<MailStore>((set, get) => ({
 			{},
 		);
 
+		//
+
 		const dbReadMessage = await messagesDB.getReadMessages();
-		const readMessageIds = new Set(dbReadMessage);
+		this.readMessageIds = new Set(dbReadMessage);
+
+		//
 
 		const dbDeletedMessages = await messagesDB.retrieveAllDeletedMessages();
 		const deletedMessageIds: Record<string, Set<string>> = {};
@@ -302,41 +290,11 @@ export const useMailStore = create<MailStore>((set, get) => ({
 			deletedMessageIds[acc] = new Set(dbDeletedMessages[acc]);
 		}
 
-		set({ decodedMessagesById, readMessageIds, deletedMessageIds });
-	},
+		this.deletedMessageIds = deletedMessageIds;
+	}
 
-	readingSession: (() => {
-		const readingSession = new SourceReadingSession();
-
-		// readingSession.sourceOptimizer = (subject, reader) => {
-		// 	if (reader instanceof EthereumBlockchainController) {
-		// 		return new IndexerListSource(
-		// 			new EthereumListSource(reader, subject, 30000),
-		// 			readingSession.indexerHub,
-		// 			reader,
-		// 			subject,
-		// 		);
-		// 	} else {
-		// 		return new BlockchainListSource(reader, subject, 10000);
-		// 	}
-		// };
-
-		return readingSession;
-	})(),
-
-	lastActiveFolderId: FolderId.Inbox,
-	setLastActiveFolderId: folderId => set({ lastActiveFolderId: folderId }),
-
-	lastMessagesList: [],
-	setLastMessagesList: (messages: ILinkedMessage[]) => {
-		set({ lastMessagesList: messages });
-	},
-
-	decodedMessagesById: {},
-	decodeMessage: async pushMsg => {
-		const state = get();
-
-		analytics.mailOpened(state.lastActiveFolderId || 'null');
+	async decodeMessage(pushMsg: ILinkedMessage) {
+		analytics.mailOpened(this.lastActiveFolderId || 'null');
 
 		const decodedMessage = await decodeMessage(pushMsg.msgId, pushMsg.msg, pushMsg.recipient!.account);
 
@@ -354,27 +312,21 @@ export const useMailStore = create<MailStore>((set, get) => ({
 					  },
 		};
 
-		state.decodedMessagesById[pushMsg.msgId] = serializedMsg;
-		set({ decodedMessagesById: { ...state.decodedMessagesById } });
+		this.decodedMessagesById[pushMsg.msgId] = serializedMsg;
 
 		if (browserStorage.saveDecodedMessages) {
 			console.log('msg saved: ', pushMsg.msgId);
 			await messagesDB.saveDecodedMessage(serializedMsg);
 		}
-	},
+	}
 
-	readMessageIds: new Set(),
-	markMessagesAsReaded: async ids => {
-		const readMessageIds = new Set(get().readMessageIds);
-		ids.forEach(id => readMessageIds.add(id));
-		set({ readMessageIds });
-
+	async markMessagesAsReaded(ids: string[]) {
+		ids.forEach(id => this.readMessageIds.add(id));
 		await messagesDB.saveMessagesRead(ids);
-	},
+	}
 
-	deletedMessageIds: {},
-	markMessagesAsDeleted: async messages => {
-		const deletedMessageIds = { ...get().deletedMessageIds };
+	async markMessagesAsDeleted(messages: ILinkedMessage[]) {
+		const deletedMessageIds = { ...this.deletedMessageIds };
 
 		messages.forEach(m => {
 			if (deletedMessageIds[m.recipient?.account.address || 'null']) {
@@ -384,7 +336,7 @@ export const useMailStore = create<MailStore>((set, get) => ({
 			}
 		});
 
-		set({ deletedMessageIds });
+		this.deletedMessageIds = deletedMessageIds;
 
 		await messagesDB.saveMessagesDeleted(
 			messages.map(m => ({
@@ -392,9 +344,10 @@ export const useMailStore = create<MailStore>((set, get) => ({
 				accountAddress: m.recipient?.account.address || 'null',
 			})),
 		);
-	},
-	markMessagesAsNotDeleted: async messages => {
-		const deletedMessageIds = { ...get().deletedMessageIds };
+	}
+
+	async markMessagesAsNotDeleted(messages: ILinkedMessage[]) {
+		const deletedMessageIds = { ...this.deletedMessageIds };
 
 		messages.forEach(m => {
 			if (deletedMessageIds[m.recipient?.account.address || 'null']) {
@@ -402,7 +355,7 @@ export const useMailStore = create<MailStore>((set, get) => ({
 			}
 		});
 
-		set({ deletedMessageIds });
+		this.deletedMessageIds = deletedMessageIds;
 
 		await messagesDB.saveMessagesNotDeleted(
 			messages.map(m => ({
@@ -410,5 +363,7 @@ export const useMailStore = create<MailStore>((set, get) => ({
 				accountAddress: m.recipient?.account.address || 'null',
 			})),
 		);
-	},
-}));
+	}
+}
+
+export const mailStore = new MailStore();

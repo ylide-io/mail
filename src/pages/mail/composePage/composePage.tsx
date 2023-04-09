@@ -9,7 +9,7 @@ import { OverlappingLoader } from '../../../components/overlappingLoader/overlap
 import { ReactComponent as CrossSvg } from '../../../icons/ic20/cross.svg';
 import { analytics } from '../../../stores/Analytics';
 import mailer from '../../../stores/Mailer';
-import { useMailStore } from '../../../stores/MailList';
+import { mailStore } from '../../../stores/MailList';
 import { globalOutgoingMailData } from '../../../stores/outgoingMailData';
 import { RoutePath } from '../../../stores/routePath';
 import { useNav } from '../../../utils/url';
@@ -18,7 +18,6 @@ import css from './composePage.module.scss';
 
 export const ComposePage = observer(() => {
 	const navigate = useNav();
-	const lastActiveFolderId = useMailStore(state => state.lastActiveFolderId);
 
 	useEffect(() => {
 		analytics.composeOpened();
@@ -36,7 +35,9 @@ export const ComposePage = observer(() => {
 						<ActionButton
 							look={ActionButtonLook.DANGEROUS}
 							onClick={() => {
-								navigate(generatePath(RoutePath.MAIL_FOLDER, { folderId: lastActiveFolderId }));
+								navigate(
+									generatePath(RoutePath.MAIL_FOLDER, { folderId: mailStore.lastActiveFolderId }),
+								);
 							}}
 							icon={<CrossSvg />}
 						>
@@ -48,7 +49,9 @@ export const ComposePage = observer(() => {
 				<ComposeMailForm
 					className={css.form}
 					mailData={globalOutgoingMailData}
-					onSent={() => navigate(generatePath(RoutePath.MAIL_FOLDER, { folderId: lastActiveFolderId }))}
+					onSent={() =>
+						navigate(generatePath(RoutePath.MAIL_FOLDER, { folderId: mailStore.lastActiveFolderId }))
+					}
 				/>
 
 				{mailer.sending && <OverlappingLoader text="Broadcasting your message to blockchain ..." />}

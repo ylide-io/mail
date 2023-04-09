@@ -13,7 +13,7 @@ import { ReactComponent as ContactSvg } from '../../../icons/ic20/contact.svg';
 import { ReactComponent as ForwardSvg } from '../../../icons/ic20/forward.svg';
 import { ReactComponent as ReplySvg } from '../../../icons/ic20/reply.svg';
 import { IMessageDecodedSerializedContent } from '../../../indexedDB/MessagesDB';
-import { FolderId, ILinkedMessage, useMailList, useMailStore } from '../../../stores/MailList';
+import { FolderId, ILinkedMessage, mailStore, useMailList } from '../../../stores/MailList';
 import { globalOutgoingMailData, OutgoingMailData } from '../../../stores/outgoingMailData';
 import { RoutePath } from '../../../stores/routePath';
 import { DateFormatStyle, formatDate } from '../../../utils/date';
@@ -34,25 +34,15 @@ export const MailDetailsPage = observer(() => {
 
 	const openMailCopmpose = useOpenMailCopmpose();
 
-	const {
-		lastMessagesList,
-		decodedMessagesById,
-		deletedMessageIds,
-		markMessagesAsDeleted,
-		markMessagesAsNotDeleted,
-		markMessagesAsReaded,
-		decodeMessage,
-	} = useMailStore();
-
-	const initialMessage = lastMessagesList.find(m => m.id === id!);
+	const initialMessage = mailStore.lastMessagesList.find(m => m.id === id!);
 	const initialDecodedContent: IMessageDecodedSerializedContent | undefined =
-		initialMessage && decodedMessagesById[initialMessage.msgId];
+		initialMessage && mailStore.decodedMessagesById[initialMessage.msgId];
 
 	useEffect(() => {
 		if (id && initialDecodedContent) {
-			markMessagesAsReaded([id]);
+			mailStore.markMessagesAsReaded([id]);
 		}
-	}, [id, initialDecodedContent, markMessagesAsReaded]);
+	}, [id, initialDecodedContent]);
 
 	useEffect(() => {
 		if (!initialMessage || !initialDecodedContent) {
@@ -70,6 +60,8 @@ export const MailDetailsPage = observer(() => {
 	const [isLoadingThread, setLoadingThread] = useState(needToLoadThread);
 	const [isDecodingThread, setDecodingThread] = useState(false);
 	const [isThreadOpen, setThreadOpen] = useState(false);
+
+	const deletedMessageIds = mailStore.deletedMessageIds;
 
 	const threadFilter = useCallback(
 		(m: ILinkedMessage) => {
@@ -111,7 +103,7 @@ export const MailDetailsPage = observer(() => {
 		} else if (!isLoading) {
 			loadNextPage();
 		}
-	}, [decodeMessage, isLoading, isNextPageAvailable, loadNextPage, threadMessages]);
+	}, [isLoading, isNextPageAvailable, loadNextPage, threadMessages]);
 
 	const onOpenThreadClick = () => {
 		setDecodingThread(true);
@@ -119,7 +111,7 @@ export const MailDetailsPage = observer(() => {
 		(async () => {
 			for (const m of wrappedThreadMessages) {
 				console.log('decodeMessage');
-				await decodeMessage(m.message);
+				await mailStore.decodeMessage(m.message);
 			}
 
 			setDecodingThread(false);
@@ -168,7 +160,7 @@ export const MailDetailsPage = observer(() => {
 	};
 
 	const onDeleteClick = (m: ILinkedMessage) => {
-		markMessagesAsDeleted([m]);
+		mailStore.markMessagesAsDeleted([m]);
 
 		if (isThreadOpen) {
 			setWrappedThreadMessages(
@@ -180,7 +172,7 @@ export const MailDetailsPage = observer(() => {
 	};
 
 	const onRestoreClick = (m: ILinkedMessage) => {
-		markMessagesAsNotDeleted([m]);
+		mailStore.markMessagesAsNotDeleted([m]);
 
 		setWrappedThreadMessages(
 			wrappedThreadMessages.map(it => (it.message.msgId === m.msgId ? { ...it, isDeleted: false } : it)),
@@ -216,7 +208,7 @@ export const MailDetailsPage = observer(() => {
 						<div className={css.messageWrapper}>
 							{isThreadOpen ? (
 								wrappedThreadMessages.map(message => {
-									const decoded = decodedMessagesById[message.message.msgId];
+									const decoded = mailStore.decodedMessagesById[message.message.msgId];
 									const isPrimaryItem = message.message.id === initialMessage.id;
 
 									return (

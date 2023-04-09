@@ -10,7 +10,7 @@ import { ContactName } from '../../../../components/contactName/contactName';
 import { ReadableDate } from '../../../../components/readableDate/readableDate';
 import { ReactComponent as FilterSvg } from '../../../../icons/ic20/filter.svg';
 import domain from '../../../../stores/Domain';
-import { FolderId, ILinkedMessage, useMailStore } from '../../../../stores/MailList';
+import { FolderId, ILinkedMessage, mailStore } from '../../../../stores/MailList';
 import { RoutePath } from '../../../../stores/routePath';
 import { decodeEditorData } from '../../../../utils/editorJs';
 import { formatSubject } from '../../../../utils/mail';
@@ -32,10 +32,8 @@ const MailboxListRow: React.FC<MailboxListRowProps> = observer(
 		const [isLoading, setLoading] = useState(false);
 		const [error, setError] = useState('');
 
-		const { decodedMessagesById, readMessageIds, decodeMessage } = useMailStore();
-
-		const decoded = decodedMessagesById[message.msgId];
-		const isRead = readMessageIds.has(message.id);
+		const decoded = mailStore.decodedMessagesById[message.msgId];
+		const isRead = mailStore.readMessageIds.has(message.id);
 
 		const messageClickHandler = async () => {
 			if (decoded) {
@@ -45,7 +43,7 @@ const MailboxListRow: React.FC<MailboxListRowProps> = observer(
 			} else {
 				setLoading(true);
 				try {
-					await decodeMessage(message);
+					await mailStore.decodeMessage(message);
 				} catch (err) {
 					console.log('decode err: ', err);
 					return setError(`Decoding error. Please, double check your Ylide password`);

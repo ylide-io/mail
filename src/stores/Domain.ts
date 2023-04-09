@@ -38,7 +38,7 @@ import { blockchainMeta } from '../utils/blockchain';
 import { supportedWallets } from '../utils/wallet';
 import { Accounts } from './Accounts';
 import contacts from './Contacts';
-import { useMailStore } from './MailList';
+import { mailStore } from './MailList';
 import { Wallet } from './models/Wallet';
 import { OTCStore } from './OTC';
 import tags from './Tags';
@@ -544,7 +544,7 @@ export class Domain {
 		await this.accounts.accountsProcessed;
 		await contacts.init();
 		await tags.getTags();
-		await useMailStore.getState().init();
+		await mailStore.init();
 		this.initialized = true;
 	}
 }

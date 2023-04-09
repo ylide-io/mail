@@ -9,7 +9,7 @@ import { GenericLayout } from '../../../components/genericLayout/genericLayout';
 import { YlideLoader } from '../../../components/ylideLoader/ylideLoader';
 import { analytics } from '../../../stores/Analytics';
 import domain from '../../../stores/Domain';
-import { FolderId, ILinkedMessage, useMailList, useMailStore } from '../../../stores/MailList';
+import { FolderId, ILinkedMessage, mailStore, useMailList } from '../../../stores/MailList';
 import { useNav } from '../../../utils/url';
 import { useWindowSize } from '../../../utils/useWindowSize';
 import MailboxEmpty from './mailboxEmpty/mailboxEmpty';
@@ -51,7 +51,6 @@ export function MailboxListItem({ index, style, data }: ListChildComponentProps<
 
 export const MailboxPage = observer(() => {
 	const navigate = useNav();
-	const { setLastActiveFolderId, setLastMessagesList, markMessagesAsReaded } = useMailStore();
 
 	const params = useParams<{ folderId: FolderId }>();
 	const [searchParams] = useSearchParams();
@@ -60,11 +59,11 @@ export const MailboxPage = observer(() => {
 	const filterBySender = searchParams.get('sender') || undefined;
 
 	useEffect(() => {
+		mailStore.lastActiveFolderId = folderId;
 		analytics.mailFolderOpened(folderId);
-		setLastActiveFolderId(folderId);
-	}, [folderId, setLastActiveFolderId]);
+	}, [folderId]);
 
-	const { deletedMessageIds, markMessagesAsDeleted, markMessagesAsNotDeleted } = useMailStore();
+	const deletedMessageIds = mailStore.deletedMessageIds;
 
 	const messageFilter = useCallback(
 		(m: ILinkedMessage) => {
@@ -82,7 +81,9 @@ export const MailboxPage = observer(() => {
 		filter: messageFilter,
 	});
 
-	useEffect(() => setLastMessagesList(messages), [setLastMessagesList, messages]);
+	useEffect(() => {
+		mailStore.lastMessagesList = messages;
+	}, [messages]);
 
 	const [selectedMessageIds, setSelectedMessageIds] = useState(new Set<string>());
 	const isAllSelected = !!messages.length && messages.every(it => selectedMessageIds.has(it.id));
@@ -117,15 +118,15 @@ export const MailboxPage = observer(() => {
 						}}
 						isActionButtonsDisabled={!selectedMessageIds.size}
 						onMarkReadClick={() => {
-							markMessagesAsReaded(Array.from(selectedMessageIds));
+							mailStore.markMessagesAsReaded(Array.from(selectedMessageIds));
 							setSelectedMessageIds(new Set());
 						}}
 						onDeleteClick={() => {
-							markMessagesAsDeleted(messages.filter(it => selectedMessageIds.has(it.id)));
+							mailStore.markMessagesAsDeleted(messages.filter(it => selectedMessageIds.has(it.id)));
 							setSelectedMessageIds(new Set());
 						}}
 						onRestoreClick={() => {
-							markMessagesAsNotDeleted(messages.filter(it => selectedMessageIds.has(it.id)));
+							mailStore.markMessagesAsNotDeleted(messages.filter(it => selectedMessageIds.has(it.id)));
 							setSelectedMessageIds(new Set());
 						}}
 					/>
