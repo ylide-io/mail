@@ -20,7 +20,7 @@
 	}
 }
 
-.root_unread .contact,
+.root_unread .contactValue,
 .root_unread .preview,
 .root_unread .subject,
 .root_unread .date {
@@ -40,10 +40,20 @@
 }
 
 .contact {
-	display: grid;
-	grid-template-columns: auto 1fr;
+	display: flex;
 	align-items: center;
 	padding: 0 4px 0 0;
+}
+
+.contactsNumber {
+	flex-shrink: 0;
+	display: flex;
+	align-items: center;
+	padding: 0 8px;
+	height: 20px;
+	font-size: 11px;
+	background: var(--tertiary-surface-color);
+	border-radius: 99px;
 }
 
 .filterBySenderButton {
