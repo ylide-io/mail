@@ -66,10 +66,8 @@ export const MailboxPage = observer(() => {
 	const deletedMessageIds = mailStore.deletedMessageIds;
 
 	const messageFilter = useCallback(
-		(m: ILinkedMessage) => {
-			const { id, recipient } = m;
-			const isDeleted = deletedMessageIds[recipient?.account.address || 'null']?.has(id);
-
+		(id: string) => {
+			const isDeleted = deletedMessageIds.has(id);
 			return folderId === FolderId.Archive ? isDeleted : !isDeleted;
 		},
 		[deletedMessageIds, folderId],

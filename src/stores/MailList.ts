@@ -64,6 +64,11 @@ export async function decodeMessage(msgId: string, msg: IMessage, recepient: IGe
 
 const MailPageSize = 10;
 
+function wrapMessageId(p: IMessageWithSource) {
+	const acc = p.meta.account as DomainAccount;
+	return `${p.msg.msgId}:${acc.account.address}`;
+}
+
 export interface ILinkedMessage {
 	id: string;
 	msgId: string;
@@ -75,7 +80,7 @@ export interface ILinkedMessage {
 interface UseMailListProps {
 	folderId: FolderId;
 	sender?: string;
-	filter?: (m: ILinkedMessage) => boolean;
+	filter?: (id: string) => boolean;
 }
 
 export function useMailList(props?: UseMailListProps) {
@@ -93,7 +98,7 @@ export function useMailList(props?: UseMailListProps) {
 	const wrapMessage = useCallback((p: IMessageWithSource): ILinkedMessage => {
 		const acc = p.meta.account as DomainAccount;
 		return {
-			id: `${p.msg.msgId}:${acc.account.address}`,
+			id: wrapMessageId(p),
 			msgId: p.msg.msgId,
 			msg: p.msg,
 			recipient: acc || null,
@@ -185,9 +190,7 @@ export function useMailList(props?: UseMailListProps) {
 		if (stream && !stream.paused) {
 			stream.resetFilter(m => {
 				if (!filter) return true;
-
-				const linkedMessage = wrapMessage(m);
-				return filter(linkedMessage);
+				return filter(wrapMessageId(m));
 			});
 
 			stream.readMore(MailPageSize).then(m => {
@@ -234,7 +237,7 @@ class MailStore {
 	decodedMessagesById: Record<string, IMessageDecodedSerializedContent> = {};
 	readMessageIds = new Set<string>();
 
-	deletedMessageIds: Record<string, Set<string>> = {};
+	deletedMessageIds = new Set<string>();
 
 	constructor() {
 		makeAutoObservable(this);
@@ -258,12 +261,7 @@ class MailStore {
 		//
 
 		const dbDeletedMessages = await messagesDB.retrieveAllDeletedMessages();
-		const deletedMessageIds: Record<string, Set<string>> = {};
-		for (const acc in dbDeletedMessages) {
-			deletedMessageIds[acc] = new Set(dbDeletedMessages[acc]);
-		}
-
-		this.deletedMessageIds = deletedMessageIds;
+		this.deletedMessageIds = new Set(dbDeletedMessages);
 	}
 
 	async decodeMessage(pushMsg: ILinkedMessage) {
@@ -298,17 +296,7 @@ class MailStore {
 	}
 
 	async markMessagesAsDeleted(messages: ILinkedMessage[]) {
-		const deletedMessageIds = { ...this.deletedMessageIds };
-
-		messages.forEach(m => {
-			if (deletedMessageIds[m.recipient?.account.address || 'null']) {
-				deletedMessageIds[m.recipient?.account.address || 'null'].add(m.id);
-			} else {
-				deletedMessageIds[m.recipient?.account.address || 'null'] = new Set([m.id]);
-			}
-		});
-
-		this.deletedMessageIds = deletedMessageIds;
+		this.deletedMessageIds = new Set([...this.deletedMessageIds.values(), ...messages.map(m => m.id)]);
 
 		await messagesDB.saveMessagesDeleted(
 			messages.map(m => ({
@@ -319,15 +307,9 @@ class MailStore {
 	}
 
 	async markMessagesAsNotDeleted(messages: ILinkedMessage[]) {
-		const deletedMessageIds = { ...this.deletedMessageIds };
-
-		messages.forEach(m => {
-			if (deletedMessageIds[m.recipient?.account.address || 'null']) {
-				deletedMessageIds[m.recipient?.account.address || 'null'].delete(m.id);
-			}
-		});
-
-		this.deletedMessageIds = deletedMessageIds;
+		this.deletedMessageIds = new Set(
+			[...this.deletedMessageIds.values()].filter(id => !messages.map(m => m.id).includes(id)),
+		);
 
 		await messagesDB.saveMessagesNotDeleted(
 			messages.map(m => ({

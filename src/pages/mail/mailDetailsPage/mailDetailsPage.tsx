@@ -63,14 +63,7 @@ export const MailDetailsPage = observer(() => {
 
 	const deletedMessageIds = mailStore.deletedMessageIds;
 
-	const threadFilter = useCallback(
-		(m: ILinkedMessage) => {
-			const { id, recipient } = m;
-			const isDeleted = deletedMessageIds[recipient?.account.address || 'null']?.has(id);
-			return !isDeleted;
-		},
-		[deletedMessageIds],
-	);
+	const threadFilter = useCallback((id: string) => !deletedMessageIds.has(id), [deletedMessageIds]);
 
 	const {
 		messages: threadMessages,

@@ -92,15 +92,9 @@ class MessagesDB extends IndexedDB {
 		return (await db.getAll('readMessages')).map(r => r.msgId);
 	}
 
-	async retrieveAllDeletedMessages(): Promise<Record<string, string[]>> {
+	async retrieveAllDeletedMessages(): Promise<string[]> {
 		const db = await this.getDB();
-		return (await db.getAll('deletedMessages')).reduce(
-			(p, c) => ({
-				...p,
-				[c.accountAddress]: (p[c.accountAddress] || []).concat([c.msgId]),
-			}),
-			{} as Record<string, string[]>,
-		);
+		return (await db.getAll('deletedMessages')).map(row => row.msgId);
 	}
 
 	async saveMessagesDeleted(ids: { id: string; accountAddress: string }[]) {
