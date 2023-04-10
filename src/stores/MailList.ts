@@ -69,6 +69,17 @@ function wrapMessageId(p: IMessageWithSource) {
 	return `${p.msg.msgId}:${acc.account.address}`;
 }
 
+function wrapMessage(p: IMessageWithSource): ILinkedMessage {
+	const acc = p.meta.account as DomainAccount;
+	return {
+		id: wrapMessageId(p),
+		msgId: p.msg.msgId,
+		msg: p.msg,
+		recipient: acc || null,
+		reader: domain.ylide.controllers.blockchainsMap[p.msg.blockchain],
+	};
+}
+
 export interface ILinkedMessage {
 	id: string;
 	msgId: string;
@@ -94,17 +105,6 @@ export function useMailList(props?: UseMailListProps) {
 	const [isNextPageAvailable, setNextPageAvailable] = useState(false);
 	const [isNeedMore, setNeedMore] = useState(false);
 	const loadNextPage = useCallback(() => setNeedMore(true), []);
-
-	const wrapMessage = useCallback((p: IMessageWithSource): ILinkedMessage => {
-		const acc = p.meta.account as DomainAccount;
-		return {
-			id: wrapMessageId(p),
-			msgId: p.msg.msgId,
-			msg: p.msg,
-			recipient: acc || null,
-			reader: domain.ylide.controllers.blockchainsMap[p.msg.blockchain],
-		};
-	}, []);
 
 	const activeAccounts = domain.accounts.activeAccounts;
 	const blockchains = domain.blockchains;
@@ -182,7 +182,7 @@ export function useMailList(props?: UseMailListProps) {
 			listSourceDrainer.pause();
 			listSourceDrainer.off('messages', onNewMessages);
 		};
-	}, [activeAccounts, blockchains, folderId, loadNextPage, sender, wrapMessage]);
+	}, [activeAccounts, blockchains, folderId, loadNextPage, sender]);
 
 	useEffect(() => {
 		let isDestroyed = false;
@@ -204,7 +204,7 @@ export function useMailList(props?: UseMailListProps) {
 		return () => {
 			isDestroyed = true;
 		};
-	}, [filter, stream, wrapMessage]);
+	}, [filter, stream]);
 
 	useEffect(() => {
 		if (isNextPageAvailable && isNeedMore && stream && !stream.paused && !isLoading) {
@@ -216,7 +216,7 @@ export function useMailList(props?: UseMailListProps) {
 				setLoading(false);
 			});
 		}
-	}, [isLoading, isNeedMore, isNextPageAvailable, stream, wrapMessage]);
+	}, [isLoading, isNeedMore, isNextPageAvailable, stream]);
 
 	return {
 		isLoading: !stream || isLoading,
