@@ -86,7 +86,7 @@ export function useMailList(props?: UseMailListProps) {
 	const [stream, setStream] = useState<ListSourceDrainer | undefined>();
 	const [messages, setMessages] = useState<ILinkedMessage[]>([]);
 	const [isLoading, setLoading] = useState(false);
-	const [isNextPageAvailable, setNextPageAvailable] = useState(true);
+	const [isNextPageAvailable, setNextPageAvailable] = useState(false);
 	const [isNeedMore, setNeedMore] = useState(false);
 	const loadNextPage = useCallback(() => setNeedMore(true), []);
 
@@ -111,7 +111,7 @@ export function useMailList(props?: UseMailListProps) {
 
 		setStream(undefined);
 		setMessages([]);
-		setNextPageAvailable(true);
+		setNextPageAvailable(false);
 
 		function buildSources(
 			activeAccounts: DomainAccount[],
