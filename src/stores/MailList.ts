@@ -1,3 +1,4 @@
+import { EthereumBlockchainController } from '@ylide/ethereum';
 import {
 	AbstractBlockchainController,
 	BlockchainSourceType,
@@ -69,15 +70,27 @@ function wrapMessageId(p: IMessageWithSource) {
 	return `${p.msg.msgId}:${acc.account.address}`;
 }
 
-function wrapMessage(p: IMessageWithSource): ILinkedMessage {
+async function wrapMessage(p: IMessageWithSource): Promise<ILinkedMessage> {
 	const acc = p.meta.account as DomainAccount;
+	const reader = domain.ylide.controllers.blockchainsMap[p.msg.blockchain];
+
+	let recipients: string[] = [];
+	try {
+		recipients = (await (reader as EthereumBlockchainController).getMessageRecipients(p.msg, true)).recipients;
+	} catch (e) {}
+
 	return {
 		id: wrapMessageId(p),
 		msgId: p.msg.msgId,
 		msg: p.msg,
 		recipient: acc || null,
-		reader: domain.ylide.controllers.blockchainsMap[p.msg.blockchain],
+		recipients,
+		reader,
 	};
+}
+
+async function wrapMessages(p: IMessageWithSource[]): Promise<ILinkedMessage[]> {
+	return await Promise.all(p.map(wrapMessage));
 }
 
 export interface ILinkedMessage {
@@ -85,6 +98,7 @@ export interface ILinkedMessage {
 	msgId: string;
 	msg: IMessage;
 	recipient: DomainAccount | null;
+	recipients: string[];
 	reader: AbstractBlockchainController;
 }
 
@@ -163,7 +177,7 @@ export function useMailList(props?: UseMailListProps) {
 		);
 
 		async function onNewMessages({ messages }: { messages: IMessageWithSource[] }) {
-			setMessages(messages.map(wrapMessage));
+			setMessages(await wrapMessages(messages));
 		}
 
 		listSourceDrainer.on('messages', onNewMessages);
@@ -188,16 +202,21 @@ export function useMailList(props?: UseMailListProps) {
 		let isDestroyed = false;
 
 		if (stream && !stream.paused) {
+			setLoading(true);
+
 			stream.resetFilter(m => {
 				if (!filter) return true;
 				return filter(wrapMessageId(m));
 			});
 
-			stream.readMore(MailPageSize).then(m => {
-				if (!isDestroyed) {
-					setMessages(m.map(wrapMessage));
-					setNextPageAvailable(!stream.drained);
-				}
+			stream.readMore(MailPageSize).then(messages => {
+				wrapMessages(messages).then(wrapped => {
+					if (!isDestroyed) {
+						setMessages(wrapped);
+						setNextPageAvailable(!stream.drained);
+						setLoading(false);
+					}
+				});
 			});
 		}
 
@@ -211,9 +230,11 @@ export function useMailList(props?: UseMailListProps) {
 			setLoading(true);
 
 			stream.readMore(MailPageSize).then(messages => {
-				setMessages(messages.map(wrapMessage));
-				setNextPageAvailable(!stream.drained);
-				setLoading(false);
+				wrapMessages(messages).then(wrapped => {
+					setMessages(wrapped);
+					setNextPageAvailable(!stream.drained);
+					setLoading(false);
+				});
 			});
 		}
 	}, [isLoading, isNeedMore, isNextPageAvailable, stream]);
