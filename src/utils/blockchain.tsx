@@ -27,7 +27,7 @@ export function isAddress(input: string): boolean {
 }
 
 export function formatAddress(address: string) {
-	return address.replace(/^0+/, '');
+	return address.replace(/^0x/, '').replace(/^0:/, '').replace(/^0+/, '').toLowerCase();
 }
 
 //
