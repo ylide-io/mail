@@ -103,17 +103,17 @@ const MailboxListRow: React.FC<MailboxListRowProps> = observer(
 						address={message.recipients.length ? message.recipients[0] : message.msg.senderAddress}
 					/>
 
-					<Tooltip
-						title={message.recipients
-							.filter((_, i) => i)
-							.map(r => (
-								<ContactName address={r} />
-							))}
-					>
-						{message.recipients.length > 1 && (
+					{message.recipients.length > 1 && (
+						<Tooltip
+							title={message.recipients
+								.filter((_, i) => i)
+								.map(r => (
+									<ContactName address={r} />
+								))}
+						>
 							<div className={css.contactsNumber}>+{message.recipients.length - 1}</div>
-						)}
-					</Tooltip>
+						</Tooltip>
+					)}
 
 					{onFilterBySenderClick && (
 						<div
