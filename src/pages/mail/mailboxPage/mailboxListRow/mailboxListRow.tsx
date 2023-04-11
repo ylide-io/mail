@@ -108,7 +108,7 @@ const MailboxListRow: React.FC<MailboxListRowProps> = observer(
 							title={message.recipients
 								.filter((_, i) => i)
 								.map(r => (
-									<ContactName address={r} />
+									<ContactName address={r} noTooltip />
 								))}
 						>
 							<div className={css.contactsNumber}>+{message.recipients.length - 1}</div>

@@ -7,9 +7,10 @@ import { PropsWithClassName } from '../propsWithClassName';
 
 export interface ContactNameProps extends PropsWithClassName {
 	address: string;
+	noTooltip?: boolean;
 }
 
-export const ContactName = observer(({ className, address }: ContactNameProps) => {
+export const ContactName = observer(({ className, address, noTooltip }: ContactNameProps) => {
 	const contact = contacts.find({ address });
 
 	return (
@@ -17,7 +18,7 @@ export const ContactName = observer(({ className, address }: ContactNameProps) =
 			{contact ? (
 				<AdaptiveText className={className} text={contact.name} />
 			) : (
-				<AdaptiveAddress className={className} address={address} />
+				<AdaptiveAddress className={className} address={address} noTooltip={noTooltip} />
 			)}
 		</>
 	);
