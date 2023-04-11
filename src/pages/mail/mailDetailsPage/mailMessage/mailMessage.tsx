@@ -104,35 +104,49 @@ export const MailMessage = observer(
 				</div>
 
 				<div className={css.sender}>
-					<div className={css.senderLabel}>Sender:</div>
-					<ContactName address={message.msg.senderAddress} />
+					<div className={css.senderLabel}>
+						{message.recipients.length > 1
+							? 'Receivers'
+							: message.recipients.length
+							? 'Receiver'
+							: 'Sender'}
+						:
+					</div>
 
-					{!contact && (
-						<ActionButton
-							className={css.addContactButton}
-							isDisabled={isSavingContact}
-							icon={isSavingContact ? <Spinner /> : <AddContactSvg />}
-							title="Create contact"
-							onClick={() => {
-								const name = prompt('Enter contact name:')?.trim();
-								if (!name) return;
+					<div className={css.senderList}>
+						{(message.recipients.length ? message.recipients : [message.msg.senderAddress]).map(address => (
+							<div className={css.senderRow}>
+								<ContactName address={address} />
 
-								const contact: IContact = {
-									name,
-									description: '',
-									address: message.msg.senderAddress,
-									tags: [],
-								};
+								{!contact && (
+									<ActionButton
+										className={css.addContactButton}
+										isDisabled={isSavingContact}
+										icon={isSavingContact ? <Spinner /> : <AddContactSvg />}
+										title="Create contact"
+										onClick={() => {
+											const name = prompt('Enter contact name:')?.trim();
+											if (!name) return;
 
-								setSavingContact(true);
+											const contact: IContact = {
+												name,
+												description: '',
+												address,
+												tags: [],
+											};
 
-								contacts
-									.createContact(contact)
-									.catch(() => toast("Couldn't save 😒"))
-									.finally(() => setSavingContact(false));
-							}}
-						/>
-					)}
+											setSavingContact(true);
+
+											contacts
+												.createContact(contact)
+												.catch(() => toast("Couldn't save 😒"))
+												.finally(() => setSavingContact(false));
+										}}
+									/>
+								)}
+							</div>
+						))}
+					</div>
 				</div>
 
 				<ReadableDate className={css.date} style={DateFormatStyle.LONG} value={message.msg.createdAt * 1000} />

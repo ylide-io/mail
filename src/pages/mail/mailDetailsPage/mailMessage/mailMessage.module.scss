@@ -29,7 +29,6 @@
 
 .sender {
 	display: flex;
-	align-items: center;
 	min-width: 0;
 
 	> :not(:first-child) {
@@ -41,8 +40,29 @@
 	color: var(--secondary-text-color);
 }
 
+.senderList {
+	display: grid;
+	grid-gap: 8px;
+}
+
+.senderRow {
+	display: flex;
+	align-items: center;
+	min-width: 0;
+
+	> :not(:first-child) {
+		margin-left: 8px;
+	}
+}
+
 .addContactButton {
 	margin: -99px 0;
+	opacity: 0;
+	transition: opacity 200ms;
+}
+
+.senderRow:hover .addContactButton {
+	opacity: 1;
 }
 
 .date {
