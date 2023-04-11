@@ -26,10 +26,6 @@ export function isAddress(input: string): boolean {
 	return domain.getBlockchainsForAddress(input.toLowerCase()).length > 0;
 }
 
-export function formatAddress(address: string) {
-	return address.replace(/^0x/, '').replace(/^0:/, '').replace(/^0+/, '').toLowerCase();
-}
-
 //
 
 export interface IEthereumNetworkDescriptor {
