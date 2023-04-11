@@ -36,25 +36,27 @@ class Contacts {
 	}
 
 	async createContact(contact: IContact): Promise<void> {
-		invariant(!this.contacts.some(c => c.address === contact.address));
+		invariant(!this.contacts.some(c => c.address.toLowerCase() === contact.address.toLowerCase()));
 
 		this.contacts.unshift(contact);
 		await contactsDB.saveContact(contact);
 	}
 
 	async updateContact(contact: IContact): Promise<void> {
-		this.contacts = this.contacts.map(c => (c.address === contact.address ? contact : c));
+		this.contacts = this.contacts.map(c =>
+			c.address.toLowerCase() === contact.address.toLowerCase() ? contact : c,
+		);
 		await contactsDB.saveContact(contact);
 	}
 
 	async deleteContact(address: string): Promise<void> {
-		this.contacts = this.contacts.filter(elem => elem.address !== address);
+		this.contacts = this.contacts.filter(elem => elem.address.toLowerCase() !== address.toLowerCase());
 		await contactsDB.deleteContact(address);
 	}
 
 	find(options: { address?: string }) {
 		if (options.address) {
-			return this.contacts.find(c => c.address === options.address);
+			return this.contacts.find(c => c.address.toLowerCase() === options.address?.toLowerCase());
 		}
 	}
 
