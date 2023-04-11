@@ -3,6 +3,7 @@ import { makeAutoObservable } from 'mobx';
 
 import contactsDB from '../indexedDB/ContactsDB';
 import { invariant } from '../utils/assert';
+import { formatAddress } from '../utils/blockchain';
 import { IContact } from './models/IContact';
 import { ITag } from './models/ITag';
 
@@ -53,8 +54,9 @@ class Contacts {
 	}
 
 	find(options: { address?: string }) {
-		if (options.address) {
-			return this.contacts.find(c => c.address === options.address);
+		const address = options.address;
+		if (address) {
+			return this.contacts.find(c => formatAddress(c.address) === formatAddress(address));
 		}
 	}
 
