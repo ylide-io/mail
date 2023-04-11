@@ -18,6 +18,7 @@ import { useCallback, useEffect, useState } from 'react';
 
 import messagesDB, { IMessageDecodedSerializedContent } from '../indexedDB/MessagesDB';
 import { invariant } from '../utils/assert';
+import { formatAddress } from '../utils/blockchain';
 import { analytics } from './Analytics';
 import { browserStorage } from './browserStorage';
 import contacts from './Contacts';
@@ -76,7 +77,9 @@ async function wrapMessage(p: IMessageWithSource): Promise<ILinkedMessage> {
 
 	let recipients: string[] = [];
 	try {
-		recipients = (await (reader as EthereumBlockchainController).getMessageRecipients(p.msg, true)).recipients;
+		recipients = (await (reader as EthereumBlockchainController).getMessageRecipients(p.msg, true)).recipients.map(
+			formatAddress,
+		);
 	} catch (e) {}
 
 	return {
