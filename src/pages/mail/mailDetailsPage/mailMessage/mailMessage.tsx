@@ -8,7 +8,6 @@ import { ActionButton, ActionButtonLook } from '../../../../components/ActionBut
 import { Blockie } from '../../../../components/blockie/blockie';
 import { ContactName } from '../../../../components/contactName/contactName';
 import { ReadableDate } from '../../../../components/readableDate/readableDate';
-import { Spinner } from '../../../../components/spinner/spinner';
 import { useToastManager } from '../../../../components/toast/toast';
 import { ReactComponent as AddContactSvg } from '../../../../icons/ic20/addContact.svg';
 import { ReactComponent as ForwardSvg } from '../../../../icons/ic20/forward.svg';
@@ -39,9 +38,6 @@ export interface MailMessageProps {
 export const MailMessage = observer(
 	({ message, decoded, folderId, onReady, onReplyClick, onForwardClick, onDeleteClick }: MailMessageProps) => {
 		const { toast } = useToastManager();
-
-		const contact = contacts.find({ address: message.msg.senderAddress });
-		const [isSavingContact, setSavingContact] = useState(false);
 
 		const editorData = useMemo(() => {
 			if (!decoded?.decodedTextData) return null;
@@ -114,38 +110,36 @@ export const MailMessage = observer(
 					</div>
 
 					<div className={css.senderList}>
-						{(message.recipients.length ? message.recipients : [message.msg.senderAddress]).map(address => (
-							<div className={css.senderRow}>
-								<ContactName address={address} />
+						{(message.recipients.length ? message.recipients : [message.msg.senderAddress]).map(address => {
+							const contact = contacts.find({ address });
 
-								{!contact && (
-									<ActionButton
-										className={css.addContactButton}
-										isDisabled={isSavingContact}
-										icon={isSavingContact ? <Spinner /> : <AddContactSvg />}
-										title="Create contact"
-										onClick={() => {
-											const name = prompt('Enter contact name:')?.trim();
-											if (!name) return;
+							return (
+								<div className={css.senderRow}>
+									<ContactName address={address} />
 
-											const contact: IContact = {
-												name,
-												description: '',
-												address,
-												tags: [],
-											};
+									{!contact && (
+										<ActionButton
+											className={css.addContactButton}
+											icon={<AddContactSvg />}
+											title="Create contact"
+											onClick={() => {
+												const name = prompt('Enter contact name:')?.trim();
+												if (!name) return;
 
-											setSavingContact(true);
+												const contact: IContact = {
+													name,
+													description: '',
+													address,
+													tags: [],
+												};
 
-											contacts
-												.createContact(contact)
-												.catch(() => toast("Couldn't save 😒"))
-												.finally(() => setSavingContact(false));
-										}}
-									/>
-								)}
-							</div>
-						))}
+												contacts.createContact(contact).catch(() => toast("Couldn't save 😒"));
+											}}
+										/>
+									)}
+								</div>
+							);
+						})}
 					</div>
 				</div>
 
