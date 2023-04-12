@@ -10,6 +10,7 @@ import {
 } from '@ylide/ethereum';
 import {
 	everscaleBlockchainFactory,
+	everscaleProxyWalletFactory,
 	everscaleWalletFactory,
 	venomBlockchainFactory,
 	venomWalletFactory,
@@ -42,6 +43,7 @@ import { mailStore } from './MailList';
 import { Wallet } from './models/Wallet';
 import { OTCStore } from './OTC';
 import tags from './Tags';
+import { EverwalletProxy } from './EverwalletProxy';
 
 let INDEXER_BLOCKCHAINS: string[];
 
@@ -94,6 +96,7 @@ if (REACT_APP__OTC_MODE) {
 
 	Ylide.registerBlockchainFactory(everscaleBlockchainFactory);
 	Ylide.registerWalletFactory(everscaleWalletFactory);
+	Ylide.registerWalletFactory(everscaleProxyWalletFactory);
 
 	Ylide.registerBlockchainFactory(venomBlockchainFactory);
 	Ylide.registerWalletFactory(venomWalletFactory);
@@ -529,7 +532,15 @@ export class Domain {
 		}
 	}
 
+	everwalletProxy = new EverwalletProxy();
+
 	async reloadAvailableWallets() {
+		if (window.parent !== window) {
+			// return;
+			if (await this.everwalletProxy.isProxyWalletAvailable()) {
+				this.everwalletProxy.initializeEverwalletProxy();
+			}
+		}
 		this.availableWallets = await Ylide.getAvailableWallets();
 	}
 

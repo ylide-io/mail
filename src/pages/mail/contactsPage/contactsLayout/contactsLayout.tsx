@@ -13,7 +13,7 @@ export enum ContactsTab {
 	TAGS = 'TAGS',
 }
 
-interface ContactsLayoutProps extends PropsWithChildren {
+interface ContactsLayoutProps extends PropsWithChildren<{}> {
 	activeTab: ContactsTab;
 	title: ReactNode;
 	titleRight?: ReactNode;
