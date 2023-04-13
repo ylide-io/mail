@@ -39,11 +39,11 @@ import { blockchainMeta } from '../utils/blockchain';
 import { supportedWallets } from '../utils/wallet';
 import { Accounts } from './Accounts';
 import contacts from './Contacts';
+import { EverwalletProxy } from './EverwalletProxy';
 import { mailStore } from './MailList';
 import { Wallet } from './models/Wallet';
 import { OTCStore } from './OTC';
 import tags from './Tags';
-import { EverwalletProxy } from './EverwalletProxy';
 
 let INDEXER_BLOCKCHAINS: string[];
 
@@ -536,7 +536,6 @@ export class Domain {
 
 	async reloadAvailableWallets() {
 		if (window.parent !== window) {
-			// return;
 			if (await this.everwalletProxy.isProxyWalletAvailable()) {
 				this.everwalletProxy.initializeEverwalletProxy();
 			}

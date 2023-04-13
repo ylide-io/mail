@@ -9,7 +9,7 @@ import mailer from '../../../stores/Mailer';
 import { OutgoingMailData } from '../../../stores/outgoingMailData';
 import { invariant } from '../../../utils/assert';
 import { ComposeMailForm } from '../../mail/components/composeMailForm/composeMailForm';
-import { postWidgetMessage, WidgetEvent, WidgetId } from '../widgets';
+import { postWidgetMessage, WidgetMessageType } from '../widgets';
 import css from './sendMessageWidget.module.scss';
 
 export function SendMessageWidget() {
@@ -31,7 +31,7 @@ export function SendMessageWidget() {
 		if (mailer.sending) {
 			toast('Please wait. Sending is in progress 👌');
 		} else {
-			postWidgetMessage(WidgetId.SEND_MESSAGE, WidgetEvent.CLOSE);
+			postWidgetMessage(WidgetMessageType.SEND_MESSAGE__CLOSE);
 		}
 	};
 

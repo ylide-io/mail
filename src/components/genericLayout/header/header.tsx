@@ -10,7 +10,7 @@ import { ReactComponent as PlusSvg } from '../../../icons/ic20/plus.svg';
 import { ReactComponent as ContactsSvg } from '../../../icons/ic28/contacts.svg';
 import { YlideLargeLogo } from '../../../icons/YlideLargeLogo';
 import { useSelectWalletModal } from '../../../modals/SelectWalletModal';
-import { postWidgetMessage, WidgetEvent, WidgetId } from '../../../pages/widgets/widgets';
+import { postWidgetMessage, WidgetId, WidgetMessageType } from '../../../pages/widgets/widgets';
 import { browserStorage } from '../../../stores/browserStorage';
 import domain from '../../../stores/Domain';
 import mailer from '../../../stores/Mailer';
@@ -129,7 +129,7 @@ const Header = observer(() => {
 							if (mailer.sending) {
 								toast('Please wait. Sending is in progress 👌');
 							} else {
-								postWidgetMessage(WidgetId.MAILBOX, WidgetEvent.CLOSE);
+								postWidgetMessage(WidgetMessageType.MAILBOX__CLOSE);
 							}
 						}}
 					/>
