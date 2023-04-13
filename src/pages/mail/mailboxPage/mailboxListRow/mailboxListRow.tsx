@@ -13,6 +13,7 @@ import { ReactComponent as FilterSvg } from '../../../../icons/ic20/filter.svg';
 import domain from '../../../../stores/Domain';
 import { FolderId, ILinkedMessage, mailStore } from '../../../../stores/MailList';
 import { RoutePath } from '../../../../stores/routePath';
+import { formatAddress } from '../../../../utils/blockchain';
 import { decodeEditorData } from '../../../../utils/editorJs';
 import { formatSubject } from '../../../../utils/mail';
 import { useNav } from '../../../../utils/url';
@@ -35,6 +36,13 @@ const MailboxListRow: React.FC<MailboxListRowProps> = observer(
 
 		const decoded = mailStore.decodedMessagesById[message.msgId];
 		const isRead = mailStore.readMessageIds.has(message.id);
+
+		const recipients =
+			folderId === FolderId.Sent
+				? message.recipients.length
+					? message.recipients
+					: [formatAddress(message.msg.recipientAddress)]
+				: [message.msg.senderAddress];
 
 		const messageClickHandler = async () => {
 			if (decoded) {
@@ -98,20 +106,17 @@ const MailboxListRow: React.FC<MailboxListRowProps> = observer(
 				</div>
 
 				<div className={css.contact}>
-					<ContactName
-						className={css.contactValue}
-						address={message.recipients.length ? message.recipients[0] : message.msg.senderAddress}
-					/>
+					<ContactName className={css.contactValue} address={recipients[0]} />
 
-					{message.recipients.length > 1 && (
+					{recipients.length > 1 && (
 						<Tooltip
-							title={message.recipients
+							title={recipients
 								.filter((_, i) => i)
 								.map(r => (
 									<ContactName address={r} noTooltip />
 								))}
 						>
-							<div className={css.contactsNumber}>+{message.recipients.length - 1}</div>
+							<div className={css.contactsNumber}>+{recipients.length - 1}</div>
 						</Tooltip>
 					)}
 

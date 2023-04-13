@@ -17,6 +17,7 @@ import { IMessageDecodedSerializedContent } from '../../../../indexedDB/Messages
 import contacts from '../../../../stores/Contacts';
 import { FolderId, ILinkedMessage, mailStore } from '../../../../stores/MailList';
 import { IContact } from '../../../../stores/models/IContact';
+import { formatAddress } from '../../../../utils/blockchain';
 import { DateFormatStyle } from '../../../../utils/date';
 import { decodeEditorData, EDITOR_JS_TOOLS } from '../../../../utils/editorJs';
 import { ymfToEditorJs } from '../../../../utils/editorjsJson';
@@ -38,7 +39,7 @@ export interface MailMessageProps {
 export const MailMessage = observer(
 	({ message, decoded, folderId, onReady, onReplyClick, onForwardClick, onDeleteClick }: MailMessageProps) => {
 		const { toast } = useToastManager();
-
+		console.log(message);
 		const editorData = useMemo(() => {
 			if (!decoded?.decodedTextData) return null;
 			if (decoded.decodedTextData.type === 'plain') {
@@ -101,16 +102,21 @@ export const MailMessage = observer(
 
 				<div className={css.sender}>
 					<div className={css.senderLabel}>
-						{message.recipients.length > 1
-							? 'Receivers'
-							: message.recipients.length
-							? 'Receiver'
+						{folderId === FolderId.Sent
+							? message.recipients.length > 1
+								? 'Receivers'
+								: 'Receiver'
 							: 'Sender'}
 						:
 					</div>
 
 					<div className={css.senderList}>
-						{(message.recipients.length ? message.recipients : [message.msg.senderAddress]).map(address => {
+						{(folderId === FolderId.Sent
+							? message.recipients.length
+								? message.recipients
+								: [formatAddress(message.msg.recipientAddress)]
+							: [message.msg.senderAddress]
+						).map(address => {
 							const contact = contacts.find({ address });
 
 							return (
