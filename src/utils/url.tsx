@@ -21,7 +21,7 @@ interface UseNavParameters {
 export function buildUrl(params: string | UseNavParameters) {
 	return typeof params === 'string'
 		? params
-		: `${params.path}${params.search ? `?${createSearchParams(params.search).toString()}` : ''}${
+		: `${params.path || ''}${params.search ? `?${createSearchParams(params.search).toString()}` : ''}${
 				params.hash ? `#${params.hash}` : ''
 		  }`;
 }
