@@ -3,6 +3,7 @@ import { makeAutoObservable } from 'mobx';
 
 import contactsDB from '../indexedDB/ContactsDB';
 import { invariant } from '../utils/assert';
+import { formatAddress } from '../utils/blockchain';
 import { IContact } from './models/IContact';
 import { ITag } from './models/ITag';
 
@@ -36,7 +37,7 @@ class Contacts {
 	}
 
 	async createContact(contact: IContact): Promise<void> {
-		invariant(!this.contacts.some(c => c.address.toLowerCase() === contact.address.toLowerCase()));
+		invariant(!this.contacts.some(c => formatAddress(c.address) === formatAddress(contact.address)));
 
 		this.contacts.unshift(contact);
 		await contactsDB.saveContact(contact);
@@ -44,19 +45,20 @@ class Contacts {
 
 	async updateContact(contact: IContact): Promise<void> {
 		this.contacts = this.contacts.map(c =>
-			c.address.toLowerCase() === contact.address.toLowerCase() ? contact : c,
+			formatAddress(c.address) === formatAddress(contact.address) ? contact : c,
 		);
 		await contactsDB.saveContact(contact);
 	}
 
 	async deleteContact(address: string): Promise<void> {
-		this.contacts = this.contacts.filter(elem => elem.address.toLowerCase() !== address.toLowerCase());
+		this.contacts = this.contacts.filter(elem => formatAddress(elem.address) !== address);
 		await contactsDB.deleteContact(address);
 	}
 
 	find(options: { address?: string }) {
-		if (options.address) {
-			return this.contacts.find(c => c.address.toLowerCase() === options.address?.toLowerCase());
+		const address = options.address;
+		if (address) {
+			return this.contacts.find(c => formatAddress(c.address) === formatAddress(address));
 		}
 	}
 
