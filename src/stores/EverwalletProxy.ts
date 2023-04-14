@@ -9,7 +9,7 @@ export class EverwalletProxy {
 
 			const listener = (e: MessageEvent) => {
 				const message = decodeWidgetMessage<{ id: string; result: boolean }>(e);
-				if (message?.type === WidgetMessageType.EVER_PROXY_AVAILABILITY_RESULT && message.payload?.id === id) {
+				if (message?.type === WidgetMessageType.EVER_PROXY_AVAILABILITY && message.payload?.id === id) {
 					window.removeEventListener('message', listener);
 
 					resolve(message.payload.result);
@@ -18,7 +18,7 @@ export class EverwalletProxy {
 
 			window.addEventListener('message', listener);
 
-			postWidgetMessage(WidgetMessageType.EVER_PROXY_AVAILABILITY_REQUEST, { id });
+			postWidgetMessage(WidgetMessageType.EVER_PROXY_AVAILABILITY, { id });
 		});
 	}
 
@@ -30,7 +30,7 @@ export class EverwalletProxy {
 
 					const listener = (e: MessageEvent) => {
 						const message = decodeWidgetMessage<{ id: string; result?: unknown; error?: unknown }>(e);
-						if (message?.type === WidgetMessageType.EVER_WALLET_RESULT && message.payload?.id === id) {
+						if (message?.type === WidgetMessageType.EVER_WALLET_REQUEST && message.payload?.id === id) {
 							window.removeEventListener('message', listener);
 
 							if (message.payload.error) {
