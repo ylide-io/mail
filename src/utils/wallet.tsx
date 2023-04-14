@@ -19,42 +19,47 @@ export interface WalletMeta {
 }
 
 export const walletsMeta: Record<string, WalletMeta> = {
-	metamask: {
+	'metamask': {
 		title: 'MetaMask',
 		logo: (s = 30) => <MetaMaskLogo size={s} />,
 		link: 'https://metamask.io/',
 	},
-	walletconnect: {
+	'walletconnect': {
 		title: 'WalletConnect',
 		logo: (s = 30) => <WalletConnectLogo size={s} />,
 		link: 'https://walletconnect.com/',
 	},
-	coinbase: {
+	'coinbase': {
 		title: 'Coinbase',
 		logo: (s = 30) => <CoinbaseWalletLogo size={s} />,
 		link: 'https://www.coinbase.com/wallet',
 	},
-	trustwallet: {
+	'trustwallet': {
 		title: 'TrustWallet',
 		logo: (s = 30) => <TrustWalletLogo size={s} />,
 		link: 'https://trustwallet.com/',
 	},
-	binance: {
+	'binance': {
 		title: 'BinanceWallet',
 		logo: (s = 30) => <BinanceWalletLogo size={s} />,
 		link: 'https://chrome.google.com/webstore/detail/binance-wallet/fhbohimaelbohpjbbldcngcnapndodjp',
 	},
-	everwallet: {
+	'everwallet': {
 		title: 'EverWallet',
 		logo: (s = 30) => <EverscaleLogo size={s} />,
 		link: 'https://everwallet.net/',
 	},
-	venomwallet: {
+	'everwallet-proxy': {
+		title: 'EverWallet PROXY',
+		logo: (s = 30) => <EverscaleLogo size={s} />,
+		link: 'https://everwallet.net/',
+	},
+	'venomwallet': {
 		title: 'Venom Wallet',
 		logo: (s = 30) => <VenomLogo size={s} />,
 		link: 'https://venom.foundation/wallet',
 	},
-	phantom: {
+	'phantom': {
 		title: 'Phantom',
 		logo: (s = 30) => <PhantomLogo size={s} />,
 		link: 'https://l1.broxus.com/freeton/wallet',
@@ -164,6 +169,10 @@ export const supportedWallets: { wallet: string; blockchains: string[] }[] = [
 	},
 	{
 		wallet: 'everwallet',
+		blockchains: ['everscale'],
+	},
+	{
+		wallet: 'everwallet-proxy',
 		blockchains: ['everscale'],
 	},
 	{
