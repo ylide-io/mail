@@ -484,6 +484,8 @@ export class Domain {
 					this.walletConnectState.connected
 						? this.walletConnectState.provider
 						: null,
+				// TODO Remove after fixing 'everscaleProxyWalletFactory'
+				provider: factory.wallet === 'everwallet-proxy' ? (window as any).__everProxy : undefined,
 			}),
 		};
 		return true;
