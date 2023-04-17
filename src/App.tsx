@@ -57,7 +57,7 @@ const App = observer(() => {
 			const start = Date.now();
 			domain
 				.init()
-				.catch(err => console.log('Initialization error: ', err))
+				.catch(err => console.log('Initialization error: ', JSON.stringify(err), err))
 				.then(() => console.log(`Initialized in ${Date.now() - start}ms`));
 		}
 	}, [location.pathname]);
