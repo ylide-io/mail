@@ -2,7 +2,7 @@ import { observer } from 'mobx-react';
 import React from 'react';
 
 import { ReactComponent as PlusSvg } from '../../icons/ic20/plus.svg';
-import { useSelectWalletModal } from '../../modals/SelectWalletModal';
+import { SelectWalletModal } from '../../modals/SelectWalletModal';
 import domain from '../../stores/Domain';
 import { DomainAccount } from '../../stores/models/DomainAccount';
 import { truncateInMiddle } from '../../utils/string';
@@ -11,6 +11,7 @@ import { ActionButton, ActionButtonLook } from '../ActionButton/ActionButton';
 import { DropDownItem, DropDownItemMode } from '../dropDown/dropDown';
 import { PropsWithClassName } from '../propsWithClassName';
 import { Select } from '../select/select';
+import { showStaticComponent } from '../staticComponentManager/staticComponentManager';
 
 export function formatDomainAccount(account: DomainAccount) {
 	return `${account.name} (${truncateInMiddle(account.account.address, 10, '..')}) [${
@@ -24,8 +25,6 @@ interface AccountSelectProps extends PropsWithClassName {
 }
 
 export const AccountSelect = observer(({ className, activeAccount, onChange }: AccountSelectProps) => {
-	const selectWalletModal = useSelectWalletModal();
-
 	return (
 		<Select
 			className={className}
@@ -55,7 +54,10 @@ export const AccountSelect = observer(({ className, activeAccount, onChange }: A
 							onClick={async () => {
 								onSelect();
 
-								const newAccount = await selectWalletModal({});
+								const newAccount = await showStaticComponent<DomainAccount>(resolve => (
+									<SelectWalletModal onSuccess={resolve} onCancel={resolve} />
+								));
+
 								if (newAccount) {
 									onChange?.(newAccount);
 								}

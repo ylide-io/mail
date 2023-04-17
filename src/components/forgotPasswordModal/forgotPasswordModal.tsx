@@ -2,28 +2,9 @@ import { useState } from 'react';
 
 import { ActionButton, ActionButtonLook, ActionButtonSize } from '../ActionButton/ActionButton';
 import { Modal } from '../modal/modal';
-import { createSingletonStaticComponentHook } from '../staticComponentManager/staticComponentManager';
 import { TextField } from '../textField/textField';
 import { useToastManager } from '../toast/toast';
 import css from './forgotPasswordModal.module.scss';
-
-export const useForgotPasswordModal = createSingletonStaticComponentHook<ForgotPasswordModalProps, string>(
-	(props, resolve) => (
-		<ForgotPasswordModal
-			{...props}
-			onNewPassword={password => {
-				resolve(password);
-				props.onNewPassword?.(password);
-			}}
-			onCancel={() => {
-				resolve();
-				props.onCancel?.();
-			}}
-		/>
-	),
-);
-
-//
 
 enum Step {
 	FIRST_WARNING,

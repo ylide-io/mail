@@ -9,16 +9,18 @@ import { ReactComponent as CrossSvg } from '../../../icons/ic20/cross.svg';
 import { ReactComponent as PlusSvg } from '../../../icons/ic20/plus.svg';
 import { ReactComponent as ContactsSvg } from '../../../icons/ic28/contacts.svg';
 import { YlideLargeLogo } from '../../../icons/YlideLargeLogo';
-import { useSelectWalletModal } from '../../../modals/SelectWalletModal';
+import { SelectWalletModal } from '../../../modals/SelectWalletModal';
 import { postWidgetMessage, WidgetId, WidgetMessageType } from '../../../pages/widgets/widgets';
 import { browserStorage } from '../../../stores/browserStorage';
 import domain from '../../../stores/Domain';
 import mailer from '../../../stores/Mailer';
+import { DomainAccount } from '../../../stores/models/DomainAccount';
 import { RoutePath } from '../../../stores/routePath';
 import { useOpenMailCopmpose } from '../../../utils/mail';
 import { useNav } from '../../../utils/url';
 import { ActionButton, ActionButtonLook, ActionButtonSize } from '../../ActionButton/ActionButton';
 import { Blockie } from '../../blockie/blockie';
+import { showStaticComponent } from '../../staticComponentManager/staticComponentManager';
 import { useToastManager } from '../../toast/toast';
 import { SidebarBurger } from '../sidebar/sidebarMenu';
 import { AccountsPopup } from './accountsPopup/accountsPopup';
@@ -28,8 +30,6 @@ const Header = observer(() => {
 	const navigate = useNav();
 	const { toast } = useToastManager();
 	const openMailCopmpose = useOpenMailCopmpose();
-
-	const selectWalletModal = useSelectWalletModal();
 
 	const accountsPopupButtonRef = useRef(null);
 	const [isAccountsPopupOpen, setAccountsPopupOpen] = useState(false);
@@ -113,7 +113,11 @@ const Header = observer(() => {
 						size={ActionButtonSize.MEDIUM}
 						look={ActionButtonLook.PRIMARY}
 						icon={<PlusSvg />}
-						onClick={async () => await selectWalletModal({})}
+						onClick={() =>
+							showStaticComponent<DomainAccount>(resolve => (
+								<SelectWalletModal onSuccess={resolve} onCancel={resolve} />
+							))
+						}
 					>
 						Connect account
 					</ActionButton>

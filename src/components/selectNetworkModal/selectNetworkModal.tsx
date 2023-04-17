@@ -7,7 +7,6 @@ import { evmBalances } from '../../stores/evmBalances';
 import { Wallet } from '../../stores/models/Wallet';
 import { blockchainMeta, evmNameToNetwork } from '../../utils/blockchain';
 import { Modal } from '../modal/modal';
-import { createSingletonStaticComponentHook } from '../staticComponentManager/staticComponentManager';
 import { WalletTag } from '../walletTag/walletTag';
 
 const txPrices: Record<EVMNetwork, number> = {
@@ -31,22 +30,6 @@ const txPrices: Record<EVMNetwork, number> = {
 };
 
 //
-
-export const useSelectNetworkModal = createSingletonStaticComponentHook<SelectNetworkModalProps, EVMNetwork>(
-	(props, resolve) => (
-		<SelectNetworkModal
-			{...props}
-			onSelect={network => {
-				resolve(network);
-				props.onSelect?.(network);
-			}}
-			onCancel={() => {
-				resolve();
-				props.onCancel?.();
-			}}
-		/>
-	),
-);
 
 export interface SelectNetworkModalProps {
 	wallet: Wallet;

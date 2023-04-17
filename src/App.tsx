@@ -103,48 +103,47 @@ const App = observer(() => {
 		<QueryClientProvider client={queryClient}>
 			<PopupManager>
 				<ToastManager>
-					<StaticComponentManager>
-						<Routes>
-							<Route path={RoutePath.TEST} element={<TestPage />} />
-							<Route path={RoutePath.WALLETS} element={<NewWalletsPage />} />
-							<Route path={RoutePath.SETTINGS} element={<SettingsPage />} />
-							<Route path={RoutePath.ADMIN} element={<AdminPage />} />
+					<Routes>
+						<Route path={RoutePath.TEST} element={<TestPage />} />
+						<Route path={RoutePath.WALLETS} element={<NewWalletsPage />} />
+						<Route path={RoutePath.SETTINGS} element={<SettingsPage />} />
+						<Route path={RoutePath.ADMIN} element={<AdminPage />} />
 
-							<Route path={RoutePath.FEED} element={<FeedPage />} />
-							<Route path={RoutePath.FEED_POST} element={<FeedPostPage />} />
-							<Route path={RoutePath.FEED_CATEGORY} element={<FeedPage />} />
+						<Route path={RoutePath.FEED} element={<FeedPage />} />
+						<Route path={RoutePath.FEED_POST} element={<FeedPostPage />} />
+						<Route path={RoutePath.FEED_CATEGORY} element={<FeedPage />} />
 
-							<Route path={RoutePath.MAIL_COMPOSE} element={<ComposePage />} />
-							<Route path={RoutePath.MAIL_CONTACTS} element={<ContactListPage />} />
-							<Route path={RoutePath.MAIL_CONTACT_TAGS} element={<ContactTagsPage />} />
-							<Route path={RoutePath.MAIL_FOLDER} element={<MailboxPage />} />
-							<Route path={RoutePath.MAIL_DETAILS} element={<MailDetailsPage />} />
+						<Route path={RoutePath.MAIL_COMPOSE} element={<ComposePage />} />
+						<Route path={RoutePath.MAIL_CONTACTS} element={<ContactListPage />} />
+						<Route path={RoutePath.MAIL_CONTACT_TAGS} element={<ContactTagsPage />} />
+						<Route path={RoutePath.MAIL_FOLDER} element={<MailboxPage />} />
+						<Route path={RoutePath.MAIL_DETAILS} element={<MailDetailsPage />} />
 
-							<Route path={RoutePath.OTC_ASSETS} element={<OtcAssetsPage />} />
-							<Route path={RoutePath.OTC_WALLETS} element={<OtcWalletsPage />} />
-							<Route path={RoutePath.OTC_CHATS} element={<OtcChatsPage />} />
-							<Route path={RoutePath.OTC_CHAT} element={<OtcChatPage />} />
+						<Route path={RoutePath.OTC_ASSETS} element={<OtcAssetsPage />} />
+						<Route path={RoutePath.OTC_WALLETS} element={<OtcWalletsPage />} />
+						<Route path={RoutePath.OTC_CHATS} element={<OtcChatsPage />} />
+						<Route path={RoutePath.OTC_CHAT} element={<OtcChatPage />} />
 
-							<Route
-								path={RoutePath.ANY}
-								element={
-									<Navigate
-										replace
-										to={
-											REACT_APP__OTC_MODE
-												? generatePath(RoutePath.OTC_ASSETS)
-												: generatePath(RoutePath.FEED_CATEGORY, { category: FeedCategory.MAIN })
-										}
-									/>
-								}
-							/>
+						<Route
+							path={RoutePath.ANY}
+							element={
+								<Navigate
+									replace
+									to={
+										REACT_APP__OTC_MODE
+											? generatePath(RoutePath.OTC_ASSETS)
+											: generatePath(RoutePath.FEED_CATEGORY, { category: FeedCategory.MAIN })
+									}
+								/>
+							}
+						/>
 
-							<Route path={RoutePath.SEND_MESSAGE_WIDGET} element={<SendMessageWidget />} />
-							<Route path={RoutePath.MAILBOX_WIDGET} element={<MailboxWidget />} />
-						</Routes>
+						<Route path={RoutePath.SEND_MESSAGE_WIDGET} element={<SendMessageWidget />} />
+						<Route path={RoutePath.MAILBOX_WIDGET} element={<MailboxWidget />} />
+					</Routes>
 
-						{modals.render()}
-					</StaticComponentManager>
+					<StaticComponentManager />
+					{modals.render()}
 				</ToastManager>
 			</PopupManager>
 		</QueryClientProvider>

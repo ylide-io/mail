@@ -1,87 +1,41 @@
-import {
-	createContext,
-	createRef,
-	Fragment,
-	MutableRefObject,
-	PropsWithChildren,
-	ReactNode,
-	useContext,
-	useMemo,
-	useRef,
-	useState,
-} from 'react';
+import { observable } from 'mobx';
+import { observer } from 'mobx-react';
+import { Fragment, ReactNode } from 'react';
 
-interface StaticComponentManagerApi {
-	attach: (node: ReactNode) => void;
-	remove: (node: ReactNode) => void;
-}
+let keyCounter = 0;
 
-export const StaticComponentManagerContext = createContext<StaticComponentManagerApi | undefined>(undefined);
+const staticComponents = observable<{ node: ReactNode; resolve: (data?: any) => void; singletonKey?: string }>([], {
+	deep: false,
+});
 
-export const useStaticComponentManager = () => useContext(StaticComponentManagerContext)!;
-
-//
-
-let singletonStaticComponentKey = 0;
-
-export function createSingletonStaticComponentHook<Props, Result = undefined>(
-	factory: (props: Props, resolve: (data?: Result) => void) => ReactNode,
+export function showStaticComponent<Result = undefined>(
+	factory: (resolve: (data?: Result) => void) => ReactNode,
+	options?: { singletonKey?: string },
 ) {
-	const nodeRef = createRef() as MutableRefObject<ReactNode>;
+	return new Promise<Result | undefined>(resolve => {
+		if (options?.singletonKey) {
+			staticComponents.filter(c => c.singletonKey === options.singletonKey).forEach(it => it.resolve());
 
-	return () => {
-		const staticComponentManager = useStaticComponentManager();
-		const resolveRef = useRef<(data: Result | undefined) => void>();
+			staticComponents.replace(staticComponents.filter(c => c.singletonKey !== options.singletonKey));
+		}
 
-		return (props: Props) => {
-			return new Promise<Result | undefined>(resolve => {
-				function resolveCurrent(data?: Result) {
-					if (nodeRef.current) {
-						staticComponentManager.remove(nodeRef.current);
-						nodeRef.current = undefined;
-					}
+		const node = (
+			<Fragment key={`StaticComponent${++keyCounter}`}>
+				{factory(data => {
+					staticComponents.replace(staticComponents.filter(c => c.node !== node));
+					resolve(data);
+				})}
+			</Fragment>
+		);
 
-					if (resolveRef.current) {
-						resolveRef.current(data);
-						resolveRef.current = undefined;
-					}
-				}
-
-				resolveCurrent();
-
-				resolveRef.current = resolve;
-
-				const node = factory(
-					{ key: `${Date.now()}${++singletonStaticComponentKey}`, ...props },
-					resolveCurrent,
-				);
-				nodeRef.current = node;
-				staticComponentManager.attach(node);
-			});
-		};
-	};
+		staticComponents.push({ node, resolve: data => resolve(data), singletonKey: options?.singletonKey });
+	});
 }
 
-//
-
-export function StaticComponentManager({ children }: PropsWithChildren<{}>) {
-	const [nodes, setNodes] = useState<ReactNode[]>([]);
-
-	const api = useMemo<StaticComponentManagerApi>(
-		() => ({
-			attach: node => setNodes(n => [...n, node]),
-			remove: node => setNodes(prev => prev.filter(n => n !== node)),
-		}),
-		[],
-	);
-
-	return (
-		<StaticComponentManagerContext.Provider value={api}>
-			{children}
-
-			{nodes.map((m, i) => (
-				<Fragment key={i}>{m}</Fragment>
-			))}
-		</StaticComponentManagerContext.Provider>
-	);
-}
+export const StaticComponentManager = observer(() => (
+	<>
+		{staticComponents.map((item, i) => (
+			<Fragment key={i}>{item.node}</Fragment>
+		))}
+	</>
+));

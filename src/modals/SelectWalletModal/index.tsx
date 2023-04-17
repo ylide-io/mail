@@ -7,7 +7,7 @@ import QRCode from 'react-qr-code';
 
 import { ActionButton, ActionButtonLook, ActionButtonSize } from '../../components/ActionButton/ActionButton';
 import { Modal } from '../../components/modal/modal';
-import { createSingletonStaticComponentHook } from '../../components/staticComponentManager/staticComponentManager';
+import { showStaticComponent } from '../../components/staticComponentManager/staticComponentManager';
 import { TextField, TextFieldLook } from '../../components/textField/textField';
 import { YlideLoader } from '../../components/ylideLoader/ylideLoader';
 import domain from '../../stores/Domain';
@@ -18,24 +18,8 @@ import { invariant } from '../../utils/assert';
 import { copyToClipboard } from '../../utils/clipboard';
 import { getQueryString } from '../../utils/getQueryString';
 import { walletsMeta } from '../../utils/wallet';
-import { useNewPasswordModal } from '../NewPasswordModal';
+import { NewPasswordModal } from '../NewPasswordModal';
 import SwitchModal from '../SwitchModal';
-
-export const useSelectWalletModal = createSingletonStaticComponentHook<SelectWalletModalProps, DomainAccount>(
-	(props, resolve) => (
-		<SelectWalletModal
-			{...props}
-			onSuccess={account => {
-				resolve(account);
-				props.onSuccess?.(account);
-			}}
-			onCancel={() => {
-				resolve();
-				props.onCancel?.();
-			}}
-		/>
-	),
-);
 
 interface SelectWalletModalProps {
 	onSuccess?: (account: DomainAccount) => void;
@@ -93,8 +77,6 @@ export const SelectWalletModal = observer(({ onSuccess, onCancel }: SelectWallet
 		[availableBrowserWallets],
 	);
 
-	const newPasswordModal = useNewPasswordModal();
-
 	const connectAccount = useCallback(
 		async (wallet: string) => {
 			try {
@@ -106,13 +88,20 @@ export const SelectWalletModal = observer(({ onSuccess, onCancel }: SelectWallet
 				const remoteKeys = await domainWallet.readRemoteKeys(account);
 				const qqs = getQueryString();
 
-				const domainAccount = await newPasswordModal({
-					faucetType: ['polygon', 'fantom', 'gnosis'].includes(qqs.faucet) ? (qqs.faucet as any) : 'gnosis',
-					bonus: qqs.bonus === 'true',
-					wallet: domainWallet,
-					account,
-					remoteKeys: remoteKeys.remoteKeys,
-				});
+				const domainAccount = await showStaticComponent<DomainAccount>(resolve => (
+					<NewPasswordModal
+						faucetType={
+							['polygon', 'fantom', 'gnosis'].includes(qqs.faucet) ? (qqs.faucet as any) : 'gnosis'
+						}
+						bonus={qqs.bonus === 'true'}
+						wallet={domainWallet}
+						account={account}
+						remoteKeys={remoteKeys.remoteKeys}
+						onSuccess={resolve}
+						onCancel={resolve}
+					/>
+				));
+
 				invariant(domainAccount);
 
 				onSuccess?.(domainAccount);
@@ -120,7 +109,7 @@ export const SelectWalletModal = observer(({ onSuccess, onCancel }: SelectWallet
 				onCancel?.();
 			}
 		},
-		[newPasswordModal, onCancel, onSuccess],
+		[onCancel, onSuccess],
 	);
 
 	useEffect(

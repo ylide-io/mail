@@ -1,6 +1,10 @@
 import { generatePath, useLocation } from 'react-router-dom';
 
-import { useComposeMailPopup } from '../pages/mail/components/composeMailPopup/composeMailPopup';
+import { showStaticComponent } from '../components/staticComponentManager/staticComponentManager';
+import {
+	COMPOSE_MAIL_POPUP_SINGLETON_KEY,
+	ComposeMailPopup,
+} from '../pages/mail/components/composeMailPopup/composeMailPopup';
 import { WidgetId } from '../pages/widgets/widgets';
 import { browserStorage } from '../stores/browserStorage';
 import { globalOutgoingMailData, OutgoingMailData } from '../stores/outgoingMailData';
@@ -14,7 +18,6 @@ export function formatSubject(subject?: string | null, prefix?: string) {
 export function useOpenMailCopmpose() {
 	const location = useLocation();
 	const navigate = useNav();
-	const composeMailPopup = useComposeMailPopup();
 
 	return ({ mailData }: { mailData?: OutgoingMailData } = {}) => {
 		if (location.pathname !== generatePath(RoutePath.MAIL_COMPOSE)) {
@@ -22,7 +25,10 @@ export function useOpenMailCopmpose() {
 				globalOutgoingMailData.reset(mailData);
 				navigate(generatePath(RoutePath.MAIL_COMPOSE));
 			} else {
-				composeMailPopup({ mailData: mailData || new OutgoingMailData() });
+				showStaticComponent(
+					resolve => <ComposeMailPopup mailData={mailData || new OutgoingMailData()} onClose={resolve} />,
+					{ singletonKey: COMPOSE_MAIL_POPUP_SINGLETON_KEY },
+				);
 			}
 		}
 	};

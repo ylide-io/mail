@@ -1,17 +1,20 @@
 import clsx from 'clsx';
 import { observer } from 'mobx-react';
+import React from 'react';
 import { generatePath } from 'react-router-dom';
 
 import { ActionButton, ActionButtonLook, ActionButtonSize } from '../../components/ActionButton/ActionButton';
 import { AdaptiveAddress } from '../../components/adaptiveAddress/adaptiveAddress';
+import { showStaticComponent } from '../../components/staticComponentManager/staticComponentManager';
 import { APP_NAME } from '../../constants';
 import { ReactComponent as CrossSvg } from '../../icons/ic20/cross.svg';
 import { ReactComponent as NextSvg } from '../../icons/ic28/next.svg';
 import { YlideLargeLogo } from '../../icons/YlideLargeLogo';
-import { useAccountConnectedModal } from '../../modals/accountConnectedModal/accountConnectedModal';
-import { useNewPasswordModal } from '../../modals/NewPasswordModal';
-import { useSelectWalletModal } from '../../modals/SelectWalletModal';
+import { AccountConnectedModal } from '../../modals/accountConnectedModal/accountConnectedModal';
+import { NewPasswordModal } from '../../modals/NewPasswordModal';
+import { SelectWalletModal } from '../../modals/SelectWalletModal';
 import domain from '../../stores/Domain';
+import { DomainAccount } from '../../stores/models/DomainAccount';
 import { RoutePath } from '../../stores/routePath';
 import { blockchainMeta } from '../../utils/blockchain';
 import { getQueryString } from '../../utils/getQueryString';
@@ -20,10 +23,6 @@ import { walletsMeta } from '../../utils/wallet';
 
 export const NewWalletsPage = observer(() => {
 	const navigate = useNav();
-
-	const selectWalletModal = useSelectWalletModal();
-	const newPasswordModal = useNewPasswordModal();
-	const accountConnectedModal = useAccountConnectedModal();
 
 	return (
 		<div className="intro-page">
@@ -89,15 +88,21 @@ export const NewWalletsPage = observer(() => {
 											const remoteKeys = await wallet.readRemoteKeys(acc.account);
 											const qqs = getQueryString();
 
-											await newPasswordModal({
-												faucetType: ['polygon', 'fantom', 'gnosis'].includes(qqs.faucet)
-													? (qqs.faucet as any)
-													: 'gnosis',
-												bonus: qqs.bonus === 'true',
-												wallet,
-												account: acc.account,
-												remoteKeys: remoteKeys.remoteKeys,
-											});
+											await showStaticComponent<DomainAccount>(resolve => (
+												<NewPasswordModal
+													faucetType={
+														['polygon', 'fantom', 'gnosis'].includes(qqs.faucet)
+															? (qqs.faucet as any)
+															: 'gnosis'
+													}
+													bonus={qqs.bonus === 'true'}
+													wallet={wallet}
+													account={acc.account}
+													remoteKeys={remoteKeys.remoteKeys}
+													onSuccess={resolve}
+													onCancel={resolve}
+												/>
+											));
 										}}
 									>
 										Activate
@@ -128,8 +133,12 @@ export const NewWalletsPage = observer(() => {
 					<div
 						className="cw-block emphaized"
 						onClick={async () => {
-							if (await selectWalletModal({})) {
-								await accountConnectedModal({});
+							const account = await showStaticComponent<DomainAccount>(resolve => (
+								<SelectWalletModal onSuccess={resolve} onCancel={resolve} />
+							));
+
+							if (account) {
+								await showStaticComponent(resolve => <AccountConnectedModal onClose={resolve} />);
 							}
 						}}
 					>

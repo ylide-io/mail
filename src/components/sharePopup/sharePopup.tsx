@@ -7,11 +7,11 @@ import {
 	WhatsappShareButton,
 } from 'react-share';
 
-import { useComposeMailPopup } from '../../pages/mail/components/composeMailPopup/composeMailPopup';
 import { OutgoingMailData } from '../../stores/outgoingMailData';
 import { HorizontalAlignment } from '../../utils/alignment';
 import { copyToClipboard } from '../../utils/clipboard';
 import { plainTextToEditorData } from '../../utils/editorJs';
+import { useOpenMailCopmpose } from '../../utils/mail';
 import { AnchoredPopup } from '../popup/anchoredPopup/anchoredPopup';
 import { useToastManager } from '../toast/toast';
 import { ReactComponent as ClipboardSvg } from './icons/clipboard.svg';
@@ -35,7 +35,7 @@ export interface SharePopupProps {
 export function SharePopup({ anchorRef, horizontalAlign, onClose, url, subject }: SharePopupProps) {
 	const realUrl = url || window.location.toString();
 
-	const composeMailPopup = useComposeMailPopup();
+	const openMailCopmpose = useOpenMailCopmpose();
 	const { toast } = useToastManager();
 
 	return (
@@ -57,7 +57,7 @@ export function SharePopup({ anchorRef, horizontalAlign, onClose, url, subject }
 							mailData.subject = subject;
 							mailData.editorData = plainTextToEditorData(realUrl);
 
-							composeMailPopup({ mailData });
+							openMailCopmpose({ mailData });
 
 							onClose();
 						}}

@@ -8,16 +8,18 @@ import { autorun } from 'mobx';
 import { observer } from 'mobx-react';
 import React, { ReactNode, useEffect } from 'react';
 
-import { useSelectNetworkModal } from '../../../../../components/selectNetworkModal/selectNetworkModal';
+import { SelectNetworkModal } from '../../../../../components/selectNetworkModal/selectNetworkModal';
 import { Spinner } from '../../../../../components/spinner/spinner';
+import { showStaticComponent } from '../../../../../components/staticComponentManager/staticComponentManager';
 import { useToastManager } from '../../../../../components/toast/toast';
 import { REACT_APP__OTC_MODE } from '../../../../../env';
 import { ReactComponent as ArrowDownSvg } from '../../../../../icons/ic20/arrowDown.svg';
 import { ReactComponent as ReplySvg } from '../../../../../icons/ic20/reply.svg';
-import { useSelectWalletModal } from '../../../../../modals/SelectWalletModal';
+import { SelectWalletModal } from '../../../../../modals/SelectWalletModal';
 import domain from '../../../../../stores/Domain';
 import { evmBalances } from '../../../../../stores/evmBalances';
 import mailer from '../../../../../stores/Mailer';
+import { DomainAccount } from '../../../../../stores/models/DomainAccount';
 import { OutgoingMailData } from '../../../../../stores/outgoingMailData';
 import { invariant } from '../../../../../utils/assert';
 import { blockchainMeta, evmNameToNetwork } from '../../../../../utils/blockchain';
@@ -31,8 +33,6 @@ export interface SendMailButtonProps {
 
 export const SendMailButton = observer(({ mailData, onSent }: SendMailButtonProps) => {
 	const { toast } = useToastManager();
-	const selectWalletModal = useSelectWalletModal();
-	const selectNetworkModal = useSelectNetworkModal();
 
 	useEffect(
 		() =>
@@ -82,14 +82,24 @@ export const SendMailButton = observer(({ mailData, onSent }: SendMailButtonProp
 			mailer.sending = true;
 
 			if (!mailData.from) {
-				mailData.from = await selectWalletModal({});
+				mailData.from = await showStaticComponent<DomainAccount>(resolve => (
+					<SelectWalletModal onSuccess={resolve} onCancel={resolve} />
+				));
+
 				invariant(mailData.from);
 
 				if (mailData.from.wallet.factory.blockchainGroup === 'evm') {
-					mailData.network = await selectNetworkModal({
-						wallet: mailData.from.wallet,
-						account: mailData.from.account,
-					});
+					const from = mailData.from;
+
+					mailData.network = await showStaticComponent(resolve => (
+						<SelectNetworkModal
+							wallet={from.wallet}
+							account={from.account}
+							onSelect={resolve}
+							onCancel={resolve}
+						/>
+					));
+
 					invariant(mailData.network);
 				}
 			}

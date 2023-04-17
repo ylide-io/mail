@@ -1,14 +1,14 @@
 import { EVMNetwork } from '@ylide/ethereum';
 import { asyncDelay, ExternalYlidePublicKey, IGenericAccount, YlideKeyPair, YlidePublicKeyVersion } from '@ylide/sdk';
 import SmartBuffer from '@ylide/smart-buffer';
-import { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { generatePath } from 'react-router-dom';
 
 import { ActionButton, ActionButtonLook, ActionButtonSize } from '../../components/ActionButton/ActionButton';
-import { useForgotPasswordModal } from '../../components/forgotPasswordModal/forgotPasswordModal';
+import { ForgotPasswordModal } from '../../components/forgotPasswordModal/forgotPasswordModal';
 import { Modal } from '../../components/modal/modal';
 import { SelectNetworkModal } from '../../components/selectNetworkModal/selectNetworkModal';
-import { createSingletonStaticComponentHook } from '../../components/staticComponentManager/staticComponentManager';
+import { showStaticComponent } from '../../components/staticComponentManager/staticComponentManager';
 import { TextField, TextFieldLook } from '../../components/textField/textField';
 import { useToastManager } from '../../components/toast/toast';
 import { WalletTag } from '../../components/walletTag/walletTag';
@@ -26,24 +26,6 @@ import { assertUnreachable, invariant } from '../../utils/assert';
 import { blockchainMeta } from '../../utils/blockchain';
 import { isBytesEqual } from '../../utils/isBytesEqual';
 import { getEvmWalletNetwork } from '../../utils/wallet';
-
-export const useNewPasswordModal = createSingletonStaticComponentHook<NewPasswordModalProps, DomainAccount>(
-	(props, resolve) => (
-		<NewPasswordModal
-			{...props}
-			onSuccess={account => {
-				resolve(account);
-				props.onSuccess?.(account);
-			}}
-			onCancel={() => {
-				resolve();
-				props.onCancel?.();
-			}}
-		/>
-	),
-);
-
-//
 
 enum Step {
 	ENTER_PASSWORD,
@@ -102,8 +84,6 @@ export function NewPasswordModal({
 
 	const [password, setPassword] = useState('');
 	const [passwordRepeat, setPasswordRepeat] = useState('');
-
-	const forgotPasswordModal = useForgotPasswordModal();
 
 	const [network, setNetwork] = useState<EVMNetwork>();
 	useEffect(() => {
@@ -365,11 +345,15 @@ export function NewPasswordModal({
 								>
 									<button
 										onClick={() =>
-											forgotPasswordModal({
-												onNewPassword: password => {
-													createLocalKey(password, true);
-												},
-											})
+											showStaticComponent<string>(resolve => (
+												<ForgotPasswordModal
+													onNewPassword={password => {
+														resolve();
+														createLocalKey(password, true);
+													}}
+													onCancel={resolve}
+												/>
+											))
 										}
 									>
 										Forgot Password?

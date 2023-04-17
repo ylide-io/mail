@@ -5,14 +5,16 @@ import React, { RefObject } from 'react';
 import { ReactComponent as EditSvg } from '../../../../icons/ic20/edit.svg';
 import { ReactComponent as PlusSvg } from '../../../../icons/ic20/plus.svg';
 import { ReactComponent as LogoutSvg } from '../../../../icons/ic28/logout.svg';
-import { useSelectWalletModal } from '../../../../modals/SelectWalletModal';
+import { SelectWalletModal } from '../../../../modals/SelectWalletModal';
 import domain from '../../../../stores/Domain';
+import { DomainAccount } from '../../../../stores/models/DomainAccount';
 import { HorizontalAlignment } from '../../../../utils/alignment';
 import { walletsMeta } from '../../../../utils/wallet';
 import { ActionButton, ActionButtonLook, ActionButtonSize } from '../../../ActionButton/ActionButton';
 import { AdaptiveAddress } from '../../../adaptiveAddress/adaptiveAddress';
 import { Blockie } from '../../../blockie/blockie';
 import { AnchoredPopup } from '../../../popup/anchoredPopup/anchoredPopup';
+import { showStaticComponent } from '../../../staticComponentManager/staticComponentManager';
 import css from './accountsPopup.module.scss';
 
 interface AccountsPopupProps {
@@ -21,8 +23,6 @@ interface AccountsPopupProps {
 }
 
 export const AccountsPopup = observer(({ anchorRef, onClose }: AccountsPopupProps) => {
-	const selectWalletModal = useSelectWalletModal();
-
 	return (
 		<AnchoredPopup
 			anchorRef={anchorRef}
@@ -81,9 +81,12 @@ export const AccountsPopup = observer(({ anchorRef, onClose }: AccountsPopupProp
 						size={ActionButtonSize.MEDIUM}
 						look={ActionButtonLook.PRIMARY}
 						icon={<PlusSvg />}
-						onClick={async () => {
+						onClick={() => {
 							onClose();
-							await selectWalletModal({});
+
+							showStaticComponent<DomainAccount>(resolve => (
+								<SelectWalletModal onSuccess={resolve} onCancel={resolve} />
+							));
 						}}
 					>
 						Connect account

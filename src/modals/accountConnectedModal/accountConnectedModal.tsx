@@ -1,26 +1,14 @@
+import React from 'react';
 import { generatePath } from 'react-router-dom';
 
 import { ActionButton, ActionButtonLook, ActionButtonSize } from '../../components/ActionButton/ActionButton';
 import { Modal } from '../../components/modal/modal';
-import { createSingletonStaticComponentHook } from '../../components/staticComponentManager/staticComponentManager';
+import { showStaticComponent } from '../../components/staticComponentManager/staticComponentManager';
 import { APP_NAME } from '../../constants';
+import { DomainAccount } from '../../stores/models/DomainAccount';
 import { RoutePath } from '../../stores/routePath';
 import { useNav } from '../../utils/url';
-import { useSelectWalletModal } from '../SelectWalletModal';
-
-export const useAccountConnectedModal = createSingletonStaticComponentHook<AccountConnectedModalProps>(
-	(props, resolve) => (
-		<AccountConnectedModal
-			{...props}
-			onClose={() => {
-				resolve();
-				props.onClose?.();
-			}}
-		/>
-	),
-);
-
-//
+import { SelectWalletModal } from '../SelectWalletModal';
 
 interface AccountConnectedModalProps {
 	onClose?: () => void;
@@ -28,7 +16,6 @@ interface AccountConnectedModalProps {
 
 export function AccountConnectedModal({ onClose }: AccountConnectedModalProps) {
 	const navigate = useNav();
-	const selectWalletModal = useSelectWalletModal();
 
 	return (
 		<Modal className="account-modal wallet-modal" onClose={() => onClose?.()}>
@@ -57,9 +44,12 @@ export function AccountConnectedModal({ onClose }: AccountConnectedModalProps) {
 				</ActionButton>
 				<ActionButton
 					size={ActionButtonSize.XLARGE}
-					onClick={async () => {
+					onClick={() => {
 						onClose?.();
-						await selectWalletModal({});
+
+						showStaticComponent<DomainAccount>(resolve => (
+							<SelectWalletModal onSuccess={resolve} onCancel={resolve} />
+						));
 					}}
 				>
 					Add one more account

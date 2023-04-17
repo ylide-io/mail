@@ -6,7 +6,6 @@ import { generatePath } from 'react-router-dom';
 import { ActionButton, ActionButtonLook } from '../../../../components/ActionButton/ActionButton';
 import { OverlappingLoader } from '../../../../components/overlappingLoader/overlappingLoader';
 import { Popup } from '../../../../components/popup/popup';
-import { createSingletonStaticComponentHook } from '../../../../components/staticComponentManager/staticComponentManager';
 import { ReactComponent as CrossSvg } from '../../../../icons/ic20/cross.svg';
 import { ReactComponent as ExternalSvg } from '../../../../icons/ic20/external.svg';
 import mailer from '../../../../stores/Mailer';
@@ -17,17 +16,7 @@ import { useOnMountAnimation } from '../../../../utils/useOnMountAnimation';
 import { ComposeMailForm } from '../composeMailForm/composeMailForm';
 import css from './composeMailPopup.module.scss';
 
-export const useComposeMailPopup = createSingletonStaticComponentHook<ComposeMailPopupProps>((props, resolve) => (
-	<ComposeMailPopup
-		{...props}
-		onClose={() => {
-			resolve();
-			props.onClose?.();
-		}}
-	/>
-));
-
-//
+export const COMPOSE_MAIL_POPUP_SINGLETON_KEY = 'COMPOSE_MAIL_POPUP';
 
 export interface ComposeMailPopupProps {
 	mailData: OutgoingMailData;
