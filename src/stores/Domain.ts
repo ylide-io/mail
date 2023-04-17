@@ -36,7 +36,7 @@ import { REACT_APP__OTC_MODE } from '../env';
 import PasswordModal from '../modals/PasswordModal';
 import SwitchModal from '../modals/SwitchModal';
 import { blockchainMeta } from '../utils/blockchain';
-import { supportedWallets } from '../utils/wallet';
+import { walletsMeta } from '../utils/wallet';
 import { Accounts } from './Accounts';
 import contacts from './Contacts';
 import { EverwalletProxy } from './EverwalletProxy';
@@ -515,8 +515,8 @@ export class Domain {
 			}
 		}
 
-		for (const supportedWallet of supportedWallets) {
-			const factory = this.registeredWallets.find(factory => factory.wallet === supportedWallet.wallet);
+		for (const wallet in walletsMeta) {
+			const factory = this.registeredWallets.find(factory => factory.wallet === wallet);
 			if (!factory) {
 				continue;
 			}

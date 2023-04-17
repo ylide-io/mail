@@ -17,7 +17,7 @@ import walletConnect from '../../stores/WalletConnect';
 import { invariant } from '../../utils/assert';
 import { copyToClipboard } from '../../utils/clipboard';
 import { getQueryString } from '../../utils/getQueryString';
-import { supportedWallets, walletsMeta } from '../../utils/wallet';
+import { walletsMeta } from '../../utils/wallet';
 import { useNewPasswordModal } from '../NewPasswordModal';
 import SwitchModal from '../SwitchModal';
 
@@ -74,22 +74,15 @@ export const SelectWalletModal = observer(({ onSuccess, onCancel }: SelectWallet
 
 	const availableBrowserWallets = useMemo(
 		() =>
-			supportedWallets
-				.map(w => w.wallet)
-				.filter(w => {
-					return w !== 'walletconnect' && !!availableWallets.find(ww => ww.wallet === w);
-				}),
+			Object.keys(walletsMeta).filter(
+				wallet => wallet !== 'walletconnect' && !!availableWallets.find(ww => ww.wallet === wallet),
+			),
 		[availableWallets],
 	);
 
 	const walletsToInstall = useMemo(
-		() =>
-			supportedWallets
-				.map(w => w.wallet)
-				.filter(w => {
-					return w !== 'walletconnect' && !availableWallets.find(ww => ww.wallet === w);
-				}),
-		[availableWallets],
+		() => Object.keys(walletsMeta).filter(w => !availableBrowserWallets.includes(w)),
+		[availableBrowserWallets],
 	);
 
 	const newPasswordModal = useNewPasswordModal();
