@@ -74,14 +74,22 @@ export const SelectWalletModal = observer(({ onSuccess, onCancel }: SelectWallet
 
 	const availableBrowserWallets = useMemo(
 		() =>
-			Object.keys(walletsMeta).filter(
-				wallet => wallet !== 'walletconnect' && !!availableWallets.find(ww => ww.wallet === wallet),
-			),
+			Object.entries(walletsMeta)
+				.filter(
+					([wallet, meta]) =>
+						wallet !== 'walletconnect' &&
+						!!availableWallets.find(ww => ww.wallet === wallet) &&
+						!meta.isProxy,
+				)
+				.map(([wallet]) => wallet),
 		[availableWallets],
 	);
 
 	const walletsToInstall = useMemo(
-		() => Object.keys(walletsMeta).filter(w => !availableBrowserWallets.includes(w)),
+		() =>
+			Object.entries(walletsMeta)
+				.filter(([wallet, meta]) => !availableBrowserWallets.includes(wallet) && !meta.isProxy)
+				.map(([wallet]) => wallet),
 		[availableBrowserWallets],
 	);
 

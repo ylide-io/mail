@@ -16,6 +16,7 @@ export interface WalletMeta {
 	link: string;
 	logo: (size?: number) => JSX.Element;
 	blockchains: string[];
+	isProxy?: boolean;
 }
 
 export const walletsMeta: Record<string, WalletMeta> = {
@@ -140,6 +141,7 @@ export const walletsMeta: Record<string, WalletMeta> = {
 		logo: (s = 30) => <EverscaleLogo size={s} />,
 		link: 'https://everwallet.net/',
 		blockchains: ['everscale'],
+		isProxy: true,
 	},
 	'venomwallet': {
 		title: 'Venom Wallet',
