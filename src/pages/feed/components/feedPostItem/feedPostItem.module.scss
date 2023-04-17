@@ -142,7 +142,7 @@
 .text {
 	font-size: 15px;
 	font-weight: $font-weight_light;
-	line-height: 1.5;
+	line-height: $line-height_text;
 	word-break: break-word;
 
 	> * {
