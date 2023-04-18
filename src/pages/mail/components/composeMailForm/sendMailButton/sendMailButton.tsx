@@ -15,12 +15,11 @@ import { useToastManager } from '../../../../../components/toast/toast';
 import { REACT_APP__OTC_MODE } from '../../../../../env';
 import { ReactComponent as ArrowDownSvg } from '../../../../../icons/ic20/arrowDown.svg';
 import { ReactComponent as ReplySvg } from '../../../../../icons/ic20/reply.svg';
-import { SelectWalletModal } from '../../../../../modals/SelectWalletModal';
 import domain from '../../../../../stores/Domain';
 import { evmBalances } from '../../../../../stores/evmBalances';
 import mailer from '../../../../../stores/Mailer';
-import { DomainAccount } from '../../../../../stores/models/DomainAccount';
 import { OutgoingMailData } from '../../../../../stores/outgoingMailData';
+import { connectAccount } from '../../../../../utils/account';
 import { invariant } from '../../../../../utils/assert';
 import { blockchainMeta, evmNameToNetwork } from '../../../../../utils/blockchain';
 import { editorJsToYMF } from '../../../../../utils/editorjsJson';
@@ -82,10 +81,7 @@ export const SendMailButton = observer(({ mailData, onSent }: SendMailButtonProp
 			mailer.sending = true;
 
 			if (!mailData.from) {
-				mailData.from = await showStaticComponent<DomainAccount>(resolve => (
-					<SelectWalletModal onClose={resolve} />
-				));
-
+				mailData.from = await connectAccount();
 				invariant(mailData.from);
 
 				if (mailData.from.wallet.factory.blockchainGroup === 'evm') {

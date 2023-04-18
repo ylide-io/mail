@@ -12,10 +12,10 @@ import { ReactComponent as NextSvg } from '../../icons/ic28/next.svg';
 import { YlideLargeLogo } from '../../icons/YlideLargeLogo';
 import { AccountConnectedModal } from '../../modals/accountConnectedModal/accountConnectedModal';
 import { NewPasswordModal } from '../../modals/NewPasswordModal';
-import { SelectWalletModal } from '../../modals/SelectWalletModal';
 import domain from '../../stores/Domain';
 import { DomainAccount } from '../../stores/models/DomainAccount';
 import { RoutePath } from '../../stores/routePath';
+import { connectAccount } from '../../utils/account';
 import { blockchainMeta } from '../../utils/blockchain';
 import { getQueryString } from '../../utils/getQueryString';
 import { useNav } from '../../utils/url';
@@ -132,9 +132,7 @@ export const NewWalletsPage = observer(() => {
 					<div
 						className="cw-block emphaized"
 						onClick={async () => {
-							const account = await showStaticComponent<DomainAccount>(resolve => (
-								<SelectWalletModal onClose={resolve} />
-							));
+							const account = await connectAccount();
 
 							if (account) {
 								await showStaticComponent(resolve => <AccountConnectedModal onClose={resolve} />);

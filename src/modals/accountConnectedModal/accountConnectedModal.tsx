@@ -3,12 +3,10 @@ import { generatePath } from 'react-router-dom';
 
 import { ActionButton, ActionButtonLook, ActionButtonSize } from '../../components/ActionButton/ActionButton';
 import { Modal } from '../../components/modal/modal';
-import { showStaticComponent } from '../../components/staticComponentManager/staticComponentManager';
 import { APP_NAME } from '../../constants';
-import { DomainAccount } from '../../stores/models/DomainAccount';
 import { RoutePath } from '../../stores/routePath';
+import { connectAccount } from '../../utils/account';
 import { useNav } from '../../utils/url';
-import { SelectWalletModal } from '../SelectWalletModal';
 
 interface AccountConnectedModalProps {
 	onClose?: () => void;
@@ -46,8 +44,7 @@ export function AccountConnectedModal({ onClose }: AccountConnectedModalProps) {
 					size={ActionButtonSize.XLARGE}
 					onClick={() => {
 						onClose?.();
-
-						showStaticComponent<DomainAccount>(resolve => <SelectWalletModal onClose={resolve} />);
+						connectAccount();
 					}}
 				>
 					Add one more account

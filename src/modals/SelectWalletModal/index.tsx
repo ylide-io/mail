@@ -1,28 +1,22 @@
 import * as browserUtils from '@walletconnect/browser-utils';
 import clsx from 'clsx';
-import { reaction, toJS } from 'mobx';
+import { toJS } from 'mobx';
 import { observer } from 'mobx-react';
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import QRCode from 'react-qr-code';
 
 import { ActionButton, ActionButtonLook, ActionButtonSize } from '../../components/ActionButton/ActionButton';
 import { Modal } from '../../components/modal/modal';
-import { showStaticComponent } from '../../components/staticComponentManager/staticComponentManager';
 import { TextField, TextFieldLook } from '../../components/textField/textField';
 import { YlideLoader } from '../../components/ylideLoader/ylideLoader';
 import domain from '../../stores/Domain';
-import { DomainAccount } from '../../stores/models/DomainAccount';
 import { Wallet } from '../../stores/models/Wallet';
 import walletConnect from '../../stores/WalletConnect';
-import { invariant } from '../../utils/assert';
 import { copyToClipboard } from '../../utils/clipboard';
-import { getQueryString } from '../../utils/getQueryString';
 import { walletsMeta } from '../../utils/wallet';
-import { NewPasswordModal } from '../NewPasswordModal';
-import SwitchModal from '../SwitchModal';
 
 interface SelectWalletModalProps {
-	onClose?: (account?: DomainAccount) => void;
+	onClose?: (wallet?: Wallet) => void;
 }
 
 export const SelectWalletModal = observer(({ onClose }: SelectWalletModalProps) => {
@@ -76,85 +70,6 @@ export const SelectWalletModal = observer(({ onClose }: SelectWalletModalProps) 
 		[availableBrowserWallets],
 	);
 
-	const connectAccount = useCallback(
-		async (wallet: string) => {
-			try {
-				const domainWallet = domain.wallets.find(w => w.factory.wallet === wallet)!;
-
-				const account = await connectWalletAccount(domainWallet);
-				invariant(account);
-
-				const remoteKeys = await domainWallet.readRemoteKeys(account);
-				const qqs = getQueryString();
-
-				const domainAccount = await showStaticComponent<DomainAccount>(resolve => (
-					<NewPasswordModal
-						faucetType={
-							['polygon', 'fantom', 'gnosis'].includes(qqs.faucet) ? (qqs.faucet as any) : 'gnosis'
-						}
-						bonus={qqs.bonus === 'true'}
-						wallet={domainWallet}
-						account={account}
-						remoteKeys={remoteKeys.remoteKeys}
-						onClose={resolve}
-					/>
-				));
-
-				invariant(domainAccount);
-
-				onClose?.(domainAccount);
-			} catch (e) {
-				onClose?.();
-			}
-		},
-		[onClose],
-	);
-
-	useEffect(
-		() =>
-			reaction(
-				() => domain.wallets && domain.wallets.find(w => w.factory.wallet === 'walletconnect'),
-				(wc, prev) => {
-					if (!prev && wc) {
-						connectAccount('walletconnect');
-					}
-				},
-			),
-		[connectAccount],
-	);
-
-	async function connectWalletAccount(wallet: Wallet) {
-		let currentAccount = await wallet.getCurrentAccount();
-		// to fix everwallet stuck in auth state without registered key
-		if (
-			currentAccount &&
-			!wallet.isAccountRegistered(currentAccount) &&
-			!wallet.controller.isMultipleAccountsSupported()
-		) {
-			await wallet.controller.disconnectAccount(currentAccount);
-		}
-		currentAccount = await wallet.getCurrentAccount();
-		if (currentAccount && wallet.isAccountRegistered(currentAccount)) {
-			const result = await SwitchModal.show('account', wallet);
-			if (!result) {
-				return null;
-			}
-		}
-		currentAccount = await wallet.getCurrentAccount();
-		if (currentAccount && wallet.isAccountRegistered(currentAccount)) {
-			const domainAccount = wallet.accounts.find(a => a.account.address === currentAccount!.address)!;
-			if (domainAccount.isLocalKeyRegistered) {
-				alert('This account is already connected. Please choose a different one.');
-				return null;
-			} else {
-				await domain.accounts.removeAccount(domainAccount);
-				return await wallet.connectAccount();
-			}
-		} else {
-			return await wallet.connectAccount();
-		}
-	}
-
 	async function disconnectWalletConnect() {
 		if (domain.walletConnectState.loading || !domain.walletConnectState.connected) {
 			return;
@@ -200,7 +115,11 @@ export const SelectWalletModal = observer(({ onClose }: SelectWalletModalProps) 
 					<div className="aw-title">Available browser extensions</div>
 					<div className="wallets-container">
 						{availableBrowserWallets.map(w => (
-							<div className="wallet-icon" key={w} onClick={() => connectAccount(w)}>
+							<div
+								className="wallet-icon"
+								key={w}
+								onClick={() => onClose?.(domain.wallets.find(it => it.wallet === w))}
+							>
 								<div className="wallet-icon-block">
 									<div className="wallet-icon-image">{walletsMeta[w].logo(32)}</div>
 								</div>

@@ -5,16 +5,14 @@ import React, { RefObject } from 'react';
 import { ReactComponent as EditSvg } from '../../../../icons/ic20/edit.svg';
 import { ReactComponent as PlusSvg } from '../../../../icons/ic20/plus.svg';
 import { ReactComponent as LogoutSvg } from '../../../../icons/ic28/logout.svg';
-import { SelectWalletModal } from '../../../../modals/SelectWalletModal';
 import domain from '../../../../stores/Domain';
-import { DomainAccount } from '../../../../stores/models/DomainAccount';
+import { connectAccount } from '../../../../utils/account';
 import { HorizontalAlignment } from '../../../../utils/alignment';
 import { walletsMeta } from '../../../../utils/wallet';
 import { ActionButton, ActionButtonLook, ActionButtonSize } from '../../../ActionButton/ActionButton';
 import { AdaptiveAddress } from '../../../adaptiveAddress/adaptiveAddress';
 import { Blockie } from '../../../blockie/blockie';
 import { AnchoredPopup } from '../../../popup/anchoredPopup/anchoredPopup';
-import { showStaticComponent } from '../../../staticComponentManager/staticComponentManager';
 import css from './accountsPopup.module.scss';
 
 interface AccountsPopupProps {
@@ -83,8 +81,7 @@ export const AccountsPopup = observer(({ anchorRef, onClose }: AccountsPopupProp
 						icon={<PlusSvg />}
 						onClick={() => {
 							onClose();
-
-							showStaticComponent<DomainAccount>(resolve => <SelectWalletModal onClose={resolve} />);
+							connectAccount();
 						}}
 					>
 						Connect account

@@ -4,15 +4,13 @@ import { generatePath } from 'react-router-dom';
 
 import { ActionButton, ActionButtonLook, ActionButtonSize } from '../../../../components/ActionButton/ActionButton';
 import { AdaptiveAddress } from '../../../../components/adaptiveAddress/adaptiveAddress';
-import { showStaticComponent } from '../../../../components/staticComponentManager/staticComponentManager';
 import { useToastManager } from '../../../../components/toast/toast';
 import { ReactComponent as ClipboardSvg } from '../../../../icons/ic20/clipboard.svg';
 import { ReactComponent as PlusSvg } from '../../../../icons/ic20/plus.svg';
-import { SelectWalletModal } from '../../../../modals/SelectWalletModal';
 import domain from '../../../../stores/Domain';
 import { FolderId } from '../../../../stores/MailList';
-import { DomainAccount } from '../../../../stores/models/DomainAccount';
 import { RoutePath } from '../../../../stores/routePath';
+import { connectAccount } from '../../../../utils/account';
 import { assertUnreachable } from '../../../../utils/assert';
 import { copyToClipboard } from '../../../../utils/clipboard';
 import { useNav } from '../../../../utils/url';
@@ -36,9 +34,7 @@ const MailboxEmpty = observer(({ folderId }: MailboxEmptyProps) => {
 						size={ActionButtonSize.MEDIUM}
 						look={ActionButtonLook.PRIMARY}
 						icon={<PlusSvg />}
-						onClick={() =>
-							showStaticComponent<DomainAccount>(resolve => <SelectWalletModal onClose={resolve} />)
-						}
+						onClick={() => connectAccount()}
 					>
 						Connect account
 					</ActionButton>
