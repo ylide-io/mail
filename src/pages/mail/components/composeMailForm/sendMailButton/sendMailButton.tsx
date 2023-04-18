@@ -8,6 +8,9 @@ import { autorun } from 'mobx';
 import { observer } from 'mobx-react';
 import React, { ReactNode, useEffect } from 'react';
 
+import { ActionButtonLook } from '../../../../../components/ActionButton/ActionButton';
+import { ActionModal } from '../../../../../components/actionModal/actionModal';
+import { AdaptiveText } from '../../../../../components/adaptiveText/adaptiveText';
 import { SelectNetworkModal } from '../../../../../components/selectNetworkModal/selectNetworkModal';
 import { Spinner } from '../../../../../components/spinner/spinner';
 import { showStaticComponent } from '../../../../../components/staticComponentManager/staticComponentManager';
@@ -22,6 +25,7 @@ import { OutgoingMailData } from '../../../../../stores/outgoingMailData';
 import { connectAccount } from '../../../../../utils/account';
 import { blockchainMeta, evmNameToNetwork } from '../../../../../utils/blockchain';
 import { editorJsToYMF } from '../../../../../utils/editorjsJson';
+import { truncateInMiddle } from '../../../../../utils/string';
 import { getEvmWalletNetwork } from '../../../../../utils/wallet';
 
 export interface SendMailButtonProps {
@@ -79,6 +83,8 @@ export const SendMailButton = observer(({ mailData, onSent }: SendMailButtonProp
 
 			mailer.sending = true;
 
+			const proxyAccount = domain.availableProxyAccounts[0];
+
 			if (!mailData.from) {
 				mailData.from = await connectAccount();
 				if (!mailData.from) return;
@@ -92,6 +98,44 @@ export const SendMailButton = observer(({ mailData, onSent }: SendMailButtonProp
 
 					if (!mailData.network) return;
 				}
+			} else if (proxyAccount && proxyAccount.account.address !== mailData.from.account.address) {
+				const proceed = await showStaticComponent<boolean>(resolve => (
+					<ActionModal
+						title="Different accounts"
+						description={
+							<>
+								You're going to send the message using
+								<br />
+								<b>
+									<AdaptiveText text={mailData.from!.account.address} />
+								</b>
+								<br />
+								But the parent application uses
+								<br />
+								<b>
+									<AdaptiveText text={proxyAccount.account.address} />
+								</b>
+								<br />
+								Are you sure you want to continue sending the message?
+							</>
+						}
+						buttons={[
+							{
+								title: `Continue with ${truncateInMiddle(mailData.from!.account.address, 8, '...')}`,
+								onClick: () => resolve(true),
+								look: ActionButtonLook.PRIMARY,
+							},
+							{
+								title: 'Cancel',
+								onClick: () => resolve(false),
+								look: ActionButtonLook.LITE,
+							},
+						]}
+						onClose={resolve}
+					/>
+				));
+
+				if (!proceed) return;
 			}
 
 			const curr = await mailData.from.wallet.getCurrentAccount();

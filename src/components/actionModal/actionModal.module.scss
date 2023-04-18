@@ -5,10 +5,12 @@
 }
 
 .title {
+	min-width: 0;
 	font-size: 24px;
 }
 
 .description {
+	min-width: 0;
 	font-size: 14px;
 	line-height: $line-height_text;
 }
