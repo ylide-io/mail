@@ -1,5 +1,6 @@
 import React from 'react';
 
+import { SelectWalletTypeModal, WalletType } from '../components/selectWalletTypeModal/selectWalletTypeModal';
 import { showStaticComponent } from '../components/staticComponentManager/staticComponentManager';
 import { NewPasswordModal } from '../modals/NewPasswordModal';
 import { SelectWalletModal } from '../modals/SelectWalletModal';
@@ -12,6 +13,19 @@ import { getQueryString } from './getQueryString';
 
 export async function connectAccount(options?: { walletName?: string }): Promise<DomainAccount | undefined> {
 	let wallet = options?.walletName ? domain.wallets.find(w => w.wallet === options.walletName)! : undefined;
+	const proxyAccount = domain.availableProxyAccounts[0];
+
+	if (!wallet && proxyAccount) {
+		const walletType = await showStaticComponent<WalletType>(resolve => (
+			<SelectWalletTypeModal proxyAccount={proxyAccount} onClose={resolve} />
+		));
+
+		if (!walletType) {
+			return;
+		} else if (walletType === WalletType.PROXY) {
+			wallet = proxyAccount.wallet;
+		}
+	}
 
 	if (!wallet) {
 		wallet = await showStaticComponent<Wallet>(resolve => <SelectWalletModal onClose={resolve} />);

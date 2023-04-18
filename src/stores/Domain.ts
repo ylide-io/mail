@@ -138,6 +138,8 @@ export class Domain {
 
 	@observable availableWallets: WalletControllerFactory[] = [];
 
+	@observable availableProxyAccounts: Array<{ wallet: Wallet; account: IGenericAccount }> = [];
+
 	@observable blockchains: BlockchainMap<AbstractBlockchainController> = {};
 	@observable walletControllers: BlockchainWalletMap<AbstractWalletController | null> = {};
 
@@ -532,6 +534,17 @@ export class Domain {
 				this.wallets.push(newWallet);
 			}
 		}
+
+		this.availableWallets
+			.filter(w => walletsMeta[w.wallet].isProxy)
+			.forEach(w => {
+				const wallet = this.wallets.find(it => it.wallet === w.wallet);
+				const account = wallet?.currentWalletAccount;
+
+				if (wallet && account) {
+					this.availableProxyAccounts.push({ wallet, account });
+				}
+			});
 	}
 
 	everwalletProxy = new EverwalletProxy();

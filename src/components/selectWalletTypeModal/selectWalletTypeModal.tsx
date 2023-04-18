@@ -1,3 +1,6 @@
+import { IGenericAccount } from '@ylide/sdk';
+
+import { Wallet } from '../../stores/models/Wallet';
 import { ActionButton, ActionButtonLook, ActionButtonSize } from '../ActionButton/ActionButton';
 import { Modal } from '../modal/modal';
 import css from './selectWalletTypeModal.module.scss';
@@ -8,6 +11,10 @@ export enum WalletType {
 }
 
 export interface SelectWalletTypeModalProps {
+	proxyAccount: {
+		wallet: Wallet;
+		account: IGenericAccount;
+	};
 	onClose?: (type?: WalletType) => void;
 }
 
@@ -27,7 +34,7 @@ export function SelectWalletTypeModal({ onClose }: SelectWalletTypeModalProps) {
 					look={ActionButtonLook.PRIMARY}
 					onClick={() => onClose?.(WalletType.PROXY)}
 				>
-					Connect same account
+					Connect same wallet
 				</ActionButton>
 
 				<ActionButton
@@ -35,7 +42,7 @@ export function SelectWalletTypeModal({ onClose }: SelectWalletTypeModalProps) {
 					look={ActionButtonLook.LITE}
 					onClick={() => onClose?.(WalletType.REGULAR)}
 				>
-					Connect another one
+					Use another one
 				</ActionButton>
 			</div>
 		</Modal>
