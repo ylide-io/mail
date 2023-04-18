@@ -345,6 +345,10 @@ export class Domain {
 	}
 
 	async disconnectWalletConnect() {
+		if (this.walletConnectState.loading || !this.walletConnectState.connected) {
+			return;
+		}
+
 		if (this.walletControllers.evm?.walletconnect) {
 			await (domain.walletControllers.evm.walletconnect as any).writeWeb3.currentProvider.disconnect();
 			// TODO: pizdec

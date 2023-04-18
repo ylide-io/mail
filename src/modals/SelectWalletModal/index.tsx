@@ -1,6 +1,5 @@
 import * as browserUtils from '@walletconnect/browser-utils';
 import clsx from 'clsx';
-import { toJS } from 'mobx';
 import { observer } from 'mobx-react';
 import React, { useEffect, useMemo, useState } from 'react';
 import QRCode from 'react-qr-code';
@@ -70,19 +69,6 @@ export const SelectWalletModal = observer(({ onClose }: SelectWalletModalProps) 
 		[availableBrowserWallets],
 	);
 
-	async function disconnectWalletConnect() {
-		if (domain.walletConnectState.loading || !domain.walletConnectState.connected) {
-			return;
-		}
-
-		console.log('domain.walletControllers: ', toJS(domain.walletControllers));
-		console.log('domain.walletControllers.evm: ', toJS(domain.walletControllers.evm));
-		console.log('domain.walletControllers.evm.walletconnect: ', toJS(domain.walletControllers.evm.walletconnect));
-		await (domain.walletControllers.evm.walletconnect as any)?.writeWeb3.currentProvider.disconnect();
-		// TODO: pizdec
-		document.location.reload();
-	}
-
 	function renderWalletConnectAlreadyUsed(walletName: string) {
 		return (
 			<div className="overall">
@@ -97,7 +83,7 @@ export const SelectWalletModal = observer(({ onClose }: SelectWalletModalProps) 
 					isMultiline
 					size={ActionButtonSize.MEDIUM}
 					look={ActionButtonLook.SECONDARY}
-					onClick={disconnectWalletConnect}
+					onClick={() => domain.disconnectWalletConnect()}
 				>
 					Disconnect WalletConnect
 					<br />({walletName})
