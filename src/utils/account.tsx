@@ -11,11 +11,11 @@ import { Wallet } from '../stores/models/Wallet';
 import { invariant } from './assert';
 import { getQueryString } from './getQueryString';
 
-export async function connectAccount(options?: { walletName?: string }): Promise<DomainAccount | undefined> {
-	let wallet = options?.walletName ? domain.wallets.find(w => w.wallet === options.walletName)! : undefined;
+export async function connectAccount(): Promise<DomainAccount | undefined> {
+	let wallet: Wallet | undefined;
 	const proxyAccount = domain.availableProxyAccounts[0];
 
-	if (!wallet && proxyAccount) {
+	if (proxyAccount) {
 		const walletType = await showStaticComponent<WalletType>(resolve => (
 			<SelectWalletTypeModal proxyAccount={proxyAccount} onClose={resolve} />
 		));
