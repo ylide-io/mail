@@ -20,7 +20,6 @@ import { evmBalances } from '../../../../../stores/evmBalances';
 import mailer from '../../../../../stores/Mailer';
 import { OutgoingMailData } from '../../../../../stores/outgoingMailData';
 import { connectAccount } from '../../../../../utils/account';
-import { invariant } from '../../../../../utils/assert';
 import { blockchainMeta, evmNameToNetwork } from '../../../../../utils/blockchain';
 import { editorJsToYMF } from '../../../../../utils/editorjsJson';
 import { getEvmWalletNetwork } from '../../../../../utils/wallet';
@@ -82,7 +81,7 @@ export const SendMailButton = observer(({ mailData, onSent }: SendMailButtonProp
 
 			if (!mailData.from) {
 				mailData.from = await connectAccount();
-				invariant(mailData.from);
+				if (!mailData.from) return;
 
 				if (mailData.from.wallet.factory.blockchainGroup === 'evm') {
 					const from = mailData.from;
@@ -91,7 +90,7 @@ export const SendMailButton = observer(({ mailData, onSent }: SendMailButtonProp
 						<SelectNetworkModal wallet={from.wallet} account={from.account} onClose={resolve} />
 					));
 
-					invariant(mailData.network);
+					if (!mailData.network) return;
 				}
 			}
 
