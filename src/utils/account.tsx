@@ -1,6 +1,7 @@
 import React from 'react';
 
-import { SelectWalletTypeModal, WalletType } from '../components/selectWalletTypeModal/selectWalletTypeModal';
+import { ActionButtonLook } from '../components/ActionButton/ActionButton';
+import { ActionModal } from '../components/actionModal/actionModal';
 import { showStaticComponent } from '../components/staticComponentManager/staticComponentManager';
 import { NewPasswordModal } from '../modals/NewPasswordModal';
 import { SelectWalletModal } from '../modals/SelectWalletModal';
@@ -10,19 +11,45 @@ import { DomainAccount } from '../stores/models/DomainAccount';
 import { Wallet } from '../stores/models/Wallet';
 import { invariant } from './assert';
 import { getQueryString } from './getQueryString';
+import { truncateInMiddle } from './string';
 
 export async function connectAccount(): Promise<DomainAccount | undefined> {
 	let wallet: Wallet | undefined;
 	const proxyAccount = domain.availableProxyAccounts[0];
 
 	if (proxyAccount) {
-		const walletType = await showStaticComponent<WalletType>(resolve => (
-			<SelectWalletTypeModal proxyAccount={proxyAccount} onClose={resolve} />
+		const useProxy = await showStaticComponent<boolean>(resolve => (
+			<ActionModal
+				title="Connect same account?"
+				description={
+					<>
+						We noticed that you're using Ylide within another application. You can connect the same account
+						as the parent application uses –{' '}
+						<b>{truncateInMiddle(proxyAccount.account.address, 8, '...')}</b>
+						<br />
+						<br />
+						We recommend connecting the same account to get seamless user experience.
+					</>
+				}
+				buttons={[
+					{
+						title: 'Connect same account',
+						look: ActionButtonLook.PRIMARY,
+						onClick: () => resolve(true),
+					},
+					{
+						title: 'Use another one',
+						look: ActionButtonLook.LITE,
+						onClick: () => resolve(false),
+					},
+				]}
+				onClose={resolve}
+			/>
 		));
 
-		if (!walletType) {
+		if (useProxy == null) {
 			return;
-		} else if (walletType === WalletType.PROXY) {
+		} else if (useProxy) {
 			wallet = proxyAccount.wallet;
 		}
 	}
