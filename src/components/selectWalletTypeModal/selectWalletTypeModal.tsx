@@ -1,6 +1,7 @@
 import { IGenericAccount } from '@ylide/sdk';
 
 import { Wallet } from '../../stores/models/Wallet';
+import { truncateInMiddle } from '../../utils/string';
 import { ActionButton, ActionButtonLook, ActionButtonSize } from '../ActionButton/ActionButton';
 import { Modal } from '../modal/modal';
 import css from './selectWalletTypeModal.module.scss';
@@ -18,14 +19,17 @@ export interface SelectWalletTypeModalProps {
 	onClose?: (type?: WalletType) => void;
 }
 
-export function SelectWalletTypeModal({ onClose }: SelectWalletTypeModalProps) {
+export function SelectWalletTypeModal({ proxyAccount, onClose }: SelectWalletTypeModalProps) {
 	return (
 		<Modal className={css.root} onClose={onClose}>
-			<div className={css.title}>Select Wallet Type</div>
+			<div className={css.title}>Connect same account?</div>
 
 			<div className={css.description}>
-				We noticed that you're using Ylide within another application. You can connect the same wallet as the
-				parent application uses. We recommend connect the same account to get seamless user experience.
+				We noticed that you're using Ylide within another application. You can connect the same account as the
+				parent application uses – <b>{truncateInMiddle(proxyAccount.account.address, 10, '...')}</b>
+				<br />
+				<br />
+				We recommend connect the same account to get seamless user experience.
 			</div>
 
 			<div className={css.buttons}>
@@ -34,7 +38,7 @@ export function SelectWalletTypeModal({ onClose }: SelectWalletTypeModalProps) {
 					look={ActionButtonLook.PRIMARY}
 					onClick={() => onClose?.(WalletType.PROXY)}
 				>
-					Connect same wallet
+					Connect same account
 				</ActionButton>
 
 				<ActionButton
