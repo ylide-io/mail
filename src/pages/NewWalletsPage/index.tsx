@@ -99,8 +99,7 @@ export const NewWalletsPage = observer(() => {
 													wallet={wallet}
 													account={acc.account}
 													remoteKeys={remoteKeys.remoteKeys}
-													onSuccess={resolve}
-													onCancel={resolve}
+													onClose={resolve}
 												/>
 											));
 										}}
@@ -134,7 +133,7 @@ export const NewWalletsPage = observer(() => {
 						className="cw-block emphaized"
 						onClick={async () => {
 							const account = await showStaticComponent<DomainAccount>(resolve => (
-								<SelectWalletModal onSuccess={resolve} onCancel={resolve} />
+								<SelectWalletModal onClose={resolve} />
 							));
 
 							if (account) {

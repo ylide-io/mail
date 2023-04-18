@@ -41,19 +41,10 @@ interface NewPasswordModalProps {
 	wallet: Wallet;
 	account: IGenericAccount;
 	remoteKeys: Record<string, ExternalYlidePublicKey | null>;
-	onSuccess?: (account: DomainAccount) => void;
-	onCancel?: () => void;
+	onClose?: (account?: DomainAccount) => void;
 }
 
-export function NewPasswordModal({
-	faucetType,
-	bonus,
-	wallet,
-	account,
-	remoteKeys,
-	onSuccess,
-	onCancel,
-}: NewPasswordModalProps) {
+export function NewPasswordModal({ faucetType, bonus, wallet, account, remoteKeys, onClose }: NewPasswordModalProps) {
 	const { toast } = useToastManager();
 
 	const freshestKey: { key: ExternalYlidePublicKey; blockchain: string } | undefined = useMemo(
@@ -167,7 +158,7 @@ export function NewPasswordModal({
 			await promise;
 		}
 
-		onSuccess?.(account);
+		onClose?.(account);
 	}
 
 	async function publishLocalKey(account: DomainAccount) {
@@ -177,7 +168,7 @@ export function NewPasswordModal({
 			await asyncDelay(7000);
 			await account.init();
 			analytics.walletRegistered(wallet.factory.wallet, account.account.address, domain.accounts.accounts.length);
-			onSuccess?.(account);
+			onClose?.(account);
 		} catch (err) {
 			console.error('Publish error: ', err);
 			if (wallet.factory.blockchainGroup === 'evm') {
@@ -245,7 +236,7 @@ export function NewPasswordModal({
 		} else if (isBytesEqual(freshestKey.key.publicKey.bytes, tempLocalKey.publicKey)) {
 			const domainAccount = await wallet.instantiateNewAccount(account, tempLocalKey, keyVersion);
 			analytics.walletConnected(wallet.factory.wallet, account.address, domain.accounts.accounts.length);
-			onSuccess?.(domainAccount);
+			onClose?.(domainAccount);
 		} else if (forceNew) {
 			const domainAccount = await wallet.instantiateNewAccount(account, tempLocalKey, keyVersion);
 			setDomainAccount(domainAccount);
@@ -273,14 +264,13 @@ export function NewPasswordModal({
 			<SelectNetworkModal
 				wallet={wallet}
 				account={account}
-				onSelect={network => networkSelect(network)}
-				onCancel={() => onCancel?.()}
+				onClose={network => (network ? networkSelect(network) : onClose?.())}
 			/>
 		);
 	}
 
 	return (
-		<Modal className="account-modal wallet-modal" onClose={() => onCancel?.()}>
+		<Modal className="account-modal wallet-modal" onClose={onClose}>
 			<div
 				style={{
 					padding: 24,
@@ -347,11 +337,10 @@ export function NewPasswordModal({
 										onClick={() =>
 											showStaticComponent<string>(resolve => (
 												<ForgotPasswordModal
-													onNewPassword={password => {
-														resolve();
-														createLocalKey(password, true);
+													onClose={password => {
+														resolve(password);
+														password && createLocalKey(password, true);
 													}}
-													onCancel={resolve}
 												/>
 											))
 										}
@@ -413,7 +402,7 @@ export function NewPasswordModal({
 					)}
 
 					<div className="wm-footer">
-						<ActionButton size={ActionButtonSize.XLARGE} onClick={() => onCancel?.()}>
+						<ActionButton size={ActionButtonSize.XLARGE} onClick={() => onClose?.()}>
 							Back
 						</ActionButton>
 						<ActionButton
@@ -489,7 +478,7 @@ export function NewPasswordModal({
 					<div className="wm-footer">
 						<ActionButton
 							size={ActionButtonSize.XLARGE}
-							onClick={() => (keyParams.isPasswordNeeded ? setStep(Step.ENTER_PASSWORD) : onCancel?.())}
+							onClick={() => (keyParams.isPasswordNeeded ? setStep(Step.ENTER_PASSWORD) : onClose?.())}
 						>
 							Back
 						</ActionButton>

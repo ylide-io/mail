@@ -22,11 +22,10 @@ import { NewPasswordModal } from '../NewPasswordModal';
 import SwitchModal from '../SwitchModal';
 
 interface SelectWalletModalProps {
-	onSuccess?: (account: DomainAccount) => void;
-	onCancel?: () => void;
+	onClose?: (account?: DomainAccount) => void;
 }
 
-export const SelectWalletModal = observer(({ onSuccess, onCancel }: SelectWalletModalProps) => {
+export const SelectWalletModal = observer(({ onClose }: SelectWalletModalProps) => {
 	const isMobile = browserUtils.isMobile();
 	const isDesktop = !isMobile;
 
@@ -97,19 +96,18 @@ export const SelectWalletModal = observer(({ onSuccess, onCancel }: SelectWallet
 						wallet={domainWallet}
 						account={account}
 						remoteKeys={remoteKeys.remoteKeys}
-						onSuccess={resolve}
-						onCancel={resolve}
+						onClose={resolve}
 					/>
 				));
 
 				invariant(domainAccount);
 
-				onSuccess?.(domainAccount);
+				onClose?.(domainAccount);
 			} catch (e) {
-				onCancel?.();
+				onClose?.();
 			}
 		},
-		[onCancel, onSuccess],
+		[onClose],
 	);
 
 	useEffect(
@@ -194,7 +192,7 @@ export const SelectWalletModal = observer(({ onSuccess, onCancel }: SelectWallet
 	}
 
 	return (
-		<Modal className="wallet-modal" onClose={() => onCancel?.()}>
+		<Modal className="wallet-modal" onClose={onClose}>
 			<h3 className="wm-title">Select wallet</h3>
 
 			{!!availableBrowserWallets.length && (

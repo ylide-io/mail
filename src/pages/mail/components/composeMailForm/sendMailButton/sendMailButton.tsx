@@ -83,7 +83,7 @@ export const SendMailButton = observer(({ mailData, onSent }: SendMailButtonProp
 
 			if (!mailData.from) {
 				mailData.from = await showStaticComponent<DomainAccount>(resolve => (
-					<SelectWalletModal onSuccess={resolve} onCancel={resolve} />
+					<SelectWalletModal onClose={resolve} />
 				));
 
 				invariant(mailData.from);
@@ -92,12 +92,7 @@ export const SendMailButton = observer(({ mailData, onSent }: SendMailButtonProp
 					const from = mailData.from;
 
 					mailData.network = await showStaticComponent(resolve => (
-						<SelectNetworkModal
-							wallet={from.wallet}
-							account={from.account}
-							onSelect={resolve}
-							onCancel={resolve}
-						/>
+						<SelectNetworkModal wallet={from.wallet} account={from.account} onClose={resolve} />
 					));
 
 					invariant(mailData.network);

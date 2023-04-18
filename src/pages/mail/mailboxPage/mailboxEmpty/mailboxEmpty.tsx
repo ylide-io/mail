@@ -37,9 +37,7 @@ const MailboxEmpty = observer(({ folderId }: MailboxEmptyProps) => {
 						look={ActionButtonLook.PRIMARY}
 						icon={<PlusSvg />}
 						onClick={() =>
-							showStaticComponent<DomainAccount>(resolve => (
-								<SelectWalletModal onSuccess={resolve} onCancel={resolve} />
-							))
+							showStaticComponent<DomainAccount>(resolve => <SelectWalletModal onClose={resolve} />)
 						}
 					>
 						Connect account

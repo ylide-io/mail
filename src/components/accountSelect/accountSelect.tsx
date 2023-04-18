@@ -55,7 +55,7 @@ export const AccountSelect = observer(({ className, activeAccount, onChange }: A
 								onSelect();
 
 								const newAccount = await showStaticComponent<DomainAccount>(resolve => (
-									<SelectWalletModal onSuccess={resolve} onCancel={resolve} />
+									<SelectWalletModal onClose={resolve} />
 								));
 
 								if (newAccount) {

@@ -34,13 +34,12 @@ const txPrices: Record<EVMNetwork, number> = {
 export interface SelectNetworkModalProps {
 	wallet: Wallet;
 	account: IGenericAccount;
-	onSelect?: (network: EVMNetwork) => void;
-	onCancel?: () => void;
+	onClose?: (network?: EVMNetwork) => void;
 }
 
-export function SelectNetworkModal({ wallet, account, onSelect, onCancel }: SelectNetworkModalProps) {
+export function SelectNetworkModal({ wallet, account, onClose }: SelectNetworkModalProps) {
 	return (
-		<Modal className="account-modal wallet-modal" onClose={() => onCancel?.()}>
+		<Modal className="account-modal wallet-modal" onClose={onClose}>
 			<div
 				style={{
 					padding: 24,
@@ -89,7 +88,7 @@ export function SelectNetworkModal({ wallet, account, onSelect, onCancel }: Sele
 									disabled:
 										Number(evmBalances.balances[evmNameToNetwork(bc.blockchain)!].toFixed(4)) === 0,
 								})}
-								onClick={() => onSelect?.(evmNameToNetwork(bc.blockchain)!)}
+								onClick={() => onClose?.(evmNameToNetwork(bc.blockchain)!)}
 							>
 								<div className="wmn-icon">{bData.logo(32)}</div>
 								<div className="wmn-title">

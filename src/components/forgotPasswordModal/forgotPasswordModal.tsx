@@ -13,11 +13,10 @@ enum Step {
 }
 
 export interface ForgotPasswordModalProps {
-	onNewPassword?: (password: string) => void;
-	onCancel?: () => void;
+	onClose?: (password?: string) => void;
 }
 
-export function ForgotPasswordModal({ onNewPassword, onCancel }: ForgotPasswordModalProps) {
+export function ForgotPasswordModal({ onClose }: ForgotPasswordModalProps) {
 	const { toast } = useToastManager();
 
 	const [step, setStep] = useState(Step.FIRST_WARNING);
@@ -31,12 +30,12 @@ export function ForgotPasswordModal({ onNewPassword, onCancel }: ForgotPasswordM
 		} else if (password !== passwordRepeat) {
 			toast(`Passwords don't match`);
 		} else {
-			onNewPassword?.(password);
+			onClose?.(password);
 		}
 	}
 
 	return (
-		<Modal onClose={onCancel}>
+		<Modal onClose={onClose}>
 			<div className={css.main}>
 				<div className={css.title}>Reset Password</div>
 
@@ -114,7 +113,11 @@ export function ForgotPasswordModal({ onNewPassword, onCancel }: ForgotPasswordM
 						>
 							I understand I won't be able to read old messages
 						</ActionButton>
-						<ActionButton size={ActionButtonSize.MEDIUM} look={ActionButtonLook.LITE} onClick={onCancel}>
+						<ActionButton
+							size={ActionButtonSize.MEDIUM}
+							look={ActionButtonLook.LITE}
+							onClick={() => onClose?.()}
+						>
 							Cancel
 						</ActionButton>
 					</>
@@ -128,7 +131,11 @@ export function ForgotPasswordModal({ onNewPassword, onCancel }: ForgotPasswordM
 						>
 							I clearly understand the consequences
 						</ActionButton>
-						<ActionButton size={ActionButtonSize.MEDIUM} look={ActionButtonLook.LITE} onClick={onCancel}>
+						<ActionButton
+							size={ActionButtonSize.MEDIUM}
+							look={ActionButtonLook.LITE}
+							onClick={() => onClose?.()}
+						>
 							Cancel
 						</ActionButton>
 					</>
@@ -142,7 +149,11 @@ export function ForgotPasswordModal({ onNewPassword, onCancel }: ForgotPasswordM
 						>
 							Save Password
 						</ActionButton>
-						<ActionButton size={ActionButtonSize.MEDIUM} look={ActionButtonLook.LITE} onClick={onCancel}>
+						<ActionButton
+							size={ActionButtonSize.MEDIUM}
+							look={ActionButtonLook.LITE}
+							onClick={() => onClose?.()}
+						>
 							Cancel
 						</ActionButton>
 					</>

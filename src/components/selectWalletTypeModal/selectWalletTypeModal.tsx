@@ -8,12 +8,12 @@ export enum WalletType {
 }
 
 export interface SelectWalletTypeModalProps {
-	onClose: (type?: WalletType) => void;
+	onClose?: (type?: WalletType) => void;
 }
 
 export function SelectWalletTypeModal({ onClose }: SelectWalletTypeModalProps) {
 	return (
-		<Modal className={css.root} onClose={() => onClose()}>
+		<Modal className={css.root} onClose={onClose}>
 			<div className={css.title}>Select Wallet Type</div>
 
 			<div className={css.description}>
@@ -25,7 +25,7 @@ export function SelectWalletTypeModal({ onClose }: SelectWalletTypeModalProps) {
 				<ActionButton
 					size={ActionButtonSize.XLARGE}
 					look={ActionButtonLook.PRIMARY}
-					onClick={() => onClose(WalletType.PROXY)}
+					onClick={() => onClose?.(WalletType.PROXY)}
 				>
 					Connect same account
 				</ActionButton>
@@ -33,7 +33,7 @@ export function SelectWalletTypeModal({ onClose }: SelectWalletTypeModalProps) {
 				<ActionButton
 					size={ActionButtonSize.XLARGE}
 					look={ActionButtonLook.LITE}
-					onClick={() => onClose(WalletType.REGULAR)}
+					onClick={() => onClose?.(WalletType.REGULAR)}
 				>
 					Connect another one
 				</ActionButton>

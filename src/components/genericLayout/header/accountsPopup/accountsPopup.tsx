@@ -84,9 +84,7 @@ export const AccountsPopup = observer(({ anchorRef, onClose }: AccountsPopupProp
 						onClick={() => {
 							onClose();
 
-							showStaticComponent<DomainAccount>(resolve => (
-								<SelectWalletModal onSuccess={resolve} onCancel={resolve} />
-							));
+							showStaticComponent<DomainAccount>(resolve => <SelectWalletModal onClose={resolve} />);
 						}}
 					>
 						Connect account

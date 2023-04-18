@@ -18,7 +18,7 @@ export function AccountConnectedModal({ onClose }: AccountConnectedModalProps) {
 	const navigate = useNav();
 
 	return (
-		<Modal className="account-modal wallet-modal" onClose={() => onClose?.()}>
+		<Modal className="account-modal wallet-modal" onClose={onClose}>
 			<h3 className="wm-title" style={{ marginTop: 20, marginBottom: 10 }}>
 				Your account is ready
 			</h3>
@@ -47,9 +47,7 @@ export function AccountConnectedModal({ onClose }: AccountConnectedModalProps) {
 					onClick={() => {
 						onClose?.();
 
-						showStaticComponent<DomainAccount>(resolve => (
-							<SelectWalletModal onSuccess={resolve} onCancel={resolve} />
-						));
+						showStaticComponent<DomainAccount>(resolve => <SelectWalletModal onClose={resolve} />);
 					}}
 				>
 					Add one more account
