@@ -137,7 +137,7 @@ export const walletsMeta: Record<string, WalletMeta> = {
 		blockchains: ['everscale'],
 	},
 	'everwallet-proxy': {
-		title: 'EverWallet PROXY',
+		title: 'EverWallet',
 		logo: (s = 30) => <EverscaleLogo size={s} />,
 		link: 'https://everwallet.net/',
 		blockchains: ['everscale'],
