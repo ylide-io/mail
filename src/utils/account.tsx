@@ -12,6 +12,7 @@ import { Wallet } from '../stores/models/Wallet';
 import { invariant } from './assert';
 import { getQueryString } from './getQueryString';
 import { truncateInMiddle } from './string';
+import { walletsMeta } from './wallet';
 
 export async function connectAccount(): Promise<DomainAccount | undefined> {
 	let wallet: Wallet | undefined;
@@ -60,12 +61,14 @@ export async function connectAccount(): Promise<DomainAccount | undefined> {
 
 	if (wallet) {
 		async function connectWalletAccount(wallet: Wallet) {
+			const walletMeta = walletsMeta[wallet.wallet];
 			let currentAccount = await wallet.getCurrentAccount();
 			// to fix everwallet stuck in auth state without registered key
 			if (
 				currentAccount &&
 				!wallet.isAccountRegistered(currentAccount) &&
-				!wallet.controller.isMultipleAccountsSupported()
+				!wallet.controller.isMultipleAccountsSupported() &&
+				!walletMeta.isProxy
 			) {
 				await wallet.controller.disconnectAccount(currentAccount);
 			}
