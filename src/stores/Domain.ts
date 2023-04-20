@@ -32,8 +32,8 @@ import {
 import { makeObservable, observable } from 'mobx';
 
 import { NFT3NameService } from '../api/nft3DID';
+import { PasswordRequestModal } from '../components/passwordRequestModal/passwordRequestModal';
 import { REACT_APP__OTC_MODE } from '../env';
-import PasswordModal from '../modals/PasswordModal';
 import SwitchModal from '../modals/SwitchModal';
 import { blockchainMeta } from '../utils/blockchain';
 import { walletsMeta } from '../utils/wallet';
@@ -281,8 +281,8 @@ export class Domain {
 			if (domain.savedPassword) {
 				return resolve(domain.savedPassword);
 			}
-			const result = await PasswordModal.show(reason);
-			resolve(result ? result.value : null);
+			const password = await PasswordRequestModal.show(reason);
+			resolve(password || null);
 		});
 	}
 
