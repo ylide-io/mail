@@ -33,8 +33,8 @@ import { makeObservable, observable } from 'mobx';
 
 import { NFT3NameService } from '../api/nft3DID';
 import { PasswordRequestModal } from '../components/passwordRequestModal/passwordRequestModal';
+import SwitchModal from '../components/switchModal/switchModal';
 import { REACT_APP__OTC_MODE } from '../env';
-import SwitchModal from '../modals/SwitchModal';
 import { blockchainMeta } from '../utils/blockchain';
 import { walletsMeta } from '../utils/wallet';
 import { Accounts } from './Accounts';

@@ -1,12 +1,12 @@
 import React from 'react';
 import { generatePath } from 'react-router-dom';
 
-import { ActionButton, ActionButtonLook, ActionButtonSize } from '../../components/ActionButton/ActionButton';
-import { Modal } from '../../components/modal/modal';
 import { APP_NAME } from '../../constants';
 import { RoutePath } from '../../stores/routePath';
 import { connectAccount } from '../../utils/account';
 import { useNav } from '../../utils/url';
+import { ActionButton, ActionButtonLook, ActionButtonSize } from '../ActionButton/ActionButton';
+import { Modal } from '../modal/modal';
 
 interface AccountConnectedModalProps {
 	onClose?: () => void;

@@ -5,11 +5,11 @@ import { observer } from 'mobx-react';
 import { PureComponent } from 'react';
 
 import metamaskSwitchVideo from '../../assets/video/metamask-switch.mp4';
-import { ErrorMessage } from '../../components/errorMessage/errorMessage';
-import { Modal } from '../../components/modal/modal';
 import modals from '../../stores/Modals';
 import { Wallet } from '../../stores/models/Wallet';
 import { truncateInMiddle } from '../../utils/string';
+import { ErrorMessage } from '../errorMessage/errorMessage';
+import { Modal } from '../modal/modal';
 
 export interface SwitchModalProps {
 	type: 'account' | 'network';

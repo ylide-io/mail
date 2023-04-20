@@ -2,10 +2,10 @@ import React from 'react';
 
 import { ActionButtonLook } from '../components/ActionButton/ActionButton';
 import { ActionModal } from '../components/actionModal/actionModal';
+import { NewPasswordModal } from '../components/newPasswordModal/newPasswordModal';
+import { SelectWalletModal } from '../components/selectWalletModal/selectWalletModal';
 import { showStaticComponent } from '../components/staticComponentManager/staticComponentManager';
-import { NewPasswordModal } from '../modals/NewPasswordModal';
-import { SelectWalletModal } from '../modals/SelectWalletModal';
-import SwitchModal from '../modals/SwitchModal';
+import SwitchModal from '../components/switchModal/switchModal';
 import domain from '../stores/Domain';
 import { DomainAccount } from '../stores/models/DomainAccount';
 import { Wallet } from '../stores/models/Wallet';

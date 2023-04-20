@@ -4,15 +4,6 @@ import SmartBuffer from '@ylide/smart-buffer';
 import React, { useEffect, useMemo, useState } from 'react';
 import { generatePath } from 'react-router-dom';
 
-import { ActionButton, ActionButtonLook, ActionButtonSize } from '../../components/ActionButton/ActionButton';
-import { ForgotPasswordModal } from '../../components/forgotPasswordModal/forgotPasswordModal';
-import { Modal } from '../../components/modal/modal';
-import { SelectNetworkModal } from '../../components/selectNetworkModal/selectNetworkModal';
-import { showStaticComponent } from '../../components/staticComponentManager/staticComponentManager';
-import { TextField, TextFieldLook } from '../../components/textField/textField';
-import { useToastManager } from '../../components/toast/toast';
-import { WalletTag } from '../../components/walletTag/walletTag';
-import { YlideLoader } from '../../components/ylideLoader/ylideLoader';
 import { REACT_APP__OTC_MODE } from '../../env';
 import { analytics } from '../../stores/Analytics';
 import { browserStorage } from '../../stores/browserStorage';
@@ -26,6 +17,15 @@ import { assertUnreachable, invariant } from '../../utils/assert';
 import { blockchainMeta } from '../../utils/blockchain';
 import { isBytesEqual } from '../../utils/isBytesEqual';
 import { getEvmWalletNetwork } from '../../utils/wallet';
+import { ActionButton, ActionButtonLook, ActionButtonSize } from '../ActionButton/ActionButton';
+import { ForgotPasswordModal } from '../forgotPasswordModal/forgotPasswordModal';
+import { Modal } from '../modal/modal';
+import { SelectNetworkModal } from '../selectNetworkModal/selectNetworkModal';
+import { showStaticComponent } from '../staticComponentManager/staticComponentManager';
+import { TextField, TextFieldLook } from '../textField/textField';
+import { useToastManager } from '../toast/toast';
+import { WalletTag } from '../walletTag/walletTag';
+import { YlideLoader } from '../ylideLoader/ylideLoader';
 
 enum Step {
 	ENTER_PASSWORD,

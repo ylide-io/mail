@@ -3,15 +3,15 @@ import { observer } from 'mobx-react';
 import React from 'react';
 import { generatePath } from 'react-router-dom';
 
+import { AccountConnectedModal } from '../../components/accountConnectedModal/accountConnectedModal';
 import { ActionButton, ActionButtonLook, ActionButtonSize } from '../../components/ActionButton/ActionButton';
 import { AdaptiveAddress } from '../../components/adaptiveAddress/adaptiveAddress';
+import { NewPasswordModal } from '../../components/newPasswordModal/newPasswordModal';
 import { showStaticComponent } from '../../components/staticComponentManager/staticComponentManager';
 import { APP_NAME } from '../../constants';
 import { ReactComponent as CrossSvg } from '../../icons/ic20/cross.svg';
 import { ReactComponent as NextSvg } from '../../icons/ic28/next.svg';
 import { YlideLargeLogo } from '../../icons/YlideLargeLogo';
-import { AccountConnectedModal } from '../../modals/accountConnectedModal/accountConnectedModal';
-import { NewPasswordModal } from '../../modals/NewPasswordModal';
 import domain from '../../stores/Domain';
 import { DomainAccount } from '../../stores/models/DomainAccount';
 import { RoutePath } from '../../stores/routePath';

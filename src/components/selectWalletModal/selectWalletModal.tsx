@@ -4,15 +4,15 @@ import { observer } from 'mobx-react';
 import React, { useEffect, useMemo, useState } from 'react';
 import QRCode from 'react-qr-code';
 
-import { ActionButton, ActionButtonLook, ActionButtonSize } from '../../components/ActionButton/ActionButton';
-import { Modal } from '../../components/modal/modal';
-import { TextField, TextFieldLook } from '../../components/textField/textField';
-import { YlideLoader } from '../../components/ylideLoader/ylideLoader';
 import domain from '../../stores/Domain';
 import { Wallet } from '../../stores/models/Wallet';
 import walletConnect from '../../stores/WalletConnect';
 import { copyToClipboard } from '../../utils/clipboard';
 import { walletsMeta } from '../../utils/wallet';
+import { ActionButton, ActionButtonLook, ActionButtonSize } from '../ActionButton/ActionButton';
+import { Modal } from '../modal/modal';
+import { TextField, TextFieldLook } from '../textField/textField';
+import { YlideLoader } from '../ylideLoader/ylideLoader';
 
 interface SelectWalletModalProps {
 	onClose?: (wallet?: Wallet) => void;
