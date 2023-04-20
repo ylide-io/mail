@@ -1,5 +1,6 @@
 import * as browserUtils from '@walletconnect/browser-utils';
 import clsx from 'clsx';
+import { reaction } from 'mobx';
 import { observer } from 'mobx-react';
 import React, { useEffect, useMemo, useState } from 'react';
 import QRCode from 'react-qr-code';
@@ -29,7 +30,6 @@ export const SelectWalletModal = observer(({ onClose }: SelectWalletModalProps) 
 
 	useEffect(() => {
 		const reloadWallets = async () => {
-			console.log('Reload wallets');
 			await domain.reloadAvailableWallets();
 			await domain.extractWalletsData();
 		};
@@ -67,6 +67,19 @@ export const SelectWalletModal = observer(({ onClose }: SelectWalletModalProps) 
 				.filter(([wallet, meta]) => !availableBrowserWallets.includes(wallet) && !meta.isProxy)
 				.map(([wallet]) => wallet),
 		[availableBrowserWallets],
+	);
+
+	useEffect(
+		() =>
+			reaction(
+				() => domain.wallets.find(w => w.factory.wallet === 'walletconnect'),
+				(wc, prev) => {
+					if (!prev && wc) {
+						onClose?.(wc);
+					}
+				},
+			),
+		[onClose],
 	);
 
 	function renderWalletConnectAlreadyUsed(walletName: string) {
