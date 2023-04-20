@@ -178,6 +178,7 @@ export const SendMailButton = observer(({ mailData, onSent }: SendMailButtonProp
 			className={clsx('send-btn', {
 				disabled:
 					mailer.sending ||
+					!mailData.from ||
 					!mailData.to.items.length ||
 					mailData.to.items.some(r => r.isLoading) ||
 					(!mailData.hasEditorData && !mailData.hasPlainTextData),

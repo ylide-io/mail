@@ -19,7 +19,10 @@ export class OutgoingMailData {
 		makeAutoObservable(this);
 
 		autorun(() => {
-			this.from = this.from || domain.accounts.activeAccounts[0];
+			this.from =
+				this.from && domain.accounts.activeAccounts.includes(this.from)
+					? this.from
+					: domain.accounts.activeAccounts[0];
 		});
 	}
 
