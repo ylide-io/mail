@@ -28,6 +28,7 @@ export function ActionModal({ title, description, buttons, onClose }: ActionModa
 				<div className={css.buttons}>
 					{buttons.map(button => (
 						<ActionButton
+							isMultiline
 							size={ActionButtonSize.XLARGE}
 							look={button.look}
 							onClick={() => button.onClick()}
