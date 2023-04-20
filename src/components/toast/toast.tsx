@@ -1,85 +1,16 @@
 import clsx from 'clsx';
-import { createContext, PropsWithChildren, ReactNode, useContext, useMemo, useState } from 'react';
+import { observable } from 'mobx';
+import { observer } from 'mobx-react';
+import { PropsWithChildren, ReactNode } from 'react';
 
 import { Popup } from '../popup/popup';
 import css from './toast.module.scss';
-
-let toastId = 0;
 
 enum ToastState {
 	SHOWING,
 	SHOWN,
 	HIDING,
 }
-
-interface ToastManagerApi {
-	toast: (content: ReactNode) => void;
-}
-
-export const ToastManagerContext = createContext<ToastManagerApi | undefined>(undefined);
-
-export const useToastManager = () => useContext(ToastManagerContext)!;
-
-export function ToastManager({ children }: PropsWithChildren<{}>) {
-	const [toasts, setToasts] = useState<Array<{ id: number; content: ReactNode; state: ToastState }>>([]);
-
-	const api: ToastManagerApi = useMemo(
-		() => ({
-			toast: content => {
-				const id = ++toastId;
-
-				setToasts(prev => [
-					...prev.map(it => ({ ...it, state: ToastState.HIDING })),
-					{ id, content, state: ToastState.SHOWING },
-				]);
-
-				setTimeout(
-					() =>
-						setToasts(prev =>
-							prev.map(it =>
-								it.id !== id || it.state !== ToastState.SHOWING
-									? it
-									: { ...it, state: ToastState.SHOWN },
-							),
-						),
-					100,
-				);
-
-				setTimeout(
-					() =>
-						setToasts(prev =>
-							prev.map(it =>
-								it.id !== id || it.state !== ToastState.SHOWN
-									? it
-									: { ...it, state: ToastState.HIDING },
-							),
-						),
-					Toast.DISPLAY_TIME,
-				);
-
-				setTimeout(
-					() => setToasts(prev => prev.filter(it => it.id !== id)),
-					Toast.DISPLAY_TIME + Toast.HIDING_TIME,
-				);
-			},
-		}),
-		[],
-	);
-
-	return (
-		<ToastManagerContext.Provider value={api}>
-			{children}
-
-			{toasts.map(it => (
-				<Toast key={it.id} state={it.state}>
-					{it.content}
-				</Toast>
-			))}
-		</ToastManagerContext.Provider>
-	);
-}
-
-//
 
 interface ToastProps extends PropsWithChildren<{}> {
 	state: ToastState;
@@ -99,5 +30,52 @@ export function Toast({ children, state }: ToastProps) {
 	);
 }
 
-Toast.DISPLAY_TIME = 5000;
-Toast.HIDING_TIME = 1000;
+export namespace Toast {
+	export const DISPLAY_TIME = 5000;
+	export const HIDING_TIME = 1000;
+}
+
+//
+
+let toastId = 0;
+
+const toasts = observable<{ id: number; content: ReactNode; state: ToastState }>([]);
+
+export function toast(content: ReactNode) {
+	const id = ++toastId;
+
+	toasts.replace(toasts.map(it => ({ ...it, state: ToastState.HIDING })));
+	toasts.push({ id, content, state: ToastState.SHOWING });
+
+	setTimeout(
+		() =>
+			toasts.replace(
+				toasts.map(it =>
+					it.id !== id || it.state !== ToastState.SHOWING ? it : { ...it, state: ToastState.SHOWN },
+				),
+			),
+		100,
+	);
+
+	setTimeout(
+		() =>
+			toasts.replace(
+				toasts.map(it =>
+					it.id !== id || it.state !== ToastState.SHOWN ? it : { ...it, state: ToastState.HIDING },
+				),
+			),
+		Toast.DISPLAY_TIME,
+	);
+
+	setTimeout(() => toasts.replace(toasts.filter(it => it.id !== id)), Toast.DISPLAY_TIME + Toast.HIDING_TIME);
+}
+
+export const ToastManager = observer(() => (
+	<>
+		{toasts.map(it => (
+			<Toast key={it.id} state={it.state}>
+				{it.content}
+			</Toast>
+		))}
+	</>
+));

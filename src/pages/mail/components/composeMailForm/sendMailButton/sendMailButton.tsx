@@ -14,7 +14,7 @@ import { AdaptiveText } from '../../../../../components/adaptiveText/adaptiveTex
 import { SelectNetworkModal } from '../../../../../components/selectNetworkModal/selectNetworkModal';
 import { Spinner } from '../../../../../components/spinner/spinner';
 import { showStaticComponent } from '../../../../../components/staticComponentManager/staticComponentManager';
-import { useToastManager } from '../../../../../components/toast/toast';
+import { toast } from '../../../../../components/toast/toast';
 import { REACT_APP__OTC_MODE } from '../../../../../env';
 import { ReactComponent as ArrowDownSvg } from '../../../../../icons/ic20/arrowDown.svg';
 import { ReactComponent as ReplySvg } from '../../../../../icons/ic20/reply.svg';
@@ -34,8 +34,6 @@ export interface SendMailButtonProps {
 }
 
 export const SendMailButton = observer(({ mailData, onSent }: SendMailButtonProps) => {
-	const { toast } = useToastManager();
-
 	useEffect(
 		() =>
 			autorun(async () => {

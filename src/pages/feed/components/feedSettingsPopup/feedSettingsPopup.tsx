@@ -11,7 +11,7 @@ import { Modal } from '../../../../components/modal/modal';
 import { OverlappingLoader } from '../../../../components/overlappingLoader/overlappingLoader';
 import { Spinner } from '../../../../components/spinner/spinner';
 import { TextField, TextFieldLook } from '../../../../components/textField/textField';
-import { useToastManager } from '../../../../components/toast/toast';
+import { toast } from '../../../../components/toast/toast';
 import { ReactComponent as ContactSvg } from '../../../../icons/ic20/contact.svg';
 import { ReactComponent as SearchSvg } from '../../../../icons/ic28/search.svg';
 import { browserStorage } from '../../../../stores/browserStorage';
@@ -56,8 +56,6 @@ export interface FeedSettingsPopupProps {
 }
 
 export function FeedSettingsPopup({ onClose }: FeedSettingsPopupProps) {
-	const { toast } = useToastManager();
-
 	const { isLoading, data } = useQuery('feed-sources', async () => {
 		const res = await FeedServerApi.getSources();
 		res.sources.sort(

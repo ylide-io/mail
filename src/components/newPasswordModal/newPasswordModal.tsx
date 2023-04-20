@@ -23,7 +23,7 @@ import { Modal } from '../modal/modal';
 import { SelectNetworkModal } from '../selectNetworkModal/selectNetworkModal';
 import { showStaticComponent } from '../staticComponentManager/staticComponentManager';
 import { TextField, TextFieldLook } from '../textField/textField';
-import { useToastManager } from '../toast/toast';
+import { toast } from '../toast/toast';
 import { WalletTag } from '../walletTag/walletTag';
 import { YlideLoader } from '../ylideLoader/ylideLoader';
 
@@ -45,8 +45,6 @@ interface NewPasswordModalProps {
 }
 
 export function NewPasswordModal({ faucetType, bonus, wallet, account, remoteKeys, onClose }: NewPasswordModalProps) {
-	const { toast } = useToastManager();
-
 	const freshestKey: { key: ExternalYlidePublicKey; blockchain: string } | undefined = useMemo(
 		() =>
 			Object.keys(remoteKeys)

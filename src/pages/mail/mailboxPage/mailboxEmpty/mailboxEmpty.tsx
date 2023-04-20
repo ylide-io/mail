@@ -4,7 +4,7 @@ import { generatePath } from 'react-router-dom';
 
 import { ActionButton, ActionButtonLook, ActionButtonSize } from '../../../../components/ActionButton/ActionButton';
 import { AdaptiveAddress } from '../../../../components/adaptiveAddress/adaptiveAddress';
-import { useToastManager } from '../../../../components/toast/toast';
+import { toast } from '../../../../components/toast/toast';
 import { ReactComponent as ClipboardSvg } from '../../../../icons/ic20/clipboard.svg';
 import { ReactComponent as PlusSvg } from '../../../../icons/ic20/plus.svg';
 import domain from '../../../../stores/Domain';
@@ -22,7 +22,6 @@ interface MailboxEmptyProps {
 
 const MailboxEmpty = observer(({ folderId }: MailboxEmptyProps) => {
 	const navigate = useNav();
-	const { toast } = useToastManager();
 
 	return (
 		<div className={css.root}>

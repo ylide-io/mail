@@ -8,7 +8,7 @@ import { ActionButton, ActionButtonLook } from '../../../../components/ActionBut
 import { Blockie } from '../../../../components/blockie/blockie';
 import { ContactName } from '../../../../components/contactName/contactName';
 import { ReadableDate } from '../../../../components/readableDate/readableDate';
-import { useToastManager } from '../../../../components/toast/toast';
+import { toast } from '../../../../components/toast/toast';
 import { ReactComponent as AddContactSvg } from '../../../../icons/ic20/addContact.svg';
 import { ReactComponent as ForwardSvg } from '../../../../icons/ic20/forward.svg';
 import { ReactComponent as ReplySvg } from '../../../../icons/ic20/reply.svg';
@@ -38,8 +38,6 @@ export interface MailMessageProps {
 
 export const MailMessage = observer(
 	({ message, decoded, folderId, onReady, onReplyClick, onForwardClick, onDeleteClick }: MailMessageProps) => {
-		const { toast } = useToastManager();
-		console.log(message);
 		const editorData = useMemo(() => {
 			if (!decoded?.decodedTextData) return null;
 			if (decoded.decodedTextData.type === 'plain') {

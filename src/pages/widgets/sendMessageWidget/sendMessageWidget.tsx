@@ -3,7 +3,7 @@ import { useSearchParams } from 'react-router-dom';
 
 import { ActionButton, ActionButtonLook } from '../../../components/ActionButton/ActionButton';
 import { Recipients } from '../../../components/recipientInput/recipientInput';
-import { Toast, useToastManager } from '../../../components/toast/toast';
+import { Toast, toast } from '../../../components/toast/toast';
 import { ReactComponent as CrossSvg } from '../../../icons/ic20/cross.svg';
 import mailer from '../../../stores/Mailer';
 import { OutgoingMailData } from '../../../stores/outgoingMailData';
@@ -17,8 +17,6 @@ export function SendMessageWidget() {
 	const toAddress = searchParams.get('to');
 	const subject = searchParams.get('subject') || '';
 	invariant(toAddress, 'to-address required');
-
-	const { toast } = useToastManager();
 
 	const mailData = useMemo(() => {
 		const data = new OutgoingMailData();

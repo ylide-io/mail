@@ -13,7 +13,7 @@ import { copyToClipboard } from '../../utils/clipboard';
 import { plainTextToEditorData } from '../../utils/editorJs';
 import { useOpenMailCopmpose } from '../../utils/mail';
 import { AnchoredPopup } from '../popup/anchoredPopup/anchoredPopup';
-import { useToastManager } from '../toast/toast';
+import { toast } from '../toast/toast';
 import { ReactComponent as ClipboardSvg } from './icons/clipboard.svg';
 import { ReactComponent as FacebookSvg } from './icons/facebook.svg';
 import { ReactComponent as MailSvg } from './icons/mail.svg';
@@ -36,7 +36,6 @@ export function SharePopup({ anchorRef, horizontalAlign, onClose, url, subject }
 	const realUrl = url || window.location.toString();
 
 	const openMailCopmpose = useOpenMailCopmpose();
-	const { toast } = useToastManager();
 
 	return (
 		<AnchoredPopup

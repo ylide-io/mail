@@ -19,14 +19,13 @@ import { useOpenMailCopmpose } from '../../../utils/mail';
 import { useNav } from '../../../utils/url';
 import { ActionButton, ActionButtonLook, ActionButtonSize } from '../../ActionButton/ActionButton';
 import { Blockie } from '../../blockie/blockie';
-import { useToastManager } from '../../toast/toast';
+import { toast } from '../../toast/toast';
 import { SidebarBurger } from '../sidebar/sidebarMenu';
 import { AccountsPopup } from './accountsPopup/accountsPopup';
 import css from './header.module.scss';
 
 const Header = observer(() => {
 	const navigate = useNav();
-	const { toast } = useToastManager();
 	const openMailCopmpose = useOpenMailCopmpose();
 
 	const accountsPopupButtonRef = useRef(null);

@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { ActionButtonLook } from '../ActionButton/ActionButton';
 import { ActionModal } from '../actionModal/actionModal';
 import { TextField } from '../textField/textField';
-import { useToastManager } from '../toast/toast';
+import { toast } from '../toast/toast';
 
 enum Step {
 	FIRST_WARNING,
@@ -16,8 +16,6 @@ export interface ForgotPasswordModalProps {
 }
 
 export function ForgotPasswordModal({ onClose }: ForgotPasswordModalProps) {
-	const { toast } = useToastManager();
-
 	const [step, setStep] = useState(Step.FIRST_WARNING);
 
 	const [password, setPassword] = useState('');
