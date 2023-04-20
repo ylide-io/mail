@@ -6,6 +6,12 @@
 	height: 18px;
 }
 
+.root_disabled {
+	pointer-events: none;
+	cursor: default;
+	opacity: 0.65;
+}
+
 .input {
 	position: absolute;
 	top: 0;
@@ -26,7 +32,7 @@
 	border: 1px solid transparent;
 }
 
-.view_regular {
+.root_regular .view {
 	background: var(--surface-color);
 	border-color: var(--border-color);
 
@@ -36,7 +42,7 @@
 	}
 }
 
-.view_checked {
+.root_checked .view {
 	background: var(--accent-color);
 
 	&:hover,

@@ -7,15 +7,16 @@ import { ReactComponent as CrossSvg } from '../../../../icons/ic20/cross.svg';
 import { ReactComponent as MerkReadSvg } from '../../../../icons/ic20/markRead.svg';
 import { ReactComponent as RestoreSvg } from '../../../../icons/ic20/restore.svg';
 import { ReactComponent as TrashSvg } from '../../../../icons/ic20/trash.svg';
-import { FolderId, getFolderName } from '../../../../stores/MailList';
+import { FolderId, getFolderName, ILinkedMessage } from '../../../../stores/MailList';
 import { useNav } from '../../../../utils/url';
 
 interface MailboxHeaderProps {
 	folderId: FolderId;
+	messages: ILinkedMessage[];
+	selectedMessageIds: Set<string>;
 	filterBySender?: string;
 	isAllSelected: boolean;
 	onSelectAllCheckBoxClick: (isChecked: boolean) => void;
-	isActionButtonsDisabled: boolean;
 	onMarkReadClick: () => void;
 	onDeleteClick: () => void;
 	onRestoreClick: () => void;
@@ -23,15 +24,18 @@ interface MailboxHeaderProps {
 
 export function MailboxHeader({
 	folderId,
+	messages,
+	selectedMessageIds,
 	filterBySender,
 	isAllSelected,
 	onSelectAllCheckBoxClick,
-	isActionButtonsDisabled,
 	onMarkReadClick,
 	onDeleteClick,
 	onRestoreClick,
 }: MailboxHeaderProps) {
 	const navigate = useNav();
+
+	const isActionButtonsDisabled = !selectedMessageIds.size;
 
 	return (
 		<div className="mailbox-header">
@@ -56,7 +60,11 @@ export function MailboxHeader({
 
 			<div className="mailbox-tools">
 				<div className="global-checkbox-wrapper" title="Select all">
-					<CheckBox isChecked={isAllSelected} onChange={onSelectAllCheckBoxClick} />
+					<CheckBox
+						isDisabled={!messages.length}
+						isChecked={isAllSelected}
+						onChange={onSelectAllCheckBoxClick}
+					/>
 				</div>
 
 				<ActionButton

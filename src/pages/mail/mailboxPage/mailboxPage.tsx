@@ -109,12 +109,13 @@ export const MailboxPage = observer(() => {
 				<div className="mailbox-page animated fadeInRight">
 					<MailboxHeader
 						folderId={folderId!}
+						messages={messages}
+						selectedMessageIds={selectedMessageIds}
 						filterBySender={filterBySender}
 						isAllSelected={isAllSelected}
 						onSelectAllCheckBoxClick={isChecked => {
 							setSelectedMessageIds(isChecked ? new Set(messages.map(it => it.id)) : new Set());
 						}}
-						isActionButtonsDisabled={!selectedMessageIds.size}
 						onMarkReadClick={() => {
 							mailStore.markMessagesAsReaded(Array.from(selectedMessageIds));
 							setSelectedMessageIds(new Set());
