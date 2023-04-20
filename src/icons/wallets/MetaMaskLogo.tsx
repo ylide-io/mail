@@ -2,7 +2,14 @@ import { CSSProperties } from 'react';
 
 export function MetaMaskLogo({ size = 16, style }: { size?: number; style?: CSSProperties }) {
 	return (
-		<svg fill="none" viewBox="0 0 35 33" width={size} height={(size * 33) / 35} xmlns="http://www.w3.org/2000/svg">
+		<svg
+			fill="none"
+			viewBox="0 0 35 33"
+			width={size}
+			height={(size * 33) / 35}
+			style={style}
+			xmlns="http://www.w3.org/2000/svg"
+		>
 			<g strokeLinecap="round" strokeLinejoin="round" strokeWidth=".25">
 				<path d="m32.9582 1-13.1341 9.7183 2.4424-5.72731z" fill="#e17726" stroke="#e17726" />
 				<g fill="#e27625" stroke="#e27625">

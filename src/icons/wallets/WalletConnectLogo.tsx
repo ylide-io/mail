@@ -7,6 +7,7 @@ export function WalletConnectLogo({ size = 16, style }: { size?: number; style?:
 			xmlns="http://www.w3.org/2000/svg"
 			width={size}
 			height={size}
+			style={style}
 			viewBox="120 120 550 400"
 			enableBackground="new 0 0 824 618"
 		>

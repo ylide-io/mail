@@ -6,6 +6,7 @@ export function ArbitrumLogo({ size = 16, style }: { size?: number; style?: CSSP
 			version="1.1"
 			width={size}
 			height={size}
+			style={style}
 			xmlns="http://www.w3.org/2000/svg"
 			viewBox="0 0 288 323"
 			fill="none"

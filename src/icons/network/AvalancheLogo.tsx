@@ -6,6 +6,7 @@ export function AvalancheLogo({ size = 16, style }: { size?: number; style?: CSS
 			version="1.1"
 			width={size}
 			height={size}
+			style={style}
 			xmlns="http://www.w3.org/2000/svg"
 			viewBox="0 0 1503 1504"
 			fill="none"

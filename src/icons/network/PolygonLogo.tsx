@@ -6,6 +6,7 @@ export function PolygonLogo({ size = 16, style }: { size?: number; style?: CSSPr
 			version="1.1"
 			width={size}
 			height={size}
+			style={style}
 			xmlns="http://www.w3.org/2000/svg"
 			viewBox="0 0 38.4 33.5"
 			enableBackground="new 0 0 38.4 33.5"

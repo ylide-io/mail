@@ -6,6 +6,7 @@ export function BNBChainLogo({ size = 16, style }: { size?: number; style?: CSSP
 			version="1.1"
 			width={size}
 			height={size}
+			style={style}
 			xmlns="http://www.w3.org/2000/svg"
 			viewBox="0 0 2496 2496"
 			enableBackground="new 0 0 2496 2496"

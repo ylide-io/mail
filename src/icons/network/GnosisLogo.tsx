@@ -9,6 +9,7 @@ export function GnosisLogo({ size = 16, style }: { size?: number; style?: CSSPro
 			y="0px"
 			width={size}
 			height={size}
+			style={style}
 			viewBox="0 0 428 428"
 			enableBackground="new 0 0 428 428"
 		>

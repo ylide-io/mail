@@ -3,7 +3,7 @@ import React from 'react';
 export const VenomLogo = ({ size = 20 }: { size?: number }) => {
 	return (
 		<svg width={size} height={size} viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-			<g clip-path="url(#clip0_2_2)">
+			<g clipPath="url(#clip0_2_2)">
 				<path
 					d="M16 32C24.8366 32 32 24.8366 32 16C32 7.16344 24.8366 0 16 0C7.16344 0 0 7.16344 0 16C0 24.8366 7.16344 32 16 32Z"
 					fill="url(#paint0_linear_2_2)"
@@ -49,9 +49,9 @@ export const VenomLogo = ({ size = 20 }: { size?: number }) => {
 					width="50.8786"
 					height="48.481"
 					filterUnits="userSpaceOnUse"
-					color-interpolation-filters="sRGB"
+					colorInterpolationFilters="sRGB"
 				>
-					<feFlood flood-opacity="0" result="BackgroundImageFix" />
+					<feFlood floodOpacity="0" result="BackgroundImageFix" />
 					<feBlend mode="normal" in="SourceGraphic" in2="BackgroundImageFix" result="shape" />
 					<feGaussianBlur stdDeviation="5" result="effect1_foregroundBlur_2_2" />
 				</filter>
@@ -62,9 +62,9 @@ export const VenomLogo = ({ size = 20 }: { size?: number }) => {
 					width="52.0001"
 					height="47.2001"
 					filterUnits="userSpaceOnUse"
-					color-interpolation-filters="sRGB"
+					colorInterpolationFilters="sRGB"
 				>
-					<feFlood flood-opacity="0" result="BackgroundImageFix" />
+					<feFlood floodOpacity="0" result="BackgroundImageFix" />
 					<feBlend mode="normal" in="SourceGraphic" in2="BackgroundImageFix" result="shape" />
 					<feGaussianBlur stdDeviation="5" result="effect1_foregroundBlur_2_2" />
 				</filter>
@@ -76,8 +76,8 @@ export const VenomLogo = ({ size = 20 }: { size?: number }) => {
 					y2="28.87"
 					gradientUnits="userSpaceOnUse"
 				>
-					<stop stop-color="#649A66" />
-					<stop offset="1" stop-color="#2B4CCF" />
+					<stop stopColor="#649A66" />
+					<stop offset="1" stopColor="#2B4CCF" />
 				</linearGradient>
 				<linearGradient
 					id="paint1_linear_2_2"
@@ -87,8 +87,8 @@ export const VenomLogo = ({ size = 20 }: { size?: number }) => {
 					y2="28.87"
 					gradientUnits="userSpaceOnUse"
 				>
-					<stop stop-color="#649A66" />
-					<stop offset="1" stop-color="#2B4CCF" />
+					<stop stopColor="#649A66" />
+					<stop offset="1" stopColor="#2B4CCF" />
 				</linearGradient>
 				<linearGradient
 					id="paint2_linear_2_2"
@@ -98,8 +98,8 @@ export const VenomLogo = ({ size = 20 }: { size?: number }) => {
 					y2="20.464"
 					gradientUnits="userSpaceOnUse"
 				>
-					<stop stop-color="#8FEBFF" />
-					<stop offset="1" stop-color="#2B4CCF" stop-opacity="0" />
+					<stop stopColor="#8FEBFF" />
+					<stop offset="1" stopColor="#2B4CCF" stopOpacity="0" />
 				</linearGradient>
 				<linearGradient
 					id="paint3_linear_2_2"
@@ -109,8 +109,8 @@ export const VenomLogo = ({ size = 20 }: { size?: number }) => {
 					y2="26.309"
 					gradientUnits="userSpaceOnUse"
 				>
-					<stop stop-color="#49F150" />
-					<stop offset="1" stop-color="#2B4CCF" stop-opacity="0" />
+					<stop stopColor="#49F150" />
+					<stop offset="1" stopColor="#2B4CCF" stopOpacity="0" />
 				</linearGradient>
 				<clipPath id="clip0_2_2">
 					<rect width="32" height="32" fill="white" />
