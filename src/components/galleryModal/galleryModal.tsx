@@ -3,24 +3,15 @@ import { PureComponent } from 'react';
 //@ts-ignore
 import ImageGallery from 'react-image-gallery';
 
-import modals from '../../stores/Modals';
+import { showStaticComponent } from '../staticComponentManager/staticComponentManager';
 
-export interface GalleryModalProps {
+interface GalleryModalProps {
 	images: string[];
 	close: () => void;
 }
 
 @observer
-export default class GalleryModal extends PureComponent<GalleryModalProps> {
-	static view(images: string[]) {
-		let hide = () => {};
-		modals.show((close: () => void) => {
-			hide = close;
-			return <GalleryModal close={close} images={images} />;
-		});
-		return { hide };
-	}
-
+export class GalleryModal extends PureComponent<GalleryModalProps> {
 	render() {
 		return (
 			<div
@@ -80,5 +71,11 @@ export default class GalleryModal extends PureComponent<GalleryModalProps> {
 				</div>
 			</div>
 		);
+	}
+}
+
+export namespace GalleryModal {
+	export function show(images: string[]) {
+		return showStaticComponent(resolve => <GalleryModal close={resolve} images={images} />);
 	}
 }

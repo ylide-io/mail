@@ -5,13 +5,13 @@ import { observer } from 'mobx-react';
 import { PureComponent } from 'react';
 
 import metamaskSwitchVideo from '../../assets/video/metamask-switch.mp4';
-import modals from '../../stores/Modals';
 import { Wallet } from '../../stores/models/Wallet';
 import { truncateInMiddle } from '../../utils/string';
 import { ErrorMessage } from '../errorMessage/errorMessage';
 import { Modal } from '../modal/modal';
+import { showStaticComponent } from '../staticComponentManager/staticComponentManager';
 
-export interface SwitchModalProps {
+interface SwitchModalProps {
 	type: 'account' | 'network';
 	wallet: Wallet;
 	needAccount?: IGenericAccount;
@@ -20,53 +20,7 @@ export interface SwitchModalProps {
 }
 
 @observer
-export default class SwitchModal extends PureComponent<SwitchModalProps> {
-	static async show(
-		type: 'account' | 'network',
-		wallet: Wallet,
-		needAccount?: IGenericAccount,
-		needNetwork?: string,
-	): Promise<boolean> {
-		return new Promise<boolean>((resolve, reject) => {
-			modals.show((close: () => void) => (
-				<SwitchModal
-					type={type}
-					wallet={wallet}
-					needAccount={needAccount}
-					needNetwork={needNetwork}
-					onConfirm={result => {
-						close();
-						resolve(result);
-					}}
-				/>
-			));
-		});
-	}
-
-	// static async view(
-	// 	type: 'account' | 'network',
-	// 	wallet: Wallet,
-	// 	needAccount?: IGenericAccount,
-	// 	needNetwork?: string,
-	// ) {
-	// 	let hide = () => {};
-	// 	const promise = new Promise<boolean>((resolve, reject) => {
-	// 		modals.show((close: () => void) => (
-	// 			<SwitchModal
-	// 				type={type}
-	// 				wallet={wallet}
-	// 				needAccount={needAccount}
-	// 				needNetwork={needNetwork}
-	// 				onConfirm={result => {
-	// 					close();
-	// 					resolve(result);
-	// 				}}
-	// 			/>
-	// 		));
-	// 	});
-	// 	return { promise, hide };
-	// }
-
+export class SwitchModal extends PureComponent<SwitchModalProps> {
 	@observable error: string = '';
 
 	constructor(props: SwitchModalProps) {
@@ -174,5 +128,24 @@ export default class SwitchModal extends PureComponent<SwitchModalProps> {
 				</div>
 			</Modal>
 		);
+	}
+}
+
+export namespace SwitchModal {
+	export function show(
+		type: 'account' | 'network',
+		wallet: Wallet,
+		needAccount?: IGenericAccount,
+		needNetwork?: string,
+	) {
+		return showStaticComponent<boolean>(resolve => (
+			<SwitchModal
+				type={type}
+				wallet={wallet}
+				needAccount={needAccount}
+				needNetwork={needNetwork}
+				onConfirm={resolve}
+			/>
+		));
 	}
 }

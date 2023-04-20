@@ -3,7 +3,7 @@ import clsx from 'clsx';
 import React, { MouseEvent, useEffect, useRef, useState } from 'react';
 import { generatePath } from 'react-router-dom';
 
-import GalleryModal from '../../../../components/galleryModal/galleryModal';
+import { GalleryModal } from '../../../../components/galleryModal/galleryModal';
 import { ReadableDate } from '../../../../components/readableDate/readableDate';
 import { SharePopup } from '../../../../components/sharePopup/sharePopup';
 import { ReactComponent as ContactSvg } from '../../../../icons/ic20/contact.svg';
@@ -23,7 +23,7 @@ interface FeedPostContentProps {
 export function FeedPostContent({ post }: FeedPostContentProps) {
 	const onPostTextClick = (e: MouseEvent) => {
 		if ((e.target as Element).tagName.toUpperCase() === 'IMG') {
-			GalleryModal.view([(e.target as HTMLImageElement).src]);
+			GalleryModal.show([(e.target as HTMLImageElement).src]);
 		}
 	};
 
@@ -45,9 +45,7 @@ export function FeedPostContent({ post }: FeedPostContentProps) {
 					<div
 						style={{ backgroundImage: `url("${post.picrel}")` }}
 						className={css.picture}
-						onClick={() => {
-							GalleryModal.view([post.picrel]);
-						}}
+						onClick={() => GalleryModal.show([post.picrel])}
 					/>
 				))}
 

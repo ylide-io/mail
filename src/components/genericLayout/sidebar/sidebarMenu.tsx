@@ -1,4 +1,5 @@
 import clsx from 'clsx';
+import { observable } from 'mobx';
 import { observer } from 'mobx-react';
 import React, { PropsWithChildren, useState } from 'react';
 import { generatePath, useLocation } from 'react-router-dom';
@@ -32,7 +33,6 @@ import { WidgetId } from '../../../pages/widgets/widgets';
 import { browserStorage } from '../../../stores/browserStorage';
 import { FeedCategory, getFeedCategoryName } from '../../../stores/Feed';
 import { FolderId } from '../../../stores/MailList';
-import modals from '../../../stores/Modals';
 import { RoutePath } from '../../../stores/routePath';
 import { useOpenMailCopmpose } from '../../../utils/mail';
 import { useNav } from '../../../utils/url';
@@ -46,10 +46,8 @@ export const SidebarBurger = observer(({ className, children }: SidebarBurgerPro
 	<div className={clsx(css.burger, className)}>
 		<ActionButton
 			size={ActionButtonSize.MEDIUM}
-			icon={modals.sidebarOpen ? <SidebarMenuCloseSvg /> : <SidebarMenuSvg />}
-			onClick={() => {
-				modals.sidebarOpen = !modals.sidebarOpen;
-			}}
+			icon={isSidebarOpen.get() ? <SidebarMenuCloseSvg /> : <SidebarMenuSvg />}
+			onClick={() => isSidebarOpen.set(!isSidebarOpen.get())}
 		>
 			{children}
 		</ActionButton>
@@ -57,6 +55,8 @@ export const SidebarBurger = observer(({ className, children }: SidebarBurgerPro
 ));
 
 //
+
+const isSidebarOpen = observable.box(false);
 
 export enum SidebarSection {
 	FEED = 'feed',
@@ -87,7 +87,7 @@ export const SidebarMenu = observer(() => {
 	const [isFeedSettingsOpen, setFeedSettingsOpen] = useState(false);
 
 	return (
-		<div className={clsx(css.root, { [css.root_open]: modals.sidebarOpen })}>
+		<div className={clsx(css.root, { [css.root_open]: isSidebarOpen.get() })}>
 			<div className={css.container}>
 				<div className={css.mobileHeader}>
 					<SidebarBurger>Hide sidebar</SidebarBurger>
@@ -120,7 +120,7 @@ export const SidebarMenu = observer(() => {
 									[css.sectionLink_active]: location.pathname === generatePath(RoutePath.OTC_ASSETS),
 								})}
 								onClick={() => {
-									modals.sidebarOpen = false;
+									isSidebarOpen.set(false);
 									navigate(generatePath(RoutePath.OTC_ASSETS));
 								}}
 							>
@@ -134,7 +134,7 @@ export const SidebarMenu = observer(() => {
 									[css.sectionLink_active]: location.pathname === generatePath(RoutePath.OTC_CHATS),
 								})}
 								onClick={() => {
-									modals.sidebarOpen = false;
+									isSidebarOpen.set(false);
 									navigate(generatePath(RoutePath.OTC_CHATS));
 								}}
 							>
@@ -181,7 +181,7 @@ export const SidebarMenu = observer(() => {
 													[css.sectionLink_active]: location.pathname === path,
 												})}
 												onClick={() => {
-													modals.sidebarOpen = false;
+													isSidebarOpen.set(false);
 													navigate(path);
 												}}
 											>
@@ -244,7 +244,7 @@ export const SidebarMenu = observer(() => {
 									look={ActionButtonLook.PRIMARY}
 									className={css.sectionButton}
 									onClick={() => {
-										modals.sidebarOpen = false;
+										isSidebarOpen.set(false);
 										openMailCopmpose();
 									}}
 								>
@@ -257,7 +257,7 @@ export const SidebarMenu = observer(() => {
 											generatePath(RoutePath.MAIL_FOLDER, { folderId: FolderId.Inbox }),
 									})}
 									onClick={() => {
-										modals.sidebarOpen = false;
+										isSidebarOpen.set(false);
 										navigate(generatePath(RoutePath.MAIL_FOLDER, { folderId: FolderId.Inbox }));
 									}}
 								>
@@ -273,7 +273,7 @@ export const SidebarMenu = observer(() => {
 											generatePath(RoutePath.MAIL_FOLDER, { folderId: FolderId.Sent }),
 									})}
 									onClick={() => {
-										modals.sidebarOpen = false;
+										isSidebarOpen.set(false);
 										navigate(generatePath(RoutePath.MAIL_FOLDER, { folderId: FolderId.Sent }));
 									}}
 								>
@@ -289,7 +289,7 @@ export const SidebarMenu = observer(() => {
 											generatePath(RoutePath.MAIL_FOLDER, { folderId: FolderId.Archive }),
 									})}
 									onClick={() => {
-										modals.sidebarOpen = false;
+										isSidebarOpen.set(false);
 										navigate(generatePath(RoutePath.MAIL_FOLDER, { folderId: FolderId.Archive }));
 									}}
 								>

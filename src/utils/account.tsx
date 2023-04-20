@@ -5,7 +5,7 @@ import { ActionModal } from '../components/actionModal/actionModal';
 import { NewPasswordModal } from '../components/newPasswordModal/newPasswordModal';
 import { SelectWalletModal } from '../components/selectWalletModal/selectWalletModal';
 import { showStaticComponent } from '../components/staticComponentManager/staticComponentManager';
-import SwitchModal from '../components/switchModal/switchModal';
+import { SwitchModal } from '../components/switchModal/switchModal';
 import domain from '../stores/Domain';
 import { DomainAccount } from '../stores/models/DomainAccount';
 import { Wallet } from '../stores/models/Wallet';

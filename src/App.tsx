@@ -29,7 +29,6 @@ import { SendMessageWidget } from './pages/widgets/sendMessageWidget/sendMessage
 import { analytics } from './stores/Analytics';
 import domain from './stores/Domain';
 import { FeedCategory } from './stores/Feed';
-import modals from './stores/Modals';
 import { RoutePath } from './stores/routePath';
 import walletConnect from './stores/WalletConnect';
 
@@ -61,15 +60,6 @@ const App = observer(() => {
 				.then(() => console.log(`Initialized in ${Date.now() - start}ms`));
 		}
 	}, [location.pathname]);
-
-	useEffect(() => {
-		if (modals.anythingVisible) {
-			document.body.classList.add('modal-body-catch');
-		} else {
-			document.body.classList.remove('modal-body-catch');
-		}
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [modals.anythingVisible]);
 
 	useEffect(() => {
 		if (!domain.accounts.hasActiveAccounts) {
@@ -143,7 +133,6 @@ const App = observer(() => {
 					</Routes>
 
 					<StaticComponentManager />
-					{modals.render()}
 				</ToastManager>
 			</PopupManager>
 		</QueryClientProvider>
