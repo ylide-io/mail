@@ -1,4 +1,3 @@
-import { Tooltip } from 'antd';
 import React from 'react';
 
 import { ActionButton, ActionButtonLook } from '../../../../components/ActionButton/ActionButton';
@@ -56,38 +55,33 @@ export function MailboxHeader({
 			</div>
 
 			<div className="mailbox-tools">
-				<Tooltip title={isAllSelected ? 'Deselect all' : 'Select all'}>
-					<div className="global-checkbox-wrapper">
-						<CheckBox isChecked={isAllSelected} onChange={onSelectAllCheckBoxClick} />
-					</div>
-				</Tooltip>
+				<div className="global-checkbox-wrapper" title="Select all">
+					<CheckBox isChecked={isAllSelected} onChange={onSelectAllCheckBoxClick} />
+				</div>
 
-				<Tooltip title="Mark as read">
-					<ActionButton
-						icon={<MerkReadSvg />}
-						isDisabled={isActionButtonsDisabled}
-						onClick={() => onMarkReadClick()}
-					/>
-				</Tooltip>
+				<ActionButton
+					isDisabled={isActionButtonsDisabled}
+					icon={<MerkReadSvg />}
+					title="Mark as read"
+					onClick={() => onMarkReadClick()}
+				/>
 
 				{folderId === FolderId.Archive && (
-					<Tooltip title="Restore mails">
-						<ActionButton
-							icon={<RestoreSvg />}
-							isDisabled={isActionButtonsDisabled}
-							onClick={() => onRestoreClick()}
-						/>
-					</Tooltip>
+					<ActionButton
+						isDisabled={isActionButtonsDisabled}
+						icon={<RestoreSvg />}
+						title="Restore"
+						onClick={() => onRestoreClick()}
+					/>
 				)}
 
 				{folderId === FolderId.Inbox && (
-					<Tooltip title="Archive mails">
-						<ActionButton
-							icon={<TrashSvg />}
-							isDisabled={isActionButtonsDisabled}
-							onClick={() => onDeleteClick()}
-						/>
-					</Tooltip>
+					<ActionButton
+						isDisabled={isActionButtonsDisabled}
+						icon={<TrashSvg />}
+						title="Archive"
+						onClick={() => onDeleteClick()}
+					/>
 				)}
 
 				{!!filterBySender && (

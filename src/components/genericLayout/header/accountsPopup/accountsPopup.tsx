@@ -1,4 +1,3 @@
-import { Tooltip } from 'antd';
 import { observer } from 'mobx-react';
 import React, { RefObject } from 'react';
 
@@ -36,18 +35,17 @@ export const AccountsPopup = observer(({ anchorRef, onClose }: AccountsPopupProp
 						<div className={css.itemBody}>
 							<div className={css.itemName}>
 								<div className={css.itemNameInner}>{account.name}</div>
-								<Tooltip title="Rename">
-									<ActionButton
-										look={ActionButtonLook.LITE}
-										icon={<EditSvg />}
-										onClick={async () => {
-											const newName = prompt('Enter new account name: ', account.name);
-											if (newName) {
-												await account.rename(newName);
-											}
-										}}
-									/>
-								</Tooltip>
+								<ActionButton
+									look={ActionButtonLook.LITE}
+									icon={<EditSvg />}
+									title="Rename"
+									onClick={async () => {
+										const newName = prompt('Enter new account name: ', account.name);
+										if (newName) {
+											await account.rename(newName);
+										}
+									}}
+								/>
 							</div>
 							<div className={css.itemWallet}>
 								{walletsMeta[account.wallet.wallet].logo(12)} {walletsMeta[account.wallet.wallet].title}
@@ -55,21 +53,20 @@ export const AccountsPopup = observer(({ anchorRef, onClose }: AccountsPopupProp
 							<AdaptiveAddress className={css.itemAddress} address={account.account.address} />
 						</div>
 						<div className={css.itemActions}>
-							<Tooltip title="Logout">
-								<ActionButton
-									size={ActionButtonSize.MEDIUM}
-									look={ActionButtonLook.DANGEROUS}
-									icon={<LogoutSvg />}
-									onClick={async () => {
-										await account.wallet.disconnectAccount(account);
-										await domain.accounts.removeAccount(account);
+							<ActionButton
+								size={ActionButtonSize.MEDIUM}
+								look={ActionButtonLook.DANGEROUS}
+								icon={<LogoutSvg />}
+								title="Logout"
+								onClick={async () => {
+									await account.wallet.disconnectAccount(account);
+									await domain.accounts.removeAccount(account);
 
-										if (!domain.accounts.hasActiveAccounts) {
-											onClose();
-										}
-									}}
-								/>
-							</Tooltip>
+									if (!domain.accounts.hasActiveAccounts) {
+										onClose();
+									}
+								}}
+							/>
 						</div>
 					</div>
 				))}

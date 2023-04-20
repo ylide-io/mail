@@ -1,5 +1,4 @@
 import { YMF } from '@ylide/sdk';
-import { Tooltip } from 'antd';
 import { observer } from 'mobx-react';
 import React, { useEffect, useMemo, useState } from 'react';
 import { createReactEditorJS } from 'react-editor-js';
@@ -79,18 +78,15 @@ export const MailMessage = observer(
 								Reply
 							</ActionButton>
 
-							<Tooltip title="Forward">
-								<ActionButton icon={<ForwardSvg />} onClick={() => onForwardClick()} />
-							</Tooltip>
+							<ActionButton icon={<ForwardSvg />} title="Forward" onClick={() => onForwardClick()} />
 
 							{folderId !== FolderId.Archive && (
-								<Tooltip title="Archive">
-									<ActionButton
-										look={ActionButtonLook.DANGEROUS}
-										icon={<TrashSvg />}
-										onClick={() => onDeleteClick()}
-									/>
-								</Tooltip>
+								<ActionButton
+									look={ActionButtonLook.DANGEROUS}
+									icon={<TrashSvg />}
+									title="Archive"
+									onClick={() => onDeleteClick()}
+								/>
 							)}
 						</>
 					) : (

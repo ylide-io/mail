@@ -1,4 +1,3 @@
-import { Tooltip } from 'antd';
 import { observer } from 'mobx-react';
 import React, { useRef, useState } from 'react';
 import { generatePath } from 'react-router-dom';
@@ -59,17 +58,16 @@ const Header = observer(() => {
 
 			<div className={css.main}>
 				{REACT_APP__OTC_MODE || !domain.accounts.hasActiveAccounts || (
-					<Tooltip title="Contacts">
-						<ActionButton
-							size={ActionButtonSize.MEDIUM}
-							look={ActionButtonLook.LITE}
-							icon={<ContactsSvg />}
-							onClick={e => {
-								e.preventDefault();
-								navigate(generatePath(RoutePath.MAIL_CONTACTS));
-							}}
-						/>
-					</Tooltip>
+					<ActionButton
+						size={ActionButtonSize.MEDIUM}
+						look={ActionButtonLook.LITE}
+						icon={<ContactsSvg />}
+						title="Contacts"
+						onClick={e => {
+							e.preventDefault();
+							navigate(generatePath(RoutePath.MAIL_CONTACTS));
+						}}
+					/>
 				)}
 
 				{domain.accounts.hasActiveAccounts ? (
