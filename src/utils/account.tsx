@@ -112,3 +112,12 @@ export async function connectAccount(): Promise<DomainAccount | undefined> {
 		));
 	}
 }
+
+export async function disconnectAccount(account: DomainAccount) {
+	await account.wallet.disconnectAccount(account);
+	await domain.accounts.removeAccount(account);
+
+	if (account.wallet.factory.wallet === 'walletconnect') {
+		domain.disconnectWalletConnect();
+	}
+}

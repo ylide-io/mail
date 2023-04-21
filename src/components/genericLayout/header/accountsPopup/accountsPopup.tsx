@@ -5,7 +5,7 @@ import { ReactComponent as EditSvg } from '../../../../icons/ic20/edit.svg';
 import { ReactComponent as PlusSvg } from '../../../../icons/ic20/plus.svg';
 import { ReactComponent as LogoutSvg } from '../../../../icons/ic28/logout.svg';
 import domain from '../../../../stores/Domain';
-import { connectAccount } from '../../../../utils/account';
+import { connectAccount, disconnectAccount } from '../../../../utils/account';
 import { HorizontalAlignment } from '../../../../utils/alignment';
 import { walletsMeta } from '../../../../utils/wallet';
 import { ActionButton, ActionButtonLook, ActionButtonSize } from '../../../ActionButton/ActionButton';
@@ -59,8 +59,7 @@ export const AccountsPopup = observer(({ anchorRef, onClose }: AccountsPopupProp
 								icon={<LogoutSvg />}
 								title="Logout"
 								onClick={async () => {
-									await account.wallet.disconnectAccount(account);
-									await domain.accounts.removeAccount(account);
+									await disconnectAccount(account);
 
 									if (!domain.accounts.hasActiveAccounts) {
 										onClose();

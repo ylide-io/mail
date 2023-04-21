@@ -15,7 +15,7 @@ import { YlideLargeLogo } from '../../icons/YlideLargeLogo';
 import domain from '../../stores/Domain';
 import { DomainAccount } from '../../stores/models/DomainAccount';
 import { RoutePath } from '../../stores/routePath';
-import { connectAccount } from '../../utils/account';
+import { connectAccount, disconnectAccount } from '../../utils/account';
 import { blockchainMeta } from '../../utils/blockchain';
 import { getQueryString } from '../../utils/getQueryString';
 import { useNav } from '../../utils/url';
@@ -108,21 +108,7 @@ export const NewWalletsPage = observer(() => {
 									</ActionButton>
 								)}
 
-								<div
-									className="cw-delete"
-									onClick={async () => {
-										if (acc.wallet.factory.wallet === 'walletconnect') {
-											await (
-												domain.walletControllers.evm.walletconnect as any
-											)?.writeWeb3.currentProvider.disconnect();
-										}
-										await acc.wallet.disconnectAccount(acc);
-										await domain.accounts.removeAccount(acc);
-										if (acc.wallet.factory.wallet === 'walletconnect') {
-											document.location.reload();
-										}
-									}}
-								>
+								<div className="cw-delete" onClick={() => disconnectAccount(acc)}>
 									<CrossSvg />
 								</div>
 							</div>
