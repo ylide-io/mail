@@ -31,6 +31,7 @@ export class DomainAccount {
 	}
 
 	async rename(newName: string) {
+		newName = newName.trim();
 		if (newName.length > 255) {
 			throw new Error('Max account length is 255');
 		}

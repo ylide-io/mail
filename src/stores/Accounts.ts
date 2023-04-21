@@ -46,7 +46,7 @@ export class Accounts {
 							},
 							key,
 							key.keyVersion,
-							(await this.domain.storage.readString('yld1_accName_' + key.address)) || 'New Account',
+							(await this.domain.storage.readString('yld1_accName_' + key.address)) || '',
 						);
 					}
 				}

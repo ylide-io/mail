@@ -1,3 +1,4 @@
+import clsx from 'clsx';
 import { observer } from 'mobx-react';
 import React, { RefObject } from 'react';
 
@@ -34,16 +35,16 @@ export const AccountsPopup = observer(({ anchorRef, onClose }: AccountsPopupProp
 						<Blockie className={css.itemIcon} address={account.account.address} />
 						<div className={css.itemBody}>
 							<div className={css.itemName}>
-								<div className={css.itemNameInner}>{account.name}</div>
+								<div className={clsx(css.itemNameInner, !account.name && css.itemNameInner_empty)}>
+									{account.name || 'No name'}
+								</div>
 								<ActionButton
 									look={ActionButtonLook.LITE}
 									icon={<EditSvg />}
 									title="Rename"
 									onClick={async () => {
-										const newName = prompt('Enter new account name: ', account.name);
-										if (newName) {
-											await account.rename(newName);
-										}
+										const newName = prompt('Enter new account name: ', account.name) || '';
+										await account.rename(newName);
 									}}
 								/>
 							</div>

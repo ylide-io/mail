@@ -51,6 +51,10 @@
 	text-overflow: ellipsis;
 }
 
+.itemNameInner_empty {
+	color: var(--secondary-text-color);
+}
+
 .itemWallet {
 	display: grid;
 	grid-template-columns: auto 1fr;

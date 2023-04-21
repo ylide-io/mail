@@ -12,10 +12,12 @@ import { DropDownItem, DropDownItemMode } from '../dropDown/dropDown';
 import { PropsWithClassName } from '../propsWithClassName';
 import { Select } from '../select/select';
 
-export function formatDomainAccount(account: DomainAccount) {
-	return `${account.name} (${truncateInMiddle(account.account.address, 10, '..')}) [${
-		walletsMeta[account.wallet.wallet].title
-	}]`;
+export function formatFullAccountName(account: DomainAccount) {
+	const walletName = walletsMeta[account.wallet.wallet].title;
+
+	return account.name
+		? `${account.name} (${truncateInMiddle(account.account.address, 8, '..')}, ${walletName})`
+		: `${truncateInMiddle(account.account.address, 16, '..')} (${walletName})`;
 }
 
 interface AccountSelectProps extends PropsWithClassName {
@@ -27,7 +29,7 @@ export const AccountSelect = observer(({ className, activeAccount, onChange }: A
 	return (
 		<Select
 			className={className}
-			text={activeAccount && formatDomainAccount(activeAccount)}
+			text={activeAccount && formatFullAccountName(activeAccount)}
 			placeholder="Select account"
 		>
 			{onSelect => (
@@ -41,7 +43,7 @@ export const AccountSelect = observer(({ className, activeAccount, onChange }: A
 								onChange?.(account);
 							}}
 						>
-							{formatDomainAccount(account)}
+							{formatFullAccountName(account)}
 						</DropDownItem>
 					))}
 
