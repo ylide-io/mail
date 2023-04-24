@@ -57,44 +57,6 @@
 	max-width: 762px;
 }
 
-.intro-inner-block {
-	@include flex-column(center, flex-start);
-
-	align-self: center;
-	padding-top: 5%;
-	width: 350px;
-}
-
-.intro-title {
-	font-family: $font-family_wide;
-	letter-spacing: -0.06em;
-	font-weight: 400;
-	text-align: center;
-	margin-bottom: 30px;
-	font-size: 24px;
-}
-
-.intro-subtitle {
-	font-weight: 300;
-	text-align: center;
-	font-size: 16px;
-
-	&.emphaized {
-		font-weight: 500;
-	}
-}
-
-.intro-buttons {
-	@include flex-row(center, center);
-
-	margin-top: 20px;
-
-	button {
-		margin-left: 10px;
-		margin-right: 10px;
-	}
-}
-
 .connected-wallets {
 	@include flex-row(center, center);
 
