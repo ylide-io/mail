@@ -21,17 +21,17 @@ import { RoutePath } from '../../../../stores/routePath';
 import TagsStore from '../../../../stores/Tags';
 import { useNav } from '../../../../utils/url';
 
-interface ContactsListItemProps {
-	contact: IContact;
-	isNew?: boolean;
-}
-
 interface Option {
 	value: number;
 	label: string;
 }
 
-export const ContactsListItem: React.FC<ContactsListItemProps> = observer(({ contact, isNew }) => {
+interface ContactListItemProps {
+	contact: IContact;
+	isNew?: boolean;
+}
+
+export const ContactListItem = observer(({ contact, isNew }: ContactListItemProps) => {
 	const navigate = useNav();
 
 	const [editing, setEditing] = useState(isNew || false);

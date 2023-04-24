@@ -8,19 +8,14 @@ import { ReactComponent as TrashSvg } from '../../../../icons/ic20/trash.svg';
 import { ITag } from '../../../../stores/models/ITag';
 import tags from '../../../../stores/Tags';
 import { allColors } from '../../../../utils/colors';
-import ColorPicker from './colorPicker';
+import ColorPicker from '../colorPicker/colorPicker';
 
-interface TagsListItemProps {
+interface TagListItemProps {
 	tag: ITag;
 	isNew?: boolean;
 }
 
-export interface IColor {
-	value: number;
-	name: string;
-}
-
-const TagsListItem: React.FC<TagsListItemProps> = ({ tag, isNew }) => {
+const TagListItem = ({ tag, isNew }: TagListItemProps) => {
 	const [editing, setEditing] = useState(isNew || false);
 	const [name, setName] = useState(tag.name);
 	const [color, setColor] = useState<string>(tag.color);
@@ -97,4 +92,4 @@ const TagsListItem: React.FC<TagsListItemProps> = ({ tag, isNew }) => {
 	);
 };
 
-export default TagsListItem;
+export default TagListItem;
