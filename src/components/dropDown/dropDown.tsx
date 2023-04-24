@@ -9,7 +9,7 @@ import {
 } from '../../utils/alignment';
 import { scrollIntoViewIfNeeded } from '../../utils/ui';
 import { AnchoredPopup } from '../popup/anchoredPopup/anchoredPopup';
-import { PropsWithClassName } from '../propsWithClassName';
+import { PropsWithClassName } from '../props';
 import css from './dropDown.module.scss';
 
 const alignerOptions: DefaultAnchoredElementAlignerOptions = {

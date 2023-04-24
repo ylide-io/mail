@@ -3,7 +3,7 @@ import React, { PropsWithChildren } from 'react';
 
 import { useNav } from '../../../../utils/url';
 import { ActionButton, ActionButtonLook, ActionButtonSize } from '../../../ActionButton/ActionButton';
-import { PropsWithClassName } from '../../../propsWithClassName';
+import { PropsWithClassName } from '../../../props';
 import css from './fullPageContent.module.scss';
 
 export interface FullPageContentProps extends PropsWithChildren<{}>, PropsWithClassName {

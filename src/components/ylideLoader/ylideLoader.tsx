@@ -1,6 +1,6 @@
 import clsx from 'clsx';
 
-import { PropsWithClassName } from '../propsWithClassName';
+import { PropsWithClassName } from '../props';
 import css from './ylideLoader.module.scss';
 
 interface YlideLoaderProps extends PropsWithClassName {

@@ -3,7 +3,7 @@ import React, { PropsWithChildren, useContext, useLayoutEffect, useRef } from 'r
 import { invariant } from '../../utils/assert';
 import { useEscPress } from '../../utils/useEscPress';
 import { useOutsideClick } from '../../utils/useOutsideClick';
-import { PropsWithClassName } from '../propsWithClassName';
+import { PropsWithClassName } from '../props';
 import { PopupManagerContext } from './popupManager/popupManager';
 
 interface PopupProps extends PropsWithChildren<{}>, PropsWithClassName {

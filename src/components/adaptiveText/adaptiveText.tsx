@@ -3,7 +3,7 @@ import clsx from 'clsx';
 import { useEffect, useRef, useState } from 'react';
 
 import { truncateInMiddle } from '../../utils/string';
-import { PropsWithClassName } from '../propsWithClassName';
+import { PropsWithClassName } from '../props';
 import css from './adaptiveText.module.scss';
 
 interface AdaptiveTextProps extends PropsWithClassName {

@@ -1,11 +1,10 @@
-import { Avatar, Select } from 'antd';
-import clsx from 'clsx';
+import { Select } from 'antd';
 import { observer } from 'mobx-react';
 import React, { useMemo, useState } from 'react';
 
 import { ActionButton, ActionButtonLook } from '../../../../components/ActionButton/ActionButton';
 import { AdaptiveAddress } from '../../../../components/adaptiveAddress/adaptiveAddress';
-import { Blockie } from '../../../../components/blockie/blockie';
+import { ContactAvatar } from '../../../../components/contactAvatar/contactAvatar';
 import { Recipients } from '../../../../components/recipientInput/recipientInput';
 import { TextField } from '../../../../components/textField/textField';
 import { ReactComponent as EditSvg } from '../../../../icons/ic20/edit.svg';
@@ -20,6 +19,7 @@ import { globalOutgoingMailData } from '../../../../stores/outgoingMailData';
 import { RoutePath } from '../../../../stores/routePath';
 import TagsStore from '../../../../stores/Tags';
 import { useNav } from '../../../../utils/url';
+import css from './contactListItem.module.scss';
 
 interface Option {
 	value: number;
@@ -34,7 +34,7 @@ interface ContactListItemProps {
 export const ContactListItem = observer(({ contact, isNew }: ContactListItemProps) => {
 	const navigate = useNav();
 
-	const [editing, setEditing] = useState(isNew || false);
+	const [isEditing, setEditing] = useState(isNew || false);
 	const [name, setName] = useState(contact.name);
 	const [address, setAddress] = useState(contact.address);
 	const [description] = useState(contact.description);
@@ -138,80 +138,64 @@ export const ContactListItem = observer(({ contact, isNew }: ContactListItemProp
 		navigate(RoutePath.MAIL_COMPOSE);
 	};
 
-	if (editing) {
-		return (
-			<div className="contacts-list-item">
-				<div className="contact-avatar">
-					{contact.img ? <img alt="Avatar" src={contact.img} /> : <Avatar />}
-				</div>
-				<div className="contact-name">
-					<TextField
-						isError={nameError}
-						value={name}
-						placeholder={'Type contact name'}
-						onValueChange={onNameEdit}
-					/>
-				</div>
-				<div className="contact-address">
-					<TextField
-						isError={addressError}
-						placeholder={'Type contact address'}
-						value={address}
-						onValueChange={onAddressEdit}
-					/>
-				</div>
-				<div className="contact-folders">
-					<Select
-						style={{ width: '100%', minWidth: 200 }}
-						mode="tags"
-						options={options}
-						defaultValue={defaultOptions}
-						onChange={selectHandler}
-						placeholder="Tags"
-					/>
-				</div>
-				<div className="contact-actions">
-					<ActionButton look={ActionButtonLook.PRIMARY} onClick={saveClickHandler} icon={<TickSvg />} />
-					{!isNew ? (
-						<ActionButton
-							look={ActionButtonLook.DANGEROUS}
-							onClick={deleteClickHandler}
-							icon={<TrashSvg />}
-						/>
-					) : null}
-				</div>
-			</div>
-		);
-	}
-
 	return (
-		<div className="contacts-list-item">
-			<div className="contact-avatar">
-				{contact.img ? (
-					<Avatar src={contact.img} />
-				) : (
-					<Blockie className="contact-blockie" address={contact.address} />
-				)}
-			</div>
-			<div className="contact-name">{name}</div>
-			<div className="contact-address">
-				<AdaptiveAddress address={address} />
-			</div>
-			<div style={{ textAlign: 'center' }} className="contact-folders">
-				{tags.map((tag, index) => (
-					<span key={index} style={{ marginLeft: '3px' }} className={clsx(['label', `label-${tag.color}`])}>
-						{tag.name}
-					</span>
-				))}
-			</div>
-			<div className="contact-actions">
-				<ActionButton icon={<MailSvg />} onClick={mailThisContact}>
-					Compose
-				</ActionButton>
-				<ActionButton icon={<EditSvg />} onClick={editClickHandler}>
-					Edit
-				</ActionButton>
-			</div>
+		<div className={css.root}>
+			{isEditing ? (
+				<>
+					<ContactAvatar className={css.avatar} contact={contact} />
+					<div className={css.name}>
+						<TextField
+							isError={nameError}
+							value={name}
+							placeholder={'Type contact name'}
+							onValueChange={onNameEdit}
+						/>
+					</div>
+					<div className={css.address}>
+						<TextField
+							isError={addressError}
+							placeholder={'Type contact address'}
+							value={address}
+							onValueChange={onAddressEdit}
+						/>
+					</div>
+					<div className={css.folders}>
+						<Select
+							mode="tags"
+							options={options}
+							defaultValue={defaultOptions}
+							onChange={selectHandler}
+							placeholder="Tags"
+							style={{ width: '100%' }}
+						/>
+					</div>
+					<div className={css.actions}>
+						<ActionButton look={ActionButtonLook.PRIMARY} onClick={saveClickHandler} icon={<TickSvg />} />
+						{isNew || (
+							<ActionButton
+								look={ActionButtonLook.DANGEROUS}
+								onClick={deleteClickHandler}
+								icon={<TrashSvg />}
+							/>
+						)}
+					</div>
+				</>
+			) : (
+				<>
+					<ContactAvatar className={css.avatar} contact={contact} />
+					<div className={css.name}>{name}</div>
+					<AdaptiveAddress className={css.address} address={address} />
+					<div className={css.folders}>{tags.map(tag => tag.name).join(', ')}</div>
+					<div className={css.actions}>
+						<ActionButton icon={<MailSvg />} onClick={mailThisContact}>
+							Compose
+						</ActionButton>
+						<ActionButton icon={<EditSvg />} onClick={editClickHandler}>
+							Edit
+						</ActionButton>
+					</div>
+				</>
+			)}
 		</div>
 	);
 });

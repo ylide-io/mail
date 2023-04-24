@@ -4,7 +4,7 @@ import { ReactNode, useCallback, useRef, useState } from 'react';
 import { ReactComponent as ArrowDownSvg } from '../../icons/ic20/arrowDown.svg';
 import { HorizontalAlignment } from '../../utils/alignment';
 import { DropDown } from '../dropDown/dropDown';
-import { PropsWithClassName } from '../propsWithClassName';
+import { PropsWithClassName } from '../props';
 import css from './select.module.scss';
 
 export interface SelectProps extends PropsWithClassName {

@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 
 import { DateFormatStyle, formatDate, UnixTime } from '../../utils/date';
-import { PropsWithClassName } from '../propsWithClassName';
+import { PropsWithClassName } from '../props';
 
 interface ReadableDateProps extends PropsWithClassName {
 	style?: DateFormatStyle;

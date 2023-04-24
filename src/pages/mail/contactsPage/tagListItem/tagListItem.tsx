@@ -1,14 +1,16 @@
+import clsx from 'clsx';
 import React, { useState } from 'react';
 
 import { ActionButton, ActionButtonLook } from '../../../../components/ActionButton/ActionButton';
 import { TextField } from '../../../../components/textField/textField';
+import { toast } from '../../../../components/toast/toast';
 import { ReactComponent as EditSvg } from '../../../../icons/ic20/edit.svg';
 import { ReactComponent as TickSvg } from '../../../../icons/ic20/tick.svg';
 import { ReactComponent as TrashSvg } from '../../../../icons/ic20/trash.svg';
 import { ITag } from '../../../../stores/models/ITag';
 import tags from '../../../../stores/Tags';
 import { allColors } from '../../../../utils/colors';
-import ColorPicker from '../colorPicker/colorPicker';
+import css from './tagListItem.module.scss';
 
 interface TagListItemProps {
 	tag: ITag;
@@ -16,7 +18,7 @@ interface TagListItemProps {
 }
 
 const TagListItem = ({ tag, isNew }: TagListItemProps) => {
-	const [editing, setEditing] = useState(isNew || false);
+	const [isEditing, setEditing] = useState(isNew || false);
 	const [name, setName] = useState(tag.name);
 	const [color, setColor] = useState<string>(tag.color);
 
@@ -25,6 +27,11 @@ const TagListItem = ({ tag, isNew }: TagListItemProps) => {
 	};
 
 	const saveClickHandler = () => {
+		const cleanName = name.trim();
+		if (!cleanName) {
+			return toast('Please enter tag name');
+		}
+
 		const newTag: ITag = {
 			id: tag.id,
 			name,
@@ -44,50 +51,44 @@ const TagListItem = ({ tag, isNew }: TagListItemProps) => {
 		await tags.deleteTag(tag.id);
 	};
 
-	if (editing) {
-		return (
-			<div className="contacts-list-item">
-				<div className="contact-folders">
-					<div style={{ display: 'inline-flex' }}>
+	return (
+		<div className={css.root}>
+			{isEditing ? (
+				<>
+					<div className={css.colors}>
 						{allColors.map(c => (
-							<ColorPicker key={c} onClick={setColor} active={c === color} color={c} />
+							<div
+								onClick={() => setColor(c)}
+								className={clsx(css.color, c !== color && css.color_notSelected)}
+								style={{ backgroundColor: c }}
+							/>
 						))}
 					</div>
-				</div>
-				<div className="contact-name">
-					<TextField placeholder="Tag name" value={name} onValueChange={setName} />
-				</div>
-				<div className="contact-actions small-actions">
-					{!isNew ? (
-						<>
-							<ActionButton
-								look={ActionButtonLook.PRIMARY}
-								onClick={saveClickHandler}
-								icon={<TickSvg />}
-							/>
+					<div className={css.name}>
+						<TextField placeholder="Tag name" value={name} onValueChange={setName} />
+					</div>
+					<div className={css.actions}>
+						<ActionButton look={ActionButtonLook.PRIMARY} onClick={saveClickHandler} icon={<TickSvg />} />
+						{isNew || (
 							<ActionButton
 								look={ActionButtonLook.DANGEROUS}
 								onClick={deleteClickHandler}
 								icon={<TrashSvg />}
 							/>
-						</>
-					) : (
-						<ActionButton look={ActionButtonLook.PRIMARY} onClick={saveClickHandler} icon={<TickSvg />} />
-					)}
-				</div>
-			</div>
-		);
-	}
-
-	return (
-		<div className="contacts-list-item">
-			<div className="contact-folders">
-				<div style={{ width: 20, height: 20, borderRadius: 10, backgroundColor: tag.color }} />
-			</div>
-			<div className="contact-name">{tag.name}</div>
-			<div className="contact-actions small-actions">
-				<ActionButton onClick={editClickHandler} icon={<EditSvg />} />
-			</div>
+						)}
+					</div>
+				</>
+			) : (
+				<>
+					<div className={css.color} style={{ backgroundColor: tag.color }} />
+					<div className={css.name}>{tag.name}</div>
+					<div className={css.actions}>
+						<ActionButton onClick={editClickHandler} icon={<EditSvg />}>
+							Edit
+						</ActionButton>
+					</div>
+				</>
+			)}
 		</div>
 	);
 };

@@ -85,12 +85,12 @@ export const ContactListPage = observer(() => {
 					<h3>No contacts</h3>
 				</div>
 			) : (
-				<div className="contacts-list">
+				<>
 					{contacts.newContact && <ContactListItem isNew={true} contact={{ ...contacts.newContact }} />}
 					{contactsList.map(contact => (
 						<ContactListItem key={contact.address} contact={{ ...contact }} />
 					))}
-				</div>
+				</>
 			)}
 		</ContactsLayout>
 	);

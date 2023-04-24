@@ -40,7 +40,7 @@ export const ContactTagsPage = observer(() => {
 					<h3>Your tag list is empty yet.</h3>
 				</div>
 			) : (
-				<div className="contacts-list">
+				<div>
 					{tags.newTag && <TagListItem isNew={true} tag={{ ...tags.newTag }} />}
 					{tags.tags.map(tag => (
 						<TagListItem key={tag.id} tag={{ ...tag }} />

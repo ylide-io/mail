@@ -14,7 +14,7 @@ export enum RoutePath {
 
 	MAIL_COMPOSE = '/mail/compose',
 	MAIL_CONTACTS = '/mail/contacts',
-	MAIL_CONTACT_TAGS = '/mail/contact-tags',
+	MAIL_CONTACT_TAGS = '/mail/contacts/tags',
 	MAIL_FOLDER = '/mail/:folderId',
 	MAIL_DETAILS = '/mail/:folderId/:id',
 

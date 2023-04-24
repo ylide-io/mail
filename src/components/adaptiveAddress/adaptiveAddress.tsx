@@ -1,7 +1,7 @@
 import { Tooltip } from 'antd';
 
 import { AdaptiveText } from '../adaptiveText/adaptiveText';
-import { PropsWithClassName } from '../propsWithClassName';
+import { PropsWithClassName } from '../props';
 
 interface AdaptiveAddressProps extends PropsWithClassName {
 	address: string;

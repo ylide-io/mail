@@ -1,7 +1,7 @@
 import clsx from 'clsx';
 import { ReactNode } from 'react';
 
-import { PropsWithClassName } from '../../../../components/propsWithClassName';
+import { PropsWithClassName } from '../../../../components/props';
 import css from './otcTable.module.scss';
 
 export interface ColumnProp extends PropsWithClassName {

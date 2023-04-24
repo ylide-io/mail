@@ -1,4 +1,4 @@
-import { PropsWithClassName } from '../../../../components/propsWithClassName';
+import { PropsWithClassName } from '../../../../components/props';
 import { LinkType } from '../../../../stores/Feed';
 import { ReactComponent as DiscordSvg } from './icons/discord.svg';
 import { ReactComponent as MediumSvg } from './icons/medium.svg';

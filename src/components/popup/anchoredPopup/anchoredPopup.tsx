@@ -9,7 +9,7 @@ import {
 	VerticalAlignment,
 } from '../../../utils/alignment';
 import { invariant } from '../../../utils/assert';
-import { PropsWithClassName } from '../../propsWithClassName';
+import { PropsWithClassName } from '../../props';
 import { Popup } from '../popup';
 
 interface PopupProps extends PropsWithChildren<{}>, PropsWithClassName {

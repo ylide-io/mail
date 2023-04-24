@@ -1,7 +1,7 @@
 import clsx from 'clsx';
 import React, { ButtonHTMLAttributes, forwardRef, PropsWithChildren, ReactNode, Ref } from 'react';
 
-import { PropsWithClassName } from '../propsWithClassName';
+import { PropsWithClassName } from '../props';
 import css from './ActionButton.module.scss';
 
 export enum ActionButtonSize {

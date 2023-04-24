@@ -2,7 +2,7 @@ import clsx from 'clsx';
 import { FocusEvent, forwardRef, KeyboardEvent, PropsWithChildren, Ref, useRef, useState } from 'react';
 
 import { ReactComponent as CrossSvg } from '../../icons/ic20/cross.svg';
-import { PropsWithClassName } from '../propsWithClassName';
+import { PropsWithClassName } from '../props';
 import css from './tagInput.module.scss';
 
 export enum TagInputItemLook {

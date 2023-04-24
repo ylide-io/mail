@@ -3,7 +3,7 @@ import { observer } from 'mobx-react';
 import React from 'react';
 
 import { AccountSelect } from '../../../../components/accountSelect/accountSelect';
-import { PropsWithClassName } from '../../../../components/propsWithClassName';
+import { PropsWithClassName } from '../../../../components/props';
 import { RecipientInput } from '../../../../components/recipientInput/recipientInput';
 import { TextField } from '../../../../components/textField/textField';
 import domain from '../../../../stores/Domain';

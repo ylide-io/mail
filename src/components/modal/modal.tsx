@@ -6,7 +6,7 @@ import { ReactComponent as FoldSvg } from '../../icons/ic20/fold.svg';
 import { alignAtViewportCenter } from '../../utils/alignment';
 import { Overlay } from '../overlay/overlay';
 import { Popup } from '../popup/popup';
-import { PropsWithClassName } from '../propsWithClassName';
+import { PropsWithClassName } from '../props';
 import css from './modal.module.scss';
 
 export interface ModalProps extends PropsWithChildren<{}>, PropsWithClassName {

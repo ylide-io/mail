@@ -1,7 +1,7 @@
 import clsx from 'clsx';
 import { PropsWithChildren } from 'react';
 
-import { PropsWithClassName } from '../propsWithClassName';
+import { PropsWithClassName } from '../props';
 import css from './errorMessage.module.scss';
 
 export interface ErrorMessageProps extends PropsWithChildren<{}>, PropsWithClassName {}

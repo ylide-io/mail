@@ -37,7 +37,7 @@ import { RoutePath } from '../../../stores/routePath';
 import { useOpenMailCopmpose } from '../../../utils/mail';
 import { useNav } from '../../../utils/url';
 import { ActionButton, ActionButtonLook, ActionButtonSize } from '../../ActionButton/ActionButton';
-import { PropsWithClassName } from '../../propsWithClassName';
+import { PropsWithClassName } from '../../props';
 import css from './sidebarMenu.module.scss';
 
 interface SidebarBurgerProps extends PropsWithClassName, PropsWithChildren<{}> {}

@@ -1,7 +1,7 @@
 import clsx from 'clsx';
 import { CSSProperties } from 'react';
 
-import { PropsWithClassName } from '../propsWithClassName';
+import { PropsWithClassName } from '../props';
 import css from './spinner.module.scss';
 
 export interface LoaderProps extends PropsWithClassName {

@@ -9,7 +9,7 @@ import { truncateInMiddle } from '../../utils/string';
 import { walletsMeta } from '../../utils/wallet';
 import { ActionButton, ActionButtonLook } from '../ActionButton/ActionButton';
 import { DropDownItem, DropDownItemMode } from '../dropDown/dropDown';
-import { PropsWithClassName } from '../propsWithClassName';
+import { PropsWithClassName } from '../props';
 import { Select } from '../select/select';
 
 export function formatFullAccountName(account: DomainAccount) {
