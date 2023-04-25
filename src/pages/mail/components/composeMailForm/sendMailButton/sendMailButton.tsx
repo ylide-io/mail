@@ -11,6 +11,7 @@ import React, { ReactNode, useEffect } from 'react';
 import { ActionButtonLook } from '../../../../../components/ActionButton/ActionButton';
 import { ActionModal } from '../../../../../components/actionModal/actionModal';
 import { AdaptiveText } from '../../../../../components/adaptiveText/adaptiveText';
+import { PropsWithClassName } from '../../../../../components/props';
 import { SelectNetworkModal } from '../../../../../components/selectNetworkModal/selectNetworkModal';
 import { Spinner } from '../../../../../components/spinner/spinner';
 import { showStaticComponent } from '../../../../../components/staticComponentManager/staticComponentManager';
@@ -28,12 +29,12 @@ import { editorJsToYMF } from '../../../../../utils/editorjsJson';
 import { truncateInMiddle } from '../../../../../utils/string';
 import { getEvmWalletNetwork } from '../../../../../utils/wallet';
 
-export interface SendMailButtonProps {
+export interface SendMailButtonProps extends PropsWithClassName {
 	mailData: OutgoingMailData;
 	onSent?: () => void;
 }
 
-export const SendMailButton = observer(({ mailData, onSent }: SendMailButtonProps) => {
+export const SendMailButton = observer(({ className, mailData, onSent }: SendMailButtonProps) => {
 	useEffect(
 		() =>
 			autorun(async () => {
@@ -153,6 +154,7 @@ export const SendMailButton = observer(({ mailData, onSent }: SendMailButtonProp
 				mailData.from,
 				mailData.subject,
 				content,
+				mailData.attachments,
 				mailData.to.items.map(r => r.routing?.address!),
 				mailData.network,
 				REACT_APP__OTC_MODE
@@ -173,13 +175,13 @@ export const SendMailButton = observer(({ mailData, onSent }: SendMailButtonProp
 
 	return (
 		<div
-			className={clsx('send-btn', {
+			className={clsx(className, 'send-btn', {
 				disabled:
 					mailer.sending ||
 					!mailData.from ||
 					!mailData.to.items.length ||
 					mailData.to.items.some(r => r.isLoading) ||
-					(!mailData.hasEditorData && !mailData.hasPlainTextData),
+					(!mailData.hasEditorData && !mailData.hasPlainTextData && !mailData.attachments.length),
 				withDropdown: mailData.from?.wallet.factory.blockchainGroup === 'evm',
 			})}
 		>

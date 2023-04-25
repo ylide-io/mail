@@ -15,6 +15,8 @@ export class OutgoingMailData {
 	editorData?: OutputData;
 	plainTextData?: string;
 
+	attachments: File[] = [];
+
 	constructor() {
 		makeAutoObservable(this);
 
@@ -42,6 +44,8 @@ export class OutgoingMailData {
 		this.subject = data?.subject || '';
 		this.editorData = data?.editorData;
 		this.plainTextData = data?.plainTextData;
+
+		this.attachments = data?.attachments || [];
 	}
 }
 

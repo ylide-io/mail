@@ -22,7 +22,7 @@ $contentPadding: 6px;
 	display: flex;
 	align-items: center;
 	padding: 0 12px;
-	height: $interactive-elem-size;
+	min-height: $interactive-elem-size;
 	white-space: nowrap;
 	overflow: hidden;
 }

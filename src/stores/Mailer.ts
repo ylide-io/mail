@@ -1,8 +1,19 @@
 import { EVMNetwork } from '@ylide/ethereum';
-import { MessageContentV4, SendMailResult, ServiceCode, Uint256, YMF } from '@ylide/sdk';
+import {
+	MessageAttachmentLinkV1,
+	MessageAttachmentType,
+	MessageContentV4,
+	MessageSecureContext,
+	SendMailResult,
+	ServiceCode,
+	Uint256,
+	YlideIpfsStorage,
+	YMF,
+} from '@ylide/sdk';
 import { makeAutoObservable } from 'mobx';
 
 import messagesDB from '../indexedDB/MessagesDB';
+import { readFileAsArrayBuffer } from '../utils/file';
 import { getEvmWalletNetwork } from '../utils/wallet';
 import { analytics } from './Analytics';
 import domain from './Domain';
@@ -69,6 +80,7 @@ class Mailer {
 		sender: DomainAccount,
 		subject: string,
 		text: YMF,
+		attachments: File[],
 		recipients: string[],
 		network?: EVMNetwork,
 		feedId?: Uint256,
@@ -78,12 +90,32 @@ class Mailer {
 		try {
 			this.sending = true;
 
+			const secureContext = MessageSecureContext.create();
+			const ipfsStorage = new YlideIpfsStorage();
+
+			const messageAttachments = await Promise.all(
+				attachments.map(async file => {
+					const buffer = await readFileAsArrayBuffer(file);
+					const encrypted = secureContext.encrypt(new Uint8Array(buffer));
+					const uploaded = await ipfsStorage.uploadToIpfs(encrypted);
+
+					return new MessageAttachmentLinkV1({
+						type: MessageAttachmentType.LINK_V1,
+						previewLink: '',
+						link: `ipfs://${uploaded.hash}`,
+						fileName: file.name,
+						fileSize: file.size,
+						isEncrypted: true,
+					});
+				}),
+			);
+
 			const content = new MessageContentV4({
 				sendingAgentName: 'ysh',
 				sendingAgentVersion: { major: 1, minor: 0, patch: 0 },
 				subject,
 				content: text,
-				attachments: [], // MessageAttachment[];
+				attachments: messageAttachments,
 				extraBytes: new Uint8Array(0),
 				extraJson: {},
 			});
