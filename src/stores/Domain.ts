@@ -350,8 +350,7 @@ export class Domain {
 		}
 
 		if (this.walletControllers.evm?.walletconnect) {
-			//@ts-ignore
-			await domain.walletControllers.evm.walletconnect.signer.provider.provider.disconnect();
+			await (domain.walletControllers.evm.walletconnect as any).signer.provider.provider.disconnect();
 			// TODO: pizdec
 			document.location.reload();
 		}
