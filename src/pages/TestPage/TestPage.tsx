@@ -52,7 +52,7 @@ export const TestPage = observer(() => {
 					Lite
 				</ActionButton>
 				<ActionButton look={ActionButtonLook.DANGEROUS} icon={<SettingsSvg />}>
-					Dengerous
+					Dangerous
 				</ActionButton>
 			</Row>
 
