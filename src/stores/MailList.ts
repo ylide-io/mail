@@ -17,7 +17,7 @@ import { makeAutoObservable } from 'mobx';
 import { useCallback, useEffect, useState } from 'react';
 
 import messagesDB, { MessagesDB } from '../indexedDB/impl/MessagesDB';
-import { IMessageDecodedContent, MessageDecodedContentType } from '../indexedDB/IndexedDB';
+import { IMessageDecodedContent, MessageDecodedTextDataType } from '../indexedDB/IndexedDB';
 import { invariant } from '../utils/assert';
 import { formatAddress } from '../utils/blockchain';
 import { analytics } from './Analytics';
@@ -66,11 +66,11 @@ export async function decodeMessage(
 		decodedTextData:
 			result.content.content instanceof YMF
 				? {
-						type: MessageDecodedContentType.YMF,
+						type: MessageDecodedTextDataType.YMF,
 						value: result.content.content,
 				  }
 				: {
-						type: MessageDecodedContentType.PLAIN,
+						type: MessageDecodedTextDataType.PLAIN,
 						value: result.content.content,
 				  },
 	};

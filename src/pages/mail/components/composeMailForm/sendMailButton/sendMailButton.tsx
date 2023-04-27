@@ -25,7 +25,7 @@ import mailer from '../../../../../stores/Mailer';
 import { OutgoingMailData } from '../../../../../stores/outgoingMailData';
 import { connectAccount } from '../../../../../utils/account';
 import { blockchainMeta, evmNameToNetwork } from '../../../../../utils/blockchain';
-import { editorJsToYMF } from '../../../../../utils/editorjsJson';
+import { editorJsToYMF } from '../../../../../utils/editorJs';
 import { truncateInMiddle } from '../../../../../utils/string';
 import { getEvmWalletNetwork } from '../../../../../utils/wallet';
 
@@ -144,8 +144,7 @@ export const SendMailButton = observer(({ className, mailData, onSent }: SendMai
 
 			let content: YMF;
 			if (mailData.hasEditorData) {
-				const ymfText = editorJsToYMF(mailData.editorData);
-				content = YMF.fromYMFText(ymfText);
+				content = editorJsToYMF(mailData.editorData);
 			} else {
 				content = YMF.fromPlainText(mailData.plainTextData!.trim());
 			}

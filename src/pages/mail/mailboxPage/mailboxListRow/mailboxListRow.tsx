@@ -9,12 +9,11 @@ import { CheckBox } from '../../../../components/checkBox/checkBox';
 import { ContactName } from '../../../../components/contactName/contactName';
 import { ReadableDate } from '../../../../components/readableDate/readableDate';
 import { ReactComponent as FilterSvg } from '../../../../icons/ic20/filter.svg';
-import { MessageDecodedContentType } from '../../../../indexedDB/IndexedDB';
 import domain from '../../../../stores/Domain';
 import { FolderId, ILinkedMessage, mailStore } from '../../../../stores/MailList';
 import { RoutePath } from '../../../../stores/routePath';
 import { formatAddress } from '../../../../utils/blockchain';
-import { decodeEditorData } from '../../../../utils/editorJs';
+import { decodedTextDataToPlainText } from '../../../../utils/editorJs';
 import { formatSubject } from '../../../../utils/mail';
 import { useNav } from '../../../../utils/url';
 import css from './mailboxListRow.module.scss';
@@ -67,23 +66,7 @@ const MailboxListRow: React.FC<MailboxListRowProps> = observer(
 			setError('');
 		}, [message.id]);
 
-		const preview = useMemo(() => {
-			if (!decoded) {
-				return null;
-			}
-			if (decoded.decodedTextData?.type === MessageDecodedContentType.YMF) {
-				const val = decoded.decodedTextData.value.toPlainText();
-				console.log('val: ', val);
-				return val;
-			} else {
-				const json = decodeEditorData(decoded.decodedTextData?.value);
-				if (json?.blocks) {
-					return json?.blocks.map((b: any) => b.data.text).join('\n');
-				} else {
-					return (json as any)?.body;
-				}
-			}
-		}, [decoded]);
+		const preview = useMemo(() => decodedTextDataToPlainText(decoded?.decodedTextData || undefined), [decoded]);
 
 		return (
 			<div

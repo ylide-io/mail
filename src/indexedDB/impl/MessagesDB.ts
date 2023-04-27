@@ -6,7 +6,7 @@ import {
 	IMessageDecodedContent,
 	IMessageDecodedSerializedContent,
 	IndexedDB,
-	MessageDecodedContentType,
+	MessageDecodedTextDataType,
 } from '../IndexedDB';
 
 export class MessagesDB extends IndexedDB {
@@ -25,15 +25,15 @@ export class MessagesDB extends IndexedDB {
 			...content,
 			decodedTextData:
 				content.decodedTextData &&
-				(content.decodedTextData.type === MessageDecodedContentType.YMF
+				(content.decodedTextData.type === MessageDecodedTextDataType.YMF
 					? {
 							...content.decodedTextData,
-							type: MessageDecodedContentType.YMF,
+							type: MessageDecodedTextDataType.YMF,
 							value: YMF.fromYMFText(content.decodedTextData.value),
 					  }
 					: {
 							...content.decodedTextData,
-							type: MessageDecodedContentType.PLAIN,
+							type: MessageDecodedTextDataType.PLAIN,
 							value: content.decodedTextData.value,
 					  }),
 		};

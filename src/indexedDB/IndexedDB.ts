@@ -1,25 +1,26 @@
 import { IMessage, YMF } from '@ylide/sdk';
 import { DBSchema, IDBPDatabase, openDB } from 'idb';
 
-export enum MessageDecodedContentType {
+export enum MessageDecodedTextDataType {
 	PLAIN = 'plain',
 	YMF = 'YMF',
 }
 
+export type IMessageDecodedTextData =
+	| { type: MessageDecodedTextDataType.PLAIN; value: string }
+	| { type: MessageDecodedTextDataType.YMF; value: YMF };
+
 export interface IMessageDecodedContent {
 	msgId: string;
-	decodedTextData:
-		| { type: MessageDecodedContentType.PLAIN; value: string }
-		| { type: MessageDecodedContentType.YMF; value: YMF }
-		| null;
+	decodedTextData: IMessageDecodedTextData | null;
 	decodedSubject: string | null;
 }
 
 export interface IMessageDecodedSerializedContent {
 	msgId: string;
 	decodedTextData:
-		| { type: MessageDecodedContentType.PLAIN; value: string }
-		| { type: MessageDecodedContentType.YMF; value: string }
+		| { type: MessageDecodedTextDataType.PLAIN; value: string }
+		| { type: MessageDecodedTextDataType.YMF; value: string }
 		| null;
 	decodedSubject: string | null;
 }

@@ -19,7 +19,7 @@ import domain from '../../../stores/Domain';
 import { decodeMessage } from '../../../stores/MailList';
 import { OutgoingMailData } from '../../../stores/outgoingMailData';
 import { invariant } from '../../../utils/assert';
-import { parseEditorjsJson } from '../../../utils/editorjsJson';
+import { parseEditorJsJson } from '../../../utils/editorJs';
 import { useAutoSizeTextArea } from '../../../utils/useAutoSizeTextArea';
 import { SendMailButton } from '../../mail/components/composeMailForm/sendMailButton/sendMailButton';
 import { OtcLayout } from '../components/otcLayout/otcLayout';
@@ -50,7 +50,7 @@ export function Chat({ data }: ChatProps) {
 					>
 						<NlToBr
 							text={
-								decoded?.decodedTextData ? parseEditorjsJson(decoded?.decodedTextData) : '[Encrypted]'
+								decoded?.decodedTextData ? parseEditorJsJson(decoded?.decodedTextData) : '[Encrypted]'
 							}
 						/>
 					</div>

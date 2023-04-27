@@ -11,13 +11,12 @@ import { ReactComponent as AddContactSvg } from '../../../../icons/ic20/addConta
 import { ReactComponent as ForwardSvg } from '../../../../icons/ic20/forward.svg';
 import { ReactComponent as ReplySvg } from '../../../../icons/ic20/reply.svg';
 import { ReactComponent as TrashSvg } from '../../../../icons/ic20/trash.svg';
-import { IContact, IMessageDecodedContent, MessageDecodedContentType } from '../../../../indexedDB/IndexedDB';
+import { IContact, IMessageDecodedContent } from '../../../../indexedDB/IndexedDB';
 import contacts from '../../../../stores/Contacts';
 import { FolderId, ILinkedMessage, mailStore } from '../../../../stores/MailList';
 import { formatAddress } from '../../../../utils/blockchain';
 import { DateFormatStyle } from '../../../../utils/date';
-import { decodeEditorData, EDITOR_JS_TOOLS } from '../../../../utils/editorJs';
-import { ymfToEditorJs } from '../../../../utils/editorjsJson';
+import { decodedTextDataToEditorJsData, EDITOR_JS_TOOLS } from '../../../../utils/editorJs';
 import { formatSubject } from '../../../../utils/mail';
 import css from './mailMessage.module.scss';
 
@@ -35,22 +34,10 @@ export interface MailMessageProps {
 
 export const MailMessage = observer(
 	({ message, decoded, folderId, onReady, onReplyClick, onForwardClick, onDeleteClick }: MailMessageProps) => {
-		const editorData = useMemo(() => {
-			if (!decoded?.decodedTextData) return null;
-			if (decoded.decodedTextData.type === MessageDecodedContentType.YMF) {
-				return ymfToEditorJs(decoded.decodedTextData.value);
-			} else {
-				const json = decodeEditorData(decoded.decodedTextData.value);
-				const isQamonMessage = !json?.blocks;
-				return isQamonMessage
-					? {
-							time: 1676587472156,
-							blocks: [{ id: '2cC8_Z_Rad', type: 'paragraph', data: { text: (json as any).body } }],
-							version: '2.26.5',
-					  }
-					: json;
-			}
-		}, [decoded?.decodedTextData]);
+		const editorData = useMemo(
+			() => decodedTextDataToEditorJsData(decoded?.decodedTextData || undefined),
+			[decoded],
+		);
 
 		const onDecodeClick = () => {
 			mailStore.decodeMessage(message);
