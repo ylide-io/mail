@@ -131,7 +131,7 @@ export const MailDetailsPage = observer(() => {
 	};
 
 	const onForwardClick = (message: ILinkedMessage, decodedContent: IMessageDecodedContent) => {
-		const editorData = decodedTextDataToEditorJsData(decodedContent.decodedTextData || undefined);
+		const editorData = decodedTextDataToEditorJsData(decodedContent.decodedTextData);
 		if (editorData) {
 			const forwardedData = plainTextToEditorJsData(
 				`\n${[

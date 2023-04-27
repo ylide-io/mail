@@ -34,10 +34,7 @@ export interface MailMessageProps {
 
 export const MailMessage = observer(
 	({ message, decoded, folderId, onReady, onReplyClick, onForwardClick, onDeleteClick }: MailMessageProps) => {
-		const editorData = useMemo(
-			() => decodedTextDataToEditorJsData(decoded?.decodedTextData || undefined),
-			[decoded],
-		);
+		const editorData = useMemo(() => decoded && decodedTextDataToEditorJsData(decoded.decodedTextData), [decoded]);
 
 		const onDecodeClick = () => {
 			mailStore.decodeMessage(message);

@@ -46,9 +46,7 @@ export function plainTextToEditorJsData(text: string): OutputData {
 	};
 }
 
-export function decodedTextDataToEditorJsData(
-	decodedTextData: IMessageDecodedTextData | undefined,
-): OutputData | undefined {
+export function decodedTextDataToEditorJsData(decodedTextData: IMessageDecodedTextData): OutputData | undefined {
 	if (!decodedTextData) return;
 
 	if (decodedTextData.type === MessageDecodedTextDataType.YMF) {
@@ -58,9 +56,7 @@ export function decodedTextDataToEditorJsData(
 	}
 }
 
-export function decodedTextDataToPlainText(decodedTextData: IMessageDecodedTextData | undefined): string | undefined {
-	if (!decodedTextData) return;
-
+export function decodedTextDataToPlainText(decodedTextData: IMessageDecodedTextData): string | undefined {
 	if (decodedTextData.type === MessageDecodedTextDataType.YMF) {
 		return decodedTextData.value.toPlainText();
 	} else {

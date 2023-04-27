@@ -12,17 +12,16 @@ export type IMessageDecodedTextData =
 
 export interface IMessageDecodedContent {
 	msgId: string;
-	decodedTextData: IMessageDecodedTextData | null;
-	decodedSubject: string | null;
+	decodedTextData: IMessageDecodedTextData;
+	decodedSubject: string;
 }
 
 export interface IMessageDecodedSerializedContent {
 	msgId: string;
 	decodedTextData:
 		| { type: MessageDecodedTextDataType.PLAIN; value: string }
-		| { type: MessageDecodedTextDataType.YMF; value: string }
-		| null;
-	decodedSubject: string | null;
+		| { type: MessageDecodedTextDataType.YMF; value: string };
+	decodedSubject: string;
 }
 
 export interface IContact {

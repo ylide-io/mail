@@ -13,7 +13,7 @@ export class MessagesDB extends IndexedDB {
 	static serializeMessageDecodedContent(content: IMessageDecodedContent): IMessageDecodedSerializedContent {
 		return {
 			...content,
-			decodedTextData: content.decodedTextData && {
+			decodedTextData: {
 				...content.decodedTextData,
 				value: content.decodedTextData.value.toString(),
 			},
@@ -24,8 +24,7 @@ export class MessagesDB extends IndexedDB {
 		return {
 			...content,
 			decodedTextData:
-				content.decodedTextData &&
-				(content.decodedTextData.type === MessageDecodedTextDataType.YMF
+				content.decodedTextData.type === MessageDecodedTextDataType.YMF
 					? {
 							...content.decodedTextData,
 							type: MessageDecodedTextDataType.YMF,
@@ -35,7 +34,7 @@ export class MessagesDB extends IndexedDB {
 							...content.decodedTextData,
 							type: MessageDecodedTextDataType.PLAIN,
 							value: content.decodedTextData.value,
-					  }),
+					  },
 		};
 	}
 

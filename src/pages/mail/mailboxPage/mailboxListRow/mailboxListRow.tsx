@@ -66,7 +66,7 @@ const MailboxListRow: React.FC<MailboxListRowProps> = observer(
 			setError('');
 		}, [message.id]);
 
-		const preview = useMemo(() => decodedTextDataToPlainText(decoded?.decodedTextData || undefined), [decoded]);
+		const preview = useMemo(() => decoded && decodedTextDataToPlainText(decoded.decodedTextData), [decoded]);
 
 		return (
 			<div
