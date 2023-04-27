@@ -263,7 +263,7 @@ export function ymfToEditorJs(ymf: YMF) {
 
 //
 
-export function formatSubject(subject?: string | null, prefix?: string) {
+export function formatSubject(subject: string, prefix?: string) {
 	return `${prefix || ''}${subject || '(no subject)'}`;
 }
 

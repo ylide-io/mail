@@ -151,10 +151,7 @@ export const MailDetailsPage = observer(() => {
 		}
 
 		globalOutgoingMailData.editorData = editorData;
-		globalOutgoingMailData.subject = formatSubject(
-			decodedContent.decodedSubject?.replace(/^Fwd:\s+/i, ''),
-			'Fwd: ',
-		);
+		globalOutgoingMailData.subject = formatSubject(decodedContent.decodedSubject.replace(/^Fwd:\s+/i, ''), 'Fwd: ');
 
 		navigate(RoutePath.MAIL_COMPOSE);
 	};

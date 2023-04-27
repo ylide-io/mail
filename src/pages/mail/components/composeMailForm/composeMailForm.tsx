@@ -59,7 +59,7 @@ export const ComposeMailForm = observer(
 
 					<div className={css.metaLabel}>Subject</div>
 					<TextField
-						placeholder={formatSubject()}
+						placeholder={formatSubject('')}
 						value={mailData.subject}
 						onValueChange={value => (mailData.subject = value)}
 					/>
