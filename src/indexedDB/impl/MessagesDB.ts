@@ -35,6 +35,7 @@ export class MessagesDB extends IndexedDB {
 							type: MessageDecodedTextDataType.PLAIN,
 							value: content.decodedTextData.value,
 					  },
+			attachments: [],
 		};
 	}
 

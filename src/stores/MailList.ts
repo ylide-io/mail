@@ -8,6 +8,7 @@ import {
 	ISourceWithMeta,
 	ListSourceDrainer,
 	ListSourceMultiplexer,
+	MessageContentV4,
 	SourceReadingSession,
 	Uint256,
 	YLIDE_MAIN_FEED_ID,
@@ -73,6 +74,7 @@ export async function decodeMessage(
 						type: MessageDecodedTextDataType.PLAIN,
 						value: result.content.content,
 				  },
+		attachments: result.content instanceof MessageContentV4 ? result.content.attachments : [],
 	};
 }
 
