@@ -1,7 +1,7 @@
 import { IMessage } from '@ylide/sdk';
 import { toJS } from 'mobx';
 
-import { IMessageDecodedSerializedContent, IndexedDB } from './IndexedDB';
+import { IMessageDecodedSerializedContent, IndexedDB } from '../IndexedDB';
 
 class MessagesDB extends IndexedDB {
 	async saveMessage(msg: IMessage): Promise<void> {

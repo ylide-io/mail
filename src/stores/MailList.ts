@@ -17,7 +17,7 @@ import { makeAutoObservable } from 'mobx';
 import { useCallback, useEffect, useState } from 'react';
 
 import { IMessageDecodedSerializedContent } from '../indexedDB/IndexedDB';
-import messagesDB from '../indexedDB/MessagesDB';
+import messagesDB from '../indexedDB/impl/MessagesDB';
 import { invariant } from '../utils/assert';
 import { formatAddress } from '../utils/blockchain';
 import { analytics } from './Analytics';

@@ -1,6 +1,6 @@
 import { toJS } from 'mobx';
 
-import { IndexedDB, ITag } from './IndexedDB';
+import { IndexedDB, ITag } from '../IndexedDB';
 
 class TagsDB extends IndexedDB {
 	async saveTag(tag: ITag): Promise<void> {

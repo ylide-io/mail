@@ -12,7 +12,7 @@ import {
 } from '@ylide/sdk';
 import { makeAutoObservable } from 'mobx';
 
-import messagesDB from '../indexedDB/MessagesDB';
+import messagesDB from '../indexedDB/impl/MessagesDB';
 import { readFileAsArrayBuffer } from '../utils/file';
 import { getEvmWalletNetwork } from '../utils/wallet';
 import { analytics } from './Analytics';

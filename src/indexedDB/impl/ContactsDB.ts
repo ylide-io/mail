@@ -1,6 +1,6 @@
 import { toJS } from 'mobx';
 
-import { IContact, IndexedDB } from './IndexedDB';
+import { IContact, IndexedDB } from '../IndexedDB';
 
 class ContactsDB extends IndexedDB {
 	async saveContact(contact: IContact): Promise<void> {
