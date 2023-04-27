@@ -14,7 +14,7 @@ import { Recipients } from '../../../components/recipientInput/recipientInput';
 import { YlideLoader } from '../../../components/ylideLoader/ylideLoader';
 import { REACT_APP__OTC_PROVIDER } from '../../../env';
 import { ReactComponent as ContactSvg } from '../../../icons/ic20/contact.svg';
-import { IMessageDecodedSerializedContent } from '../../../indexedDB/IndexedDB';
+import { IMessageDecodedContent } from '../../../indexedDB/IndexedDB';
 import domain from '../../../stores/Domain';
 import { decodeMessage } from '../../../stores/MailList';
 import { OutgoingMailData } from '../../../stores/outgoingMailData';
@@ -28,7 +28,7 @@ import { IframePopup } from './iframePopup/iframePopup';
 import css from './OtcChatPage.module.scss';
 
 interface ChatData extends OtcApi.IThreadResponse {
-	decodedMessagesById: Record<string, IMessageDecodedSerializedContent>;
+	decodedMessagesById: Record<string, IMessageDecodedContent>;
 }
 
 interface ChatProps {

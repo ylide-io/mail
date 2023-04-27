@@ -12,7 +12,7 @@ import { ReactComponent as AddContactSvg } from '../../../../icons/ic20/addConta
 import { ReactComponent as ForwardSvg } from '../../../../icons/ic20/forward.svg';
 import { ReactComponent as ReplySvg } from '../../../../icons/ic20/reply.svg';
 import { ReactComponent as TrashSvg } from '../../../../icons/ic20/trash.svg';
-import { IContact, IMessageDecodedSerializedContent } from '../../../../indexedDB/IndexedDB';
+import { IContact, IMessageDecodedContent, MessageDecodedContentType } from '../../../../indexedDB/IndexedDB';
 import contacts from '../../../../stores/Contacts';
 import { FolderId, ILinkedMessage, mailStore } from '../../../../stores/MailList';
 import { formatAddress } from '../../../../utils/blockchain';
@@ -26,7 +26,7 @@ const ReactEditorJS = createReactEditorJS();
 
 export interface MailMessageProps {
 	message: ILinkedMessage;
-	decoded?: IMessageDecodedSerializedContent;
+	decoded?: IMessageDecodedContent;
 	folderId?: FolderId;
 	onReady?: () => void;
 	onReplyClick: () => void;
@@ -38,7 +38,9 @@ export const MailMessage = observer(
 	({ message, decoded, folderId, onReady, onReplyClick, onForwardClick, onDeleteClick }: MailMessageProps) => {
 		const editorData = useMemo(() => {
 			if (!decoded?.decodedTextData) return null;
-			if (decoded.decodedTextData.type === 'plain') {
+			if (decoded.decodedTextData.type === MessageDecodedContentType.YMF) {
+				return ymfToEditorJs(YMF.fromYMFText(decoded.decodedTextData.value));
+			} else {
 				const json = decodeEditorData(decoded.decodedTextData.value);
 				const isQamonMessage = !json?.blocks;
 				return isQamonMessage
@@ -48,8 +50,6 @@ export const MailMessage = observer(
 							version: '2.26.5',
 					  }
 					: json;
-			} else {
-				return ymfToEditorJs(YMF.fromYMFText(decoded.decodedTextData.value));
 			}
 		}, [decoded?.decodedTextData]);
 

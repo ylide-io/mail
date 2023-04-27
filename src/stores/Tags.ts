@@ -1,7 +1,7 @@
 import { makeAutoObservable } from 'mobx';
 
-import { ITag } from '../indexedDB/IndexedDB';
 import tagsDB from '../indexedDB/impl/TagsDB';
+import { ITag } from '../indexedDB/IndexedDB';
 import { colors } from '../utils/colors';
 
 class Tags {

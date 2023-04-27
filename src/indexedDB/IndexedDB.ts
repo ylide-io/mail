@@ -1,9 +1,14 @@
 import { IMessage } from '@ylide/sdk';
 import { DBSchema, IDBPDatabase, openDB } from 'idb';
 
-export interface IMessageDecodedSerializedContent {
+export enum MessageDecodedContentType {
+	PLAIN = 'plain',
+	YMF = 'YMF',
+}
+
+export interface IMessageDecodedContent {
 	msgId: string;
-	decodedTextData: { type: 'plain'; value: string } | { type: 'YMF'; value: string } | null;
+	decodedTextData: { type: MessageDecodedContentType; value: string } | null;
 	decodedSubject: string | null;
 }
 
@@ -35,7 +40,7 @@ interface DBInterface extends DBSchema {
 		key: string;
 	};
 	decodedMessages: {
-		value: IMessageDecodedSerializedContent;
+		value: IMessageDecodedContent;
 		key: string;
 	};
 	deletedMessages: {

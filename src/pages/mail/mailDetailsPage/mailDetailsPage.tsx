@@ -12,7 +12,7 @@ import { ReactComponent as ArrowLeftSvg } from '../../../icons/ic20/arrowLeft.sv
 import { ReactComponent as ContactSvg } from '../../../icons/ic20/contact.svg';
 import { ReactComponent as ForwardSvg } from '../../../icons/ic20/forward.svg';
 import { ReactComponent as ReplySvg } from '../../../icons/ic20/reply.svg';
-import { IMessageDecodedSerializedContent } from '../../../indexedDB/IndexedDB';
+import { IMessageDecodedContent, MessageDecodedContentType } from '../../../indexedDB/IndexedDB';
 import { FolderId, ILinkedMessage, mailStore, useMailList } from '../../../stores/MailList';
 import { globalOutgoingMailData, OutgoingMailData } from '../../../stores/outgoingMailData';
 import { RoutePath } from '../../../stores/routePath';
@@ -35,7 +35,7 @@ export const MailDetailsPage = observer(() => {
 	const openMailCopmpose = useOpenMailCopmpose();
 
 	const initialMessage = mailStore.lastMessagesList.find(m => m.id === id!);
-	const initialDecodedContent: IMessageDecodedSerializedContent | undefined =
+	const initialDecodedContent: IMessageDecodedContent | undefined =
 		initialMessage && mailStore.decodedMessagesById[initialMessage.msgId];
 
 	useEffect(() => {
@@ -235,7 +235,8 @@ export const MailDetailsPage = observer(() => {
 														onForwardClick(
 															message.message,
 															decoded.decodedTextData
-																? decoded.decodedTextData.type === 'YMF'
+																? decoded.decodedTextData.type ===
+																  MessageDecodedContentType.YMF
 																	? decoded.decodedTextData.value.toString()
 																	: decoded.decodedTextData.value
 																: null,
@@ -263,7 +264,8 @@ export const MailDetailsPage = observer(() => {
 										onForwardClick(
 											initialMessage,
 											initialDecodedContent.decodedTextData
-												? initialDecodedContent.decodedTextData.type === 'YMF'
+												? initialDecodedContent.decodedTextData.type ===
+												  MessageDecodedContentType.YMF
 													? initialDecodedContent.decodedTextData.value.toString()
 													: initialDecodedContent.decodedTextData.value
 												: null,
@@ -294,7 +296,8 @@ export const MailDetailsPage = observer(() => {
 										onForwardClick(
 											initialMessage,
 											initialDecodedContent.decodedTextData
-												? initialDecodedContent.decodedTextData.type === 'YMF'
+												? initialDecodedContent.decodedTextData.type ===
+												  MessageDecodedContentType.YMF
 													? initialDecodedContent.decodedTextData.value.toString()
 													: initialDecodedContent.decodedTextData.value
 												: null,

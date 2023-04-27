@@ -10,6 +10,7 @@ import { CheckBox } from '../../../../components/checkBox/checkBox';
 import { ContactName } from '../../../../components/contactName/contactName';
 import { ReadableDate } from '../../../../components/readableDate/readableDate';
 import { ReactComponent as FilterSvg } from '../../../../icons/ic20/filter.svg';
+import { MessageDecodedContentType } from '../../../../indexedDB/IndexedDB';
 import domain from '../../../../stores/Domain';
 import { FolderId, ILinkedMessage, mailStore } from '../../../../stores/MailList';
 import { RoutePath } from '../../../../stores/routePath';
@@ -71,7 +72,7 @@ const MailboxListRow: React.FC<MailboxListRowProps> = observer(
 			if (!decoded) {
 				return null;
 			}
-			if (decoded.decodedTextData?.type === 'YMF') {
+			if (decoded.decodedTextData?.type === MessageDecodedContentType.YMF) {
 				const val = YMF.fromYMFText(decoded.decodedTextData.value).toPlainText();
 				console.log('val: ', val);
 				return val;

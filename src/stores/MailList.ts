@@ -16,8 +16,8 @@ import {
 import { makeAutoObservable } from 'mobx';
 import { useCallback, useEffect, useState } from 'react';
 
-import { IMessageDecodedSerializedContent } from '../indexedDB/IndexedDB';
 import messagesDB from '../indexedDB/impl/MessagesDB';
+import { IMessageDecodedContent, MessageDecodedContentType } from '../indexedDB/IndexedDB';
 import { invariant } from '../utils/assert';
 import { formatAddress } from '../utils/blockchain';
 import { analytics } from './Analytics';
@@ -259,7 +259,7 @@ class MailStore {
 	lastActiveFolderId: FolderId = FolderId.Inbox;
 	lastMessagesList: ILinkedMessage[] = [];
 
-	decodedMessagesById: Record<string, IMessageDecodedSerializedContent> = {};
+	decodedMessagesById: Record<string, IMessageDecodedContent> = {};
 	readMessageIds = new Set<string>();
 
 	deletedMessageIds = new Set<string>();
@@ -299,11 +299,11 @@ class MailStore {
 			decodedTextData:
 				decodedMessage.decodedTextData instanceof YMF
 					? {
-							type: 'YMF' as const,
+							type: MessageDecodedContentType.YMF,
 							value: decodedMessage.decodedTextData.toString(),
 					  }
 					: {
-							type: 'plain' as const,
+							type: MessageDecodedContentType.PLAIN,
 							value: decodedMessage.decodedTextData,
 					  },
 		};

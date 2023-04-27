@@ -1,7 +1,7 @@
 import { IMessage } from '@ylide/sdk';
 import { toJS } from 'mobx';
 
-import { IMessageDecodedSerializedContent, IndexedDB } from '../IndexedDB';
+import { IMessageDecodedContent, IndexedDB } from '../IndexedDB';
 
 class MessagesDB extends IndexedDB {
 	async saveMessage(msg: IMessage): Promise<void> {
@@ -24,17 +24,17 @@ class MessagesDB extends IndexedDB {
 		await db.clear('messages');
 	}
 
-	async saveDecodedMessage(msg: IMessageDecodedSerializedContent) {
+	async saveDecodedMessage(msg: IMessageDecodedContent) {
 		const db = await this.getDB();
 		await db.put('decodedMessages', toJS(msg));
 	}
 
-	async retrieveAllDecodedMessages(): Promise<IMessageDecodedSerializedContent[]> {
+	async retrieveAllDecodedMessages(): Promise<IMessageDecodedContent[]> {
 		const db = await this.getDB();
 		return await db.getAll('decodedMessages');
 	}
 
-	async retrieveDecodedMessageById(id: string): Promise<IMessageDecodedSerializedContent | null> {
+	async retrieveDecodedMessageById(id: string): Promise<IMessageDecodedContent | null> {
 		const db = await this.getDB();
 		return (await db.get('decodedMessages', id)) || null;
 	}
