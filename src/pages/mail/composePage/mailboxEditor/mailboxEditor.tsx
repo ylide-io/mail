@@ -4,7 +4,7 @@ import React, { useRef, useState } from 'react';
 import { createReactEditorJS } from 'react-editor-js';
 
 import { OutgoingMailData } from '../../../../stores/outgoingMailData';
-import { EDITOR_JS_TOOLS } from '../../../../utils/editorJs';
+import { EDITOR_JS_TOOLS } from '../../../../utils/mail';
 
 const ReactEditorJS = createReactEditorJS();
 

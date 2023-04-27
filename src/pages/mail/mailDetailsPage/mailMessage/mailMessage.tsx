@@ -16,8 +16,7 @@ import contacts from '../../../../stores/Contacts';
 import { FolderId, ILinkedMessage, mailStore } from '../../../../stores/MailList';
 import { formatAddress } from '../../../../utils/blockchain';
 import { DateFormatStyle } from '../../../../utils/date';
-import { decodedTextDataToEditorJsData, EDITOR_JS_TOOLS } from '../../../../utils/editorJs';
-import { formatSubject } from '../../../../utils/mail';
+import { decodedTextDataToEditorJsData, EDITOR_JS_TOOLS, formatSubject } from '../../../../utils/mail';
 import css from './mailMessage.module.scss';
 
 const ReactEditorJS = createReactEditorJS();

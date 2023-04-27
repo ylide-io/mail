@@ -17,8 +17,12 @@ import { FolderId, ILinkedMessage, mailStore, useMailList } from '../../../store
 import { globalOutgoingMailData, OutgoingMailData } from '../../../stores/outgoingMailData';
 import { RoutePath } from '../../../stores/routePath';
 import { DateFormatStyle, formatDate } from '../../../utils/date';
-import { decodedTextDataToEditorJsData, plainTextToEditorJsData } from '../../../utils/editorJs';
-import { formatSubject, useOpenMailCopmpose } from '../../../utils/mail';
+import {
+	decodedTextDataToEditorJsData,
+	formatSubject,
+	plainTextToEditorJsData,
+	useOpenMailCopmpose,
+} from '../../../utils/mail';
 import { useNav } from '../../../utils/url';
 import css from './mailDetailsPage.module.scss';
 import { MailMessage } from './mailMessage/mailMessage';

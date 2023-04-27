@@ -10,8 +10,7 @@ import {
 import { OutgoingMailData } from '../../stores/outgoingMailData';
 import { HorizontalAlignment } from '../../utils/alignment';
 import { copyToClipboard } from '../../utils/clipboard';
-import { plainTextToEditorJsData } from '../../utils/editorJs';
-import { useOpenMailCopmpose } from '../../utils/mail';
+import { plainTextToEditorJsData, useOpenMailCopmpose } from '../../utils/mail';
 import { AnchoredPopup } from '../popup/anchoredPopup/anchoredPopup';
 import { toast } from '../toast/toast';
 import { ReactComponent as ClipboardSvg } from './icons/clipboard.svg';

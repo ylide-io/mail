@@ -25,7 +25,7 @@ import mailer from '../../../../../stores/Mailer';
 import { OutgoingMailData } from '../../../../../stores/outgoingMailData';
 import { connectAccount } from '../../../../../utils/account';
 import { blockchainMeta, evmNameToNetwork } from '../../../../../utils/blockchain';
-import { editorJsToYMF } from '../../../../../utils/editorJs';
+import { editorJsToYMF } from '../../../../../utils/mail';
 import { truncateInMiddle } from '../../../../../utils/string';
 import { getEvmWalletNetwork } from '../../../../../utils/wallet';
 

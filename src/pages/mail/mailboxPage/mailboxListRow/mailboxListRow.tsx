@@ -13,8 +13,7 @@ import domain from '../../../../stores/Domain';
 import { FolderId, ILinkedMessage, mailStore } from '../../../../stores/MailList';
 import { RoutePath } from '../../../../stores/routePath';
 import { formatAddress } from '../../../../utils/blockchain';
-import { decodedTextDataToPlainText } from '../../../../utils/editorJs';
-import { formatSubject } from '../../../../utils/mail';
+import { decodedTextDataToPlainText, formatSubject } from '../../../../utils/mail';
 import { useNav } from '../../../../utils/url';
 import css from './mailboxListRow.module.scss';
 
