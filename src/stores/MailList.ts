@@ -77,7 +77,7 @@ async function wrapMessage(p: IMessageWithSource): Promise<ILinkedMessage> {
 
 	let recipients: string[] = [];
 	try {
-		recipients = (await (reader as EthereumBlockchainController).getMessageRecipients(p.msg, true)).recipients.map(
+		recipients = (await (reader as EthereumBlockchainController).getMessageRecipients(p.msg, true))!.recipients.map(
 			formatAddress,
 		);
 	} catch (e) {}
