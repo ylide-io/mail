@@ -13,7 +13,7 @@ export class OutgoingMailData {
 
 	subject = '';
 	editorData?: OutputData;
-	plainTextData?: string;
+	plainTextData: string = '';
 
 	attachments: File[] = [];
 
@@ -43,7 +43,7 @@ export class OutgoingMailData {
 
 		this.subject = data?.subject || '';
 		this.editorData = data?.editorData;
-		this.plainTextData = data?.plainTextData;
+		this.plainTextData = data?.plainTextData || '';
 
 		this.attachments = data?.attachments || [];
 	}

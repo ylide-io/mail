@@ -146,7 +146,7 @@ export const SendMailButton = observer(({ className, mailData, onSent }: SendMai
 			if (mailData.hasEditorData) {
 				content = editorJsToYMF(mailData.editorData);
 			} else {
-				content = YMF.fromPlainText(mailData.plainTextData!.trim());
+				content = YMF.fromPlainText(mailData.plainTextData.trim());
 			}
 
 			const msgId = await mailer.sendMail(
