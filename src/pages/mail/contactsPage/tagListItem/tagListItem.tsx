@@ -7,7 +7,7 @@ import { toast } from '../../../../components/toast/toast';
 import { ReactComponent as EditSvg } from '../../../../icons/ic20/edit.svg';
 import { ReactComponent as TickSvg } from '../../../../icons/ic20/tick.svg';
 import { ReactComponent as TrashSvg } from '../../../../icons/ic20/trash.svg';
-import { ITag } from '../../../../stores/models/ITag';
+import { ITag } from '../../../../indexedDB/IndexedDB';
 import tags from '../../../../stores/Tags';
 import { allColors } from '../../../../utils/colors';
 import css from './tagListItem.module.scss';

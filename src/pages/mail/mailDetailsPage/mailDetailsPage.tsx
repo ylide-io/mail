@@ -12,7 +12,7 @@ import { ReactComponent as ArrowLeftSvg } from '../../../icons/ic20/arrowLeft.sv
 import { ReactComponent as ContactSvg } from '../../../icons/ic20/contact.svg';
 import { ReactComponent as ForwardSvg } from '../../../icons/ic20/forward.svg';
 import { ReactComponent as ReplySvg } from '../../../icons/ic20/reply.svg';
-import { IMessageDecodedSerializedContent } from '../../../indexedDB/MessagesDB';
+import { IMessageDecodedSerializedContent } from '../../../indexedDB/IndexedDB';
 import { FolderId, ILinkedMessage, mailStore, useMailList } from '../../../stores/MailList';
 import { globalOutgoingMailData, OutgoingMailData } from '../../../stores/outgoingMailData';
 import { RoutePath } from '../../../stores/routePath';

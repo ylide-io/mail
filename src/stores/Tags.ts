@@ -1,8 +1,8 @@
 import { makeAutoObservable } from 'mobx';
 
+import { ITag } from '../indexedDB/IndexedDB';
 import tagsDB from '../indexedDB/TagsDB';
 import { colors } from '../utils/colors';
-import { ITag } from './models/ITag';
 
 class Tags {
 	tags: ITag[] = [];

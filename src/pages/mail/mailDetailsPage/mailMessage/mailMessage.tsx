@@ -12,10 +12,9 @@ import { ReactComponent as AddContactSvg } from '../../../../icons/ic20/addConta
 import { ReactComponent as ForwardSvg } from '../../../../icons/ic20/forward.svg';
 import { ReactComponent as ReplySvg } from '../../../../icons/ic20/reply.svg';
 import { ReactComponent as TrashSvg } from '../../../../icons/ic20/trash.svg';
-import { IMessageDecodedSerializedContent } from '../../../../indexedDB/MessagesDB';
+import { IContact, IMessageDecodedSerializedContent } from '../../../../indexedDB/IndexedDB';
 import contacts from '../../../../stores/Contacts';
 import { FolderId, ILinkedMessage, mailStore } from '../../../../stores/MailList';
-import { IContact } from '../../../../stores/models/IContact';
 import { formatAddress } from '../../../../utils/blockchain';
 import { DateFormatStyle } from '../../../../utils/date';
 import { decodeEditorData, EDITOR_JS_TOOLS } from '../../../../utils/editorJs';

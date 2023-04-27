@@ -1,9 +1,26 @@
 import { IMessage } from '@ylide/sdk';
 import { DBSchema, IDBPDatabase, openDB } from 'idb';
 
-import { IContact } from '../stores/models/IContact';
-import { ITag } from '../stores/models/ITag';
-import { IMessageDecodedSerializedContent } from './MessagesDB';
+export interface IMessageDecodedSerializedContent {
+	msgId: string;
+	decodedTextData: { type: 'plain'; value: string } | { type: 'YMF'; value: string } | null;
+	decodedSubject: string | null;
+}
+
+export interface IContact {
+	name: string;
+	address: string;
+	description: string;
+	tags: number[];
+	img?: string;
+}
+
+export interface ITag {
+	id: number;
+	name: string;
+	color: string;
+	icon: string;
+}
 
 interface DBInterface extends DBSchema {
 	messages: {

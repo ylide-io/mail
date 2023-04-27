@@ -1,7 +1,7 @@
 import { Avatar } from 'antd';
 import React from 'react';
 
-import { IContact } from '../../stores/models/IContact';
+import { IContact } from '../../indexedDB/IndexedDB';
 import { Blockie } from '../blockie/blockie';
 import { PropsWithClassName } from '../props';
 

@@ -2,10 +2,9 @@ import fuzzysort from 'fuzzysort';
 import { makeAutoObservable } from 'mobx';
 
 import contactsDB from '../indexedDB/ContactsDB';
+import { IContact, ITag } from '../indexedDB/IndexedDB';
 import { invariant } from '../utils/assert';
 import { formatAddress } from '../utils/blockchain';
-import { IContact } from './models/IContact';
-import { ITag } from './models/ITag';
 
 class Contacts {
 	loading = false;
