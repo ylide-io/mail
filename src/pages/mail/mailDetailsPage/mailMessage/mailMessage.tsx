@@ -1,4 +1,3 @@
-import { YMF } from '@ylide/sdk';
 import { observer } from 'mobx-react';
 import React, { useEffect, useMemo, useState } from 'react';
 import { createReactEditorJS } from 'react-editor-js';
@@ -39,7 +38,7 @@ export const MailMessage = observer(
 		const editorData = useMemo(() => {
 			if (!decoded?.decodedTextData) return null;
 			if (decoded.decodedTextData.type === MessageDecodedContentType.YMF) {
-				return ymfToEditorJs(YMF.fromYMFText(decoded.decodedTextData.value));
+				return ymfToEditorJs(decoded.decodedTextData.value);
 			} else {
 				const json = decodeEditorData(decoded.decodedTextData.value);
 				const isQamonMessage = !json?.blocks;

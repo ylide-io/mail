@@ -16,7 +16,7 @@ import {
 import { makeAutoObservable } from 'mobx';
 import { useCallback, useEffect, useState } from 'react';
 
-import messagesDB from '../indexedDB/impl/MessagesDB';
+import messagesDB, { MessagesDB } from '../indexedDB/impl/MessagesDB';
 import { IMessageDecodedContent, MessageDecodedContentType } from '../indexedDB/IndexedDB';
 import { invariant } from '../utils/assert';
 import { formatAddress } from '../utils/blockchain';
@@ -48,7 +48,11 @@ export function getFolderName(folderId: FolderId) {
 
 //
 
-export async function decodeMessage(msgId: string, msg: IMessage, recepient: IGenericAccount) {
+export async function decodeMessage(
+	msgId: string,
+	msg: IMessage,
+	recepient: IGenericAccount,
+): Promise<IMessageDecodedContent> {
 	const content = await domain.ylide.core.getMessageContent(msg);
 	invariant(content && !content.corrupted, 'Content is not available or corrupted');
 
@@ -59,7 +63,16 @@ export async function decodeMessage(msgId: string, msg: IMessage, recepient: IGe
 	return {
 		msgId,
 		decodedSubject: result.content.subject,
-		decodedTextData: result.content.content,
+		decodedTextData:
+			result.content.content instanceof YMF
+				? {
+						type: MessageDecodedContentType.YMF,
+						value: result.content.content,
+				  }
+				: {
+						type: MessageDecodedContentType.PLAIN,
+						value: result.content.content,
+				  },
 	};
 }
 
@@ -273,7 +286,7 @@ class MailStore {
 		this.decodedMessagesById = dbDecodedMessages.reduce(
 			(p, c) => ({
 				...p,
-				[c.msgId]: c,
+				[c.msgId]: MessagesDB.deserializeMessageDecodedContent(c),
 			}),
 			{},
 		);
@@ -294,24 +307,10 @@ class MailStore {
 
 		const decodedMessage = await decodeMessage(pushMsg.msgId, pushMsg.msg, pushMsg.recipient!.account);
 
-		const serializedMsg = {
-			...decodedMessage,
-			decodedTextData:
-				decodedMessage.decodedTextData instanceof YMF
-					? {
-							type: MessageDecodedContentType.YMF,
-							value: decodedMessage.decodedTextData.toString(),
-					  }
-					: {
-							type: MessageDecodedContentType.PLAIN,
-							value: decodedMessage.decodedTextData,
-					  },
-		};
-
-		this.decodedMessagesById[pushMsg.msgId] = serializedMsg;
+		this.decodedMessagesById[pushMsg.msgId] = decodedMessage;
 
 		if (browserStorage.saveDecodedMessages) {
-			await messagesDB.saveDecodedMessage(serializedMsg);
+			await messagesDB.saveDecodedMessage(MessagesDB.serializeMessageDecodedContent(decodedMessage));
 		}
 	}
 

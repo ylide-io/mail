@@ -1,9 +1,46 @@
-import { IMessage } from '@ylide/sdk';
+import { IMessage, YMF } from '@ylide/sdk';
 import { toJS } from 'mobx';
 
-import { DBTable, IMessageDecodedContent, IndexedDB } from '../IndexedDB';
+import {
+	DBTable,
+	IMessageDecodedContent,
+	IMessageDecodedSerializedContent,
+	IndexedDB,
+	MessageDecodedContentType,
+} from '../IndexedDB';
 
-class MessagesDB extends IndexedDB {
+export class MessagesDB extends IndexedDB {
+	static serializeMessageDecodedContent(content: IMessageDecodedContent): IMessageDecodedSerializedContent {
+		return {
+			...content,
+			decodedTextData: content.decodedTextData && {
+				...content.decodedTextData,
+				value: content.decodedTextData.value.toString(),
+			},
+		};
+	}
+
+	static deserializeMessageDecodedContent(content: IMessageDecodedSerializedContent): IMessageDecodedContent {
+		return {
+			...content,
+			decodedTextData:
+				content.decodedTextData &&
+				(content.decodedTextData.type === MessageDecodedContentType.YMF
+					? {
+							...content.decodedTextData,
+							type: MessageDecodedContentType.YMF,
+							value: YMF.fromYMFText(content.decodedTextData.value),
+					  }
+					: {
+							...content.decodedTextData,
+							type: MessageDecodedContentType.PLAIN,
+							value: content.decodedTextData.value,
+					  }),
+		};
+	}
+
+	//
+
 	async saveMessage(msg: IMessage): Promise<void> {
 		const db = await this.getDB();
 		await db.put(DBTable.MESSAGES, toJS(msg));
@@ -24,17 +61,17 @@ class MessagesDB extends IndexedDB {
 		await db.clear(DBTable.MESSAGES);
 	}
 
-	async saveDecodedMessage(msg: IMessageDecodedContent) {
+	async saveDecodedMessage(msg: IMessageDecodedSerializedContent) {
 		const db = await this.getDB();
 		await db.put(DBTable.DECODED_MESSAGES, toJS(msg));
 	}
 
-	async retrieveAllDecodedMessages(): Promise<IMessageDecodedContent[]> {
+	async retrieveAllDecodedMessages(): Promise<IMessageDecodedSerializedContent[]> {
 		const db = await this.getDB();
 		return await db.getAll(DBTable.DECODED_MESSAGES);
 	}
 
-	async retrieveDecodedMessageById(id: string): Promise<IMessageDecodedContent | null> {
+	async retrieveDecodedMessageById(id: string): Promise<IMessageDecodedSerializedContent | null> {
 		const db = await this.getDB();
 		return (await db.get(DBTable.DECODED_MESSAGES, id)) || null;
 	}

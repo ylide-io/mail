@@ -1,4 +1,3 @@
-import { YMF } from '@ylide/sdk';
 import { Tooltip } from 'antd';
 import clsx from 'clsx';
 import { observer } from 'mobx-react';
@@ -73,11 +72,11 @@ const MailboxListRow: React.FC<MailboxListRowProps> = observer(
 				return null;
 			}
 			if (decoded.decodedTextData?.type === MessageDecodedContentType.YMF) {
-				const val = YMF.fromYMFText(decoded.decodedTextData.value).toPlainText();
+				const val = decoded.decodedTextData.value.toPlainText();
 				console.log('val: ', val);
 				return val;
 			} else {
-				const json = decodeEditorData(decoded?.decodedTextData?.value);
+				const json = decodeEditorData(decoded.decodedTextData?.value);
 				if (json?.blocks) {
 					return json?.blocks.map((b: any) => b.data.text).join('\n');
 				} else {
