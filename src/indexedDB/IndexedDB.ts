@@ -27,27 +27,36 @@ export interface ITag {
 	icon: string;
 }
 
+export enum DBTable {
+	MESSAGES = 'messages',
+	READ_MESSAGES = 'readMessages',
+	DECODED_MESSAGES = 'decodedMessages',
+	DELETED_MESSAGES = 'deletedMessages',
+	CONTACTS = 'contacts',
+	TAGS = 'tags',
+}
+
 interface DBInterface extends DBSchema {
-	messages: {
+	[DBTable.MESSAGES]: {
 		value: IMessage;
 		key: string;
 		indexes: {
 			createdAt: number;
 		};
 	};
-	readMessages: {
+	[DBTable.READ_MESSAGES]: {
 		value: { msgId: string; readAt: string };
 		key: string;
 	};
-	decodedMessages: {
+	[DBTable.DECODED_MESSAGES]: {
 		value: IMessageDecodedContent;
 		key: string;
 	};
-	deletedMessages: {
+	[DBTable.DELETED_MESSAGES]: {
 		value: { msgId: string; accountAddress: string; deletedAt: string };
 		key: string;
 	};
-	contacts: {
+	[DBTable.CONTACTS]: {
 		value: IContact;
 		key: string;
 		indexes: {
@@ -55,7 +64,7 @@ interface DBInterface extends DBSchema {
 			address: string;
 		};
 	};
-	tags: {
+	[DBTable.TAGS]: {
 		value: ITag;
 		key: number;
 		indexes: {
@@ -70,14 +79,14 @@ export class IndexedDB {
 	private async openDB() {
 		return await openDB<DBInterface>('mail-2', 1, {
 			upgrade(db) {
-				const messagesStore = db.createObjectStore('messages', {
+				const messagesStore = db.createObjectStore(DBTable.MESSAGES, {
 					keyPath: 'msgId',
 				});
 				messagesStore.createIndex('createdAt', 'createdAt');
 
 				// ----------------------
 
-				const contactsStore = db.createObjectStore('contacts', {
+				const contactsStore = db.createObjectStore(DBTable.CONTACTS, {
 					keyPath: 'address',
 				});
 				contactsStore.createIndex('name', 'name');
@@ -108,7 +117,7 @@ export class IndexedDB {
 
 				// ----------------------
 
-				const tagsStore = db.createObjectStore('tags', {
+				const tagsStore = db.createObjectStore(DBTable.TAGS, {
 					keyPath: 'id',
 				});
 
@@ -122,19 +131,19 @@ export class IndexedDB {
 
 				// ----------------------
 
-				db.createObjectStore('readMessages', {
+				db.createObjectStore(DBTable.READ_MESSAGES, {
 					keyPath: 'msgId',
 				});
 
 				// ----------------------
 
-				db.createObjectStore('decodedMessages', {
+				db.createObjectStore(DBTable.DECODED_MESSAGES, {
 					keyPath: 'msgId',
 				});
 
 				// ----------------------
 
-				db.createObjectStore('deletedMessages', {
+				db.createObjectStore(DBTable.DELETED_MESSAGES, {
 					keyPath: 'msgId',
 				});
 			},

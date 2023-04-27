@@ -1,52 +1,52 @@
 import { IMessage } from '@ylide/sdk';
 import { toJS } from 'mobx';
 
-import { IMessageDecodedContent, IndexedDB } from '../IndexedDB';
+import { DBTable, IMessageDecodedContent, IndexedDB } from '../IndexedDB';
 
 class MessagesDB extends IndexedDB {
 	async saveMessage(msg: IMessage): Promise<void> {
 		const db = await this.getDB();
-		await db.put('messages', toJS(msg));
+		await db.put(DBTable.MESSAGES, toJS(msg));
 	}
 
 	async retrieveAllMessages(): Promise<IMessage[]> {
 		const db = await this.getDB();
-		return await db.getAllFromIndex('messages', 'createdAt');
+		return await db.getAllFromIndex(DBTable.MESSAGES, 'createdAt');
 	}
 
 	async retrieveMessageById(id: string): Promise<IMessage | null> {
 		const db = await this.getDB();
-		return (await db.get('messages', id)) || null;
+		return (await db.get(DBTable.MESSAGES, id)) || null;
 	}
 
 	async clearAllMessages(): Promise<void> {
 		const db = await this.getDB();
-		await db.clear('messages');
+		await db.clear(DBTable.MESSAGES);
 	}
 
 	async saveDecodedMessage(msg: IMessageDecodedContent) {
 		const db = await this.getDB();
-		await db.put('decodedMessages', toJS(msg));
+		await db.put(DBTable.DECODED_MESSAGES, toJS(msg));
 	}
 
 	async retrieveAllDecodedMessages(): Promise<IMessageDecodedContent[]> {
 		const db = await this.getDB();
-		return await db.getAll('decodedMessages');
+		return await db.getAll(DBTable.DECODED_MESSAGES);
 	}
 
 	async retrieveDecodedMessageById(id: string): Promise<IMessageDecodedContent | null> {
 		const db = await this.getDB();
-		return (await db.get('decodedMessages', id)) || null;
+		return (await db.get(DBTable.DECODED_MESSAGES, id)) || null;
 	}
 
 	async clearAllDecodedMessages(): Promise<void> {
 		const db = await this.getDB();
-		await db.clear('decodedMessages');
+		await db.clear(DBTable.DECODED_MESSAGES);
 	}
 
 	async saveMessageRead(id: string) {
 		const db = await this.getDB();
-		await db.put('readMessages', {
+		await db.put(DBTable.READ_MESSAGES, {
 			msgId: id,
 			readAt: new Date().toISOString(),
 		});
@@ -54,7 +54,7 @@ class MessagesDB extends IndexedDB {
 
 	async saveMessagesRead(ids: string[]) {
 		const db = await this.getDB();
-		const tx = db.transaction('readMessages', 'readwrite');
+		const tx = db.transaction(DBTable.READ_MESSAGES, 'readwrite');
 		await Promise.all(
 			ids.map(id =>
 				tx.store.put({
@@ -68,32 +68,32 @@ class MessagesDB extends IndexedDB {
 
 	async isMessageRead(id: string): Promise<boolean> {
 		const db = await this.getDB();
-		return (await db.get('readMessages', id)) ? true : false;
+		return (await db.get(DBTable.READ_MESSAGES, id)) ? true : false;
 	}
 
 	async getReadMessages(): Promise<string[]> {
 		const db = await this.getDB();
-		return (await db.getAll('readMessages')).map(v => v.msgId);
+		return (await db.getAll(DBTable.READ_MESSAGES)).map(v => v.msgId);
 	}
 
 	async clearAllReadMessages(): Promise<void> {
 		const db = await this.getDB();
-		await db.clear('readMessages');
+		await db.clear(DBTable.READ_MESSAGES);
 	}
 
 	async retrieveAllReadMessages(): Promise<string[]> {
 		const db = await this.getDB();
-		return (await db.getAll('readMessages')).map(r => r.msgId);
+		return (await db.getAll(DBTable.READ_MESSAGES)).map(r => r.msgId);
 	}
 
 	async retrieveAllDeletedMessages(): Promise<string[]> {
 		const db = await this.getDB();
-		return (await db.getAll('deletedMessages')).map(row => row.msgId);
+		return (await db.getAll(DBTable.DELETED_MESSAGES)).map(row => row.msgId);
 	}
 
 	async saveMessagesDeleted(ids: { id: string; accountAddress: string }[]) {
 		const db = await this.getDB();
-		const tx = db.transaction('deletedMessages', 'readwrite');
+		const tx = db.transaction(DBTable.DELETED_MESSAGES, 'readwrite');
 		await Promise.all(
 			ids.map(v =>
 				tx.store.put({
@@ -108,14 +108,14 @@ class MessagesDB extends IndexedDB {
 
 	async saveMessagesNotDeleted(ids: { id: string; accountAddress: string }[]) {
 		const db = await this.getDB();
-		const tx = db.transaction('deletedMessages', 'readwrite');
+		const tx = db.transaction(DBTable.DELETED_MESSAGES, 'readwrite');
 		await Promise.all(ids.map(v => tx.store.delete(v.id)));
 		await tx.done;
 	}
 
 	async saveMessageDeleted(id: string, accountAddress: string) {
 		const db = await this.getDB();
-		await db.put('deletedMessages', {
+		await db.put(DBTable.DELETED_MESSAGES, {
 			msgId: id,
 			accountAddress,
 			deletedAt: new Date().toISOString(),
@@ -124,17 +124,17 @@ class MessagesDB extends IndexedDB {
 
 	async restoreDeletedMessage(id: string) {
 		const db = await this.getDB();
-		await db.delete('deletedMessages', id);
+		await db.delete(DBTable.DELETED_MESSAGES, id);
 	}
 
 	async isMessageDeleted(id: string): Promise<boolean> {
 		const db = await this.getDB();
-		return (await db.get('deletedMessages', id)) ? true : false;
+		return (await db.get(DBTable.DELETED_MESSAGES, id)) ? true : false;
 	}
 
 	async clearAllDeletedMessages(): Promise<void> {
 		const db = await this.getDB();
-		await db.clear('deletedMessages');
+		await db.clear(DBTable.DELETED_MESSAGES);
 	}
 }
 
