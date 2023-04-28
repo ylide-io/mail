@@ -74,6 +74,12 @@ export async function decodeAttachment(data: Uint8Array, msg: IMessage, recipien
 
 //
 
+const EMPTY_OUTPUT_DATA: OutputData = {
+	time: 1676587472156,
+	version: '2.26.5',
+	blocks: [],
+};
+
 export const EDITOR_JS_TOOLS = {
 	list: List,
 	header: Header,
@@ -85,11 +91,7 @@ function decodeEditorJsData(data: string): OutputData | undefined {
 
 		// Qamon message
 		if (!json?.blocks && json.body) {
-			return {
-				time: 1676587472156,
-				blocks: [{ id: '2cC8_Z_Rad', type: 'paragraph', data: { text: json.body } }],
-				version: '2.26.5',
-			};
+			return plainTextToEditorJsData(json.body);
 		}
 
 		invariant(json.blocks);
@@ -103,6 +105,7 @@ function generateEditorJsId() {
 
 export function plainTextToEditorJsData(text: string): OutputData {
 	return {
+		...EMPTY_OUTPUT_DATA,
 		blocks: text.split('\n').map(line => ({
 			id: generateEditorJsId(),
 			type: 'paragraph',
@@ -302,15 +305,13 @@ export function ymfToEditorJs(ymf: YMF) {
 		}
 
 		return {
-			time: 1676587472156,
+			...EMPTY_OUTPUT_DATA,
 			blocks,
-			version: '2.26.5',
 		};
 	} else {
 		return {
-			time: 1676587472156,
-			blocks: [{ id: '2cC8_Z_Rad', type: 'paragraph', data: { text: ymf.toPlainText() } }],
-			version: '2.26.5',
+			...EMPTY_OUTPUT_DATA,
+			blocks: [{ id: generateEditorJsId(), type: 'paragraph', data: { text: ymf.toPlainText() } }],
 		};
 	}
 }
