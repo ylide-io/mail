@@ -130,6 +130,7 @@ class Mailer {
 					sender: sender.account,
 					content,
 					recipients,
+					secureContext,
 					serviceCode: ServiceCode.MAIL,
 					feedId,
 				},
