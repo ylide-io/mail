@@ -1,4 +1,4 @@
-import { IMessageAttachmentLinkV1, YlideIpfsStorage } from '@ylide/sdk';
+import { MessageAttachment, MessageAttachmentLinkV1, YlideIpfsStorage } from '@ylide/sdk';
 import { observer } from 'mobx-react';
 import React, { useEffect, useMemo, useState } from 'react';
 import { createReactEditorJS } from 'react-editor-js';
@@ -17,6 +17,7 @@ import { ReactComponent as TrashSvg } from '../../../../icons/ic20/trash.svg';
 import { IContact, IMessageDecodedContent } from '../../../../indexedDB/IndexedDB';
 import contacts from '../../../../stores/Contacts';
 import { FolderId, ILinkedMessage, mailStore } from '../../../../stores/MailList';
+import { invariant } from '../../../../utils/assert';
 import { formatAddress } from '../../../../utils/blockchain';
 import { DateFormatStyle } from '../../../../utils/date';
 import { downloadFile, formatFileSize } from '../../../../utils/file';
@@ -164,11 +165,13 @@ export const MailMessage = observer(
 //
 
 interface AttachmentProps {
-	attachment: IMessageAttachmentLinkV1;
+	attachment: MessageAttachment;
 	message: ILinkedMessage;
 }
 
 export function Attachment({ attachment, message }: AttachmentProps) {
+	invariant(attachment instanceof MessageAttachmentLinkV1);
+
 	const [isDownloading, setDownloading] = useState(false);
 
 	const onDownloadClick = async () => {

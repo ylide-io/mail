@@ -8,8 +8,8 @@ import { IMessageDecodedContent, IMessageDecodedTextData, MessageDecodedTextData
 import {
 	IGenericAccount,
 	IMessage,
-	IMessageAttachmentLinkV1,
 	IYMFTagNode,
+	MessageAttachmentLinkV1,
 	MessageContainer,
 	MessageContentV4,
 	YMF,
@@ -58,10 +58,7 @@ export async function decodeMessage(
 						type: MessageDecodedTextDataType.PLAIN,
 						value: result.content.content,
 				  },
-		attachments:
-			result.content instanceof MessageContentV4
-				? (result.content.attachments as unknown as IMessageAttachmentLinkV1[])
-				: [],
+		attachments: result.content instanceof MessageContentV4 ? result.content.attachments : [],
 	};
 }
 
@@ -70,6 +67,14 @@ export async function decodeAttachment(data: Uint8Array, msg: IMessage, recipien
 	const unpackedContainer = MessageContainer.unpackContainter(content.content);
 	const secureContext = await domain.ylide.core.getMessageSecureContext(recipient, msg, unpackedContainer);
 	return secureContext.decrypt(data);
+}
+
+export function bytesToAttachment(bytes: Uint8Array) {
+	if (MessageAttachmentLinkV1.isValid(bytes)) {
+		return MessageAttachmentLinkV1.fromBytes(bytes);
+	} else {
+		throw new Error('Invalid attachemnt bytes');
+	}
 }
 
 //
