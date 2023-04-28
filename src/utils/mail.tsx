@@ -5,7 +5,15 @@ import Header from '@editorjs/header';
 import { nanoid } from 'nanoid';
 import { OutputData } from '@editorjs/editorjs';
 import { IMessageDecodedContent, IMessageDecodedTextData, MessageDecodedTextDataType } from '../indexedDB/IndexedDB';
-import { IGenericAccount, IMessage, IYMFTagNode, MessageContainer, MessageContentV4, YMF } from '@ylide/sdk';
+import {
+	IGenericAccount,
+	IMessage,
+	IMessageAttachmentLinkV1,
+	IYMFTagNode,
+	MessageContainer,
+	MessageContentV4,
+	YMF,
+} from '@ylide/sdk';
 import { generatePath, useLocation } from 'react-router-dom';
 import { useNav } from './url';
 import { globalOutgoingMailData, OutgoingMailData } from '../stores/outgoingMailData';
@@ -50,7 +58,10 @@ export async function decodeMessage(
 						type: MessageDecodedTextDataType.PLAIN,
 						value: result.content.content,
 				  },
-		attachments: result.content instanceof MessageContentV4 ? result.content.attachments : [],
+		attachments:
+			result.content instanceof MessageContentV4
+				? (result.content.attachments as unknown as IMessageAttachmentLinkV1[])
+				: [],
 	};
 }
 

@@ -1,4 +1,4 @@
-import { IMessage, MessageAttachment, YMF } from '@ylide/sdk';
+import { IMessage, IMessageAttachmentLinkV1, YMF } from '@ylide/sdk';
 import { DBSchema, IDBPDatabase, openDB } from 'idb';
 
 export enum MessageDecodedTextDataType {
@@ -14,7 +14,7 @@ export interface IMessageDecodedContent {
 	msgId: string;
 	decodedTextData: IMessageDecodedTextData;
 	decodedSubject: string;
-	attachments: MessageAttachment[];
+	attachments: IMessageAttachmentLinkV1[];
 }
 
 export interface IMessageDecodedSerializedContent {
@@ -23,7 +23,7 @@ export interface IMessageDecodedSerializedContent {
 		| { type: MessageDecodedTextDataType.PLAIN; value: string }
 		| { type: MessageDecodedTextDataType.YMF; value: string };
 	decodedSubject: string;
-	attachments?: MessageAttachment[];
+	attachments?: IMessageAttachmentLinkV1[];
 }
 
 export interface IContact {

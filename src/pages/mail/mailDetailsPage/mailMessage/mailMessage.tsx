@@ -1,4 +1,4 @@
-import { MessageAttachmentLinkV1, YlideIpfsStorage } from '@ylide/sdk';
+import { IMessageAttachmentLinkV1, YlideIpfsStorage } from '@ylide/sdk';
 import { observer } from 'mobx-react';
 import React, { useEffect, useMemo, useState } from 'react';
 import { createReactEditorJS } from 'react-editor-js';
@@ -54,9 +54,6 @@ export const MailMessage = observer(
 				onReady?.();
 			}
 		}, [isEditorReady, onReady]);
-
-		const linkAttachments =
-			(decoded?.attachments.filter(a => a instanceof MessageAttachmentLinkV1) as MessageAttachmentLinkV1[]) || [];
 
 		return (
 			<div className={css.root}>
@@ -151,9 +148,9 @@ export const MailMessage = observer(
 						</div>
 					)}
 
-					{!!linkAttachments.length && (
+					{!!decoded?.attachments.length && (
 						<div className={css.attachments}>
-							{linkAttachments.map(a => (
+							{decoded.attachments.map(a => (
 								<Attachment attachment={a} message={message} />
 							))}
 						</div>
@@ -167,7 +164,7 @@ export const MailMessage = observer(
 //
 
 interface AttachmentProps {
-	attachment: MessageAttachmentLinkV1;
+	attachment: IMessageAttachmentLinkV1;
 	message: ILinkedMessage;
 }
 
