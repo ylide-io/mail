@@ -3,6 +3,7 @@ import { EVMNetwork } from '@ylide/ethereum';
 import { autorun, makeAutoObservable } from 'mobx';
 
 import { Recipients } from '../components/recipientInput/recipientInput';
+import { isEmptyEditorJsData } from '../utils/mail';
 import domain from './Domain';
 import { DomainAccount } from './models/DomainAccount';
 
@@ -29,7 +30,7 @@ export class OutgoingMailData {
 	}
 
 	get hasEditorData() {
-		return !!this.editorData?.blocks.length;
+		return !isEmptyEditorJsData(this.editorData);
 	}
 
 	get hasPlainTextData() {

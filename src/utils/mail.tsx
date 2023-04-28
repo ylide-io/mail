@@ -116,11 +116,24 @@ export function plainTextToEditorJsData(text: string): OutputData {
 	};
 }
 
+export function editorJsDataToPlainText(data: OutputData | undefined) {
+	return data?.blocks.map((b: any) => b.data.text).join('\n');
+}
+
+export function isEmptyEditorJsData(data: OutputData | undefined) {
+	return !editorJsDataToPlainText(data);
+}
+
 export function decodedTextDataToEditorJsData(decodedTextData: IMessageDecodedTextData): OutputData | undefined {
 	if (decodedTextData.type === MessageDecodedTextDataType.YMF) {
-		return ymfToEditorJs(decodedTextData.value);
+		if (!isEmptyYMF(decodedTextData.value)) {
+			return ymfToEditorJs(decodedTextData.value);
+		}
 	} else {
-		return decodeEditorJsData(decodedTextData.value);
+		const data = decodeEditorJsData(decodedTextData.value);
+		if (!isEmptyEditorJsData(data)) {
+			return data;
+		}
 	}
 }
 
@@ -129,7 +142,7 @@ export function decodedTextDataToPlainText(decodedTextData: IMessageDecodedTextD
 		return decodedTextData.value.toPlainText();
 	} else {
 		const data = decodeEditorJsData(decodedTextData.value);
-		return data?.blocks.map((b: any) => b.data.text).join('\n');
+		return editorJsDataToPlainText(data);
 	}
 }
 
@@ -205,6 +218,7 @@ export function parseEditorJsJson(json: any) {
 }
 
 export function editorJsToYMF(json: any) {
+	console.log(json);
 	const nodes: string[] = [];
 	for (const block of json.blocks) {
 		if (block.type === 'paragraph') {
@@ -314,6 +328,10 @@ export function ymfToEditorJs(ymf: YMF) {
 			blocks: [{ id: generateEditorJsId(), type: 'paragraph', data: { text: ymf.toPlainText() } }],
 		};
 	}
+}
+
+export function isEmptyYMF(ymf: YMF) {
+	return !ymf.toString();
 }
 
 //
