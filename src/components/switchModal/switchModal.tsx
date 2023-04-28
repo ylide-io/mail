@@ -111,7 +111,7 @@ export class SwitchModal extends PureComponent<SwitchModalProps> {
 						width: '100%',
 					}}
 				>
-					<div style={{ fontSize: 20 }}>Switch account</div>
+					<div style={{ fontSize: 20 }}>Activate account</div>
 
 					<div>
 						Please unlock you wallet and make sure that both account and network are selected correctly.
