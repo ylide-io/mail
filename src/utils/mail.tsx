@@ -2,7 +2,6 @@
 // eslint-disable-next-line simple-import-sort/imports
 import List from '@editorjs/list';
 import Header from '@editorjs/header';
-import { toJS } from 'mobx';
 import { nanoid } from 'nanoid';
 import { OutputData } from '@editorjs/editorjs';
 import { IMessageDecodedTextData, MessageDecodedTextDataType } from '../indexedDB/IndexedDB';
@@ -18,6 +17,7 @@ import {
 	COMPOSE_MAIL_POPUP_SINGLETON_KEY,
 	ComposeMailPopup,
 } from '../pages/mail/components/composeMailPopup/composeMailPopup';
+import { invariant } from './assert';
 
 export const EDITOR_JS_TOOLS = {
 	list: List,
@@ -25,20 +25,21 @@ export const EDITOR_JS_TOOLS = {
 };
 
 function decodeEditorJsData(data: string): OutputData | undefined {
-	let json: OutputData | undefined;
-
 	try {
-		json = typeof data === 'string' ? JSON.parse(data) : toJS(data);
-	} catch (e) {}
+		const json = JSON.parse(data);
 
-	const isQamonMessage = !json?.blocks;
-	return isQamonMessage
-		? {
+		// Qamon message
+		if (!json?.blocks && json.body) {
+			return {
 				time: 1676587472156,
-				blocks: [{ id: '2cC8_Z_Rad', type: 'paragraph', data: { text: (json as any).body } }],
+				blocks: [{ id: '2cC8_Z_Rad', type: 'paragraph', data: { text: json.body } }],
 				version: '2.26.5',
-		  }
-		: json;
+			};
+		}
+
+		invariant(json.blocks);
+		return json;
+	} catch (e) {}
 }
 
 function generateEditorJsId() {
@@ -58,8 +59,6 @@ export function plainTextToEditorJsData(text: string): OutputData {
 }
 
 export function decodedTextDataToEditorJsData(decodedTextData: IMessageDecodedTextData): OutputData | undefined {
-	if (!decodedTextData) return;
-
 	if (decodedTextData.type === MessageDecodedTextDataType.YMF) {
 		return ymfToEditorJs(decodedTextData.value);
 	} else {
@@ -181,84 +180,84 @@ export function editorJsToYMF(json: any) {
 
 export function ymfToEditorJs(ymf: YMF) {
 	if (
-		!ymf ||
-		ymf.root.children.length !== 1 ||
-		ymf.root.children[0].type !== 'tag' ||
-		ymf.root.children[0].tag !== 'editorjs'
-	)
+		ymf.root.children.length === 1 &&
+		ymf.root.children[0].type === 'tag' &&
+		ymf.root.children[0].tag === 'editorjs'
+	) {
+		const root: IYMFTagNode = ymf.root.children[0];
+		const blocks: any[] = [];
+		for (const child of root.children) {
+			if (child.type === 'text') {
+				// do nothing, skip line breaks
+			} else if (child.type === 'tag') {
+				if (child.tag === 'p') {
+					blocks.push({
+						id: child.attributes['ejs-id'],
+						type: 'paragraph',
+						data: {
+							text: child.children.map(c => YMF.nodeToYMFText(c)).join(''),
+						},
+					});
+				} else if (child.tag.startsWith('h')) {
+					const level = parseInt(child.tag[1], 10);
+					blocks.push({
+						id: child.attributes['ejs-id'],
+						type: 'header',
+						data: {
+							text: child.children.map(c => YMF.nodeToYMFText(c)).join(''),
+							level,
+						},
+					});
+				} else if (child.tag === 'ol') {
+					blocks.push({
+						id: child.attributes['ejs-id'],
+						type: 'list',
+						data: {
+							style: 'ordered',
+							items: child.children
+								.filter(c => c.type === 'tag')
+								.map(c =>
+									(c as IYMFTagNode).children
+										.slice(1)
+										.map(c => YMF.nodeToYMFText(c))
+										.join(''),
+								),
+						},
+					});
+				} else if (child.tag === 'ul') {
+					blocks.push({
+						id: child.attributes['ejs-id'],
+						type: 'list',
+						data: {
+							style: 'unordered',
+							items: child.children
+								.filter(c => c.type === 'tag')
+								.map(c =>
+									(c as IYMFTagNode).children
+										.slice(1)
+										.map(c => YMF.nodeToYMFText(c))
+										.join(''),
+								),
+						},
+					});
+				} else {
+					// do nothing
+				}
+			}
+		}
+
+		return {
+			time: 1676587472156,
+			blocks,
+			version: '2.26.5',
+		};
+	} else {
 		return {
 			time: 1676587472156,
 			blocks: [{ id: '2cC8_Z_Rad', type: 'paragraph', data: { text: ymf.toPlainText() } }],
 			version: '2.26.5',
 		};
-
-	const root: IYMFTagNode = ymf.root.children[0];
-	const blocks: any[] = [];
-	for (const child of root.children) {
-		if (child.type === 'text') {
-			// do nothing, skip line breaks
-		} else if (child.type === 'tag') {
-			if (child.tag === 'p') {
-				blocks.push({
-					id: child.attributes['ejs-id'],
-					type: 'paragraph',
-					data: {
-						text: child.children.map(c => YMF.nodeToYMFText(c)).join(''),
-					},
-				});
-			} else if (child.tag.startsWith('h')) {
-				const level = parseInt(child.tag[1], 10);
-				blocks.push({
-					id: child.attributes['ejs-id'],
-					type: 'header',
-					data: {
-						text: child.children.map(c => YMF.nodeToYMFText(c)).join(''),
-						level,
-					},
-				});
-			} else if (child.tag === 'ol') {
-				blocks.push({
-					id: child.attributes['ejs-id'],
-					type: 'list',
-					data: {
-						style: 'ordered',
-						items: child.children
-							.filter(c => c.type === 'tag')
-							.map(c =>
-								(c as IYMFTagNode).children
-									.slice(1)
-									.map(c => YMF.nodeToYMFText(c))
-									.join(''),
-							),
-					},
-				});
-			} else if (child.tag === 'ul') {
-				blocks.push({
-					id: child.attributes['ejs-id'],
-					type: 'list',
-					data: {
-						style: 'unordered',
-						items: child.children
-							.filter(c => c.type === 'tag')
-							.map(c =>
-								(c as IYMFTagNode).children
-									.slice(1)
-									.map(c => YMF.nodeToYMFText(c))
-									.join(''),
-							),
-					},
-				});
-			} else {
-				// do nothing
-			}
-		}
 	}
-
-	return {
-		time: 1676587472156,
-		blocks,
-		version: '2.26.5',
-	};
 }
 
 //
