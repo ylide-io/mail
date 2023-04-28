@@ -4,8 +4,8 @@ import List from '@editorjs/list';
 import Header from '@editorjs/header';
 import { nanoid } from 'nanoid';
 import { OutputData } from '@editorjs/editorjs';
-import { IMessageDecodedTextData, MessageDecodedTextDataType } from '../indexedDB/IndexedDB';
-import { IYMFTagNode, YMF } from '@ylide/sdk';
+import { IMessageDecodedContent, IMessageDecodedTextData, MessageDecodedTextDataType } from '../indexedDB/IndexedDB';
+import { IGenericAccount, IMessage, IYMFTagNode, MessageContainer, MessageContentV4, YMF } from '@ylide/sdk';
 import { generatePath, useLocation } from 'react-router-dom';
 import { useNav } from './url';
 import { globalOutgoingMailData, OutgoingMailData } from '../stores/outgoingMailData';
@@ -18,6 +18,50 @@ import {
 	ComposeMailPopup,
 } from '../pages/mail/components/composeMailPopup/composeMailPopup';
 import { invariant } from './assert';
+import domain from '../stores/Domain';
+
+async function getMessageContent(msg: IMessage) {
+	const content = await domain.ylide.core.getMessageContent(msg);
+	invariant(content && !content.corrupted, 'Content is not available or corrupted');
+	return content;
+}
+
+export async function decodeMessage(
+	msgId: string,
+	msg: IMessage,
+	recipient: IGenericAccount,
+): Promise<IMessageDecodedContent> {
+	const content = await getMessageContent(msg);
+
+	const result = msg.isBroadcast
+		? domain.ylide.core.decryptBroadcastContent(msg, content)
+		: await domain.ylide.core.decryptMessageContent(recipient, msg, content);
+
+	return {
+		msgId,
+		decodedSubject: result.content.subject,
+		decodedTextData:
+			result.content.content instanceof YMF
+				? {
+						type: MessageDecodedTextDataType.YMF,
+						value: result.content.content,
+				  }
+				: {
+						type: MessageDecodedTextDataType.PLAIN,
+						value: result.content.content,
+				  },
+		attachments: result.content instanceof MessageContentV4 ? result.content.attachments : [],
+	};
+}
+
+export async function decodeAttachment(data: Uint8Array, msg: IMessage, recipient: IGenericAccount) {
+	const content = await getMessageContent(msg);
+	const unpackedContainer = MessageContainer.unpackContainter(content.content);
+	const secureContext = await domain.ylide.core.getMessageSecureContext(recipient, msg, unpackedContainer);
+	return secureContext.decrypt(data);
+}
+
+//
 
 export const EDITOR_JS_TOOLS = {
 	list: List,

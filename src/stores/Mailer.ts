@@ -96,7 +96,8 @@ class Mailer {
 			const messageAttachments = await Promise.all(
 				attachments.map(async file => {
 					const buffer = await readFileAsArrayBuffer(file);
-					const encrypted = secureContext.encrypt(new Uint8Array(buffer));
+					const uint8Array = new Uint8Array(buffer);
+					const encrypted = secureContext.encrypt(uint8Array);
 					const uploaded = await ipfsStorage.uploadToIpfs(encrypted);
 
 					return new MessageAttachmentLinkV1({

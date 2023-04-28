@@ -52,3 +52,16 @@ export function formatFileSize(
 
 	return size.toFixed(precision) + ' ' + units[u];
 }
+
+export function downloadFile(data: Uint8Array, fileName: string) {
+	const blob = new Blob([data], { type: 'octet/stream' });
+	const url = window.URL.createObjectURL(blob);
+
+	const a = document.createElement('a');
+	a.style.display = 'none';
+	a.href = url;
+	a.download = fileName;
+	a.click();
+
+	window.URL.revokeObjectURL(url);
+}

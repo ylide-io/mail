@@ -1,3 +1,4 @@
+import { MessageAttachmentLinkV1, YlideIpfsStorage } from '@ylide/sdk';
 import { observer } from 'mobx-react';
 import React, { useEffect, useMemo, useState } from 'react';
 import { createReactEditorJS } from 'react-editor-js';
@@ -6,8 +7,10 @@ import { ActionButton, ActionButtonLook } from '../../../../components/ActionBut
 import { Blockie } from '../../../../components/blockie/blockie';
 import { ContactName } from '../../../../components/contactName/contactName';
 import { ReadableDate } from '../../../../components/readableDate/readableDate';
+import { Spinner } from '../../../../components/spinner/spinner';
 import { toast } from '../../../../components/toast/toast';
 import { ReactComponent as AddContactSvg } from '../../../../icons/ic20/addContact.svg';
+import { ReactComponent as DownloadSvg } from '../../../../icons/ic20/download.svg';
 import { ReactComponent as ForwardSvg } from '../../../../icons/ic20/forward.svg';
 import { ReactComponent as ReplySvg } from '../../../../icons/ic20/reply.svg';
 import { ReactComponent as TrashSvg } from '../../../../icons/ic20/trash.svg';
@@ -16,7 +19,13 @@ import contacts from '../../../../stores/Contacts';
 import { FolderId, ILinkedMessage, mailStore } from '../../../../stores/MailList';
 import { formatAddress } from '../../../../utils/blockchain';
 import { DateFormatStyle } from '../../../../utils/date';
-import { decodedTextDataToEditorJsData, EDITOR_JS_TOOLS, formatSubject } from '../../../../utils/mail';
+import { downloadFile, formatFileSize } from '../../../../utils/file';
+import {
+	decodeAttachment,
+	decodedTextDataToEditorJsData,
+	EDITOR_JS_TOOLS,
+	formatSubject,
+} from '../../../../utils/mail';
 import css from './mailMessage.module.scss';
 
 const ReactEditorJS = createReactEditorJS();
@@ -45,6 +54,9 @@ export const MailMessage = observer(
 				onReady?.();
 			}
 		}, [isEditorReady, onReady]);
+
+		const linkAttachments =
+			(decoded?.attachments.filter(a => a instanceof MessageAttachmentLinkV1) as MessageAttachmentLinkV1[]) || [];
 
 		return (
 			<div className={css.root}>
@@ -126,18 +138,74 @@ export const MailMessage = observer(
 
 				<ReadableDate className={css.date} style={DateFormatStyle.LONG} value={message.msg.createdAt * 1000} />
 
-				{editorData?.blocks && (
-					<div className={css.body}>
-						<ReactEditorJS
-							tools={EDITOR_JS_TOOLS}
-							readOnly={true}
-							//@ts-ignore
-							data={editorData}
-							onReady={() => setEditorReady(true)}
-						/>
-					</div>
-				)}
+				<div className={css.body}>
+					{editorData?.blocks && (
+						<div className={css.content}>
+							<ReactEditorJS
+								tools={EDITOR_JS_TOOLS}
+								readOnly={true}
+								//@ts-ignore
+								data={editorData}
+								onReady={() => setEditorReady(true)}
+							/>
+						</div>
+					)}
+
+					{!!linkAttachments.length && (
+						<div className={css.attachments}>
+							{linkAttachments.map(a => (
+								<Attachment attachment={a} message={message} />
+							))}
+						</div>
+					)}
+				</div>
 			</div>
 		);
 	},
 );
+
+//
+
+interface AttachmentProps {
+	attachment: MessageAttachmentLinkV1;
+	message: ILinkedMessage;
+}
+
+export function Attachment({ attachment, message }: AttachmentProps) {
+	const [isDownloading, setDownloading] = useState(false);
+
+	const onDownloadClick = async () => {
+		try {
+			setDownloading(true);
+
+			const uint8Array = await new YlideIpfsStorage().downloadFromIpfs(attachment.link.replace('ipfs://', ''));
+			const decrypted = await decodeAttachment(uint8Array, message.msg, message.recipient!.account);
+
+			downloadFile(decrypted, attachment.fileName);
+		} catch (e) {
+			toast("Couldn't download file 😒");
+		} finally {
+			setDownloading(false);
+		}
+	};
+
+	return (
+		<div className={css.attachment}>
+			<div className={css.attachmentName} title={attachment.fileName}>
+				{attachment.fileName}
+			</div>
+			<div className={css.attachmentSize} title={attachment.fileSize.toString()}>
+				{formatFileSize(attachment.fileSize)}
+			</div>
+
+			<ActionButton
+				className={css.attachmentActions}
+				isDisabled={isDownloading}
+				look={ActionButtonLook.LITE}
+				icon={isDownloading ? <Spinner /> : <DownloadSvg />}
+				title="Download"
+				onClick={onDownloadClick}
+			/>
+		</div>
+	);
+}

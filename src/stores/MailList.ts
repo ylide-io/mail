@@ -2,25 +2,22 @@ import { EthereumBlockchainController } from '@ylide/ethereum';
 import {
 	AbstractBlockchainController,
 	BlockchainSourceType,
-	IGenericAccount,
 	IMessage,
 	IMessageWithSource,
 	ISourceWithMeta,
 	ListSourceDrainer,
 	ListSourceMultiplexer,
-	MessageContentV4,
 	SourceReadingSession,
 	Uint256,
 	YLIDE_MAIN_FEED_ID,
-	YMF,
 } from '@ylide/sdk';
 import { makeAutoObservable } from 'mobx';
 import { useCallback, useEffect, useState } from 'react';
 
 import messagesDB, { MessagesDB } from '../indexedDB/impl/MessagesDB';
-import { IMessageDecodedContent, MessageDecodedTextDataType } from '../indexedDB/IndexedDB';
-import { invariant } from '../utils/assert';
+import { IMessageDecodedContent } from '../indexedDB/IndexedDB';
 import { formatAddress } from '../utils/blockchain';
+import { decodeMessage } from '../utils/mail';
 import { analytics } from './Analytics';
 import { browserStorage } from './browserStorage';
 import contacts from './Contacts';
@@ -45,37 +42,6 @@ export function getFolderName(folderId: FolderId) {
 		const tag = tags.tags.find(t => String(t.id) === folderId);
 		return tag?.name || 'Unknown';
 	}
-}
-
-//
-
-export async function decodeMessage(
-	msgId: string,
-	msg: IMessage,
-	recepient: IGenericAccount,
-): Promise<IMessageDecodedContent> {
-	const content = await domain.ylide.core.getMessageContent(msg);
-	invariant(content && !content.corrupted, 'Content is not available or corrupted');
-
-	const result = msg.isBroadcast
-		? domain.ylide.core.decryptBroadcastContent(msg, content)
-		: await domain.ylide.core.decryptMessageContent(recepient, msg, content);
-
-	return {
-		msgId,
-		decodedSubject: result.content.subject,
-		decodedTextData:
-			result.content.content instanceof YMF
-				? {
-						type: MessageDecodedTextDataType.YMF,
-						value: result.content.content,
-				  }
-				: {
-						type: MessageDecodedTextDataType.PLAIN,
-						value: result.content.content,
-				  },
-		attachments: result.content instanceof MessageContentV4 ? result.content.attachments : [],
-	};
 }
 
 //
