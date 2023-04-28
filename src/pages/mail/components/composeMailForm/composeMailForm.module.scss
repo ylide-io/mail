@@ -26,7 +26,32 @@
 	flex: 0 0 64px;
 	display: flex;
 	align-items: center;
-	justify-content: flex-end;
 	padding: 0 16px;
 	border-top: 1px solid var(--border-color);
+}
+
+.attachment {
+	display: grid;
+	grid-template-columns: 1fr auto;
+	align-items: center;
+	grid-gap: 4px;
+	padding: 8px 12px;
+	width: 200px;
+}
+.attachmentName {
+	@include truncate-text;
+	font-weight: $font-weight_bold;
+}
+.attachmentSize {
+	@include truncate-text;
+	font-size: 11px;
+	color: var(--secondary-text-color);
+}
+.attachmentActions {
+	grid-column: 2/3;
+	grid-row: 1/3;
+}
+
+.sendButton {
+	margin: 0 0 0 auto;
 }

@@ -10,8 +10,7 @@ import {
 import { OutgoingMailData } from '../../stores/outgoingMailData';
 import { HorizontalAlignment } from '../../utils/alignment';
 import { copyToClipboard } from '../../utils/clipboard';
-import { plainTextToEditorData } from '../../utils/editorJs';
-import { useOpenMailCopmpose } from '../../utils/mail';
+import { plainTextToEditorJsData, useOpenMailCopmpose } from '../../utils/mail';
 import { AnchoredPopup } from '../popup/anchoredPopup/anchoredPopup';
 import { toast } from '../toast/toast';
 import { ReactComponent as ClipboardSvg } from './icons/clipboard.svg';
@@ -54,7 +53,7 @@ export function SharePopup({ anchorRef, horizontalAlign, onClose, url, subject }
 						onClick={() => {
 							const mailData = new OutgoingMailData();
 							mailData.subject = subject;
-							mailData.editorData = plainTextToEditorData(realUrl);
+							mailData.editorData = plainTextToEditorJsData(realUrl);
 
 							openMailCopmpose({ mailData });
 

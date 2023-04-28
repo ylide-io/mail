@@ -3,6 +3,7 @@ import { EVMNetwork } from '@ylide/ethereum';
 import { autorun, makeAutoObservable } from 'mobx';
 
 import { Recipients } from '../components/recipientInput/recipientInput';
+import { isEmptyEditorJsData } from '../utils/mail';
 import domain from './Domain';
 import { DomainAccount } from './models/DomainAccount';
 
@@ -13,7 +14,9 @@ export class OutgoingMailData {
 
 	subject = '';
 	editorData?: OutputData;
-	plainTextData?: string;
+	plainTextData: string = '';
+
+	attachments: File[] = [];
 
 	constructor() {
 		makeAutoObservable(this);
@@ -27,7 +30,7 @@ export class OutgoingMailData {
 	}
 
 	get hasEditorData() {
-		return !!this.editorData?.blocks.length;
+		return !isEmptyEditorJsData(this.editorData);
 	}
 
 	get hasPlainTextData() {
@@ -41,7 +44,9 @@ export class OutgoingMailData {
 
 		this.subject = data?.subject || '';
 		this.editorData = data?.editorData;
-		this.plainTextData = data?.plainTextData;
+		this.plainTextData = data?.plainTextData || '';
+
+		this.attachments = data?.attachments || [];
 	}
 }
 

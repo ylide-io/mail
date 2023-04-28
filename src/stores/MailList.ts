@@ -2,7 +2,6 @@ import { EthereumBlockchainController } from '@ylide/ethereum';
 import {
 	AbstractBlockchainController,
 	BlockchainSourceType,
-	IGenericAccount,
 	IMessage,
 	IMessageWithSource,
 	ISourceWithMeta,
@@ -11,14 +10,14 @@ import {
 	SourceReadingSession,
 	Uint256,
 	YLIDE_MAIN_FEED_ID,
-	YMF,
 } from '@ylide/sdk';
 import { makeAutoObservable } from 'mobx';
 import { useCallback, useEffect, useState } from 'react';
 
-import messagesDB, { IMessageDecodedSerializedContent } from '../indexedDB/MessagesDB';
-import { invariant } from '../utils/assert';
+import messagesDB, { MessagesDB } from '../indexedDB/impl/MessagesDB';
+import { IMessageDecodedContent } from '../indexedDB/IndexedDB';
 import { formatAddress } from '../utils/blockchain';
+import { decodeMessage } from '../utils/mail';
 import { analytics } from './Analytics';
 import { browserStorage } from './browserStorage';
 import contacts from './Contacts';
@@ -47,23 +46,6 @@ export function getFolderName(folderId: FolderId) {
 
 //
 
-export async function decodeMessage(msgId: string, msg: IMessage, recepient: IGenericAccount) {
-	const content = await domain.ylide.core.getMessageContent(msg);
-	invariant(content && !content.corrupted, 'Content is not available or corrupted');
-
-	const result = msg.isBroadcast
-		? domain.ylide.core.decryptBroadcastContent(msg, content)
-		: await domain.ylide.core.decryptMessageContent(recepient, msg, content);
-
-	return {
-		msgId,
-		decodedSubject: result.content.subject,
-		decodedTextData: result.content.content,
-	};
-}
-
-//
-
 const MailPageSize = 10;
 
 function wrapMessageId(p: IMessageWithSource) {
@@ -77,7 +59,7 @@ async function wrapMessage(p: IMessageWithSource): Promise<ILinkedMessage> {
 
 	let recipients: string[] = [];
 	try {
-		recipients = (await (reader as EthereumBlockchainController).getMessageRecipients(p.msg, true)).recipients.map(
+		recipients = (await (reader as EthereumBlockchainController).getMessageRecipients(p.msg, true))!.recipients.map(
 			formatAddress,
 		);
 	} catch (e) {}
@@ -258,7 +240,7 @@ class MailStore {
 	lastActiveFolderId: FolderId = FolderId.Inbox;
 	lastMessagesList: ILinkedMessage[] = [];
 
-	decodedMessagesById: Record<string, IMessageDecodedSerializedContent> = {};
+	decodedMessagesById: Record<string, IMessageDecodedContent> = {};
 	readMessageIds = new Set<string>();
 
 	deletedMessageIds = new Set<string>();
@@ -272,7 +254,7 @@ class MailStore {
 		this.decodedMessagesById = dbDecodedMessages.reduce(
 			(p, c) => ({
 				...p,
-				[c.msgId]: c,
+				[c.msgId]: MessagesDB.deserializeMessageDecodedContent(c),
 			}),
 			{},
 		);
@@ -293,24 +275,10 @@ class MailStore {
 
 		const decodedMessage = await decodeMessage(pushMsg.msgId, pushMsg.msg, pushMsg.recipient!.account);
 
-		const serializedMsg = {
-			...decodedMessage,
-			decodedTextData:
-				decodedMessage.decodedTextData instanceof YMF
-					? {
-							type: 'YMF' as const,
-							value: decodedMessage.decodedTextData.toString(),
-					  }
-					: {
-							type: 'plain' as const,
-							value: decodedMessage.decodedTextData,
-					  },
-		};
-
-		this.decodedMessagesById[pushMsg.msgId] = serializedMsg;
+		this.decodedMessagesById[pushMsg.msgId] = decodedMessage;
 
 		if (browserStorage.saveDecodedMessages) {
-			await messagesDB.saveDecodedMessage(serializedMsg);
+			await messagesDB.saveDecodedMessage(MessagesDB.serializeMessageDecodedContent(decodedMessage));
 		}
 	}
 

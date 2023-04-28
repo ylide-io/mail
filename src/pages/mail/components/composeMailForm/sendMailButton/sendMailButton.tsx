@@ -11,6 +11,7 @@ import React, { ReactNode, useEffect } from 'react';
 import { ActionButtonLook } from '../../../../../components/ActionButton/ActionButton';
 import { ActionModal } from '../../../../../components/actionModal/actionModal';
 import { AdaptiveText } from '../../../../../components/adaptiveText/adaptiveText';
+import { PropsWithClassName } from '../../../../../components/props';
 import { SelectNetworkModal } from '../../../../../components/selectNetworkModal/selectNetworkModal';
 import { Spinner } from '../../../../../components/spinner/spinner';
 import { showStaticComponent } from '../../../../../components/staticComponentManager/staticComponentManager';
@@ -24,16 +25,16 @@ import mailer from '../../../../../stores/Mailer';
 import { OutgoingMailData } from '../../../../../stores/outgoingMailData';
 import { connectAccount } from '../../../../../utils/account';
 import { blockchainMeta, evmNameToNetwork } from '../../../../../utils/blockchain';
-import { editorJsToYMF } from '../../../../../utils/editorjsJson';
+import { editorJsToYMF } from '../../../../../utils/mail';
 import { truncateInMiddle } from '../../../../../utils/string';
 import { getEvmWalletNetwork } from '../../../../../utils/wallet';
 
-export interface SendMailButtonProps {
+export interface SendMailButtonProps extends PropsWithClassName {
 	mailData: OutgoingMailData;
 	onSent?: () => void;
 }
 
-export const SendMailButton = observer(({ mailData, onSent }: SendMailButtonProps) => {
+export const SendMailButton = observer(({ className, mailData, onSent }: SendMailButtonProps) => {
 	useEffect(
 		() =>
 			autorun(async () => {
@@ -143,16 +144,16 @@ export const SendMailButton = observer(({ mailData, onSent }: SendMailButtonProp
 
 			let content: YMF;
 			if (mailData.hasEditorData) {
-				const ymfText = editorJsToYMF(mailData.editorData);
-				content = YMF.fromYMFText(ymfText);
+				content = editorJsToYMF(mailData.editorData);
 			} else {
-				content = YMF.fromPlainText(mailData.plainTextData!.trim());
+				content = YMF.fromPlainText(mailData.plainTextData.trim());
 			}
 
 			const msgId = await mailer.sendMail(
 				mailData.from,
 				mailData.subject,
 				content,
+				mailData.attachments,
 				mailData.to.items.map(r => r.routing?.address!),
 				mailData.network,
 				REACT_APP__OTC_MODE
@@ -173,13 +174,13 @@ export const SendMailButton = observer(({ mailData, onSent }: SendMailButtonProp
 
 	return (
 		<div
-			className={clsx('send-btn', {
+			className={clsx(className, 'send-btn', {
 				disabled:
 					mailer.sending ||
 					!mailData.from ||
 					!mailData.to.items.length ||
 					mailData.to.items.some(r => r.isLoading) ||
-					(!mailData.hasEditorData && !mailData.hasPlainTextData),
+					(!mailData.hasEditorData && !mailData.hasPlainTextData && !mailData.attachments.length),
 				withDropdown: mailData.from?.wallet.factory.blockchainGroup === 'evm',
 			})}
 		>

@@ -12,13 +12,17 @@ import { ReactComponent as ArrowLeftSvg } from '../../../icons/ic20/arrowLeft.sv
 import { ReactComponent as ContactSvg } from '../../../icons/ic20/contact.svg';
 import { ReactComponent as ForwardSvg } from '../../../icons/ic20/forward.svg';
 import { ReactComponent as ReplySvg } from '../../../icons/ic20/reply.svg';
-import { IMessageDecodedSerializedContent } from '../../../indexedDB/MessagesDB';
+import { IMessageDecodedContent } from '../../../indexedDB/IndexedDB';
 import { FolderId, ILinkedMessage, mailStore, useMailList } from '../../../stores/MailList';
 import { globalOutgoingMailData, OutgoingMailData } from '../../../stores/outgoingMailData';
 import { RoutePath } from '../../../stores/routePath';
 import { DateFormatStyle, formatDate } from '../../../utils/date';
-import { decodeEditorData, plainTextToEditorData } from '../../../utils/editorJs';
-import { formatSubject, useOpenMailCopmpose } from '../../../utils/mail';
+import {
+	decodedTextDataToEditorJsData,
+	formatSubject,
+	plainTextToEditorJsData,
+	useOpenMailCopmpose,
+} from '../../../utils/mail';
 import { useNav } from '../../../utils/url';
 import css from './mailDetailsPage.module.scss';
 import { MailMessage } from './mailMessage/mailMessage';
@@ -35,7 +39,7 @@ export const MailDetailsPage = observer(() => {
 	const openMailCopmpose = useOpenMailCopmpose();
 
 	const initialMessage = mailStore.lastMessagesList.find(m => m.id === id!);
-	const initialDecodedContent: IMessageDecodedSerializedContent | undefined =
+	const initialDecodedContent: IMessageDecodedContent | undefined =
 		initialMessage && mailStore.decodedMessagesById[initialMessage.msgId];
 
 	useEffect(() => {
@@ -130,15 +134,15 @@ export const MailDetailsPage = observer(() => {
 		openMailCopmpose({ mailData });
 	};
 
-	const onForwardClick = (message: ILinkedMessage, decodedTextData: string | null, subject: string | null) => {
-		const editorData = decodeEditorData(decodedTextData);
+	const onForwardClick = (message: ILinkedMessage, decodedContent: IMessageDecodedContent) => {
+		const editorData = decodedTextDataToEditorJsData(decodedContent.decodedTextData);
 		if (editorData) {
-			const forwardedData = plainTextToEditorData(
+			const forwardedData = plainTextToEditorJsData(
 				`\n${[
 					'---------- Forwarded message ---------',
 					`From: ${message.msg.senderAddress}`,
 					`Date: ${formatDate(message.msg.createdAt * 1000, DateFormatStyle.LONG)}`,
-					`Subject: ${formatSubject(subject)}`,
+					`Subject: ${formatSubject(decodedContent.decodedSubject)}`,
 					`To: ${message.recipient?.account.address || message.msg.recipientAddress}`,
 				].join('<br>')}\n`,
 			);
@@ -147,7 +151,7 @@ export const MailDetailsPage = observer(() => {
 		}
 
 		globalOutgoingMailData.editorData = editorData;
-		globalOutgoingMailData.subject = formatSubject(subject?.replace(/^Fwd:\s+/i, ''), 'Fwd: ');
+		globalOutgoingMailData.subject = formatSubject(decodedContent.decodedSubject.replace(/^Fwd:\s+/i, ''), 'Fwd: ');
 
 		navigate(RoutePath.MAIL_COMPOSE);
 	};
@@ -231,17 +235,7 @@ export const MailDetailsPage = observer(() => {
 															decoded.decodedSubject,
 														)
 													}
-													onForwardClick={() =>
-														onForwardClick(
-															message.message,
-															decoded.decodedTextData
-																? decoded.decodedTextData.type === 'YMF'
-																	? decoded.decodedTextData.value.toString()
-																	: decoded.decodedTextData.value
-																: null,
-															decoded.decodedSubject,
-														)
-													}
+													onForwardClick={() => onForwardClick(message.message, decoded)}
 													onDeleteClick={() => onDeleteClick(message.message)}
 												/>
 											)}
@@ -259,17 +253,7 @@ export const MailDetailsPage = observer(() => {
 											initialDecodedContent.decodedSubject,
 										)
 									}
-									onForwardClick={() =>
-										onForwardClick(
-											initialMessage,
-											initialDecodedContent.decodedTextData
-												? initialDecodedContent.decodedTextData.type === 'YMF'
-													? initialDecodedContent.decodedTextData.value.toString()
-													: initialDecodedContent.decodedTextData.value
-												: null,
-											initialDecodedContent.decodedSubject,
-										)
-									}
+									onForwardClick={() => onForwardClick(initialMessage, initialDecodedContent)}
 									onDeleteClick={() => onDeleteClick(initialMessage)}
 								/>
 							)}
@@ -290,17 +274,7 @@ export const MailDetailsPage = observer(() => {
 								</ActionButton>
 
 								<ActionButton
-									onClick={() =>
-										onForwardClick(
-											initialMessage,
-											initialDecodedContent.decodedTextData
-												? initialDecodedContent.decodedTextData.type === 'YMF'
-													? initialDecodedContent.decodedTextData.value.toString()
-													: initialDecodedContent.decodedTextData.value
-												: null,
-											initialDecodedContent.decodedSubject,
-										)
-									}
+									onClick={() => onForwardClick(initialMessage, initialDecodedContent)}
 									icon={<ForwardSvg />}
 								>
 									Forward

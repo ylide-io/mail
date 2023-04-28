@@ -61,12 +61,12 @@ export enum DropDownItemMode {
 	WRAPPER = 'WRAPPER',
 }
 
-interface DropDownItemProps extends PropsWithChildren<{}> {
+interface DropDownItemProps extends PropsWithChildren<{}>, PropsWithClassName {
 	mode?: DropDownItemMode;
 	onSelect?: () => void;
 }
 
-export function DropDownItem({ children, mode = DropDownItemMode.REGULAR, onSelect }: DropDownItemProps) {
+export function DropDownItem({ children, className, mode = DropDownItemMode.REGULAR, onSelect }: DropDownItemProps) {
 	const itemRef = useRef<HTMLDivElement>(null);
 
 	useEffect(() => {
@@ -87,6 +87,7 @@ export function DropDownItem({ children, mode = DropDownItemMode.REGULAR, onSele
 					[DropDownItemMode.DISABLED]: css.item_disabled,
 					[DropDownItemMode.WRAPPER]: css.item_wrapper,
 				}[mode || DropDownItemMode.REGULAR],
+				className,
 			)}
 			onClick={() => {
 				if (mode !== DropDownItemMode.DISABLED) {
