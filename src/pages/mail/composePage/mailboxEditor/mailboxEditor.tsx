@@ -19,6 +19,9 @@ export function MailboxEditor({ mailData }: MailboxEditorProps) {
 
 	async function handleSave() {
 		if (instanceRef.current) {
+			// https://github.com/codex-team/editor.js/issues/2120
+			await instanceRef.current.save();
+
 			mailData.editorData = await instanceRef.current.save();
 		}
 	}
