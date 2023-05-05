@@ -10,7 +10,7 @@ import { YlideLoader } from '../../../components/ylideLoader/ylideLoader';
 import { ReactComponent as ArrowUpSvg } from '../../../icons/ic20/arrowUp.svg';
 import { ReactComponent as CrossSvg } from '../../../icons/ic20/cross.svg';
 import { browserStorage } from '../../../stores/browserStorage';
-import feed, { FeedCategory } from '../../../stores/Feed';
+import feed, { FeedCategory, getFeedCategoryName } from '../../../stores/Feed';
 import { useNav } from '../../../utils/url';
 import { FeedPostItem } from '../components/feedPostItem/feedPostItem';
 import css from './feedPage.module.scss';
@@ -74,15 +74,7 @@ const FeedPageContent = observer(() => {
 		await feed.loadNew();
 	};
 
-	let title;
-
-	if (feed.selectedCategory === FeedCategory.MAIN) {
-		title = 'My feed';
-	} else if (feed.selectedCategory === FeedCategory.ALL) {
-		title = 'All topics';
-	} else {
-		title = feed.selectedCategory;
-	}
+	const title = getFeedCategoryName(feed.selectedCategory);
 
 	return (
 		<NarrowContent

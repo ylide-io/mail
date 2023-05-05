@@ -17,13 +17,13 @@ export enum FeedCategory {
 	EDUCATION = 'Education',
 }
 
-export const nonSyntheticFeedCategories = Object.values(FeedCategory).filter(
+export const nonSyntheticFeedCategories = Object.values<FeedCategory>(FeedCategory).filter(
 	it => it !== FeedCategory.MAIN && it !== FeedCategory.ALL,
 );
 
 export function getFeedCategoryName(category: FeedCategory) {
 	if (category === FeedCategory.MAIN) {
-		return 'My feed';
+		return 'Smart feed';
 	} else if (category === FeedCategory.ALL) {
 		return 'All topics';
 	} else {
@@ -74,7 +74,7 @@ class Feed {
 	@observable loaded = false;
 	@observable loading = false;
 
-	@observable selectedCategory: string = FeedCategory.MAIN;
+	@observable selectedCategory = FeedCategory.MAIN;
 	@observable mainCategories: string[] = JSON.parse(
 		localStorage.getItem('t_main_categories') || JSON.stringify(nonSyntheticFeedCategories),
 	);

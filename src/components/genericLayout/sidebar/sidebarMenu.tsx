@@ -8,6 +8,7 @@ import { REACT_APP__OTC_MODE, REACT_APP__SMART_FEED_MODE } from '../../../env';
 import { ReactComponent as ArchiveSvg } from '../../../icons/archive.svg';
 import { ReactComponent as ArrowDownSvg } from '../../../icons/ic20/arrowDown.svg';
 import { ReactComponent as ArrowUpSvg } from '../../../icons/ic20/arrowUp.svg';
+import { ReactComponent as ContactSvg } from '../../../icons/ic20/contact.svg';
 import { ReactComponent as SettingsSvg } from '../../../icons/ic20/settings.svg';
 import { ReactComponent as SidebarMenuSvg } from '../../../icons/ic28/sidebarMenu.svg';
 import { ReactComponent as SidebarMenuCloseSvg } from '../../../icons/ic28/sidebarMenu_close.svg';
@@ -31,12 +32,14 @@ import { sideTechnologyIcon } from '../../../icons/static/sideTechnologyIcon';
 import { FeedSettingsPopup } from '../../../pages/feed/components/feedSettingsPopup/feedSettingsPopup';
 import { WidgetId } from '../../../pages/widgets/widgets';
 import { browserStorage } from '../../../stores/browserStorage';
-import { FeedCategory, getFeedCategoryName } from '../../../stores/Feed';
+import domain from '../../../stores/Domain';
+import { FeedCategory, getFeedCategoryName, nonSyntheticFeedCategories } from '../../../stores/Feed';
 import { FolderId } from '../../../stores/MailList';
 import { RoutePath } from '../../../stores/routePath';
 import { useOpenMailCopmpose } from '../../../utils/mail';
 import { useNav } from '../../../utils/url';
 import { ActionButton, ActionButtonLook, ActionButtonSize } from '../../ActionButton/ActionButton';
+import { AdaptiveText } from '../../adaptiveText/adaptiveText';
 import { PropsWithClassName } from '../../props';
 import css from './sidebarMenu.module.scss';
 
@@ -87,6 +90,7 @@ const SidebarSection = observer(({ children, section, title }: SidebarSectionPro
 
 interface SidebarButtonProps {
 	isActive?: boolean;
+	isSubmenu?: boolean;
 	icon: ReactNode;
 	name: ReactNode;
 	rightButton?: {
@@ -96,29 +100,32 @@ interface SidebarButtonProps {
 	onClick: () => void;
 }
 
-export const SidebarButton = observer(({ isActive, icon, name, rightButton, onClick }: SidebarButtonProps) => (
-	<div
-		className={clsx(css.sectionLink, {
-			[css.sectionLink_active]: isActive,
-		})}
-		onClick={() => onClick()}
-	>
-		<div className={css.sectionLinkIconLeft}>{icon}</div>
-		<div className={css.sectionLinkTitle}>{name}</div>
+export const SidebarButton = observer(
+	({ isActive, isSubmenu, icon, name, rightButton, onClick }: SidebarButtonProps) => (
+		<div
+			className={clsx(css.sectionLink, {
+				[css.sectionLink_active]: isActive,
+				[css.sectionLink_submenu]: isSubmenu,
+			})}
+			onClick={() => onClick()}
+		>
+			<div className={css.sectionLinkIconLeft}>{icon}</div>
+			<div className={css.sectionLinkTitle}>{name}</div>
 
-		{rightButton && (
-			<ActionButton
-				className={css.sectionRightButton}
-				look={ActionButtonLook.LITE}
-				icon={rightButton.icon}
-				onClick={e => {
-					e.stopPropagation();
-					rightButton?.onClick();
-				}}
-			/>
-		)}
-	</div>
-));
+			{rightButton && (
+				<ActionButton
+					className={css.sectionRightButton}
+					look={ActionButtonLook.LITE}
+					icon={rightButton.icon}
+					onClick={e => {
+						e.stopPropagation();
+						rightButton?.onClick();
+					}}
+				/>
+			)}
+		</div>
+	),
+);
 
 //
 
@@ -126,6 +133,7 @@ const isSidebarOpen = observable.box(false);
 
 export enum Section {
 	FEED = 'feed',
+	FEED_DISCOVERY = 'feed_discovery',
 	MAIL = 'mail',
 	OTC = 'otc',
 }
@@ -180,33 +188,54 @@ export const SidebarMenu = observer(() => {
 
 	function renderFeedSection() {
 		return (
-			<SidebarSection section={Section.FEED} title="Feed">
-				{Object.values(FeedCategory).map(category => {
-					const path = generatePath(RoutePath.FEED_CATEGORY, { category });
+			<>
+				<SidebarSection section={Section.FEED} title="Feed">
+					<SidebarButton
+						isActive={
+							location.pathname === generatePath(RoutePath.FEED_CATEGORY, { category: FeedCategory.MAIN })
+						}
+						icon={getFeedCategoryIcon(FeedCategory.MAIN)}
+						name={getFeedCategoryName(FeedCategory.MAIN)}
+						onClick={() => {
+							isSidebarOpen.set(false);
+							navigate(generatePath(RoutePath.FEED_CATEGORY, { category: FeedCategory.MAIN }));
+						}}
+					/>
 
-					return (
+					{domain.accounts.activeAccounts.map(account => (
 						<SidebarButton
-							isActive={location.pathname === path}
-							icon={getFeedCategoryIcon(category)}
-							name={getFeedCategoryName(category)}
-							onClick={() => {
-								isSidebarOpen.set(false);
-								navigate(path);
+							isSubmenu
+							icon={<ContactSvg />}
+							name={<AdaptiveText text={account.account.address} />}
+							onClick={() => {}}
+							rightButton={{
+								icon: <SettingsSvg />,
+								onClick: () => setFeedSettingsOpen(!isFeedSettingsOpen),
 							}}
-							rightButton={
-								category === FeedCategory.MAIN
-									? {
-											icon: <SettingsSvg />,
-											onClick: () => setFeedSettingsOpen(!isFeedSettingsOpen),
-									  }
-									: undefined
-							}
 						/>
-					);
-				})}
+					))}
+				</SidebarSection>
 
-				{isFeedSettingsOpen && <FeedSettingsPopup onClose={() => setFeedSettingsOpen(false)} />}
-			</SidebarSection>
+				<SidebarSection section={Section.FEED_DISCOVERY} title="Discovery">
+					{nonSyntheticFeedCategories.map(category => {
+						const path = generatePath(RoutePath.FEED_CATEGORY, { category });
+
+						return (
+							<SidebarButton
+								isActive={location.pathname === path}
+								icon={getFeedCategoryIcon(category)}
+								name={getFeedCategoryName(category)}
+								onClick={() => {
+									isSidebarOpen.set(false);
+									navigate(path);
+								}}
+							/>
+						);
+					})}
+
+					{isFeedSettingsOpen && <FeedSettingsPopup onClose={() => setFeedSettingsOpen(false)} />}
+				</SidebarSection>
+			</>
 		);
 	}
 
