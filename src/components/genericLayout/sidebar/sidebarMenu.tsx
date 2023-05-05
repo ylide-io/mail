@@ -1,7 +1,7 @@
 import clsx from 'clsx';
 import { observable } from 'mobx';
 import { observer } from 'mobx-react';
-import React, { PropsWithChildren, useState } from 'react';
+import React, { PropsWithChildren, ReactNode, useState } from 'react';
 import { generatePath, useLocation } from 'react-router-dom';
 
 import { REACT_APP__OTC_MODE, REACT_APP__SMART_FEED_MODE } from '../../../env';
@@ -56,9 +56,75 @@ export const SidebarBurger = observer(({ className, children }: SidebarBurgerPro
 
 //
 
+interface SidebarSectionProps extends PropsWithChildren<{}> {
+	section: Section;
+	title: ReactNode;
+}
+
+const SidebarSection = observer(({ children, section, title }: SidebarSectionProps) => (
+	<div className={css.section}>
+		<div className={css.sectionTitle}>
+			{title}
+			<ActionButton
+				look={ActionButtonLook.LITE}
+				icon={browserStorage.isSidebarSectionFolded(section) ? <ArrowDownSvg /> : <ArrowUpSvg />}
+				onClick={() => browserStorage.toggleSidebarSectionFolding(section)}
+			/>
+		</div>
+
+		<div
+			className={clsx(
+				css.sectionContent,
+				browserStorage.isSidebarSectionFolded(section) || css.sectionContent_open,
+			)}
+		>
+			{children}
+		</div>
+	</div>
+));
+
+//
+
+interface SidebarButtonProps {
+	isActive?: boolean;
+	icon: ReactNode;
+	name: ReactNode;
+	rightButton?: {
+		icon: ReactNode;
+		onClick: () => void;
+	};
+	onClick: () => void;
+}
+
+export const SidebarButton = observer(({ isActive, icon, name, rightButton, onClick }: SidebarButtonProps) => (
+	<div
+		className={clsx(css.sectionLink, {
+			[css.sectionLink_active]: isActive,
+		})}
+		onClick={() => onClick()}
+	>
+		<div className={css.sectionLinkIconLeft}>{icon}</div>
+		<div className={css.sectionLinkTitle}>{name}</div>
+
+		{rightButton && (
+			<ActionButton
+				className={css.sectionRightButton}
+				look={ActionButtonLook.LITE}
+				icon={rightButton.icon}
+				onClick={e => {
+					e.stopPropagation();
+					rightButton?.onClick();
+				}}
+			/>
+		)}
+	</div>
+));
+
+//
+
 const isSidebarOpen = observable.box(false);
 
-export enum SidebarSection {
+export enum Section {
 	FEED = 'feed',
 	MAIL = 'mail',
 	OTC = 'otc',
@@ -88,207 +154,106 @@ export const SidebarMenu = observer(() => {
 
 	function renderOtcSection() {
 		return (
-			<div className={css.section}>
-				<div className={css.sectionTitle}>
-					OTC Trading
-					<ActionButton
-						look={ActionButtonLook.LITE}
-						icon={
-							browserStorage.isSidebarSectionFolded(SidebarSection.OTC) ? (
-								<ArrowDownSvg />
-							) : (
-								<ArrowUpSvg />
-							)
-						}
-						onClick={() => browserStorage.toggleSidebarSectionFolding(SidebarSection.OTC)}
-					/>
-				</div>
-				<div
-					className={clsx(
-						css.sectionContent,
-						browserStorage.isSidebarSectionFolded(SidebarSection.OTC) || css.sectionContent_open,
-					)}
-				>
-					<div
-						className={clsx(css.sectionLink, {
-							[css.sectionLink_active]: location.pathname === generatePath(RoutePath.OTC_ASSETS),
-						})}
-						onClick={() => {
-							isSidebarOpen.set(false);
-							navigate(generatePath(RoutePath.OTC_ASSETS));
-						}}
-					>
-						<div className={css.sectionLinkIconLeft}>
-							<InboxSvg />
-						</div>
-						<div className={css.sectionLinkTitle}>Asset Explorer</div>
-					</div>
-					<div
-						className={clsx(css.sectionLink, {
-							[css.sectionLink_active]: location.pathname === generatePath(RoutePath.OTC_CHATS),
-						})}
-						onClick={() => {
-							isSidebarOpen.set(false);
-							navigate(generatePath(RoutePath.OTC_CHATS));
-						}}
-					>
-						<div className={css.sectionLinkIconLeft}>
-							<SentSvg />
-						</div>
-						<div className={css.sectionLinkTitle}>Chats</div>
-					</div>
-				</div>
-			</div>
+			<SidebarSection section={Section.OTC} title="OTC Trading">
+				<SidebarButton
+					isActive={location.pathname === generatePath(RoutePath.OTC_ASSETS)}
+					icon={<InboxSvg />}
+					name="Asset Explorer"
+					onClick={() => {
+						isSidebarOpen.set(false);
+						navigate(generatePath(RoutePath.OTC_ASSETS));
+					}}
+				/>
+
+				<SidebarButton
+					isActive={location.pathname === generatePath(RoutePath.OTC_CHATS)}
+					icon={<SentSvg />}
+					name="Chats"
+					onClick={() => {
+						isSidebarOpen.set(false);
+						navigate(generatePath(RoutePath.OTC_CHATS));
+					}}
+				/>
+			</SidebarSection>
 		);
 	}
 
 	function renderFeedSection() {
 		return (
-			<div className={css.section}>
-				<div className={css.sectionTitle}>
-					Feed
-					<ActionButton
-						look={ActionButtonLook.LITE}
-						icon={
-							browserStorage.isSidebarSectionFolded(SidebarSection.FEED) ? (
-								<ArrowDownSvg />
-							) : (
-								<ArrowUpSvg />
-							)
-						}
-						onClick={() => browserStorage.toggleSidebarSectionFolding(SidebarSection.FEED)}
-					/>
-				</div>
+			<SidebarSection section={Section.FEED} title="Feed">
+				{Object.values(FeedCategory).map(category => {
+					const path = generatePath(RoutePath.FEED_CATEGORY, { category });
 
-				<div
-					className={clsx(
-						css.sectionContent,
-						browserStorage.isSidebarSectionFolded(SidebarSection.FEED) || css.sectionContent_open,
-					)}
-				>
-					{Object.values(FeedCategory).map(category => {
-						const path = generatePath(RoutePath.FEED_CATEGORY, { category });
+					return (
+						<SidebarButton
+							isActive={location.pathname === path}
+							icon={getFeedCategoryIcon(category)}
+							name={getFeedCategoryName(category)}
+							onClick={() => {
+								isSidebarOpen.set(false);
+								navigate(path);
+							}}
+							rightButton={
+								category === FeedCategory.MAIN
+									? {
+											icon: <SettingsSvg />,
+											onClick: () => setFeedSettingsOpen(!isFeedSettingsOpen),
+									  }
+									: undefined
+							}
+						/>
+					);
+				})}
 
-						return (
-							<div
-								key={category}
-								className={clsx(css.sectionLink, {
-									[css.sectionLink_active]: location.pathname === path,
-								})}
-								onClick={() => {
-									isSidebarOpen.set(false);
-									navigate(path);
-								}}
-							>
-								<div className={css.sectionLinkIconLeft}>{getFeedCategoryIcon(category)}</div>
-								<div className={css.sectionLinkTitle}>{getFeedCategoryName(category)}</div>
-
-								{category === FeedCategory.MAIN && (
-									<>
-										<ActionButton
-											className={css.sectionRightButton}
-											look={ActionButtonLook.LITE}
-											icon={<SettingsSvg />}
-											onClick={e => {
-												e.stopPropagation();
-												setFeedSettingsOpen(!isFeedSettingsOpen);
-											}}
-										/>
-
-										{isFeedSettingsOpen && (
-											<FeedSettingsPopup onClose={() => setFeedSettingsOpen(false)} />
-										)}
-									</>
-								)}
-							</div>
-						);
-					})}
-				</div>
-			</div>
+				{isFeedSettingsOpen && <FeedSettingsPopup onClose={() => setFeedSettingsOpen(false)} />}
+			</SidebarSection>
 		);
 	}
 
 	function renderMailSection() {
 		return (
-			<div className={css.section}>
-				<div className={css.sectionTitle}>
-					Mail
-					<ActionButton
-						look={ActionButtonLook.LITE}
-						icon={
-							browserStorage.isSidebarSectionFolded(SidebarSection.MAIL) ? (
-								<ArrowDownSvg />
-							) : (
-								<ArrowUpSvg />
-							)
-						}
-						onClick={() => browserStorage.toggleSidebarSectionFolding(SidebarSection.MAIL)}
-					/>
-				</div>
-				<div
-					className={clsx(
-						css.sectionContent,
-						browserStorage.isSidebarSectionFolded(SidebarSection.MAIL) || css.sectionContent_open,
-					)}
+			<SidebarSection section={Section.MAIL} title="Mail">
+				<ActionButton
+					look={ActionButtonLook.PRIMARY}
+					className={css.sectionButton}
+					onClick={() => {
+						isSidebarOpen.set(false);
+						openMailCopmpose();
+					}}
 				>
-					<ActionButton
-						look={ActionButtonLook.PRIMARY}
-						className={css.sectionButton}
-						onClick={() => {
-							isSidebarOpen.set(false);
-							openMailCopmpose();
-						}}
-					>
-						Compose mail
-					</ActionButton>
-					<div
-						className={clsx(css.sectionLink, {
-							[css.sectionLink_active]:
-								location.pathname === generatePath(RoutePath.MAIL_FOLDER, { folderId: FolderId.Inbox }),
-						})}
-						onClick={() => {
-							isSidebarOpen.set(false);
-							navigate(generatePath(RoutePath.MAIL_FOLDER, { folderId: FolderId.Inbox }));
-						}}
-					>
-						<div className={css.sectionLinkIconLeft}>
-							<InboxSvg />
-						</div>
-						<div className={css.sectionLinkTitle}>Inbox</div>
-					</div>
-					<div
-						className={clsx(css.sectionLink, {
-							[css.sectionLink_active]:
-								location.pathname === generatePath(RoutePath.MAIL_FOLDER, { folderId: FolderId.Sent }),
-						})}
-						onClick={() => {
-							isSidebarOpen.set(false);
-							navigate(generatePath(RoutePath.MAIL_FOLDER, { folderId: FolderId.Sent }));
-						}}
-					>
-						<div className={css.sectionLinkIconLeft}>
-							<SentSvg />
-						</div>
-						<div className={css.sectionLinkTitle}>Sent</div>
-					</div>
-					<div
-						className={clsx(css.sectionLink, {
-							[css.sectionLink_active]:
-								location.pathname ===
-								generatePath(RoutePath.MAIL_FOLDER, { folderId: FolderId.Archive }),
-						})}
-						onClick={() => {
-							isSidebarOpen.set(false);
-							navigate(generatePath(RoutePath.MAIL_FOLDER, { folderId: FolderId.Archive }));
-						}}
-					>
-						<div className={css.sectionLinkIconLeft}>
-							<ArchiveSvg />
-						</div>
-						<div className={css.sectionLinkTitle}>Archive</div>
-					</div>
-				</div>
-			</div>
+					Compose mail
+				</ActionButton>
+
+				<SidebarButton
+					isActive={location.pathname === generatePath(RoutePath.MAIL_FOLDER, { folderId: FolderId.Inbox })}
+					icon={<InboxSvg />}
+					name="Inbox"
+					onClick={() => {
+						isSidebarOpen.set(false);
+						navigate(generatePath(RoutePath.MAIL_FOLDER, { folderId: FolderId.Inbox }));
+					}}
+				/>
+
+				<SidebarButton
+					isActive={location.pathname === generatePath(RoutePath.MAIL_FOLDER, { folderId: FolderId.Sent })}
+					icon={<SentSvg />}
+					name="Sent"
+					onClick={() => {
+						isSidebarOpen.set(false);
+						navigate(generatePath(RoutePath.MAIL_FOLDER, { folderId: FolderId.Sent }));
+					}}
+				/>
+
+				<SidebarButton
+					isActive={location.pathname === generatePath(RoutePath.MAIL_FOLDER, { folderId: FolderId.Archive })}
+					icon={<ArchiveSvg />}
+					name="Archive"
+					onClick={() => {
+						isSidebarOpen.set(false);
+						navigate(generatePath(RoutePath.MAIL_FOLDER, { folderId: FolderId.Archive }));
+					}}
+				/>
+			</SidebarSection>
 		);
 	}
 

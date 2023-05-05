@@ -1,6 +1,6 @@
 import { makeAutoObservable } from 'mobx';
 
-import { SidebarSection } from '../components/genericLayout/sidebar/sidebarMenu';
+import { Section } from '../components/genericLayout/sidebar/sidebarMenu';
 import { WidgetId } from '../pages/widgets/widgets';
 import { toggleArrayItem } from '../utils/array';
 
@@ -91,14 +91,14 @@ class BrowserStorage {
 	private _sidebarFoldedSections =
 		BrowserStorage.getItemWithTransform(
 			BrowserStorageKey.SIDEBAR_FOLDED_SECTIONS,
-			item => item.split(',') as SidebarSection[],
+			item => item.split(',') as Section[],
 		) || [];
 
-	isSidebarSectionFolded(section: SidebarSection) {
+	isSidebarSectionFolded(section: Section) {
 		return this._sidebarFoldedSections.includes(section);
 	}
 
-	toggleSidebarSectionFolding(section: SidebarSection) {
+	toggleSidebarSectionFolding(section: Section) {
 		const newValue = toggleArrayItem(this._sidebarFoldedSections, section);
 		BrowserStorage.setItem(
 			BrowserStorageKey.SIDEBAR_FOLDED_SECTIONS,
