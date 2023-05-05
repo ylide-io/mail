@@ -7,6 +7,7 @@ import {
 	WhatsappShareButton,
 } from 'react-share';
 
+import { REACT_APP__SMART_FEED_MODE } from '../../env';
 import { OutgoingMailData } from '../../stores/outgoingMailData';
 import { HorizontalAlignment } from '../../utils/alignment';
 import { copyToClipboard } from '../../utils/clipboard';
@@ -48,21 +49,23 @@ export function SharePopup({ anchorRef, horizontalAlign, onClose, url, subject }
 		>
 			<div className={css.content}>
 				<div className={css.primaryButtons}>
-					<button
-						className={css.primaryButton}
-						onClick={() => {
-							const mailData = new OutgoingMailData();
-							mailData.subject = subject;
-							mailData.editorData = plainTextToEditorJsData(realUrl);
+					{!REACT_APP__SMART_FEED_MODE && (
+						<button
+							className={css.primaryButton}
+							onClick={() => {
+								const mailData = new OutgoingMailData();
+								mailData.subject = subject;
+								mailData.editorData = plainTextToEditorJsData(realUrl);
 
-							openMailCopmpose({ mailData });
+								openMailCopmpose({ mailData });
 
-							onClose();
-						}}
-					>
-						<YlideSvg className={css.icon} />
-						Share via Ylide Mail
-					</button>
+								onClose();
+							}}
+						>
+							<YlideSvg className={css.icon} />
+							Share via Ylide Mail
+						</button>
+					)}
 
 					<button
 						className={css.primaryButton}
