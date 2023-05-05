@@ -98,7 +98,15 @@ const App = observer(() => {
 					<Route path={RoutePath.SETTINGS} element={<SettingsPage />} />
 					<Route path={RoutePath.ADMIN} element={<AdminPage />} />
 
-					<Route path={RoutePath.FEED} element={<FeedPage />} />
+					<Route
+						path={RoutePath.FEED}
+						element={
+							<Navigate
+								replace
+								to={generatePath(RoutePath.FEED_CATEGORY, { category: FeedCategory.MAIN })}
+							/>
+						}
+					/>
 					<Route path={RoutePath.FEED_POST} element={<FeedPostPage />} />
 					<Route path={RoutePath.FEED_CATEGORY} element={<FeedPage />} />
 
@@ -113,6 +121,9 @@ const App = observer(() => {
 					<Route path={RoutePath.OTC_CHATS} element={<OtcChatsPage />} />
 					<Route path={RoutePath.OTC_CHAT} element={<OtcChatPage />} />
 
+					<Route path={RoutePath.SEND_MESSAGE_WIDGET} element={<SendMessageWidget />} />
+					<Route path={RoutePath.MAILBOX_WIDGET} element={<MailboxWidget />} />
+
 					<Route
 						path={RoutePath.ANY}
 						element={
@@ -121,14 +132,11 @@ const App = observer(() => {
 								to={
 									REACT_APP__OTC_MODE
 										? generatePath(RoutePath.OTC_ASSETS)
-										: generatePath(RoutePath.FEED_CATEGORY, { category: FeedCategory.MAIN })
+										: generatePath(RoutePath.FEED)
 								}
 							/>
 						}
 					/>
-
-					<Route path={RoutePath.SEND_MESSAGE_WIDGET} element={<SendMessageWidget />} />
-					<Route path={RoutePath.MAILBOX_WIDGET} element={<MailboxWidget />} />
 				</Routes>
 
 				<StaticComponentManager />
