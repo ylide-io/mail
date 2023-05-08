@@ -87,6 +87,16 @@
 	color: var(--secondary-text-color);
 }
 
+.reason {
+	@include truncate-text;
+	padding: 2px 6px 1px;
+	color: var(--accent2-color);
+	font-size: 11px;
+	background: rgba(var(--accent2-rgb-color), 0.08);
+	border-radius: 99px;
+	cursor: default;
+}
+
 .date {
 	color: var(--secondary-text-color);
 	font-weight: $font-weight_light;

@@ -41,7 +41,7 @@
 
 	background: #ffffff;
 	border: 0.5px solid var(--accent2-color);
-	box-shadow: 0px 4px 24px rgba(151, 71, 255, 0.24);
+	box-shadow: 0px 4px 24px rgba(var(--accent2-rgb-color), 0.24);
 	border-radius: 12px;
 
 	transition: all 0.3s;

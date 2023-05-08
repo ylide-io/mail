@@ -47,6 +47,14 @@ export interface FeedPostEmbed {
 	text: string;
 }
 
+export enum FeedPostDisplayReason {
+	ADDED,
+	HOLDING_TICKER,
+	HOLDED_TICKER,
+	USING_PROJECT,
+	USED_PROJECT,
+}
+
 export interface FeedPost {
 	id: string;
 	title: string;
@@ -67,6 +75,10 @@ export interface FeedPost {
 	sourceLink: string;
 	embeds: FeedPostEmbed[];
 	thread: FeedPost[];
+	displayReason: {
+		reason: FeedPostDisplayReason;
+		meta?: string;
+	};
 }
 
 class Feed {
@@ -123,6 +135,14 @@ class Feed {
 				...params,
 				categories,
 				sourceListId,
+			});
+
+			// FIXME Temp stuff
+			response.items.forEach(it => {
+				it.displayReason = {
+					reason: FeedPostDisplayReason.HOLDING_TICKER,
+					meta: 'BTC',
+				};
 			});
 
 			this.loaded = true;

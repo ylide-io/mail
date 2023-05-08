@@ -3,13 +3,13 @@ import clsx from 'clsx';
 import React, { MouseEvent, useEffect, useRef, useState } from 'react';
 import { generatePath } from 'react-router-dom';
 
+import { DropDown, DropDownItem } from '../../../../components/dropDown/dropDown';
 import { GalleryModal } from '../../../../components/galleryModal/galleryModal';
 import { ReadableDate } from '../../../../components/readableDate/readableDate';
 import { SharePopup } from '../../../../components/sharePopup/sharePopup';
 import { ReactComponent as ContactSvg } from '../../../../icons/ic20/contact.svg';
-import { ReactComponent as ExternalSvg } from '../../../../icons/ic20/external.svg';
-import { ReactComponent as ShareSvg } from '../../../../icons/ic20/share.svg';
-import { FeedCategory, FeedPost, LinkType } from '../../../../stores/Feed';
+import { ReactComponent as MenuSvg } from '../../../../icons/ic20/menu.svg';
+import { FeedCategory, FeedPost, FeedPostDisplayReason, LinkType } from '../../../../stores/Feed';
 import { RoutePath } from '../../../../stores/routePath';
 import { HorizontalAlignment } from '../../../../utils/alignment';
 import { toAbsoluteUrl, useNav } from '../../../../utils/url';
@@ -99,7 +99,8 @@ export function FeedPostItem({ isInFeed, post }: FeedPostItemProps) {
 	const navigate = useNav();
 	const postPath = generatePath(RoutePath.FEED_POST, { id: post.id });
 
-	const shareButtonRef = useRef(null);
+	const menuButtonRef = useRef(null);
+	const [isMenuOpen, setMenuOpen] = useState(false);
 	const [isSharePopupOpen, setSharePopupOpen] = useState(false);
 
 	useEffect(() => {
@@ -138,6 +139,22 @@ export function FeedPostItem({ isInFeed, post }: FeedPostItemProps) {
 				</div>
 
 				<div className={css.metaRight}>
+					{post.displayReason && (
+						<div className={css.reason} title="The reason why you see this post">
+							{
+								{
+									[FeedPostDisplayReason.ADDED]: 'Added manually',
+									[FeedPostDisplayReason.HOLDING_TICKER]: "You're holding ",
+									[FeedPostDisplayReason.HOLDED_TICKER]: 'You holded ',
+									[FeedPostDisplayReason.USING_PROJECT]: "You're in ",
+									[FeedPostDisplayReason.USED_PROJECT]: 'You used ',
+								}[post.displayReason.reason]
+							}
+
+							{post.displayReason.meta != null && <b>{post.displayReason.meta}</b>}
+						</div>
+					)}
+
 					<a
 						className={css.date}
 						href={postPath}
@@ -149,39 +166,54 @@ export function FeedPostItem({ isInFeed, post }: FeedPostItemProps) {
 						<ReadableDate value={Date.parse(post.date)} />
 					</a>
 
-					{isInFeed && (
-						<>
-							<button
-								ref={shareButtonRef}
-								className={css.metaButton}
-								title="Share this post"
-								onClick={() => setSharePopupOpen(!isSharePopupOpen)}
-							>
-								<ShareSvg />
-							</button>
+					<button
+						ref={menuButtonRef}
+						className={css.metaButton}
+						onClick={() => {
+							setSharePopupOpen(false);
+							setMenuOpen(!isMenuOpen);
+						}}
+					>
+						<MenuSvg />
+					</button>
 
-							{isSharePopupOpen && (
-								<SharePopup
-									anchorRef={shareButtonRef}
-									horizontalAlign={HorizontalAlignment.END}
-									onClose={() => setSharePopupOpen(false)}
-									subject="Check out this post on Ylide!"
-									url={toAbsoluteUrl(postPath)}
-								/>
+					{isMenuOpen && (
+						<DropDown
+							anchorRef={menuButtonRef}
+							horizontalAlign={HorizontalAlignment.END}
+							onCloseRequest={() => setMenuOpen(false)}
+						>
+							<DropDownItem
+								onSelect={() => {
+									setMenuOpen(false);
+									setSharePopupOpen(true);
+								}}
+							>
+								Share post
+							</DropDownItem>
+
+							{!!post.sourceLink && (
+								<DropDownItem
+									onSelect={() => {
+										navigate(post.sourceLink);
+									}}
+								>
+									Open post source
+								</DropDownItem>
 							)}
-						</>
+
+							<DropDownItem>Unfollow</DropDownItem>
+						</DropDown>
 					)}
 
-					{!!post.sourceLink && (
-						<a
-							className={css.metaButton}
-							href={post.sourceLink}
-							title="Open post source"
-							target="_blank"
-							rel="noreferrer"
-						>
-							<ExternalSvg />
-						</a>
+					{isSharePopupOpen && (
+						<SharePopup
+							anchorRef={menuButtonRef}
+							horizontalAlign={HorizontalAlignment.END}
+							onClose={() => setSharePopupOpen(false)}
+							subject="Check out this post on Ylide!"
+							url={toAbsoluteUrl(postPath)}
+						/>
 					)}
 				</div>
 			</div>
