@@ -143,15 +143,15 @@ export function FeedPostItem({ isInFeed, post }: FeedPostItemProps) {
 						<div className={css.reason} title="The reason why you see this post">
 							{
 								{
-									[FeedSourceUserRelation.NONE]: 'Added manually',
+									[FeedSourceUserRelation.NONE]: 'Added manually ',
 									[FeedSourceUserRelation.HOLDING_TOKEN]: "You're holding ",
 									[FeedSourceUserRelation.HOLDED_TOKEN]: 'You holded ',
 									[FeedSourceUserRelation.USING_PROJECT]: "You're in ",
 									[FeedSourceUserRelation.USED_PROJECT]: 'You used ',
-								}[post.userRelation.relation]
+								}[post.userRelation]
 							}
 
-							{post.userRelation.meta != null && <b>{post.userRelation.meta}</b>}
+							{!!post.tokens.length && <b>{post.tokens.join(', ')}</b>}
 						</div>
 					)}
 

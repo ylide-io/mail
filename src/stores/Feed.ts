@@ -77,10 +77,8 @@ class Feed {
 
 			// FIXME Temp
 			response.items.forEach(it => {
-				it.userRelation = {
-					relation: randomArrayElem(Object.values(FeedSourceUserRelation)),
-					meta: randomArrayElem(['BTC', 'ETH', 'USDT']),
-				};
+				it.tokens = [randomArrayElem(['BTC', 'ETH', 'USDT'])];
+				it.userRelation = randomArrayElem(Object.values(FeedSourceUserRelation));
 			});
 
 			this.loaded = true;

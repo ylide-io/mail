@@ -58,10 +58,8 @@ export interface FeedPost {
 	sourceLink: string;
 	embeds: FeedPostEmbed[];
 	thread: FeedPost[];
-	userRelation: {
-		relation: FeedSourceUserRelation;
-		meta?: string;
-	};
+	tokens: string[];
+	userRelation: FeedSourceUserRelation;
 }
 
 export enum LinkType {
