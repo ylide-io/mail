@@ -1,6 +1,7 @@
 import { makeObservable, observable } from 'mobx';
 
-import { FeedCategory, FeedPost, FeedPostDisplayReason, FeedServerApi } from '../api/feedServerApi';
+import { FeedCategory, FeedPost, FeedServerApi, FeedSourceUserRelation } from '../api/feedServerApi';
+import { randomArrayElem } from '../utils/array';
 import { analytics } from './Analytics';
 import { browserStorage } from './browserStorage';
 
@@ -74,11 +75,11 @@ class Feed {
 				sourceListId,
 			});
 
-			// FIXME Temp stuff
+			// FIXME Temp
 			response.items.forEach(it => {
-				it.displayReason = {
-					reason: FeedPostDisplayReason.HOLDING_TOKEN,
-					meta: 'BTC',
+				it.userRelation = {
+					relation: randomArrayElem(Object.values(FeedSourceUserRelation)),
+					meta: randomArrayElem(['BTC', 'ETH', 'USDT']),
 				};
 			});
 

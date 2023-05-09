@@ -58,8 +58,8 @@ export interface FeedPost {
 	sourceLink: string;
 	embeds: FeedPostEmbed[];
 	thread: FeedPost[];
-	displayReason: {
-		reason: FeedPostDisplayReason;
+	userRelation: {
+		relation: FeedSourceUserRelation;
 		meta?: string;
 	};
 }
@@ -78,14 +78,6 @@ export interface FeedPostEmbed {
 	link: string;
 	title: string;
 	text: string;
-}
-
-export enum FeedPostDisplayReason {
-	ADDED = 'ADDED',
-	HOLDING_TOKEN = 'HOLDING_TOKEN',
-	HOLDED_TOKEN = 'HOLDED_TOKEN',
-	USING_PROJECT = 'USING_PROJECT',
-	USED_PROJECT = 'USED_PROJECT',
 }
 
 //

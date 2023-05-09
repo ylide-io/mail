@@ -3,7 +3,7 @@ import clsx from 'clsx';
 import React, { MouseEvent, useEffect, useRef, useState } from 'react';
 import { generatePath } from 'react-router-dom';
 
-import { FeedCategory, FeedPost, FeedPostDisplayReason, LinkType } from '../../../../api/feedServerApi';
+import { FeedCategory, FeedPost, FeedSourceUserRelation, LinkType } from '../../../../api/feedServerApi';
 import { DropDown, DropDownItem } from '../../../../components/dropDown/dropDown';
 import { GalleryModal } from '../../../../components/galleryModal/galleryModal';
 import { ReadableDate } from '../../../../components/readableDate/readableDate';
@@ -139,19 +139,19 @@ export function FeedPostItem({ isInFeed, post }: FeedPostItemProps) {
 				</div>
 
 				<div className={css.metaRight}>
-					{post.displayReason && (
+					{post.userRelation && (
 						<div className={css.reason} title="The reason why you see this post">
 							{
 								{
-									[FeedPostDisplayReason.ADDED]: 'Added manually',
-									[FeedPostDisplayReason.HOLDING_TOKEN]: "You're holding ",
-									[FeedPostDisplayReason.HOLDED_TOKEN]: 'You holded ',
-									[FeedPostDisplayReason.USING_PROJECT]: "You're in ",
-									[FeedPostDisplayReason.USED_PROJECT]: 'You used ',
-								}[post.displayReason.reason]
+									[FeedSourceUserRelation.NONE]: 'Added manually',
+									[FeedSourceUserRelation.HOLDING_TOKEN]: "You're holding ",
+									[FeedSourceUserRelation.HOLDED_TOKEN]: 'You holded ',
+									[FeedSourceUserRelation.USING_PROJECT]: "You're in ",
+									[FeedSourceUserRelation.USED_PROJECT]: 'You used ',
+								}[post.userRelation.relation]
 							}
 
-							{post.displayReason.meta != null && <b>{post.displayReason.meta}</b>}
+							{post.userRelation.meta != null && <b>{post.userRelation.meta}</b>}
 						</div>
 					)}
 
