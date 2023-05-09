@@ -193,13 +193,9 @@ export function FeedPostItem({ isInFeed, post }: FeedPostItemProps) {
 							</DropDownItem>
 
 							{!!post.sourceLink && (
-								<DropDownItem
-									onSelect={() => {
-										navigate(post.sourceLink);
-									}}
-								>
-									Open post source
-								</DropDownItem>
+								<a href={post.sourceLink} target="_blank" rel="noreferrer">
+									<DropDownItem>Open post source</DropDownItem>
+								</a>
 							)}
 
 							<DropDownItem>Unfollow</DropDownItem>
