@@ -134,12 +134,31 @@ export const FeedSettingsPopup = observer(({ onClose }: FeedSettingsPopupProps) 
 
 		if (!filteredSources?.length) return;
 
-		return filteredSources.reduce((res, source) => {
-			const userRelation = source.userRelation;
-			const items = (res[userRelation] = res[userRelation] || []);
-			items.push(source);
-			return res;
-		}, {} as Record<FeedSourceUserRelation, FeedSource[]>);
+		const grouped = filteredSources.reduce(
+			(res, source) => {
+				const userRelation = source.userRelation;
+				const items = (res[userRelation] = res[userRelation] || []);
+				items.push(source);
+				return res;
+			},
+			{
+				[FeedSourceUserRelation.HOLDING_TOKEN]: [],
+				[FeedSourceUserRelation.HOLDED_TOKEN]: [],
+				[FeedSourceUserRelation.USING_PROJECT]: [],
+				[FeedSourceUserRelation.USED_PROJECT]: [],
+				[FeedSourceUserRelation.NONE]: [],
+			} as Record<FeedSourceUserRelation, FeedSource[]>,
+		);
+
+		(Object.entries(grouped) as [FeedSourceUserRelation, FeedSource[]][]).forEach(([userRelation, sources]) => {
+			if (!sources.length) {
+				delete grouped[userRelation];
+			}
+		});
+
+		if (Object.keys(grouped).length) {
+			return grouped;
+		}
 	}, [data, searchTerm]);
 
 	return (
