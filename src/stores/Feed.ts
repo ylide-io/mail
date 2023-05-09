@@ -1,21 +1,8 @@
 import { makeObservable, observable } from 'mobx';
 
-import { FeedServerApi } from '../api/feedServerApi';
+import { FeedCategory, FeedPost, FeedPostDisplayReason, FeedServerApi } from '../api/feedServerApi';
 import { analytics } from './Analytics';
 import { browserStorage } from './browserStorage';
-
-export enum FeedCategory {
-	MAIN = 'main',
-	ALL = 'all',
-	MARKETS = 'Markets',
-	ANALYTICS = 'Analytics',
-	PROJECTS = 'Projects',
-	POLICY = 'Policy',
-	SECURITY = 'Security',
-	TECHNOLOGY = 'Technology',
-	CULTURE = 'Culture',
-	EDUCATION = 'Education',
-}
 
 export const nonSyntheticFeedCategories = Object.values<FeedCategory>(FeedCategory).filter(
 	it => it !== FeedCategory.MAIN && it !== FeedCategory.ALL,
@@ -29,56 +16,6 @@ export function getFeedCategoryName(category: FeedCategory) {
 	} else {
 		return category;
 	}
-}
-
-export enum LinkType {
-	TELEGRAM = 'telegram',
-	TWITTER = 'twitter',
-	MEDIUM = 'medium',
-	MIRROR = 'mirror',
-	DISCORD = 'discord',
-}
-
-export interface FeedPostEmbed {
-	type: 'link-preview' | 'image' | 'video';
-	previewImageUrl: string;
-	link: string;
-	title: string;
-	text: string;
-}
-
-export enum FeedPostDisplayReason {
-	ADDED = 'ADDED',
-	HOLDING_TOKEN = 'HOLDING_TOKEN',
-	HOLDED_TOKEN = 'HOLDED_TOKEN',
-	USING_PROJECT = 'USING_PROJECT',
-	USED_PROJECT = 'USED_PROJECT',
-}
-
-export interface FeedPost {
-	id: string;
-	title: string;
-	subtitle: string;
-	content: string;
-	picrel: string;
-	sourceId: string;
-	sourceName: string;
-	sourceNickname: string;
-	serverName: string;
-	channelName: string;
-	sourceType: LinkType;
-	categories: string[];
-	date: string;
-	authorName: string;
-	authorAvatar: string;
-	authorNickname: string;
-	sourceLink: string;
-	embeds: FeedPostEmbed[];
-	thread: FeedPost[];
-	displayReason: {
-		reason: FeedPostDisplayReason;
-		meta?: string;
-	};
 }
 
 class Feed {

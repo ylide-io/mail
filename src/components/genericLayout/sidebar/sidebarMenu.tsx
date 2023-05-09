@@ -4,6 +4,7 @@ import { observer } from 'mobx-react';
 import React, { PropsWithChildren, ReactNode, useState } from 'react';
 import { generatePath, useLocation } from 'react-router-dom';
 
+import { FeedCategory } from '../../../api/feedServerApi';
 import { REACT_APP__OTC_MODE, REACT_APP__SMART_FEED_MODE } from '../../../env';
 import { ReactComponent as ArchiveSvg } from '../../../icons/archive.svg';
 import { ReactComponent as ArrowDownSvg } from '../../../icons/ic20/arrowDown.svg';
@@ -33,7 +34,7 @@ import { FeedSettingsPopup } from '../../../pages/feed/components/feedSettingsPo
 import { WidgetId } from '../../../pages/widgets/widgets';
 import { browserStorage } from '../../../stores/browserStorage';
 import domain from '../../../stores/Domain';
-import { FeedCategory, getFeedCategoryName, nonSyntheticFeedCategories } from '../../../stores/Feed';
+import { getFeedCategoryName, nonSyntheticFeedCategories } from '../../../stores/Feed';
 import { FolderId } from '../../../stores/MailList';
 import { RoutePath } from '../../../stores/routePath';
 import { useOpenMailCopmpose } from '../../../utils/mail';

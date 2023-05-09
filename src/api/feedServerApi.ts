@@ -1,8 +1,94 @@
 import { REACT_APP__FEED_SERVER } from '../env';
-import { FeedCategory, FeedPost, LinkType } from '../stores/Feed';
 import { randomArrayElem } from '../utils/array';
 import { invariant } from '../utils/assert';
 import { createCleanSerachParams } from '../utils/url';
+
+export interface FeedSource {
+	id: string;
+	category: FeedCategory;
+	name: string;
+	origin?: string;
+	avatar?: string;
+	link: string;
+	type: LinkType;
+	tokens: string[];
+	userRelation: FeedSourceUserRelation;
+}
+
+export enum FeedCategory {
+	MAIN = 'main',
+	ALL = 'all',
+	MARKETS = 'Markets',
+	ANALYTICS = 'Analytics',
+	PROJECTS = 'Projects',
+	POLICY = 'Policy',
+	SECURITY = 'Security',
+	TECHNOLOGY = 'Technology',
+	CULTURE = 'Culture',
+	EDUCATION = 'Education',
+}
+
+export enum FeedSourceUserRelation {
+	NONE = 'NONE',
+	HOLDING_TOKEN = 'HOLDING_TOKEN',
+	HOLDED_TOKEN = 'HOLDED_TOKEN',
+	USING_PROJECT = 'USING_PROJECT',
+	USED_PROJECT = 'USED_PROJECT',
+}
+
+//
+
+export interface FeedPost {
+	id: string;
+	title: string;
+	subtitle: string;
+	content: string;
+	picrel: string;
+	sourceId: string;
+	sourceName: string;
+	sourceNickname: string;
+	serverName: string;
+	channelName: string;
+	sourceType: LinkType;
+	categories: string[];
+	date: string;
+	authorName: string;
+	authorAvatar: string;
+	authorNickname: string;
+	sourceLink: string;
+	embeds: FeedPostEmbed[];
+	thread: FeedPost[];
+	displayReason: {
+		reason: FeedPostDisplayReason;
+		meta?: string;
+	};
+}
+
+export enum LinkType {
+	TELEGRAM = 'telegram',
+	TWITTER = 'twitter',
+	MEDIUM = 'medium',
+	MIRROR = 'mirror',
+	DISCORD = 'discord',
+}
+
+export interface FeedPostEmbed {
+	type: 'link-preview' | 'image' | 'video';
+	previewImageUrl: string;
+	link: string;
+	title: string;
+	text: string;
+}
+
+export enum FeedPostDisplayReason {
+	ADDED = 'ADDED',
+	HOLDING_TOKEN = 'HOLDING_TOKEN',
+	HOLDED_TOKEN = 'HOLDED_TOKEN',
+	USING_PROJECT = 'USING_PROJECT',
+	USED_PROJECT = 'USED_PROJECT',
+}
+
+//
 
 export namespace FeedServerApi {
 	export enum ErrorCode {
@@ -50,7 +136,9 @@ export namespace FeedServerApi {
 
 	//
 
-	export interface GetPostsParams {
+	export type GetPostsResponse = { moreAvailable: boolean; newPosts: number; items: FeedPost[] };
+
+	export async function getPosts(params: {
 		needOld: boolean;
 		length: number;
 		categories?: string[];
@@ -58,11 +146,7 @@ export namespace FeedServerApi {
 		sourceListId?: string;
 		lastPostId?: string;
 		firstPostId?: string;
-	}
-
-	export type GetPostsResponse = { moreAvailable: boolean; newPosts: number; items: FeedPost[] };
-
-	export async function getPosts(params: GetPostsParams): Promise<GetPostsResponse> {
+	}): Promise<GetPostsResponse> {
 		return await request(`/posts?${createCleanSerachParams(params)}`);
 	}
 
@@ -75,26 +159,6 @@ export namespace FeedServerApi {
 	}
 
 	//
-
-	export interface FeedSource {
-		id: string;
-		category: FeedCategory;
-		name: string;
-		origin?: string;
-		avatar?: string;
-		link: string;
-		type: LinkType;
-		tokens: string[];
-		userRelation: FeedSourceUserRelation;
-	}
-
-	export enum FeedSourceUserRelation {
-		NONE = 'NONE',
-		HOLDING_TOKEN = 'HOLDING_TOKEN',
-		HOLDED_TOKEN = 'HOLDED_TOKEN',
-		USING_PROJECT = 'USING_PROJECT',
-		USED_PROJECT = 'USED_PROJECT',
-	}
 
 	export type GetSourcesResponse = { sources: FeedSource[] };
 

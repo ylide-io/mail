@@ -4,7 +4,7 @@ import { observer } from 'mobx-react';
 import React, { useCallback, useMemo, useState } from 'react';
 import { useMutation, useQuery } from 'react-query';
 
-import { FeedServerApi } from '../../../../api/feedServerApi';
+import { FeedServerApi, FeedSource, FeedSourceUserRelation } from '../../../../api/feedServerApi';
 import { ActionButton, ActionButtonLook } from '../../../../components/ActionButton/ActionButton';
 import { CheckBox } from '../../../../components/checkBox/checkBox';
 import { ErrorMessage } from '../../../../components/errorMessage/errorMessage';
@@ -20,8 +20,6 @@ import { toggleArrayItem } from '../../../../utils/array';
 import { invariant } from '../../../../utils/assert';
 import { FeedLinkTypeIcon } from '../feedLinkTypeIcon/feedLinkTypeIcon';
 import css from './feedSettingsPopup.module.scss';
-import FeedSourceUserRelation = FeedServerApi.FeedSourceUserRelation;
-import FeedSource = FeedServerApi.FeedSource;
 
 function formatFeedUserRelation(userRelation: FeedSourceUserRelation) {
 	return {
@@ -36,7 +34,7 @@ function formatFeedUserRelation(userRelation: FeedSourceUserRelation) {
 //
 
 interface RowProps {
-	source: FeedServerApi.FeedSource;
+	source: FeedSource;
 	isSelected: boolean;
 	onSelect: (sourceId: string, isSelected: boolean) => void;
 }

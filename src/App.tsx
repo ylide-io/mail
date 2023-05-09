@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { QueryClient, QueryClientProvider } from 'react-query';
 import { generatePath, Navigate, Route, Routes, useLocation } from 'react-router-dom';
 
+import { FeedCategory } from './api/feedServerApi';
 import { PopupManager } from './components/popup/popupManager/popupManager';
 import { StaticComponentManager } from './components/staticComponentManager/staticComponentManager';
 import { ToastManager } from './components/toast/toast';
@@ -28,7 +29,6 @@ import { MailboxWidget } from './pages/widgets/mailboxWidget/mailboxWidget';
 import { SendMessageWidget } from './pages/widgets/sendMessageWidget/sendMessageWidget';
 import { analytics } from './stores/Analytics';
 import domain from './stores/Domain';
-import { FeedCategory } from './stores/Feed';
 import { RoutePath } from './stores/routePath';
 import walletConnect from './stores/WalletConnect';
 

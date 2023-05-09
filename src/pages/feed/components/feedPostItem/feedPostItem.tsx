@@ -3,13 +3,13 @@ import clsx from 'clsx';
 import React, { MouseEvent, useEffect, useRef, useState } from 'react';
 import { generatePath } from 'react-router-dom';
 
+import { FeedCategory, FeedPost, FeedPostDisplayReason, LinkType } from '../../../../api/feedServerApi';
 import { DropDown, DropDownItem } from '../../../../components/dropDown/dropDown';
 import { GalleryModal } from '../../../../components/galleryModal/galleryModal';
 import { ReadableDate } from '../../../../components/readableDate/readableDate';
 import { SharePopup } from '../../../../components/sharePopup/sharePopup';
 import { ReactComponent as ContactSvg } from '../../../../icons/ic20/contact.svg';
 import { ReactComponent as MenuSvg } from '../../../../icons/ic20/menu.svg';
-import { FeedCategory, FeedPost, FeedPostDisplayReason, LinkType } from '../../../../stores/Feed';
 import { RoutePath } from '../../../../stores/routePath';
 import { HorizontalAlignment } from '../../../../utils/alignment';
 import { toAbsoluteUrl, useNav } from '../../../../utils/url';
