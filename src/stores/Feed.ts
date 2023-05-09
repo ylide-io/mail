@@ -48,11 +48,11 @@ export interface FeedPostEmbed {
 }
 
 export enum FeedPostDisplayReason {
-	ADDED,
-	HOLDING_TICKER,
-	HOLDED_TICKER,
-	USING_PROJECT,
-	USED_PROJECT,
+	ADDED = 'ADDED',
+	HOLDING_TOKEN = 'HOLDING_TOKEN',
+	HOLDED_TOKEN = 'HOLDED_TOKEN',
+	USING_PROJECT = 'USING_PROJECT',
+	USED_PROJECT = 'USED_PROJECT',
 }
 
 export interface FeedPost {
@@ -140,7 +140,7 @@ class Feed {
 			// FIXME Temp stuff
 			response.items.forEach(it => {
 				it.displayReason = {
-					reason: FeedPostDisplayReason.HOLDING_TICKER,
+					reason: FeedPostDisplayReason.HOLDING_TOKEN,
 					meta: 'BTC',
 				};
 			});

@@ -144,8 +144,8 @@ export function FeedPostItem({ isInFeed, post }: FeedPostItemProps) {
 							{
 								{
 									[FeedPostDisplayReason.ADDED]: 'Added manually',
-									[FeedPostDisplayReason.HOLDING_TICKER]: "You're holding ",
-									[FeedPostDisplayReason.HOLDED_TICKER]: 'You holded ',
+									[FeedPostDisplayReason.HOLDING_TOKEN]: "You're holding ",
+									[FeedPostDisplayReason.HOLDED_TOKEN]: 'You holded ',
 									[FeedPostDisplayReason.USING_PROJECT]: "You're in ",
 									[FeedPostDisplayReason.USED_PROJECT]: 'You used ',
 								}[post.displayReason.reason]

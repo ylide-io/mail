@@ -1,6 +1,7 @@
 import Avatar from 'antd/lib/avatar/avatar';
 import clsx from 'clsx';
-import React, { useCallback, useState } from 'react';
+import { observer } from 'mobx-react';
+import React, { useCallback, useMemo, useState } from 'react';
 import { useMutation, useQuery } from 'react-query';
 
 import { FeedServerApi } from '../../../../api/feedServerApi';
@@ -17,9 +18,22 @@ import { ReactComponent as SearchSvg } from '../../../../icons/ic28/search.svg';
 import { browserStorage } from '../../../../stores/browserStorage';
 import { toggleArrayItem } from '../../../../utils/array';
 import { invariant } from '../../../../utils/assert';
-import { formatFeedLinkType } from '../../../../utils/feed';
 import { FeedLinkTypeIcon } from '../feedLinkTypeIcon/feedLinkTypeIcon';
 import css from './feedSettingsPopup.module.scss';
+import FeedSourceUserRelation = FeedServerApi.FeedSourceUserRelation;
+import FeedSource = FeedServerApi.FeedSource;
+
+function formatFeedUserRelation(userRelation: FeedSourceUserRelation) {
+	return {
+		[FeedSourceUserRelation.NONE]: 'Others',
+		[FeedSourceUserRelation.HOLDING_TOKEN]: 'Tokens you hold',
+		[FeedSourceUserRelation.HOLDED_TOKEN]: 'Tokens you held',
+		[FeedSourceUserRelation.USING_PROJECT]: 'Projects you have position in',
+		[FeedSourceUserRelation.USED_PROJECT]: 'Projects you used',
+	}[userRelation];
+}
+
+//
 
 interface RowProps {
 	source: FeedServerApi.FeedSource;
@@ -29,23 +43,24 @@ interface RowProps {
 
 export const Row = React.memo(({ source, isSelected, onSelect }: RowProps) => (
 	<div key={source.id} className={clsx(css.row, css.row_data)}>
-		<div className={css.checkBoxCell}>
+		<div className={css.sourceCheckBox}>
 			<CheckBox isChecked={isSelected} onChange={isChecked => onSelect(source.id, isChecked)} />
 		</div>
-		<div>
-			<div className={css.sourceName}>
-				<Avatar size={24} src={source.avatar} icon={<ContactSvg width="100%" height="100%" />} />
 
-				<div className={css.sourceNameText}>{source.name}</div>
-			</div>
+		<div className={css.sourceName}>
+			<Avatar size={24} src={source.avatar} icon={<ContactSvg width="100%" height="100%" />} />
+
+			<div className={css.sourceNameText}>{source.name}</div>
 		</div>
-		<div>{source.origin}</div>
-		<div>
-			<a className={css.sourceLink} href={source.link} target="_blank" rel="noreferrer">
+
+		<div className={css.sourceOrigin}>
+			<a className={css.sourceOriginLink} href={source.link} target="_blank" rel="noreferrer">
 				<FeedLinkTypeIcon size={16} linkType={source.type} />
-				{formatFeedLinkType(source.type)}
+				<span className={css.sourceOriginText}>{source.origin || source.link}</span>
 			</a>
 		</div>
+
+		<div className={css.sourceToken}>{source.tokens.join(', ')}</div>
 	</div>
 ));
 
@@ -55,11 +70,12 @@ export interface FeedSettingsPopupProps {
 	onClose?: () => void;
 }
 
-export function FeedSettingsPopup({ onClose }: FeedSettingsPopupProps) {
+export const FeedSettingsPopup = observer(({ onClose }: FeedSettingsPopupProps) => {
 	const { isLoading, data } = useQuery('feed-sources', async () => {
 		const res = await FeedServerApi.getSources();
 		res.sources.sort(
 			(a, b) =>
+				b.userRelation.localeCompare(a.userRelation) ||
 				b.type.localeCompare(a.type) ||
 				(a.origin || '').localeCompare(b.origin || '') ||
 				a.name.localeCompare(b.name),
@@ -110,12 +126,23 @@ export function FeedSettingsPopup({ onClose }: FeedSettingsPopupProps) {
 		}
 	};
 
-	const filteredSources = data?.sources.filter(source => {
-		const term = searchTerm.trim().toLowerCase();
-		if (!term) return true;
+	const sourcesByUserRelation = useMemo(() => {
+		const filteredSources = data?.sources.filter(source => {
+			const term = searchTerm.trim().toLowerCase();
+			if (!term) return true;
 
-		return source.name.toLowerCase().includes(term) || source.origin?.toLowerCase().includes(term);
-	});
+			return source.name.toLowerCase().includes(term) || source.origin?.toLowerCase().includes(term);
+		});
+
+		if (!filteredSources?.length) return;
+
+		return filteredSources.reduce((res, source) => {
+			const userRelation = source.userRelation;
+			const items = (res[userRelation] = res[userRelation] || []);
+			items.push(source);
+			return res;
+		}, {} as Record<FeedSourceUserRelation, FeedSource[]>);
+	}, [data, searchTerm]);
 
 	return (
 		<Modal className={css.root} onClose={onClose}>
@@ -126,29 +153,47 @@ export function FeedSettingsPopup({ onClose }: FeedSettingsPopupProps) {
 
 			<div className={css.list}>
 				{data ? (
-					filteredSources?.length ? (
-						<>
-							<div className={clsx(css.row, css.row_header)}>
-								<div className={css.checkBoxCell}>
-									<CheckBox
-										isChecked={isSelectedAll}
-										onChange={isChecked => setSelectedSourceIds(isChecked ? allSourceIds : [])}
-									/>
-								</div>
-								<div>Name</div>
-								<div>Origin / Username</div>
-								<div>Link</div>
-							</div>
+					sourcesByUserRelation ? (
+						(Object.entries(sourcesByUserRelation) as [FeedSourceUserRelation, FeedSource[]][]).map(
+							([userRelation, sources]) => {
+								return (
+									<div className={css.listGroup}>
+										<div className={clsx(css.row, css.row_category)}>
+											<CheckBox
+												isChecked={sourcesByUserRelation[userRelation].every(s =>
+													selectedSourceIds.includes(s.id),
+												)}
+												onChange={isChecked => {
+													const newSourceIds = selectedSourceIds.filter(
+														id => !sources.find(s => s.id === id),
+													);
+													setSelectedSourceIds(
+														isChecked
+															? [...newSourceIds, ...sources.map(s => s.id)]
+															: newSourceIds,
+													);
+												}}
+											/>
+											<div className={css.userRelation}>
+												{formatFeedUserRelation(userRelation)}
+											</div>
+											<div className={css.token}>Token / Project</div>
+										</div>
 
-							{filteredSources.map(source => (
-								<Row
-									key={source.id}
-									source={source}
-									isSelected={selectedSourceIds.includes(source.id)}
-									onSelect={onRowSelect}
-								/>
-							))}
-						</>
+										<div>
+											{sources.map(source => (
+												<Row
+													key={source.id}
+													source={source}
+													isSelected={selectedSourceIds.includes(source.id)}
+													onSelect={onRowSelect}
+												/>
+											))}
+										</div>
+									</div>
+								);
+							},
+						)
 					) : (
 						<div className={css.noData}>- No sources found -</div>
 					)
@@ -199,4 +244,4 @@ export function FeedSettingsPopup({ onClose }: FeedSettingsPopupProps) {
 			</div>
 		</Modal>
 	);
-}
+});

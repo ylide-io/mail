@@ -1,5 +1,6 @@
 import { REACT_APP__FEED_SERVER } from '../env';
 import { FeedCategory, FeedPost, LinkType } from '../stores/Feed';
+import { randomArrayElem } from '../utils/array';
 import { invariant } from '../utils/assert';
 import { createCleanSerachParams } from '../utils/url';
 
@@ -83,12 +84,30 @@ export namespace FeedServerApi {
 		avatar?: string;
 		link: string;
 		type: LinkType;
+		tokens: string[];
+		userRelation: FeedSourceUserRelation;
+	}
+
+	export enum FeedSourceUserRelation {
+		NONE = 'NONE',
+		HOLDING_TOKEN = 'HOLDING_TOKEN',
+		HOLDED_TOKEN = 'HOLDED_TOKEN',
+		USING_PROJECT = 'USING_PROJECT',
+		USED_PROJECT = 'USED_PROJECT',
 	}
 
 	export type GetSourcesResponse = { sources: FeedSource[] };
 
 	export async function getSources(): Promise<GetSourcesResponse> {
-		return await request('/sources');
+		const response = await request<GetSourcesResponse>('/sources');
+
+		// FIXME Temp
+		response.sources.forEach(s => {
+			s.tokens = [randomArrayElem(['BTC', 'ETH', 'USDT'])];
+			s.userRelation = randomArrayElem(Object.values(FeedSourceUserRelation));
+		});
+
+		return response;
 	}
 
 	//
