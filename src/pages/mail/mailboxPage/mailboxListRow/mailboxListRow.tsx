@@ -1,4 +1,3 @@
-import { Tooltip } from 'antd';
 import clsx from 'clsx';
 import { observer } from 'mobx-react';
 import React, { CSSProperties, useEffect, useMemo, useState } from 'react';
@@ -9,6 +8,7 @@ import { CheckBox } from '../../../../components/checkBox/checkBox';
 import { ContactName } from '../../../../components/contactName/contactName';
 import { ReadableDate } from '../../../../components/readableDate/readableDate';
 import { ReactComponent as FilterSvg } from '../../../../icons/ic20/filter.svg';
+import contacts from '../../../../stores/Contacts';
 import domain from '../../../../stores/Domain';
 import { FolderId, ILinkedMessage, mailStore } from '../../../../stores/MailList';
 import { RoutePath } from '../../../../stores/routePath';
@@ -91,15 +91,15 @@ const MailboxListRow: React.FC<MailboxListRowProps> = observer(
 					<ContactName className={css.contactValue} address={recipients[0]} />
 
 					{recipients.length > 1 && (
-						<Tooltip
+						<div
+							className={css.contactsNumber}
 							title={recipients
 								.filter((_, i) => i)
-								.map(r => (
-									<ContactName address={r} noTooltip />
-								))}
+								.map(address => contacts.find({ address })?.name || address)
+								.join('\n')}
 						>
-							<div className={css.contactsNumber}>+{recipients.length - 1}</div>
-						</Tooltip>
+							+{recipients.length - 1}
+						</div>
 					)}
 
 					{onFilterBySenderClick && (

@@ -1,4 +1,3 @@
-import { Tooltip } from 'antd';
 import { autorun, makeAutoObservable } from 'mobx';
 import { observer } from 'mobx-react';
 import { KeyboardEvent, useEffect, useRef, useState } from 'react';
@@ -258,22 +257,22 @@ export const RecipientInput = observer(({ isReadOnly, value }: RecipientInputPro
 						: undefined;
 
 					return (
-						<Tooltip key={i} title={tooltip}>
-							<TagInputItem
-								look={
-									item.isLoading == null
-										? TagInputItemLook.DEFAULT
-										: item.isLoading
-										? TagInputItemLook.LOADING
-										: routing?.details
-										? TagInputItemLook.SUCCESS
-										: TagInputItemLook.ERROR
-								}
-								onRemove={isReadOnly ? undefined : () => onRemove(item)}
-							>
-								<AdaptiveText text={item.name} />
-							</TagInputItem>
-						</Tooltip>
+						<TagInputItem
+							key={i}
+							look={
+								item.isLoading == null
+									? TagInputItemLook.DEFAULT
+									: item.isLoading
+									? TagInputItemLook.LOADING
+									: routing?.details
+									? TagInputItemLook.SUCCESS
+									: TagInputItemLook.ERROR
+							}
+							title={tooltip}
+							onRemove={isReadOnly ? undefined : () => onRemove(item)}
+						>
+							<AdaptiveText text={item.name} />
+						</TagInputItem>
 					);
 				})}
 			</TagInput>

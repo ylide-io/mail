@@ -1,4 +1,4 @@
-import { Tabs } from 'antd';
+import clsx from 'clsx';
 import React, { PropsWithChildren, ReactNode } from 'react';
 import { generatePath } from 'react-router-dom';
 
@@ -30,10 +30,21 @@ export function ContactsLayout({ children, activeTab, title, titleRight }: Conta
 					<div className={css.titleRight}>{titleRight}</div>
 				</div>
 
-				<Tabs activeKey={activeTab} onTabClick={key => navigate(generatePath(key))}>
-					<Tabs.TabPane tab="Contacts" key={RoutePath.MAIL_CONTACTS} />
-					<Tabs.TabPane tab="Tags" key={RoutePath.MAIL_CONTACT_TAGS} />
-				</Tabs>
+				<div className={css.tags}>
+					<div
+						className={clsx(css.tag, activeTab === ContactsTab.CONTACTS && css.tag_active)}
+						onClick={() => navigate(generatePath(RoutePath.MAIL_CONTACTS))}
+					>
+						Contacts
+					</div>
+
+					<div
+						className={clsx(css.tag, activeTab === ContactsTab.TAGS && css.tag_active)}
+						onClick={() => navigate(generatePath(RoutePath.MAIL_CONTACT_TAGS))}
+					>
+						Tags
+					</div>
+				</div>
 
 				<div>{children}</div>
 			</FullPageContent>

@@ -15,7 +15,6 @@ import {
 	TVMMailerContractType,
 	TVMRegistryContractType,
 } from '@ylide/everscale';
-import { Tooltip } from 'antd';
 import clsx from 'clsx';
 import { observer } from 'mobx-react';
 import { FC, PureComponent, useState } from 'react';
@@ -73,7 +72,7 @@ export const EthereumContractPlate: FC<EthereumContractPlateProps> = ({ contract
 				<div className={css.contractTitle}>
 					<div className={css.contractName}>
 						{contract.contract && !contract.contract.verified ? (
-							<Tooltip title="Code not verified on scanner">{contract.title}</Tooltip>
+							<span title="Code not verified on scanner">{contract.title}</span>
 						) : (
 							contract.title
 						)}
@@ -140,7 +139,7 @@ export const EverscaleContractPlate: FC<EverscaleContractPlateProps> = ({ contra
 				<div className={css.contractTitle}>
 					<div className={css.contractName}>
 						{contract.contract && !contract.contract.verified ? (
-							<Tooltip title="Code not verified on scanner">{contract.title}</Tooltip>
+							<span title="Code not verified on scanner">{contract.title}</span>
 						) : (
 							contract.title
 						)}

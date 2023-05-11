@@ -1,14 +1,14 @@
 import { EVM_NAMES } from '@ylide/ethereum';
 import { Uint256, YMF } from '@ylide/sdk';
-import { Dropdown, Menu } from 'antd';
 import clsx from 'clsx';
 import { autorun } from 'mobx';
 import { observer } from 'mobx-react';
-import React, { ReactNode, useEffect } from 'react';
+import React, { ReactNode, useEffect, useRef, useState } from 'react';
 
 import { ActionButtonLook } from '../../../../../components/ActionButton/ActionButton';
 import { ActionModal } from '../../../../../components/actionModal/actionModal';
 import { AdaptiveText } from '../../../../../components/adaptiveText/adaptiveText';
+import { DropDown, DropDownItem, DropDownItemMode } from '../../../../../components/dropDown/dropDown';
 import { PropsWithClassName } from '../../../../../components/props';
 import { SelectNetworkModal } from '../../../../../components/selectNetworkModal/selectNetworkModal';
 import { Spinner } from '../../../../../components/spinner/spinner';
@@ -22,6 +22,7 @@ import { evmBalances } from '../../../../../stores/evmBalances';
 import mailer from '../../../../../stores/Mailer';
 import { OutgoingMailData } from '../../../../../stores/outgoingMailData';
 import { connectAccount } from '../../../../../utils/account';
+import { AlignmentDirection, HorizontalAlignment } from '../../../../../utils/alignment';
 import { blockchainMeta, evmNameToNetwork } from '../../../../../utils/blockchain';
 import { editorJsToYMF } from '../../../../../utils/mail';
 import { truncateInMiddle } from '../../../../../utils/string';
@@ -72,6 +73,9 @@ export const SendMailButton = observer(({ className, mailData, onSent }: SendMai
 			console.log('WTF: ', mailData.network, EVM_NAMES[mailData.network]);
 		}
 	}
+
+	const menuAnchorRef = useRef(null);
+	const [menuVisible, setMenuVisible] = useState(false);
 
 	const sendMailHandler = async () => {
 		try {
@@ -198,48 +202,58 @@ export const SendMailButton = observer(({ className, mailData, onSent }: SendMai
 			</div>
 
 			{mailData.from?.wallet.factory.blockchainGroup === 'evm' && (
-				<Dropdown
-					overlay={
-						<Menu
-							onClick={async info => {
-								const blockchainName = info.key;
-								const newNetwork = evmNameToNetwork(blockchainName);
-								const currentBlockchainName =
-									await mailData.from!.wallet.controller.getCurrentBlockchain();
-								if (currentBlockchainName !== blockchainName) {
-									await domain.switchEVMChain(mailData.from?.wallet!, newNetwork!);
-									mailData.network = newNetwork;
-								}
-							}}
-							items={domain.registeredBlockchains
+				<>
+					<div ref={menuAnchorRef} className={css.dropdownIcon} onClick={() => setMenuVisible(!menuVisible)}>
+						<ArrowDownSvg />
+					</div>
+
+					{menuVisible && (
+						<DropDown
+							anchorRef={menuAnchorRef}
+							alignmentDirection={AlignmentDirection.TOP}
+							horizontalAlign={HorizontalAlignment.END}
+							onCloseRequest={() => setMenuVisible(false)}
+						>
+							{domain.registeredBlockchains
 								.filter(f => f.blockchainGroup === 'evm')
 								.map(bc => {
 									const bData = blockchainMeta[bc.blockchain];
-									return {
-										key: bc.blockchain,
-										disabled:
-											Number(
-												evmBalances.balances[evmNameToNetwork(bc.blockchain)!].toFixed(3),
-											) === 0,
-										label: (
+									const network = evmNameToNetwork(bc.blockchain)!;
+
+									return (
+										<DropDownItem
+											key={bc.blockchain}
+											mode={
+												Number(evmBalances.balances[network].toFixed(3)) === 0
+													? DropDownItemMode.DISABLED
+													: undefined
+											}
+											onSelect={async () => {
+												const currentBlockchainName =
+													await mailData.from!.wallet.controller.getCurrentBlockchain();
+
+												if (currentBlockchainName !== bc.blockchain) {
+													await domain.switchEVMChain(mailData.from?.wallet!, network);
+													mailData.network = network;
+												}
+
+												setMenuVisible(false);
+											}}
+										>
 											<>
+												<div style={{ marginRight: 7 }}>{bData.logo(16)}</div>
 												{bData.title} [
 												{Number(
 													evmBalances.balances[evmNameToNetwork(bc.blockchain)!].toFixed(3),
 												)}{' '}
 												{bData.ethNetwork!.nativeCurrency.symbol}]
 											</>
-										),
-										icon: <div style={{ marginRight: 7 }}>{bData.logo(16)}</div>,
-									};
+										</DropDownItem>
+									);
 								})}
-						/>
-					}
-				>
-					<div className={css.dropdownIcon}>
-						<ArrowDownSvg />
-					</div>
-				</Dropdown>
+						</DropDown>
+					)}
+				</>
 			)}
 		</div>
 	);
