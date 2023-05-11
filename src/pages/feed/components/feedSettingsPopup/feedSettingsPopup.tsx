@@ -25,7 +25,7 @@ function formatFeedUserRelation(userRelation: FeedSourceUserRelation) {
 	return {
 		[FeedSourceUserRelation.NONE]: 'Others',
 		[FeedSourceUserRelation.HOLDING_TOKEN]: 'Tokens you hold',
-		[FeedSourceUserRelation.HOLDED_TOKEN]: 'Tokens you held',
+		[FeedSourceUserRelation.HELD_TOKEN]: 'Tokens you held',
 		[FeedSourceUserRelation.USING_PROJECT]: 'Projects you have position in',
 		[FeedSourceUserRelation.USED_PROJECT]: 'Projects you used',
 	}[userRelation];
@@ -143,7 +143,7 @@ export const FeedSettingsPopup = observer(({ onClose }: FeedSettingsPopupProps) 
 			},
 			{
 				[FeedSourceUserRelation.HOLDING_TOKEN]: [],
-				[FeedSourceUserRelation.HOLDED_TOKEN]: [],
+				[FeedSourceUserRelation.HELD_TOKEN]: [],
 				[FeedSourceUserRelation.USING_PROJECT]: [],
 				[FeedSourceUserRelation.USED_PROJECT]: [],
 				[FeedSourceUserRelation.NONE]: [],

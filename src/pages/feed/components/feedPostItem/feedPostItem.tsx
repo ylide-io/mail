@@ -137,7 +137,7 @@ export function FeedPostItem({ isInFeed, post }: FeedPostItemProps) {
 								{
 									[FeedSourceUserRelation.NONE]: 'Added manually ',
 									[FeedSourceUserRelation.HOLDING_TOKEN]: "You're holding ",
-									[FeedSourceUserRelation.HOLDED_TOKEN]: 'You holded ',
+									[FeedSourceUserRelation.HELD_TOKEN]: 'You held ',
 									[FeedSourceUserRelation.USING_PROJECT]: "You're in ",
 									[FeedSourceUserRelation.USED_PROJECT]: 'You used ',
 								}[post.userRelation]

@@ -31,7 +31,7 @@ export enum FeedCategory {
 export enum FeedSourceUserRelation {
 	NONE = 'NONE',
 	HOLDING_TOKEN = 'HOLDING_TOKEN',
-	HOLDED_TOKEN = 'HOLDED_TOKEN',
+	HELD_TOKEN = 'HELD_TOKEN',
 	USING_PROJECT = 'USING_PROJECT',
 	USED_PROJECT = 'USED_PROJECT',
 }
