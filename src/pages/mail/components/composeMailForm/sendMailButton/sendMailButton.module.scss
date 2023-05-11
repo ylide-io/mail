@@ -1,76 +1,73 @@
-:global {
-	.send-btn {
-		display: flex;
-		flex-direction: row;
-		align-items: stretch;
+.root {
+	display: flex;
+	flex-direction: row;
+	align-items: stretch;
 
-		height: 30px;
-		color: white;
+	height: 30px;
+	color: white;
+}
 
-		&.disabled {
-			pointer-events: none;
-			opacity: 0.6;
-		}
+.root_disabled {
+	pointer-events: none;
+	opacity: 0.6;
+}
 
-		.send-btn-text {
-			@include flex-row(center, flex-start);
+.text {
+	@include flex-row(center, flex-start);
 
-			border-top-left-radius: 3px;
-			border-bottom-left-radius: 3px;
+	border-top-left-radius: 3px;
+	border-bottom-left-radius: 3px;
 
-			background-color: var(--accent-color);
+	background-color: var(--accent-color);
 
-			padding-left: 10px;
-			font-size: 0.8rem;
+	padding-left: 10px;
+	font-size: 0.8rem;
 
-			padding-top: 1px;
-			padding-right: 10px;
-			line-height: 1;
-			cursor: pointer;
+	padding-top: 1px;
+	padding-right: 10px;
+	line-height: 1;
+	cursor: pointer;
 
-			&:hover {
-				background-color: var(--accent-hover-color);
-			}
+	&:hover {
+		background-color: var(--accent-hover-color);
+	}
+}
 
-			.send-btn-title {
-				@include flex-row(center, flex-start);
+.root:not(.root_withDropdown) .text {
+	border-top-right-radius: 3px;
+	border-bottom-right-radius: 3px;
 
-				svg {
-					margin-left: 6px;
-					margin-right: 4px;
-				}
-			}
-		}
-		.send-btn-dropdown-icon {
-			border-top-right-radius: 3px;
-			border-bottom-right-radius: 3px;
+	padding-right: 13px;
+}
 
-			background-color: var(--accent-color);
+.title {
+	@include flex-row(center, flex-start);
 
-			display: flex;
-			align-items: center;
-			padding: 0 4px;
+	svg {
+		margin-left: 6px;
+		margin-right: 4px;
+	}
+}
 
-			cursor: pointer;
+.dropdownIcon {
+	border-top-right-radius: 3px;
+	border-bottom-right-radius: 3px;
 
-			border-left: 1px solid var(--accent-hover-color);
+	background-color: var(--accent-color);
 
-			&:hover {
-				background-color: var(--accent-hover-color);
-			}
+	display: flex;
+	align-items: center;
+	padding: 0 4px;
 
-			> svg {
-				fill: currentColor;
-			}
-		}
+	cursor: pointer;
 
-		&:not(.withDropdown) {
-			.send-btn-text {
-				border-top-right-radius: 3px;
-				border-bottom-right-radius: 3px;
+	border-left: 1px solid var(--accent-hover-color);
 
-				padding-right: 13px;
-			}
-		}
+	&:hover {
+		background-color: var(--accent-hover-color);
+	}
+
+	> svg {
+		fill: currentColor;
 	}
 }

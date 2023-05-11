@@ -1,5 +1,3 @@
-import './sendMailButton.module.scss';
-
 import { EVM_NAMES } from '@ylide/ethereum';
 import { Uint256, YMF } from '@ylide/sdk';
 import { Dropdown, Menu } from 'antd';
@@ -28,6 +26,7 @@ import { blockchainMeta, evmNameToNetwork } from '../../../../../utils/blockchai
 import { editorJsToYMF } from '../../../../../utils/mail';
 import { truncateInMiddle } from '../../../../../utils/string';
 import { getEvmWalletNetwork } from '../../../../../utils/wallet';
+import css from './sendMailButton.module.scss';
 
 export interface SendMailButtonProps extends PropsWithClassName {
 	mailData: OutgoingMailData;
@@ -174,26 +173,26 @@ export const SendMailButton = observer(({ className, mailData, onSent }: SendMai
 
 	return (
 		<div
-			className={clsx(className, 'send-btn', {
-				disabled:
+			className={clsx(css.root, className, {
+				[css.root_disabled]:
 					mailer.sending ||
 					!mailData.from ||
 					!mailData.to.items.length ||
 					mailData.to.items.some(r => r.isLoading) ||
 					(!mailData.hasEditorData && !mailData.hasPlainTextData && !mailData.attachments.length),
-				withDropdown: mailData.from?.wallet.factory.blockchainGroup === 'evm',
+				[css.root_withDropdown]: mailData.from?.wallet.factory.blockchainGroup === 'evm',
 			})}
 		>
-			<div className="send-btn-text" onClick={sendMailHandler}>
+			<div className={css.text} onClick={sendMailHandler}>
 				{mailer.sending ? (
 					<>
 						<Spinner style={{ marginRight: 6, color: 'currentcolor' }} />
-						<span className="send-btn-title">Sending ...</span>
+						<span className={css.title}>Sending ...</span>
 					</>
 				) : (
 					<>
 						<ReplySvg style={{ marginRight: 6, fill: 'currentcolor' }} />
-						{text && <span className="send-btn-title">{text}</span>}
+						{text && <span className={css.title}>{text}</span>}
 					</>
 				)}
 			</div>
@@ -237,7 +236,7 @@ export const SendMailButton = observer(({ className, mailData, onSent }: SendMai
 						/>
 					}
 				>
-					<div className="send-btn-dropdown-icon">
+					<div className={css.dropdownIcon}>
 						<ArrowDownSvg />
 					</div>
 				</Dropdown>
