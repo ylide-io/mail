@@ -22,7 +22,7 @@
 		width: 6px;
 		height: 6px;
 		transform: scale(2);
-		background: #000000;
+		background: var(--primary-text-color);
 		border-radius: 100%;
 		float: left;
 		margin-bottom: 12px;
@@ -62,27 +62,27 @@
 @keyframes scaleDot {
 	5% {
 		transform: scale(1.9);
-		background-color: #000000;
+		background-color: var(--primary-text-color);
 	}
 	25% {
 		transform: scale(2.4);
-		background-color: #b0fcde;
+		background-color: var(--accent-color);
 	}
 	45% {
 		transform: scale(1.9);
-		background-color: #000000;
+		background-color: var(--primary-text-color);
 	}
 	55% {
 		transform: scale(1.9);
-		background-color: #000000;
+		background-color: var(--primary-text-color);
 	}
 	75% {
 		transform: scale(2.4);
-		background-color: #f2abfe;
+		background-color: var(--accent2-color);
 	}
 	95% {
 		transform: scale(1.9);
-		background-color: #000000;
+		background-color: var(--primary-text-color);
 	}
 }
 

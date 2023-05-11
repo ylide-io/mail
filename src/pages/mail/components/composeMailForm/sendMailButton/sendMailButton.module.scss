@@ -18,7 +18,7 @@
 			border-top-left-radius: 3px;
 			border-bottom-left-radius: 3px;
 
-			background-color: #1ab394;
+			background-color: var(--accent-color);
 
 			padding-left: 10px;
 			font-size: 0.8rem;
@@ -29,7 +29,7 @@
 			cursor: pointer;
 
 			&:hover {
-				background-color: #18a689;
+				background-color: var(--accent-hover-color);
 			}
 
 			.send-btn-title {
@@ -45,7 +45,7 @@
 			border-top-right-radius: 3px;
 			border-bottom-right-radius: 3px;
 
-			background-color: #1ab394;
+			background-color: var(--accent-color);
 
 			display: flex;
 			align-items: center;
@@ -53,10 +53,10 @@
 
 			cursor: pointer;
 
-			border-left: 1px solid #0a9e80;
+			border-left: 1px solid var(--accent-hover-color);
 
 			&:hover {
-				background-color: #18a689;
+				background-color: var(--accent-hover-color);
 			}
 
 			> svg {

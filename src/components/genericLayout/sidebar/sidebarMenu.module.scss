@@ -11,7 +11,7 @@
 		bottom: 0;
 		left: -210px;
 		background-color: var(--surface-color);
-		box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+		box-shadow: 0 0 10px rgba(var(--shade-rgb-color), 0.2);
 		opacity: 0;
 		width: 210px;
 		transition: all 0.2s;
@@ -80,16 +80,8 @@
 
 .sectionLink {
 	@include flex-row(center, flex-start);
-
 	padding: 6px 6px 6px 40px;
-
-	&:hover {
-		cursor: pointer;
-
-		.sectionLinkTitle {
-			color: #606060;
-		}
-	}
+	cursor: pointer;
 }
 
 .sectionLink_active {
@@ -121,7 +113,6 @@
 .sectionLinkTitle {
 	min-width: 0;
 	line-height: 20px;
-	color: #202020;
 }
 
 .sectionRightButton {

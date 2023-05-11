@@ -5,7 +5,7 @@
 	min-height: 100%;
 	position: relative;
 
-	background-color: #fff;
+	background-color: var(--surface-color);
 }
 
 .intro-header {
@@ -38,8 +38,6 @@
 	text-align: center;
 	letter-spacing: -0.09em;
 
-	color: #202020;
-
 	margin-bottom: 20px;
 }
 
@@ -51,8 +49,6 @@
 	/* or 140% */
 
 	text-align: center;
-
-	color: #000000;
 
 	max-width: 762px;
 }
@@ -87,7 +83,7 @@
 		}
 
 		&.notActive {
-			background-color: rgba(255, 0, 0, 0.03);
+			background-color: rgba(var(--error-rgb-color), 0.03);
 			.cw-logo {
 				margin-bottom: 0px;
 			}
@@ -149,8 +145,6 @@
 			text-align: center;
 
 			margin-bottom: 1px;
-
-			color: #000000;
 		}
 
 		.cw-subtitle {
@@ -170,12 +164,12 @@
 			top: -5px;
 			width: 20px;
 			height: 20px;
-			color: #fff;
+			color: var(--on-inverted-surface-color);
 			border-radius: 10px;
 			background-color: black;
 			cursor: pointer;
 			&:hover {
-				background-color: #404040;
+				background-color: var(--inverted-surface-color);
 			}
 		}
 	}
@@ -191,8 +185,6 @@
 	letter-spacing: -0.09em;
 	margin-top: 40px;
 	margin-bottom: 30px;
-
-	color: #202020;
 }
 
 .intro-blockchains-list {

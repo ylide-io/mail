@@ -52,15 +52,7 @@ export function FeedPostContent({ post }: FeedPostContentProps) {
 			{!!post.embeds.length && (
 				<div className={css.embeds}>
 					{post.embeds.map((e, idx) => (
-						<a
-							key={idx}
-							className={clsx(css.embed, {
-								[css.postEmbed_withLink]: !!e.link,
-							})}
-							href={e.link}
-							target="_blank"
-							rel="noreferrer"
-						>
+						<a key={idx} className={css.embed} href={e.link} target="_blank" rel="noreferrer">
 							{!!e.previewImageUrl && (
 								<div
 									className={css.embedImage}

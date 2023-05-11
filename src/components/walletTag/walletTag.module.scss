@@ -2,7 +2,7 @@
 	@include flex-row(center, center);
 
 	padding: 4px 12px;
-	border: 0.5px solid rgba(0, 0, 0, 0.2);
+	border: 1px solid var(--border-color);
 	border-radius: 22px;
 }
 
@@ -17,7 +17,6 @@
 	font-weight: 300;
 	font-size: 14px;
 	line-height: 100%;
-	color: #000000;
 }
 
 .address {

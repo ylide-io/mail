@@ -9,8 +9,6 @@
 		font-family: $font-family_wide;
 		text-align: center;
 		letter-spacing: -0.09em;
-		color: #202020;
-
 		margin-bottom: 24px;
 	}
 
@@ -21,8 +19,6 @@
 		font-size: 14px;
 		line-height: 20px;
 		text-align: center;
-
-		color: #000000;
 
 		svg {
 			display: inline;
@@ -38,7 +34,7 @@
 .available-wallets {
 	@include flex-column(center, flex-start);
 
-	border: 0.5px solid rgba(0, 0, 0, 0.2);
+	border: 0.5px solid var(--border-color);
 	border-radius: 16px;
 	padding: 12px;
 	padding-left: 0;
@@ -47,7 +43,7 @@
 	.aw-title {
 		margin-top: -24px;
 		margin-bottom: 12px;
-		background: #f3f4f7;
+		background: var(--tertiary-surface-color);
 		border-radius: 100px;
 
 		display: flex;
@@ -65,7 +61,7 @@
 		text-align: center;
 		letter-spacing: -0.09em;
 
-		color: #808080;
+		color: var(--secondary-text-color);
 	}
 
 	.wallet-icon {
@@ -111,7 +107,7 @@
 		height: 48px;
 		padding: 8px;
 
-		background: rgba(246, 133, 27, 0.12);
+		background: var(--tertiary-surface-color);
 		border-radius: 12px;
 		margin-bottom: 8px;
 
@@ -127,13 +123,11 @@
 		font-size: 12px;
 		line-height: 16px;
 		text-align: center;
-
-		color: #000000;
 	}
 
 	&:hover {
 		cursor: pointer;
-		background: rgba(246, 133, 27, 0.12);
+		background: var(--secondary-surface-color);
 	}
 }
 
@@ -159,22 +153,24 @@
 		font-weight: 400;
 		overflow: hidden;
 
-		color: rgba(0, 0, 0, 0.32);
+		color: var(--secondary-text-color);
 		cursor: pointer;
 
 		&:not(.active) {
 			&::after {
 				position: absolute;
-				bottom: 0px;
+				bottom: 0;
 				content: ' ';
 				width: 100%;
-				height: 0.5px;
-				background: rgba(0, 0, 0, 0.2);
+				height: 1px;
+				background: var(--border-color);
 			}
 		}
 
 		&.active {
 			color: var(--accent2-color);
+			cursor: default;
+
 			&::after {
 				position: absolute;
 				bottom: -3px;
@@ -185,10 +181,6 @@
 				border-top-right-radius: 3px;
 				background: var(--accent2-color);
 			}
-		}
-
-		&:hover {
-			color: rgba(0, 0, 0, 0.6);
 		}
 	}
 }
@@ -214,8 +206,6 @@
 
 		text-align: center;
 		letter-spacing: -0.09em;
-
-		color: #000000;
 	}
 
 	.qr-link {
@@ -273,7 +263,7 @@
 
 .wmn-plate {
 	@include flex-row(stretch, flex-start);
-	border: 0.5px solid rgba(0, 0, 0, 0.2);
+	border: 1px solid var(--border-color);
 	border-radius: 12px;
 	padding: 9px 12px;
 	height: 58px;
@@ -282,7 +272,7 @@
 	cursor: pointer;
 
 	&:hover {
-		box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.3);
+		box-shadow: 0 0 10px rgba(var(--shade-rgb-color), 0.3);
 	}
 
 	&.disabled {
@@ -305,17 +295,16 @@
 			font-weight: 400;
 			font-size: 16px;
 			line-height: 20px;
-			color: #000000;
 		}
 		.wmn-optimal {
 			font-style: normal;
 			font-weight: 400;
 			font-size: 11px;
 			line-height: 16px;
-			color: #824f22;
-			padding: 0px 8px;
+			color: var(--accent2-color);
+			padding: 0 8px;
 
-			background: #ffcc9e;
+			background: rgba(var(--accent2-rgb-color), 0.08);
 			border-radius: 14px;
 		}
 	}
@@ -327,8 +316,6 @@
 			font-size: 14px;
 			line-height: 20px;
 			text-align: right;
-
-			color: #000000;
 		}
 		.wmn-transaction-price {
 			font-style: normal;
@@ -337,7 +324,7 @@
 			line-height: 16px;
 			text-align: right;
 
-			color: rgba(0, 0, 0, 0.32);
+			color: var(--secondary-text-color);
 		}
 	}
 }
