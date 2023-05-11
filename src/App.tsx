@@ -9,7 +9,7 @@ import { StaticComponentManager } from './components/staticComponentManager/stat
 import { ToastManager } from './components/toast/toast';
 import { YlideLoader } from './components/ylideLoader/ylideLoader';
 import { APP_NAME } from './constants';
-import { REACT_APP__OTC_MODE } from './env';
+import { REACT_APP__OTC_MODE, REACT_APP__SMART_FEED_MODE } from './env';
 import { AdminPage } from './pages/AdminPage';
 import { FeedPage } from './pages/feed/feedPage/feedPage';
 import { FeedPostPage } from './pages/feed/feedPostPage/feedPostPage';
@@ -32,6 +32,11 @@ import domain from './stores/Domain';
 import { RoutePath } from './stores/routePath';
 import walletConnect from './stores/WalletConnect';
 
+export enum AppTheme {
+	V1 = 'v1',
+	V2 = 'v2',
+}
+
 const App = observer(() => {
 	const [queryClient] = useState(
 		new QueryClient({
@@ -49,6 +54,7 @@ const App = observer(() => {
 
 	useEffect(() => {
 		document.title = APP_NAME;
+		document.documentElement.dataset.theme = REACT_APP__SMART_FEED_MODE ? AppTheme.V2 : AppTheme.V1;
 	}, []);
 
 	useEffect(() => {

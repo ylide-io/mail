@@ -1,4 +1,4 @@
-:root {
+[data-theme='v1'] {
 	--primary-text-color: #111;
 	--secondary-text-color: #888;
 
@@ -44,6 +44,10 @@
 	--popup-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
 	--inverted-popup-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
 	--layout-shadow: 0 0 30px rgba(0, 0, 0, 0.15);
+}
+
+[data-theme='v2'] {
+	//
 }
 
 body,
