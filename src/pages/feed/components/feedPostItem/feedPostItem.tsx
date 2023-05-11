@@ -1,9 +1,9 @@
-import Avatar from 'antd/lib/avatar/avatar';
 import clsx from 'clsx';
 import React, { MouseEvent, useEffect, useRef, useState } from 'react';
 import { generatePath } from 'react-router-dom';
 
 import { FeedCategory, FeedPost, FeedSourceUserRelation, LinkType } from '../../../../api/feedServerApi';
+import { Avatar } from '../../../../components/avatar/avatar';
 import { DropDown, DropDownItem } from '../../../../components/dropDown/dropDown';
 import { GalleryModal } from '../../../../components/galleryModal/galleryModal';
 import { ReadableDate } from '../../../../components/readableDate/readableDate';
@@ -111,7 +111,7 @@ export function FeedPostItem({ isInFeed, post }: FeedPostItemProps) {
 	return (
 		<div ref={selfRef} className={clsx(css.root, { [css.root_collapsed]: collapsed })}>
 			<div className={css.ava}>
-				<Avatar size={48} src={post.authorAvatar} icon={<ContactSvg width="100%" height="100%" />} />
+				<Avatar image={post.authorAvatar} placeholder={<ContactSvg width="100%" height="100%" />} />
 				<FeedLinkTypeIcon className={css.avaSource} linkType={post.sourceType} />
 			</div>
 

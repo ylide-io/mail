@@ -4,7 +4,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { createReactEditorJS } from 'react-editor-js';
 
 import { ActionButton, ActionButtonLook } from '../../../../components/ActionButton/ActionButton';
-import { Blockie } from '../../../../components/blockie/blockie';
+import { Avatar } from '../../../../components/avatar/avatar';
 import { ContactName } from '../../../../components/contactName/contactName';
 import { ReadableDate } from '../../../../components/readableDate/readableDate';
 import { Spinner } from '../../../../components/spinner/spinner';
@@ -58,7 +58,7 @@ export const MailMessage = observer(
 
 		return (
 			<div className={css.root}>
-				<Blockie className={css.avatar} address={message.msg.senderAddress} />
+				<Avatar className={css.avatar} blockie={message.msg.senderAddress} />
 
 				<div className={css.title}>{decoded ? formatSubject(decoded.decodedSubject) : '[Encrypted]'}</div>
 

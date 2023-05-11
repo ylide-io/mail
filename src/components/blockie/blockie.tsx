@@ -1,5 +1,5 @@
 import makeBlockie from 'ethereum-blockies-base64';
-import { useEffect, useState } from 'react';
+import { useMemo } from 'react';
 
 import { PropsWithClassName, PropsWithCSSStyle } from '../props';
 
@@ -8,11 +8,7 @@ interface BlockieProps extends PropsWithClassName, PropsWithCSSStyle {
 }
 
 export function Blockie({ className, style, address }: BlockieProps) {
-	const [url, setUrl] = useState('');
-
-	useEffect(() => {
-		setUrl(makeBlockie(address));
-	}, [address]);
+	const url = useMemo(() => makeBlockie(address), [address]);
 
 	return <img className={className} src={url} alt="Blockie img" style={{ borderRadius: '50%', ...style }} />;
 }

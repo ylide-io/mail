@@ -17,7 +17,7 @@ import { connectAccount } from '../../../utils/account';
 import { useOpenMailCopmpose } from '../../../utils/mail';
 import { useNav } from '../../../utils/url';
 import { ActionButton, ActionButtonLook, ActionButtonSize } from '../../ActionButton/ActionButton';
-import { Blockie } from '../../blockie/blockie';
+import { Avatar } from '../../avatar/avatar';
 import { toast } from '../../toast/toast';
 import { SidebarBurger } from '../sidebar/sidebarMenu';
 import { AccountsPopup } from './accountsPopup/accountsPopup';
@@ -79,10 +79,10 @@ const Header = observer(() => {
 						>
 							<div>
 								{domain.accounts.accounts.map(acc => (
-									<Blockie
+									<Avatar
 										key={acc.account.address}
 										className={css.usersAvatar}
-										address={acc.account.address}
+										blockie={acc.account.address}
 									/>
 								))}
 							</div>

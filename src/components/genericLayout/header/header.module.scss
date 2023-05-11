@@ -66,6 +66,8 @@
 }
 
 .usersAvatar {
+	display: inline-block;
+	vertical-align: top;
 	width: $interactive-elem-size_large - 2px;
 	height: $interactive-elem-size_large - 2px;
 	border: 2px solid var(--surface-color);

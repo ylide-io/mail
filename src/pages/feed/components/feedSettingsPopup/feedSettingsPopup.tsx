@@ -1,4 +1,3 @@
-import Avatar from 'antd/lib/avatar/avatar';
 import clsx from 'clsx';
 import { observer } from 'mobx-react';
 import React, { useCallback, useMemo, useState } from 'react';
@@ -6,6 +5,7 @@ import { useMutation, useQuery } from 'react-query';
 
 import { FeedServerApi, FeedSource, FeedSourceUserRelation } from '../../../../api/feedServerApi';
 import { ActionButton, ActionButtonLook } from '../../../../components/ActionButton/ActionButton';
+import { Avatar } from '../../../../components/avatar/avatar';
 import { CheckBox } from '../../../../components/checkBox/checkBox';
 import { ErrorMessage } from '../../../../components/errorMessage/errorMessage';
 import { Modal } from '../../../../components/modal/modal';
@@ -46,7 +46,7 @@ export const Row = React.memo(({ source, isSelected, onSelect }: RowProps) => (
 		</div>
 
 		<div className={css.sourceName}>
-			<Avatar size={24} src={source.avatar} icon={<ContactSvg width="100%" height="100%" />} />
+			<Avatar image={source.avatar} placeholder={<ContactSvg width="100%" height="100%" />} />
 
 			<div className={css.sourceNameText}>{source.name}</div>
 		</div>
