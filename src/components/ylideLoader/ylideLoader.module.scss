@@ -8,6 +8,7 @@
 .loader {
 	position: relative;
 	padding: 10px 10px 0;
+	color: var(--primary-text-color);
 }
 
 .dots {
@@ -22,7 +23,7 @@
 		width: 6px;
 		height: 6px;
 		transform: scale(2);
-		background: var(--primary-text-color);
+		background: currentColor;
 		border-radius: 100%;
 		float: left;
 		margin-bottom: 12px;
@@ -62,7 +63,7 @@
 @keyframes scaleDot {
 	5% {
 		transform: scale(1.9);
-		background-color: var(--primary-text-color);
+		background-color: currentColor;
 	}
 	25% {
 		transform: scale(2.4);
@@ -70,11 +71,11 @@
 	}
 	45% {
 		transform: scale(1.9);
-		background-color: var(--primary-text-color);
+		background-color: currentColor;
 	}
 	55% {
 		transform: scale(1.9);
-		background-color: var(--primary-text-color);
+		background-color: currentColor;
 	}
 	75% {
 		transform: scale(2.4);
@@ -82,7 +83,7 @@
 	}
 	95% {
 		transform: scale(1.9);
-		background-color: var(--primary-text-color);
+		background-color: currentColor;
 	}
 }
 
