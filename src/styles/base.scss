@@ -53,11 +53,18 @@
 	//
 }
 
+//
+
+body {
+	background: var(--background-color);
+}
+
 body,
+button,
 input,
 textarea,
 select,
-button {
+optgroup {
 	// 1.25 - default Figma line-height for Lexend font
 	font: 13px/1.25 $font-family_main;
 	color: var(--primary-text-color);
@@ -65,33 +72,20 @@ button {
 	-moz-osx-font-smoothing: grayscale;
 }
 
-body {
-	@include flex-column(stretch, flex-start);
-	margin: 0;
-	min-width: 100%;
-	min-height: 100vh;
-	overflow-x: hidden;
-
-	background: var(--background-color);
-	background-size: cover;
-}
-
-label {
-	cursor: pointer;
-}
-
+button,
 input,
 textarea,
-button {
+select {
 	appearance: none;
 	padding: 0;
 	background: none;
 	border: 0;
 }
 
+button:focus,
 input:focus,
 textarea:focus,
-button:focus {
+select:focus {
 	outline: none;
 }
 
@@ -103,13 +97,17 @@ textarea {
 	resize: none;
 }
 
+label,
 button,
 [type='button'],
 [type='reset'],
 [type='submit'] {
-	font: inherit;
-	color: inherit;
 	cursor: pointer;
+}
+
+a {
+	color: var(--link-color);
+	text-decoration: none;
 }
 
 b,
@@ -126,7 +124,6 @@ svg {
 }
 
 hr {
-	margin: 0;
 	width: 100%;
 	border: solid var(--border-color);
 	border-width: 0 0 1px;
@@ -134,16 +131,10 @@ hr {
 
 iframe {
 	display: block;
-	border: 0;
 }
 
 //
 
 #root {
-	min-width: 100%;
-	min-height: 100vh;
-}
-
-.ant-tooltip {
-	max-width: 600px;
+	height: 100vh;
 }

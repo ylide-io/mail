@@ -106,7 +106,7 @@ export const MailboxPage = observer(() => {
 	return (
 		<GenericLayout>
 			<FullPageContent>
-				<div className="mailbox-page animated fadeInRight">
+				<div className="mailbox-page">
 					<MailboxHeader
 						folderId={folderId!}
 						messages={messages}
