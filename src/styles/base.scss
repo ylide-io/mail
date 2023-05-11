@@ -72,8 +72,7 @@ body {
 	min-height: 100vh;
 	overflow-x: hidden;
 
-	// background-image: url(../assets/img/background-desktop.svg);
-	background: var(--background-color) url(../assets/img/background-desktop-2.svg) no-repeat fixed center;
+	background: var(--background-color);
 	background-size: cover;
 }
 
