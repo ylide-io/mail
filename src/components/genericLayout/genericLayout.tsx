@@ -1,8 +1,6 @@
 import { observer } from 'mobx-react';
 import React, { createContext, PropsWithChildren, useContext, useEffect, useMemo, useRef } from 'react';
 
-import domain from '../../stores/Domain';
-import { TransactionPopup } from '../TransactionPopup/TransactionPopup';
 import css from './genericLayout.module.scss';
 import Header from './header/header';
 import { SidebarMenu } from './sidebar/sidebarMenu';
@@ -51,8 +49,6 @@ export const GenericLayout = observer(({ children }: GenericLayoutProps) => {
 		<GenericLayoutApiContext.Provider value={api}>
 			<div className={css.root}>
 				<Header />
-
-				{domain.txPlateVisible && <TransactionPopup />}
 
 				<div className={css.main} ref={mainRef}>
 					<SidebarMenu />

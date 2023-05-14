@@ -7,6 +7,7 @@ import { FeedCategory } from './api/feedServerApi';
 import { PopupManager } from './components/popup/popupManager/popupManager';
 import { StaticComponentManager } from './components/staticComponentManager/staticComponentManager';
 import { ToastManager } from './components/toast/toast';
+import { TransactionPopup } from './components/TransactionPopup/TransactionPopup';
 import { YlideLoader } from './components/ylideLoader/ylideLoader';
 import { APP_NAME } from './constants';
 import { REACT_APP__OTC_MODE, REACT_APP__SMART_FEED_MODE } from './env';
@@ -144,6 +145,8 @@ const App = observer(() => {
 						}
 					/>
 				</Routes>
+
+				{domain.txPlateVisible && <TransactionPopup />}
 
 				<StaticComponentManager />
 				<ToastManager />
