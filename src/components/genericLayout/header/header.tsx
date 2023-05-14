@@ -7,7 +7,6 @@ import { ReactComponent as ArrowDownSvg } from '../../../icons/ic20/arrowDown.sv
 import { ReactComponent as CrossSvg } from '../../../icons/ic20/cross.svg';
 import { ReactComponent as PlusSvg } from '../../../icons/ic20/plus.svg';
 import { ReactComponent as ContactsSvg } from '../../../icons/ic28/contacts.svg';
-import { YlideLargeLogo } from '../../../icons/YlideLargeLogo';
 import { postWidgetMessage, WidgetId, WidgetMessageType } from '../../../pages/widgets/widgets';
 import { browserStorage } from '../../../stores/browserStorage';
 import domain from '../../../stores/Domain';
@@ -17,6 +16,7 @@ import { connectAccount } from '../../../utils/account';
 import { useOpenMailCopmpose } from '../../../utils/mail';
 import { useNav } from '../../../utils/url';
 import { ActionButton, ActionButtonLook, ActionButtonSize } from '../../ActionButton/ActionButton';
+import { AppLogo } from '../../appLogo/appLogo';
 import { Avatar } from '../../avatar/avatar';
 import { toast } from '../../toast/toast';
 import { SidebarBurger } from '../sidebar/sidebarMenu';
@@ -52,7 +52,7 @@ const Header = observer(() => {
 						navigate(generatePath(RoutePath.ROOT));
 					}}
 				>
-					<YlideLargeLogo className={css.logoImage} />
+					<AppLogo />
 				</a>
 			</div>
 

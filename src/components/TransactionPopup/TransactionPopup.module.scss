@@ -36,7 +36,7 @@
 	position: relative;
 
 	background: var(--surface-color);
-	border: 1px solid var(--accent2-color);
+	border: 1px solid var(--accent-color);
 	box-shadow: var(--popup-shadow);
 	border-radius: 12px;
 
@@ -57,7 +57,7 @@
 
 		transition: 0.3s all;
 
-		background-color: var(--accent2-color);
+		background-color: var(--accent-color);
 	}
 
 	.header {

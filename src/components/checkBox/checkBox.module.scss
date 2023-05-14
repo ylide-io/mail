@@ -43,11 +43,11 @@
 }
 
 .root_checked .view {
-	background: var(--accent-color);
+	background: var(--accent2-color);
 
 	&:hover,
 	.input:focus-visible + & {
-		background: var(--accent-hover-color);
+		background: var(--accent2-hover-color);
 	}
 
 	> svg {

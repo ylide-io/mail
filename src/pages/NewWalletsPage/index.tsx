@@ -6,12 +6,12 @@ import { generatePath } from 'react-router-dom';
 import { AccountConnectedModal } from '../../components/accountConnectedModal/accountConnectedModal';
 import { ActionButton, ActionButtonLook, ActionButtonSize } from '../../components/ActionButton/ActionButton';
 import { AdaptiveAddress } from '../../components/adaptiveAddress/adaptiveAddress';
+import { AppLogo } from '../../components/appLogo/appLogo';
 import { NewPasswordModal } from '../../components/newPasswordModal/newPasswordModal';
 import { showStaticComponent } from '../../components/staticComponentManager/staticComponentManager';
 import { APP_NAME } from '../../constants';
 import { ReactComponent as CrossSvg } from '../../icons/ic20/cross.svg';
 import { ReactComponent as NextSvg } from '../../icons/ic28/next.svg';
-import { YlideLargeLogo } from '../../icons/YlideLargeLogo';
 import domain from '../../stores/Domain';
 import { DomainAccount } from '../../stores/models/DomainAccount';
 import { RoutePath } from '../../stores/routePath';
@@ -27,7 +27,7 @@ export const NewWalletsPage = observer(() => {
 	return (
 		<div className="intro-page">
 			<div className="intro-header">
-				<YlideLargeLogo />
+				<AppLogo />
 			</div>
 			<div className="intro-body">
 				<h2 className="intro-main-title">Connect your wallets</h2>

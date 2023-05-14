@@ -19,7 +19,6 @@
 	--border-heavy-color: rgba(0, 0, 0, 0.3);
 
 	--link-color: #19f;
-	--link-hover-color: #4bf;
 
 	--field-border-color: rgba(0, 0, 0, 0.15);
 	--field-focus-border-color: #4bf;
@@ -29,13 +28,14 @@
 	--selected-background-color: #92cffb;
 	--selected-light-background-color: #d1ecff;
 
-	--accent-color: #1ab394;
-	--accent-rgb-color: 26, 179, 148;
-	--accent-hover-color: #0f947a;
+	--accent-color: #9747ff;
+	--accent-rgb-color: 151, 71, 255;
+	--accent-hover-color: #7d2ce7;
 	--on-accent-color: #fff;
-	--accent2-color: #9747ff;
-	--accent2-rgb-color: 151, 71, 255;
-	--accent2-hover-color: #7d2ce7;
+
+	--accent2-color: #1ab394;
+	--accent2-rgb-color: 26, 179, 148;
+	--accent2-hover-color: #0f947a;
 	--on-accent2-color: #fff;
 
 	--error-color: #f45;
@@ -50,7 +50,54 @@
 }
 
 [data-theme='v2'] {
-	//
+	--background-color: #e4ebf0;
+
+	--primary-text-color: #111;
+	--secondary-text-color: #888;
+
+	--surface-color: #fff;
+	--surface-rgb-color: 255, 255, 255;
+	--surface-hover-color: #f8f8f8;
+	--secondary-surface-color: #f4f9fc;
+	--tertiary-surface-color: #d3d7db;
+	--error-surface-color: rgba(255, 68, 85, 0.2);
+	--success-surface-color: #d1f3dd;
+	--inverted-surface-color: #111;
+	--on-inverted-surface-color: #fff;
+
+	--border-color: rgba(0, 0, 0, 0.1);
+	--border-lite-color: rgba(0, 0, 0, 0.05);
+	--border-heavy-color: rgba(0, 0, 0, 0.2);
+
+	--link-color: #0b9;
+
+	--field-border-color: rgba(0, 0, 0, 0.15);
+	--field-focus-border-color: #0b9;
+	--field-error-border-color: #f45;
+
+	--selected-text-color: #19f;
+	--selected-background-color: #92cffb;
+	--selected-light-background-color: #d1ecff;
+
+	--accent-color: #0b9;
+	--accent-rgb-color: 0, 187, 153;
+	--accent-hover-color: #097;
+	--on-accent-color: #fff;
+
+	--accent2-color: #0b9;
+	--accent2-rgb-color: 0, 187, 153;
+	--accent2-hover-color: #097;
+	--on-accent2-color: #fff;
+
+	--error-color: #f45;
+	--error-rgb-color: 255, 68, 85;
+	--success-color: #0b4;
+
+	--shade-color: #000;
+	--shade-rgb-color: 0, 0, 0;
+	--popup-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+	--inverted-popup-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+	--layout-shadow: 0 0 30px rgba(0, 0, 0, 0.15);
 }
 
 //

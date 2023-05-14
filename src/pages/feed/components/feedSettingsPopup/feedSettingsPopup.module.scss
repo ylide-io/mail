@@ -113,6 +113,10 @@ $hPadding: 20px;
 	align-items: center;
 	grid-gap: 4px;
 	color: var(--primary-text-color);
+
+	&:hover {
+		color: var(--link-color);
+	}
 }
 
 .sourceOriginText {

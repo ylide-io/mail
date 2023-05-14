@@ -4,7 +4,7 @@
 	grid-gap: 4px;
 	align-items: center;
 	border: 1px solid;
-	border-radius: 20px;
+	border-radius: 22px;
 
 	> i {
 		min-width: 20px;
@@ -166,17 +166,17 @@
 	}
 
 	&.root_hasContent {
-		padding-right: 15px;
-		padding-left: 15px;
+		padding-right: 17px;
+		padding-left: 17px;
 	}
 
 	&.root_hasIcon {
-		padding-left: 7px;
+		padding-left: 9px;
 	}
 
 	&.root_hasIcon:not(.root_hasContent) {
-		padding-right: 5px;
-		padding-left: 5px;
+		padding-right: 7px;
+		padding-left: 7px;
 	}
 
 	.icon {
@@ -202,18 +202,6 @@
 }
 
 .root_primaryLook {
-	color: var(--on-accent2-color);
-	background: var(--accent2-color);
-	border-color: var(--accent2-color);
-
-	&:hover,
-	&:focus-visible {
-		background: var(--accent2-hover-color);
-		border-color: var(--accent2-hover-color);
-	}
-}
-
-.root_secondaryLook {
 	color: var(--on-accent-color);
 	background: var(--accent-color);
 	border-color: var(--accent-color);
@@ -222,6 +210,18 @@
 	&:focus-visible {
 		background: var(--accent-hover-color);
 		border-color: var(--accent-hover-color);
+	}
+}
+
+.root_secondaryLook {
+	color: var(--on-accent2-color);
+	background: var(--accent2-color);
+	border-color: var(--accent2-color);
+
+	&:hover,
+	&:focus-visible {
+		background: var(--accent2-hover-color);
+		border-color: var(--accent2-hover-color);
 	}
 }
 

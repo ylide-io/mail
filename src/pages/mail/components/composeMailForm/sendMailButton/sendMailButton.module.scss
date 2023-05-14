@@ -18,7 +18,7 @@
 	border-top-left-radius: 3px;
 	border-bottom-left-radius: 3px;
 
-	background-color: var(--accent-color);
+	background-color: var(--accent2-color);
 
 	padding-left: 10px;
 	font-size: 0.8rem;
@@ -29,7 +29,7 @@
 	cursor: pointer;
 
 	&:hover {
-		background-color: var(--accent-hover-color);
+		background-color: var(--accent2-hover-color);
 	}
 }
 
@@ -53,7 +53,7 @@
 	border-top-right-radius: 3px;
 	border-bottom-right-radius: 3px;
 
-	background-color: var(--accent-color);
+	background-color: var(--accent2-color);
 
 	display: flex;
 	align-items: center;
@@ -61,10 +61,10 @@
 
 	cursor: pointer;
 
-	border-left: 1px solid var(--accent-hover-color);
+	border-left: 1px solid var(--accent2-hover-color);
 
 	&:hover {
-		background-color: var(--accent-hover-color);
+		background-color: var(--accent2-hover-color);
 	}
 
 	> svg {

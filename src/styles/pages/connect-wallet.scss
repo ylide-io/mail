@@ -168,7 +168,7 @@
 		}
 
 		&.active {
-			color: var(--accent2-color);
+			color: var(--accent-color);
 			cursor: default;
 
 			&::after {
@@ -179,7 +179,7 @@
 				height: 6px;
 				border-top-left-radius: 3px;
 				border-top-right-radius: 3px;
-				background: var(--accent2-color);
+				background: var(--accent-color);
 			}
 		}
 	}
@@ -221,7 +221,7 @@
 		text-align: center;
 		letter-spacing: -0.09em;
 
-		color: var(--accent2-color);
+		color: var(--accent-color);
 	}
 }
 
@@ -301,10 +301,10 @@
 			font-weight: 400;
 			font-size: 11px;
 			line-height: 16px;
-			color: var(--accent2-color);
+			color: var(--accent-color);
 			padding: 0 8px;
 
-			background: rgba(var(--accent2-rgb-color), 0.08);
+			background: rgba(var(--accent-rgb-color), 0.08);
 			border-radius: 14px;
 		}
 	}
