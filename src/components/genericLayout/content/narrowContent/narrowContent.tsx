@@ -11,19 +11,17 @@ export interface NarrowContentProps extends PropsWithChildren<{}> {
 export function NarrowContent({ children, title, titleSubItem, titleRight }: NarrowContentProps) {
 	return (
 		<div className={css.root}>
-			<div className={css.main}>
-				<div className={css.header}>
-					<div className={css.title}>
-						<div className={css.titleText}>{title}</div>
+			<div className={css.header}>
+				<div className={css.title}>
+					<div className={css.titleText}>{title}</div>
 
-						{titleSubItem}
-					</div>
-
-					{titleRight != null && <div className={css.titleRight}>{titleRight}</div>}
+					{titleSubItem}
 				</div>
 
-				<div>{children}</div>
+				{titleRight != null && <div className={css.titleRight}>{titleRight}</div>}
 			</div>
+
+			<div>{children}</div>
 		</div>
 	);
 }

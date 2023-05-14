@@ -56,7 +56,7 @@ const Header = observer(() => {
 				</a>
 			</div>
 
-			<div className={css.main}>
+			<div className={css.right}>
 				{!REACT_APP__OTC_MODE && !REACT_APP__SMART_FEED_MODE && domain.accounts.hasActiveAccounts && (
 					<ActionButton
 						size={ActionButtonSize.MEDIUM}

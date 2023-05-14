@@ -34,7 +34,13 @@ export function MailboxListItem({ index, style, data }: ListChildComponentProps<
 	const message = messages[index];
 
 	return index === messages.length ? (
-		<div key={index} style={Object.assign({ height: itemSize, textAlign: 'center' }, style)}>
+		<div
+			key={index}
+			style={Object.assign(
+				{ height: itemSize, display: 'flex', alignItems: 'center', justifyContent: 'center' },
+				style,
+			)}
+		>
 			Loading...
 		</div>
 	) : (

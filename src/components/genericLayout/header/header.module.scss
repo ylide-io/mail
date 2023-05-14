@@ -1,12 +1,11 @@
 .root {
-	@include flex-row(center, flex-start);
-	padding: 0 16px;
-	height: 65px;
-	border-bottom: 1px solid var(--border-color);
+	display: flex;
+	align-items: center;
+	height: 140px;
 
-	@include less720px {
-		padding-right: 8px;
-		height: 55px;
+	@include less920px {
+		padding: 0 20px;
+		height: 80px;
 	}
 }
 
@@ -33,7 +32,7 @@
 	}
 }
 
-.main {
+.right {
 	display: grid;
 	grid-auto-flow: column;
 	grid-gap: 20px;
