@@ -100,6 +100,10 @@
 .date {
 	color: var(--secondary-text-color);
 	font-weight: $font-weight_light;
+
+	&:hover {
+		color: var(--link-color);
+	}
 }
 
 .metaButton {
@@ -163,6 +167,11 @@
 		}
 	}
 
+	a:hover,
+	a:focus-visible {
+		text-decoration: underline;
+	}
+
 	img {
 		max-width: 100%;
 		cursor: pointer;
@@ -182,9 +191,14 @@
 	color: var(--primary-text-color);
 	background: var(--secondary-surface-color);
 	border: 1px solid var(--border-lite-color);
-	border-radius: 10px;
+	border-radius: 8px;
 	overflow: hidden;
 	transition: box-shadow 0.3s;
+
+	&:hover,
+	&:focus-visible {
+		border: 1px solid var(--border-heavy-color);
+	}
 
 	.embedImage {
 		border-bottom: 1px solid var(--border-lite-color);
