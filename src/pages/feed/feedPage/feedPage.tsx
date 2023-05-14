@@ -39,7 +39,7 @@ const FeedPageContent = observer(() => {
 	useEffect(() => {
 		genericLayoutApi.scrollToTop();
 		feed.loadCategory(category!, sourceId);
-	}, [category, sourceId]);
+	}, [category, genericLayoutApi, sourceId]);
 
 	// Re-load when source-list changes
 	useEffect(() => {
@@ -51,7 +51,7 @@ const FeedPageContent = observer(() => {
 				feed.loadCategory(category, sourceId);
 			}
 		}
-	}, [category, lastSourceListId, sourceId, sourceListId]);
+	}, [category, genericLayoutApi, lastSourceListId, sourceId, sourceListId]);
 
 	useEffect(() => {
 		const timer = setInterval(async () => {
