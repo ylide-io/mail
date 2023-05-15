@@ -10,6 +10,7 @@ import { ToastManager } from './components/toast/toast';
 import { YlideLoader } from './components/ylideLoader/ylideLoader';
 import { APP_NAME } from './constants';
 import { REACT_APP__OTC_MODE, REACT_APP__SMART_FEED_MODE } from './env';
+import { AdminFeedPage } from './pages/AdminFeedPage';
 import { AdminPage } from './pages/AdminPage';
 import { FeedPage } from './pages/feed/feedPage/feedPage';
 import { FeedPostPage } from './pages/feed/feedPostPage/feedPostPage';
@@ -103,6 +104,7 @@ const App = observer(() => {
 					<Route path={RoutePath.WALLETS} element={<NewWalletsPage />} />
 					<Route path={RoutePath.SETTINGS} element={<SettingsPage />} />
 					<Route path={RoutePath.ADMIN} element={<AdminPage />} />
+					<Route path={RoutePath.ADMIN_FEED} element={<AdminFeedPage />} />
 
 					<Route
 						path={RoutePath.FEED}

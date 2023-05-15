@@ -1,6 +1,7 @@
 export enum RoutePath {
 	TEST = '/test',
 	ADMIN = '/admin',
+	ADMIN_FEED = '/admin/feed',
 
 	ROOT = '/',
 	ANY = '/*',
