@@ -44,17 +44,16 @@ const Header = observer(() => {
 				</ActionButton>
 			)}
 
-			<div className={css.logo}>
-				<a
-					href={generatePath(RoutePath.ROOT)}
-					onClick={e => {
-						e.preventDefault();
-						navigate(generatePath(RoutePath.ROOT));
-					}}
-				>
-					<AppLogo />
-				</a>
-			</div>
+			<a
+				className={css.logo}
+				href={generatePath(RoutePath.ROOT)}
+				onClick={e => {
+					e.preventDefault();
+					navigate(generatePath(RoutePath.ROOT));
+				}}
+			>
+				<AppLogo />
+			</a>
 
 			<div className={css.right}>
 				{REACT_APP__APP_MODE === AppMode.HUB && domain.accounts.hasActiveAccounts && (

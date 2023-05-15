@@ -7,6 +7,11 @@
 		padding: 0 20px;
 		height: 80px;
 	}
+
+	@include less720px {
+		padding: 0 12px;
+		height: 64px;
+	}
 }
 
 .burger {
@@ -14,8 +19,19 @@
 }
 
 .logo {
+	@include expand-click-area;
+
+	@include less920px {
+		width: 130px;
+	}
+
 	@include less720px {
 		display: none;
+	}
+
+	> svg {
+		width: 100%;
+		height: 100%;
 	}
 }
 

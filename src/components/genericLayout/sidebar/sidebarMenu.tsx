@@ -66,7 +66,7 @@ interface SidebarSectionProps extends PropsWithChildren<{}> {
 }
 
 const SidebarSection = observer(({ children, section, title }: SidebarSectionProps) => (
-	<div>
+	<div className={css.section}>
 		<div className={css.sectionTitle}>
 			{title}
 			<ActionButton
