@@ -34,7 +34,7 @@ import { makeObservable, observable } from 'mobx';
 import { NFT3NameService } from '../api/nft3DID';
 import { PasswordRequestModal } from '../components/passwordRequestModal/passwordRequestModal';
 import { SwitchModal } from '../components/switchModal/switchModal';
-import { REACT_APP__OTC_MODE } from '../env';
+import { AppMode, REACT_APP__APP_MODE } from '../env';
 import { blockchainMeta } from '../utils/blockchain';
 import { walletsMeta } from '../utils/wallet';
 import { Accounts } from './Accounts';
@@ -47,7 +47,7 @@ import tags from './Tags';
 
 let INDEXER_BLOCKCHAINS: string[];
 
-if (REACT_APP__OTC_MODE) {
+if (REACT_APP__APP_MODE === AppMode.OTC) {
 	INDEXER_BLOCKCHAINS = ['POLYGON', 'FANTOM', 'GNOSIS'];
 
 	Ylide.registerBlockchainFactory(evmBlockchainFactories[EVMNetwork.POLYGON]);

@@ -1,62 +1,18 @@
 .root {
-	position: sticky;
-	top: 0;
-	padding: 0 0 20px;
-	overflow-y: auto;
-
-	@include less920px {
-		position: absolute;
-		z-index: 100;
-		top: 0;
-		bottom: 0;
-		left: -210px;
-		background-color: var(--surface-color);
-		box-shadow: 0 0 10px rgba(var(--shade-rgb-color), 0.2);
-		opacity: 0;
-		width: 210px;
-		transition: all 0.2s;
-
-		&.root_open {
-			left: 0;
-			opacity: 1;
-		}
-	}
-}
-
-.container {
-	@include flex-column(stretch, flex-start);
-
-	padding: 12px 0 0 16px;
-
-	position: sticky;
-	top: 0;
-
-	@include less920px {
-		position: static;
-		padding: 15px 15px 0;
-	}
-}
-
-.mobileHeader {
-	display: none;
-
-	@include less920px {
-		@include flex-row(center, space-between);
-		align-self: center;
-		margin: 4px 0 32px;
-	}
+	padding: 0 16px;
 }
 
 .section {
-	margin-left: -15px;
-	@include flex-column(stretch, flex-start);
+	margin: 0 0 16px;
 }
 
 .sectionTitle {
 	display: flex;
 	align-items: center;
-	padding: 0 0 8px 28px;
-	font-size: 17px;
+	padding: 0 0 0 12px;
+	height: 40px;
+	font-size: 16px;
+	font-weight: $font-weight_bold;
 }
 
 .sectionButton {
@@ -66,9 +22,10 @@
 }
 
 .sectionContent {
-	@include flex-column(stretch, flex-start);
-
-	margin-bottom: 18px;
+	display: flex;
+	flex-direction: column;
+	margin: 0 0 0 -16px;
+	padding: 0 0 0 16px;
 	max-height: 0;
 	overflow: hidden;
 	transition: max-height 0.2s;
@@ -79,18 +36,17 @@
 }
 
 .sectionLink {
-	@include flex-row(center, flex-start);
-	padding: 6px 6px 6px 40px;
+	display: flex;
+	align-items: center;
+	margin: 0 0 0 -16px;
+	padding: 0 6px 0 40px;
+	height: 32px;
 	cursor: pointer;
 }
 
 .sectionLink_active {
-	background: rgba(var(--accent2-rgb-color), 0.08);
+	background: var(--border-color);
 	border-radius: 0 30px 30px 0;
-
-	.sectionLinkTitle {
-		color: var(--accent2-color);
-	}
 }
 
 .sectionLink_submenu {
@@ -128,17 +84,17 @@
 .socials {
 	display: grid;
 	grid-auto-flow: column;
-	justify-content: start;
+	justify-content: center;
 	grid-gap: 8px;
 	position: relative;
-	padding: 24px 0 0 24px;
+	padding: 24px 0 0 0;
 
 	&:before {
 		content: '';
 		position: absolute;
 		top: 0;
-		right: 8px;
-		left: 4px;
+		right: 0;
+		left: 0;
 		height: 1px;
 		background: var(--border-color);
 	}
@@ -148,16 +104,12 @@
 		color: var(--primary-text-color);
 
 		&:hover {
-			color: var(--link-hover-color);
+			color: var(--link-color);
 		}
 
 		svg {
 			fill: currentColor;
 		}
-	}
-
-	@include less920px {
-		padding-left: 14px;
 	}
 }
 

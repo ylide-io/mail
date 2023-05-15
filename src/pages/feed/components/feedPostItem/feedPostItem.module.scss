@@ -90,9 +90,9 @@
 .reason {
 	@include truncate-text;
 	padding: 2px 6px 1px;
-	color: var(--accent2-color);
+	color: var(--accent-color);
 	font-size: 11px;
-	background: rgba(var(--accent2-rgb-color), 0.08);
+	background: rgba(var(--accent-rgb-color), 0.08);
 	border-radius: 99px;
 	cursor: default;
 }
@@ -100,6 +100,10 @@
 .date {
 	color: var(--secondary-text-color);
 	font-weight: $font-weight_light;
+
+	&:hover {
+		color: var(--link-color);
+	}
 }
 
 .metaButton {
@@ -109,7 +113,7 @@
 	color: var(--secondary-text-color);
 
 	&:hover {
-		color: var(--link-hover-color);
+		color: var(--link-color);
 	}
 
 	> svg {
@@ -163,6 +167,11 @@
 		}
 	}
 
+	a:hover,
+	a:focus-visible {
+		text-decoration: underline;
+	}
+
 	img {
 		max-width: 100%;
 		cursor: pointer;
@@ -182,9 +191,14 @@
 	color: var(--primary-text-color);
 	background: var(--secondary-surface-color);
 	border: 1px solid var(--border-lite-color);
-	border-radius: 10px;
+	border-radius: 8px;
 	overflow: hidden;
 	transition: box-shadow 0.3s;
+
+	&:hover,
+	&:focus-visible {
+		border: 1px solid var(--border-heavy-color);
+	}
 
 	.embedImage {
 		border-bottom: 1px solid var(--border-lite-color);

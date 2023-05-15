@@ -105,6 +105,7 @@ $hPadding: 20px;
 
 .sourceOrigin {
 	flex: 0.66 1;
+	display: flex;
 }
 
 .sourceOriginLink {
@@ -113,6 +114,10 @@ $hPadding: 20px;
 	align-items: center;
 	grid-gap: 4px;
 	color: var(--primary-text-color);
+
+	&:hover {
+		color: var(--link-color);
+	}
 }
 
 .sourceOriginText {

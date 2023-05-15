@@ -5,7 +5,7 @@ import React, { PropsWithChildren, ReactNode, useState } from 'react';
 import { generatePath, useLocation } from 'react-router-dom';
 
 import { FeedCategory } from '../../../api/feedServerApi';
-import { REACT_APP__OTC_MODE, REACT_APP__SMART_FEED_MODE } from '../../../env';
+import { AppMode, REACT_APP__APP_MODE } from '../../../env';
 import { ReactComponent as ArchiveSvg } from '../../../icons/archive.svg';
 import { ReactComponent as ArrowDownSvg } from '../../../icons/ic20/arrowDown.svg';
 import { ReactComponent as ArrowUpSvg } from '../../../icons/ic20/arrowUp.svg';
@@ -130,7 +130,7 @@ export const SidebarButton = observer(
 
 //
 
-const isSidebarOpen = observable.box(false);
+export const isSidebarOpen = observable.box(false);
 
 export enum Section {
 	FEED = 'feed',
@@ -288,41 +288,35 @@ export const SidebarMenu = observer(() => {
 	}
 
 	return (
-		<div className={clsx(css.root, { [css.root_open]: isSidebarOpen.get() })}>
-			<div className={css.container}>
-				<div className={css.mobileHeader}>
-					<SidebarBurger>Hide sidebar</SidebarBurger>
-				</div>
+		<div className={css.root}>
+			{REACT_APP__APP_MODE === AppMode.OTC ? (
+				renderOtcSection()
+			) : REACT_APP__APP_MODE === AppMode.MAIN_VIEW ? (
+				renderFeedSection()
+			) : (
+				<>
+					{browserStorage.widgetId !== WidgetId.MAILBOX && renderFeedSection()}
 
-				{REACT_APP__OTC_MODE ? (
-					renderOtcSection()
-				) : REACT_APP__SMART_FEED_MODE ? (
-					renderFeedSection()
-				) : (
-					<>
-						{browserStorage.widgetId !== WidgetId.MAILBOX && renderFeedSection()}
+					{renderMailSection()}
+				</>
+			)}
 
-						{renderMailSection()}
-					</>
-				)}
-
-				<div className={css.socials}>
-					<a href="https://t.me/ylide_chat" target="_blank noreferrer" title="Telegram">
-						<TelegramSvg />
-					</a>
-					<a href="https://discord.gg/ylide" target="_blank noreferrer" title="Discord">
-						<DiscordSvg />
-					</a>
-					<a href="https://twitter.com/ylide_" target="_blank noreferrer" title="Twitter">
-						<TwitterSvg />
-					</a>
-					<a href="https://www.linkedin.com/company/ylide/" target="_blank noreferrer" title="LinkedIn">
-						<LinkedInSvg />
-					</a>
-					<a href="https://medium.com/@ylide" target="_blank noreferrer" title="Medium">
-						<MediumSvg />
-					</a>
-				</div>
+			<div className={css.socials}>
+				<a href="https://t.me/ylide_chat" target="_blank noreferrer" title="Telegram">
+					<TelegramSvg />
+				</a>
+				<a href="https://discord.gg/ylide" target="_blank noreferrer" title="Discord">
+					<DiscordSvg />
+				</a>
+				<a href="https://twitter.com/ylide_" target="_blank noreferrer" title="Twitter">
+					<TwitterSvg />
+				</a>
+				<a href="https://www.linkedin.com/company/ylide/" target="_blank noreferrer" title="LinkedIn">
+					<LinkedInSvg />
+				</a>
+				<a href="https://medium.com/@ylide" target="_blank noreferrer" title="Medium">
+					<MediumSvg />
+				</a>
 			</div>
 		</div>
 	);

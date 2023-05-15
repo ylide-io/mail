@@ -1,23 +1,12 @@
 .root {
-	display: grid;
-	grid-auto-flow: column;
-	grid-template-columns: 1fr minmax(0, 720px) 1.5fr;
+	padding: 24px 74px 24px 48px;
 
 	@include less920px {
-		grid-template-columns: 1fr minmax(0, 720px) 1fr;
+		padding: 16px 20px;
 	}
 
 	@include less720px {
-		grid-template-columns: 1fr;
-		padding: 12px 0;
-	}
-}
-
-.main {
-	grid-column: 2/3;
-
-	@include less720px {
-		grid-column: 1/2;
+		padding: 16px 0;
 	}
 }
 
@@ -25,10 +14,10 @@
 	display: flex;
 	align-items: center;
 	justify-content: space-between;
-	padding: 0 0 12px 12px;
+	padding: 0 0 16px 12px;
 
 	@include less720px {
-		padding: 0 12px 12px;
+		padding: 0 12px 16px;
 	}
 }
 

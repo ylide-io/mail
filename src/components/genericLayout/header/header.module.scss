@@ -1,12 +1,16 @@
 .root {
-	@include flex-row(center, flex-start);
-	padding: 0 16px;
-	height: 65px;
-	border-bottom: 1px solid var(--border-color);
+	display: flex;
+	align-items: center;
+	height: 140px;
+
+	@include less920px {
+		padding: 0 20px;
+		height: 80px;
+	}
 
 	@include less720px {
-		padding-right: 8px;
-		height: 55px;
+		padding: 0 12px;
+		height: 64px;
 	}
 }
 
@@ -15,13 +19,20 @@
 }
 
 .logo {
+	@include expand-click-area;
+
+	@include less920px {
+		width: 130px;
+	}
+
 	@include less720px {
 		display: none;
 	}
-}
 
-.logoImage {
-	display: block;
+	> svg {
+		width: 100%;
+		height: 100%;
+	}
 }
 
 .composeButton {
@@ -33,7 +44,7 @@
 	}
 }
 
-.main {
+.right {
 	display: grid;
 	grid-auto-flow: column;
 	grid-gap: 20px;
@@ -49,11 +60,12 @@
 	@include expand-click-area;
 	display: flex;
 	align-items: center;
-	height: $interactive-elem-size_large;
+	padding: 0 0 0 3px;
+	height: $interactive-elem-size_xlarge;
 	white-space: nowrap;
-	background-color: var(--surface-color);
+	background-color: var(--secondary-surface-color);
 	border: 1px solid var(--border-color);
-	border-radius: 20px;
+	border-radius: $interactive-elem-size_xlarge/2;
 
 	&:hover,
 	&:focus-visible {
@@ -68,9 +80,8 @@
 .usersAvatar {
 	display: inline-block;
 	vertical-align: top;
-	width: $interactive-elem-size_large - 2px;
-	height: $interactive-elem-size_large - 2px;
-	border: 2px solid var(--surface-color);
+	width: $interactive-elem-size_xlarge - 8px;
+	border: 2px solid var(--secondary-surface-color);
 
 	&:not(:first-child) {
 		margin: 0 0 0 -18px;

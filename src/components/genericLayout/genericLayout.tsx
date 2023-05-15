@@ -1,11 +1,10 @@
+import clsx from 'clsx';
 import { observer } from 'mobx-react';
 import React, { createContext, PropsWithChildren, useContext, useEffect, useMemo, useRef } from 'react';
 
-import domain from '../../stores/Domain';
-import { TransactionPopup } from '../TransactionPopup/TransactionPopup';
 import css from './genericLayout.module.scss';
 import Header from './header/header';
-import { SidebarMenu } from './sidebar/sidebarMenu';
+import { isSidebarOpen, SidebarBurger, SidebarMenu } from './sidebar/sidebarMenu';
 
 interface GenericLayoutApi {
 	scrollToTop: () => void;
@@ -52,10 +51,14 @@ export const GenericLayout = observer(({ children }: GenericLayoutProps) => {
 			<div className={css.root}>
 				<Header />
 
-				{domain.txPlateVisible && <TransactionPopup />}
-
 				<div className={css.main} ref={mainRef}>
-					<SidebarMenu />
+					<div className={clsx(css.sidebar, isSidebarOpen.get() && css.sidebar_open)}>
+						<div className={css.sidebarMobileHeader}>
+							<SidebarBurger>Hide sidebar</SidebarBurger>
+						</div>
+
+						<SidebarMenu />
+					</div>
 
 					<div className={css.content}>{children}</div>
 				</div>

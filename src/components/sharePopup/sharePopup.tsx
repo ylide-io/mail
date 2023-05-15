@@ -7,7 +7,7 @@ import {
 	WhatsappShareButton,
 } from 'react-share';
 
-import { REACT_APP__SMART_FEED_MODE } from '../../env';
+import { AppMode, REACT_APP__APP_MODE } from '../../env';
 import { OutgoingMailData } from '../../stores/outgoingMailData';
 import { HorizontalAlignment } from '../../utils/alignment';
 import { copyToClipboard } from '../../utils/clipboard';
@@ -49,7 +49,7 @@ export function SharePopup({ anchorRef, horizontalAlign, onClose, url, subject }
 		>
 			<div className={css.content}>
 				<div className={css.primaryButtons}>
-					{!REACT_APP__SMART_FEED_MODE && (
+					{REACT_APP__APP_MODE !== AppMode.MAIN_VIEW && (
 						<button
 							className={css.primaryButton}
 							onClick={() => {
