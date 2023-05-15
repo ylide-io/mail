@@ -5,7 +5,7 @@ import React, { PropsWithChildren, ReactNode, useState } from 'react';
 import { generatePath, useLocation } from 'react-router-dom';
 
 import { FeedCategory } from '../../../api/feedServerApi';
-import { REACT_APP__OTC_MODE, REACT_APP__SMART_FEED_MODE } from '../../../env';
+import { AppMode, REACT_APP__APP_MODE } from '../../../env';
 import { ReactComponent as ArchiveSvg } from '../../../icons/archive.svg';
 import { ReactComponent as ArrowDownSvg } from '../../../icons/ic20/arrowDown.svg';
 import { ReactComponent as ArrowUpSvg } from '../../../icons/ic20/arrowUp.svg';
@@ -289,9 +289,9 @@ export const SidebarMenu = observer(() => {
 
 	return (
 		<div className={css.root}>
-			{REACT_APP__OTC_MODE ? (
+			{REACT_APP__APP_MODE === AppMode.OTC ? (
 				renderOtcSection()
-			) : REACT_APP__SMART_FEED_MODE ? (
+			) : REACT_APP__APP_MODE === AppMode.MAIN_VIEW ? (
 				renderFeedSection()
 			) : (
 				<>

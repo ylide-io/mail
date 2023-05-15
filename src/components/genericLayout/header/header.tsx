@@ -2,7 +2,7 @@ import { observer } from 'mobx-react';
 import React, { useRef, useState } from 'react';
 import { generatePath } from 'react-router-dom';
 
-import { REACT_APP__OTC_MODE, REACT_APP__SMART_FEED_MODE } from '../../../env';
+import { AppMode, REACT_APP__APP_MODE } from '../../../env';
 import { ReactComponent as ArrowDownSvg } from '../../../icons/ic20/arrowDown.svg';
 import { ReactComponent as CrossSvg } from '../../../icons/ic20/cross.svg';
 import { ReactComponent as PlusSvg } from '../../../icons/ic20/plus.svg';
@@ -34,7 +34,7 @@ const Header = observer(() => {
 		<div className={css.root}>
 			<SidebarBurger className={css.burger} />
 
-			{!REACT_APP__SMART_FEED_MODE && domain.accounts.hasActiveAccounts && (
+			{REACT_APP__APP_MODE === AppMode.HUB && domain.accounts.hasActiveAccounts && (
 				<ActionButton
 					className={css.composeButton}
 					look={ActionButtonLook.PRIMARY}
@@ -57,7 +57,7 @@ const Header = observer(() => {
 			</div>
 
 			<div className={css.right}>
-				{!REACT_APP__OTC_MODE && !REACT_APP__SMART_FEED_MODE && domain.accounts.hasActiveAccounts && (
+				{REACT_APP__APP_MODE === AppMode.HUB && domain.accounts.hasActiveAccounts && (
 					<ActionButton
 						size={ActionButtonSize.MEDIUM}
 						look={ActionButtonLook.LITE}

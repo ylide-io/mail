@@ -14,7 +14,7 @@ import { SelectNetworkModal } from '../../../../../components/selectNetworkModal
 import { Spinner } from '../../../../../components/spinner/spinner';
 import { showStaticComponent } from '../../../../../components/staticComponentManager/staticComponentManager';
 import { toast } from '../../../../../components/toast/toast';
-import { REACT_APP__OTC_MODE } from '../../../../../env';
+import { AppMode, REACT_APP__APP_MODE } from '../../../../../env';
 import { ReactComponent as ArrowDownSvg } from '../../../../../icons/ic20/arrowDown.svg';
 import { ReactComponent as ReplySvg } from '../../../../../icons/ic20/reply.svg';
 import domain from '../../../../../stores/Domain';
@@ -159,7 +159,7 @@ export const SendMailButton = observer(({ className, mailData, onSent }: SendMai
 				mailData.attachments,
 				mailData.to.items.map(r => r.routing?.address!),
 				mailData.network,
-				REACT_APP__OTC_MODE
+				REACT_APP__APP_MODE === AppMode.OTC
 					? ('0000000000000000000000000000000000000000000000000000000000000001' as Uint256)
 					: undefined,
 			);

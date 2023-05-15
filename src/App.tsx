@@ -10,7 +10,7 @@ import { ToastManager } from './components/toast/toast';
 import { TransactionPopup } from './components/TransactionPopup/TransactionPopup';
 import { YlideLoader } from './components/ylideLoader/ylideLoader';
 import { APP_NAME } from './constants';
-import { REACT_APP__OTC_MODE, REACT_APP__SMART_FEED_MODE } from './env';
+import { AppMode, REACT_APP__APP_MODE } from './env';
 import { AdminPage } from './pages/AdminPage';
 import { FeedPage } from './pages/feed/feedPage/feedPage';
 import { FeedPostPage } from './pages/feed/feedPostPage/feedPostPage';
@@ -55,7 +55,7 @@ const App = observer(() => {
 
 	useEffect(() => {
 		document.title = APP_NAME;
-		document.documentElement.dataset.theme = REACT_APP__SMART_FEED_MODE ? AppTheme.V2 : AppTheme.V1;
+		document.documentElement.dataset.theme = REACT_APP__APP_MODE === AppMode.MAIN_VIEW ? AppTheme.V2 : AppTheme.V1;
 	}, []);
 
 	useEffect(() => {
@@ -137,7 +137,7 @@ const App = observer(() => {
 							<Navigate
 								replace
 								to={
-									REACT_APP__OTC_MODE
+									REACT_APP__APP_MODE === AppMode.OTC
 										? generatePath(RoutePath.OTC_ASSETS)
 										: generatePath(RoutePath.FEED)
 								}
