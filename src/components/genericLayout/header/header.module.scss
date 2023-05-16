@@ -3,6 +3,10 @@
 	align-items: center;
 	height: 140px;
 
+	@media (max-height: 840px) {
+		height: 100px;
+	}
+
 	@include less920px {
 		padding: 0 20px;
 		height: 80px;
