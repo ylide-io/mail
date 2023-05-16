@@ -152,6 +152,15 @@ export const TestPage = observer(() => {
 				</ActionButton>
 			</Row>
 
+			<Row>
+				fixed width
+				<ActionButton style={{ width: 200 }}>Text Only</ActionButton>
+				<ActionButton style={{ width: 200 }} icon={<SettingsSvg />}>
+					With Icon
+				</ActionButton>
+				<ActionButton style={{ width: 200 }} icon={<SettingsSvg />} />
+			</Row>
+
 			<hr style={{ margin: '32px 0' }} />
 
 			<Row>

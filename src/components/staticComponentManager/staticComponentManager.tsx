@@ -32,10 +32,4 @@ export function showStaticComponent<Result = undefined>(
 	});
 }
 
-export const StaticComponentManager = observer(() => (
-	<>
-		{staticComponents.map((item, i) => (
-			<Fragment key={i}>{item.node}</Fragment>
-		))}
-	</>
-));
+export const StaticComponentManager = observer(() => <>{staticComponents.map(item => item.node)}</>);

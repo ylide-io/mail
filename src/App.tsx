@@ -4,6 +4,7 @@ import { QueryClient, QueryClientProvider } from 'react-query';
 import { generatePath, Navigate, Route, Routes, useLocation } from 'react-router-dom';
 
 import { FeedCategory } from './api/feedServerApi';
+import { MainViewOnboarding } from './components/mainViewOnboarding/mainViewOnboarding';
 import { PopupManager } from './components/popup/popupManager/popupManager';
 import { StaticComponentManager } from './components/staticComponentManager/staticComponentManager';
 import { ToastManager } from './components/toast/toast';
@@ -152,6 +153,8 @@ const App = observer(() => {
 
 				<StaticComponentManager />
 				<ToastManager />
+
+				{REACT_APP__APP_MODE === AppMode.MAIN_VIEW && <MainViewOnboarding />}
 			</PopupManager>
 		</QueryClientProvider>
 	);

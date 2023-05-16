@@ -6,6 +6,7 @@ import { NewPasswordModal } from '../components/newPasswordModal/newPasswordModa
 import { SelectWalletModal } from '../components/selectWalletModal/selectWalletModal';
 import { showStaticComponent } from '../components/staticComponentManager/staticComponentManager';
 import { SwitchModal } from '../components/switchModal/switchModal';
+import { toast } from '../components/toast/toast';
 import domain from '../stores/Domain';
 import { DomainAccount } from '../stores/models/DomainAccount';
 import { Wallet } from '../stores/models/Wallet';
@@ -79,16 +80,14 @@ export async function connectAccount(): Promise<DomainAccount | undefined> {
 			currentAccount = await wallet.getCurrentAccount();
 			if (currentAccount && wallet.isAccountRegistered(currentAccount)) {
 				const result = await SwitchModal.show('account', wallet);
-				if (!result) {
-					return null;
-				}
+				if (!result) return;
 			}
 			currentAccount = await wallet.getCurrentAccount();
 			if (currentAccount && wallet.isAccountRegistered(currentAccount)) {
 				const domainAccount = wallet.accounts.find(a => a.account.address === currentAccount!.address)!;
 				if (domainAccount.isLocalKeyRegistered) {
-					alert('This account is already connected. Please choose a different one.');
-					return null;
+					toast('This account is already connected. Please choose a different one.');
+					return;
 				} else {
 					await domain.accounts.removeAccount(domainAccount);
 					return await wallet.connectAccount();
