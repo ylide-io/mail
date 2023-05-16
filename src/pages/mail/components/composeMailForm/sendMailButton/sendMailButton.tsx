@@ -5,7 +5,7 @@ import { autorun } from 'mobx';
 import { observer } from 'mobx-react';
 import React, { ReactNode, useEffect, useRef, useState } from 'react';
 
-import { ActionButtonLook } from '../../../../../components/ActionButton/ActionButton';
+import { ActionButton, ActionButtonLook, ActionButtonSize } from '../../../../../components/ActionButton/ActionButton';
 import { ActionModal } from '../../../../../components/actionModal/actionModal';
 import { AdaptiveText } from '../../../../../components/adaptiveText/adaptiveText';
 import { DropDown, DropDownItem, DropDownItemMode } from '../../../../../components/dropDown/dropDown';
@@ -122,16 +122,20 @@ export const SendMailButton = observer(({ className, mailData, onSent }: SendMai
 							</>
 						}
 						buttons={[
-							{
-								title: `Continue with ${truncateInMiddle(mailData.from!.account.address, 8, '...')}`,
-								onClick: () => resolve(true),
-								look: ActionButtonLook.PRIMARY,
-							},
-							{
-								title: 'Cancel',
-								onClick: () => resolve(false),
-								look: ActionButtonLook.LITE,
-							},
+							<ActionButton
+								size={ActionButtonSize.XLARGE}
+								look={ActionButtonLook.PRIMARY}
+								onClick={() => resolve(true)}
+							>
+								Continue with {truncateInMiddle(mailData.from!.account.address, 8, '...')}
+							</ActionButton>,
+							<ActionButton
+								size={ActionButtonSize.XLARGE}
+								look={ActionButtonLook.LITE}
+								onClick={() => resolve(false)}
+							>
+								Cancel
+							</ActionButton>,
 						]}
 						onClose={resolve}
 					/>

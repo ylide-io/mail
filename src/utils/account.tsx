@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { ActionButtonLook } from '../components/ActionButton/ActionButton';
+import { ActionButton, ActionButtonLook, ActionButtonSize } from '../components/ActionButton/ActionButton';
 import { ActionModal } from '../components/actionModal/actionModal';
 import { NewPasswordModal } from '../components/newPasswordModal/newPasswordModal';
 import { SelectWalletModal } from '../components/selectWalletModal/selectWalletModal';
@@ -33,16 +33,20 @@ export async function connectAccount(): Promise<DomainAccount | undefined> {
 					</>
 				}
 				buttons={[
-					{
-						title: 'Connect same account',
-						look: ActionButtonLook.PRIMARY,
-						onClick: () => resolve(true),
-					},
-					{
-						title: 'Use another one',
-						look: ActionButtonLook.LITE,
-						onClick: () => resolve(false),
-					},
+					<ActionButton
+						size={ActionButtonSize.XLARGE}
+						look={ActionButtonLook.PRIMARY}
+						onClick={() => resolve(true)}
+					>
+						Connect same account
+					</ActionButton>,
+					<ActionButton
+						size={ActionButtonSize.XLARGE}
+						look={ActionButtonLook.LITE}
+						onClick={() => resolve(false)}
+					>
+						Use another one
+					</ActionButton>,
 				]}
 				onClose={resolve}
 			/>
