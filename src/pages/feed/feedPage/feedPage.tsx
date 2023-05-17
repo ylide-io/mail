@@ -99,13 +99,15 @@ const FeedPageContent = observer(() => {
 				)
 			}
 		>
-			<ActionButton
-				className={css.scrollToTop}
-				size={ActionButtonSize.XLARGE}
-				look={ActionButtonLook.SECONDARY}
-				icon={<ArrowUpSvg />}
-				onClick={() => genericLayoutApi.scrollToTop()}
-			/>
+			{!!feed.posts.length && (
+				<ActionButton
+					className={css.scrollToTop}
+					size={ActionButtonSize.XLARGE}
+					look={ActionButtonLook.SECONDARY}
+					icon={<ArrowUpSvg />}
+					onClick={() => genericLayoutApi.scrollToTop()}
+				/>
+			)}
 
 			<div className={css.feedBody} ref={feedBodyRef}>
 				{newPostsVisible && !!feed.newPosts && (
