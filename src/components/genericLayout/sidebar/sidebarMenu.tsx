@@ -192,23 +192,30 @@ export const SidebarMenu = observer(() => {
 			<>
 				<SidebarSection section={Section.FEED} title="Feed">
 					<SidebarButton
-						isActive={
-							location.pathname === generatePath(RoutePath.FEED_CATEGORY, { category: FeedCategory.MAIN })
-						}
+						isActive={location.pathname === generatePath(RoutePath.FEED_SMART)}
 						icon={getFeedCategoryIcon(FeedCategory.MAIN)}
 						name={getFeedCategoryName(FeedCategory.MAIN)}
 						onClick={() => {
 							isSidebarOpen.set(false);
-							navigate(generatePath(RoutePath.FEED_CATEGORY, { category: FeedCategory.MAIN }));
+							navigate(generatePath(RoutePath.FEED_SMART));
 						}}
 					/>
 
 					{domain.accounts.activeAccounts.map(account => (
 						<SidebarButton
 							isSubmenu
+							isActive={
+								location.pathname ===
+								generatePath(RoutePath.FEED_SMART_ADDRESS, { address: account.account.address })
+							}
 							icon={<ContactSvg />}
 							name={<AdaptiveText text={account.account.address} />}
-							onClick={() => {}}
+							onClick={() => {
+								isSidebarOpen.set(false);
+								navigate(
+									generatePath(RoutePath.FEED_SMART_ADDRESS, { address: account.account.address }),
+								);
+							}}
 							rightButton={{
 								icon: <SettingsSvg />,
 								onClick: () => setFeedSettingsOpen(!isFeedSettingsOpen),

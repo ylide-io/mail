@@ -119,6 +119,8 @@ const App = observer(() => {
 					/>
 					<Route path={RoutePath.FEED_POST} element={<FeedPostPage />} />
 					<Route path={RoutePath.FEED_CATEGORY} element={<FeedPage />} />
+					<Route path={RoutePath.FEED_SMART} element={<FeedPage />} />
+					<Route path={RoutePath.FEED_SMART_ADDRESS} element={<FeedPage />} />
 
 					<Route path={RoutePath.MAIL_COMPOSE} element={<ComposePage />} />
 					<Route path={RoutePath.MAIL_CONTACTS} element={<ContactListPage />} />
