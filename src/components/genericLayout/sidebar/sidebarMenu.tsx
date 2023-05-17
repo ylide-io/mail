@@ -90,25 +90,33 @@ const SidebarSection = observer(({ children, section, title }: SidebarSectionPro
 //
 
 interface SidebarButtonProps {
-	isActive?: boolean;
 	isSubmenu?: boolean;
+	href: string;
 	icon: ReactNode;
 	name: ReactNode;
 	rightButton?: {
 		icon: ReactNode;
 		onClick: () => void;
 	};
-	onClick: () => void;
 }
 
-export const SidebarButton = observer(
-	({ isActive, isSubmenu, icon, name, rightButton, onClick }: SidebarButtonProps) => (
-		<div
+export const SidebarButton = observer(({ isSubmenu, href, icon, name, rightButton }: SidebarButtonProps) => {
+	const location = useLocation();
+	const navigate = useNav();
+
+	const isActive = location.pathname === href;
+
+	return (
+		<a
 			className={clsx(css.sectionLink, {
 				[css.sectionLink_active]: isActive,
 				[css.sectionLink_submenu]: isSubmenu,
 			})}
-			onClick={() => onClick()}
+			href={href}
+			onClick={e => {
+				e.preventDefault();
+				navigate(href);
+			}}
 		>
 			<div className={css.sectionLinkIconLeft}>{icon}</div>
 			<div className={css.sectionLinkTitle}>{name}</div>
@@ -119,14 +127,15 @@ export const SidebarButton = observer(
 					look={ActionButtonLook.LITE}
 					icon={rightButton.icon}
 					onClick={e => {
+						e.preventDefault();
 						e.stopPropagation();
 						rightButton?.onClick();
 					}}
 				/>
 			)}
-		</div>
-	),
-);
+		</a>
+	);
+});
 
 //
 
@@ -155,8 +164,6 @@ const getFeedCategoryIcon = (category: FeedCategory) => {
 };
 
 export const SidebarMenu = observer(() => {
-	const location = useLocation();
-	const navigate = useNav();
 	const openMailCopmpose = useOpenMailCopmpose();
 
 	const [isFeedSettingsOpen, setFeedSettingsOpen] = useState(false);
@@ -164,25 +171,9 @@ export const SidebarMenu = observer(() => {
 	function renderOtcSection() {
 		return (
 			<SidebarSection section={Section.OTC} title="OTC Trading">
-				<SidebarButton
-					isActive={location.pathname === generatePath(RoutePath.OTC_ASSETS)}
-					icon={<InboxSvg />}
-					name="Asset Explorer"
-					onClick={() => {
-						isSidebarOpen.set(false);
-						navigate(generatePath(RoutePath.OTC_ASSETS));
-					}}
-				/>
+				<SidebarButton href={generatePath(RoutePath.OTC_ASSETS)} icon={<InboxSvg />} name="Asset Explorer" />
 
-				<SidebarButton
-					isActive={location.pathname === generatePath(RoutePath.OTC_CHATS)}
-					icon={<SentSvg />}
-					name="Chats"
-					onClick={() => {
-						isSidebarOpen.set(false);
-						navigate(generatePath(RoutePath.OTC_CHATS));
-					}}
-				/>
+				<SidebarButton href={generatePath(RoutePath.OTC_CHATS)} icon={<SentSvg />} name="Chats" />
 			</SidebarSection>
 		);
 	}
@@ -192,30 +183,17 @@ export const SidebarMenu = observer(() => {
 			<>
 				<SidebarSection section={Section.FEED} title="Feed">
 					<SidebarButton
-						isActive={location.pathname === generatePath(RoutePath.FEED_SMART)}
+						href={generatePath(RoutePath.FEED_SMART)}
 						icon={getFeedCategoryIcon(FeedCategory.MAIN)}
 						name={getFeedCategoryName(FeedCategory.MAIN)}
-						onClick={() => {
-							isSidebarOpen.set(false);
-							navigate(generatePath(RoutePath.FEED_SMART));
-						}}
 					/>
 
 					{domain.accounts.activeAccounts.map(account => (
 						<SidebarButton
 							isSubmenu
-							isActive={
-								location.pathname ===
-								generatePath(RoutePath.FEED_SMART_ADDRESS, { address: account.account.address })
-							}
+							href={generatePath(RoutePath.FEED_SMART_ADDRESS, { address: account.account.address })}
 							icon={<ContactSvg />}
 							name={<AdaptiveText text={account.account.address} />}
-							onClick={() => {
-								isSidebarOpen.set(false);
-								navigate(
-									generatePath(RoutePath.FEED_SMART_ADDRESS, { address: account.account.address }),
-								);
-							}}
 							rightButton={{
 								icon: <SettingsSvg />,
 								onClick: () => setFeedSettingsOpen(!isFeedSettingsOpen),
@@ -225,21 +203,13 @@ export const SidebarMenu = observer(() => {
 				</SidebarSection>
 
 				<SidebarSection section={Section.FEED_DISCOVERY} title="Discovery">
-					{nonSyntheticFeedCategories.map(category => {
-						const path = generatePath(RoutePath.FEED_CATEGORY, { category });
-
-						return (
-							<SidebarButton
-								isActive={location.pathname === path}
-								icon={getFeedCategoryIcon(category)}
-								name={getFeedCategoryName(category)}
-								onClick={() => {
-									isSidebarOpen.set(false);
-									navigate(path);
-								}}
-							/>
-						);
-					})}
+					{nonSyntheticFeedCategories.map(category => (
+						<SidebarButton
+							href={generatePath(RoutePath.FEED_CATEGORY, { category })}
+							icon={getFeedCategoryIcon(category)}
+							name={getFeedCategoryName(category)}
+						/>
+					))}
 
 					{isFeedSettingsOpen && <FeedSettingsPopup onClose={() => setFeedSettingsOpen(false)} />}
 				</SidebarSection>
@@ -262,33 +232,21 @@ export const SidebarMenu = observer(() => {
 				</ActionButton>
 
 				<SidebarButton
-					isActive={location.pathname === generatePath(RoutePath.MAIL_FOLDER, { folderId: FolderId.Inbox })}
+					href={generatePath(RoutePath.MAIL_FOLDER, { folderId: FolderId.Inbox })}
 					icon={<InboxSvg />}
 					name="Inbox"
-					onClick={() => {
-						isSidebarOpen.set(false);
-						navigate(generatePath(RoutePath.MAIL_FOLDER, { folderId: FolderId.Inbox }));
-					}}
 				/>
 
 				<SidebarButton
-					isActive={location.pathname === generatePath(RoutePath.MAIL_FOLDER, { folderId: FolderId.Sent })}
+					href={generatePath(RoutePath.MAIL_FOLDER, { folderId: FolderId.Sent })}
 					icon={<SentSvg />}
 					name="Sent"
-					onClick={() => {
-						isSidebarOpen.set(false);
-						navigate(generatePath(RoutePath.MAIL_FOLDER, { folderId: FolderId.Sent }));
-					}}
 				/>
 
 				<SidebarButton
-					isActive={location.pathname === generatePath(RoutePath.MAIL_FOLDER, { folderId: FolderId.Archive })}
+					href={generatePath(RoutePath.MAIL_FOLDER, { folderId: FolderId.Archive })}
 					icon={<ArchiveSvg />}
 					name="Archive"
-					onClick={() => {
-						isSidebarOpen.set(false);
-						navigate(generatePath(RoutePath.MAIL_FOLDER, { folderId: FolderId.Archive }));
-					}}
 				/>
 			</SidebarSection>
 		);
