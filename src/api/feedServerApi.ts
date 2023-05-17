@@ -82,7 +82,9 @@ export interface FeedPostEmbed {
 
 export namespace FeedServerApi {
 	export enum ErrorCode {
+		REQUIRED_PARAMETERS = 'REQUIRED_PARAMETERS',
 		SOURCE_LIST_NOT_FOUND = 'SOURCE_LIST_NOT_FOUND',
+		NO_POSTS_FOR_ADDRESS = 'NO_POSTS_FOR_ADDRESS',
 	}
 
 	export class FeedServerError extends Error {
@@ -131,16 +133,15 @@ export namespace FeedServerApi {
 	export async function getPosts(params: {
 		needOld: boolean;
 		length: number;
-		categories?: string[];
-		sourceId?: string;
-		sourceListId?: string;
 		lastPostId?: string;
 		firstPostId?: string;
+		categories?: FeedCategory[];
+		sourceId?: string;
+		sourceListId?: string;
+		addresses?: string[];
 	}): Promise<GetPostsResponse> {
 		return await request(`/posts?${createCleanSerachParams(params)}`);
 	}
-
-	//
 
 	export type GetPostResponse = { post: FeedPost };
 

@@ -19,32 +19,35 @@ export function getFeedCategoryName(category: FeedCategory) {
 	}
 }
 
-class Feed {
+const FEED_PAGE_SIZE = 10;
+
+export class FeedStore {
 	@observable posts: FeedPost[] = [];
+
 	@observable loaded = false;
 	@observable loading = false;
+	@observable error: boolean | FeedServerApi.ErrorCode = false;
 
-	@observable selectedCategory = FeedCategory.MAIN;
-	@observable mainCategories: string[] = JSON.parse(
-		localStorage.getItem('t_main_categories') || JSON.stringify(nonSyntheticFeedCategories),
-	);
-
-	@observable sourceId: string | undefined;
-
-	@observable newPosts: number = 0;
+	@observable newPosts = 0;
 	@observable moreAvailable = false;
-	@observable errorLoading = false;
 
-	constructor() {
+	readonly selectedCategory = FeedCategory.MAIN;
+	readonly category: FeedCategory | undefined;
+	readonly sourceId: string | undefined;
+	readonly addresses: string[] | undefined;
+
+	constructor(params: { category?: FeedCategory; sourceId?: string; addresses?: string[] }) {
+		this.category = params.category;
+		this.sourceId = params.sourceId;
+		this.addresses = params.addresses;
+
 		makeObservable(this);
-		this.loadCategory(FeedCategory.MAIN);
 	}
 
 	private async genericLoad(
 		params: {
 			needOld: boolean;
 			length: number;
-			sourceId?: string;
 			lastPostId?: string;
 			firstPostId?: string;
 		},
@@ -53,26 +56,25 @@ class Feed {
 		try {
 			this.loading = true;
 
-			const selectedCategory = this.selectedCategory;
-
 			const sourceListId =
-				selectedCategory === FeedCategory.MAIN && !params.sourceId
+				this.category === FeedCategory.MAIN && !this.sourceId
 					? browserStorage.feedSourceSettings?.listId
 					: undefined;
 
 			const categories =
-				params.sourceId || sourceListId
+				this.sourceId || sourceListId || !this.category
 					? undefined
-					: selectedCategory === FeedCategory.MAIN
-					? this.mainCategories
-					: selectedCategory === FeedCategory.ALL
+					: this.category === FeedCategory.MAIN
 					? nonSyntheticFeedCategories
-					: [selectedCategory];
+					: this.category === FeedCategory.ALL
+					? nonSyntheticFeedCategories
+					: [this.category];
 
 			const response = await FeedServerApi.getPosts({
 				...params,
 				categories,
 				sourceListId,
+				addresses: this.addresses,
 			});
 
 			// FIXME Temp
@@ -82,46 +84,46 @@ class Feed {
 			});
 
 			this.loaded = true;
-			this.errorLoading = false;
+			this.error = false;
+
+			if (params.needOld && this.category) {
+				analytics.feedPageLoaded(this.category, Math.floor(this.posts.length / FEED_PAGE_SIZE) + 1);
+			}
 
 			return response;
 		} catch (e) {
-			if (
-				e instanceof FeedServerApi.FeedServerError &&
-				e.code === FeedServerApi.ErrorCode.SOURCE_LIST_NOT_FOUND &&
-				!isRetryWithNewSourceList
-			) {
-				const sourceIds = browserStorage.feedSourceSettings?.sourceIds;
-				if (sourceIds) {
-					try {
-						const data = await FeedServerApi.createSourceList(sourceIds);
-						browserStorage.feedSourceSettings = {
-							listId: data.sourceListId,
-							sourceIds,
-						};
+			if (e instanceof FeedServerApi.FeedServerError) {
+				if (e.code !== FeedServerApi.ErrorCode.SOURCE_LIST_NOT_FOUND) {
+					this.error = e.code;
+					return;
+				} else if (!isRetryWithNewSourceList) {
+					const sourceIds = browserStorage.feedSourceSettings?.sourceIds;
+					if (sourceIds) {
+						try {
+							const data = await FeedServerApi.createSourceList(sourceIds);
+							browserStorage.feedSourceSettings = {
+								listId: data.sourceListId,
+								sourceIds,
+							};
 
-						return await this.genericLoad(params, true);
-					} catch (e) {}
+							return await this.genericLoad(params, true);
+						} catch (e) {}
+					}
 				}
 			}
 
-			this.errorLoading = true;
+			this.error = true;
 		} finally {
 			this.loading = false;
 		}
 	}
 
-	async loadCategory(id: FeedCategory, sourceId?: string) {
-		analytics.feedPageLoaded(id, 1);
-
-		this.selectedCategory = id;
-		this.sourceId = sourceId;
-		this.loaded = false;
+	async load() {
+		if (this.loading) return;
 
 		const data = await this.genericLoad({
 			needOld: true,
-			length: 10,
-			sourceId,
+			length: FEED_PAGE_SIZE,
 		});
 
 		if (data) {
@@ -131,13 +133,12 @@ class Feed {
 		}
 	}
 
-	async loadMore(length: number) {
-		analytics.feedPageLoaded(this.selectedCategory, Math.floor(this.posts.length / 10) + 1);
+	async loadMore() {
+		if (this.loading) return;
 
 		const data = await this.genericLoad({
 			needOld: true,
-			length,
-			sourceId: this.sourceId,
+			length: FEED_PAGE_SIZE,
 			lastPostId: this.posts.at(-1)?.id,
 			firstPostId: this.posts.at(0)?.id,
 		});
@@ -150,10 +151,11 @@ class Feed {
 	}
 
 	async loadNew() {
+		if (this.loading) return;
+
 		const data = await this.genericLoad({
 			needOld: false,
-			length: 10,
-			sourceId: this.sourceId,
+			length: FEED_PAGE_SIZE,
 			lastPostId: this.posts.at(-1)?.id,
 			firstPostId: this.posts.at(0)?.id,
 		});
@@ -164,8 +166,3 @@ class Feed {
 		}
 	}
 }
-
-const feed = new Feed();
-//@ts-ignore
-window.feed = feed;
-export default feed;

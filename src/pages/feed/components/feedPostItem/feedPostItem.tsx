@@ -2,7 +2,7 @@ import clsx from 'clsx';
 import React, { MouseEvent, useEffect, useRef, useState } from 'react';
 import { generatePath } from 'react-router-dom';
 
-import { FeedCategory, FeedPost, FeedSourceUserRelation, LinkType } from '../../../../api/feedServerApi';
+import { FeedPost, FeedSourceUserRelation, LinkType } from '../../../../api/feedServerApi';
 import { Avatar } from '../../../../components/avatar/avatar';
 import { DropDown, DropDownItem } from '../../../../components/dropDown/dropDown';
 import { GalleryModal } from '../../../../components/galleryModal/galleryModal';
@@ -102,10 +102,7 @@ export function FeedPostItem({ isInFeed, post }: FeedPostItemProps) {
 	}, [isInFeed]);
 
 	const onSourceIdClick = () => {
-		navigate({
-			path: generatePath(RoutePath.FEED_CATEGORY, { category: FeedCategory.ALL }),
-			search: { sourceId: post.sourceId },
-		});
+		navigate(generatePath(RoutePath.FEED_SOURCE, { source: post.sourceId }));
 	};
 
 	return (

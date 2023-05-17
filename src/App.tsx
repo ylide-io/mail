@@ -3,7 +3,6 @@ import React, { useEffect, useState } from 'react';
 import { QueryClient, QueryClientProvider } from 'react-query';
 import { generatePath, Navigate, Route, Routes, useLocation } from 'react-router-dom';
 
-import { FeedCategory } from './api/feedServerApi';
 import { MainViewOnboarding } from './components/mainViewOnboarding/mainViewOnboarding';
 import { PopupManager } from './components/popup/popupManager/popupManager';
 import { StaticComponentManager } from './components/staticComponentManager/staticComponentManager';
@@ -110,15 +109,11 @@ const App = observer(() => {
 
 					<Route
 						path={RoutePath.FEED}
-						element={
-							<Navigate
-								replace
-								to={generatePath(RoutePath.FEED_CATEGORY, { category: FeedCategory.MAIN })}
-							/>
-						}
+						element={<Navigate replace to={generatePath(RoutePath.FEED_SMART)} />}
 					/>
 					<Route path={RoutePath.FEED_POST} element={<FeedPostPage />} />
 					<Route path={RoutePath.FEED_CATEGORY} element={<FeedPage />} />
+					<Route path={RoutePath.FEED_SOURCE} element={<FeedPage />} />
 					<Route path={RoutePath.FEED_SMART} element={<FeedPage />} />
 					<Route path={RoutePath.FEED_SMART_ADDRESS} element={<FeedPage />} />
 

@@ -1,8 +1,8 @@
 import { observer } from 'mobx-react';
-import React, { useEffect, useRef, useState } from 'react';
-import { useParams, useSearchParams } from 'react-router-dom';
+import React, { useEffect, useMemo, useRef } from 'react';
+import { useParams } from 'react-router-dom';
 
-import { FeedCategory } from '../../../api/feedServerApi';
+import { FeedCategory, FeedServerApi } from '../../../api/feedServerApi';
 import { ActionButton, ActionButtonLook, ActionButtonSize } from '../../../components/ActionButton/ActionButton';
 import { ErrorMessage } from '../../../components/errorMessage/errorMessage';
 import { NarrowContent } from '../../../components/genericLayout/content/narrowContent/narrowContent';
@@ -10,11 +10,12 @@ import { GenericLayout, useGenericLayoutApi } from '../../../components/genericL
 import { YlideLoader } from '../../../components/ylideLoader/ylideLoader';
 import { ReactComponent as ArrowUpSvg } from '../../../icons/ic20/arrowUp.svg';
 import { ReactComponent as CrossSvg } from '../../../icons/ic20/cross.svg';
-import { browserStorage } from '../../../stores/browserStorage';
-import feed, { getFeedCategoryName } from '../../../stores/Feed';
+import { useDomainAccounts } from '../../../stores/Domain';
+import { FeedStore, getFeedCategoryName } from '../../../stores/Feed';
 import { useNav } from '../../../utils/url';
 import { FeedPostItem } from '../components/feedPostItem/feedPostItem';
 import css from './feedPage.module.scss';
+import ErrorCode = FeedServerApi.ErrorCode;
 
 function isInViewport(element: HTMLDivElement) {
 	const rect = element.getBoundingClientRect();
@@ -27,61 +28,50 @@ const FeedPageContent = observer(() => {
 
 	const lastPostView = useRef<HTMLDivElement>(null);
 	const feedBodyRef = useRef<HTMLDivElement>(null);
-	const [newPostsVisible, setNewPostsVisible] = useState(false);
-	const { category } = useParams<{ category: FeedCategory }>();
-	const [searchParams] = useSearchParams();
-	const sourceId = searchParams.get('sourceId') || undefined;
+	const { category, source, address } = useParams<{ category: FeedCategory; source: string; address: string }>();
 
-	const sourceListId = browserStorage.feedSourceSettings?.listId;
-	const [lastSourceListId, setLastSourceListId] = useState(sourceListId);
+	const accounts = useDomainAccounts();
 
-	// Re-load when category changes
-	useEffect(() => {
+	// TODO Reload when feed settings changes
+	// TODO New posts button only when scrolled down
+
+	const feed = useMemo(() => {
+		const feed = new FeedStore({
+			category,
+			sourceId: source,
+			addresses: address
+				? [address]
+				: !category && !source && !address
+				? accounts.map(a => a.account.address)
+				: undefined,
+		});
+
 		genericLayoutApi.scrollToTop();
-		feed.loadCategory(category!, sourceId);
-	}, [category, genericLayoutApi, sourceId]);
+		feed.load();
 
-	// Re-load when source-list changes
-	useEffect(() => {
-		if (lastSourceListId !== sourceListId) {
-			setLastSourceListId(sourceListId);
-
-			if (category === FeedCategory.MAIN) {
-				genericLayoutApi.scrollToTop();
-				feed.loadCategory(category, sourceId);
-			}
-		}
-	}, [category, genericLayoutApi, lastSourceListId, sourceId, sourceListId]);
+		return feed;
+	}, [accounts, address, category, genericLayoutApi, source]);
 
 	useEffect(() => {
 		const timer = setInterval(async () => {
-			if (lastPostView.current && isInViewport(lastPostView.current) && !feed.loading && feed.moreAvailable) {
-				await feed.loadMore(10);
-			}
-
-			if (feedBodyRef.current && feedBodyRef.current.getBoundingClientRect().top < 0) {
-				setNewPostsVisible(true);
-			} else {
-				setNewPostsVisible(false);
+			if (lastPostView.current && isInViewport(lastPostView.current) && feed.moreAvailable) {
+				await feed.loadMore();
 			}
 		}, 300);
 
 		return () => clearInterval(timer);
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [feed.loading, feed.moreAvailable]);
+	}, [feed]);
 
 	const showNewPosts = async () => {
 		genericLayoutApi.scrollToTop();
 		await feed.loadNew();
 	};
 
-	const title = getFeedCategoryName(feed.selectedCategory);
-
 	return (
 		<NarrowContent
-			title={title}
+			title={getFeedCategoryName(feed.selectedCategory)}
 			titleSubItem={
-				!!sourceId && (
+				!!source && (
 					<ActionButton
 						look={ActionButtonLook.PRIMARY}
 						icon={<CrossSvg />}
@@ -110,7 +100,7 @@ const FeedPageContent = observer(() => {
 			)}
 
 			<div className={css.feedBody} ref={feedBodyRef}>
-				{newPostsVisible && !!feed.newPosts && (
+				{!!feed.newPosts && (
 					<ActionButton
 						look={ActionButtonLook.SECONDARY}
 						className={css.newPostsButton}
@@ -132,8 +122,12 @@ const FeedPageContent = observer(() => {
 							</div>
 						)}
 					</>
-				) : feed.errorLoading ? (
-					<ErrorMessage>Sorry, an error occured during feed loading. Please, try again later.</ErrorMessage>
+				) : feed.error ? (
+					<ErrorMessage>
+						{feed.error === ErrorCode.NO_POSTS_FOR_ADDRESS
+							? 'No posts for your account.'
+							: 'Sorry, an error occured during feed loading. Please, try again later.'}
+					</ErrorMessage>
 				) : (
 					<div className={css.loader}>
 						<YlideLoader reason="Your feed is loading ..." />

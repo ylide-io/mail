@@ -29,7 +29,8 @@ import {
 	Ylide,
 	YlideKeyStore,
 } from '@ylide/sdk';
-import { makeObservable, observable } from 'mobx';
+import { makeObservable, observable, reaction } from 'mobx';
+import { useEffect, useState } from 'react';
 
 import { NFT3NameService } from '../api/nft3DID';
 import { PasswordRequestModal } from '../components/passwordRequestModal/passwordRequestModal';
@@ -578,6 +579,21 @@ export class Domain {
 		await mailStore.init();
 		this.initialized = true;
 	}
+}
+
+export function useDomainAccounts() {
+	const [accounts, setAccounts] = useState(() => domain.accounts.accounts);
+
+	useEffect(
+		() =>
+			reaction(
+				() => [...domain.accounts.accounts],
+				arg => setAccounts(arg),
+			),
+		[],
+	);
+
+	return accounts;
 }
 
 //@ts-ignore
