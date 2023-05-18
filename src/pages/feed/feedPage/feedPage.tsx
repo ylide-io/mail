@@ -1,6 +1,6 @@
 import { observer } from 'mobx-react';
 import React, { useEffect, useMemo, useRef } from 'react';
-import { useParams } from 'react-router-dom';
+import { generatePath, useParams } from 'react-router-dom';
 
 import { FeedCategory, FeedServerApi } from '../../../api/feedServerApi';
 import { ActionButton, ActionButtonLook, ActionButtonSize } from '../../../components/ActionButton/ActionButton';
@@ -12,6 +12,7 @@ import { ReactComponent as ArrowUpSvg } from '../../../icons/ic20/arrowUp.svg';
 import { ReactComponent as CrossSvg } from '../../../icons/ic20/cross.svg';
 import { useDomainAccounts } from '../../../stores/Domain';
 import { FeedStore, getFeedCategoryName } from '../../../stores/Feed';
+import { RoutePath } from '../../../stores/routePath';
 import { connectAccount } from '../../../utils/account';
 import { useNav } from '../../../utils/url';
 import { FeedPostItem } from '../components/feedPostItem/feedPostItem';
@@ -32,6 +33,12 @@ const FeedPageContent = observer(() => {
 	const { category, source, address } = useParams<{ category: FeedCategory; source: string; address: string }>();
 
 	const accounts = useDomainAccounts();
+
+	useEffect(() => {
+		if (address && !accounts.find(a => a.account.address === address)) {
+			navigate(generatePath(RoutePath.FEED));
+		}
+	}, [accounts, address, navigate]);
 
 	// TODO Reload when feed settings changes
 	// TODO New posts button only when scrolled down
