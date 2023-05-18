@@ -41,7 +41,6 @@ const FeedPageContent = observer(() => {
 	}, [accounts, address, navigate]);
 
 	// TODO Reload when feed settings changes
-	// TODO New posts button only when scrolled down
 
 	const feed = useMemo(() => {
 		const feed = new FeedStore({
@@ -70,11 +69,6 @@ const FeedPageContent = observer(() => {
 		return () => clearInterval(timer);
 	}, [feed]);
 
-	const showNewPosts = async () => {
-		genericLayoutApi.scrollToTop();
-		await feed.loadNew();
-	};
-
 	return (
 		<NarrowContent
 			title={getFeedCategoryName(feed.selectedCategory)}
@@ -91,7 +85,7 @@ const FeedPageContent = observer(() => {
 			}
 			titleRight={
 				!!feed.newPosts && (
-					<ActionButton look={ActionButtonLook.SECONDARY} onClick={showNewPosts}>
+					<ActionButton look={ActionButtonLook.SECONDARY} onClick={() => feed.loadNew()}>
 						Show {feed.newPosts} new posts
 					</ActionButton>
 				)
@@ -108,16 +102,6 @@ const FeedPageContent = observer(() => {
 			)}
 
 			<div className={css.feedBody} ref={feedBodyRef}>
-				{!!feed.newPosts && (
-					<ActionButton
-						look={ActionButtonLook.SECONDARY}
-						className={css.newPostsButton}
-						onClick={showNewPosts}
-					>
-						Show {feed.newPosts} new posts
-					</ActionButton>
-				)}
-
 				{feed.loaded ? (
 					<>
 						{feed.posts.map(post => (

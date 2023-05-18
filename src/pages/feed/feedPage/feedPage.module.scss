@@ -1,12 +1,3 @@
-.newPostsButton {
-	position: fixed;
-	z-index: 1;
-	top: 50px;
-	left: 50%;
-	transform: translateX(-50%);
-	box-shadow: var(--popup-shadow);
-}
-
 .loader {
 	display: flex;
 	align-items: center;
