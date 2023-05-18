@@ -4,7 +4,7 @@ import { useParams } from 'react-router-dom';
 
 import { FeedCategory, FeedServerApi } from '../../../api/feedServerApi';
 import { ActionButton, ActionButtonLook, ActionButtonSize } from '../../../components/ActionButton/ActionButton';
-import { ErrorMessage } from '../../../components/errorMessage/errorMessage';
+import { ErrorMessage, ErrorMessageLook } from '../../../components/errorMessage/errorMessage';
 import { NarrowContent } from '../../../components/genericLayout/content/narrowContent/narrowContent';
 import { GenericLayout, useGenericLayoutApi } from '../../../components/genericLayout/genericLayout';
 import { YlideLoader } from '../../../components/ylideLoader/ylideLoader';
@@ -12,6 +12,7 @@ import { ReactComponent as ArrowUpSvg } from '../../../icons/ic20/arrowUp.svg';
 import { ReactComponent as CrossSvg } from '../../../icons/ic20/cross.svg';
 import { useDomainAccounts } from '../../../stores/Domain';
 import { FeedStore, getFeedCategoryName } from '../../../stores/Feed';
+import { connectAccount } from '../../../utils/account';
 import { useNav } from '../../../utils/url';
 import { FeedPostItem } from '../components/feedPostItem/feedPostItem';
 import css from './feedPage.module.scss';
@@ -123,10 +124,23 @@ const FeedPageContent = observer(() => {
 						)}
 					</>
 				) : feed.error ? (
-					<ErrorMessage>
-						{feed.error === ErrorCode.NO_POSTS_FOR_ADDRESS
-							? 'No posts for your account.'
-							: 'Sorry, an error occured during feed loading. Please, try again later.'}
+					<ErrorMessage
+						look={feed.error === ErrorCode.NO_POSTS_FOR_ADDRESS ? ErrorMessageLook.INFO : undefined}
+					>
+						{feed.error === ErrorCode.NO_POSTS_FOR_ADDRESS ? (
+							<>
+								<b>No posts for this account.</b>
+								<div>
+									Your crypto account doesn't have any tokens or transactions that we can use to build
+									the Feed for you. You can connect another account anytime.
+								</div>
+								<ActionButton look={ActionButtonLook.PRIMARY} onClick={() => connectAccount()}>
+									Connect another account
+								</ActionButton>
+							</>
+						) : (
+							'Sorry, an error occured during feed loading. Please, try again later.'
+						)}
 					</ErrorMessage>
 				) : (
 					<div className={css.loader}>

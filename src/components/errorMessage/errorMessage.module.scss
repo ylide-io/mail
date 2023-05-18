@@ -1,6 +1,19 @@
 .root {
+	display: grid;
+	grid-gap: 8px;
+	justify-items: start;
+}
+
+.root_errorLook {
 	padding: 12px;
 	color: var(--error-color);
 	background: rgba(var(--error-rgb-color), 0.2);
 	border-radius: 4px;
+}
+
+.root_infoLook {
+	padding: 24px;
+	font-size: 14px;
+	background: rgba(var(--shade-rgb-color), 0.1);
+	border-radius: 8px;
 }
