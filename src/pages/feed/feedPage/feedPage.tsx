@@ -19,7 +19,7 @@ import { FeedPostItem } from '../components/feedPostItem/feedPostItem';
 import css from './feedPage.module.scss';
 import ErrorCode = FeedServerApi.ErrorCode;
 
-function isInViewport(element: HTMLDivElement) {
+function isInViewport(element: Element) {
 	const rect = element.getBoundingClientRect();
 	return rect.top >= -100 && rect.top <= (window.innerHeight || document.documentElement.clientHeight);
 }
@@ -110,7 +110,7 @@ const FeedPageContent = observer(() => {
 
 						{feed.moreAvailable && (
 							<div className={css.loader} ref={lastPostView}>
-								{feed.loading && <YlideLoader reason="Loading more posts ..." />}
+								<YlideLoader reason="Loading more posts ..." />
 							</div>
 						)}
 					</>
