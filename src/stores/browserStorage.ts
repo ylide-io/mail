@@ -11,7 +11,6 @@ export interface FeedSourceSettings {
 
 enum BrowserStorageKey {
 	CAN_SKIP_REGISTRATION = 'can_skip_registration',
-	QUEST3 = 'quest3',
 	FEED_SOURCE_SETTINGS = 'ylide_feedSourceSettings',
 	SIDEBAR_FOLDED_SECTIONS = 'ylide_sidebarFoldedSections',
 	SAVE_DECODED_MESSAGES = 'ylide_saveDecodedMessages',
@@ -55,19 +54,6 @@ class BrowserStorage {
 	set canSkipRegistration(value: boolean) {
 		BrowserStorage.setItem(BrowserStorageKey.CAN_SKIP_REGISTRATION, value);
 		this._canSkipRegistration = value;
-	}
-
-	//
-
-	private _quest3 = BrowserStorage.getItem(BrowserStorageKey.QUEST3) !== 'false';
-
-	get quest3() {
-		return this._quest3;
-	}
-
-	set quest3(value: boolean) {
-		BrowserStorage.setItem(BrowserStorageKey.QUEST3, value);
-		this._quest3 = value;
 	}
 
 	//
