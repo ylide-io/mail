@@ -159,7 +159,7 @@ export const MainViewOnboarding = observer(() => {
 			{step === Step.SIGN_AUTH && (
 				<ActionModal
 					title="Authenticate your wallet"
-					description="Please, sign special string so we can verify that you are the owner of the wallet."
+					description="Please, sign a special string so we can verify that you are the owner of the wallet."
 					buttons={
 						<ActionButton
 							isLoading
@@ -174,7 +174,7 @@ export const MainViewOnboarding = observer(() => {
 			{step === Step.BUILDING_FEED && (
 				<ActionModal
 					title="We're setting up your personalized feed"
-					description="We're currently fetching data about your tokens and transactions to create a tailored experience just for you. This may take a few moments. Thank you for your patience."
+					description="We're currently fetching data about your tokens and transactions to create a tailored experience just for you. This may take a few moments. Thank you for your patience."
 					buttons={
 						<ActionButton
 							isLoading
