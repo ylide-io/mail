@@ -3,6 +3,7 @@ import { ExternalYlidePublicKey, IGenericAccount, ServiceCode, YlideCore, YlideK
 import { computed, makeAutoObservable, observable } from 'mobx';
 
 import { isBytesEqual } from '../../utils/isBytesEqual';
+import { browserStorage } from '../browserStorage';
 import { Wallet } from './Wallet';
 
 export class DomainAccount {
@@ -100,12 +101,13 @@ export class DomainAccount {
 	}
 
 	getMainViewKey() {
-		this.mainViewKey = localStorage.getItem('yld1_mainViewKey_' + this.account.address) || '';
-		return this.mainViewKey;
+		return browserStorage.mainViewKeys[this.account.address] || '';
 	}
 
 	setMainViewKey(key: string) {
-		this.mainViewKey = key;
-		localStorage.setItem('yld1_mainViewKey_' + this.account.address, key);
+		browserStorage.mainViewKeys = {
+			...browserStorage.mainViewKeys,
+			[this.account.address]: key,
+		};
 	}
 }

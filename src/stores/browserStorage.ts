@@ -15,6 +15,7 @@ enum BrowserStorageKey {
 	SIDEBAR_FOLDED_SECTIONS = 'ylide_sidebarFoldedSections',
 	SAVE_DECODED_MESSAGES = 'ylide_saveDecodedMessages',
 	WIDGET_ID = 'ylide_widgetId',
+	MAIN_VIEW_KEYS = 'ylide_mainViewKeys',
 }
 
 class BrowserStorage {
@@ -22,8 +23,8 @@ class BrowserStorage {
 		makeAutoObservable(this);
 	}
 
-	private static getItem(key: BrowserStorageKey, storage: Storage = localStorage) {
-		return storage.getItem(key) || undefined;
+	private static getItem<T = string>(key: BrowserStorageKey, storage: Storage = localStorage) {
+		return (storage.getItem(key) as T) || undefined;
 	}
 
 	private static getItemWithTransform<T>(
@@ -108,7 +109,7 @@ class BrowserStorage {
 
 	//
 
-	private _widgetId = BrowserStorage.getItem(BrowserStorageKey.WIDGET_ID, sessionStorage) as WidgetId | undefined;
+	private _widgetId = BrowserStorage.getItem<WidgetId>(BrowserStorageKey.WIDGET_ID, sessionStorage);
 
 	get widgetId() {
 		return this._widgetId;
@@ -117,6 +118,23 @@ class BrowserStorage {
 	set widgetId(value: WidgetId | undefined) {
 		BrowserStorage.setItem(BrowserStorageKey.WIDGET_ID, value, sessionStorage);
 		this._widgetId = value;
+	}
+
+	//
+
+	private _mainViewKeys =
+		BrowserStorage.getItemWithTransform(
+			BrowserStorageKey.MAIN_VIEW_KEYS,
+			item => JSON.parse(item) as Record<string, string>,
+		) || {};
+
+	get mainViewKeys() {
+		return this._mainViewKeys;
+	}
+
+	set mainViewKeys(value: Record<string, string>) {
+		BrowserStorage.setItem(BrowserStorageKey.MAIN_VIEW_KEYS, JSON.stringify(value));
+		this._mainViewKeys = value;
 	}
 }
 
