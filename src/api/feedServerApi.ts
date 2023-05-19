@@ -60,6 +60,9 @@ export interface FeedPost {
 	thread: FeedPost[];
 	tokens: string[];
 	userRelation: FeedSourceUserRelation;
+	cryptoProjectId: string | null;
+	cryptoProjectName: string | null;
+	cryptoProjectReasons: string[];
 }
 
 export enum LinkType {
@@ -138,7 +141,7 @@ export namespace FeedServerApi {
 		categories?: FeedCategory[];
 		sourceId?: string;
 		sourceListId?: string;
-		addresses?: string[];
+		addressTokens?: string[];
 	}): Promise<GetPostsResponse> {
 		return await request(`/posts?${createCleanSerachParams(params)}`);
 	}

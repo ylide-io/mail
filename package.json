@@ -4,6 +4,8 @@
 	"private": true,
 	"scripts": {
 		"start": "react-app-rewired start",
+		"start-mainview": "REACT_APP__APP_MODE=MAIN_VIEW react-app-rewired start",
+		"start-hub": "REACT_APP__APP_MODE=HUB react-app-rewired start",
 		"start-otc": "REACT_APP__APP_MODE=OTC REACT_APP__OTC_PROVIDER=AIRSWAP react-app-rewired start",
 		"build-hub": "react-app-rewired build",
 		"build-airswap": "REACT_APP__APP_MODE=OTC REACT_APP__OTC_PROVIDER=AIRSWAP react-app-rewired build",

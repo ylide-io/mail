@@ -13,8 +13,8 @@ export class DomainAccount {
 	private _name: string;
 
 	@observable remoteKey: ExternalYlidePublicKey | null = null;
-
 	@observable remoteKeys: Record<string, ExternalYlidePublicKey | null> = {};
+	@observable mainViewKey: string;
 
 	constructor(wallet: Wallet, account: IGenericAccount, key: YlideKey, keyVersion: number, name: string) {
 		makeAutoObservable(this);
@@ -24,6 +24,7 @@ export class DomainAccount {
 		this.key = key;
 		this.keyVersion = keyVersion;
 		this._name = name;
+		this.mainViewKey = this.getMainViewKey();
 	}
 
 	get name() {
@@ -92,5 +93,19 @@ export class DomainAccount {
 				network: preferredNetwork,
 			},
 		);
+	}
+
+	async makeMainViewKey() {
+		return await this.wallet.constructMainViewKey(this.account);
+	}
+
+	getMainViewKey() {
+		this.mainViewKey = localStorage.getItem('yld1_mainViewKey_' + this.account.address) || '';
+		return this.mainViewKey;
+	}
+
+	setMainViewKey(key: string) {
+		this.mainViewKey = key;
+		localStorage.setItem('yld1_mainViewKey_' + this.account.address, key);
 	}
 }

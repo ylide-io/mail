@@ -46,10 +46,10 @@ const FeedPageContent = observer(() => {
 		const feed = new FeedStore({
 			category,
 			sourceId: source,
-			addresses: address
-				? [address]
+			addressTokens: address
+				? [accounts.find(d => d.account.address.toLowerCase() === address.toLowerCase())!.mainViewKey]
 				: !category && !source && !address
-				? accounts.map(a => a.account.address)
+				? accounts.map(a => a.mainViewKey)
 				: undefined,
 		});
 

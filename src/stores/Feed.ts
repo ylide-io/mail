@@ -34,12 +34,12 @@ export class FeedStore {
 	readonly selectedCategory = FeedCategory.MAIN;
 	readonly category: FeedCategory | undefined;
 	readonly sourceId: string | undefined;
-	readonly addresses: string[] | undefined;
+	readonly addressTokens: string[] | undefined;
 
-	constructor(params: { category?: FeedCategory; sourceId?: string; addresses?: string[] }) {
+	constructor(params: { category?: FeedCategory; sourceId?: string; addressTokens?: string[] }) {
 		this.category = params.category;
 		this.sourceId = params.sourceId;
-		this.addresses = params.addresses;
+		this.addressTokens = params.addressTokens;
 
 		makeObservable(this);
 	}
@@ -74,13 +74,28 @@ export class FeedStore {
 				...params,
 				categories,
 				sourceListId,
-				addresses: this.addresses,
+				addressTokens: this.addressTokens,
 			});
 
 			// FIXME Temp
 			response.items.forEach(it => {
-				it.tokens = [randomArrayElem(['BTC', 'ETH', 'USDT'])];
-				it.userRelation = randomArrayElem(Object.values(FeedSourceUserRelation));
+				// NONE = 'NONE',
+				// HOLDING_TOKEN = 'HOLDING_TOKEN',
+				// HELD_TOKEN = 'HELD_TOKEN',
+				// USING_PROJECT = 'USING_PROJECT',
+				// USED_PROJECT = 'USED_PROJECT',
+				// it.tokens = [randomArrayElem(['BTC', 'ETH', 'USDT'])];
+				// it.userRelation = randomArrayElem(Object.values(FeedSourceUserRelation));
+				it.tokens = it.cryptoProjectName ? [it.cryptoProjectName] : [];
+				if (it.cryptoProjectReasons.includes('balance')) {
+					it.userRelation = FeedSourceUserRelation.HOLDING_TOKEN;
+				} else if (it.cryptoProjectReasons.includes('protocol')) {
+					it.userRelation = FeedSourceUserRelation.USING_PROJECT;
+				} else if (it.cryptoProjectReasons.includes('transaction')) {
+					it.userRelation = FeedSourceUserRelation.USED_PROJECT;
+				} else {
+					it.userRelation = FeedSourceUserRelation.NONE;
+				}
 			});
 
 			this.loaded = true;

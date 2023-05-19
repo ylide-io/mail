@@ -248,26 +248,55 @@ class GuessProjectModal extends PureComponent<{
 											display: 'flex',
 											justifyContent: 'flex-start',
 											alignItems: 'stretch',
-											flexDirection: 'row',
+											flexDirection: 'column',
 											flexGrow: 0,
 											flexShrink: 0,
 											padding: 10,
 											borderBottom: '1px solid #e0e0e0',
 										}}
 									>
-										{p.name}
-										&nbsp;
-										{this.selectedProjectId === p.id ? (
-											<a
-												href="#"
-												onClick={e => {
-													e.preventDefault();
-													this.attachTokenToProject(token, p.id);
-												}}
-											>
-												Confirm
-											</a>
-										) : null}
+										<div
+											style={{
+												display: 'flex',
+												justifyContent: 'flex-start',
+												alignItems: 'stretch',
+												flexDirection: 'row',
+												flexGrow: 0,
+												flexShrink: 0,
+												marginBottom: 4,
+											}}
+										>
+											{p.name}
+											&nbsp;
+											{this.selectedProjectId === p.id ? (
+												<a
+													href="#"
+													onClick={e => {
+														e.preventDefault();
+														this.attachTokenToProject(token, p.id);
+													}}
+												>
+													Confirm
+												</a>
+											) : null}
+										</div>
+										<div
+											style={{
+												display: 'flex',
+												justifyContent: 'flex-start',
+												alignItems: 'stretch',
+												flexDirection: 'row',
+												flexGrow: 0,
+												flexShrink: 0,
+												padding: 5,
+												fontSize: 10,
+												borderBottom: '1px solid #e0e0e0',
+											}}
+										>
+											{p.meta?.coingecko?.links?.homepage}
+											<br />
+											{JSON.stringify(p.meta?.coingecko)}
+										</div>
 									</div>
 								))}
 							</div>
@@ -300,6 +329,7 @@ export class AdminFeedPage extends PureComponent<{}> {
 	@observable selectedProjectIds: string[] = [];
 	@observable selectedToken: string | null = null;
 	@observable guessData: string | null = null;
+	@observable projectsQuery: string = '';
 
 	mouseDown = false;
 	idxStart: number = -1;
@@ -316,8 +346,8 @@ export class AdminFeedPage extends PureComponent<{}> {
 		await this.fetchProjects();
 	}
 
-	async fetchProjects(query: string = '') {
-		const response = await fetch(`${baseUrl}/projects?query=` + encodeURIComponent(query));
+	async fetchProjects() {
+		const response = await fetch(`${baseUrl}/projects?query=` + encodeURIComponent(this.projectsQuery));
 		const projects = await response.json();
 		this.projects = projects;
 		this.selectedProjectIds = [];
@@ -468,24 +498,38 @@ export class AdminFeedPage extends PureComponent<{}> {
 							}}
 							onClick={() => (this.tab = 'projects')}
 						>
-							Projects
+							Projects{this.projects ? ` (${this.projects.length})` : ''}
 						</button>
 					</div>
 					{this.tab === 'tokens' ? (
-						<table>
+						<table style={{ marginTop: 30 }}>
 							<thead>
 								<tr>
-									<th>Token</th>
-									<th>Scan</th>
-									<th>Smart guess</th>
-									<th>Attach</th>
+									<th style={{ textAlign: 'left', paddingBottom: 10 }}>Token</th>
+									<th style={{ textAlign: 'left', paddingBottom: 10 }}>Scan</th>
+									<th style={{ textAlign: 'left', paddingBottom: 10 }}>Smart guess</th>
+									<th style={{ textAlign: 'left', paddingBottom: 10 }}>Attach</th>
 								</tr>
 							</thead>
 							<tbody>
 								{this.tokens.map((token, index) => (
 									<tr key={index}>
-										<td>{token}</td>
-										<td>
+										<td
+											style={{
+												marginBottom: 5,
+												paddingBottom: 5,
+												borderBottom: '1px solid #e0e0e0',
+											}}
+										>
+											{token}
+										</td>
+										<td
+											style={{
+												marginBottom: 5,
+												paddingBottom: 5,
+												borderBottom: '1px solid #e0e0e0',
+											}}
+										>
 											<a
 												href={
 													scanners[token.split(':')[0]] +
@@ -499,7 +543,13 @@ export class AdminFeedPage extends PureComponent<{}> {
 												{token}
 											</a>
 										</td>
-										<td>
+										<td
+											style={{
+												marginBottom: 5,
+												paddingBottom: 5,
+												borderBottom: '1px solid #e0e0e0',
+											}}
+										>
 											<a
 												href="#"
 												onClick={e => {
@@ -510,89 +560,149 @@ export class AdminFeedPage extends PureComponent<{}> {
 												Extract data
 											</a>
 										</td>
-										<td>Select project</td>
+										<td
+											style={{
+												marginBottom: 8,
+												paddingBottom: 8,
+												borderBottom: '1px solid #c0c0c0',
+											}}
+										>
+											Select project
+										</td>
 									</tr>
 								))}
 							</tbody>
 						</table>
 					) : (
-						<table style={{ userSelect: 'none' }}>
-							<thead>
-								<tr>
-									<th> </th>
-									<th>Projects</th>
-									<th>Associated tokens</th>
-									<th>Smth</th>
-								</tr>
-							</thead>
-							<tbody>
-								{this.projects.map((project, index) => (
-									<tr
-										key={index}
-										onMouseMove={e => {
-											if (this.mouseDown) {
-												this.idxEnd = index;
-												if (Math.abs(this.idxStart - this.idxEnd) > 1) {
-													const newIds: string[] = [];
-													for (
-														let i = Math.min(this.idxStart, this.idxEnd);
-														i <= Math.max(this.idxStart, this.idxEnd);
-														i++
-													) {
-														newIds.push(this.projects[i].id);
-													}
-													this.selectedProjectIds = newIds;
-												} else {
-													this.selectedProjectIds = [project.id];
-												}
-											}
-										}}
-										onMouseUp={e => {
-											this.mouseDown = false;
-											if (Math.abs(this.idxStart - this.idxEnd) > 1) {
-												const newIds: string[] = [];
-												for (
-													let i = Math.min(this.idxStart, this.idxEnd);
-													i <= Math.max(this.idxStart, this.idxEnd);
-													i++
-												) {
-													newIds.push(this.projects[i].id);
-												}
-												this.selectedProjectIds = newIds;
-											} else {
-												this.selectedProjectIds = [project.id];
-											}
-										}}
-									>
-										<td>
-											<input
-												onMouseDown={e => {
-													e.stopPropagation();
-													this.mouseDown = true;
-													this.idxStart = index;
-													this.idxEnd = index;
-												}}
-												style={{ appearance: 'auto' }}
-												type="checkbox"
-												checked={this.selectedProjectIds.includes(project.id)}
-												// onChange={e => {
-												// 	if (e.target.checked) {
-												// 		this.selectedProjectIds.push(project.id);
-												// 	} else {
-												// 		this.selectedProjectIds = this.selectedProjectIds.filter(
-												// 			id => id !== project.id,
-												// 		);
-												// 	}
-												// }}
-											/>
-										</td>
-										<td>{project.name}</td>
-										<td>Will be here...</td>
-										<td>Smth</td>
+						<>
+							<input
+								type="search"
+								style={{
+									border: '1px solid #e0e0e0',
+									margin: 20,
+									height: 30,
+									backgroundColor: 'white',
+									width: 300,
+									appearance: 'auto',
+								}}
+								value={this.projectsQuery}
+								onChange={e => {
+									this.projectsQuery = e.target.value;
+								}}
+								onKeyDown={e => {
+									if (e.key === 'Enter') {
+										e.preventDefault();
+										this.fetchProjects();
+									}
+								}}
+								placeholder="Search projects"
+							/>
+							<table style={{ userSelect: 'none' }}>
+								<thead>
+									<tr>
+										<th> </th>
+										<th>Project</th>
+										<th>Associated tokens</th>
+										<th>Smth</th>
 									</tr>
-								))}
-							</tbody>
-						</table>
+								</thead>
+								<tbody>
+									{this.projects.map((project, index) => (
+										<tr
+											key={index}
+											style={{
+												marginBottom: 5,
+												borderBottom: '1px solid #e0e0e0',
+											}}
+											onMouseMove={e => {
+												if (this.mouseDown) {
+													this.idxEnd = index;
+													if (Math.abs(this.idxStart - this.idxEnd) > 0) {
+														const newIds: string[] = [];
+														for (
+															let i = Math.min(this.idxStart, this.idxEnd);
+															i <= Math.max(this.idxStart, this.idxEnd);
+															i++
+														) {
+															newIds.push(this.projects[i].id);
+														}
+														this.selectedProjectIds = newIds;
+													} else {
+														this.selectedProjectIds = [project.id];
+													}
+												}
+											}}
+											onMouseUp={e => {
+												if (this.mouseDown) {
+													this.mouseDown = false;
+													if (Math.abs(this.idxStart - this.idxEnd) > 0) {
+														const newIds: string[] = [];
+														for (
+															let i = Math.min(this.idxStart, this.idxEnd);
+															i <= Math.max(this.idxStart, this.idxEnd);
+															i++
+														) {
+															newIds.push(this.projects[i].id);
+														}
+														this.selectedProjectIds = newIds;
+													} else {
+														this.selectedProjectIds = [project.id];
+													}
+												}
+											}}
+										>
+											<td style={{ verticalAlign: 'top' }}>
+												<input
+													onClick={e => {
+														if (e.shiftKey) {
+															e.stopPropagation();
+															if (this.selectedProjectIds.includes(project.id)) {
+																this.selectedProjectIds =
+																	this.selectedProjectIds.filter(
+																		id => id !== project.id,
+																	);
+															} else {
+																this.selectedProjectIds.push(project.id);
+															}
+														}
+													}}
+													onMouseDown={e => {
+														if (e.shiftKey) {
+															return;
+														}
+														e.stopPropagation();
+														this.mouseDown = true;
+														this.idxStart = index;
+														this.idxEnd = index;
+													}}
+													style={{ appearance: 'auto' }}
+													type="checkbox"
+													checked={this.selectedProjectIds.includes(project.id)}
+													// onChange={e => {
+													// 	if (e.target.checked) {
+													// 		this.selectedProjectIds.push(project.id);
+													// 	} else {
+													// 		this.selectedProjectIds = this.selectedProjectIds.filter(
+													// 			id => id !== project.id,
+													// 		);
+													// 	}
+													// }}
+												/>
+											</td>
+											<td style={{ verticalAlign: 'top' }}>{project.name}</td>
+											<td style={{ verticalAlign: 'top' }}>Will be here...</td>
+											<td style={{ verticalAlign: 'top' }}>
+												<pre style={{ fontSize: 10 }}>
+													{Array.isArray(project.meta)
+														? JSON.stringify(project.meta[0]?.coingecko?.links, null, 2)
+														: JSON.stringify(project.meta?.coingecko, null, 2)}
+												</pre>
+											</td>
+										</tr>
+									))}
+								</tbody>
+							</table>
+						</>
 					)}
 				</div>
 			</>
