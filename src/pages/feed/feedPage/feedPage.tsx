@@ -34,6 +34,7 @@ const FeedPageContent = observer(() => {
 
 	const accounts = useDomainAccounts();
 	const selectedAccount = accounts.find(a => a.account.address === address);
+	const canLoadFeed = !!accounts.length && accounts.every(a => a.mainViewKey);
 
 	useEffect(() => {
 		if (address && !selectedAccount) {
@@ -56,12 +57,12 @@ const FeedPageContent = observer(() => {
 
 		genericLayoutApi.scrollToTop();
 
-		if (!!accounts.length && accounts.every(a => a.mainViewKey)) {
+		if (canLoadFeed) {
 			feed.load();
 		}
 
 		return feed;
-	}, [accounts, category, genericLayoutApi, selectedAccount, source]);
+	}, [accounts, canLoadFeed, category, genericLayoutApi, selectedAccount, source]);
 
 	useEffect(() => {
 		const timer = setInterval(async () => {

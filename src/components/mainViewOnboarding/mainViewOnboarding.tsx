@@ -74,33 +74,30 @@ export const MainViewOnboarding = observer(() => {
 			setInviteCodeLoading(false);
 		}
 
-		// CREATE KEY
+		// CREATE KEY & PREPARE FEED
 		try {
 			setStep(Step.SIGN_AUTH);
 
 			const key = await account.makeMainViewKey();
 			invariant(key);
 
-			const authResult = await FeedManagerApi.authAddress(
+			const { success, token } = await FeedManagerApi.authAddress(
 				account.account.address,
 				key.signature,
 				key.timestamp,
 				cleanInviteCode,
 			);
-			invariant(authResult.success);
+			invariant(success);
 
-			account.mainViewKey = authResult.token;
-		} catch (e) {
-			return toast('Unexpected error 🤷‍♂️');
-		}
-
-		// BUILD FEED
-		try {
 			setStep(Step.BUILDING_FEED);
-			await FeedManagerApi.init(account.mainViewKey);
+			await FeedManagerApi.init(token);
+
+			// Update keys after Feed Manager initialized
+			account.mainViewKey = token;
+
 			toast(`Welcome to ${APP_NAME} 🔥`);
 		} catch (e) {
-			toast("Couldn't set up your personalized feed 🤦‍♀️");
+			return toast('Unexpected error 🤷‍♂️');
 		}
 
 		setStep(undefined);
