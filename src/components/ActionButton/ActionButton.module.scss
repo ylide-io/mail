@@ -4,6 +4,7 @@
 	grid-gap: 4px;
 	align-items: center;
 	justify-content: center;
+	position: relative;
 	border: 1px solid;
 	border-radius: 22px;
 
@@ -48,6 +49,18 @@
 }
 .root_singleline .content {
 	@include truncate-text;
+}
+
+.root_loading .icon,
+.root_loading .content {
+	visibility: hidden;
+}
+
+.loader {
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
 }
 
 // SIZE
