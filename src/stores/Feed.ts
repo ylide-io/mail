@@ -31,7 +31,6 @@ export class FeedStore {
 	@observable newPosts = 0;
 	@observable moreAvailable = false;
 
-	readonly selectedCategory = FeedCategory.MAIN;
 	readonly category: FeedCategory | undefined;
 	readonly sourceId: string | undefined;
 	readonly addressTokens: string[] | undefined;
