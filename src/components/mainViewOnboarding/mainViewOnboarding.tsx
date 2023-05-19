@@ -89,7 +89,7 @@ export const MainViewOnboarding = observer(() => {
 			);
 			invariant(authResult.success);
 
-			account.setMainViewKey(authResult.token);
+			account.mainViewKey = authResult.token;
 		} catch (e) {
 			return toast('Unexpected error 🤷‍♂️');
 		}

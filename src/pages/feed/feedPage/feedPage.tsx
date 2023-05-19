@@ -33,12 +33,13 @@ const FeedPageContent = observer(() => {
 	const { category, source, address } = useParams<{ category: FeedCategory; source: string; address: string }>();
 
 	const accounts = useDomainAccounts();
+	const selectedAccount = accounts.find(a => a.account.address === address);
 
 	useEffect(() => {
-		if (address && !accounts.find(a => a.account.address === address)) {
+		if (address && !selectedAccount) {
 			navigate(generatePath(RoutePath.FEED));
 		}
-	}, [accounts, address, navigate]);
+	}, [address, navigate, selectedAccount]);
 
 	// TODO Reload when feed settings changes
 
@@ -46,18 +47,21 @@ const FeedPageContent = observer(() => {
 		const feed = new FeedStore({
 			category,
 			sourceId: source,
-			addressTokens: address
-				? [accounts.find(d => d.account.address.toLowerCase() === address.toLowerCase())!.mainViewKey]
-				: !category && !source && !address
+			addressTokens: selectedAccount
+				? [selectedAccount.mainViewKey]
+				: !category && !source
 				? accounts.map(a => a.mainViewKey)
 				: undefined,
 		});
 
 		genericLayoutApi.scrollToTop();
-		feed.load();
+
+		if (!!accounts.length && accounts.every(a => a.mainViewKey)) {
+			feed.load();
+		}
 
 		return feed;
-	}, [accounts, address, category, genericLayoutApi, source]);
+	}, [accounts, category, genericLayoutApi, selectedAccount, source]);
 
 	useEffect(() => {
 		const timer = setInterval(async () => {
@@ -134,9 +138,11 @@ const FeedPageContent = observer(() => {
 						)}
 					</ErrorMessage>
 				) : (
-					<div className={css.loader}>
-						<YlideLoader reason="Your feed is loading ..." />
-					</div>
+					feed.loading && (
+						<div className={css.loader}>
+							<YlideLoader reason="Your feed is loading ..." />
+						</div>
+					)
 				)}
 			</div>
 		</NarrowContent>
