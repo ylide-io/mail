@@ -105,7 +105,7 @@ export class DomainAccount {
 	set mainViewKey(key: string) {
 		browserStorage.mainViewKeys = {
 			...browserStorage.mainViewKeys,
-			[this.account.address]: key,
+			[this.account.address]: key || undefined,
 		};
 	}
 }

@@ -125,14 +125,14 @@ class BrowserStorage {
 	private _mainViewKeys =
 		BrowserStorage.getItemWithTransform(
 			BrowserStorageKey.MAIN_VIEW_KEYS,
-			item => JSON.parse(item) as Record<string, string>,
+			item => JSON.parse(item) as Record<string, string | undefined>,
 		) || {};
 
 	get mainViewKeys() {
 		return this._mainViewKeys;
 	}
 
-	set mainViewKeys(value: Record<string, string>) {
+	set mainViewKeys(value: Record<string, string | undefined>) {
 		BrowserStorage.setItem(BrowserStorageKey.MAIN_VIEW_KEYS, JSON.stringify(value));
 		this._mainViewKeys = value;
 	}
