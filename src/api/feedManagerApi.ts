@@ -70,18 +70,18 @@ export namespace FeedManagerApi {
 		export type UserData = UserProjectEntity[];
 	}
 
-	export function getUrl() {
-		return REACT_APP__FEED_MANAGER || 'https://fm-api.ylide.io'; // || 'http://localhost:8271'
-	}
-
 	async function request<Resp>(path: string, query?: Record<string, any>, data?: any): Promise<Resp> {
-		const response = await fetch(`${getUrl()}${path}?${query ? createCleanSerachParams(query) : ''}`, {
-			method: data ? 'POST' : 'GET',
-			headers: {
-				'Content-Type': 'application/json',
+		const response = await fetch(
+			`${REACT_APP__FEED_MANAGER}${path}?${query ? createCleanSerachParams(query) : ''}`,
+			{
+				method: data ? 'POST' : 'GET',
+				headers: {
+					'Content-Type': 'application/json',
+				},
+				body: data ? JSON.stringify(data) : undefined,
 			},
-			body: data ? JSON.stringify(data) : undefined,
-		});
+		);
+
 		if (response.status < 200 || response.status >= 300) {
 			let body: FeedManagerResponse<Resp>;
 			try {
@@ -96,7 +96,7 @@ export namespace FeedManagerApi {
 			}
 		} else {
 			const body: FeedManagerResponse<Resp> = await response.json();
-			if (body.result === false) {
+			if (!body.result) {
 				throw new FeedManagerError(body.error);
 			} else {
 				return body.data;
