@@ -34,7 +34,42 @@ export const MainViewOnboarding = observer(() => {
 		if (!accounts.length) {
 			setStep(Step.CONNECT_ACCOUNT);
 		} else if (!accounts.find(a => a.mainViewKey)) {
-			setStep(Step.ENTER_INVITE_CODE);
+			const account = accounts[0];
+			FeedManagerApi.isAddressActive(account.account.address)
+				.then(isActive => {
+					if (isActive) {
+						setStep(Step.SIGN_AUTH);
+						account
+							.makeMainViewKey()
+							.then(key => {
+								invariant(key);
+								return FeedManagerApi.authAddress(
+									account.account.address,
+									key.signature,
+									key.timestamp,
+								);
+							})
+							.then(({ token }) => {
+								setStep(Step.BUILDING_FEED);
+								return FeedManagerApi.init(token).then(() => token);
+							})
+							.then(token => {
+								// Update keys after Feed Manager initialized
+								account.mainViewKey = token;
+
+								toast(`Welcome to ${APP_NAME} 🔥`);
+								setStep(undefined);
+							})
+							.catch(e => {
+								toast('Unexpected error 🤷‍♂️');
+							});
+					} else {
+						setStep(Step.ENTER_INVITE_CODE);
+					}
+				})
+				.catch(err => {
+					setStep(Step.CONNECT_ACCOUNT);
+				});
 		}
 	}, [accounts, step]);
 
@@ -43,7 +78,41 @@ export const MainViewOnboarding = observer(() => {
 			connectAccount()
 				.then(account => {
 					invariant(account);
-					setStep(Step.ENTER_INVITE_CODE);
+					FeedManagerApi.isAddressActive(account.account.address)
+						.then(isActive => {
+							if (isActive) {
+								setStep(Step.SIGN_AUTH);
+								account
+									.makeMainViewKey()
+									.then(key => {
+										invariant(key);
+										return FeedManagerApi.authAddress(
+											account.account.address,
+											key.signature,
+											key.timestamp,
+										);
+									})
+									.then(({ token }) => {
+										setStep(Step.BUILDING_FEED);
+										return FeedManagerApi.init(token).then(() => token);
+									})
+									.then(token => {
+										// Update keys after Feed Manager initialized
+										account.mainViewKey = token;
+
+										toast(`Welcome to ${APP_NAME} 🔥`);
+										setStep(undefined);
+									})
+									.catch(e => {
+										toast('Unexpected error 🤷‍♂️');
+									});
+							} else {
+								setStep(Step.ENTER_INVITE_CODE);
+							}
+						})
+						.catch(err => {
+							setStep(Step.CONNECT_ACCOUNT);
+						});
 				})
 				.catch(() => {
 					setStep(Step.CONNECT_ACCOUNT_INFO);
@@ -66,28 +135,25 @@ export const MainViewOnboarding = observer(() => {
 		// CHECK INVITE CODE
 		try {
 			setInviteCodeLoading(true);
-			const result = await FeedManagerApi.checkInvite(cleanInviteCode);
-			invariant(result.success);
+			await FeedManagerApi.checkInvite(cleanInviteCode, account.account.address);
 		} catch (e) {
 			return toast('Invalid invite code 🤦‍♀️');
 		} finally {
 			setInviteCodeLoading(false);
 		}
 
+		setStep(Step.SIGN_AUTH);
+
 		// CREATE KEY & PREPARE FEED
 		try {
-			setStep(Step.SIGN_AUTH);
-
 			const key = await account.makeMainViewKey();
-			invariant(key);
 
-			const { success, token } = await FeedManagerApi.authAddress(
+			const { token } = await FeedManagerApi.authAddress(
 				account.account.address,
 				key.signature,
 				key.timestamp,
 				cleanInviteCode,
 			);
-			invariant(success);
 
 			setStep(Step.BUILDING_FEED);
 			await FeedManagerApi.init(token);

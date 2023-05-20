@@ -3,9 +3,13 @@ import { createCleanSerachParams } from '../utils/url';
 
 export namespace FeedManagerApi {
 	export enum ErrorCode {
-		REQUIRED_PARAMETERS = 'REQUIRED_PARAMETERS',
-		SOURCE_LIST_NOT_FOUND = 'SOURCE_LIST_NOT_FOUND',
-		NO_POSTS_FOR_ADDRESS = 'NO_POSTS_FOR_ADDRESS',
+		INVALID_REQUEST = 'INVALID_REQUEST',
+		INVALID_TIMESTAMP = 'INVALID_TIMESTAMP',
+		INVALID_INVITE = 'INVALID_INVITE',
+		INVALID_SIGNATURE = 'INVALID_SIGNATURE',
+		INVALID_TOKEN = 'INVALID_TOKEN',
+		INVALID_ADDRESS = 'INVALID_ADDRESS',
+		INTERNAL_ERROR = 'INTERNAL_ERROR',
 	}
 
 	export class FeedManagerError extends Error {
@@ -14,11 +18,63 @@ export namespace FeedManagerApi {
 		}
 	}
 
-	export function getUrl() {
-		return REACT_APP__FEED_MANAGER || 'https://fm-api.ylide.io'; //  || 'http://localhost:8271'
+	export interface FeedManagerSuccessResponse<Data> {
+		result: true;
+		data: Data;
 	}
 
-	async function request<Data>(path: string, query?: Record<string, any>, data?: any): Promise<Data> {
+	export interface FeedManagerErrorResponse {
+		result: false;
+		error: ErrorCode;
+		data?: any;
+	}
+
+	export type FeedManagerResponse<Data> = FeedManagerSuccessResponse<Data> | FeedManagerErrorResponse;
+
+	export enum ConfigMode {
+		AUTO_ADD = 'auto-add',
+		DONT_ADD = 'dont-add',
+	}
+
+	export interface ConfigEntity {
+		address: string;
+		mode: ConfigMode;
+		includedProjectIds: string[];
+		excludedProjectIds: string[];
+		lastLoginTimestamp: number;
+	}
+
+	export interface UserProjectEntity {
+		projectId: string;
+		projectName: string;
+		reasons: string[];
+		reasonsRaw: string[][];
+		reasonsDataRaw: any[];
+	}
+
+	export namespace FeedManagerResponse {
+		export interface CheckInviteData {
+			used: boolean;
+			usedByThisAddress: boolean;
+		}
+
+		export interface GetConfigData {
+			config: ConfigEntity;
+			defaultProjects: UserProjectEntity[];
+		}
+
+		export interface AuthAddressData {
+			token: string;
+		}
+
+		export type UserData = UserProjectEntity[];
+	}
+
+	export function getUrl() {
+		return REACT_APP__FEED_MANAGER || 'http://localhost:8271' || 'https://fm-api.ylide.io'; //  ||
+	}
+
+	async function request<Resp>(path: string, query?: Record<string, any>, data?: any): Promise<Resp> {
 		const response = await fetch(`${getUrl()}${path}?${query ? createCleanSerachParams(query) : ''}`, {
 			method: data ? 'POST' : 'GET',
 			headers: {
@@ -27,25 +83,36 @@ export namespace FeedManagerApi {
 			body: data ? JSON.stringify(data) : undefined,
 		});
 		if (response.status < 200 || response.status >= 300) {
-			throw new Error(response.statusText);
+			let body: FeedManagerResponse<Resp>;
+			try {
+				body = await response.json();
+			} catch (err) {
+				throw new Error(response.statusText);
+			}
+			if (body && !body.result && typeof body.error === 'string') {
+				throw new FeedManagerError(body.error);
+			} else {
+				throw new Error(response.statusText);
+			}
+		} else {
+			const body: FeedManagerResponse<Resp> = await response.json();
+			if (body.result === false) {
+				throw new FeedManagerError(body.error);
+			} else {
+				return body.data;
+			}
 		}
-
-		return await response.json();
 	}
 
-	export async function checkInvite(invite: string): Promise<{ success: boolean; used: boolean }> {
-		return await request(`/check-invite`, {
+	export async function checkInvite(invite: string, address: string) {
+		return await request<FeedManagerResponse.CheckInviteData>(`/check-invite`, {
 			invite,
+			address,
 		});
 	}
 
-	export async function authAddress(
-		address: string,
-		signature: string,
-		messageTimestamp: number,
-		invite?: string,
-	): Promise<{ success: boolean; token: string }> {
-		return await request(`/auth-address`, undefined, {
+	export async function authAddress(address: string, signature: string, messageTimestamp: number, invite?: string) {
+		return await request<FeedManagerResponse.AuthAddressData>(`/auth-address`, undefined, {
 			address,
 			signature,
 			messageTimestamp,
@@ -53,49 +120,24 @@ export namespace FeedManagerApi {
 		});
 	}
 
-	export enum ConfigMode {
-		AUTO_ADD = 'auto-add',
-		DONT_ADD = 'dont-add',
-	}
-
-	export async function getConfig(token: string): Promise<{
-		success: true;
-		config: {
-			address: string;
-			mode: ConfigMode;
-			includedProjectIds: string[];
-			excludedProjectIds: string[];
-			lastLoginTimestamp: number;
-		};
-		defaultProjects: {
-			projectId: string;
-			reasons: string[];
-			reasonsData: any[];
-		}[];
-	}> {
-		return await request(`/get-config`, {
+	export async function getConfig(token: string) {
+		return await request<FeedManagerResponse.GetConfigData>(`/get-config`, {
 			token,
 		});
 	}
 
-	export async function init(token: string): Promise<{ success: true }> {
-		return await request(`/init`, {
+	export async function init(token: string) {
+		return await request<void>(`/init`, {
 			token,
 		});
 	}
 
-	/*
-	app.post('/set-config', async (req, res) => {
-		try {
-			const { token: tokenRaw, config: configRaw } = req.query;
-			if (typeof tokenRaw !== 'string') {
-				throw new Error('Invalid token');
-			}
-			const token = String(tokenRaw);
-			const { authBundle, authConfig } = await authByKey(token);
+	export async function isAddressActive(address: string) {
+		return await request<boolean>(`/is-address-active`, {
+			address,
+		});
+	}
 
-			const { mode, includedProjectIds, excludedProjectIds } = configRaw as any;
-			*/
 	export async function setConfig(
 		token: string,
 		config: {
@@ -103,7 +145,7 @@ export namespace FeedManagerApi {
 			includedProjectIds: string[];
 			excludedProjectIds: string[];
 		},
-	): Promise<{ success: true }> {
-		return await request(`/set-config`, {}, { token, config });
+	) {
+		return await request<void>(`/set-config`, {}, { token, config });
 	}
 }
