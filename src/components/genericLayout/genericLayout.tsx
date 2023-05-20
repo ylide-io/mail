@@ -1,6 +1,6 @@
 import clsx from 'clsx';
 import { observer } from 'mobx-react';
-import React, { createContext, PropsWithChildren, useContext, useEffect, useMemo, useRef } from 'react';
+import React, { createContext, PropsWithChildren, useContext, useEffect, useMemo } from 'react';
 
 import css from './genericLayout.module.scss';
 import Header from './header/header';
@@ -33,14 +33,10 @@ export const GenericLayout = observer(({ children }: GenericLayoutProps) => {
 		}, 10000);
 	}, []);
 
-	const mainRef = useRef<HTMLDivElement>(null);
-
 	const api: GenericLayoutApi = useMemo(
 		() => ({
 			scrollToTop: () => {
-				if (mainRef.current) {
-					mainRef.current.scrollTo({ top: 0, behavior: 'smooth' });
-				}
+				window.scrollTo({ top: 0, behavior: 'smooth' });
 			},
 		}),
 		[],
@@ -51,7 +47,7 @@ export const GenericLayout = observer(({ children }: GenericLayoutProps) => {
 			<div className={css.root}>
 				<Header />
 
-				<div className={css.main} ref={mainRef}>
+				<div className={css.main}>
 					<div className={clsx(css.sidebar, isSidebarOpen.get() && css.sidebar_open)}>
 						<div className={css.sidebarMobileHeader}>
 							<SidebarBurger>Hide sidebar</SidebarBurger>
