@@ -71,7 +71,7 @@ export namespace FeedManagerApi {
 	}
 
 	export function getUrl() {
-		return REACT_APP__FEED_MANAGER || 'http://localhost:8271' || 'https://fm-api.ylide.io'; //  ||
+		return REACT_APP__FEED_MANAGER || 'https://fm-api.ylide.io'; // || 'http://localhost:8271'
 	}
 
 	async function request<Resp>(path: string, query?: Record<string, any>, data?: any): Promise<Resp> {
