@@ -60,7 +60,7 @@
 		"@walletconnect/types": "^1.8.0",
 		"@walletconnect/web3-provider": "^1.8.0",
 		"@ylide/ethereum": "0.8.0-beta.31",
-		"@ylide/everscale": "0.8.0-beta.14",
+		"@ylide/everscale": "0.8.0-beta.16",
 		"@ylide/sdk": "0.8.0-beta.10",
 		"@ylide/smart-buffer": "0.0.11",
 		"clsx": "^1.2.1",
