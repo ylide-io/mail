@@ -1,5 +1,6 @@
+import { autorun } from 'mobx';
 import { observer } from 'mobx-react';
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { generatePath, useParams } from 'react-router-dom';
 
 import { ActionButton } from '../../../components/ActionButton/ActionButton';
@@ -13,7 +14,7 @@ import { ReactComponent as ContactSvg } from '../../../icons/ic20/contact.svg';
 import { ReactComponent as ForwardSvg } from '../../../icons/ic20/forward.svg';
 import { ReactComponent as ReplySvg } from '../../../icons/ic20/reply.svg';
 import { IMessageDecodedContent } from '../../../indexedDB/IndexedDB';
-import { FolderId, ILinkedMessage, mailStore, useMailList } from '../../../stores/MailList';
+import { FolderId, ILinkedMessage, MailList, mailStore } from '../../../stores/MailList';
 import { globalOutgoingMailData, OutgoingMailData } from '../../../stores/outgoingMailData';
 import { RoutePath } from '../../../stores/routePath';
 import { DateFormatStyle, formatDate } from '../../../utils/date';
@@ -58,56 +59,49 @@ export const MailDetailsPage = observer(() => {
 
 	const primaryThreadItemRef = useRef<HTMLDivElement>(null);
 
-	const [needToLoadThread, setNeedToLoadThread] = useState(
-		folderId === FolderId.Inbox && initialMessage?.msg.senderAddress,
-	);
-	const [isLoadingThread, setLoadingThread] = useState(needToLoadThread);
 	const [isDecodingThread, setDecodingThread] = useState(false);
 	const [isThreadOpen, setThreadOpen] = useState(false);
 
 	const deletedMessageIds = mailStore.deletedMessageIds;
 
-	const threadFilter = useCallback((id: string) => !deletedMessageIds.has(id), [deletedMessageIds]);
+	const threadMailList = useMemo(() => {
+		if (folderId !== FolderId.Inbox || !initialMessage?.msg.senderAddress) return;
 
-	const {
-		messages: threadMessages,
-		isLoading,
-		isNextPageAvailable,
-		loadNextPage,
-	} = useMailList(
-		needToLoadThread
-			? {
-					folderId: FolderId.Inbox,
-					sender: initialMessage?.msg.senderAddress,
-					filter: threadFilter,
-			  }
-			: undefined,
-	);
+		return new MailList({
+			folderId: FolderId.Inbox,
+			sender: initialMessage?.msg.senderAddress,
+			filter: (id: string) => !deletedMessageIds.has(id),
+		});
+	}, [deletedMessageIds, folderId, initialMessage?.msg.senderAddress]);
+
+	useEffect(() => () => threadMailList?.destroy(), [threadMailList]);
 
 	const [wrappedThreadMessages, setWrappedThreadMessages] = useState<WrappedThreadMessage[]>([]);
 
-	useEffect(() => {
-		if (!isNextPageAvailable) {
-			setWrappedThreadMessages(
-				threadMessages.map(it => ({
-					message: it,
-					isDeleted: false,
-				})),
-			);
+	useEffect(
+		() =>
+			autorun(() => {
+				if (!threadMailList) return;
 
-			setNeedToLoadThread(false);
-			setLoadingThread(false);
-		} else if (!isLoading) {
-			loadNextPage();
-		}
-	}, [isLoading, isNextPageAvailable, loadNextPage, threadMessages]);
+				if (!threadMailList.isNextPageAvailable) {
+					setWrappedThreadMessages(
+						threadMailList.messages.map(it => ({
+							message: it,
+							isDeleted: false,
+						})),
+					);
+				} else if (!threadMailList.isLoading) {
+					threadMailList.loadNextPage();
+				}
+			}),
+		[threadMailList],
+	);
 
 	const onOpenThreadClick = () => {
 		setDecodingThread(true);
 
 		(async () => {
 			for (const m of wrappedThreadMessages) {
-				console.log('decodeMessage');
 				await mailStore.decodeMessage(m.message);
 			}
 
@@ -186,7 +180,7 @@ export const MailDetailsPage = observer(() => {
 						<div className={css.header}>
 							<ActionButton onClick={onBackClick} icon={<ArrowLeftSvg />} />
 
-							{isLoadingThread || isDecodingThread ? (
+							{threadMailList?.isLoading || isDecodingThread ? (
 								<Spinner className={css.headerSpinner} />
 							) : isThreadOpen ? (
 								<div className={css.messagesFrom}>

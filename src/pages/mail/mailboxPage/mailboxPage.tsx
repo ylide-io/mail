@@ -1,5 +1,6 @@
+import { autorun } from 'mobx';
 import { observer } from 'mobx-react';
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useParams, useSearchParams } from 'react-router-dom';
 import AutoSizer from 'react-virtualized-auto-sizer';
 import { FixedSizeList, ListChildComponentProps } from 'react-window';
@@ -9,7 +10,7 @@ import { GenericLayout } from '../../../components/genericLayout/genericLayout';
 import { YlideLoader } from '../../../components/ylideLoader/ylideLoader';
 import { analytics } from '../../../stores/Analytics';
 import domain from '../../../stores/Domain';
-import { FolderId, ILinkedMessage, mailStore, useMailList } from '../../../stores/MailList';
+import { FolderId, ILinkedMessage, MailList, mailStore } from '../../../stores/MailList';
 import { useNav } from '../../../utils/url';
 import { useWindowSize } from '../../../utils/useWindowSize';
 import MailboxEmpty from './mailboxEmpty/mailboxEmpty';
@@ -79,18 +80,20 @@ export const MailboxPage = observer(() => {
 		[deletedMessageIds, folderId],
 	);
 
-	const { messages, isLoading, isNextPageAvailable, loadNextPage } = useMailList({
-		folderId: folderId!,
-		sender: filterBySender,
-		filter: messageFilter,
-	});
+	const mailList = useMemo(() => {
+		return new MailList({
+			folderId: folderId!,
+			sender: filterBySender,
+			filter: messageFilter,
+		});
+	}, [filterBySender, folderId, messageFilter]);
 
-	useEffect(() => {
-		mailStore.lastMessagesList = messages;
-	}, [messages]);
+	useEffect(() => () => mailList.destroy(), [mailList]);
+
+	useEffect(() => autorun(() => (mailStore.lastMessagesList = mailList.messages)), [mailList]);
 
 	const [selectedMessageIds, setSelectedMessageIds] = useState(new Set<string>());
-	const isAllSelected = !!messages.length && messages.every(it => selectedMessageIds.has(it.id));
+	const isAllSelected = !!mailList.messages.length && mailList.messages.every(it => selectedMessageIds.has(it.id));
 
 	const { windowWidth } = useWindowSize();
 	const isHighRow = windowWidth <= 720;
@@ -101,13 +104,17 @@ export const MailboxPage = observer(() => {
 		height: 0,
 	});
 
-	useEffect(() => {
-		const itemsHeight = itemSize * messages.length;
-		const offsetToEnd = itemsHeight - (scrollParams.height + scrollParams.offset);
-		if (offsetToEnd < itemSize && isNextPageAvailable && !isLoading) {
-			loadNextPage();
-		}
-	}, [itemSize, scrollParams, isLoading, messages.length, isNextPageAvailable, loadNextPage]);
+	useEffect(
+		() =>
+			autorun(() => {
+				const itemsHeight = itemSize * mailList.messages.length;
+				const offsetToEnd = itemsHeight - (scrollParams.height + scrollParams.offset);
+				if (offsetToEnd < itemSize && mailList.isNextPageAvailable && !mailList.isLoading) {
+					mailList.loadNextPage();
+				}
+			}),
+		[itemSize, mailList, scrollParams],
+	);
 
 	return (
 		<GenericLayout>
@@ -115,29 +122,33 @@ export const MailboxPage = observer(() => {
 				<div className="mailbox-page">
 					<MailboxHeader
 						folderId={folderId!}
-						messages={messages}
+						messages={mailList.messages}
 						selectedMessageIds={selectedMessageIds}
 						filterBySender={filterBySender}
 						isAllSelected={isAllSelected}
 						onSelectAllCheckBoxClick={isChecked => {
-							setSelectedMessageIds(isChecked ? new Set(messages.map(it => it.id)) : new Set());
+							setSelectedMessageIds(isChecked ? new Set(mailList.messages.map(it => it.id)) : new Set());
 						}}
 						onMarkReadClick={() => {
 							mailStore.markMessagesAsReaded(Array.from(selectedMessageIds));
 							setSelectedMessageIds(new Set());
 						}}
 						onDeleteClick={() => {
-							mailStore.markMessagesAsDeleted(messages.filter(it => selectedMessageIds.has(it.id)));
+							mailStore.markMessagesAsDeleted(
+								mailList.messages.filter(it => selectedMessageIds.has(it.id)),
+							);
 							setSelectedMessageIds(new Set());
 						}}
 						onRestoreClick={() => {
-							mailStore.markMessagesAsNotDeleted(messages.filter(it => selectedMessageIds.has(it.id)));
+							mailStore.markMessagesAsNotDeleted(
+								mailList.messages.filter(it => selectedMessageIds.has(it.id)),
+							);
 							setSelectedMessageIds(new Set());
 						}}
 					/>
 
 					<div className="mailbox">
-						{isLoading && !messages.length ? (
+						{!mailList.messages.length && mailList.isLoading ? (
 							<div style={{ padding: '40px 0' }}>
 								<YlideLoader
 									reason={`Retrieving your mails from ${
@@ -145,7 +156,7 @@ export const MailboxPage = observer(() => {
 									} blockchains`}
 								/>
 							</div>
-						) : messages.length ? (
+						) : mailList.messages.length ? (
 							<AutoSizer>
 								{({ width, height }) => {
 									// noinspection JSUnusedGlobalSymbols
@@ -156,7 +167,7 @@ export const MailboxPage = observer(() => {
 											height={height}
 											style={{ padding: '0 0 12px' }}
 											itemData={{
-												messages,
+												messages: mailList.messages,
 												itemSize,
 												isSelected: (messageId: string) => selectedMessageIds.has(messageId),
 												onSelectClick: (messageId: string, isSelected: boolean) => {
@@ -180,7 +191,9 @@ export const MailboxPage = observer(() => {
 													height,
 												});
 											}}
-											itemCount={messages.length + (isNextPageAvailable ? 1 : 0)}
+											itemCount={
+												mailList.messages.length + (mailList.isNextPageAvailable ? 1 : 0)
+											}
 										>
 											{MailboxListItem}
 										</FixedSizeList>

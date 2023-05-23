@@ -11,8 +11,8 @@ import {
 	Uint256,
 	YLIDE_MAIN_FEED_ID,
 } from '@ylide/sdk';
-import { makeAutoObservable } from 'mobx';
-import { useCallback, useEffect, useState } from 'react';
+import { autobind } from 'core-decorators';
+import { makeAutoObservable, makeObservable, observable, transaction } from 'mobx';
 
 import messagesDB, { MessagesDB } from '../indexedDB/impl/MessagesDB';
 import { IMessageDecodedContent } from '../indexedDB/IndexedDB';
@@ -87,36 +87,14 @@ export interface ILinkedMessage {
 	reader: AbstractBlockchainController;
 }
 
-interface UseMailListProps {
-	folderId: FolderId;
-	sender?: string;
-	filter?: (id: string) => boolean;
-}
+export class MailList {
+	@observable isLoading = true;
+	@observable isNextPageAvailable = true;
+	@observable messages: ILinkedMessage[] = [];
 
-export function useMailList(props?: UseMailListProps) {
-	const folderId = props?.folderId;
-	const sender = props?.sender;
-	const filter = props?.filter;
+	private readonly stream: ListSourceDrainer;
 
-	const [stream, setStream] = useState<ListSourceDrainer | undefined>();
-	const [messages, setMessages] = useState<ILinkedMessage[]>([]);
-	const [isLoading, setLoading] = useState(false);
-	const [isNextPageAvailable, setNextPageAvailable] = useState(true);
-	const [isNeedMore, setNeedMore] = useState(false);
-	const loadNextPage = useCallback(() => setNeedMore(true), []);
-
-	const activeAccounts = domain.accounts.activeAccounts;
-	const blockchains = domain.blockchains;
-
-	useEffect(() => {
-		if (!folderId) return;
-
-		let isDestroyed = false;
-
-		setStream(undefined);
-		setMessages([]);
-		setNextPageAvailable(true);
-
+	constructor(props: { folderId: FolderId; sender?: string; filter?: (id: string) => boolean }) {
 		function buildSources(
 			activeAccounts: DomainAccount[],
 			readingSession: SourceReadingSession,
@@ -157,79 +135,48 @@ export function useMailList(props?: UseMailListProps) {
 			}
 		}
 
-		const listSourceDrainer = new ListSourceDrainer(
-			new ListSourceMultiplexer(buildSources(activeAccounts, mailStore.readingSession, folderId, sender)),
-		);
+		const stream = (this.stream = new ListSourceDrainer(
+			new ListSourceMultiplexer(
+				buildSources(domain.accounts.activeAccounts, mailStore.readingSession, props.folderId, props.sender),
+			),
+		));
 
-		async function onNewMessages({ messages }: { messages: IMessageWithSource[] }) {
-			setMessages(await wrapMessages(messages));
-		}
-
-		listSourceDrainer.on('messages', onNewMessages);
-
-		listSourceDrainer.resume().then(() => {
-			if (!isDestroyed) {
-				setStream(listSourceDrainer);
-				loadNextPage();
-			}
+		stream.resetFilter(m => {
+			return props.filter ? props.filter(wrapMessageId(m)) : true;
 		});
 
-		return () => {
-			isDestroyed = true;
-			setStream(undefined);
+		stream.on('messages', this.onNewMessages);
 
-			listSourceDrainer.pause();
-			listSourceDrainer.off('messages', onNewMessages);
-		};
-	}, [activeAccounts, blockchains, folderId, loadNextPage, sender]);
+		stream.resume().then(() => {
+			this.loadNextPage();
+		});
 
-	useEffect(() => {
-		let isDestroyed = false;
+		makeObservable(this);
+	}
 
-		if (stream && !stream.paused) {
-			setLoading(true);
+	@autobind
+	private async onNewMessages({ messages }: { messages: IMessageWithSource[] }) {
+		this.messages = await wrapMessages(messages);
+	}
 
-			stream.resetFilter(m => {
-				if (!filter) return true;
-				return filter(wrapMessageId(m));
-			});
+	loadNextPage() {
+		this.isLoading = true;
 
-			stream.readMore(MailPageSize).then(messages => {
-				wrapMessages(messages).then(wrapped => {
-					if (!isDestroyed) {
-						setMessages(wrapped);
-						setNextPageAvailable(!stream.drained);
-						setLoading(false);
-					}
+		this.stream.readMore(MailPageSize).then(messages => {
+			wrapMessages(messages).then(wrapped => {
+				transaction(() => {
+					this.messages = wrapped;
+					this.isNextPageAvailable = !this.stream.drained;
+					this.isLoading = false;
 				});
 			});
-		}
+		});
+	}
 
-		return () => {
-			isDestroyed = true;
-		};
-	}, [filter, stream]);
-
-	useEffect(() => {
-		if (isNextPageAvailable && isNeedMore && stream && !stream.paused && !isLoading) {
-			setLoading(true);
-
-			stream.readMore(MailPageSize).then(messages => {
-				wrapMessages(messages).then(wrapped => {
-					setMessages(wrapped);
-					setNextPageAvailable(!stream.drained);
-					setLoading(false);
-				});
-			});
-		}
-	}, [isLoading, isNeedMore, isNextPageAvailable, stream]);
-
-	return {
-		isLoading: !stream || isLoading,
-		messages,
-		isNextPageAvailable,
-		loadNextPage,
-	};
+	destroy() {
+		this.stream.pause();
+		this.stream.off('messages', this.onNewMessages);
+	}
 }
 
 //
