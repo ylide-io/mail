@@ -44,13 +44,16 @@ export class FeedStore {
 		try {
 			this.loading = true;
 
-			const sourceListId = !this.sourceId ? browserStorage.feedSourceSettings?.listId : undefined;
+			const sourceId = this.sourceId;
 
-			const categories = this.sourceId || sourceListId ? undefined : this.categories;
+			const sourceListId = !sourceId ? browserStorage.feedSourceSettings?.listId : undefined;
+
+			const categories = sourceId || sourceListId ? undefined : this.categories;
 
 			const response = await FeedServerApi.getPosts({
 				...params,
 				categories,
+				sourceId,
 				sourceListId,
 				addressTokens: this.addressTokens,
 			});

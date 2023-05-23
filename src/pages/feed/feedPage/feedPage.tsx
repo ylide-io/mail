@@ -96,7 +96,7 @@ const FeedPageContent = observer(() => {
 					<ActionButton
 						look={ActionButtonLook.PRIMARY}
 						icon={<CrossSvg />}
-						onClick={() => navigate({ search: {} })}
+						onClick={() => navigate(generatePath(RoutePath.FEED))}
 					>
 						Clear filter
 					</ActionButton>
