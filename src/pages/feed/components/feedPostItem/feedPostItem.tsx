@@ -186,8 +186,6 @@ export function FeedPostItem({ isInFeed, post }: FeedPostItemProps) {
 									<DropDownItem>Open post source</DropDownItem>
 								</a>
 							)}
-
-							<DropDownItem>Unfollow</DropDownItem>
 						</DropDown>
 					)}
 
