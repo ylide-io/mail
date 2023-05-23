@@ -1,5 +1,5 @@
 import { EVM_NAMES } from '@ylide/ethereum';
-import { Uint256, YMF } from '@ylide/sdk';
+import { YMF } from '@ylide/sdk';
 import clsx from 'clsx';
 import { autorun } from 'mobx';
 import { observer } from 'mobx-react';
@@ -14,6 +14,7 @@ import { SelectNetworkModal } from '../../../../../components/selectNetworkModal
 import { Spinner } from '../../../../../components/spinner/spinner';
 import { showStaticComponent } from '../../../../../components/staticComponentManager/staticComponentManager';
 import { toast } from '../../../../../components/toast/toast';
+import { OTC_FEED_ID } from '../../../../../constants';
 import { AppMode, REACT_APP__APP_MODE } from '../../../../../env';
 import { ReactComponent as ArrowDownSvg } from '../../../../../icons/ic20/arrowDown.svg';
 import { ReactComponent as ReplySvg } from '../../../../../icons/ic20/reply.svg';
@@ -163,9 +164,7 @@ export const SendMailButton = observer(({ className, mailData, onSent }: SendMai
 				mailData.attachments,
 				mailData.to.items.map(r => r.routing?.address!),
 				mailData.network,
-				REACT_APP__APP_MODE === AppMode.OTC
-					? ('0000000000000000000000000000000000000000000000000000000000000001' as Uint256)
-					: undefined,
+				REACT_APP__APP_MODE === AppMode.OTC ? OTC_FEED_ID : undefined,
 			);
 
 			console.log('id: ', msgId);

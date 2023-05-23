@@ -17,6 +17,7 @@ import {
 import { autobind } from 'core-decorators';
 import { makeAutoObservable, makeObservable, observable, transaction } from 'mobx';
 
+import { VENOM_FEED_ID } from '../constants';
 import messagesDB, { MessagesDB } from '../indexedDB/impl/MessagesDB';
 import { IMessageDecodedContent } from '../indexedDB/IndexedDB';
 import { invariant } from '../utils/assert';
@@ -162,8 +163,7 @@ export class MailList {
 				invariant(venomFeed);
 
 				const blockchainController = domain.blockchains['venom-testnet'] as EverscaleBlockchainController;
-				const venomFeedId = '0000000000000000000000000000000000000000000000000000000000000004' as Uint256;
-				const composedFeedId = await blockchainController.getComposedFeedId(venomFeedId, 1);
+				const composedFeedId = await blockchainController.getComposedFeedId(VENOM_FEED_ID, 1);
 				const blockchainSubject: IBlockchainSourceSubject = {
 					feedId: composedFeedId,
 					type: BlockchainSourceType.BROADCAST,
