@@ -68,9 +68,11 @@ export const MailDetailsPage = observer(() => {
 		if (folderId !== FolderId.Inbox || !initialMessage?.msg.senderAddress) return;
 
 		return new MailList({
-			folderId: FolderId.Inbox,
-			sender: initialMessage?.msg.senderAddress,
-			filter: (id: string) => !deletedMessageIds.has(id),
+			mailbox: {
+				folderId: FolderId.Inbox,
+				sender: initialMessage?.msg.senderAddress,
+				filter: (id: string) => !deletedMessageIds.has(id),
+			},
 		});
 	}, [deletedMessageIds, folderId, initialMessage?.msg.senderAddress]);
 

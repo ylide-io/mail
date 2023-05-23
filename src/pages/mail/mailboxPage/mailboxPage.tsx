@@ -82,9 +82,11 @@ export const MailboxPage = observer(() => {
 
 	const mailList = useMemo(() => {
 		return new MailList({
-			folderId: folderId!,
-			sender: filterBySender,
-			filter: messageFilter,
+			mailbox: {
+				folderId: folderId!,
+				sender: filterBySender,
+				filter: messageFilter,
+			},
 		});
 	}, [filterBySender, folderId, messageFilter]);
 

@@ -13,6 +13,7 @@ import { ReactComponent as ArrowUpSvg } from '../../../icons/ic20/arrowUp.svg';
 import { ReactComponent as CrossSvg } from '../../../icons/ic20/cross.svg';
 import { useDomainAccounts } from '../../../stores/Domain';
 import { FeedStore, getFeedCategoryName } from '../../../stores/Feed';
+import { MailList } from '../../../stores/MailList';
 import { RoutePath } from '../../../stores/routePath';
 import { connectAccount } from '../../../utils/account';
 import { useNav } from '../../../utils/url';
@@ -26,25 +27,15 @@ function isInViewport(element: Element) {
 	return rect.top >= -100 && rect.top <= (window.innerHeight || document.documentElement.clientHeight);
 }
 
-const FeedPageContent = observer(() => {
+const RegularFeedContent = observer(() => {
 	const location = useLocation();
 	const navigate = useNav();
+	const accounts = useDomainAccounts();
 	const genericLayoutApi = useGenericLayoutApi();
 
-	const lastPostView = useRef<HTMLDivElement>(null);
-	const feedBodyRef = useRef<HTMLDivElement>(null);
 	const { category, source, address } = useParams<{ category: FeedCategory; source: string; address: string }>();
 	const isAllPosts = location.pathname === generatePath(RoutePath.FEED_ALL);
-	const isVenomFeed = location.pathname === generatePath(RoutePath.FEED_VENOM);
-
-	const accounts = useDomainAccounts();
 	const selectedAccount = accounts.find(a => a.account.address === address);
-
-	// We can NOT load smart feed if no suitable account connected
-	const canLoadFeed =
-		!!category ||
-		isAllPosts ||
-		(!!accounts.length && (REACT_APP__APP_MODE !== AppMode.MAIN_VIEW || accounts.every(a => a.mainViewKey)));
 
 	useEffect(() => {
 		if (address && !selectedAccount) {
@@ -52,7 +43,11 @@ const FeedPageContent = observer(() => {
 		}
 	}, [address, navigate, selectedAccount]);
 
-	// TODO Reload when feed settings changes
+	// We can NOT load smart feed if no suitable account connected
+	const canLoadFeed =
+		!!category ||
+		isAllPosts ||
+		(!!accounts.length && (REACT_APP__APP_MODE !== AppMode.MAIN_VIEW || accounts.every(a => a.mainViewKey)));
 
 	const feed = useMemo(() => {
 		const feed = new FeedStore({
@@ -74,6 +69,9 @@ const FeedPageContent = observer(() => {
 		return feed;
 	}, [accounts, canLoadFeed, category, genericLayoutApi, isAllPosts, selectedAccount, source]);
 
+	const lastPostView = useRef<HTMLDivElement>(null);
+	const feedBodyRef = useRef<HTMLDivElement>(null);
+
 	useEffect(() => {
 		const timer = setInterval(async () => {
 			if (lastPostView.current && isInViewport(lastPostView.current) && feed.moreAvailable) {
@@ -87,9 +85,7 @@ const FeedPageContent = observer(() => {
 	return (
 		<NarrowContent
 			title={
-				isVenomFeed
-					? 'Venom feed'
-					: feed.categories.length === 1
+				feed.categories.length === 1
 					? getFeedCategoryName(feed.categories[0])
 					: feed.sourceId || isAllPosts
 					? 'Feed'
@@ -125,9 +121,7 @@ const FeedPageContent = observer(() => {
 			)}
 
 			<div className={css.feedBody} ref={feedBodyRef}>
-				{isVenomFeed ? (
-					<CreatePostForm />
-				) : feed.loaded ? (
+				{feed.loaded ? (
 					<>
 						{feed.posts.map(post => (
 							<FeedPostItem isInFeed post={post} key={post.id} />
@@ -177,6 +171,29 @@ const FeedPageContent = observer(() => {
 			</div>
 		</NarrowContent>
 	);
+});
+
+const VenomFeedContent = observer(() => {
+	const feed = useMemo(() => {
+		return new MailList({ venom: { isVenom: true } });
+	}, []);
+
+	useEffect(() => () => feed.destroy(), [feed]);
+
+	return (
+		<NarrowContent title="Venom feed">
+			<CreatePostForm />
+		</NarrowContent>
+	);
+});
+
+//
+
+const FeedPageContent = observer(() => {
+	const location = useLocation();
+	const isVenomFeed = location.pathname === generatePath(RoutePath.FEED_VENOM);
+
+	return isVenomFeed ? <VenomFeedContent /> : <RegularFeedContent />;
 });
 
 export const FeedPage = () => (
