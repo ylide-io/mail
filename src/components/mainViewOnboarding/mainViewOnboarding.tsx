@@ -47,9 +47,7 @@ export const MainViewOnboarding = observer(() => {
 	const authorize = useCallback(
 		async (account: DomainAccount, invite?: string) => {
 			try {
-				const isActive = await FeedManagerApi.isAddressActive(account.account.address);
-
-				if (isActive) {
+				async function doAuthorize() {
 					setStep(Step.SIGN_AUTH);
 
 					const key = await account.makeMainViewKey();
@@ -71,8 +69,22 @@ export const MainViewOnboarding = observer(() => {
 
 					toast(`Welcome to ${APP_NAME} 🔥`);
 					reset();
+				}
+
+				// If just entered invite code, the try to authorize right away
+				if (invite) {
+					await doAuthorize();
 				} else {
-					setStep(Step.ENTER_INVITE_CODE);
+					const isActive = await FeedManagerApi.isAddressActive(account.account.address);
+
+					// If account had been authorized already, do it again
+					if (isActive) {
+						await doAuthorize();
+					}
+					// Request invide code
+					else {
+						setStep(Step.ENTER_INVITE_CODE);
+					}
 				}
 			} catch (e) {
 				toast('Unexpected error 🤷‍♂️');
@@ -122,7 +134,7 @@ export const MainViewOnboarding = observer(() => {
 			setInviteCodeLoading(false);
 		}
 
-		authorize(unathorizedAccount);
+		authorize(unathorizedAccount, cleanInviteCode);
 	}, [authorize, inviteCode, unathorizedAccount]);
 
 	useEffect(() => {
