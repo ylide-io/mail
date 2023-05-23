@@ -95,19 +95,14 @@ export class MailList {
 	private readonly stream: ListSourceDrainer;
 
 	constructor(props: { folderId: FolderId; sender?: string; filter?: (id: string) => boolean }) {
-		function buildSources(
-			activeAccounts: DomainAccount[],
-			readingSession: SourceReadingSession,
-			folderId: FolderId,
-			sender?: string,
-		): ISourceWithMeta[] {
+		function buildSources(): ISourceWithMeta[] {
 			function getDirectWithMeta(
 				recipient: Uint256,
 				sender: string | null,
 				account: DomainAccount,
 			): ISourceWithMeta[] {
 				return domain.ylide.core
-					.getListSources(readingSession, [
+					.getListSources(mailStore.readingSession, [
 						{
 							feedId: YLIDE_MAIN_FEED_ID,
 							type: BlockchainSourceType.DIRECT,
@@ -118,12 +113,16 @@ export class MailList {
 					.map(source => ({ source, meta: { account } }));
 			}
 
-			if (folderId === FolderId.Inbox || folderId === FolderId.Archive) {
-				return activeAccounts.map(acc => getDirectWithMeta(acc.uint256Address, sender || null, acc)).flat();
-			} else if (folderId === FolderId.Sent) {
+			const activeAccounts = domain.accounts.activeAccounts;
+
+			if (props.folderId === FolderId.Inbox || props.folderId === FolderId.Archive) {
+				return activeAccounts
+					.map(acc => getDirectWithMeta(acc.uint256Address, props.sender || null, acc))
+					.flat();
+			} else if (props.folderId === FolderId.Sent) {
 				return activeAccounts.map(acc => getDirectWithMeta(acc.sentAddress, null, acc)).flat();
 			} else {
-				const tag = tags.tags.find(t => String(t.id) === folderId);
+				const tag = tags.tags.find(t => String(t.id) === props.folderId);
 				if (!tag) {
 					return [];
 				}
@@ -135,11 +134,7 @@ export class MailList {
 			}
 		}
 
-		const stream = (this.stream = new ListSourceDrainer(
-			new ListSourceMultiplexer(
-				buildSources(domain.accounts.activeAccounts, mailStore.readingSession, props.folderId, props.sender),
-			),
-		));
+		const stream = (this.stream = new ListSourceDrainer(new ListSourceMultiplexer(buildSources())));
 
 		stream.resetFilter(m => {
 			return props.filter ? props.filter(wrapMessageId(m)) : true;
