@@ -153,7 +153,7 @@ export const MainViewOnboarding = observer(() => {
 			{step === Step.CONNECT_ACCOUNT_INFO && (
 				<ActionModal
 					title="Connect Account"
-					description={`You need to connect your crypto wallet in order to use ${APP_NAME}`}
+					description={`You need to connect a crypto wallet in order to use ${APP_NAME}`}
 					buttons={
 						<ActionButton
 							size={ActionButtonSize.XLARGE}

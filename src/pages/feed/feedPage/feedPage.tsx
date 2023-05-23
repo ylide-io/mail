@@ -34,7 +34,9 @@ const FeedPageContent = observer(() => {
 
 	const accounts = useDomainAccounts();
 	const selectedAccount = accounts.find(a => a.account.address === address);
-	const canLoadFeed = !!accounts.length && accounts.every(a => a.mainViewKey);
+
+	// We can only load category sections; We can NOT load smart feed
+	const canLoadFeed = !!category || (!!accounts.length && accounts.every(a => a.mainViewKey));
 
 	useEffect(() => {
 		if (address && !selectedAccount) {
@@ -138,11 +140,20 @@ const FeedPageContent = observer(() => {
 							'Sorry, an error occured during feed loading. Please, try again later.'
 						)}
 					</ErrorMessage>
+				) : feed.loading ? (
+					<div className={css.loader}>
+						<YlideLoader reason="Your feed is loading ..." />
+					</div>
 				) : (
-					feed.loading && (
-						<div className={css.loader}>
-							<YlideLoader reason="Your feed is loading ..." />
-						</div>
+					canLoadFeed || (
+						<ErrorMessage look={ErrorMessageLook.INFO}>
+							<div>
+								You need to connect a crypto wallet in order to use <b>Smart feed</b> 🔥
+							</div>
+							<ActionButton look={ActionButtonLook.PRIMARY} onClick={() => connectAccount()}>
+								Connect account
+							</ActionButton>
+						</ErrorMessage>
 					)
 				)}
 			</div>
