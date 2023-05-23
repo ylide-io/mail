@@ -1,10 +1,13 @@
 import { EthereumBlockchainController } from '@ylide/ethereum';
+import { EverscaleBlockchainController } from '@ylide/everscale';
 import {
 	AbstractBlockchainController,
 	BlockchainSourceType,
+	IBlockchainSourceSubject,
 	IMessage,
 	IMessageWithSource,
 	ISourceWithMeta,
+	ListSource,
 	ListSourceDrainer,
 	ListSourceMultiplexer,
 	SourceReadingSession,
@@ -93,88 +96,100 @@ export class MailList {
 	@observable isNextPageAvailable = true;
 	@observable messages: ILinkedMessage[] = [];
 
-	private readonly stream: ListSourceDrainer;
+	private stream: ListSourceDrainer | undefined;
 
 	constructor(props: {
 		mailbox?: { folderId: FolderId; sender?: string; filter?: (id: string) => boolean };
 		venomFeed?: { account: DomainAccount };
 	}) {
-		const { mailbox, venomFeed } = props;
-
-		if (mailbox) {
-			function buildMailboxSources(): ISourceWithMeta[] {
-				invariant(mailbox);
-
-				function getDirectWithMeta(
-					recipient: Uint256,
-					sender: string | null,
-					account: DomainAccount,
-				): ISourceWithMeta[] {
-					return domain.ylide.core
-						.getListSources(mailStore.readingSession, [
-							{
-								feedId: YLIDE_MAIN_FEED_ID,
-								type: BlockchainSourceType.DIRECT,
-								recipient,
-								sender,
-							},
-						])
-						.map(source => ({ source, meta: { account } }));
-				}
-
-				const activeAccounts = domain.accounts.activeAccounts;
-
-				if (mailbox.folderId === FolderId.Inbox || mailbox.folderId === FolderId.Archive) {
-					return activeAccounts
-						.map(acc => getDirectWithMeta(acc.uint256Address, mailbox.sender || null, acc))
-						.flat();
-				} else if (mailbox.folderId === FolderId.Sent) {
-					return activeAccounts.map(acc => getDirectWithMeta(acc.sentAddress, null, acc)).flat();
-				} else {
-					const tag = tags.tags.find(t => String(t.id) === mailbox.folderId);
-					if (!tag) {
-						return [];
-					}
-					const contactsV = contacts.contacts.filter(c => c.tags.includes(tag.id));
-					return contactsV
-						.map(v => activeAccounts.map(acc => getDirectWithMeta(acc.uint256Address, v.address, acc)))
-						.flat()
-						.flat();
-				}
-			}
-
-			this.stream = new ListSourceDrainer(new ListSourceMultiplexer(buildMailboxSources()));
-
-			this.stream.resetFilter(m => {
-				return mailbox.filter ? mailbox.filter(wrapMessageId(m)) : true;
-			});
-		} else if (venomFeed) {
-			function buildVenomFources(): ISourceWithMeta[] {
-				invariant(venomFeed);
-
-				return domain.ylide.core
-					.getListSources(mailStore.readingSession, [
-						{
-							feedId: '0000000000000000000000000000000000000000000000000000000000000004' as Uint256,
-							type: BlockchainSourceType.BROADCAST,
-							sender: null,
-						},
-					])
-					.map(source => ({ source, meta: { account: venomFeed.account } }));
-			}
-
-			this.stream = new ListSourceDrainer(new ListSourceMultiplexer(buildVenomFources()));
-		} else {
-			throw new Error('Cannot init list sources');
-		}
-
-		this.stream.on('messages', this.onNewMessages);
-
-		this.stream.resume().then(() => {
-			this.loadNextPage();
-		});
-
 		makeObservable(this);
+
+		(async () => {
+			const { mailbox, venomFeed } = props;
+
+			if (mailbox) {
+				function buildMailboxSources(): ISourceWithMeta[] {
+					invariant(mailbox);
+
+					function getDirectWithMeta(
+						recipient: Uint256,
+						sender: string | null,
+						account: DomainAccount,
+					): ISourceWithMeta[] {
+						return domain.ylide.core
+							.getListSources(mailStore.readingSession, [
+								{
+									feedId: YLIDE_MAIN_FEED_ID,
+									type: BlockchainSourceType.DIRECT,
+									recipient,
+									sender,
+								},
+							])
+							.map(source => ({ source, meta: { account } }));
+					}
+
+					const activeAccounts = domain.accounts.activeAccounts;
+
+					if (mailbox.folderId === FolderId.Inbox || mailbox.folderId === FolderId.Archive) {
+						return activeAccounts
+							.map(acc => getDirectWithMeta(acc.uint256Address, mailbox.sender || null, acc))
+							.flat();
+					} else if (mailbox.folderId === FolderId.Sent) {
+						return activeAccounts.map(acc => getDirectWithMeta(acc.sentAddress, null, acc)).flat();
+					} else {
+						const tag = tags.tags.find(t => String(t.id) === mailbox.folderId);
+						if (!tag) {
+							return [];
+						}
+						const contactsV = contacts.contacts.filter(c => c.tags.includes(tag.id));
+						return contactsV
+							.map(v => activeAccounts.map(acc => getDirectWithMeta(acc.uint256Address, v.address, acc)))
+							.flat()
+							.flat();
+					}
+				}
+
+				this.stream = new ListSourceDrainer(new ListSourceMultiplexer(buildMailboxSources()));
+
+				this.stream.resetFilter(m => {
+					return mailbox.filter ? mailbox.filter(wrapMessageId(m)) : true;
+				});
+			} else if (venomFeed) {
+				async function buildVenomFources(): Promise<ISourceWithMeta[]> {
+					invariant(venomFeed);
+
+					const blockchainController = domain.blockchains['venom-testnet'] as EverscaleBlockchainController;
+					const venomFeedId = '0000000000000000000000000000000000000000000000000000000000000004' as Uint256;
+					const composedFeedId = await blockchainController.getComposedFeedId(venomFeedId, 1);
+					const blockchainSubject: IBlockchainSourceSubject = {
+						feedId: composedFeedId,
+						type: BlockchainSourceType.BROADCAST,
+						sender: null,
+						blockchain: 'venom-testnet',
+						id: 'venom-global-feed',
+					};
+					const originalSource = blockchainController.ininiateMessagesSource(blockchainSubject);
+					const listSource = new ListSource(mailStore.readingSession, blockchainSubject, originalSource);
+
+					return [
+						{
+							source: listSource,
+							meta: { account: venomFeed.account },
+						},
+					];
+				}
+
+				this.stream = new ListSourceDrainer(new ListSourceMultiplexer(await buildVenomFources()));
+			} else {
+				throw new Error('Cannot init list sources');
+			}
+
+			this.stream.on('messages', this.onNewMessages);
+
+			this.stream.resume().then(() => {
+				this.loadNextPage();
+			});
+		})();
 	}
 
 	@autobind
@@ -183,13 +198,15 @@ export class MailList {
 	}
 
 	loadNextPage() {
+		if (this.isLoading || !this.isNextPageAvailable) return;
+
 		this.isLoading = true;
 
-		this.stream.readMore(MailPageSize).then(messages => {
+		this.stream?.readMore(MailPageSize).then(messages => {
 			wrapMessages(messages).then(wrapped => {
 				transaction(() => {
 					this.messages = wrapped;
-					this.isNextPageAvailable = !this.stream.drained;
+					this.isNextPageAvailable = !this.stream?.drained;
 					this.isLoading = false;
 				});
 			});
@@ -197,8 +214,8 @@ export class MailList {
 	}
 
 	destroy() {
-		this.stream.pause();
-		this.stream.off('messages', this.onNewMessages);
+		this.stream?.pause();
+		this.stream?.off('messages', this.onNewMessages);
 	}
 }
 
