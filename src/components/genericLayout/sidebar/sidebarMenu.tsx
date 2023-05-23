@@ -19,7 +19,6 @@ import { ReactComponent as LinkedInSvg } from '../../../icons/social/linkedIn.sv
 import { ReactComponent as MediumSvg } from '../../../icons/social/medium.svg';
 import { ReactComponent as TelegramSvg } from '../../../icons/social/telegram.svg';
 import { ReactComponent as TwitterSvg } from '../../../icons/social/twitter.svg';
-import { sideAllTopicsIcon } from '../../../icons/static/sideAllTopicsIcon';
 import { sideAnalyticsIcon } from '../../../icons/static/sideAnalyticsIcon';
 import { sideCultureIcon } from '../../../icons/static/sideCultureIcon';
 import { sideEducationIcon } from '../../../icons/static/sideEducationIcon';
@@ -33,7 +32,7 @@ import { FeedSettingsPopup } from '../../../pages/feed/components/feedSettingsPo
 import { WidgetId } from '../../../pages/widgets/widgets';
 import { browserStorage } from '../../../stores/browserStorage';
 import domain from '../../../stores/Domain';
-import { getFeedCategoryName, nonSyntheticFeedCategories } from '../../../stores/Feed';
+import { getFeedCategoryName } from '../../../stores/Feed';
 import { FolderId } from '../../../stores/MailList';
 import { RoutePath } from '../../../stores/routePath';
 import { useOpenMailCopmpose } from '../../../utils/mail';
@@ -149,8 +148,6 @@ export enum Section {
 
 const getFeedCategoryIcon = (category: FeedCategory) => {
 	return {
-		[FeedCategory.MAIN]: sideFeedIcon(14),
-		[FeedCategory.ALL]: sideAllTopicsIcon(15),
 		[FeedCategory.MARKETS]: sideMarketsIcon(15),
 		[FeedCategory.ANALYTICS]: sideAnalyticsIcon(15),
 		[FeedCategory.PROJECTS]: sideProjectsIcon(15),
@@ -183,8 +180,8 @@ export const SidebarMenu = observer(() => {
 				<SidebarSection section={Section.FEED} title="Feed">
 					<SidebarButton
 						href={generatePath(RoutePath.FEED_SMART)}
-						icon={getFeedCategoryIcon(FeedCategory.MAIN)}
-						name={getFeedCategoryName(FeedCategory.MAIN)}
+						icon={sideFeedIcon(14)}
+						name="Smart feed"
 					/>
 
 					{domain.accounts.activeAccounts.map(account => (
@@ -198,7 +195,7 @@ export const SidebarMenu = observer(() => {
 				</SidebarSection>
 
 				<SidebarSection section={Section.FEED_DISCOVERY} title="Discovery">
-					{nonSyntheticFeedCategories.map(category => (
+					{Object.values<FeedCategory>(FeedCategory).map(category => (
 						<SidebarButton
 							href={generatePath(RoutePath.FEED_CATEGORY, { category })}
 							icon={getFeedCategoryIcon(category)}

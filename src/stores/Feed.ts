@@ -1,22 +1,11 @@
 import { makeObservable, observable } from 'mobx';
 
 import { FeedCategory, FeedPost, FeedServerApi, FeedSourceUserRelation } from '../api/feedServerApi';
-import { randomArrayElem } from '../utils/array';
 import { analytics } from './Analytics';
 import { browserStorage } from './browserStorage';
 
-export const nonSyntheticFeedCategories = Object.values<FeedCategory>(FeedCategory).filter(
-	it => it !== FeedCategory.MAIN && it !== FeedCategory.ALL,
-);
-
 export function getFeedCategoryName(category: FeedCategory) {
-	if (category === FeedCategory.MAIN) {
-		return 'Smart feed';
-	} else if (category === FeedCategory.ALL) {
-		return 'All topics';
-	} else {
-		return category;
-	}
+	return category;
 }
 
 const FEED_PAGE_SIZE = 10;
@@ -55,19 +44,9 @@ export class FeedStore {
 		try {
 			this.loading = true;
 
-			const sourceListId =
-				this.category === FeedCategory.MAIN && !this.sourceId
-					? browserStorage.feedSourceSettings?.listId
-					: undefined;
+			const sourceListId = !this.sourceId ? browserStorage.feedSourceSettings?.listId : undefined;
 
-			const categories =
-				this.sourceId || sourceListId || !this.category
-					? undefined
-					: this.category === FeedCategory.MAIN
-					? nonSyntheticFeedCategories
-					: this.category === FeedCategory.ALL
-					? nonSyntheticFeedCategories
-					: [this.category];
+			const categories = this.sourceId || sourceListId || !this.category ? undefined : [this.category];
 
 			const response = await FeedServerApi.getPosts({
 				...params,

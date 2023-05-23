@@ -16,8 +16,6 @@ export interface FeedSource {
 }
 
 export enum FeedCategory {
-	MAIN = 'main',
-	ALL = 'all',
 	MARKETS = 'Markets',
 	ANALYTICS = 'Analytics',
 	PROJECTS = 'Projects',

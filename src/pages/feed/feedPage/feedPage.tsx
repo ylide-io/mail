@@ -76,7 +76,7 @@ const FeedPageContent = observer(() => {
 
 	return (
 		<NarrowContent
-			title={getFeedCategoryName(feed.category || FeedCategory.MAIN)}
+			title={feed.category ? getFeedCategoryName(feed.category) : feed.sourceId ? 'Feed' : 'Smart feed'}
 			titleSubItem={
 				!!source && (
 					<ActionButton
