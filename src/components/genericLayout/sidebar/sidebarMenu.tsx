@@ -202,13 +202,15 @@ export const SidebarMenu = observer(() => {
 				>
 					<SidebarButton href={generatePath(RoutePath.FEED_ALL)} icon={sideFeedIcon(14)} name="All topics" />
 
-					{Object.values<FeedCategory>(FeedCategory).map(category => (
-						<SidebarButton
-							href={generatePath(RoutePath.FEED_CATEGORY, { category })}
-							icon={getFeedCategoryIcon(category)}
-							name={getFeedCategoryName(category)}
-						/>
-					))}
+					{Object.values<FeedCategory>(FeedCategory)
+						.filter(c => c !== FeedCategory.POLICY && c !== FeedCategory.EDUCATION)
+						.map(category => (
+							<SidebarButton
+								href={generatePath(RoutePath.FEED_CATEGORY, { category })}
+								icon={getFeedCategoryIcon(category)}
+								name={getFeedCategoryName(category)}
+							/>
+						))}
 
 					{isFeedSettingsOpen && <FeedSettingsPopup onClose={() => setFeedSettingsOpen(false)} />}
 				</SidebarSection>
