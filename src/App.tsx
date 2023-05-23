@@ -146,7 +146,7 @@ const App = observer(() => {
 					/>
 				</Routes>
 
-				{domain.txPlateVisible && <TransactionPopup />}
+				{domain.txPlateVisible && REACT_APP__APP_MODE !== AppMode.MAIN_VIEW && <TransactionPopup />}
 
 				<StaticComponentManager />
 				<ToastManager />
