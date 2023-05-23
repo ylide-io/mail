@@ -128,11 +128,10 @@ export function FeedPostItem({ isInFeed, post }: FeedPostItemProps) {
 				</div>
 
 				<div className={css.metaRight}>
-					{post.userRelation && (
+					{post.userRelation && post.userRelation !== FeedSourceUserRelation.NONE && (
 						<div className={css.reason} title="The reason why you see this post">
 							{
 								{
-									[FeedSourceUserRelation.NONE]: 'Added manually ',
 									[FeedSourceUserRelation.HOLDING_TOKEN]: "You're holding ",
 									[FeedSourceUserRelation.HELD_TOKEN]: 'You held ',
 									[FeedSourceUserRelation.USING_PROJECT]: "You're in ",
