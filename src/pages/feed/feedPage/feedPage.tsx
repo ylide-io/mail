@@ -179,7 +179,11 @@ const VenomFeedContent = observer(() => {
 	const feed = useMemo(() => {
 		if (!venomAccounts.length) return;
 
-		return new MailList({ venomFeed: { account: venomAccounts[0] } });
+		const list = new MailList();
+
+		list.init({ venomFeed: { account: venomAccounts[0] } });
+
+		return list;
 	}, [venomAccounts]);
 
 	useEffect(() => () => feed?.destroy(), [feed]);

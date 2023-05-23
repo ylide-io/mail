@@ -67,13 +67,17 @@ export const MailDetailsPage = observer(() => {
 	const threadMailList = useMemo(() => {
 		if (folderId !== FolderId.Inbox || !initialMessage?.msg.senderAddress) return;
 
-		return new MailList({
+		const list = new MailList();
+
+		list.init({
 			mailbox: {
 				folderId: FolderId.Inbox,
 				sender: initialMessage?.msg.senderAddress,
 				filter: (id: string) => !deletedMessageIds.has(id),
 			},
 		});
+
+		return list;
 	}, [deletedMessageIds, folderId, initialMessage?.msg.senderAddress]);
 
 	useEffect(() => () => threadMailList?.destroy(), [threadMailList]);
