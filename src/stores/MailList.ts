@@ -92,6 +92,8 @@ export interface ILinkedMessage {
 }
 
 export class MailList {
+	private isDestroyed = false;
+
 	@observable isLoading = true;
 	@observable isNextPageAvailable = true;
 	@observable messages: ILinkedMessage[] = [];
@@ -185,6 +187,8 @@ export class MailList {
 			throw new Error('Cannot init list sources');
 		}
 
+		if (this.isDestroyed) return;
+
 		this.stream.on('messages', this.onNewMessages);
 
 		this.stream.resume().then(() => {
@@ -198,9 +202,12 @@ export class MailList {
 	}
 
 	loadNextPage() {
+		invariant(this.stream, 'Mail list not ready yet');
+		invariant(!this.isDestroyed, 'Mail destroyed already');
+
 		this.isLoading = true;
 
-		this.stream?.readMore(MailPageSize).then(messages => {
+		this.stream.readMore(MailPageSize).then(messages => {
 			wrapMessages(messages).then(wrapped => {
 				transaction(() => {
 					this.messages = wrapped;
@@ -212,6 +219,8 @@ export class MailList {
 	}
 
 	destroy() {
+		this.isDestroyed = true;
+
 		this.stream?.pause();
 		this.stream?.off('messages', this.onNewMessages);
 	}
