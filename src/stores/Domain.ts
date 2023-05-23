@@ -596,6 +596,11 @@ export function useDomainAccounts() {
 	return accounts;
 }
 
+export function useVenomAccounts() {
+	const accounts = useDomainAccounts();
+	return accounts.filter(a => a.wallet.wallet === 'venomwallet');
+}
+
 //@ts-ignore
 const domain = (window.domain = new Domain());
 export default domain;

@@ -97,9 +97,9 @@ export class MailList {
 
 	constructor(props: {
 		mailbox?: { folderId: FolderId; sender?: string; filter?: (id: string) => boolean };
-		venom?: { isVenom?: boolean };
+		venomFeed?: { account: DomainAccount };
 	}) {
-		const { mailbox, venom } = props;
+		const { mailbox, venomFeed } = props;
 
 		if (mailbox) {
 			function buildMailboxSources(): ISourceWithMeta[] {
@@ -148,21 +148,19 @@ export class MailList {
 			this.stream.resetFilter(m => {
 				return mailbox.filter ? mailbox.filter(wrapMessageId(m)) : true;
 			});
-		} else if (venom) {
+		} else if (venomFeed) {
 			function buildVenomFources(): ISourceWithMeta[] {
-				return domain.accounts.activeAccounts
-					.map(account =>
-						domain.ylide.core
-							.getListSources(mailStore.readingSession, [
-								{
-									feedId: '0000000000000000000000000000000000000000000000000000000000000004' as Uint256,
-									type: BlockchainSourceType.BROADCAST,
-									sender: null,
-								},
-							])
-							.map(source => ({ source, meta: { account } })),
-					)
-					.flat();
+				invariant(venomFeed);
+
+				return domain.ylide.core
+					.getListSources(mailStore.readingSession, [
+						{
+							feedId: '0000000000000000000000000000000000000000000000000000000000000004' as Uint256,
+							type: BlockchainSourceType.BROADCAST,
+							sender: null,
+						},
+					])
+					.map(source => ({ source, meta: { account: venomFeed.account } }));
 			}
 
 			this.stream = new ListSourceDrainer(new ListSourceMultiplexer(buildVenomFources()));

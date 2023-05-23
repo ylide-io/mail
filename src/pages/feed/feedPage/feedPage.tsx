@@ -11,7 +11,7 @@ import { YlideLoader } from '../../../components/ylideLoader/ylideLoader';
 import { AppMode, REACT_APP__APP_MODE } from '../../../env';
 import { ReactComponent as ArrowUpSvg } from '../../../icons/ic20/arrowUp.svg';
 import { ReactComponent as CrossSvg } from '../../../icons/ic20/cross.svg';
-import { useDomainAccounts } from '../../../stores/Domain';
+import { useDomainAccounts, useVenomAccounts } from '../../../stores/Domain';
 import { FeedStore, getFeedCategoryName } from '../../../stores/Feed';
 import { MailList } from '../../../stores/MailList';
 import { RoutePath } from '../../../stores/routePath';
@@ -174,11 +174,15 @@ const RegularFeedContent = observer(() => {
 });
 
 const VenomFeedContent = observer(() => {
-	const feed = useMemo(() => {
-		return new MailList({ venom: { isVenom: true } });
-	}, []);
+	const venomAccounts = useVenomAccounts();
 
-	useEffect(() => () => feed.destroy(), [feed]);
+	const feed = useMemo(() => {
+		if (!venomAccounts.length) return;
+
+		return new MailList({ venomFeed: { account: venomAccounts[0] } });
+	}, [venomAccounts]);
+
+	useEffect(() => () => feed?.destroy(), [feed]);
 
 	return (
 		<NarrowContent title="Venom feed">
