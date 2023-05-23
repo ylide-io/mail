@@ -1,6 +1,6 @@
 import { useState } from 'react';
 
-import { ActionButtonLook } from '../ActionButton/ActionButton';
+import { ActionButton, ActionButtonLook, ActionButtonSize } from '../ActionButton/ActionButton';
 import { ActionModal } from '../actionModal/actionModal';
 import { ForgotPasswordModal } from '../forgotPasswordModal/forgotPasswordModal';
 import { showStaticComponent } from '../staticComponentManager/staticComponentManager';
@@ -47,16 +47,16 @@ export function PasswordRequestModal({ reason, onClose }: PasswordRequestModalPr
 				</>
 			}
 			buttons={[
-				{
-					title: 'Confirm',
-					look: ActionButtonLook.PRIMARY,
-					onClick: () => onClose?.(password),
-				},
-				{
-					title: 'Cancel',
-					look: ActionButtonLook.LITE,
-					onClick: () => onClose?.(),
-				},
+				<ActionButton
+					size={ActionButtonSize.XLARGE}
+					look={ActionButtonLook.PRIMARY}
+					onClick={() => onClose?.(password)}
+				>
+					Confirm
+				</ActionButton>,
+				<ActionButton size={ActionButtonSize.XLARGE} look={ActionButtonLook.LITE} onClick={() => onClose?.()}>
+					Cancel
+				</ActionButton>,
 			]}
 		/>
 	);

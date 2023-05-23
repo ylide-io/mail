@@ -14,10 +14,11 @@ export enum TagInputItemLook {
 
 interface TagInputItemProps extends PropsWithChildren<{}>, PropsWithClassName {
 	look?: TagInputItemLook;
+	title?: string;
 	onRemove?: () => void;
 }
 
-export function TagInputItem({ children, className, look, onRemove, ...props }: TagInputItemProps) {
+export function TagInputItem({ children, className, look, title, onRemove, ...props }: TagInputItemProps) {
 	const styleClass = {
 		[TagInputItemLook.DEFAULT]: css.tag_default,
 		[TagInputItemLook.LOADING]: css.tag_loading,
@@ -26,7 +27,12 @@ export function TagInputItem({ children, className, look, onRemove, ...props }: 
 	}[look || TagInputItemLook.DEFAULT];
 
 	return (
-		<div className={clsx(css.tag, styleClass, className)} onMouseUp={e => e.stopPropagation()} {...props}>
+		<div
+			className={clsx(css.tag, styleClass, className)}
+			title={title}
+			onMouseUp={e => e.stopPropagation()}
+			{...props}
+		>
 			<div className={css.tagContent}>{children}</div>
 
 			{onRemove && (

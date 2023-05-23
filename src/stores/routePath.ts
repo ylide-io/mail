@@ -1,6 +1,7 @@
 export enum RoutePath {
 	TEST = '/test',
 	ADMIN = '/admin',
+	ADMIN_FEED = '/admin/feed',
 
 	ROOT = '/',
 	ANY = '/*',
@@ -20,7 +21,10 @@ export enum RoutePath {
 
 	FEED = '/feed',
 	FEED_POST = '/feed/post/:id',
-	FEED_CATEGORY = '/feed/:category',
+	FEED_CATEGORY = '/feed/category/:category',
+	FEED_SOURCE = '/feed/source/:source',
+	FEED_SMART = '/feed/smart',
+	FEED_SMART_ADDRESS = '/feed/smart/:address',
 
 	OTC_ASSETS = '/otc/assets',
 	OTC_WALLETS = '/otc/wallets',
@@ -29,7 +33,6 @@ export enum RoutePath {
 
 	// WIDGETS
 
-	WIDGET = '/widget',
 	SEND_MESSAGE_WIDGET = '/widget/send-message',
 	MAILBOX_WIDGET = '/widget/mailbox',
 }

@@ -3,6 +3,7 @@ import { ExternalYlidePublicKey, IGenericAccount, ServiceCode, YlideCore, YlideK
 import { computed, makeAutoObservable, observable } from 'mobx';
 
 import { isBytesEqual } from '../../utils/isBytesEqual';
+import { browserStorage } from '../browserStorage';
 import { Wallet } from './Wallet';
 
 export class DomainAccount {
@@ -13,7 +14,6 @@ export class DomainAccount {
 	private _name: string;
 
 	@observable remoteKey: ExternalYlidePublicKey | null = null;
-
 	@observable remoteKeys: Record<string, ExternalYlidePublicKey | null> = {};
 
 	constructor(wallet: Wallet, account: IGenericAccount, key: YlideKey, keyVersion: number, name: string) {
@@ -92,5 +92,20 @@ export class DomainAccount {
 				network: preferredNetwork,
 			},
 		);
+	}
+
+	async makeMainViewKey() {
+		return await this.wallet.constructMainViewKey(this.account);
+	}
+
+	get mainViewKey() {
+		return browserStorage.mainViewKeys[this.account.address] || '';
+	}
+
+	set mainViewKey(key: string) {
+		browserStorage.mainViewKeys = {
+			...browserStorage.mainViewKeys,
+			[this.account.address]: key || undefined,
+		};
 	}
 }

@@ -6,7 +6,7 @@ import { browserStorage } from '../../stores/browserStorage';
 export const SettingsPage = () => {
 	return (
 		<GenericLayout>
-			<div className="mail-page animated fadeInRight">
+			<div className="mail-page">
 				<div className="mail-top contacts-mail-top">
 					<div className="mail-header">
 						<h2 className="mailbox-title">Settings</h2>
@@ -17,7 +17,7 @@ export const SettingsPage = () => {
 						<span style={{ marginRight: 50 }}>Save decoded mails to internal storage</span>
 						<input
 							checked={browserStorage.saveDecodedMessages}
-							onChange={() => browserStorage.saveDecodedMessages = !browserStorage.saveDecodedMessages}
+							onChange={() => (browserStorage.saveDecodedMessages = !browserStorage.saveDecodedMessages)}
 							type="checkbox"
 						/>
 					</div>

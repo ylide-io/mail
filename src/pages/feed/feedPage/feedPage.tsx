@@ -1,21 +1,25 @@
 import { observer } from 'mobx-react';
-import React, { useEffect, useRef, useState } from 'react';
-import { useParams, useSearchParams } from 'react-router-dom';
+import React, { useEffect, useMemo, useRef } from 'react';
+import { generatePath, useParams } from 'react-router-dom';
 
+import { FeedCategory, FeedServerApi } from '../../../api/feedServerApi';
 import { ActionButton, ActionButtonLook, ActionButtonSize } from '../../../components/ActionButton/ActionButton';
-import { ErrorMessage } from '../../../components/errorMessage/errorMessage';
+import { ErrorMessage, ErrorMessageLook } from '../../../components/errorMessage/errorMessage';
 import { NarrowContent } from '../../../components/genericLayout/content/narrowContent/narrowContent';
 import { GenericLayout, useGenericLayoutApi } from '../../../components/genericLayout/genericLayout';
 import { YlideLoader } from '../../../components/ylideLoader/ylideLoader';
 import { ReactComponent as ArrowUpSvg } from '../../../icons/ic20/arrowUp.svg';
 import { ReactComponent as CrossSvg } from '../../../icons/ic20/cross.svg';
-import { browserStorage } from '../../../stores/browserStorage';
-import feed, { FeedCategory } from '../../../stores/Feed';
+import { useDomainAccounts } from '../../../stores/Domain';
+import { FeedStore, getFeedCategoryName } from '../../../stores/Feed';
+import { RoutePath } from '../../../stores/routePath';
+import { connectAccount } from '../../../utils/account';
 import { useNav } from '../../../utils/url';
 import { FeedPostItem } from '../components/feedPostItem/feedPostItem';
 import css from './feedPage.module.scss';
+import ErrorCode = FeedServerApi.ErrorCode;
 
-function isInViewport(element: HTMLDivElement) {
+function isInViewport(element: Element) {
 	const rect = element.getBoundingClientRect();
 	return rect.top >= -100 && rect.top <= (window.innerHeight || document.documentElement.clientHeight);
 }
@@ -26,69 +30,57 @@ const FeedPageContent = observer(() => {
 
 	const lastPostView = useRef<HTMLDivElement>(null);
 	const feedBodyRef = useRef<HTMLDivElement>(null);
-	const [newPostsVisible, setNewPostsVisible] = useState(false);
-	const { category } = useParams<{ category: FeedCategory }>();
-	const [searchParams] = useSearchParams();
-	const sourceId = searchParams.get('sourceId') || undefined;
+	const { category, source, address } = useParams<{ category: FeedCategory; source: string; address: string }>();
 
-	const sourceListId = browserStorage.feedSourceSettings?.listId;
-	const [lastSourceListId, setLastSourceListId] = useState(sourceListId);
+	const accounts = useDomainAccounts();
+	const selectedAccount = accounts.find(a => a.account.address === address);
 
-	// Re-load when category changes
+	// We can only load category sections; We can NOT load smart feed
+	const canLoadFeed = !!category || (!!accounts.length && accounts.every(a => a.mainViewKey));
+
 	useEffect(() => {
-		genericLayoutApi.scrollToTop();
-		feed.loadCategory(category!, sourceId);
-	}, [category, sourceId]);
-
-	// Re-load when source-list changes
-	useEffect(() => {
-		if (lastSourceListId !== sourceListId) {
-			setLastSourceListId(sourceListId);
-
-			if (category === FeedCategory.MAIN) {
-				genericLayoutApi.scrollToTop();
-				feed.loadCategory(category, sourceId);
-			}
+		if (address && !selectedAccount) {
+			navigate(generatePath(RoutePath.FEED));
 		}
-	}, [category, lastSourceListId, sourceId, sourceListId]);
+	}, [address, navigate, selectedAccount]);
+
+	// TODO Reload when feed settings changes
+
+	const feed = useMemo(() => {
+		const feed = new FeedStore({
+			category,
+			sourceId: source,
+			addressTokens: selectedAccount
+				? [selectedAccount.mainViewKey]
+				: !category && !source
+				? accounts.map(a => a.mainViewKey)
+				: undefined,
+		});
+
+		genericLayoutApi.scrollToTop();
+
+		if (canLoadFeed) {
+			feed.load();
+		}
+
+		return feed;
+	}, [accounts, canLoadFeed, category, genericLayoutApi, selectedAccount, source]);
 
 	useEffect(() => {
 		const timer = setInterval(async () => {
-			if (lastPostView.current && isInViewport(lastPostView.current) && !feed.loading && feed.moreAvailable) {
-				await feed.loadMore(10);
-			}
-
-			if (feedBodyRef.current && feedBodyRef.current.getBoundingClientRect().top < 0) {
-				setNewPostsVisible(true);
-			} else {
-				setNewPostsVisible(false);
+			if (lastPostView.current && isInViewport(lastPostView.current) && feed.moreAvailable) {
+				await feed.loadMore();
 			}
 		}, 300);
 
 		return () => clearInterval(timer);
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [feed.loading, feed.moreAvailable]);
-
-	const showNewPosts = async () => {
-		genericLayoutApi.scrollToTop();
-		await feed.loadNew();
-	};
-
-	let title;
-
-	if (feed.selectedCategory === FeedCategory.MAIN) {
-		title = 'My feed';
-	} else if (feed.selectedCategory === FeedCategory.ALL) {
-		title = 'All topics';
-	} else {
-		title = feed.selectedCategory;
-	}
+	}, [feed]);
 
 	return (
 		<NarrowContent
-			title={title}
+			title={feed.category ? getFeedCategoryName(feed.category) : feed.sourceId ? 'Feed' : 'Smart feed'}
 			titleSubItem={
-				!!sourceId && (
+				!!source && (
 					<ActionButton
 						look={ActionButtonLook.PRIMARY}
 						icon={<CrossSvg />}
@@ -100,31 +92,23 @@ const FeedPageContent = observer(() => {
 			}
 			titleRight={
 				!!feed.newPosts && (
-					<ActionButton look={ActionButtonLook.SECONDARY} onClick={showNewPosts}>
+					<ActionButton look={ActionButtonLook.SECONDARY} onClick={() => feed.loadNew()}>
 						Show {feed.newPosts} new posts
 					</ActionButton>
 				)
 			}
 		>
-			<ActionButton
-				className={css.scrollToTop}
-				size={ActionButtonSize.XLARGE}
-				look={ActionButtonLook.SECONDARY}
-				icon={<ArrowUpSvg />}
-				onClick={() => genericLayoutApi.scrollToTop()}
-			/>
+			{!!feed.posts.length && (
+				<ActionButton
+					className={css.scrollToTop}
+					size={ActionButtonSize.XLARGE}
+					look={ActionButtonLook.SECONDARY}
+					icon={<ArrowUpSvg />}
+					onClick={() => genericLayoutApi.scrollToTop()}
+				/>
+			)}
 
 			<div className={css.feedBody} ref={feedBodyRef}>
-				{newPostsVisible && !!feed.newPosts && (
-					<ActionButton
-						look={ActionButtonLook.SECONDARY}
-						className={css.newPostsButton}
-						onClick={showNewPosts}
-					>
-						Show {feed.newPosts} new posts
-					</ActionButton>
-				)}
-
 				{feed.loaded ? (
 					<>
 						{feed.posts.map(post => (
@@ -133,16 +117,44 @@ const FeedPageContent = observer(() => {
 
 						{feed.moreAvailable && (
 							<div className={css.loader} ref={lastPostView}>
-								{feed.loading && <YlideLoader reason="Loading more posts ..." />}
+								<YlideLoader reason="Loading more posts ..." />
 							</div>
 						)}
 					</>
-				) : feed.errorLoading ? (
-					<ErrorMessage>Sorry, an error occured during feed loading. Please, try again later.</ErrorMessage>
-				) : (
+				) : feed.error ? (
+					<ErrorMessage
+						look={feed.error === ErrorCode.NO_POSTS_FOR_ADDRESS ? ErrorMessageLook.INFO : undefined}
+					>
+						{feed.error === ErrorCode.NO_POSTS_FOR_ADDRESS ? (
+							<>
+								<b>No posts for this account.</b>
+								<div>
+									Your crypto account doesn't have any tokens or transactions that we can use to build
+									the Feed for you. You can connect another account anytime.
+								</div>
+								<ActionButton look={ActionButtonLook.PRIMARY} onClick={() => connectAccount()}>
+									Connect another account
+								</ActionButton>
+							</>
+						) : (
+							'Sorry, an error occured during feed loading. Please, try again later.'
+						)}
+					</ErrorMessage>
+				) : feed.loading ? (
 					<div className={css.loader}>
 						<YlideLoader reason="Your feed is loading ..." />
 					</div>
+				) : (
+					canLoadFeed || (
+						<ErrorMessage look={ErrorMessageLook.INFO}>
+							<div>
+								You need to connect a crypto wallet in order to use <b>Smart feed</b> 🔥
+							</div>
+							<ActionButton look={ActionButtonLook.PRIMARY} onClick={() => connectAccount()}>
+								Connect account
+							</ActionButton>
+						</ErrorMessage>
+					)
 				)}
 			</div>
 		</NarrowContent>

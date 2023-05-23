@@ -5,17 +5,17 @@
 	grid-gap: 8px;
 	padding: 0 20px;
 	cursor: pointer;
-	border-bottom: 1px solid #f3f3f3;
+	border-bottom: 1px solid var(--border-lite-color);
 
 	&:first-child {
 		border-top: 1px solid #f3f3f3;
 	}
 
 	&:hover:not(.root_loading) {
-		background: rgba(#d9d9d9, 0.25);
+		background: var(--surface-hover-color);
 
 		&.root_error {
-			background: #ffdcdc;
+			background: rgba(var(--error-rgb-color), 0.15);
 		}
 	}
 }
@@ -32,7 +32,7 @@
 }
 
 .root_error {
-	background: #fceaea;
+	background: rgba(var(--error-rgb-color), 0.1);
 }
 
 .checkbox {
@@ -76,7 +76,7 @@
 	}
 
 	&:hover {
-		background: rgba(0, 0, 0, 0.05);
+		background: rgba(var(--shade-rgb-color), 0.05);
 	}
 }
 

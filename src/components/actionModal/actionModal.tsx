@@ -1,43 +1,24 @@
 import { ReactNode } from 'react';
 
-import { ActionButton, ActionButtonLook, ActionButtonSize } from '../ActionButton/ActionButton';
 import { Modal } from '../modal/modal';
 import css from './actionModal.module.scss';
-
-export interface ActionModalButton {
-	title: ReactNode;
-	look?: ActionButtonLook;
-	onClick: () => void;
-}
 
 export interface ActionModalProps {
 	title?: ReactNode;
 	description?: ReactNode;
-	buttons?: ActionModalButton[];
+	buttons?: ReactNode;
+	noOverlay?: boolean;
 	onClose?: () => void;
 }
 
-export function ActionModal({ title, description, buttons, onClose }: ActionModalProps) {
+export function ActionModal({ title, description, buttons, noOverlay, onClose }: ActionModalProps) {
 	return (
-		<Modal className={css.root} onClose={onClose}>
+		<Modal className={css.root} noOverlay={noOverlay} onClose={onClose}>
 			{title != null && <div className={css.title}>{title}</div>}
 
 			{description != null && <div className={css.description}>{description}</div>}
 
-			{!!buttons?.length && (
-				<div className={css.buttons}>
-					{buttons.map(button => (
-						<ActionButton
-							isMultiline
-							size={ActionButtonSize.XLARGE}
-							look={button.look}
-							onClick={() => button.onClick()}
-						>
-							{button.title}
-						</ActionButton>
-					))}
-				</div>
-			)}
+			{buttons != null && <div className={css.buttons}>{buttons}</div>}
 		</Modal>
 	);
 }

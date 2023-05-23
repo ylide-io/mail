@@ -1,11 +1,91 @@
 import { REACT_APP__FEED_SERVER } from '../env';
-import { FeedCategory, FeedPost, LinkType } from '../stores/Feed';
+import { randomArrayElem } from '../utils/array';
 import { invariant } from '../utils/assert';
 import { createCleanSerachParams } from '../utils/url';
 
+export interface FeedSource {
+	id: string;
+	category: FeedCategory;
+	name: string;
+	origin?: string;
+	avatar?: string;
+	link: string;
+	type: LinkType;
+	tokens: string[];
+	userRelation: FeedSourceUserRelation;
+}
+
+export enum FeedCategory {
+	MARKETS = 'Markets',
+	ANALYTICS = 'Analytics',
+	PROJECTS = 'Projects',
+	POLICY = 'Policy',
+	SECURITY = 'Security',
+	TECHNOLOGY = 'Technology',
+	CULTURE = 'Culture',
+	EDUCATION = 'Education',
+}
+
+export enum FeedSourceUserRelation {
+	NONE = 'NONE',
+	HOLDING_TOKEN = 'HOLDING_TOKEN',
+	HELD_TOKEN = 'HELD_TOKEN',
+	USING_PROJECT = 'USING_PROJECT',
+	USED_PROJECT = 'USED_PROJECT',
+}
+
+//
+
+export interface FeedPost {
+	id: string;
+	title: string;
+	subtitle: string;
+	content: string;
+	picrel: string;
+	sourceId: string;
+	sourceName: string;
+	sourceNickname: string;
+	serverName: string;
+	channelName: string;
+	sourceType: LinkType;
+	categories: string[];
+	date: string;
+	authorName: string;
+	authorAvatar: string;
+	authorNickname: string;
+	sourceLink: string;
+	embeds: FeedPostEmbed[];
+	thread: FeedPost[];
+	tokens: string[];
+	userRelation: FeedSourceUserRelation;
+	cryptoProjectId: string | null;
+	cryptoProjectName: string | null;
+	cryptoProjectReasons: string[];
+}
+
+export enum LinkType {
+	TELEGRAM = 'telegram',
+	TWITTER = 'twitter',
+	MEDIUM = 'medium',
+	MIRROR = 'mirror',
+	DISCORD = 'discord',
+}
+
+export interface FeedPostEmbed {
+	type: 'link-preview' | 'image' | 'video';
+	previewImageUrl: string;
+	link: string;
+	title: string;
+	text: string;
+}
+
+//
+
 export namespace FeedServerApi {
 	export enum ErrorCode {
+		REQUIRED_PARAMETERS = 'REQUIRED_PARAMETERS',
 		SOURCE_LIST_NOT_FOUND = 'SOURCE_LIST_NOT_FOUND',
+		NO_POSTS_FOR_ADDRESS = 'NO_POSTS_FOR_ADDRESS',
 	}
 
 	export class FeedServerError extends Error {
@@ -49,23 +129,20 @@ export namespace FeedServerApi {
 
 	//
 
-	export interface GetPostsParams {
-		needOld: boolean;
-		length: number;
-		categories?: string[];
-		sourceId?: string;
-		sourceListId?: string;
-		lastPostId?: string;
-		firstPostId?: string;
-	}
-
 	export type GetPostsResponse = { moreAvailable: boolean; newPosts: number; items: FeedPost[] };
 
-	export async function getPosts(params: GetPostsParams): Promise<GetPostsResponse> {
+	export async function getPosts(params: {
+		needOld: boolean;
+		length: number;
+		lastPostId?: string;
+		firstPostId?: string;
+		categories?: FeedCategory[];
+		sourceId?: string;
+		sourceListId?: string;
+		addressTokens?: string[];
+	}): Promise<GetPostsResponse> {
 		return await request(`/posts?${createCleanSerachParams(params)}`);
 	}
-
-	//
 
 	export type GetPostResponse = { post: FeedPost };
 
@@ -75,20 +152,18 @@ export namespace FeedServerApi {
 
 	//
 
-	export interface FeedSource {
-		id: string;
-		category: FeedCategory;
-		name: string;
-		origin?: string;
-		avatar?: string;
-		link: string;
-		type: LinkType;
-	}
-
 	export type GetSourcesResponse = { sources: FeedSource[] };
 
 	export async function getSources(): Promise<GetSourcesResponse> {
-		return await request('/sources');
+		const response = await request<GetSourcesResponse>('/sources');
+
+		// FIXME Temp
+		response.sources.forEach(s => {
+			s.tokens = [randomArrayElem(['BTC', 'ETH', 'USDT'])];
+			s.userRelation = randomArrayElem(Object.values(FeedSourceUserRelation));
+		});
+
+		return response;
 	}
 
 	//

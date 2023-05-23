@@ -1,19 +1,16 @@
 import {
+	EthereumMailerV8Wrapper,
 	EthereumWalletController,
 	EVM_NAMES,
 	EVMNetwork,
 	IEVMMailerContractLink,
 	IEVMRegistryContractLink,
-	EthereumMailerV8Wrapper,
 } from '@ylide/ethereum';
-import { Spin } from 'antd';
 import clsx from 'clsx';
-import { FC, useCallback, useEffect, useState } from 'react';
+import { FC, useEffect, useState } from 'react';
 
-import { AccountSelect } from '../../../components/accountSelect/accountSelect';
-import { ActionButton } from '../../../components/ActionButton/ActionButton';
 import { Modal } from '../../../components/modal/modal';
-import { YlideLoader } from '../../../components/ylideLoader/ylideLoader';
+import { Spinner } from '../../../components/spinner/spinner';
 import domain from '../../../stores/Domain';
 import { DomainAccount } from '../../../stores/models/DomainAccount';
 import { blockchainMeta } from '../../../utils/blockchain';
@@ -105,7 +102,7 @@ export const EVMMailerV8Modal: FC<EVMMailerV8ModalProps> = ({ contract, isModern
 			<div className={css.row}>
 				<div className={css.label}>Address</div>
 				<div className={clsx(css.value, css.withModificator)}>
-					<a href={`${scan}/address/${contract.contract!.address}`} target="_blank">
+					<a href={`${scan}/address/${contract.contract!.address}`} target="_blank" rel="noreferrer">
 						{contract.contract!.address}
 					</a>
 				</div>
@@ -114,9 +111,9 @@ export const EVMMailerV8Modal: FC<EVMMailerV8ModalProps> = ({ contract, isModern
 				<div className={css.label}>Owner</div>
 				<div className={clsx(css.value, css.withModificator)}>
 					{loading ? (
-						<Spin size="small" />
+						<Spinner />
 					) : (
-						<a href={`${scan}/address/${params.owner}`} target="_blank">
+						<a href={`${scan}/address/${params.owner}`} target="_blank" rel="noreferrer">
 							{params.owner}
 						</a>
 					)}
@@ -126,9 +123,9 @@ export const EVMMailerV8Modal: FC<EVMMailerV8ModalProps> = ({ contract, isModern
 				<div className={css.label}>Beneficiary</div>
 				<div className={clsx(css.value, css.withModificator)}>
 					{loading ? (
-						<Spin size="small" />
+						<Spinner />
 					) : (
-						<a href={`${scan}/address/${params.beneficiary}`} target="_blank">
+						<a href={`${scan}/address/${params.beneficiary}`} target="_blank" rel="noreferrer">
 							{params.beneficiary}
 						</a>
 					)}
@@ -138,7 +135,7 @@ export const EVMMailerV8Modal: FC<EVMMailerV8ModalProps> = ({ contract, isModern
 				<div className={css.label}>Fees</div>
 				<div className={clsx(css.value, css.withModificator)}>
 					{loading ? (
-						<Spin size="small" />
+						<Spinner />
 					) : (
 						<>
 							Fees
@@ -154,9 +151,7 @@ export const EVMMailerV8Modal: FC<EVMMailerV8ModalProps> = ({ contract, isModern
 			</div>
 			<div className={css.row}>
 				<div className={css.label}>Prices</div>
-				<div className={clsx(css.value, css.withModificator)}>
-					{loading ? <Spin size="small" /> : <>Prices</>}
-				</div>
+				<div className={clsx(css.value, css.withModificator)}>{loading ? <Spinner /> : <>Prices</>}</div>
 			</div>
 			{/* <div className={css.row}>
 				<div className={css.label}>Deployer wallet</div>

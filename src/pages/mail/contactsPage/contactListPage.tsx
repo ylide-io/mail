@@ -28,7 +28,7 @@ export const ContactListPage = observer(() => {
 					<TextField value={searchTerm} onValueChange={setSearchTerm} placeholder="Search contacts" />
 
 					{!!tags.tags.length && (
-						<Select placeholder="Filter by tag">
+						<Select placeholder="Filter by tag" text={contacts.filterByTag?.name}>
 							{onSelect => (
 								<>
 									<DropDownItem

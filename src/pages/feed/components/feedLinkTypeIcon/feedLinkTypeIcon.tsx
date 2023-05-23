@@ -1,5 +1,5 @@
+import { LinkType } from '../../../../api/feedServerApi';
 import { PropsWithClassName } from '../../../../components/props';
-import { LinkType } from '../../../../stores/Feed';
 import { ReactComponent as DiscordSvg } from './icons/discord.svg';
 import { ReactComponent as MediumSvg } from './icons/medium.svg';
 import { ReactComponent as MirrorSvg } from './icons/mirror.svg';

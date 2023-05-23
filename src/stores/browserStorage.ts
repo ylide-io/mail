@@ -1,6 +1,6 @@
 import { makeAutoObservable } from 'mobx';
 
-import { SidebarSection } from '../components/genericLayout/sidebar/sidebarMenu';
+import { Section } from '../components/genericLayout/sidebar/sidebarMenu';
 import { WidgetId } from '../pages/widgets/widgets';
 import { toggleArrayItem } from '../utils/array';
 
@@ -11,11 +11,11 @@ export interface FeedSourceSettings {
 
 enum BrowserStorageKey {
 	CAN_SKIP_REGISTRATION = 'can_skip_registration',
-	QUEST3 = 'quest3',
 	FEED_SOURCE_SETTINGS = 'ylide_feedSourceSettings',
 	SIDEBAR_FOLDED_SECTIONS = 'ylide_sidebarFoldedSections',
 	SAVE_DECODED_MESSAGES = 'ylide_saveDecodedMessages',
 	WIDGET_ID = 'ylide_widgetId',
+	MAIN_VIEW_KEYS = 'ylide_mainViewKeys',
 }
 
 class BrowserStorage {
@@ -23,8 +23,8 @@ class BrowserStorage {
 		makeAutoObservable(this);
 	}
 
-	private static getItem(key: BrowserStorageKey, storage: Storage = localStorage) {
-		return storage.getItem(key) || undefined;
+	private static getItem<T = string>(key: BrowserStorageKey, storage: Storage = localStorage) {
+		return (storage.getItem(key) as T) || undefined;
 	}
 
 	private static getItemWithTransform<T>(
@@ -59,19 +59,6 @@ class BrowserStorage {
 
 	//
 
-	private _quest3 = BrowserStorage.getItem(BrowserStorageKey.QUEST3) !== 'false';
-
-	get quest3() {
-		return this._quest3;
-	}
-
-	set quest3(value: boolean) {
-		BrowserStorage.setItem(BrowserStorageKey.QUEST3, value);
-		this._quest3 = value;
-	}
-
-	//
-
 	private _feedSourceSettings = BrowserStorage.getItemWithTransform(
 		BrowserStorageKey.FEED_SOURCE_SETTINGS,
 		item => JSON.parse(item) as FeedSourceSettings,
@@ -91,14 +78,14 @@ class BrowserStorage {
 	private _sidebarFoldedSections =
 		BrowserStorage.getItemWithTransform(
 			BrowserStorageKey.SIDEBAR_FOLDED_SECTIONS,
-			item => item.split(',') as SidebarSection[],
+			item => item.split(',') as Section[],
 		) || [];
 
-	isSidebarSectionFolded(section: SidebarSection) {
+	isSidebarSectionFolded(section: Section) {
 		return this._sidebarFoldedSections.includes(section);
 	}
 
-	toggleSidebarSectionFolding(section: SidebarSection) {
+	toggleSidebarSectionFolding(section: Section) {
 		const newValue = toggleArrayItem(this._sidebarFoldedSections, section);
 		BrowserStorage.setItem(
 			BrowserStorageKey.SIDEBAR_FOLDED_SECTIONS,
@@ -122,7 +109,7 @@ class BrowserStorage {
 
 	//
 
-	private _widgetId = BrowserStorage.getItem(BrowserStorageKey.WIDGET_ID, sessionStorage) as WidgetId | undefined;
+	private _widgetId = BrowserStorage.getItem<WidgetId>(BrowserStorageKey.WIDGET_ID, sessionStorage);
 
 	get widgetId() {
 		return this._widgetId;
@@ -131,6 +118,23 @@ class BrowserStorage {
 	set widgetId(value: WidgetId | undefined) {
 		BrowserStorage.setItem(BrowserStorageKey.WIDGET_ID, value, sessionStorage);
 		this._widgetId = value;
+	}
+
+	//
+
+	private _mainViewKeys =
+		BrowserStorage.getItemWithTransform(
+			BrowserStorageKey.MAIN_VIEW_KEYS,
+			item => JSON.parse(item) as Record<string, string | undefined>,
+		) || {};
+
+	get mainViewKeys() {
+		return this._mainViewKeys;
+	}
+
+	set mainViewKeys(value: Record<string, string | undefined>) {
+		BrowserStorage.setItem(BrowserStorageKey.MAIN_VIEW_KEYS, JSON.stringify(value));
+		this._mainViewKeys = value;
 	}
 }
 

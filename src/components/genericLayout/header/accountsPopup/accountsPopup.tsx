@@ -11,7 +11,7 @@ import { HorizontalAlignment } from '../../../../utils/alignment';
 import { walletsMeta } from '../../../../utils/wallet';
 import { ActionButton, ActionButtonLook, ActionButtonSize } from '../../../ActionButton/ActionButton';
 import { AdaptiveAddress } from '../../../adaptiveAddress/adaptiveAddress';
-import { Blockie } from '../../../blockie/blockie';
+import { Avatar } from '../../../avatar/avatar';
 import { AnchoredPopup } from '../../../popup/anchoredPopup/anchoredPopup';
 import css from './accountsPopup.module.scss';
 
@@ -32,7 +32,7 @@ export const AccountsPopup = observer(({ anchorRef, onClose }: AccountsPopupProp
 			<div className={css.content}>
 				{domain.accounts.accounts.map(account => (
 					<div key={account.account.address} className={css.item}>
-						<Blockie className={css.itemIcon} address={account.account.address} />
+						<Avatar className={css.itemIcon} blockie={account.account.address} />
 						<div className={css.itemBody}>
 							<div className={css.itemName}>
 								<div className={clsx(css.itemNameInner, !account.name && css.itemNameInner_empty)}>

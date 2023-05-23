@@ -3,12 +3,15 @@ import React, { useEffect, useState } from 'react';
 import { QueryClient, QueryClientProvider } from 'react-query';
 import { generatePath, Navigate, Route, Routes, useLocation } from 'react-router-dom';
 
+import { MainViewOnboarding } from './components/mainViewOnboarding/mainViewOnboarding';
 import { PopupManager } from './components/popup/popupManager/popupManager';
 import { StaticComponentManager } from './components/staticComponentManager/staticComponentManager';
 import { ToastManager } from './components/toast/toast';
+import { TransactionPopup } from './components/TransactionPopup/TransactionPopup';
 import { YlideLoader } from './components/ylideLoader/ylideLoader';
 import { APP_NAME } from './constants';
-import { REACT_APP__OTC_MODE } from './env';
+import { AppMode, REACT_APP__APP_MODE } from './env';
+import { AdminFeedPage } from './pages/AdminFeedPage';
 import { AdminPage } from './pages/AdminPage';
 import { FeedPage } from './pages/feed/feedPage/feedPage';
 import { FeedPostPage } from './pages/feed/feedPostPage/feedPostPage';
@@ -28,9 +31,13 @@ import { MailboxWidget } from './pages/widgets/mailboxWidget/mailboxWidget';
 import { SendMessageWidget } from './pages/widgets/sendMessageWidget/sendMessageWidget';
 import { analytics } from './stores/Analytics';
 import domain from './stores/Domain';
-import { FeedCategory } from './stores/Feed';
 import { RoutePath } from './stores/routePath';
 import walletConnect from './stores/WalletConnect';
+
+export enum AppTheme {
+	V1 = 'v1',
+	V2 = 'v2',
+}
 
 const App = observer(() => {
 	const [queryClient] = useState(
@@ -49,6 +56,7 @@ const App = observer(() => {
 
 	useEffect(() => {
 		document.title = APP_NAME;
+		document.documentElement.dataset.theme = REACT_APP__APP_MODE === AppMode.MAIN_VIEW ? AppTheme.V2 : AppTheme.V1;
 	}, []);
 
 	useEffect(() => {
@@ -97,10 +105,17 @@ const App = observer(() => {
 					<Route path={RoutePath.WALLETS} element={<NewWalletsPage />} />
 					<Route path={RoutePath.SETTINGS} element={<SettingsPage />} />
 					<Route path={RoutePath.ADMIN} element={<AdminPage />} />
+					<Route path={RoutePath.ADMIN_FEED} element={<AdminFeedPage />} />
 
-					<Route path={RoutePath.FEED} element={<FeedPage />} />
+					<Route
+						path={RoutePath.FEED}
+						element={<Navigate replace to={generatePath(RoutePath.FEED_SMART)} />}
+					/>
 					<Route path={RoutePath.FEED_POST} element={<FeedPostPage />} />
 					<Route path={RoutePath.FEED_CATEGORY} element={<FeedPage />} />
+					<Route path={RoutePath.FEED_SOURCE} element={<FeedPage />} />
+					<Route path={RoutePath.FEED_SMART} element={<FeedPage />} />
+					<Route path={RoutePath.FEED_SMART_ADDRESS} element={<FeedPage />} />
 
 					<Route path={RoutePath.MAIL_COMPOSE} element={<ComposePage />} />
 					<Route path={RoutePath.MAIL_CONTACTS} element={<ContactListPage />} />
@@ -113,26 +128,30 @@ const App = observer(() => {
 					<Route path={RoutePath.OTC_CHATS} element={<OtcChatsPage />} />
 					<Route path={RoutePath.OTC_CHAT} element={<OtcChatPage />} />
 
+					<Route path={RoutePath.SEND_MESSAGE_WIDGET} element={<SendMessageWidget />} />
+					<Route path={RoutePath.MAILBOX_WIDGET} element={<MailboxWidget />} />
+
 					<Route
 						path={RoutePath.ANY}
 						element={
 							<Navigate
 								replace
 								to={
-									REACT_APP__OTC_MODE
+									REACT_APP__APP_MODE === AppMode.OTC
 										? generatePath(RoutePath.OTC_ASSETS)
-										: generatePath(RoutePath.FEED_CATEGORY, { category: FeedCategory.MAIN })
+										: generatePath(RoutePath.FEED)
 								}
 							/>
 						}
 					/>
-
-					<Route path={RoutePath.SEND_MESSAGE_WIDGET} element={<SendMessageWidget />} />
-					<Route path={RoutePath.MAILBOX_WIDGET} element={<MailboxWidget />} />
 				</Routes>
+
+				{domain.txPlateVisible && REACT_APP__APP_MODE !== AppMode.MAIN_VIEW && <TransactionPopup />}
 
 				<StaticComponentManager />
 				<ToastManager />
+
+				{REACT_APP__APP_MODE === AppMode.MAIN_VIEW && <MainViewOnboarding />}
 			</PopupManager>
 		</QueryClientProvider>
 	);

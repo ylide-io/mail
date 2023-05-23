@@ -1,100 +1,41 @@
 import { makeObservable, observable } from 'mobx';
 
-import { FeedServerApi } from '../api/feedServerApi';
+import { FeedCategory, FeedPost, FeedServerApi, FeedSourceUserRelation } from '../api/feedServerApi';
 import { analytics } from './Analytics';
 import { browserStorage } from './browserStorage';
 
-export enum FeedCategory {
-	MAIN = 'main',
-	ALL = 'all',
-	MARKETS = 'Markets',
-	ANALYTICS = 'Analytics',
-	PROJECTS = 'Projects',
-	POLICY = 'Policy',
-	SECURITY = 'Security',
-	TECHNOLOGY = 'Technology',
-	CULTURE = 'Culture',
-	EDUCATION = 'Education',
-}
-
-export const nonSyntheticFeedCategories = Object.values(FeedCategory).filter(
-	it => it !== FeedCategory.MAIN && it !== FeedCategory.ALL,
-);
-
 export function getFeedCategoryName(category: FeedCategory) {
-	if (category === FeedCategory.MAIN) {
-		return 'My feed';
-	} else if (category === FeedCategory.ALL) {
-		return 'All topics';
-	} else {
-		return category;
-	}
+	return category;
 }
 
-export enum LinkType {
-	TELEGRAM = 'telegram',
-	TWITTER = 'twitter',
-	MEDIUM = 'medium',
-	MIRROR = 'mirror',
-	DISCORD = 'discord',
-}
+const FEED_PAGE_SIZE = 10;
 
-export interface FeedPostEmbed {
-	type: 'link-preview' | 'image' | 'video';
-	previewImageUrl: string;
-	link: string;
-	title: string;
-	text: string;
-}
-
-export interface FeedPost {
-	id: string;
-	title: string;
-	subtitle: string;
-	content: string;
-	picrel: string;
-	sourceId: string;
-	sourceName: string;
-	sourceNickname: string;
-	serverName: string;
-	channelName: string;
-	sourceType: LinkType;
-	categories: string[];
-	date: string;
-	authorName: string;
-	authorAvatar: string;
-	authorNickname: string;
-	sourceLink: string;
-	embeds: FeedPostEmbed[];
-	thread: FeedPost[];
-}
-
-class Feed {
+export class FeedStore {
 	@observable posts: FeedPost[] = [];
+
 	@observable loaded = false;
 	@observable loading = false;
+	@observable error: boolean | FeedServerApi.ErrorCode = false;
 
-	@observable selectedCategory: string = FeedCategory.MAIN;
-	@observable mainCategories: string[] = JSON.parse(
-		localStorage.getItem('t_main_categories') || JSON.stringify(nonSyntheticFeedCategories),
-	);
-
-	@observable sourceId: string | undefined;
-
-	@observable newPosts: number = 0;
+	@observable newPosts = 0;
 	@observable moreAvailable = false;
-	@observable errorLoading = false;
 
-	constructor() {
+	readonly category: FeedCategory | undefined;
+	readonly sourceId: string | undefined;
+	readonly addressTokens: string[] | undefined;
+
+	constructor(params: { category?: FeedCategory; sourceId?: string; addressTokens?: string[] }) {
+		this.category = params.category;
+		this.sourceId = params.sourceId;
+		this.addressTokens = params.addressTokens;
+
 		makeObservable(this);
-		this.loadCategory(FeedCategory.MAIN);
 	}
 
 	private async genericLoad(
 		params: {
 			needOld: boolean;
 			length: number;
-			sourceId?: string;
 			lastPostId?: string;
 			firstPostId?: string;
 		},
@@ -103,69 +44,79 @@ class Feed {
 		try {
 			this.loading = true;
 
-			const selectedCategory = this.selectedCategory;
+			const sourceListId = !this.sourceId ? browserStorage.feedSourceSettings?.listId : undefined;
 
-			const sourceListId =
-				selectedCategory === FeedCategory.MAIN && !params.sourceId
-					? browserStorage.feedSourceSettings?.listId
-					: undefined;
-
-			const categories =
-				params.sourceId || sourceListId
-					? undefined
-					: selectedCategory === FeedCategory.MAIN
-					? this.mainCategories
-					: selectedCategory === FeedCategory.ALL
-					? nonSyntheticFeedCategories
-					: [selectedCategory];
+			const categories = this.sourceId || sourceListId || !this.category ? undefined : [this.category];
 
 			const response = await FeedServerApi.getPosts({
 				...params,
 				categories,
 				sourceListId,
+				addressTokens: this.addressTokens,
+			});
+
+			// FIXME Temp
+			response.items.forEach(it => {
+				// NONE = 'NONE',
+				// HOLDING_TOKEN = 'HOLDING_TOKEN',
+				// HELD_TOKEN = 'HELD_TOKEN',
+				// USING_PROJECT = 'USING_PROJECT',
+				// USED_PROJECT = 'USED_PROJECT',
+				// it.tokens = [randomArrayElem(['BTC', 'ETH', 'USDT'])];
+				// it.userRelation = randomArrayElem(Object.values(FeedSourceUserRelation));
+				it.tokens = it.cryptoProjectName ? [it.cryptoProjectName] : [];
+				if (it.cryptoProjectReasons.includes('balance')) {
+					it.userRelation = FeedSourceUserRelation.HOLDING_TOKEN;
+				} else if (it.cryptoProjectReasons.includes('protocol')) {
+					it.userRelation = FeedSourceUserRelation.USING_PROJECT;
+				} else if (it.cryptoProjectReasons.includes('transaction')) {
+					it.userRelation = FeedSourceUserRelation.USED_PROJECT;
+				} else {
+					it.userRelation = FeedSourceUserRelation.NONE;
+				}
 			});
 
 			this.loaded = true;
-			this.errorLoading = false;
+			this.error = false;
+
+			if (params.needOld && this.category) {
+				analytics.feedPageLoaded(this.category, Math.floor(this.posts.length / FEED_PAGE_SIZE) + 1);
+			}
 
 			return response;
 		} catch (e) {
-			if (
-				e instanceof FeedServerApi.FeedServerError &&
-				e.code === FeedServerApi.ErrorCode.SOURCE_LIST_NOT_FOUND &&
-				!isRetryWithNewSourceList
-			) {
-				const sourceIds = browserStorage.feedSourceSettings?.sourceIds;
-				if (sourceIds) {
-					try {
-						const data = await FeedServerApi.createSourceList(sourceIds);
-						browserStorage.feedSourceSettings = {
-							listId: data.sourceListId,
-							sourceIds,
-						};
+			if (e instanceof FeedServerApi.FeedServerError) {
+				if (e.code !== FeedServerApi.ErrorCode.SOURCE_LIST_NOT_FOUND) {
+					this.error = e.code;
+					return;
+				} else if (!isRetryWithNewSourceList) {
+					const sourceIds = browserStorage.feedSourceSettings?.sourceIds;
+					if (sourceIds) {
+						try {
+							const data = await FeedServerApi.createSourceList(sourceIds);
+							browserStorage.feedSourceSettings = {
+								listId: data.sourceListId,
+								sourceIds,
+							};
 
-						return await this.genericLoad(params, true);
-					} catch (e) {}
+							return await this.genericLoad(params, true);
+						} catch (e) {}
+					}
 				}
 			}
 
-			this.errorLoading = true;
+			this.error = true;
 		} finally {
 			this.loading = false;
 		}
 	}
 
-	async loadCategory(id: FeedCategory, sourceId?: string) {
-		analytics.feedPageLoaded(id, 1);
-
-		this.selectedCategory = id;
-		this.sourceId = sourceId;
-		this.loaded = false;
+	async load() {
+		if (this.loading) return;
 
 		const data = await this.genericLoad({
 			needOld: true,
-			length: 10,
-			sourceId,
+			length: FEED_PAGE_SIZE,
 		});
 
 		if (data) {
@@ -175,13 +126,12 @@ class Feed {
 		}
 	}
 
-	async loadMore(length: number) {
-		analytics.feedPageLoaded(this.selectedCategory, Math.floor(this.posts.length / 10) + 1);
+	async loadMore() {
+		if (this.loading) return;
 
 		const data = await this.genericLoad({
 			needOld: true,
-			length,
-			sourceId: this.sourceId,
+			length: FEED_PAGE_SIZE,
 			lastPostId: this.posts.at(-1)?.id,
 			firstPostId: this.posts.at(0)?.id,
 		});
@@ -194,10 +144,11 @@ class Feed {
 	}
 
 	async loadNew() {
+		if (this.loading) return;
+
 		const data = await this.genericLoad({
 			needOld: false,
-			length: 10,
-			sourceId: this.sourceId,
+			length: FEED_PAGE_SIZE,
 			lastPostId: this.posts.at(-1)?.id,
 			firstPostId: this.posts.at(0)?.id,
 		});
@@ -208,8 +159,3 @@ class Feed {
 		}
 	}
 }
-
-const feed = new Feed();
-//@ts-ignore
-window.feed = feed;
-export default feed;

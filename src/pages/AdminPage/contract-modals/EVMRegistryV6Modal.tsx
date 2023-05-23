@@ -1,18 +1,20 @@
 import {
+	EthereumBlockchainController,
+	EthereumRegistryV6Wrapper,
 	EthereumWalletController,
+	EVM_CONTRACTS,
 	EVM_NAMES,
 	EVMNetwork,
 	IEVMRegistryContractLink,
-	EthereumRegistryV6Wrapper,
-	EVM_CONTRACTS,
-	EthereumBlockchainController,
 } from '@ylide/ethereum';
-import { Button, Input, Spin } from 'antd';
 import clsx from 'clsx';
 import { FC, useCallback, useEffect, useState } from 'react';
 
 import { AccountSelect } from '../../../components/accountSelect/accountSelect';
+import { ActionButton, ActionButtonSize } from '../../../components/ActionButton/ActionButton';
 import { Modal } from '../../../components/modal/modal';
+import { Spinner } from '../../../components/spinner/spinner';
+import { TextField } from '../../../components/textField/textField';
 import domain from '../../../stores/Domain';
 import { DomainAccount } from '../../../stores/models/DomainAccount';
 import { blockchainMeta } from '../../../utils/blockchain';
@@ -120,7 +122,7 @@ export const EVMRegistryV6Modal: FC<EVMRegistryV6ModalProps> = ({ contract, isMo
 				<div className={css.label}>Owner</div>
 				<div className={clsx(css.value, css.withModificator)}>
 					{loading ? (
-						<Spin size="small" />
+						<Spinner />
 					) : (
 						<a href={`${scan}/address/${params.owner}`} target="_blank" rel="noreferrer">
 							{params.owner}
@@ -132,7 +134,7 @@ export const EVMRegistryV6Modal: FC<EVMRegistryV6ModalProps> = ({ contract, isMo
 				<div className={css.label}>Bonuces</div>
 				<div className={clsx(css.value, css.withModificator)}>
 					{loading ? (
-						<Spin size="small" />
+						<Spinner />
 					) : (
 						<>
 							Newcomer: {parseFloat(params.newcomerBonus)} {symbol}
@@ -154,27 +156,27 @@ export const EVMRegistryV6Modal: FC<EVMRegistryV6ModalProps> = ({ contract, isMo
 				<div className={clsx(css.value, css.withModificator)}>
 					<div style={{ display: 'flex', flexDirection: 'column', flexGrow: 1, alignItems: 'stretch' }}>
 						<div style={{ display: 'flex', flexDirection: 'row', alignItems: 'stretch' }}>
-							<Input
+							<TextField
 								style={{ flexGrow: 1 }}
 								value={bonucerAddress}
 								onChange={e => setBonucerAddress(e.target.value)}
 							/>
-							<Button
+							<ActionButton
 								onClick={async () => {
 									checkBonucer();
 								}}
 							>
-								{bonucerLoading ? <Spin /> : 'Check'}
-							</Button>
+								{bonucerLoading ? <Spinner /> : 'Check'}
+							</ActionButton>
 						</div>
 						{isBonucer !== null ? (
 							<div style={{ marginTop: 6, display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
 								{isBonucer ? (
 									<>
 										It is bonucer{' '}
-										<Button
+										<ActionButton
 											style={{ marginLeft: 6 }}
-											size="small"
+											size={ActionButtonSize.SMALL}
 											onClick={async () => {
 												setChangeBonucerLoading(true);
 												const walletController = account.wallet
@@ -196,15 +198,15 @@ export const EVMRegistryV6Modal: FC<EVMRegistryV6ModalProps> = ({ contract, isMo
 												setIsBonucer(null);
 											}}
 										>
-											{changeBonucerLoading ? <Spin size="small" /> : 'Remove'}
-										</Button>
+											{changeBonucerLoading ? <Spinner /> : 'Remove'}
+										</ActionButton>
 									</>
 								) : (
 									<>
 										It is not bonucer{' '}
-										<Button
+										<ActionButton
 											style={{ marginLeft: 6 }}
-											size="small"
+											size={ActionButtonSize.SMALL}
 											onClick={async () => {
 												setChangeBonucerLoading(true);
 												const walletController = account.wallet
@@ -226,8 +228,8 @@ export const EVMRegistryV6Modal: FC<EVMRegistryV6ModalProps> = ({ contract, isMo
 												setIsBonucer(null);
 											}}
 										>
-											{changeBonucerLoading ? <Spin size="small" /> : 'Add'}
-										</Button>
+											{changeBonucerLoading ? <Spinner /> : 'Add'}
+										</ActionButton>
 									</>
 								)}
 							</div>

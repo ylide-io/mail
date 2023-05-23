@@ -1,3 +1,4 @@
+import { EthereumWalletController } from '@ylide/ethereum';
 import {
 	AbstractWalletController,
 	IGenericAccount,
@@ -136,6 +137,21 @@ export class Wallet extends EventEmitter {
 			account.address,
 			password,
 		);
+	}
+
+	async constructMainViewKey(account: IGenericAccount) {
+		if (!(this.controller instanceof EthereumWalletController)) {
+			throw new Error('Not implemented');
+		}
+		const messageTimestamp = Math.floor(Date.now() / 1000);
+		const sig = await this.controller.signString(
+			account,
+			`Ylide authorization, ${account.address.toLowerCase()}, timestamp: ${messageTimestamp}`,
+		);
+		return {
+			signature: sig.r + sig.s.substring(2) + sig.v.toString(16),
+			timestamp: messageTimestamp,
+		};
 	}
 
 	async readRemoteKeys(account: IGenericAccount) {

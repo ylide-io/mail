@@ -1,4 +1,5 @@
-import 'antd/dist/antd.min.css';
+import 'normalize.css';
+import 'minireset.css';
 import './styles/index.scss';
 
 import * as Sentry from '@sentry/react';

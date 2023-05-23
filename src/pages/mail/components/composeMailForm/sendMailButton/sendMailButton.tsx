@@ -1,22 +1,20 @@
-import './sendMailButton.module.scss';
-
 import { EVM_NAMES } from '@ylide/ethereum';
 import { Uint256, YMF } from '@ylide/sdk';
-import { Dropdown, Menu } from 'antd';
 import clsx from 'clsx';
 import { autorun } from 'mobx';
 import { observer } from 'mobx-react';
-import React, { ReactNode, useEffect } from 'react';
+import React, { ReactNode, useEffect, useRef, useState } from 'react';
 
-import { ActionButtonLook } from '../../../../../components/ActionButton/ActionButton';
+import { ActionButton, ActionButtonLook, ActionButtonSize } from '../../../../../components/ActionButton/ActionButton';
 import { ActionModal } from '../../../../../components/actionModal/actionModal';
 import { AdaptiveText } from '../../../../../components/adaptiveText/adaptiveText';
+import { DropDown, DropDownItem, DropDownItemMode } from '../../../../../components/dropDown/dropDown';
 import { PropsWithClassName } from '../../../../../components/props';
 import { SelectNetworkModal } from '../../../../../components/selectNetworkModal/selectNetworkModal';
 import { Spinner } from '../../../../../components/spinner/spinner';
 import { showStaticComponent } from '../../../../../components/staticComponentManager/staticComponentManager';
 import { toast } from '../../../../../components/toast/toast';
-import { REACT_APP__OTC_MODE } from '../../../../../env';
+import { AppMode, REACT_APP__APP_MODE } from '../../../../../env';
 import { ReactComponent as ArrowDownSvg } from '../../../../../icons/ic20/arrowDown.svg';
 import { ReactComponent as ReplySvg } from '../../../../../icons/ic20/reply.svg';
 import domain from '../../../../../stores/Domain';
@@ -24,10 +22,12 @@ import { evmBalances } from '../../../../../stores/evmBalances';
 import mailer from '../../../../../stores/Mailer';
 import { OutgoingMailData } from '../../../../../stores/outgoingMailData';
 import { connectAccount } from '../../../../../utils/account';
+import { AlignmentDirection, HorizontalAlignment } from '../../../../../utils/alignment';
 import { blockchainMeta, evmNameToNetwork } from '../../../../../utils/blockchain';
 import { editorJsToYMF } from '../../../../../utils/mail';
 import { truncateInMiddle } from '../../../../../utils/string';
 import { getEvmWalletNetwork } from '../../../../../utils/wallet';
+import css from './sendMailButton.module.scss';
 
 export interface SendMailButtonProps extends PropsWithClassName {
 	mailData: OutgoingMailData;
@@ -74,6 +74,9 @@ export const SendMailButton = observer(({ className, mailData, onSent }: SendMai
 		}
 	}
 
+	const menuAnchorRef = useRef(null);
+	const [menuVisible, setMenuVisible] = useState(false);
+
 	const sendMailHandler = async () => {
 		try {
 			if (mailData.to.items.some(r => !r.routing?.details)) {
@@ -119,16 +122,20 @@ export const SendMailButton = observer(({ className, mailData, onSent }: SendMai
 							</>
 						}
 						buttons={[
-							{
-								title: `Continue with ${truncateInMiddle(mailData.from!.account.address, 8, '...')}`,
-								onClick: () => resolve(true),
-								look: ActionButtonLook.PRIMARY,
-							},
-							{
-								title: 'Cancel',
-								onClick: () => resolve(false),
-								look: ActionButtonLook.LITE,
-							},
+							<ActionButton
+								size={ActionButtonSize.XLARGE}
+								look={ActionButtonLook.PRIMARY}
+								onClick={() => resolve(true)}
+							>
+								Continue with {truncateInMiddle(mailData.from!.account.address, 8, '...')}
+							</ActionButton>,
+							<ActionButton
+								size={ActionButtonSize.XLARGE}
+								look={ActionButtonLook.LITE}
+								onClick={() => resolve(false)}
+							>
+								Cancel
+							</ActionButton>,
 						]}
 						onClose={resolve}
 					/>
@@ -156,7 +163,7 @@ export const SendMailButton = observer(({ className, mailData, onSent }: SendMai
 				mailData.attachments,
 				mailData.to.items.map(r => r.routing?.address!),
 				mailData.network,
-				REACT_APP__OTC_MODE
+				REACT_APP__APP_MODE === AppMode.OTC
 					? ('0000000000000000000000000000000000000000000000000000000000000001' as Uint256)
 					: undefined,
 			);
@@ -174,73 +181,83 @@ export const SendMailButton = observer(({ className, mailData, onSent }: SendMai
 
 	return (
 		<div
-			className={clsx(className, 'send-btn', {
-				disabled:
+			className={clsx(css.root, className, {
+				[css.root_disabled]:
 					mailer.sending ||
 					!mailData.from ||
 					!mailData.to.items.length ||
 					mailData.to.items.some(r => r.isLoading) ||
 					(!mailData.hasEditorData && !mailData.hasPlainTextData && !mailData.attachments.length),
-				withDropdown: mailData.from?.wallet.factory.blockchainGroup === 'evm',
+				[css.root_withDropdown]: mailData.from?.wallet.factory.blockchainGroup === 'evm',
 			})}
 		>
-			<div className="send-btn-text" onClick={sendMailHandler}>
+			<div className={css.text} onClick={sendMailHandler}>
 				{mailer.sending ? (
 					<>
 						<Spinner style={{ marginRight: 6, color: 'currentcolor' }} />
-						<span className="send-btn-title">Sending ...</span>
+						<span className={css.title}>Sending ...</span>
 					</>
 				) : (
 					<>
 						<ReplySvg style={{ marginRight: 6, fill: 'currentcolor' }} />
-						{text && <span className="send-btn-title">{text}</span>}
+						{text && <span className={css.title}>{text}</span>}
 					</>
 				)}
 			</div>
 
 			{mailData.from?.wallet.factory.blockchainGroup === 'evm' && (
-				<Dropdown
-					overlay={
-						<Menu
-							onClick={async info => {
-								const blockchainName = info.key;
-								const newNetwork = evmNameToNetwork(blockchainName);
-								const currentBlockchainName =
-									await mailData.from!.wallet.controller.getCurrentBlockchain();
-								if (currentBlockchainName !== blockchainName) {
-									await domain.switchEVMChain(mailData.from?.wallet!, newNetwork!);
-									mailData.network = newNetwork;
-								}
-							}}
-							items={domain.registeredBlockchains
+				<>
+					<div ref={menuAnchorRef} className={css.dropdownIcon} onClick={() => setMenuVisible(!menuVisible)}>
+						<ArrowDownSvg />
+					</div>
+
+					{menuVisible && (
+						<DropDown
+							anchorRef={menuAnchorRef}
+							alignmentDirection={AlignmentDirection.TOP}
+							horizontalAlign={HorizontalAlignment.END}
+							onCloseRequest={() => setMenuVisible(false)}
+						>
+							{domain.registeredBlockchains
 								.filter(f => f.blockchainGroup === 'evm')
 								.map(bc => {
 									const bData = blockchainMeta[bc.blockchain];
-									return {
-										key: bc.blockchain,
-										disabled:
-											Number(
-												evmBalances.balances[evmNameToNetwork(bc.blockchain)!].toFixed(3),
-											) === 0,
-										label: (
+									const network = evmNameToNetwork(bc.blockchain)!;
+
+									return (
+										<DropDownItem
+											key={bc.blockchain}
+											mode={
+												Number(evmBalances.balances[network].toFixed(3)) === 0
+													? DropDownItemMode.DISABLED
+													: undefined
+											}
+											onSelect={async () => {
+												const currentBlockchainName =
+													await mailData.from!.wallet.controller.getCurrentBlockchain();
+
+												if (currentBlockchainName !== bc.blockchain) {
+													await domain.switchEVMChain(mailData.from?.wallet!, network);
+													mailData.network = network;
+												}
+
+												setMenuVisible(false);
+											}}
+										>
 											<>
+												<div style={{ marginRight: 7 }}>{bData.logo(16)}</div>
 												{bData.title} [
 												{Number(
 													evmBalances.balances[evmNameToNetwork(bc.blockchain)!].toFixed(3),
 												)}{' '}
 												{bData.ethNetwork!.nativeCurrency.symbol}]
 											</>
-										),
-										icon: <div style={{ marginRight: 7 }}>{bData.logo(16)}</div>,
-									};
+										</DropDownItem>
+									);
 								})}
-						/>
-					}
-				>
-					<div className="send-btn-dropdown-icon">
-						<ArrowDownSvg />
-					</div>
-				</Dropdown>
+						</DropDown>
+					)}
+				</>
 			)}
 		</div>
 	);

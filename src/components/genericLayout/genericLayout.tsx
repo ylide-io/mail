@@ -1,11 +1,10 @@
+import clsx from 'clsx';
 import { observer } from 'mobx-react';
-import React, { createContext, PropsWithChildren, useContext, useEffect, useMemo, useRef } from 'react';
+import React, { createContext, PropsWithChildren, useContext, useEffect, useMemo } from 'react';
 
-import domain from '../../stores/Domain';
-import { TransactionPopup } from '../TransactionPopup/TransactionPopup';
 import css from './genericLayout.module.scss';
 import Header from './header/header';
-import { SidebarMenu } from './sidebar/sidebarMenu';
+import { isSidebarOpen, SidebarBurger, SidebarMenu } from './sidebar/sidebarMenu';
 
 interface GenericLayoutApi {
 	scrollToTop: () => void;
@@ -34,14 +33,10 @@ export const GenericLayout = observer(({ children }: GenericLayoutProps) => {
 		}, 10000);
 	}, []);
 
-	const mainRef = useRef<HTMLDivElement>(null);
-
 	const api: GenericLayoutApi = useMemo(
 		() => ({
 			scrollToTop: () => {
-				if (mainRef.current) {
-					mainRef.current.scrollTo({ top: 0, behavior: 'smooth' });
-				}
+				window.scrollTo({ top: 0, behavior: 'smooth' });
 			},
 		}),
 		[],
@@ -52,10 +47,14 @@ export const GenericLayout = observer(({ children }: GenericLayoutProps) => {
 			<div className={css.root}>
 				<Header />
 
-				{domain.txPlateVisible && <TransactionPopup />}
+				<div className={css.main}>
+					<div className={clsx(css.sidebar, isSidebarOpen.get() && css.sidebar_open)}>
+						<div className={css.sidebarMobileHeader}>
+							<SidebarBurger>Hide sidebar</SidebarBurger>
+						</div>
 
-				<div className={css.main} ref={mainRef}>
-					<SidebarMenu />
+						<SidebarMenu />
+					</div>
 
 					<div className={css.content}>{children}</div>
 				</div>

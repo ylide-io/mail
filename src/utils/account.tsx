@@ -1,11 +1,12 @@
 import React from 'react';
 
-import { ActionButtonLook } from '../components/ActionButton/ActionButton';
+import { ActionButton, ActionButtonLook, ActionButtonSize } from '../components/ActionButton/ActionButton';
 import { ActionModal } from '../components/actionModal/actionModal';
 import { NewPasswordModal } from '../components/newPasswordModal/newPasswordModal';
 import { SelectWalletModal } from '../components/selectWalletModal/selectWalletModal';
 import { showStaticComponent } from '../components/staticComponentManager/staticComponentManager';
 import { SwitchModal } from '../components/switchModal/switchModal';
+import { toast } from '../components/toast/toast';
 import domain from '../stores/Domain';
 import { DomainAccount } from '../stores/models/DomainAccount';
 import { Wallet } from '../stores/models/Wallet';
@@ -33,16 +34,20 @@ export async function connectAccount(): Promise<DomainAccount | undefined> {
 					</>
 				}
 				buttons={[
-					{
-						title: 'Connect same account',
-						look: ActionButtonLook.PRIMARY,
-						onClick: () => resolve(true),
-					},
-					{
-						title: 'Use another one',
-						look: ActionButtonLook.LITE,
-						onClick: () => resolve(false),
-					},
+					<ActionButton
+						size={ActionButtonSize.XLARGE}
+						look={ActionButtonLook.PRIMARY}
+						onClick={() => resolve(true)}
+					>
+						Connect same account
+					</ActionButton>,
+					<ActionButton
+						size={ActionButtonSize.XLARGE}
+						look={ActionButtonLook.LITE}
+						onClick={() => resolve(false)}
+					>
+						Use another one
+					</ActionButton>,
 				]}
 				onClose={resolve}
 			/>
@@ -75,16 +80,14 @@ export async function connectAccount(): Promise<DomainAccount | undefined> {
 			currentAccount = await wallet.getCurrentAccount();
 			if (currentAccount && wallet.isAccountRegistered(currentAccount)) {
 				const result = await SwitchModal.show('account', wallet);
-				if (!result) {
-					return null;
-				}
+				if (!result) return;
 			}
 			currentAccount = await wallet.getCurrentAccount();
 			if (currentAccount && wallet.isAccountRegistered(currentAccount)) {
 				const domainAccount = wallet.accounts.find(a => a.account.address === currentAccount!.address)!;
 				if (domainAccount.isLocalKeyRegistered) {
-					alert('This account is already connected. Please choose a different one.');
-					return null;
+					toast('This account is already connected. Please choose a different one.');
+					return;
 				} else {
 					await domain.accounts.removeAccount(domainAccount);
 					return await wallet.connectAccount();
@@ -116,6 +119,7 @@ export async function connectAccount(): Promise<DomainAccount | undefined> {
 export async function disconnectAccount(account: DomainAccount) {
 	await account.wallet.disconnectAccount(account);
 	await domain.accounts.removeAccount(account);
+	account.mainViewKey = '';
 
 	if (account.wallet.factory.wallet === 'walletconnect') {
 		domain.disconnectWalletConnect();

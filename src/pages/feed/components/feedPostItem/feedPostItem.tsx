@@ -1,15 +1,15 @@
-import Avatar from 'antd/lib/avatar/avatar';
 import clsx from 'clsx';
 import React, { MouseEvent, useEffect, useRef, useState } from 'react';
 import { generatePath } from 'react-router-dom';
 
+import { FeedPost, FeedSourceUserRelation, LinkType } from '../../../../api/feedServerApi';
+import { Avatar } from '../../../../components/avatar/avatar';
+import { DropDown, DropDownItem } from '../../../../components/dropDown/dropDown';
 import { GalleryModal } from '../../../../components/galleryModal/galleryModal';
 import { ReadableDate } from '../../../../components/readableDate/readableDate';
 import { SharePopup } from '../../../../components/sharePopup/sharePopup';
 import { ReactComponent as ContactSvg } from '../../../../icons/ic20/contact.svg';
-import { ReactComponent as ExternalSvg } from '../../../../icons/ic20/external.svg';
-import { ReactComponent as ShareSvg } from '../../../../icons/ic20/share.svg';
-import { FeedCategory, FeedPost, LinkType } from '../../../../stores/Feed';
+import { ReactComponent as MenuSvg } from '../../../../icons/ic20/menu.svg';
 import { RoutePath } from '../../../../stores/routePath';
 import { HorizontalAlignment } from '../../../../utils/alignment';
 import { toAbsoluteUrl, useNav } from '../../../../utils/url';
@@ -52,15 +52,7 @@ export function FeedPostContent({ post }: FeedPostContentProps) {
 			{!!post.embeds.length && (
 				<div className={css.embeds}>
 					{post.embeds.map((e, idx) => (
-						<a
-							key={idx}
-							className={clsx(css.embed, {
-								[css.postEmbed_withLink]: !!e.link,
-							})}
-							href={e.link}
-							target="_blank"
-							rel="noreferrer"
-						>
+						<a key={idx} className={css.embed} href={e.link} target="_blank" rel="noreferrer">
 							{!!e.previewImageUrl && (
 								<div
 									className={css.embedImage}
@@ -99,7 +91,8 @@ export function FeedPostItem({ isInFeed, post }: FeedPostItemProps) {
 	const navigate = useNav();
 	const postPath = generatePath(RoutePath.FEED_POST, { id: post.id });
 
-	const shareButtonRef = useRef(null);
+	const menuButtonRef = useRef(null);
+	const [isMenuOpen, setMenuOpen] = useState(false);
 	const [isSharePopupOpen, setSharePopupOpen] = useState(false);
 
 	useEffect(() => {
@@ -109,16 +102,13 @@ export function FeedPostItem({ isInFeed, post }: FeedPostItemProps) {
 	}, [isInFeed]);
 
 	const onSourceIdClick = () => {
-		navigate({
-			path: generatePath(RoutePath.FEED_CATEGORY, { category: FeedCategory.ALL }),
-			search: { sourceId: post.sourceId },
-		});
+		navigate(generatePath(RoutePath.FEED_SOURCE, { source: post.sourceId }));
 	};
 
 	return (
 		<div ref={selfRef} className={clsx(css.root, { [css.root_collapsed]: collapsed })}>
 			<div className={css.ava}>
-				<Avatar size={48} src={post.authorAvatar} icon={<ContactSvg width="100%" height="100%" />} />
+				<Avatar image={post.authorAvatar} placeholder={<ContactSvg width="100%" height="100%" />} />
 				<FeedLinkTypeIcon className={css.avaSource} linkType={post.sourceType} />
 			</div>
 
@@ -138,6 +128,22 @@ export function FeedPostItem({ isInFeed, post }: FeedPostItemProps) {
 				</div>
 
 				<div className={css.metaRight}>
+					{post.userRelation && (
+						<div className={css.reason} title="The reason why you see this post">
+							{
+								{
+									[FeedSourceUserRelation.NONE]: 'Added manually ',
+									[FeedSourceUserRelation.HOLDING_TOKEN]: "You're holding ",
+									[FeedSourceUserRelation.HELD_TOKEN]: 'You held ',
+									[FeedSourceUserRelation.USING_PROJECT]: "You're in ",
+									[FeedSourceUserRelation.USED_PROJECT]: 'You used ',
+								}[post.userRelation]
+							}
+
+							{!!post.tokens.length && <b>{post.tokens.join(', ')}</b>}
+						</div>
+					)}
+
 					<a
 						className={css.date}
 						href={postPath}
@@ -149,39 +155,50 @@ export function FeedPostItem({ isInFeed, post }: FeedPostItemProps) {
 						<ReadableDate value={Date.parse(post.date)} />
 					</a>
 
-					{isInFeed && (
-						<>
-							<button
-								ref={shareButtonRef}
-								className={css.metaButton}
-								title="Share this post"
-								onClick={() => setSharePopupOpen(!isSharePopupOpen)}
-							>
-								<ShareSvg />
-							</button>
+					<button
+						ref={menuButtonRef}
+						className={css.metaButton}
+						onClick={() => {
+							setSharePopupOpen(false);
+							setMenuOpen(!isMenuOpen);
+						}}
+					>
+						<MenuSvg />
+					</button>
 
-							{isSharePopupOpen && (
-								<SharePopup
-									anchorRef={shareButtonRef}
-									horizontalAlign={HorizontalAlignment.END}
-									onClose={() => setSharePopupOpen(false)}
-									subject="Check out this post on Ylide!"
-									url={toAbsoluteUrl(postPath)}
-								/>
+					{isMenuOpen && (
+						<DropDown
+							anchorRef={menuButtonRef}
+							horizontalAlign={HorizontalAlignment.END}
+							onCloseRequest={() => setMenuOpen(false)}
+						>
+							<DropDownItem
+								onSelect={() => {
+									setMenuOpen(false);
+									setSharePopupOpen(true);
+								}}
+							>
+								Share post
+							</DropDownItem>
+
+							{!!post.sourceLink && (
+								<a href={post.sourceLink} target="_blank" rel="noreferrer">
+									<DropDownItem>Open post source</DropDownItem>
+								</a>
 							)}
-						</>
+
+							<DropDownItem>Unfollow</DropDownItem>
+						</DropDown>
 					)}
 
-					{!!post.sourceLink && (
-						<a
-							className={css.metaButton}
-							href={post.sourceLink}
-							title="Open post source"
-							target="_blank"
-							rel="noreferrer"
-						>
-							<ExternalSvg />
-						</a>
+					{isSharePopupOpen && (
+						<SharePopup
+							anchorRef={menuButtonRef}
+							horizontalAlign={HorizontalAlignment.END}
+							onClose={() => setSharePopupOpen(false)}
+							subject="Check out this post on Ylide!"
+							url={toAbsoluteUrl(postPath)}
+						/>
 					)}
 				</div>
 			</div>

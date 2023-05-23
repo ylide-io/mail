@@ -29,12 +29,13 @@ import {
 	Ylide,
 	YlideKeyStore,
 } from '@ylide/sdk';
-import { makeObservable, observable } from 'mobx';
+import { makeObservable, observable, reaction } from 'mobx';
+import { useEffect, useState } from 'react';
 
 import { NFT3NameService } from '../api/nft3DID';
 import { PasswordRequestModal } from '../components/passwordRequestModal/passwordRequestModal';
 import { SwitchModal } from '../components/switchModal/switchModal';
-import { REACT_APP__OTC_MODE } from '../env';
+import { AppMode, REACT_APP__APP_MODE } from '../env';
 import { blockchainMeta } from '../utils/blockchain';
 import { walletsMeta } from '../utils/wallet';
 import { Accounts } from './Accounts';
@@ -47,7 +48,7 @@ import tags from './Tags';
 
 let INDEXER_BLOCKCHAINS: string[];
 
-if (REACT_APP__OTC_MODE) {
+if (REACT_APP__APP_MODE === AppMode.OTC) {
 	INDEXER_BLOCKCHAINS = ['POLYGON', 'FANTOM', 'GNOSIS'];
 
 	Ylide.registerBlockchainFactory(evmBlockchainFactories[EVMNetwork.POLYGON]);
@@ -94,12 +95,14 @@ if (REACT_APP__OTC_MODE) {
 	Ylide.registerBlockchainFactory(evmBlockchainFactories[EVMNetwork.MOONRIVER]);
 	Ylide.registerBlockchainFactory(evmBlockchainFactories[EVMNetwork.METIS]);
 
-	Ylide.registerBlockchainFactory(everscaleBlockchainFactory);
-	Ylide.registerWalletFactory(everscaleWalletFactory);
-	Ylide.registerWalletFactory(everscaleProxyWalletFactory);
+	if (REACT_APP__APP_MODE !== AppMode.MAIN_VIEW) {
+		Ylide.registerBlockchainFactory(everscaleBlockchainFactory);
+		Ylide.registerWalletFactory(everscaleWalletFactory);
+		Ylide.registerWalletFactory(everscaleProxyWalletFactory);
 
-	Ylide.registerBlockchainFactory(venomBlockchainFactory);
-	Ylide.registerWalletFactory(venomWalletFactory);
+		Ylide.registerBlockchainFactory(venomBlockchainFactory);
+		Ylide.registerWalletFactory(venomWalletFactory);
+	}
 
 	Ylide.registerWalletFactory(evmWalletFactories.metamask);
 	Ylide.registerWalletFactory(evmWalletFactories.coinbase);
@@ -576,6 +579,21 @@ export class Domain {
 		await mailStore.init();
 		this.initialized = true;
 	}
+}
+
+export function useDomainAccounts() {
+	const [accounts, setAccounts] = useState(() => domain.accounts.accounts);
+
+	useEffect(
+		() =>
+			reaction(
+				() => [...domain.accounts.accounts],
+				arg => setAccounts(arg),
+			),
+		[],
+	);
+
+	return accounts;
 }
 
 //@ts-ignore

@@ -1,12 +1,7 @@
+import { OtcProvider } from '../../env';
 import { ReactComponent as AirSwapSvg } from './logos/airswap.svg';
 import { ReactComponent as OneInchSvg } from './logos/oneinch.svg';
 import { ReactComponent as ParaSwapSvg } from './logos/paraswap.svg';
-
-export enum OtcProvider {
-	AIRSWAP = 'AIRSWAP',
-	ONEINCH = 'ONEINCH',
-	PARASWAP = 'PARASWAP',
-}
 
 export function getOtcProviderLogo(provider: OtcProvider) {
 	return {

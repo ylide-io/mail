@@ -4,13 +4,16 @@
 	right: 0;
 	bottom: 0;
 	left: 0;
-	background: var(--shade-color);
+	background: rgba(var(--shade-rgb-color), 0);
 	visibility: hidden;
-	opacity: 0;
 	transition: opacity 500ms;
 }
 
 .root_visible {
 	visibility: visible;
-	opacity: 0.5;
+	background: rgba(var(--shade-rgb-color), 0.5);
+}
+
+.root_blur {
+	backdrop-filter: blur(8px);
 }

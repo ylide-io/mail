@@ -1,6 +1,6 @@
 import { useState } from 'react';
 
-import { ActionButtonLook } from '../ActionButton/ActionButton';
+import { ActionButton, ActionButtonLook, ActionButtonSize } from '../ActionButton/ActionButton';
 import { ActionModal } from '../actionModal/actionModal';
 import { TextField } from '../textField/textField';
 import { toast } from '../toast/toast';
@@ -104,41 +104,53 @@ export function ForgotPasswordModal({ onClose }: ForgotPasswordModalProps) {
 			buttons={
 				step === Step.FIRST_WARNING
 					? [
-							{
-								title: "I understand I won't be able to read old messages",
-								look: ActionButtonLook.DANGEROUS,
-								onClick: () => setStep(Step.SECOND_WARNING),
-							},
-							{
-								title: 'Cancel',
-								look: ActionButtonLook.LITE,
-								onClick: () => onClose?.(),
-							},
+							<ActionButton
+								size={ActionButtonSize.XLARGE}
+								look={ActionButtonLook.DANGEROUS}
+								onClick={() => setStep(Step.SECOND_WARNING)}
+							>
+								I understand I won't be able to read old messages
+							</ActionButton>,
+							<ActionButton
+								size={ActionButtonSize.XLARGE}
+								look={ActionButtonLook.LITE}
+								onClick={() => onClose?.()}
+							>
+								Cancel
+							</ActionButton>,
 					  ]
 					: step === Step.SECOND_WARNING
 					? [
-							{
-								title: 'I clearly understand the consequences',
-								look: ActionButtonLook.DANGEROUS,
-								onClick: () => setStep(Step.ENTER_PASSWORD),
-							},
-							{
-								title: 'Cancel',
-								look: ActionButtonLook.LITE,
-								onClick: () => onClose?.(),
-							},
+							<ActionButton
+								size={ActionButtonSize.XLARGE}
+								look={ActionButtonLook.DANGEROUS}
+								onClick={() => setStep(Step.ENTER_PASSWORD)}
+							>
+								I clearly understand the consequences
+							</ActionButton>,
+							<ActionButton
+								size={ActionButtonSize.XLARGE}
+								look={ActionButtonLook.LITE}
+								onClick={() => onClose?.()}
+							>
+								Cancel
+							</ActionButton>,
 					  ]
 					: [
-							{
-								title: 'Save Password',
-								look: ActionButtonLook.PRIMARY,
-								onClick: () => onSave(),
-							},
-							{
-								title: 'Cancel',
-								look: ActionButtonLook.LITE,
-								onClick: () => onClose?.(),
-							},
+							<ActionButton
+								size={ActionButtonSize.XLARGE}
+								look={ActionButtonLook.PRIMARY}
+								onClick={() => onSave()}
+							>
+								Save Password
+							</ActionButton>,
+							<ActionButton
+								size={ActionButtonSize.XLARGE}
+								look={ActionButtonLook.LITE}
+								onClick={() => onClose?.()}
+							>
+								Cancel
+							</ActionButton>,
 					  ]
 			}
 		/>

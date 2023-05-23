@@ -152,6 +152,29 @@ export const TestPage = observer(() => {
 				</ActionButton>
 			</Row>
 
+			<Row>
+				fixed width
+				<ActionButton style={{ width: 200 }}>Text Only</ActionButton>
+				<ActionButton style={{ width: 200 }} icon={<SettingsSvg />}>
+					With Icon
+				</ActionButton>
+				<ActionButton style={{ width: 200 }} icon={<SettingsSvg />} />
+			</Row>
+
+			<Row>
+				loading
+				<ActionButton isLoading icon={<SettingsSvg />}>
+					With Icon
+				</ActionButton>
+				<ActionButton isLoading isMultiline size={ActionButtonSize.MEDIUM} look={ActionButtonLook.PRIMARY}>
+					Multiline
+					<br />
+					Medium
+					<br />
+					Button
+				</ActionButton>
+			</Row>
+
 			<hr style={{ margin: '32px 0' }} />
 
 			<Row>

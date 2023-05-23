@@ -30,51 +30,71 @@ $hPadding: 20px;
 	overflow-y: auto;
 }
 
+.listGroup {
+	position: relative;
+}
+
 .row {
-	display: grid;
-	grid-template-columns: auto 10fr 8fr 5fr;
-	grid-gap: 12px;
+	display: flex;
 	align-items: center;
-	padding: 0 20px;
 
 	&:nth-child(2n) {
 		background: var(--secondary-surface-color);
 	}
 
-	> div {
-		@include truncate-text;
-		display: flex;
-	}
-
-	@include less480px {
-		grid-template-columns: auto 1fr;
-		grid-template-rows: auto auto auto;
-		grid-row-gap: 4px;
+	> :not(:first-child) {
+		margin: 0 0 0 12px;
 	}
 }
 
-.row_header {
-	height: 48px;
+.row_category {
+	position: sticky;
+	top: 0;
+	z-index: 1;
+	padding: 0 12px 0 20px;
+	height: 40px;
+	background: var(--tertiary-surface-color);
+}
+
+.userRelation {
+	flex: 1.66 1;
+	font-weight: $font-weight_bold;
+}
+
+.token {
+	flex: 0.33 1;
+	white-space: nowrap;
 	font-weight: $font-weight_bold;
 
 	@include less480px {
-		padding: 8px 20px;
-		height: auto;
+		display: none;
 	}
 }
 
 .row_data {
+	padding: 0 20px 0 36px;
 	height: 40px;
 
 	@include less480px {
-		padding: 8px 20px;
+		display: grid;
+		grid-template-columns: auto 1fr;
+		grid-row-gap: 8px;
+		padding-top: 8px;
+		padding-bottom: 8px;
 		height: auto;
 	}
 }
 
+.sourceCheckBox {
+	@include less480px {
+		grid-row: 1/4;
+	}
+}
+
 .sourceName {
+	flex: 1 1;
 	display: grid;
-	grid-template-columns: auto 1fr;
+	grid-template-columns: 24px 1fr;
 	align-items: center;
 	grid-gap: 4px;
 }
@@ -83,12 +103,36 @@ $hPadding: 20px;
 	@include truncate-text;
 }
 
-.sourceLink {
+.sourceOrigin {
+	flex: 0.66 1;
+	display: flex;
+}
+
+.sourceOriginLink {
 	display: grid;
 	grid-template-columns: auto 1fr;
 	align-items: center;
 	grid-gap: 4px;
 	color: var(--primary-text-color);
+
+	&:hover {
+		color: var(--link-color);
+	}
+}
+
+.sourceOriginText {
+	@include truncate-text;
+}
+
+.sourceToken {
+	@include truncate-text;
+	flex: 0.33 1;
+	font-weight: $font-weight_bold;
+	text-align: center;
+
+	@include less480px {
+		text-align: left;
+	}
 }
 
 .noData {
@@ -121,10 +165,4 @@ $hPadding: 20px;
 
 .footerRight {
 	margin: 0 0 0 auto;
-}
-
-@include less480px {
-	.checkBoxCell {
-		grid-row: 1/4;
-	}
 }

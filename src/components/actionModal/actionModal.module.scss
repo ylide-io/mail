@@ -10,9 +10,15 @@
 }
 
 .description {
+	display: grid;
+	grid-gap: 24px;
 	min-width: 0;
 	font-size: 14px;
 	line-height: $line-height_text;
+
+	> * {
+		min-width: 0;
+	}
 }
 
 .buttons {

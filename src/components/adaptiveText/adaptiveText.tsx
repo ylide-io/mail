@@ -9,9 +9,10 @@ import css from './adaptiveText.module.scss';
 interface AdaptiveTextProps extends PropsWithClassName {
 	text: string;
 	textAlign?: 'left' | 'right';
+	title?: string;
 }
 
-export function AdaptiveText({ className, text, textAlign = 'left', ...props }: AdaptiveTextProps) {
+export function AdaptiveText({ className, text, textAlign = 'left', title, ...props }: AdaptiveTextProps) {
 	const rootRef = useRef<HTMLDivElement>(null);
 	const visibleRef = useRef<HTMLDivElement>(null);
 
@@ -49,6 +50,7 @@ export function AdaptiveText({ className, text, textAlign = 'left', ...props }: 
 		<div
 			ref={rootRef}
 			className={clsx(css.root, textAlign === 'left' ? css.textAlignLeft : css.textAlignRight, className)}
+			title={title}
 			{...props}
 		>
 			<div className={css.invisible}>{text}</div>

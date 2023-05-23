@@ -2,6 +2,7 @@ import clsx from 'clsx';
 import React, { ButtonHTMLAttributes, forwardRef, PropsWithChildren, ReactNode, Ref } from 'react';
 
 import { PropsWithClassName } from '../props';
+import { Spinner } from '../spinner/spinner';
 import css from './ActionButton.module.scss';
 
 export enum ActionButtonSize {
@@ -25,11 +26,12 @@ interface ActionButtonProps extends PropsWithChildren<{}>, PropsWithClassName, B
 	icon?: ReactNode;
 	isDisabled?: boolean;
 	isMultiline?: boolean;
+	isLoading?: boolean;
 }
 
 export const ActionButton = forwardRef(
 	(
-		{ children, className, size, look, icon, isDisabled, isMultiline, ...props }: ActionButtonProps,
+		{ children, className, size, look, icon, isDisabled, isMultiline, isLoading, ...props }: ActionButtonProps,
 		ref: Ref<HTMLButtonElement>,
 	) => {
 		const sizeClass = {
@@ -56,15 +58,17 @@ export const ActionButton = forwardRef(
 					lookClass,
 					icon != null && css.root_hasIcon,
 					children != null && css.root_hasContent,
-					isDisabled && css.root_disabled,
+					(isDisabled || isLoading) && css.root_disabled,
 					isMultiline ? css.root_multiline : css.root_singleline,
+					isLoading && css.root_loading,
 					className,
 				)}
-				disabled={isDisabled}
+				disabled={isDisabled || isLoading}
 				{...props}
 			>
 				{icon && <div className={css.icon}>{icon}</div>}
 				{children != null && <div className={css.content}>{children}</div>}
+				{isLoading && <Spinner className={css.loader} />}
 			</button>
 		);
 	},

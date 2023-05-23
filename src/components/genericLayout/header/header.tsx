@@ -2,12 +2,11 @@ import { observer } from 'mobx-react';
 import React, { useRef, useState } from 'react';
 import { generatePath } from 'react-router-dom';
 
-import { REACT_APP__OTC_MODE } from '../../../env';
+import { AppMode, REACT_APP__APP_MODE } from '../../../env';
 import { ReactComponent as ArrowDownSvg } from '../../../icons/ic20/arrowDown.svg';
 import { ReactComponent as CrossSvg } from '../../../icons/ic20/cross.svg';
 import { ReactComponent as PlusSvg } from '../../../icons/ic20/plus.svg';
 import { ReactComponent as ContactsSvg } from '../../../icons/ic28/contacts.svg';
-import { YlideLargeLogo } from '../../../icons/YlideLargeLogo';
 import { postWidgetMessage, WidgetId, WidgetMessageType } from '../../../pages/widgets/widgets';
 import { browserStorage } from '../../../stores/browserStorage';
 import domain from '../../../stores/Domain';
@@ -17,7 +16,8 @@ import { connectAccount } from '../../../utils/account';
 import { useOpenMailCopmpose } from '../../../utils/mail';
 import { useNav } from '../../../utils/url';
 import { ActionButton, ActionButtonLook, ActionButtonSize } from '../../ActionButton/ActionButton';
-import { Blockie } from '../../blockie/blockie';
+import { AppLogo } from '../../appLogo/appLogo';
+import { Avatar } from '../../avatar/avatar';
 import { toast } from '../../toast/toast';
 import { SidebarBurger } from '../sidebar/sidebarMenu';
 import { AccountsPopup } from './accountsPopup/accountsPopup';
@@ -34,7 +34,7 @@ const Header = observer(() => {
 		<div className={css.root}>
 			<SidebarBurger className={css.burger} />
 
-			{domain.accounts.hasActiveAccounts && (
+			{REACT_APP__APP_MODE === AppMode.HUB && domain.accounts.hasActiveAccounts && (
 				<ActionButton
 					className={css.composeButton}
 					look={ActionButtonLook.PRIMARY}
@@ -44,20 +44,19 @@ const Header = observer(() => {
 				</ActionButton>
 			)}
 
-			<div className={css.logo}>
-				<a
-					href={generatePath(RoutePath.ROOT)}
-					onClick={e => {
-						e.preventDefault();
-						navigate(generatePath(RoutePath.ROOT));
-					}}
-				>
-					<YlideLargeLogo className={css.logoImage} />
-				</a>
-			</div>
+			<a
+				className={css.logo}
+				href={generatePath(RoutePath.ROOT)}
+				onClick={e => {
+					e.preventDefault();
+					navigate(generatePath(RoutePath.ROOT));
+				}}
+			>
+				<AppLogo />
+			</a>
 
-			<div className={css.main}>
-				{REACT_APP__OTC_MODE || !domain.accounts.hasActiveAccounts || (
+			<div className={css.right}>
+				{REACT_APP__APP_MODE === AppMode.HUB && domain.accounts.hasActiveAccounts && (
 					<ActionButton
 						size={ActionButtonSize.MEDIUM}
 						look={ActionButtonLook.LITE}
@@ -79,10 +78,10 @@ const Header = observer(() => {
 						>
 							<div>
 								{domain.accounts.accounts.map(acc => (
-									<Blockie
+									<Avatar
 										key={acc.account.address}
 										className={css.usersAvatar}
-										address={acc.account.address}
+										blockie={acc.account.address}
 									/>
 								))}
 							</div>

@@ -4,7 +4,7 @@ import SmartBuffer from '@ylide/smart-buffer';
 import React, { useEffect, useMemo, useState } from 'react';
 import { generatePath } from 'react-router-dom';
 
-import { REACT_APP__OTC_MODE } from '../../env';
+import { AppMode, REACT_APP__APP_MODE } from '../../env';
 import { analytics } from '../../stores/Analytics';
 import { browserStorage } from '../../stores/browserStorage';
 import domain from '../../stores/Domain';
@@ -223,7 +223,13 @@ export function NewPasswordModal({ faucetType, bonus, wallet, account, remoteKey
 			const domainAccount = await wallet.instantiateNewAccount(account, tempLocalKey, keyVersion);
 			setDomainAccount(domainAccount);
 			if (faucetType && wallet.factory.blockchainGroup === 'evm') {
-				await publishThroughFaucet(domainAccount, keyVersion, faucetType, bonus, REACT_APP__OTC_MODE);
+				await publishThroughFaucet(
+					domainAccount,
+					keyVersion,
+					faucetType,
+					bonus,
+					REACT_APP__APP_MODE === AppMode.OTC,
+				);
 			} else {
 				if (wallet.factory.blockchainGroup === 'evm') {
 					setStep(Step.SELECT_NETWORK);
