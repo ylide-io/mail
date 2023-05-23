@@ -1,6 +1,6 @@
 import { observer } from 'mobx-react';
 import React, { useEffect, useMemo, useRef } from 'react';
-import { generatePath, useParams } from 'react-router-dom';
+import { generatePath, useLocation, useParams } from 'react-router-dom';
 
 import { FeedCategory, FeedServerApi } from '../../../api/feedServerApi';
 import { ActionButton, ActionButtonLook, ActionButtonSize } from '../../../components/ActionButton/ActionButton';
@@ -26,19 +26,22 @@ function isInViewport(element: Element) {
 }
 
 const FeedPageContent = observer(() => {
+	const location = useLocation();
 	const navigate = useNav();
 	const genericLayoutApi = useGenericLayoutApi();
 
 	const lastPostView = useRef<HTMLDivElement>(null);
 	const feedBodyRef = useRef<HTMLDivElement>(null);
 	const { category, source, address } = useParams<{ category: FeedCategory; source: string; address: string }>();
+	const isAllPosts = location.pathname === generatePath(RoutePath.FEED_ALL);
 
 	const accounts = useDomainAccounts();
 	const selectedAccount = accounts.find(a => a.account.address === address);
 
-	// We can only load category sections if no suitable account connected; We can NOT load smart feed
+	// We can NOT load smart feed if no suitable account connected
 	const canLoadFeed =
 		!!category ||
+		isAllPosts ||
 		(!!accounts.length && (REACT_APP__APP_MODE !== AppMode.MAIN_VIEW || accounts.every(a => a.mainViewKey)));
 
 	useEffect(() => {
@@ -51,11 +54,11 @@ const FeedPageContent = observer(() => {
 
 	const feed = useMemo(() => {
 		const feed = new FeedStore({
-			category,
+			categories: category ? [category] : isAllPosts ? Object.values(FeedCategory) : undefined,
 			sourceId: source,
 			addressTokens: selectedAccount
 				? [selectedAccount.mainViewKey]
-				: !category && !source
+				: !category && !source && !isAllPosts
 				? accounts.map(a => a.mainViewKey)
 				: undefined,
 		});
@@ -67,7 +70,7 @@ const FeedPageContent = observer(() => {
 		}
 
 		return feed;
-	}, [accounts, canLoadFeed, category, genericLayoutApi, selectedAccount, source]);
+	}, [accounts, canLoadFeed, category, genericLayoutApi, isAllPosts, selectedAccount, source]);
 
 	useEffect(() => {
 		const timer = setInterval(async () => {
@@ -81,7 +84,13 @@ const FeedPageContent = observer(() => {
 
 	return (
 		<NarrowContent
-			title={feed.category ? getFeedCategoryName(feed.category) : feed.sourceId ? 'Feed' : 'Smart feed'}
+			title={
+				feed.categories.length === 1
+					? getFeedCategoryName(feed.categories[0])
+					: feed.sourceId || isAllPosts
+					? 'Feed'
+					: 'Smart feed'
+			}
 			titleSubItem={
 				!!source && (
 					<ActionButton

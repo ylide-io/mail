@@ -20,6 +20,7 @@ export enum RoutePath {
 	MAIL_DETAILS = '/mail/:folderId/:id',
 
 	FEED = '/feed',
+	FEED_ALL = '/feed/all',
 	FEED_POST = '/feed/post/:id',
 	FEED_CATEGORY = '/feed/category/:category',
 	FEED_SOURCE = '/feed/source/:source',

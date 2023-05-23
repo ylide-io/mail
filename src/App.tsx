@@ -109,8 +109,18 @@ const App = observer(() => {
 
 					<Route
 						path={RoutePath.FEED}
-						element={<Navigate replace to={generatePath(RoutePath.FEED_SMART)} />}
+						element={
+							<Navigate
+								replace
+								to={
+									REACT_APP__APP_MODE === AppMode.MAIN_VIEW
+										? generatePath(RoutePath.FEED_SMART)
+										: generatePath(RoutePath.FEED_ALL)
+								}
+							/>
+						}
 					/>
+					<Route path={RoutePath.FEED_ALL} element={<FeedPage />} />
 					<Route path={RoutePath.FEED_POST} element={<FeedPostPage />} />
 					<Route path={RoutePath.FEED_CATEGORY} element={<FeedPage />} />
 					<Route path={RoutePath.FEED_SOURCE} element={<FeedPage />} />

@@ -177,24 +177,31 @@ export const SidebarMenu = observer(() => {
 	function renderFeedSection() {
 		return (
 			<>
-				<SidebarSection section={Section.FEED} title="Feed">
-					<SidebarButton
-						href={generatePath(RoutePath.FEED_SMART)}
-						icon={sideFeedIcon(14)}
-						name="Smart feed"
-					/>
-
-					{domain.accounts.activeAccounts.map(account => (
+				{REACT_APP__APP_MODE === AppMode.MAIN_VIEW && (
+					<SidebarSection section={Section.FEED} title="Feed">
 						<SidebarButton
-							isSubmenu
-							href={generatePath(RoutePath.FEED_SMART_ADDRESS, { address: account.account.address })}
-							icon={<ContactSvg />}
-							name={<AdaptiveText text={account.account.address} />}
+							href={generatePath(RoutePath.FEED_SMART)}
+							icon={sideFeedIcon(14)}
+							name="Smart feed"
 						/>
-					))}
-				</SidebarSection>
 
-				<SidebarSection section={Section.FEED_DISCOVERY} title="Discovery">
+						{domain.accounts.activeAccounts.map(account => (
+							<SidebarButton
+								isSubmenu
+								href={generatePath(RoutePath.FEED_SMART_ADDRESS, { address: account.account.address })}
+								icon={<ContactSvg />}
+								name={<AdaptiveText text={account.account.address} />}
+							/>
+						))}
+					</SidebarSection>
+				)}
+
+				<SidebarSection
+					section={Section.FEED_DISCOVERY}
+					title={REACT_APP__APP_MODE === AppMode.MAIN_VIEW ? 'Discovery' : 'Feed'}
+				>
+					<SidebarButton href={generatePath(RoutePath.FEED_ALL)} icon={sideFeedIcon(14)} name="All topics" />
+
 					{Object.values<FeedCategory>(FeedCategory).map(category => (
 						<SidebarButton
 							href={generatePath(RoutePath.FEED_CATEGORY, { category })}

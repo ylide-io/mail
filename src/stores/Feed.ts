@@ -20,12 +20,12 @@ export class FeedStore {
 	@observable newPosts = 0;
 	@observable moreAvailable = false;
 
-	readonly category: FeedCategory | undefined;
+	readonly categories: FeedCategory[] = [];
 	readonly sourceId: string | undefined;
 	readonly addressTokens: string[] | undefined;
 
-	constructor(params: { category?: FeedCategory; sourceId?: string; addressTokens?: string[] }) {
-		this.category = params.category;
+	constructor(params: { categories?: FeedCategory[]; sourceId?: string; addressTokens?: string[] }) {
+		this.categories = params.categories || [];
 		this.sourceId = params.sourceId;
 		this.addressTokens = params.addressTokens;
 
@@ -46,7 +46,7 @@ export class FeedStore {
 
 			const sourceListId = !this.sourceId ? browserStorage.feedSourceSettings?.listId : undefined;
 
-			const categories = this.sourceId || sourceListId || !this.category ? undefined : [this.category];
+			const categories = this.sourceId || sourceListId ? undefined : this.categories;
 
 			const response = await FeedServerApi.getPosts({
 				...params,
@@ -79,8 +79,8 @@ export class FeedStore {
 			this.loaded = true;
 			this.error = false;
 
-			if (params.needOld && this.category) {
-				analytics.feedPageLoaded(this.category, Math.floor(this.posts.length / FEED_PAGE_SIZE) + 1);
+			if (params.needOld && this.categories.length === 1) {
+				analytics.feedPageLoaded(this.categories[0], Math.floor(this.posts.length / FEED_PAGE_SIZE) + 1);
 			}
 
 			return response;
