@@ -16,6 +16,7 @@ import { FeedStore, getFeedCategoryName } from '../../../stores/Feed';
 import { RoutePath } from '../../../stores/routePath';
 import { connectAccount } from '../../../utils/account';
 import { useNav } from '../../../utils/url';
+import { CreatePostForm } from '../components/createPostForm/createPostForm';
 import { FeedPostItem } from '../components/feedPostItem/feedPostItem';
 import css from './feedPage.module.scss';
 import ErrorCode = FeedServerApi.ErrorCode;
@@ -34,6 +35,7 @@ const FeedPageContent = observer(() => {
 	const feedBodyRef = useRef<HTMLDivElement>(null);
 	const { category, source, address } = useParams<{ category: FeedCategory; source: string; address: string }>();
 	const isAllPosts = location.pathname === generatePath(RoutePath.FEED_ALL);
+	const isVenomFeed = location.pathname === generatePath(RoutePath.FEED_VENOM);
 
 	const accounts = useDomainAccounts();
 	const selectedAccount = accounts.find(a => a.account.address === address);
@@ -85,7 +87,9 @@ const FeedPageContent = observer(() => {
 	return (
 		<NarrowContent
 			title={
-				feed.categories.length === 1
+				isVenomFeed
+					? 'Venom feed'
+					: feed.categories.length === 1
 					? getFeedCategoryName(feed.categories[0])
 					: feed.sourceId || isAllPosts
 					? 'Feed'
@@ -121,7 +125,9 @@ const FeedPageContent = observer(() => {
 			)}
 
 			<div className={css.feedBody} ref={feedBodyRef}>
-				{feed.loaded ? (
+				{isVenomFeed ? (
+					<CreatePostForm />
+				) : feed.loaded ? (
 					<>
 						{feed.posts.map(post => (
 							<FeedPostItem isInFeed post={post} key={post.id} />
