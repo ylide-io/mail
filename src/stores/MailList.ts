@@ -167,7 +167,7 @@ export class MailList {
 					type: BlockchainSourceType.BROADCAST,
 					sender: null,
 					blockchain: 'venom-testnet',
-					id: 'venom-global-feed',
+					id: 'tvm-venom-testnet-broadcaster-14',
 				};
 				const originalSource = blockchainController.ininiateMessagesSource(blockchainSubject);
 				const listSource = new ListSource(mailStore.readingSession, blockchainSubject, originalSource);
