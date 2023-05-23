@@ -87,10 +87,15 @@ const SidebarSection = observer(({ children, section, title }: SidebarSectionPro
 
 //
 
+enum SidebarButtonLook {
+	SUBMENU = 'SUBMENU',
+	SECTION = 'SECTION',
+}
+
 interface SidebarButtonProps {
-	isSubmenu?: boolean;
+	look?: SidebarButtonLook;
 	href: string;
-	icon: ReactNode;
+	icon?: ReactNode;
 	name: ReactNode;
 	rightButton?: {
 		icon: ReactNode;
@@ -98,25 +103,29 @@ interface SidebarButtonProps {
 	};
 }
 
-export const SidebarButton = observer(({ isSubmenu, href, icon, name, rightButton }: SidebarButtonProps) => {
+export const SidebarButton = observer(({ look, href, icon, name, rightButton }: SidebarButtonProps) => {
 	const location = useLocation();
 	const navigate = useNav();
 
 	const isActive = location.pathname === href;
 
+	const lookClass =
+		look &&
+		{
+			[SidebarButtonLook.SUBMENU]: css.sectionLink_submenu,
+			[SidebarButtonLook.SECTION]: css.sectionLink_section,
+		}[look];
+
 	return (
 		<a
-			className={clsx(css.sectionLink, {
-				[css.sectionLink_active]: isActive,
-				[css.sectionLink_submenu]: isSubmenu,
-			})}
+			className={clsx(css.sectionLink, lookClass, isActive && css.sectionLink_active)}
 			href={href}
 			onClick={e => {
 				e.preventDefault();
 				navigate(href);
 			}}
 		>
-			<div className={css.sectionLinkIconLeft}>{icon}</div>
+			{icon && <div className={css.sectionLinkIconLeft}>{icon}</div>}
 			<div className={css.sectionLinkTitle}>{name}</div>
 
 			{rightButton && (
@@ -177,6 +186,14 @@ export const SidebarMenu = observer(() => {
 	function renderFeedSection() {
 		return (
 			<>
+				{REACT_APP__APP_MODE !== AppMode.MAIN_VIEW && (
+					<SidebarButton
+						look={SidebarButtonLook.SECTION}
+						href={generatePath(RoutePath.FEED_VENOM)}
+						name="Venom feed"
+					/>
+				)}
+
 				{REACT_APP__APP_MODE === AppMode.MAIN_VIEW && (
 					<SidebarSection section={Section.FEED} title="Feed">
 						<SidebarButton
@@ -187,7 +204,7 @@ export const SidebarMenu = observer(() => {
 
 						{domain.accounts.activeAccounts.map(account => (
 							<SidebarButton
-								isSubmenu
+								look={SidebarButtonLook.SUBMENU}
 								href={generatePath(RoutePath.FEED_SMART_ADDRESS, { address: account.account.address })}
 								icon={<ContactSvg />}
 								name={<AdaptiveText text={account.account.address} />}

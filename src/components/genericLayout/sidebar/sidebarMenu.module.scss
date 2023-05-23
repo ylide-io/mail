@@ -1,9 +1,11 @@
 .root {
+	display: grid;
+	grid-gap: 16px;
 	padding: 0 16px;
 }
 
 .section {
-	margin: 0 0 16px;
+	//
 }
 
 .sectionTitle {
@@ -52,6 +54,12 @@
 
 .sectionLink_submenu {
 	padding-left: 52px;
+}
+
+.sectionLink_section {
+	padding-left: 24px;
+	font-size: 16px;
+	font-weight: $font-weight_bold;
 }
 
 .sectionLinkIconLeft {
