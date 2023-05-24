@@ -156,15 +156,15 @@ export const SendMailButton = observer(({ className, mailData, onSent }: SendMai
 				content = YMF.fromPlainText(mailData.plainTextData.trim());
 			}
 
-			const msgId = await sendMessage(
-				mailData.from,
-				mailData.subject,
-				content,
-				mailData.attachments,
-				mailData.to.items.map(r => r.routing?.address!),
-				mailData.network,
-				REACT_APP__APP_MODE === AppMode.OTC ? OTC_FEED_ID : undefined,
-			);
+			const msgId = await sendMessage({
+				sender: mailData.from,
+				subject: mailData.subject,
+				text: content,
+				attachments: mailData.attachments,
+				recipients: mailData.to.items.map(r => r.routing?.address!),
+				network: mailData.network,
+				feedId: REACT_APP__APP_MODE === AppMode.OTC ? OTC_FEED_ID : undefined,
+			});
 
 			console.log('id: ', msgId);
 			toast('Your message has been sent successfully 🔥');

@@ -14,6 +14,7 @@ import {
 	MessageContainer,
 	MessageContentV4,
 	MessageSecureContext,
+	SendBroadcastResult,
 	SendMailResult,
 	ServiceCode,
 	Uint256,
@@ -39,15 +40,23 @@ import { analytics } from '../stores/Analytics';
 import { readFileAsArrayBuffer } from './file';
 import { getEvmWalletNetwork } from './wallet';
 
-export async function sendMessage(
-	sender: DomainAccount,
-	subject: string,
-	text: YMF,
-	attachments: File[],
-	recipients: string[],
-	network?: EVMNetwork,
-	feedId?: Uint256,
-): Promise<SendMailResult | null> {
+export async function sendMessage({
+	sender,
+	subject,
+	text,
+	attachments,
+	recipients,
+	network,
+	feedId,
+}: {
+	sender: DomainAccount;
+	subject: string;
+	text: YMF;
+	attachments: File[];
+	recipients: string[];
+	network?: EVMNetwork;
+	feedId?: Uint256;
+}): Promise<SendMailResult> {
 	analytics.mailSentAttempt();
 
 	const secureContext = MessageSecureContext.create();
@@ -105,7 +114,73 @@ export async function sendMessage(
 	return result;
 }
 
-export async function b() {}
+export async function broadcastMessage({
+	sender,
+	subject,
+	text,
+	attachments,
+	feedId,
+	network,
+}: {
+	sender: DomainAccount;
+	subject: string;
+	text: YMF;
+	attachments: File[];
+	feedId: Uint256;
+	network?: EVMNetwork;
+}): Promise<SendBroadcastResult> {
+	analytics.mailSentAttempt();
+
+	const ipfsStorage = new YlideIpfsStorage();
+
+	const messageAttachments = await Promise.all(
+		attachments.map(async file => {
+			const buffer = await readFileAsArrayBuffer(file);
+			const uint8Array = new Uint8Array(buffer);
+			const uploaded = await ipfsStorage.uploadToIpfs(uint8Array);
+
+			return new MessageAttachmentLinkV1({
+				type: MessageAttachmentType.LINK_V1,
+				previewLink: '',
+				link: `ipfs://${uploaded.hash}`,
+				fileName: file.name,
+				fileSize: file.size,
+				isEncrypted: true,
+			});
+		}),
+	);
+
+	const content = new MessageContentV4({
+		sendingAgentName: 'ysh',
+		sendingAgentVersion: { major: 1, minor: 0, patch: 0 },
+		subject,
+		content: text,
+		attachments: messageAttachments,
+		extraBytes: new Uint8Array(0),
+		extraJson: {},
+	});
+
+	if (!network && sender.wallet.factory.blockchainGroup === 'evm') {
+		network = await getEvmWalletNetwork(sender.wallet);
+	}
+
+	const result = await domain.ylide.core.broadcastMessage(
+		{
+			wallet: sender.wallet.controller,
+			sender: sender.account,
+			content,
+			serviceCode: 6,
+			feedId,
+		},
+		{
+			network,
+		},
+	);
+
+	analytics.mailSentSuccessful();
+
+	return result;
+}
 
 //
 
