@@ -15,9 +15,11 @@ import { openFilePicker, readFileAsDataURL } from '../../../../utils/file';
 import { SendMailButton } from '../../../mail/components/composeMailForm/sendMailButton/sendMailButton';
 import css from './createPostForm.module.scss';
 
-export interface CreatePostFormProps {}
+export interface CreatePostFormProps {
+	onCreated?: () => void;
+}
 
-export const CreatePostForm = observer(({}: CreatePostFormProps) => {
+export const CreatePostForm = observer(({ onCreated }: CreatePostFormProps) => {
 	const venomAccounts = useVenomAccounts();
 
 	const mailData = useMemo(() => {
@@ -67,6 +69,11 @@ export const CreatePostForm = observer(({}: CreatePostFormProps) => {
 		}
 	};
 
+	const onSent = () => {
+		mailData.reset();
+		onCreated?.();
+	};
+
 	return (
 		<div className={clsx(css.form, expanded && css.form_expanded)}>
 			<AutoSizeTextArea
@@ -92,7 +99,7 @@ export const CreatePostForm = observer(({}: CreatePostFormProps) => {
 							{previewLoading ? (
 								<Spinner className={css.previewLoader} />
 							) : (
-								<img className={css.previewImage} src={preview} />
+								<img className={css.previewImage} alt="Preview" src={preview} />
 							)}
 						</>
 					)}
@@ -125,7 +132,7 @@ export const CreatePostForm = observer(({}: CreatePostFormProps) => {
 							/>
 						)}
 
-						<SendMailButton disabled={previewLoading} mailData={mailData} />
+						<SendMailButton disabled={previewLoading} mailData={mailData} onSent={onSent} />
 					</div>
 				</>
 			) : (
