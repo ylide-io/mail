@@ -30,7 +30,7 @@ import {
 	YlideKeyStore,
 } from '@ylide/sdk';
 import { makeObservable, observable, reaction } from 'mobx';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
 import { NFT3NameService } from '../api/nft3DID';
 import { PasswordRequestModal } from '../components/passwordRequestModal/passwordRequestModal';
@@ -598,7 +598,7 @@ export function useDomainAccounts() {
 
 export function useVenomAccounts() {
 	const accounts = useDomainAccounts();
-	return accounts.filter(a => a.wallet.wallet === 'venomwallet');
+	return useMemo(() => accounts.filter(a => a.wallet.wallet === 'venomwallet'), [accounts]);
 }
 
 //@ts-ignore
