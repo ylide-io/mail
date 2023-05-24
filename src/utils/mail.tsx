@@ -39,6 +39,7 @@ import { EVMNetwork } from '@ylide/ethereum';
 import { analytics } from '../stores/Analytics';
 import { readFileAsArrayBuffer } from './file';
 import { getEvmWalletNetwork } from './wallet';
+import { VENOM_SERVICE_CODE } from '../constants';
 
 export async function sendMessage({
 	sender,
@@ -169,7 +170,7 @@ export async function broadcastMessage({
 			wallet: sender.wallet.controller,
 			sender: sender.account,
 			content,
-			serviceCode: 6,
+			serviceCode: VENOM_SERVICE_CODE,
 			feedId,
 		},
 		{
