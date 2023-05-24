@@ -47,6 +47,18 @@
 	font-weight: $font-weight_light;
 }
 
+.body {
+	display: grid;
+	grid-gap: 12px;
+}
+
+.cover {
+	width: 100%;
+	max-height: 240px;
+	object-fit: cover;
+	border-radius: 8px;
+}
+
 @include less720px {
 	.ava {
 		grid-row: 1/2;

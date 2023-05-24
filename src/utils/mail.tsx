@@ -194,13 +194,13 @@ async function getMessageContent(msg: IMessage) {
 export async function decodeMessage(
 	msgId: string,
 	msg: IMessage,
-	recipient: IGenericAccount,
+	recipient?: IGenericAccount,
 ): Promise<IMessageDecodedContent> {
 	const content = await getMessageContent(msg);
 
 	const result = msg.isBroadcast
 		? domain.ylide.core.decryptBroadcastContent(msg, content)
-		: await domain.ylide.core.decryptMessageContent(recipient, msg, content);
+		: await domain.ylide.core.decryptMessageContent(recipient!, msg, content);
 
 	return {
 		msgId,
