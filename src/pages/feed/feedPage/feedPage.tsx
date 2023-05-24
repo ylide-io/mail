@@ -1,5 +1,5 @@
 import { observer } from 'mobx-react';
-import React, { useEffect, useMemo, useRef } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { generatePath, useLocation, useParams } from 'react-router-dom';
 
 import { FeedCategory, FeedServerApi } from '../../../api/feedServerApi';
@@ -177,7 +177,11 @@ const RegularFeedContent = observer(() => {
 const VenomFeedContent = observer(() => {
 	const venomAccounts = useVenomAccounts();
 
+	const [rebuildMailListCounter, setRebuildMailListCounter] = useState(1);
 	const mailList = useMemo(() => {
+		// Senceless code to make IDE treat this var as dependency
+		isNaN(rebuildMailListCounter);
+
 		if (!venomAccounts.length) return;
 
 		const mailList = new MailList();
@@ -185,13 +189,13 @@ const VenomFeedContent = observer(() => {
 		mailList.init({ venomFeed: { account: venomAccounts[0] } });
 
 		return mailList;
-	}, [venomAccounts]);
+	}, [rebuildMailListCounter, venomAccounts]);
 
 	useEffect(() => () => mailList?.destroy(), [mailList]);
 
 	return (
 		<NarrowContent title="Venom feed">
-			<CreatePostForm />
+			<CreatePostForm onCreated={() => setRebuildMailListCounter(i => i + 1)} />
 
 			<div className={css.divider} />
 
