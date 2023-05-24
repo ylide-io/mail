@@ -8,7 +8,6 @@ import { OverlappingLoader } from '../../../../components/overlappingLoader/over
 import { Popup } from '../../../../components/popup/popup';
 import { ReactComponent as CrossSvg } from '../../../../icons/ic20/cross.svg';
 import { ReactComponent as ExternalSvg } from '../../../../icons/ic20/external.svg';
-import mailer from '../../../../stores/Mailer';
 import { globalOutgoingMailData, OutgoingMailData } from '../../../../stores/outgoingMailData';
 import { RoutePath } from '../../../../stores/routePath';
 import { useNav } from '../../../../utils/url';
@@ -55,7 +54,7 @@ export const ComposeMailPopup = observer(({ onClose, mailData }: ComposeMailPopu
 
 			<ComposeMailForm className={css.form} mailData={mailData} onSent={onClose} />
 
-			{mailer.sending && <OverlappingLoader text="Broadcasting your message to blockchain..." />}
+			{mailData.sending && <OverlappingLoader text="Broadcasting your message to blockchain..." />}
 		</Popup>
 	);
 });

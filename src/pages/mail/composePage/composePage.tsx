@@ -8,7 +8,6 @@ import { GenericLayout } from '../../../components/genericLayout/genericLayout';
 import { OverlappingLoader } from '../../../components/overlappingLoader/overlappingLoader';
 import { ReactComponent as CrossSvg } from '../../../icons/ic20/cross.svg';
 import { analytics } from '../../../stores/Analytics';
-import mailer from '../../../stores/Mailer';
 import { mailStore } from '../../../stores/MailList';
 import { globalOutgoingMailData } from '../../../stores/outgoingMailData';
 import { RoutePath } from '../../../stores/routePath';
@@ -54,7 +53,9 @@ export const ComposePage = observer(() => {
 					}
 				/>
 
-				{mailer.sending && <OverlappingLoader text="Broadcasting your message to blockchain ..." />}
+				{globalOutgoingMailData.sending && (
+					<OverlappingLoader text="Broadcasting your message to blockchain ..." />
+				)}
 			</FullPageContent>
 		</GenericLayout>
 	);

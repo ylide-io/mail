@@ -20,12 +20,11 @@ import { ReactComponent as ArrowDownSvg } from '../../../../../icons/ic20/arrowD
 import { ReactComponent as ReplySvg } from '../../../../../icons/ic20/reply.svg';
 import domain from '../../../../../stores/Domain';
 import { evmBalances } from '../../../../../stores/evmBalances';
-import mailer from '../../../../../stores/Mailer';
 import { OutgoingMailData } from '../../../../../stores/outgoingMailData';
 import { connectAccount } from '../../../../../utils/account';
 import { AlignmentDirection, HorizontalAlignment } from '../../../../../utils/alignment';
 import { blockchainMeta, evmNameToNetwork } from '../../../../../utils/blockchain';
-import { editorJsToYMF } from '../../../../../utils/mail';
+import { editorJsToYMF, sendMessage } from '../../../../../utils/mail';
 import { truncateInMiddle } from '../../../../../utils/string';
 import { getEvmWalletNetwork } from '../../../../../utils/wallet';
 import css from './sendMailButton.module.scss';
@@ -84,7 +83,7 @@ export const SendMailButton = observer(({ className, mailData, onSent }: SendMai
 				return toast("For some of your recipients we didn't find keys on the blockchain.");
 			}
 
-			mailer.sending = true;
+			mailData.sending = true;
 
 			const proxyAccount = domain.availableProxyAccounts[0];
 
@@ -157,7 +156,7 @@ export const SendMailButton = observer(({ className, mailData, onSent }: SendMai
 				content = YMF.fromPlainText(mailData.plainTextData.trim());
 			}
 
-			const msgId = await mailer.sendMail(
+			const msgId = await sendMessage(
 				mailData.from,
 				mailData.subject,
 				content,
@@ -174,7 +173,7 @@ export const SendMailButton = observer(({ className, mailData, onSent }: SendMai
 			console.log('Error sending message', e);
 			toast("Couldn't send your message 😒");
 		} finally {
-			mailer.sending = false;
+			mailData.sending = false;
 		}
 	};
 
@@ -182,7 +181,7 @@ export const SendMailButton = observer(({ className, mailData, onSent }: SendMai
 		<div
 			className={clsx(css.root, className, {
 				[css.root_disabled]:
-					mailer.sending ||
+					mailData.sending ||
 					!mailData.from ||
 					!mailData.to.items.length ||
 					mailData.to.items.some(r => r.isLoading) ||
@@ -191,7 +190,7 @@ export const SendMailButton = observer(({ className, mailData, onSent }: SendMai
 			})}
 		>
 			<div className={css.text} onClick={sendMailHandler}>
-				{mailer.sending ? (
+				{mailData.sending ? (
 					<>
 						<Spinner style={{ marginRight: 6, color: 'currentcolor' }} />
 						<span className={css.title}>Sending ...</span>

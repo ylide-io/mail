@@ -8,6 +8,8 @@ import domain from './Domain';
 import { DomainAccount } from './models/DomainAccount';
 
 export class OutgoingMailData {
+	sending = false;
+
 	from?: DomainAccount;
 	to: Recipients = new Recipients();
 	network?: EVMNetwork;
