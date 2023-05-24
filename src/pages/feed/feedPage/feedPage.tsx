@@ -19,6 +19,7 @@ import { connectAccount } from '../../../utils/account';
 import { useNav } from '../../../utils/url';
 import { CreatePostForm } from '../components/createPostForm/createPostForm';
 import { FeedPostItem } from '../components/feedPostItem/feedPostItem';
+import { VenomFeedPostItem } from '../components/venomFeedPostItem/venomFeedPostItem';
 import css from './feedPage.module.scss';
 import ErrorCode = FeedServerApi.ErrorCode;
 
@@ -176,21 +177,35 @@ const RegularFeedContent = observer(() => {
 const VenomFeedContent = observer(() => {
 	const venomAccounts = useVenomAccounts();
 
-	const feed = useMemo(() => {
+	const mailList = useMemo(() => {
 		if (!venomAccounts.length) return;
 
-		const list = new MailList();
+		const mailList = new MailList();
 
-		list.init({ venomFeed: { account: venomAccounts[0] } });
+		mailList.init({ venomFeed: { account: venomAccounts[0] } });
 
-		return list;
+		return mailList;
 	}, [venomAccounts]);
 
-	useEffect(() => () => feed?.destroy(), [feed]);
+	useEffect(() => () => mailList?.destroy(), [mailList]);
 
 	return (
 		<NarrowContent title="Venom feed">
 			<CreatePostForm />
+
+			<div className={css.divider} />
+
+			<div className={css.posts}>
+				{mailList?.messages.length ? (
+					mailList.messages.map(message => <VenomFeedPostItem message={message} />)
+				) : mailList?.isLoading ? (
+					<div className={css.loader}>
+						<YlideLoader reason="Your feed is loading ..." />
+					</div>
+				) : (
+					<ErrorMessage look={ErrorMessageLook.INFO}>No messages yet</ErrorMessage>
+				)}
+			</div>
 		</NarrowContent>
 	);
 });

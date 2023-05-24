@@ -1,3 +1,8 @@
+.divider {
+	margin: 24px 0;
+	border-bottom: 1px solid var(--border-color);
+}
+
 .loader {
 	display: flex;
 	align-items: center;
