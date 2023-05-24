@@ -5,6 +5,11 @@
 	padding: 40px 0;
 }
 
+.posts {
+	display: grid;
+	grid-gap: 12px;
+}
+
 .scrollToTop {
 	position: fixed;
 	z-index: 1;

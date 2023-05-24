@@ -120,7 +120,7 @@ const RegularFeedContent = observer(() => {
 				/>
 			)}
 
-			<div className={css.feedBody} ref={feedBodyRef}>
+			<div className={css.posts} ref={feedBodyRef}>
 				{feed.loaded ? (
 					<>
 						{feed.posts.map(post => (
