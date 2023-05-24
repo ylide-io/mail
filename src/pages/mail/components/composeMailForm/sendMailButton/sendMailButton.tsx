@@ -18,10 +18,11 @@ import css from './sendMailButton.module.scss';
 
 export interface SendMailButtonProps extends PropsWithClassName {
 	mailData: OutgoingMailData;
+	disabled?: boolean;
 	onSent?: () => void;
 }
 
-export const SendMailButton = observer(({ className, mailData, onSent }: SendMailButtonProps) => {
+export const SendMailButton = observer(({ className, mailData, disabled, onSent }: SendMailButtonProps) => {
 	const blockchainGroup = mailData.from?.wallet.factory.blockchainGroup;
 
 	let text: ReactNode = 'Send';
@@ -68,7 +69,7 @@ export const SendMailButton = observer(({ className, mailData, onSent }: SendMai
 	return (
 		<div
 			className={clsx(css.root, className, {
-				[css.root_disabled]: !mailData.readyForSending,
+				[css.root_disabled]: !mailData.readyForSending || disabled,
 				[css.root_withDropdown]: blockchainGroup === 'evm',
 			})}
 		>

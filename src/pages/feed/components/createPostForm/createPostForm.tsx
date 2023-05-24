@@ -1,4 +1,3 @@
-import { asyncDelay } from '@ylide/sdk';
 import clsx from 'clsx';
 import { observer } from 'mobx-react';
 import { useEffect, useMemo, useState } from 'react';
@@ -34,34 +33,33 @@ export const CreatePostForm = observer(({}: CreatePostFormProps) => {
 
 	const [expanded, setExpanded] = useState(false);
 
-	const [preview, setPreview] = useState<boolean | string>(false);
+	const [preview, setPreview] = useState('');
+	const [previewLoading, setPreviewLoading] = useState(false);
 
 	const attachFile = async () => {
 		const files = await openFilePicker({ accept: 'image/png, image/jpeg' });
 		const file = files[0];
 		if (file) {
-			setPreview(true);
+			setPreview('');
+			setPreviewLoading(true);
+
+			function success(src: string) {
+				setPreview(src);
+				setPreviewLoading(false);
+				mailData.attachments = [file];
+			}
 
 			function error() {
-				setPreview(false);
+				setPreviewLoading(false);
 				mailData.attachments = [];
 				toast("Couldn't load the image 😒");
 			}
 
 			try {
 				const src = await readFileAsDataURL(file);
-
-				await asyncDelay(2000);
-
 				const img = document.createElement('img');
-
-				img.onload = () => {
-					setPreview(src);
-					mailData.attachments = [file];
-				};
-
+				img.onload = () => success(src);
 				img.onerror = error;
-
 				img.src = src;
 			} catch (e) {
 				error();
@@ -74,6 +72,7 @@ export const CreatePostForm = observer(({}: CreatePostFormProps) => {
 			<AutoSizeTextArea
 				resetKey={expanded}
 				className={css.textarea}
+				disabled={mailData.sending}
 				placeholder="Make a new post"
 				maxHeight={400}
 				rows={expanded ? 4 : 1}
@@ -86,11 +85,11 @@ export const CreatePostForm = observer(({}: CreatePostFormProps) => {
 
 			{expanded ? (
 				<>
-					{!!preview && (
+					{(!!preview || previewLoading) && (
 						<>
 							<div className={css.divider} />
 
-							{preview === true ? (
+							{previewLoading ? (
 								<Spinner className={css.previewLoader} />
 							) : (
 								<img className={css.previewImage} src={preview} />
@@ -103,12 +102,13 @@ export const CreatePostForm = observer(({}: CreatePostFormProps) => {
 					<div className={css.footer}>
 						{mailData.attachments.length ? (
 							<ActionButton
+								isDisabled={mailData.sending}
 								size={ActionButtonSize.MEDIUM}
 								look={ActionButtonLook.DANGEROUS}
 								icon={<TrashSvg />}
 								title="Remove attachment"
 								onClick={() => {
-									setPreview(false);
+									setPreview('');
 									mailData.attachments = [];
 								}}
 							>
@@ -116,6 +116,7 @@ export const CreatePostForm = observer(({}: CreatePostFormProps) => {
 							</ActionButton>
 						) : (
 							<ActionButton
+								isDisabled={previewLoading || mailData.sending}
 								size={ActionButtonSize.MEDIUM}
 								look={ActionButtonLook.LITE}
 								icon={<ImageSvg />}
@@ -124,7 +125,7 @@ export const CreatePostForm = observer(({}: CreatePostFormProps) => {
 							/>
 						)}
 
-						<SendMailButton mailData={mailData} />
+						<SendMailButton disabled={previewLoading} mailData={mailData} />
 					</div>
 				</>
 			) : (
