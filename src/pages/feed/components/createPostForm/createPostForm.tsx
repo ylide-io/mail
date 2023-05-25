@@ -77,6 +77,7 @@ export const CreatePostForm = observer(({ onCreated }: CreatePostFormProps) => {
 		});
 
 		setPreview('');
+		setExpanded(false);
 
 		onCreated?.();
 	};
