@@ -183,6 +183,13 @@ const VenomFeedContent = observer(() => {
 
 	useEffect(() => () => mailList?.destroy(), [mailList]);
 
+	const loadingMoreRef = useRef(null);
+	useIsInViewport({
+		ref: loadingMoreRef,
+		threshold: 100,
+		callback: visible => visible && mailList?.loadNextPage(),
+	});
+
 	return (
 		<NarrowContent title="Venom feed">
 			<CreatePostForm onCreated={() => setRebuildMailListCounter(i => i + 1)} />
@@ -191,7 +198,17 @@ const VenomFeedContent = observer(() => {
 
 			<div className={css.posts}>
 				{mailList?.messages.length ? (
-					mailList.messages.map(message => <VenomFeedPostItem message={message} />)
+					<>
+						{mailList.messages.map(message => (
+							<VenomFeedPostItem message={message} />
+						))}
+
+						{mailList.isNextPageAvailable && (
+							<div ref={loadingMoreRef} className={css.loader}>
+								<YlideLoader reason="Loading more posts ..." />
+							</div>
+						)}
+					</>
 				) : mailList?.isLoading ? (
 					<div className={css.loader}>
 						<YlideLoader reason="Your feed is loading ..." />
