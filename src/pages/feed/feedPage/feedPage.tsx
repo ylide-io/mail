@@ -16,17 +16,13 @@ import { FeedStore, getFeedCategoryName } from '../../../stores/Feed';
 import { MailList } from '../../../stores/MailList';
 import { RoutePath } from '../../../stores/routePath';
 import { connectAccount } from '../../../utils/account';
+import { useIsInViewport } from '../../../utils/ui';
 import { useNav } from '../../../utils/url';
 import { CreatePostForm } from '../components/createPostForm/createPostForm';
 import { FeedPostItem } from '../components/feedPostItem/feedPostItem';
 import { VenomFeedPostItem } from '../components/venomFeedPostItem/venomFeedPostItem';
 import css from './feedPage.module.scss';
 import ErrorCode = FeedServerApi.ErrorCode;
-
-function isInViewport(element: Element) {
-	const rect = element.getBoundingClientRect();
-	return rect.top >= -100 && rect.top <= (window.innerHeight || document.documentElement.clientHeight);
-}
 
 const RegularFeedContent = observer(() => {
 	const location = useLocation();
@@ -70,18 +66,12 @@ const RegularFeedContent = observer(() => {
 		return feed;
 	}, [accounts, canLoadFeed, category, genericLayoutApi, isAllPosts, selectedAccount, source]);
 
-	const lastPostView = useRef<HTMLDivElement>(null);
-	const feedBodyRef = useRef<HTMLDivElement>(null);
-
-	useEffect(() => {
-		const timer = setInterval(async () => {
-			if (lastPostView.current && isInViewport(lastPostView.current) && feed.moreAvailable) {
-				await feed.loadMore();
-			}
-		}, 300);
-
-		return () => clearInterval(timer);
-	}, [feed]);
+	const loadingMoreRef = useRef(null);
+	useIsInViewport({
+		ref: loadingMoreRef,
+		threshold: 100,
+		callback: visible => visible && feed.loadMore(),
+	});
 
 	return (
 		<NarrowContent
@@ -121,7 +111,7 @@ const RegularFeedContent = observer(() => {
 				/>
 			)}
 
-			<div className={css.posts} ref={feedBodyRef}>
+			<div className={css.posts}>
 				{feed.loaded ? (
 					<>
 						{feed.posts.map(post => (
@@ -129,7 +119,7 @@ const RegularFeedContent = observer(() => {
 						))}
 
 						{feed.moreAvailable && (
-							<div className={css.loader} ref={lastPostView}>
+							<div ref={loadingMoreRef} className={css.loader}>
 								<YlideLoader reason="Loading more posts ..." />
 							</div>
 						)}
