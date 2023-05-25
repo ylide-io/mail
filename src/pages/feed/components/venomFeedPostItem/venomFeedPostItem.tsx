@@ -9,7 +9,6 @@ import { ReactComponent as ContactSvg } from '../../../../icons/ic20/contact.svg
 import { MessageDecodedTextDataType } from '../../../../indexedDB/IndexedDB';
 import { ILinkedMessage } from '../../../../stores/MailList';
 import { uint8ArrayToDataURL } from '../../../../utils/array';
-import { invariant } from '../../../../utils/assert';
 import { decodeMessage } from '../../../../utils/mail';
 import css from './venomFeedPostItem.module.scss';
 
@@ -25,9 +24,11 @@ export function VenomFeedPostItem({ message }: VenomFeedPostItemProps) {
 
 	useEffect(() => {
 		decodeMessage(message.msgId, message.msg).then(async ({ decodedTextData, attachments }) => {
-			invariant(decodedTextData.type === MessageDecodedTextDataType.PLAIN);
-
-			setDecodedText(decodedTextData.value);
+			setDecodedText(
+				decodedTextData.type === MessageDecodedTextDataType.PLAIN
+					? decodedTextData.value
+					: decodedTextData.value.toPlainText(),
+			);
 
 			const attachment = attachments[0] as MessageAttachmentLinkV1 | undefined;
 			if (attachment) {
