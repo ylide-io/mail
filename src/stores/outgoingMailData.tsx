@@ -1,7 +1,7 @@
 import { OutputData } from '@editorjs/editorjs';
 import { EVMNetwork } from '@ylide/ethereum';
 import { Uint256, YMF } from '@ylide/sdk';
-import { autorun, makeAutoObservable } from 'mobx';
+import { autorun, makeAutoObservable, transaction } from 'mobx';
 import React from 'react';
 
 import { ActionButton, ActionButtonLook, ActionButtonSize } from '../components/ActionButton/ActionButton';
@@ -84,18 +84,20 @@ export class OutgoingMailData {
 
 		attachments?: File[];
 	}) {
-		this.mode = data?.mode || OutgoingMailDataMode.MESSAGE;
-		this.feedId = data?.feedId || DEFAULT_FEED_ID;
+		transaction(() => {
+			this.mode = data?.mode || OutgoingMailDataMode.MESSAGE;
+			this.feedId = data?.feedId || DEFAULT_FEED_ID;
 
-		this.from = data?.from || domain.accounts.activeAccounts[0];
-		this.to = data?.to || new Recipients();
-		this.network = data?.network;
+			this.from = data?.from || domain.accounts.activeAccounts[0];
+			this.to = data?.to || new Recipients();
+			this.network = data?.network;
 
-		this.subject = data?.subject || '';
-		this.editorData = data?.editorData;
-		this.plainTextData = data?.plainTextData || '';
+			this.subject = data?.subject || '';
+			this.editorData = data?.editorData;
+			this.plainTextData = data?.plainTextData || '';
 
-		this.attachments = data?.attachments || [];
+			this.attachments = data?.attachments || [];
+		});
 	}
 
 	get readyForSending() {
