@@ -42,6 +42,7 @@ export function AutoSizeTextArea({ resetKey, maxHeight, value, onChangeValue, ..
 		<textarea
 			ref={textareaRef}
 			{...props}
+			value={value}
 			onChange={e => {
 				onChangeValue?.(e.target.value);
 				props.onChange?.(e);
