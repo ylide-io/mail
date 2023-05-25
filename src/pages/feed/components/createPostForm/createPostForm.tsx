@@ -70,7 +70,14 @@ export const CreatePostForm = observer(({ onCreated }: CreatePostFormProps) => {
 	};
 
 	const onSent = () => {
-		mailData.reset();
+		mailData.reset({
+			mode: OutgoingMailDataMode.BROADCAST,
+			feedId: VENOM_FEED_ID,
+			from: mailData.from,
+		});
+
+		setPreview('');
+
 		onCreated?.();
 	};
 

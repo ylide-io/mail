@@ -1,6 +1,6 @@
 import { OutputData } from '@editorjs/editorjs';
 import { EVMNetwork } from '@ylide/ethereum';
-import { YMF } from '@ylide/sdk';
+import { Uint256, YMF } from '@ylide/sdk';
 import { autorun, makeAutoObservable } from 'mobx';
 import React from 'react';
 
@@ -21,6 +21,8 @@ import domain from './Domain';
 import { evmBalances } from './evmBalances';
 import { DomainAccount } from './models/DomainAccount';
 
+const DEFAULT_FEED_ID = REACT_APP__APP_MODE === AppMode.OTC ? OTC_FEED_ID : HUB_FEED_ID;
+
 export enum OutgoingMailDataMode {
 	MESSAGE = 'MESSAGE',
 	BROADCAST = 'BROADCAST',
@@ -28,8 +30,7 @@ export enum OutgoingMailDataMode {
 
 export class OutgoingMailData {
 	mode = OutgoingMailDataMode.MESSAGE;
-
-	sending = false;
+	feedId = DEFAULT_FEED_ID;
 
 	from?: DomainAccount;
 	to: Recipients = new Recipients();
@@ -41,7 +42,7 @@ export class OutgoingMailData {
 
 	attachments: File[] = [];
 
-	feedId = REACT_APP__APP_MODE === AppMode.OTC ? OTC_FEED_ID : HUB_FEED_ID;
+	sending = false;
 
 	constructor() {
 		makeAutoObservable(this);
@@ -69,7 +70,23 @@ export class OutgoingMailData {
 		return !!this.plainTextData.trim();
 	}
 
-	reset(data?: OutgoingMailData) {
+	reset(data?: {
+		mode?: OutgoingMailDataMode;
+		feedId?: Uint256;
+
+		from?: DomainAccount;
+		to?: Recipients;
+		network?: EVMNetwork;
+
+		subject?: string;
+		editorData?: OutputData;
+		plainTextData?: string;
+
+		attachments?: File[];
+	}) {
+		this.mode = data?.mode || OutgoingMailDataMode.MESSAGE;
+		this.feedId = data?.feedId || DEFAULT_FEED_ID;
+
 		this.from = data?.from || domain.accounts.activeAccounts[0];
 		this.to = data?.to || new Recipients();
 		this.network = data?.network;
