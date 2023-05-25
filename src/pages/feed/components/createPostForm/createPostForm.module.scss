@@ -1,0 +1,39 @@
+.form {
+	display: grid;
+	grid-template-columns: 1fr auto;
+	grid-gap: 12px;
+	padding: 12px;
+	background: var(--surface-color);
+	border: 1px solid var(--border-color);
+	border-radius: 8px;
+}
+
+.form_expanded {
+	grid-template-columns: 1fr;
+}
+
+.textarea {
+	padding: 8px;
+}
+
+.divider {
+	border-bottom: 1px solid var(--border-color);
+}
+
+.previewLoader {
+	margin: 20px auto;
+}
+
+.previewImage {
+	width: 100%;
+	max-height: 240px;
+	object-fit: cover;
+}
+
+.footer {
+	display: grid;
+	grid-auto-flow: column;
+	grid-gap: 12px;
+	align-items: center;
+	justify-content: end;
+}

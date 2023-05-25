@@ -31,7 +31,7 @@ export const ComposeMailForm = observer(
 		const [isAttachmentPopupOpen, setAttachmentPopupOpen] = useState(false);
 
 		async function attachFile() {
-			const files = await openFilePicker();
+			const files = await openFilePicker({ multiple: true });
 			if (files.length) {
 				mailData.attachments.push(...files);
 			}

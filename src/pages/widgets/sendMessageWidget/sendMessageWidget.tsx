@@ -5,7 +5,6 @@ import { ActionButton, ActionButtonLook } from '../../../components/ActionButton
 import { Recipients } from '../../../components/recipientInput/recipientInput';
 import { Toast, toast } from '../../../components/toast/toast';
 import { ReactComponent as CrossSvg } from '../../../icons/ic20/cross.svg';
-import mailer from '../../../stores/Mailer';
 import { OutgoingMailData } from '../../../stores/outgoingMailData';
 import { invariant } from '../../../utils/assert';
 import { ComposeMailForm } from '../../mail/components/composeMailForm/composeMailForm';
@@ -26,7 +25,7 @@ export function SendMessageWidget() {
 	}, [subject, toAddress]);
 
 	const closeWidget = () => {
-		if (mailer.sending) {
+		if (mailData.sending) {
 			toast('Please wait. Sending is in progress 👌');
 		} else {
 			postWidgetMessage(WidgetMessageType.SEND_MESSAGE__CLOSE);

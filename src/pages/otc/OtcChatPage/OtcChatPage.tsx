@@ -8,6 +8,7 @@ import { OtcApi } from '../../../api/otcApi';
 import { AccountSelect } from '../../../components/accountSelect/accountSelect';
 import { ActionButton, ActionButtonLook, ActionButtonSize } from '../../../components/ActionButton/ActionButton';
 import { AdaptiveAddress } from '../../../components/adaptiveAddress/adaptiveAddress';
+import { AutoSizeTextArea } from '../../../components/autoSizeTextArea/autoSizeTextArea';
 import { ErrorMessage } from '../../../components/errorMessage/errorMessage';
 import { NlToBr } from '../../../components/nlToBr/nlToBr';
 import { Recipients } from '../../../components/recipientInput/recipientInput';
@@ -19,7 +20,6 @@ import domain from '../../../stores/Domain';
 import { OutgoingMailData } from '../../../stores/outgoingMailData';
 import { invariant } from '../../../utils/assert';
 import { decodeMessage, parseEditorJsJson } from '../../../utils/mail';
-import { useAutoSizeTextArea } from '../../../utils/useAutoSizeTextArea';
 import { SendMailButton } from '../../mail/components/composeMailForm/sendMailButton/sendMailButton';
 import { OtcLayout } from '../components/otcLayout/otcLayout';
 import { getOtcProviderLogo } from '../otc';
@@ -106,9 +106,7 @@ export const OtcChatPage = observer(() => {
 		}
 	}, [data]);
 
-	const textareaRef = useRef(null);
 	const [newMessage, setNewMessage] = useState('');
-	useAutoSizeTextArea(textareaRef, newMessage, 200);
 
 	const mailData = useMemo(() => new OutgoingMailData(), []);
 	useEffect(() => {
@@ -187,13 +185,13 @@ export const OtcChatPage = observer(() => {
 			</div>
 
 			<div className={css.footer}>
-				<textarea
-					ref={textareaRef}
+				<AutoSizeTextArea
 					className={css.textarea}
+					maxHeight={200}
 					rows={1}
 					placeholder="Type your message here"
 					value={newMessage}
-					onChange={e => setNewMessage(e.target.value)}
+					onChangeValue={setNewMessage}
 				/>
 
 				<SendMailButton mailData={mailData} onSent={onSent} />

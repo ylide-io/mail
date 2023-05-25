@@ -1,5 +1,5 @@
 import { observer } from 'mobx-react';
-import React, { useEffect, useMemo, useRef } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { generatePath, useLocation, useParams } from 'react-router-dom';
 
 import { FeedCategory, FeedServerApi } from '../../../api/feedServerApi';
@@ -11,38 +11,28 @@ import { YlideLoader } from '../../../components/ylideLoader/ylideLoader';
 import { AppMode, REACT_APP__APP_MODE } from '../../../env';
 import { ReactComponent as ArrowUpSvg } from '../../../icons/ic20/arrowUp.svg';
 import { ReactComponent as CrossSvg } from '../../../icons/ic20/cross.svg';
-import { useDomainAccounts } from '../../../stores/Domain';
+import { useDomainAccounts, useVenomAccounts } from '../../../stores/Domain';
 import { FeedStore, getFeedCategoryName } from '../../../stores/Feed';
+import { MailList } from '../../../stores/MailList';
 import { RoutePath } from '../../../stores/routePath';
 import { connectAccount } from '../../../utils/account';
+import { useIsInViewport } from '../../../utils/ui';
 import { useNav } from '../../../utils/url';
+import { CreatePostForm } from '../components/createPostForm/createPostForm';
 import { FeedPostItem } from '../components/feedPostItem/feedPostItem';
+import { VenomFeedPostItem } from '../components/venomFeedPostItem/venomFeedPostItem';
 import css from './feedPage.module.scss';
 import ErrorCode = FeedServerApi.ErrorCode;
 
-function isInViewport(element: Element) {
-	const rect = element.getBoundingClientRect();
-	return rect.top >= -100 && rect.top <= (window.innerHeight || document.documentElement.clientHeight);
-}
-
-const FeedPageContent = observer(() => {
+const RegularFeedContent = observer(() => {
 	const location = useLocation();
 	const navigate = useNav();
+	const accounts = useDomainAccounts();
 	const genericLayoutApi = useGenericLayoutApi();
 
-	const lastPostView = useRef<HTMLDivElement>(null);
-	const feedBodyRef = useRef<HTMLDivElement>(null);
 	const { category, source, address } = useParams<{ category: FeedCategory; source: string; address: string }>();
 	const isAllPosts = location.pathname === generatePath(RoutePath.FEED_ALL);
-
-	const accounts = useDomainAccounts();
 	const selectedAccount = accounts.find(a => a.account.address === address);
-
-	// We can NOT load smart feed if no suitable account connected
-	const canLoadFeed =
-		!!category ||
-		isAllPosts ||
-		(!!accounts.length && (REACT_APP__APP_MODE !== AppMode.MAIN_VIEW || accounts.every(a => a.mainViewKey)));
 
 	useEffect(() => {
 		if (address && !selectedAccount) {
@@ -50,7 +40,11 @@ const FeedPageContent = observer(() => {
 		}
 	}, [address, navigate, selectedAccount]);
 
-	// TODO Reload when feed settings changes
+	// We can NOT load smart feed if no suitable account connected
+	const canLoadFeed =
+		!!category ||
+		isAllPosts ||
+		(!!accounts.length && (REACT_APP__APP_MODE !== AppMode.MAIN_VIEW || accounts.every(a => a.mainViewKey)));
 
 	const feed = useMemo(() => {
 		const feed = new FeedStore({
@@ -72,15 +66,12 @@ const FeedPageContent = observer(() => {
 		return feed;
 	}, [accounts, canLoadFeed, category, genericLayoutApi, isAllPosts, selectedAccount, source]);
 
-	useEffect(() => {
-		const timer = setInterval(async () => {
-			if (lastPostView.current && isInViewport(lastPostView.current) && feed.moreAvailable) {
-				await feed.loadMore();
-			}
-		}, 300);
-
-		return () => clearInterval(timer);
-	}, [feed]);
+	const loadingMoreRef = useRef(null);
+	useIsInViewport({
+		ref: loadingMoreRef,
+		threshold: 100,
+		callback: visible => visible && feed.loadMore(),
+	});
 
 	return (
 		<NarrowContent
@@ -120,7 +111,7 @@ const FeedPageContent = observer(() => {
 				/>
 			)}
 
-			<div className={css.feedBody} ref={feedBodyRef}>
+			<div className={css.posts}>
 				{feed.loaded ? (
 					<>
 						{feed.posts.map(post => (
@@ -128,7 +119,7 @@ const FeedPageContent = observer(() => {
 						))}
 
 						{feed.moreAvailable && (
-							<div className={css.loader} ref={lastPostView}>
+							<div ref={loadingMoreRef} className={css.loader}>
 								<YlideLoader reason="Loading more posts ..." />
 							</div>
 						)}
@@ -171,6 +162,72 @@ const FeedPageContent = observer(() => {
 			</div>
 		</NarrowContent>
 	);
+});
+
+const VenomFeedContent = observer(() => {
+	const venomAccounts = useVenomAccounts();
+
+	const [rebuildMailListCounter, setRebuildMailListCounter] = useState(1);
+	const mailList = useMemo(() => {
+		// Senceless code to make IDE treat this var as dependency
+		isNaN(rebuildMailListCounter);
+
+		if (!venomAccounts.length) return;
+
+		const mailList = new MailList();
+
+		mailList.init({ venomFeed: { account: venomAccounts[0] } });
+
+		return mailList;
+	}, [rebuildMailListCounter, venomAccounts]);
+
+	useEffect(() => () => mailList?.destroy(), [mailList]);
+
+	const loadingMoreRef = useRef(null);
+	useIsInViewport({
+		ref: loadingMoreRef,
+		threshold: 100,
+		callback: visible => visible && mailList?.loadNextPage(),
+	});
+
+	return (
+		<NarrowContent title="Venom feed">
+			<CreatePostForm onCreated={() => setRebuildMailListCounter(i => i + 1)} />
+
+			<div className={css.divider} />
+
+			<div className={css.posts}>
+				{mailList?.messages.length ? (
+					<>
+						{mailList.messages.map(message => (
+							<VenomFeedPostItem message={message} />
+						))}
+
+						{mailList.isNextPageAvailable && (
+							<div ref={loadingMoreRef} className={css.loader}>
+								<YlideLoader reason="Loading more posts ..." />
+							</div>
+						)}
+					</>
+				) : mailList?.isLoading ? (
+					<div className={css.loader}>
+						<YlideLoader reason="Your feed is loading ..." />
+					</div>
+				) : (
+					<ErrorMessage look={ErrorMessageLook.INFO}>No messages yet</ErrorMessage>
+				)}
+			</div>
+		</NarrowContent>
+	);
+});
+
+//
+
+const FeedPageContent = observer(() => {
+	const location = useLocation();
+	const isVenomFeed = location.pathname === generatePath(RoutePath.FEED_VENOM);
+
+	return isVenomFeed ? <VenomFeedContent /> : <RegularFeedContent />;
 });
 
 export const FeedPage = () => (

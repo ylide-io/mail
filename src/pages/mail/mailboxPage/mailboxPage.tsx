@@ -81,11 +81,17 @@ export const MailboxPage = observer(() => {
 	);
 
 	const mailList = useMemo(() => {
-		return new MailList({
-			folderId: folderId!,
-			sender: filterBySender,
-			filter: messageFilter,
+		const list = new MailList();
+
+		list.init({
+			mailbox: {
+				folderId: folderId!,
+				sender: filterBySender,
+				filter: messageFilter,
+			},
 		});
+
+		return list;
 	}, [filterBySender, folderId, messageFilter]);
 
 	useEffect(() => () => mailList.destroy(), [mailList]);

@@ -1,8 +1,9 @@
-export function openFilePicker(): Promise<File[]> {
+export function openFilePicker(props?: { multiple?: boolean; accept?: string }): Promise<File[]> {
 	return new Promise(resolve => {
 		const input = document.createElement('input');
 		input.type = 'file';
-		input.multiple = true;
+		input.multiple = !!props?.multiple;
+		input.accept = props?.accept || '';
 		input.onchange = () => {
 			resolve(Array.from(input.files || []));
 		};
@@ -21,6 +22,20 @@ export function readFileAsArrayBuffer(file: File): Promise<ArrayBuffer> {
 		reader.onerror = e => reject(e);
 
 		reader.readAsArrayBuffer(file);
+	});
+}
+
+export function readFileAsDataURL(file: File): Promise<string> {
+	return new Promise((resolve, reject) => {
+		const reader = new FileReader();
+
+		reader.onloadend = () => {
+			resolve(reader.result!.toString());
+		};
+
+		reader.onerror = e => reject(e);
+
+		reader.readAsDataURL(file);
 	});
 }
 
