@@ -122,6 +122,7 @@ export const SidebarButton = observer(({ look, href, icon, name, rightButton }: 
 			href={href}
 			onClick={e => {
 				e.preventDefault();
+				isSidebarOpen.set(false);
 				navigate(href);
 			}}
 		>
