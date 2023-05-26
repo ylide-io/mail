@@ -192,7 +192,17 @@ const VenomFeedContent = observer(() => {
 
 	return (
 		<NarrowContent title="Venom feed">
-			<CreatePostForm onCreated={() => setRebuildMailListCounter(i => i + 1)} />
+			{venomAccounts.length ? (
+				<CreatePostForm onCreated={() => setRebuildMailListCounter(i => i + 1)} />
+			) : (
+				<ErrorMessage look={ErrorMessageLook.INFO}>
+					<div>Connect your Venom wallet to post messages to Venom feed.</div>
+
+					<ActionButton look={ActionButtonLook.PRIMARY} onClick={() => connectAccount()}>
+						Connect account
+					</ActionButton>
+				</ErrorMessage>
+			)}
 
 			<div className={css.divider} />
 

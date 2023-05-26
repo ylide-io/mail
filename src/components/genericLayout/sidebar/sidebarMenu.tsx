@@ -31,7 +31,7 @@ import { sideTechnologyIcon } from '../../../icons/static/sideTechnologyIcon';
 import { FeedSettingsPopup } from '../../../pages/feed/components/feedSettingsPopup/feedSettingsPopup';
 import { WidgetId } from '../../../pages/widgets/widgets';
 import { browserStorage } from '../../../stores/browserStorage';
-import domain, { useVenomAccounts } from '../../../stores/Domain';
+import domain from '../../../stores/Domain';
 import { getFeedCategoryName } from '../../../stores/Feed';
 import { FolderId } from '../../../stores/MailList';
 import { RoutePath } from '../../../stores/routePath';
@@ -169,8 +169,6 @@ const getFeedCategoryIcon = (category: FeedCategory) => {
 };
 
 export const SidebarMenu = observer(() => {
-	const venomAccounts = useVenomAccounts();
-
 	const openMailCopmpose = useOpenMailCopmpose();
 
 	const [isFeedSettingsOpen, setFeedSettingsOpen] = useState(false);
@@ -188,7 +186,7 @@ export const SidebarMenu = observer(() => {
 	function renderFeedSection() {
 		return (
 			<>
-				{!!venomAccounts.length && REACT_APP__APP_MODE !== AppMode.MAIN_VIEW && (
+				{REACT_APP__APP_MODE !== AppMode.MAIN_VIEW && (
 					<SidebarButton
 						look={SidebarButtonLook.SECTION}
 						href={generatePath(RoutePath.FEED_VENOM)}
