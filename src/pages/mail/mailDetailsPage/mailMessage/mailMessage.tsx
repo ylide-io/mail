@@ -21,6 +21,7 @@ import { invariant } from '../../../../utils/assert';
 import { formatAddress } from '../../../../utils/blockchain';
 import { DateFormatStyle } from '../../../../utils/date';
 import { downloadFile, formatFileSize } from '../../../../utils/file';
+import { getIpfsHashFromUrl } from '../../../../utils/ipfs';
 import {
 	decodeAttachment,
 	decodedTextDataToEditorJsData,
@@ -178,7 +179,7 @@ export function Attachment({ attachment, message }: AttachmentProps) {
 		try {
 			setDownloading(true);
 
-			const uint8Array = await new YlideIpfsStorage().downloadFromIpfs(attachment.link.replace('ipfs://', ''));
+			const uint8Array = await new YlideIpfsStorage().downloadFromIpfs(getIpfsHashFromUrl(attachment.link));
 			const decrypted = await decodeAttachment(uint8Array, message.msg, message.recipient!.account);
 
 			downloadFile(decrypted, attachment.fileName);

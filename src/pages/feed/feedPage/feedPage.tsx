@@ -11,11 +11,13 @@ import { YlideLoader } from '../../../components/ylideLoader/ylideLoader';
 import { AppMode, REACT_APP__APP_MODE } from '../../../env';
 import { ReactComponent as ArrowUpSvg } from '../../../icons/ic20/arrowUp.svg';
 import { ReactComponent as CrossSvg } from '../../../icons/ic20/cross.svg';
+import { IMessageDecodedContent } from '../../../indexedDB/IndexedDB';
 import { useDomainAccounts, useVenomAccounts } from '../../../stores/Domain';
 import { FeedStore, getFeedCategoryName } from '../../../stores/Feed';
-import { MailList } from '../../../stores/MailList';
+import { ILinkedMessage, MailList } from '../../../stores/MailList';
 import { RoutePath } from '../../../stores/routePath';
 import { connectAccount } from '../../../utils/account';
+import { decodeMessage } from '../../../utils/mail';
 import { useIsInViewport } from '../../../utils/ui';
 import { useNav } from '../../../utils/url';
 import { CreatePostForm } from '../components/createPostForm/createPostForm';
@@ -174,9 +176,15 @@ const VenomFeedContent = observer(() => {
 
 		if (!venomAccounts.length) return;
 
-		const mailList = new MailList();
+		const mailList = new MailList<{ message: ILinkedMessage; decoded: IMessageDecodedContent }>();
 
-		mailList.init({ venomFeed: { account: venomAccounts[0] } });
+		mailList.init({
+			messageHandler: async message => ({
+				message,
+				decoded: await decodeMessage(message.msgId, message.msg),
+			}),
+			venomFeed: { account: venomAccounts[0] },
+		});
 
 		return mailList;
 	}, [rebuildMailListCounter, venomAccounts]);
@@ -210,7 +218,7 @@ const VenomFeedContent = observer(() => {
 				{mailList?.messages.length ? (
 					<>
 						{mailList.messages.map(message => (
-							<VenomFeedPostItem message={message} />
+							<VenomFeedPostItem message={message.message} decoded={message.decoded} />
 						))}
 
 						{mailList.isNextPageAvailable && (

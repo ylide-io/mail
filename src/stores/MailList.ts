@@ -92,24 +92,30 @@ export interface ILinkedMessage {
 	reader: AbstractBlockchainController;
 }
 
-export class MailList {
+export class MailList<M = ILinkedMessage> {
 	private isDestroyed = false;
 
 	@observable isLoading = true;
 	@observable isNextPageAvailable = true;
-	@observable messages: ILinkedMessage[] = [];
+	@observable messages: M[] = [];
 
 	private stream: ListSourceDrainer | undefined;
+	private messageHandler: ((message: ILinkedMessage) => M | Promise<M>) | undefined;
 
 	constructor() {
 		makeObservable(this);
 	}
 
 	async init(props: {
+		messageHandler?: (message: ILinkedMessage) => M | Promise<M>;
 		mailbox?: { folderId: FolderId; sender?: string; filter?: (id: string) => boolean };
 		venomFeed?: { account: DomainAccount };
 	}) {
-		const { mailbox, venomFeed } = props;
+		const { messageHandler, mailbox, venomFeed } = props;
+
+		if (messageHandler) {
+			this.messageHandler = messageHandler;
+		}
 
 		if (mailbox) {
 			function buildMailboxSources(): ISourceWithMeta[] {
@@ -196,9 +202,16 @@ export class MailList {
 		});
 	}
 
+	private async handleMessages(messages: IMessageWithSource[]) {
+		const wrapped = await wrapMessages(messages);
+		return await Promise.all(
+			wrapped.map(async m => (this.messageHandler ? await this.messageHandler(m) : (m as M))),
+		);
+	}
+
 	@autobind
 	private async onNewMessages({ messages }: { messages: IMessageWithSource[] }) {
-		this.messages = await wrapMessages(messages);
+		this.messages = await this.handleMessages(messages);
 	}
 
 	loadNextPage() {
@@ -208,7 +221,7 @@ export class MailList {
 		this.isLoading = true;
 
 		this.stream.readMore(MailPageSize).then(messages => {
-			wrapMessages(messages).then(wrapped => {
+			this.handleMessages(messages).then(wrapped => {
 				transaction(() => {
 					this.messages = wrapped;
 					this.isNextPageAvailable = !this.stream?.drained;
