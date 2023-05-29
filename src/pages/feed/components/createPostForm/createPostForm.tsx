@@ -115,14 +115,12 @@ export const CreatePostForm = observer(({ accounts, onCreated }: CreatePostFormP
 					<div className={css.divider} />
 
 					<div className={css.footer}>
-						{accounts.length > 1 && (
-							<AccountSelect
-								className={css.accontSelect}
-								accounts={accounts}
-								activeAccount={mailData.from}
-								onChange={account => (mailData.from = account)}
-							/>
-						)}
+						<AccountSelect
+							className={css.accontSelect}
+							accounts={accounts}
+							activeAccount={mailData.from}
+							onChange={account => (mailData.from = account)}
+						/>
 
 						<div className={css.footerRight}>
 							{mailData.attachments.length ? (
