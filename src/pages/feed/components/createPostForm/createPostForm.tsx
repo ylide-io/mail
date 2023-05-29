@@ -10,19 +10,18 @@ import { toast } from '../../../../components/toast/toast';
 import { VENOM_FEED_ID } from '../../../../constants';
 import { ReactComponent as TrashSvg } from '../../../../icons/ic20/trash.svg';
 import { ReactComponent as ImageSvg } from '../../../../icons/ic28/image.svg';
-import { useVenomAccounts } from '../../../../stores/Domain';
+import { DomainAccount } from '../../../../stores/models/DomainAccount';
 import { OutgoingMailData, OutgoingMailDataMode } from '../../../../stores/outgoingMailData';
 import { openFilePicker, readFileAsDataURL } from '../../../../utils/file';
 import { SendMailButton } from '../../../mail/components/composeMailForm/sendMailButton/sendMailButton';
 import css from './createPostForm.module.scss';
 
 export interface CreatePostFormProps {
+	accounts: DomainAccount[];
 	onCreated?: () => void;
 }
 
-export const CreatePostForm = observer(({ onCreated }: CreatePostFormProps) => {
-	const venomAccounts = useVenomAccounts();
-
+export const CreatePostForm = observer(({ accounts, onCreated }: CreatePostFormProps) => {
 	const mailData = useMemo(() => {
 		const mailData = new OutgoingMailData();
 		mailData.mode = OutgoingMailDataMode.BROADCAST;
@@ -31,8 +30,8 @@ export const CreatePostForm = observer(({ onCreated }: CreatePostFormProps) => {
 	}, []);
 
 	useEffect(() => {
-		mailData.from = venomAccounts[0];
-	}, [mailData, venomAccounts]);
+		mailData.from = accounts[0];
+	}, [mailData, accounts]);
 
 	const [expanded, setExpanded] = useState(false);
 
@@ -116,10 +115,10 @@ export const CreatePostForm = observer(({ onCreated }: CreatePostFormProps) => {
 					<div className={css.divider} />
 
 					<div className={css.footer}>
-						{venomAccounts.length > 1 && (
+						{accounts.length > 1 && (
 							<AccountSelect
 								className={css.accontSelect}
-								accounts={venomAccounts}
+								accounts={accounts}
 								activeAccount={mailData.from}
 								onChange={account => (mailData.from = account)}
 							/>
