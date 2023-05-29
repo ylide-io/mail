@@ -30,7 +30,7 @@ export const CreatePostForm = observer(({ accounts, onCreated }: CreatePostFormP
 	}, []);
 
 	useEffect(() => {
-		mailData.from = accounts[0];
+		mailData.from = mailData.from && accounts.includes(mailData.from) ? mailData.from : accounts[0];
 	}, [mailData, accounts]);
 
 	const [expanded, setExpanded] = useState(false);
