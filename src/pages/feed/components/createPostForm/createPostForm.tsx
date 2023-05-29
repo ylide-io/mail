@@ -2,6 +2,7 @@ import clsx from 'clsx';
 import { observer } from 'mobx-react';
 import { useEffect, useMemo, useState } from 'react';
 
+import { AccountSelect } from '../../../../components/accountSelect/accountSelect';
 import { ActionButton, ActionButtonLook, ActionButtonSize } from '../../../../components/ActionButton/ActionButton';
 import { AutoSizeTextArea } from '../../../../components/autoSizeTextArea/autoSizeTextArea';
 import { Spinner } from '../../../../components/spinner/spinner';
@@ -115,32 +116,43 @@ export const CreatePostForm = observer(({ onCreated }: CreatePostFormProps) => {
 					<div className={css.divider} />
 
 					<div className={css.footer}>
-						{mailData.attachments.length ? (
-							<ActionButton
-								isDisabled={mailData.sending}
-								size={ActionButtonSize.MEDIUM}
-								look={ActionButtonLook.DANGEROUS}
-								icon={<TrashSvg />}
-								title="Remove attachment"
-								onClick={() => {
-									setPreview('');
-									mailData.attachments = [];
-								}}
-							>
-								Attachment
-							</ActionButton>
-						) : (
-							<ActionButton
-								isDisabled={previewLoading || mailData.sending}
-								size={ActionButtonSize.MEDIUM}
-								look={ActionButtonLook.LITE}
-								icon={<ImageSvg />}
-								title="Attach image"
-								onClick={attachFile}
+						{venomAccounts.length > 1 && (
+							<AccountSelect
+								className={css.accontSelect}
+								accounts={venomAccounts}
+								activeAccount={mailData.from}
+								onChange={account => (mailData.from = account)}
 							/>
 						)}
 
-						<SendMailButton disabled={previewLoading} mailData={mailData} onSent={onSent} />
+						<div className={css.footerRight}>
+							{mailData.attachments.length ? (
+								<ActionButton
+									isDisabled={mailData.sending}
+									size={ActionButtonSize.MEDIUM}
+									look={ActionButtonLook.DANGEROUS}
+									icon={<TrashSvg />}
+									title="Remove attachment"
+									onClick={() => {
+										setPreview('');
+										mailData.attachments = [];
+									}}
+								>
+									Attachment
+								</ActionButton>
+							) : (
+								<ActionButton
+									isDisabled={previewLoading || mailData.sending}
+									size={ActionButtonSize.MEDIUM}
+									look={ActionButtonLook.LITE}
+									icon={<ImageSvg />}
+									title="Attach image"
+									onClick={attachFile}
+								/>
+							)}
+
+							<SendMailButton disabled={previewLoading} mailData={mailData} onSent={onSent} />
+						</div>
 					</div>
 				</>
 			) : (

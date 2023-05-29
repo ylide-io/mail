@@ -21,11 +21,14 @@ export function formatFullAccountName(account: DomainAccount) {
 }
 
 interface AccountSelectProps extends PropsWithClassName {
+	accounts?: DomainAccount[];
 	activeAccount?: DomainAccount;
 	onChange?: (account: DomainAccount) => void;
 }
 
-export const AccountSelect = observer(({ className, activeAccount, onChange }: AccountSelectProps) => {
+export const AccountSelect = observer(({ className, activeAccount, onChange, ...props }: AccountSelectProps) => {
+	const accounts = props.accounts || domain.accounts.activeAccounts;
+
 	return (
 		<Select
 			className={className}
@@ -34,7 +37,7 @@ export const AccountSelect = observer(({ className, activeAccount, onChange }: A
 		>
 			{onSelect => (
 				<>
-					{domain.accounts.activeAccounts.map((account, i) => (
+					{accounts.map((account, i) => (
 						<DropDownItem
 							key={i}
 							mode={account === activeAccount ? DropDownItemMode.HIGHLIGHTED : undefined}

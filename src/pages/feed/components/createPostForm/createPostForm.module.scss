@@ -31,9 +31,31 @@
 }
 
 .footer {
+	display: flex;
+
+	@include less720px {
+		display: grid;
+		justify-items: end;
+		grid-gap: 8px;
+	}
+}
+
+.accontSelect {
+	margin: 0 32px 0 0;
+	width: 100%;
+	max-width: 268px;
+
+	@include less720px {
+		margin: 0;
+	}
+}
+
+.footerRight {
+	flex: 0 0 auto;
 	display: grid;
 	grid-auto-flow: column;
 	grid-gap: 12px;
 	align-items: center;
-	justify-content: end;
+	justify-content: start;
+	margin: 0 0 0 auto;
 }
