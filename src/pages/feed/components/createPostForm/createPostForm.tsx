@@ -5,6 +5,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { AccountSelect } from '../../../../components/accountSelect/accountSelect';
 import { ActionButton, ActionButtonLook, ActionButtonSize } from '../../../../components/ActionButton/ActionButton';
 import { AutoSizeTextArea } from '../../../../components/autoSizeTextArea/autoSizeTextArea';
+import { PropsWithClassName } from '../../../../components/props';
 import { Spinner } from '../../../../components/spinner/spinner';
 import { toast } from '../../../../components/toast/toast';
 import { VENOM_FEED_ID } from '../../../../constants';
@@ -16,12 +17,12 @@ import { openFilePicker, readFileAsDataURL } from '../../../../utils/file';
 import { SendMailButton } from '../../../mail/components/composeMailForm/sendMailButton/sendMailButton';
 import css from './createPostForm.module.scss';
 
-export interface CreatePostFormProps {
+export interface CreatePostFormProps extends PropsWithClassName {
 	accounts: DomainAccount[];
 	onCreated?: () => void;
 }
 
-export const CreatePostForm = observer(({ accounts, onCreated }: CreatePostFormProps) => {
+export const CreatePostForm = observer(({ className, accounts, onCreated }: CreatePostFormProps) => {
 	const mailData = useMemo(() => {
 		const mailData = new OutgoingMailData();
 		mailData.mode = OutgoingMailDataMode.BROADCAST;
@@ -83,7 +84,7 @@ export const CreatePostForm = observer(({ accounts, onCreated }: CreatePostFormP
 	};
 
 	return (
-		<div className={clsx(css.form, expanded && css.form_expanded)}>
+		<div className={clsx(css.form, expanded && css.form_expanded, className)}>
 			<AutoSizeTextArea
 				resetKey={expanded}
 				className={css.textarea}

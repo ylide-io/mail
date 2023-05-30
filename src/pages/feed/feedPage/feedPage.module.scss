@@ -10,6 +10,12 @@
 	padding: 40px 0;
 }
 
+.createPostForm {
+	@include less720px {
+		margin: 0 12px;
+	}
+}
+
 .posts {
 	display: grid;
 	grid-gap: 12px;
