@@ -2,7 +2,7 @@
 	display: grid;
 	grid-template-columns: auto 1fr;
 	grid-template-rows: auto 1fr;
-	grid-gap: 4px 12px;
+	grid-gap: 8px 12px;
 	position: relative;
 	padding: 12px;
 	background: var(--surface-color);
@@ -33,6 +33,7 @@
 	align-items: center;
 	justify-content: space-between;
 	grid-gap: 8px;
+	padding: 3px 3px 0 0;
 }
 
 .metaRight {
