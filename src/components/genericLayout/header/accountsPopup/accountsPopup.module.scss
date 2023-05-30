@@ -39,16 +39,14 @@
 }
 
 .itemName {
-	@include flex-row(center, flex-start);
+	display: flex;
+	align-items: center;
 	max-width: 150px;
 	font-size: 16px;
 }
 
 .itemNameInner {
 	flex-shrink: 1;
-	overflow: hidden;
-	white-space: nowrap;
-	text-overflow: ellipsis;
 }
 
 .itemNameInner_empty {

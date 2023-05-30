@@ -11,6 +11,7 @@ import { HorizontalAlignment } from '../../../../utils/alignment';
 import { walletsMeta } from '../../../../utils/wallet';
 import { ActionButton, ActionButtonLook, ActionButtonSize } from '../../../ActionButton/ActionButton';
 import { AdaptiveAddress } from '../../../adaptiveAddress/adaptiveAddress';
+import { AdaptiveText } from '../../../adaptiveText/adaptiveText';
 import { Avatar } from '../../../avatar/avatar';
 import { AnchoredPopup } from '../../../popup/anchoredPopup/anchoredPopup';
 import css from './accountsPopup.module.scss';
@@ -35,9 +36,11 @@ export const AccountsPopup = observer(({ anchorRef, onClose }: AccountsPopupProp
 						<Avatar className={css.itemIcon} blockie={account.account.address} />
 						<div className={css.itemBody}>
 							<div className={css.itemName}>
-								<div className={clsx(css.itemNameInner, !account.name && css.itemNameInner_empty)}>
-									{account.name || 'No name'}
-								</div>
+								<AdaptiveText
+									className={clsx(css.itemNameInner, !account.name && css.itemNameInner_empty)}
+									text={account.name || 'No name'}
+								/>
+
 								<ActionButton
 									look={ActionButtonLook.LITE}
 									icon={<EditSvg />}
