@@ -3,13 +3,21 @@ import { PropsWithClassName } from '../props';
 
 interface AdaptiveAddressProps extends PropsWithClassName {
 	address: string;
+	maxLength?: number;
 	textAlign?: 'left' | 'right';
 	noTooltip?: boolean;
 }
 
-export function AdaptiveAddress({ className, address, textAlign = 'left', noTooltip }: AdaptiveAddressProps) {
+export function AdaptiveAddress({
+	className,
+	address,
+	maxLength,
+	textAlign = 'left',
+	noTooltip,
+}: AdaptiveAddressProps) {
 	return (
 		<AdaptiveText
+			maxLength={maxLength}
 			textAlign={textAlign}
 			className={className}
 			text={address}

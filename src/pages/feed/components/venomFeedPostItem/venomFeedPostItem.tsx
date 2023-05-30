@@ -34,7 +34,7 @@ export function VenomFeedPostItem({ message, decoded: { decodedTextData, attachm
 			</div>
 
 			<div className={css.meta}>
-				<AdaptiveAddress className={css.sender} address={message.msg.senderAddress} />
+				<AdaptiveAddress className={css.sender} maxLength={12} address={message.msg.senderAddress} />
 
 				<ReadableDate className={css.date} value={message.msg.createdAt * 1000} />
 			</div>

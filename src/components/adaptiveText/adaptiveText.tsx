@@ -8,6 +8,8 @@ import css from './adaptiveText.module.scss';
 
 interface AdaptiveTextProps extends PropsWithClassName {
 	text: string;
+	maxLength?: number;
+	separator?: string;
 	textAlign?: 'left' | 'right';
 	title?: string;
 }
@@ -15,6 +17,11 @@ interface AdaptiveTextProps extends PropsWithClassName {
 export function AdaptiveText({ className, text, textAlign = 'left', title, ...props }: AdaptiveTextProps) {
 	const rootRef = useRef<HTMLDivElement>(null);
 	const visibleRef = useRef<HTMLDivElement>(null);
+
+	const separator = props.separator != null ? props.separator : '..';
+	const maxLength = props.maxLength || text.length;
+
+	const initialText = truncateInMiddle(text, maxLength, separator);
 
 	const [size, setSize] = useState({ scrollWidth: 0, clientWidth: 0 });
 
@@ -37,14 +44,14 @@ export function AdaptiveText({ className, text, textAlign = 'left', title, ...pr
 		const visibleElem = visibleRef.current;
 		if (!visibleElem) return;
 
-		visibleElem.innerText = text;
+		visibleElem.innerText = initialText;
 
-		let removeCounter = 3;
+		let removeCounter = Math.max(separator.length + 1, text.length - maxLength);
 		while (removeCounter < text.length && visibleElem.clientWidth > clientWidth) {
-			visibleElem.innerText = truncateInMiddle(text, text.length - removeCounter, '..');
+			visibleElem.innerText = truncateInMiddle(text, text.length - removeCounter, separator);
 			removeCounter++;
 		}
-	}, [text, size.clientWidth, size.scrollWidth]);
+	}, [initialText, maxLength, separator, size.clientWidth, size.scrollWidth, text]);
 
 	return (
 		<div
@@ -53,9 +60,9 @@ export function AdaptiveText({ className, text, textAlign = 'left', title, ...pr
 			title={title}
 			{...props}
 		>
-			<div className={css.invisible}>{text}</div>
+			<div className={css.invisible}>{initialText}</div>
 			<div ref={visibleRef} className={css.visible}>
-				{text}
+				{initialText}
 			</div>
 		</div>
 	);
