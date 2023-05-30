@@ -18,8 +18,12 @@
 .ava {
 	grid-row: 1/3;
 	position: relative;
+	padding: 8px;
 	width: 48px;
 	height: 48px;
+	color: #fff;
+	background: linear-gradient(150deg, #50bc67 15%, #3a63ce 85%);
+	border-radius: 50%;
 }
 
 .meta {

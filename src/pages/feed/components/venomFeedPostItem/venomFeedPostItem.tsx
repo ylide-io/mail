@@ -2,7 +2,6 @@ import { MessageAttachmentLinkV1 } from '@ylide/sdk';
 import React, { useMemo, useRef } from 'react';
 
 import { AdaptiveAddress } from '../../../../components/adaptiveAddress/adaptiveAddress';
-import { Avatar } from '../../../../components/avatar/avatar';
 import { NlToBr } from '../../../../components/nlToBr/nlToBr';
 import { ReadableDate } from '../../../../components/readableDate/readableDate';
 import { ReactComponent as ContactSvg } from '../../../../icons/ic20/contact.svg';
@@ -30,7 +29,9 @@ export function VenomFeedPostItem({ message, decoded: { decodedTextData, attachm
 
 	return (
 		<div ref={selfRef} className={css.root}>
-			<Avatar className={css.ava} placeholder={<ContactSvg width="100%" height="100%" />} />
+			<div className={css.ava}>
+				<ContactSvg width="100%" height="100%" />
+			</div>
 
 			<div className={css.meta}>
 				<AdaptiveAddress className={css.sender} address={message.msg.senderAddress} />
