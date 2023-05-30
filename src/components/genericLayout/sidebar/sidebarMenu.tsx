@@ -208,7 +208,7 @@ export const SidebarMenu = observer(() => {
 								look={SidebarButtonLook.SUBMENU}
 								href={generatePath(RoutePath.FEED_SMART_ADDRESS, { address: account.account.address })}
 								icon={<ContactSvg />}
-								name={<AdaptiveText text={account.account.address} />}
+								name={<AdaptiveText text={account.name || account.account.address} />}
 							/>
 						))}
 					</SidebarSection>
