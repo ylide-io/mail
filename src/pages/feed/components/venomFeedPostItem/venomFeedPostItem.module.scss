@@ -33,7 +33,7 @@
 	align-items: center;
 	justify-content: space-between;
 	grid-gap: 8px;
-	padding: 3px 3px 0 0;
+	padding: 3px 2px 0 0;
 }
 
 .metaRight {
@@ -50,6 +50,18 @@
 .date {
 	color: var(--secondary-text-color);
 	font-weight: $font-weight_light;
+}
+
+.metaButton {
+	@include expand-click-area;
+	margin: -99px 0;
+	width: 20px;
+	height: 20px;
+	color: var(--secondary-text-color);
+
+	&:hover {
+		color: var(--link-color);
+	}
 }
 
 .body {

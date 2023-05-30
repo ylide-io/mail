@@ -5,6 +5,7 @@ import { AdaptiveAddress } from '../../../../components/adaptiveAddress/adaptive
 import { NlToBr } from '../../../../components/nlToBr/nlToBr';
 import { ReadableDate } from '../../../../components/readableDate/readableDate';
 import { ReactComponent as ContactSvg } from '../../../../icons/ic20/contact.svg';
+import { ReactComponent as ExternalSvg } from '../../../../icons/ic20/external.svg';
 import { IMessageDecodedContent, MessageDecodedTextDataType } from '../../../../indexedDB/IndexedDB';
 import { ILinkedMessage } from '../../../../stores/MailList';
 import { ipfsToHttpUrl } from '../../../../utils/ipfs';
@@ -36,7 +37,21 @@ export function VenomFeedPostItem({ message, decoded: { decodedTextData, attachm
 			<div className={css.meta}>
 				<AdaptiveAddress className={css.sender} maxLength={12} address={message.msg.senderAddress} />
 
-				<ReadableDate className={css.date} value={message.msg.createdAt * 1000} />
+				<div className={css.metaRight}>
+					<ReadableDate className={css.date} value={message.msg.createdAt * 1000} />
+
+					{!!message.msg.$$meta.id && (
+						<a
+							className={css.metaButton}
+							href={`https://testnet.venomscan.com/messages/${message.msg.$$meta.id}`}
+							target="_blank"
+							rel="noreferrer"
+							title="Details"
+						>
+							<ExternalSvg />
+						</a>
+					)}
+				</div>
 			</div>
 
 			<div className={css.body}>
