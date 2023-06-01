@@ -1,7 +1,7 @@
 import clsx from 'clsx';
 import { observer } from 'mobx-react';
 import React, { useCallback, useMemo, useState } from 'react';
-import { useQuery } from 'react-query';
+import { useMutation, useQuery } from 'react-query';
 
 import { FeedManagerApi } from '../../../../api/feedManagerApi';
 import { FeedServerApi, FeedSource } from '../../../../api/feedServerApi';
@@ -12,6 +12,7 @@ import { ErrorMessage } from '../../../../components/errorMessage/errorMessage';
 import { Modal } from '../../../../components/modal/modal';
 import { OverlappingLoader } from '../../../../components/overlappingLoader/overlappingLoader';
 import { TextField, TextFieldLook } from '../../../../components/textField/textField';
+import { toast } from '../../../../components/toast/toast';
 import { ReactComponent as ContactSvg } from '../../../../icons/ic20/contact.svg';
 import { ReactComponent as SearchSvg } from '../../../../icons/ic28/search.svg';
 import { DomainAccount } from '../../../../stores/models/DomainAccount';
@@ -57,9 +58,10 @@ export interface FeedSettingsPopupProps {
 }
 
 export const FeedSettingsPopup = observer(({ account, onClose }: FeedSettingsPopupProps) => {
+	invariant(account.mainViewKey, 'FeedSettings only supports MV accounts');
+
 	const { isLoading, data } = useQuery('feed-sources', async () => {
 		const mainViewKey = account.mainViewKey;
-		invariant(mainViewKey, 'FeedSettings only supports MV accounts');
 
 		const [{ sources }, config] = await Promise.all([
 			FeedServerApi.getSources(),
@@ -71,6 +73,17 @@ export const FeedSettingsPopup = observer(({ account, onClose }: FeedSettingsPop
 				b.type.localeCompare(a.type) ||
 				(a.origin || '').localeCompare(b.origin || '') ||
 				a.name.localeCompare(b.name),
+		);
+
+		const defaultProjectIds = config.defaultProjects.map(p => p.projectId);
+		setSelectedSourceIds(
+			sources
+				.filter(s =>
+					s.cryptoProjectId && defaultProjectIds.includes(s.cryptoProjectId)
+						? !config.config.excludedProjectIds.includes(s.id)
+						: config.config.includedProjectIds.includes(s.id),
+				)
+				.map(s => s.id),
 		);
 
 		return {
@@ -91,10 +104,41 @@ export const FeedSettingsPopup = observer(({ account, onClose }: FeedSettingsPop
 		setSelectedSourceIds(prev => toggleArrayItem(prev, sourceId, isSelected));
 	}, []);
 
-	const saveChanges = () => {
-		invariant(selectedSourceIds);
-		onClose?.();
-	};
+	const saveConfigMutation = useMutation({
+		mutationFn: async () => {
+			invariant(data);
+
+			const defaultProjectIds = data.config.defaultProjects.map(p => p.projectId);
+
+			const excludedProjectIds = data.sources
+				.filter(
+					s =>
+						!selectedSourceIds.includes(s.id) &&
+						(!s.cryptoProjectId || defaultProjectIds.includes(s.cryptoProjectId)),
+				)
+				.map(s => s.id);
+
+			const includedProjectIds = data.sources
+				.filter(
+					s =>
+						selectedSourceIds.includes(s.id) &&
+						s.cryptoProjectId &&
+						!defaultProjectIds.includes(s.cryptoProjectId),
+				)
+				.map(s => s.id);
+
+			await FeedManagerApi.setConfig({
+				token: account.mainViewKey,
+				config: {
+					mode: data.config.config.mode,
+					excludedProjectIds,
+					includedProjectIds,
+				},
+			});
+		},
+		onSuccess: () => onClose?.(),
+		onError: () => toast("Couldn't save your feed settings. Please try again."),
+	});
 
 	const filteredSources = useMemo(
 		() =>
@@ -152,14 +196,16 @@ export const FeedSettingsPopup = observer(({ account, onClose }: FeedSettingsPop
 			<div className={css.footer}>
 				<div className={css.footerLeft}>
 					<ActionButton
-						isDisabled={!selectedSourceIds.length}
+						isDisabled={!selectedSourceIds.length || saveConfigMutation.isLoading}
 						look={ActionButtonLook.PRIMARY}
-						onClick={() => saveChanges()}
+						onClick={() => saveConfigMutation.mutate()}
 					>
 						Save Settings
 					</ActionButton>
 
-					<ActionButton onClick={() => onClose?.()}>Cancel</ActionButton>
+					<ActionButton isDisabled={saveConfigMutation.isLoading} onClick={() => onClose?.()}>
+						Cancel
+					</ActionButton>
 				</div>
 
 				<div className={css.footerRight}>
