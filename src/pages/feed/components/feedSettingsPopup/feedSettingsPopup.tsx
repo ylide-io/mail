@@ -3,6 +3,7 @@ import { observer } from 'mobx-react';
 import React, { useCallback, useMemo, useState } from 'react';
 import { useMutation, useQuery } from 'react-query';
 
+import { FeedManagerApi } from '../../../../api/feedManagerApi';
 import { FeedServerApi, FeedSource, FeedSourceUserRelation } from '../../../../api/feedServerApi';
 import { ActionButton, ActionButtonLook } from '../../../../components/ActionButton/ActionButton';
 import { Avatar } from '../../../../components/avatar/avatar';
@@ -16,6 +17,7 @@ import { toast } from '../../../../components/toast/toast';
 import { ReactComponent as ContactSvg } from '../../../../icons/ic20/contact.svg';
 import { ReactComponent as SearchSvg } from '../../../../icons/ic28/search.svg';
 import { browserStorage } from '../../../../stores/browserStorage';
+import { DomainAccount } from '../../../../stores/models/DomainAccount';
 import { toggleArrayItem } from '../../../../utils/array';
 import { invariant } from '../../../../utils/assert';
 import { FeedLinkTypeIcon } from '../feedLinkTypeIcon/feedLinkTypeIcon';
@@ -65,13 +67,21 @@ export const Row = React.memo(({ source, isSelected, onSelect }: RowProps) => (
 //
 
 export interface FeedSettingsPopupProps {
+	account: DomainAccount;
 	onClose?: () => void;
 }
 
-export const FeedSettingsPopup = observer(({ onClose }: FeedSettingsPopupProps) => {
+export const FeedSettingsPopup = observer(({ account, onClose }: FeedSettingsPopupProps) => {
 	const { isLoading, data } = useQuery('feed-sources', async () => {
-		const res = await FeedServerApi.getSources();
-		res.sources.sort(
+		const mainViewKey = account.mainViewKey;
+		invariant(mainViewKey, 'FeedSettings only supports MV accounts');
+
+		const [sources, config] = await Promise.all([
+			FeedServerApi.getSources(),
+			FeedManagerApi.getConfig({ token: mainViewKey }),
+		]);
+
+		sources.sources.sort(
 			(a, b) =>
 				b.userRelation.localeCompare(a.userRelation) ||
 				b.type.localeCompare(a.type) ||
@@ -79,12 +89,15 @@ export const FeedSettingsPopup = observer(({ onClose }: FeedSettingsPopupProps) 
 				a.name.localeCompare(b.name),
 		);
 
-		const allSourceIds = res.sources.map(s => s.id);
+		const allSourceIds = sources.sources.map(s => s.id);
 		setAllSourceIds(allSourceIds);
 
 		setSelectedSourceIds(browserStorage.feedSourceSettings?.sourceIds || allSourceIds);
 
-		return res;
+		return {
+			sources: sources.sources,
+			config,
+		};
 	});
 
 	const createSourceListMutation = useMutation((sourceIds: string[]) => FeedServerApi.createSourceList(sourceIds), {

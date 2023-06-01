@@ -136,20 +136,18 @@ export namespace FeedManagerApi {
 		defaultProjects: UserProject[];
 	}
 
-	export async function getConfig(token: string) {
-		return await request<GetConfigResponse>(`/get-config`, {
-			token,
-		});
+	export async function getConfig(data: { token: string }) {
+		return await request<GetConfigResponse>(`/get-config`, data);
 	}
 
-	export async function setConfig(
-		token: string,
+	export async function setConfig(data: {
+		token: string;
 		config: {
 			mode: ConfigMode;
 			includedProjectIds: string[];
 			excludedProjectIds: string[];
-		},
-	) {
-		return await request(`/set-config`, {}, { token, config });
+		};
+	}) {
+		return await request(`/set-config`, {}, data);
 	}
 }

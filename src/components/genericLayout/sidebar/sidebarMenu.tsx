@@ -35,12 +35,14 @@ import { browserStorage } from '../../../stores/browserStorage';
 import domain from '../../../stores/Domain';
 import { getFeedCategoryName } from '../../../stores/Feed';
 import { FolderId } from '../../../stores/MailList';
+import { DomainAccount } from '../../../stores/models/DomainAccount';
 import { RoutePath } from '../../../stores/routePath';
 import { useOpenMailCopmpose } from '../../../utils/mail';
 import { useNav } from '../../../utils/url';
 import { ActionButton, ActionButtonLook, ActionButtonSize } from '../../ActionButton/ActionButton';
 import { AdaptiveText } from '../../adaptiveText/adaptiveText';
 import { PropsWithClassName } from '../../props';
+import { toast } from '../../toast/toast';
 import css from './sidebarMenu.module.scss';
 
 interface SidebarBurgerProps extends PropsWithClassName, PropsWithChildren<{}> {}
@@ -173,7 +175,7 @@ const getFeedCategoryIcon = (category: FeedCategory) => {
 export const SidebarMenu = observer(() => {
 	const openMailCopmpose = useOpenMailCopmpose();
 
-	const [isFeedSettingsOpen, setFeedSettingsOpen] = useState(false);
+	const [isFeedSettingsAccount, setFeedSettingsAccount] = useState<DomainAccount>();
 
 	function renderOtcSection() {
 		return (
@@ -214,7 +216,13 @@ export const SidebarMenu = observer(() => {
 									REACT_APP__APP_MODE === AppMode.MAIN_VIEW
 										? {
 												icon: <SettingsSvg />,
-												onClick: () => setFeedSettingsOpen(!isFeedSettingsOpen),
+												onClick: () => {
+													if (!account.mainViewKey) {
+														return toast('Please complete the onboarding first ❤');
+													}
+
+													setFeedSettingsAccount(account);
+												},
 										  }
 										: undefined
 								}
@@ -239,7 +247,12 @@ export const SidebarMenu = observer(() => {
 							/>
 						))}
 
-					{isFeedSettingsOpen && <FeedSettingsPopup onClose={() => setFeedSettingsOpen(false)} />}
+					{isFeedSettingsAccount && (
+						<FeedSettingsPopup
+							account={isFeedSettingsAccount}
+							onClose={() => setFeedSettingsAccount(undefined)}
+						/>
+					)}
 				</SidebarSection>
 			</>
 		);
