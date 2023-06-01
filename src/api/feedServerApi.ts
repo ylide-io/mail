@@ -17,6 +17,7 @@ export interface FeedSource {
 		id: string;
 		name: string;
 	};
+	cryptoProjectReasons: string[];
 }
 
 export enum FeedCategory {
@@ -166,6 +167,7 @@ export namespace FeedServerApi {
 				{ id: nanoid(), name: 'USDT' },
 				{ id: nanoid(), name: 'BTC' },
 			]);
+			s.cryptoProjectReasons = randomArrayElem([['balance'], ['transaction'], []]);
 		});
 
 		return response;

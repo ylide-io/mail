@@ -30,6 +30,37 @@ $hPadding: 20px;
 	overflow-y: auto;
 }
 
+.listGroup {
+	position: relative;
+}
+
+.category {
+	display: grid;
+	grid-template-columns: auto 1.5fr 1fr;
+	grid-gap: 12px;
+	align-items: center;
+	position: sticky;
+	top: 0;
+	z-index: 1;
+	padding: 8px 12px 8px 20px;
+	height: 40px;
+	font-weight: $font-weight_bold;
+	background: var(--tertiary-surface-color);
+}
+
+.categoryReason {
+	@include truncate-text;
+}
+
+.categoryProject {
+	@include truncate-text;
+	text-align: right;
+
+	@include less480px {
+		display: none;
+	}
+}
+
 .row {
 	display: flex;
 	align-items: center;
@@ -52,15 +83,6 @@ $hPadding: 20px;
 	}
 }
 
-.row_header {
-	height: 48px;
-	font-weight: $font-weight_bold;
-
-	@include less480px {
-		height: auto;
-	}
-}
-
 .row_data {
 	height: 40px;
 
@@ -69,32 +91,16 @@ $hPadding: 20px;
 	}
 }
 
-.checkBoxCell {
+//
+
+.sourceCheckBox {
 	@include less480px {
 		grid-row: 1/4;
 	}
 }
 
-.nameCell {
-	flex: 1 1;
-}
-
-.originCell {
-	flex: 0.66 1;
-}
-
-.projectCell {
-	flex: 0.33 1;
-	text-align: center;
-
-	@include less480px {
-		text-align: left;
-	}
-}
-
-//
-
 .sourceName {
+	flex: 1 1;
 	display: grid;
 	grid-template-columns: 24px 1fr;
 	align-items: center;
@@ -106,6 +112,7 @@ $hPadding: 20px;
 }
 
 .sourceOrigin {
+	flex: 0.66 1;
 	display: flex;
 }
 
@@ -127,7 +134,13 @@ $hPadding: 20px;
 
 .sourceProject {
 	@include truncate-text;
+	flex: 0.33 1;
+	text-align: center;
 	font-weight: $font-weight_bold;
+
+	@include less480px {
+		text-align: left;
+	}
 }
 
 //

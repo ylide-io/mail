@@ -1,6 +1,6 @@
 import clsx from 'clsx';
 import { observer } from 'mobx-react';
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { useMutation, useQuery } from 'react-query';
 
 import { FeedManagerApi } from '../../../../api/feedManagerApi';
@@ -24,29 +24,27 @@ import css from './feedSettingsPopup.module.scss';
 interface RowProps {
 	source: FeedSource;
 	isSelected: boolean;
-	onSelect: (sourceId: string, isSelected: boolean) => void;
+	onSelect: (isSelected: boolean) => void;
 }
 
 export const Row = React.memo(({ source, isSelected, onSelect }: RowProps) => (
 	<div key={source.id} className={clsx(css.row, css.row_data)}>
-		<div className={css.checkBoxCell}>
-			<CheckBox isChecked={isSelected} onChange={isChecked => onSelect(source.id, isChecked)} />
-		</div>
+		<CheckBox className={css.sourceCheckBox} isChecked={isSelected} onChange={isChecked => onSelect(isChecked)} />
 
-		<div className={clsx(css.nameCell, css.sourceName)}>
+		<div className={css.sourceName}>
 			<Avatar image={source.avatar} placeholder={<ContactSvg width="100%" height="100%" />} />
 
 			<div className={css.sourceNameText}>{source.name}</div>
 		</div>
 
-		<div className={clsx(css.originCell, css.sourceOrigin)}>
+		<div className={css.sourceOrigin}>
 			<a className={css.sourceOriginLink} href={source.link} target="_blank" rel="noreferrer">
 				<FeedLinkTypeIcon size={16} linkType={source.type} />
 				<span className={css.sourceOriginText}>{source.origin || source.link}</span>
 			</a>
 		</div>
 
-		<div className={clsx(css.projectCell, css.sourceProject)}>{source.cryptoProject?.name}</div>
+		<div className={css.sourceProject}>{source.cryptoProject?.name}</div>
 	</div>
 ));
 
@@ -92,17 +90,26 @@ export const FeedSettingsPopup = observer(({ account, onClose }: FeedSettingsPop
 		};
 	});
 
-	const allSourceIds = useMemo(() => data?.sources.map(s => s.id) || [], [data]);
 	const [selectedSourceIds, setSelectedSourceIds] = useState<string[]>([]);
-
-	const isSelectedAll = selectedSourceIds?.length === allSourceIds?.length;
 
 	const [isSearchOpen, setSearchOpen] = useState(false);
 	const [searchTerm, setSearchTerm] = useState('');
 
-	const onRowSelect = useCallback((sourceId: string, isSelected: boolean) => {
-		setSelectedSourceIds(prev => toggleArrayItem(prev, sourceId, isSelected));
-	}, []);
+	const sourcesByUserRelation = useMemo(() => {
+		const filteredSources = data?.sources.filter(source => {
+			const term = searchTerm.trim().toLowerCase();
+			if (!term) return true;
+
+			return source.name.toLowerCase().includes(term) || source.origin?.toLowerCase().includes(term);
+		});
+
+		return filteredSources?.reduce((res, s) => {
+			const reason = s.cryptoProjectReasons[0] || '';
+			const list = (res[reason] = res[reason] || []);
+			list.push(s);
+			return res;
+		}, {} as Record<string, FeedSource[]>);
+	}, [data, searchTerm]);
 
 	const saveConfigMutation = useMutation({
 		mutationFn: async () => {
@@ -140,17 +147,6 @@ export const FeedSettingsPopup = observer(({ account, onClose }: FeedSettingsPop
 		onError: () => toast("Couldn't save your feed settings. Please try again."),
 	});
 
-	const filteredSources = useMemo(
-		() =>
-			data?.sources.filter(source => {
-				const term = searchTerm.trim().toLowerCase();
-				if (!term) return true;
-
-				return source.name.toLowerCase().includes(term) || source.origin?.toLowerCase().includes(term);
-			}),
-		[data, searchTerm],
-	);
-
 	return (
 		<Modal className={css.root} onClose={onClose}>
 			<div className={css.header}>
@@ -159,30 +155,44 @@ export const FeedSettingsPopup = observer(({ account, onClose }: FeedSettingsPop
 			</div>
 
 			<div className={css.list}>
-				{filteredSources ? (
-					filteredSources.length ? (
-						<>
-							<div className={clsx(css.row, css.row_header)}>
-								<div className={css.checkBoxCell}>
+				{sourcesByUserRelation ? (
+					Object.keys(sourcesByUserRelation).length ? (
+						(Object.entries(sourcesByUserRelation) as [string, FeedSource[]][]).map(([reason, sources]) => (
+							<div className={css.listGroup}>
+								<div className={css.category}>
 									<CheckBox
-										isChecked={isSelectedAll}
-										onChange={isChecked => setSelectedSourceIds(isChecked ? allSourceIds : [])}
+										isChecked={sourcesByUserRelation[reason].every(s =>
+											selectedSourceIds.includes(s.id),
+										)}
+										onChange={isChecked => {
+											const newSourceIds = selectedSourceIds.filter(
+												id => !sources.find(s => s.id === id),
+											);
+											setSelectedSourceIds(
+												isChecked ? [...newSourceIds, ...sources.map(s => s.id)] : newSourceIds,
+											);
+										}}
 									/>
+									<div className={css.categoryReason}>{reason}</div>
+									<div className={css.categoryProject}>Token / Project</div>
 								</div>
-								<div className={css.nameCell}>Name</div>
-								<div className={css.originCell}>Origin</div>
-								<div className={css.projectCell}>Project</div>
-							</div>
 
-							{filteredSources.map(source => (
-								<Row
-									key={source.id}
-									source={source}
-									isSelected={selectedSourceIds.includes(source.id)}
-									onSelect={onRowSelect}
-								/>
-							))}
-						</>
+								<div>
+									{sources.map(source => (
+										<Row
+											key={source.id}
+											source={source}
+											isSelected={selectedSourceIds.includes(source.id)}
+											onSelect={isSelected =>
+												setSelectedSourceIds(prev =>
+													toggleArrayItem(prev, source.id, isSelected),
+												)
+											}
+										/>
+									))}
+								</div>
+							</div>
+						))
 					) : (
 						<div className={css.noData}>- No sources found -</div>
 					)
