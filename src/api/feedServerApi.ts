@@ -1,3 +1,5 @@
+import { nanoid } from 'nanoid';
+
 import { REACT_APP__FEED_SERVER } from '../env';
 import { randomArrayElem } from '../utils/array';
 import { invariant } from '../utils/assert';
@@ -11,8 +13,8 @@ export interface FeedSource {
 	avatar?: string;
 	link: string;
 	type: LinkType;
-	tokens: string[];
-	userRelation: FeedSourceUserRelation;
+	cryptoProjectId?: string;
+	cryptoProjectName?: string;
 }
 
 export enum FeedCategory {
@@ -159,8 +161,8 @@ export namespace FeedServerApi {
 
 		// FIXME Temp
 		response.sources.forEach(s => {
-			s.tokens = [randomArrayElem(['BTC', 'ETH', 'USDT'])];
-			s.userRelation = randomArrayElem(Object.values(FeedSourceUserRelation));
+			s.cryptoProjectId = randomArrayElem([nanoid(), nanoid(), nanoid(), nanoid()]);
+			s.cryptoProjectName = randomArrayElem(['Ethereum', 'XDAI', 'USDT', 'BTC']);
 		});
 
 		return response;
