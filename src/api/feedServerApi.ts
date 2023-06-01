@@ -85,8 +85,6 @@ export interface FeedPostEmbed {
 
 export namespace FeedServerApi {
 	export enum ErrorCode {
-		REQUIRED_PARAMETERS = 'REQUIRED_PARAMETERS',
-		SOURCE_LIST_NOT_FOUND = 'SOURCE_LIST_NOT_FOUND',
 		NO_POSTS_FOR_ADDRESS = 'NO_POSTS_FOR_ADDRESS',
 	}
 
@@ -140,7 +138,6 @@ export namespace FeedServerApi {
 		firstPostId?: string;
 		categories?: FeedCategory[];
 		sourceId?: string;
-		sourceListId?: string;
 		addressTokens?: string[];
 	}): Promise<GetPostsResponse> {
 		return await request(`/posts?${createCleanSerachParams(params)}`);
@@ -166,19 +163,5 @@ export namespace FeedServerApi {
 		});
 
 		return response;
-	}
-
-	//
-
-	export type CreateSourceListResponse = { sourceListId: string };
-
-	export async function createSourceList(sourceIds: string[]): Promise<CreateSourceListResponse> {
-		return await request('/source-lists/create', {
-			method: 'POST',
-			headers: {
-				'Content-Type': 'application/json',
-			},
-			body: JSON.stringify({ sourceIds }),
-		});
 	}
 }
