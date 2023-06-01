@@ -12,6 +12,7 @@ import { ReactComponent as ContactSvg } from '../../../../icons/ic20/contact.svg
 import { ReactComponent as ExternalSvg } from '../../../../icons/ic20/external.svg';
 import { ReactComponent as MenuSvg } from '../../../../icons/ic20/menu.svg';
 import { IMessageDecodedContent, MessageDecodedTextDataType } from '../../../../indexedDB/IndexedDB';
+import { browserStorage } from '../../../../stores/browserStorage';
 import { ILinkedMessage } from '../../../../stores/MailList';
 import { HorizontalAlignment } from '../../../../utils/alignment';
 import { ipfsToHttpUrl } from '../../../../utils/ipfs';
@@ -63,9 +64,11 @@ export function VenomFeedPostItem({ message, decoded: { decodedTextData, attachm
 						</a>
 					)}
 
-					<button ref={menuButtonRef} className={css.metaButton} onClick={() => setMenuOpen(!isMenuOpen)}>
-						<MenuSvg />
-					</button>
+					{browserStorage.isUserAdmin && (
+						<button ref={menuButtonRef} className={css.metaButton} onClick={() => setMenuOpen(!isMenuOpen)}>
+							<MenuSvg />
+						</button>
+					)}
 
 					{isMenuOpen && (
 						<DropDown
