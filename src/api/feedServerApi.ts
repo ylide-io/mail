@@ -13,8 +13,10 @@ export interface FeedSource {
 	avatar?: string;
 	link: string;
 	type: LinkType;
-	cryptoProjectId?: string;
-	cryptoProjectName?: string;
+	cryptoProject?: {
+		id: string;
+		name: string;
+	};
 }
 
 export enum FeedCategory {
@@ -158,8 +160,12 @@ export namespace FeedServerApi {
 
 		// FIXME Temp
 		response.sources.forEach(s => {
-			s.cryptoProjectId = randomArrayElem([nanoid(), nanoid(), nanoid(), nanoid()]);
-			s.cryptoProjectName = randomArrayElem(['Ethereum', 'XDAI', 'USDT', 'BTC']);
+			s.cryptoProject = randomArrayElem([
+				{ id: nanoid(), name: 'Ethereum' },
+				{ id: nanoid(), name: 'XDAI' },
+				{ id: nanoid(), name: 'USDT' },
+				{ id: nanoid(), name: 'BTC' },
+			]);
 		});
 
 		return response;

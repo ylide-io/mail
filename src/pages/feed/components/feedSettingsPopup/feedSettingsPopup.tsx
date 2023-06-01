@@ -46,7 +46,7 @@ export const Row = React.memo(({ source, isSelected, onSelect }: RowProps) => (
 			</a>
 		</div>
 
-		<div className={clsx(css.projectCell, css.sourceProject)}>{source.cryptoProjectName}</div>
+		<div className={clsx(css.projectCell, css.sourceProject)}>{source.cryptoProject?.name}</div>
 	</div>
 ));
 
@@ -79,7 +79,7 @@ export const FeedSettingsPopup = observer(({ account, onClose }: FeedSettingsPop
 		setSelectedSourceIds(
 			sources
 				.filter(s =>
-					s.cryptoProjectId && defaultProjectIds.includes(s.cryptoProjectId)
+					s.cryptoProject?.id && defaultProjectIds.includes(s.cryptoProject.id)
 						? !config.config.excludedProjectIds.includes(s.id)
 						: config.config.includedProjectIds.includes(s.id),
 				)
@@ -114,7 +114,7 @@ export const FeedSettingsPopup = observer(({ account, onClose }: FeedSettingsPop
 				.filter(
 					s =>
 						!selectedSourceIds.includes(s.id) &&
-						(!s.cryptoProjectId || defaultProjectIds.includes(s.cryptoProjectId)),
+						(!s.cryptoProject?.id || defaultProjectIds.includes(s.cryptoProject.id)),
 				)
 				.map(s => s.id);
 
@@ -122,8 +122,8 @@ export const FeedSettingsPopup = observer(({ account, onClose }: FeedSettingsPop
 				.filter(
 					s =>
 						selectedSourceIds.includes(s.id) &&
-						s.cryptoProjectId &&
-						!defaultProjectIds.includes(s.cryptoProjectId),
+						s.cryptoProject?.id &&
+						!defaultProjectIds.includes(s.cryptoProject.id),
 				)
 				.map(s => s.id);
 
