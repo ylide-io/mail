@@ -15,7 +15,7 @@ import {
 	YLIDE_MAIN_FEED_ID,
 } from '@ylide/sdk';
 import { autobind } from 'core-decorators';
-import { makeAutoObservable, makeObservable, observable, transaction } from 'mobx';
+import { computed, makeAutoObservable, makeObservable, observable, transaction } from 'mobx';
 
 import { VENOM_FEED_ID } from '../constants';
 import messagesDB, { MessagesDB } from '../indexedDB/impl/MessagesDB';
@@ -52,6 +52,8 @@ export function getFolderName(folderId: FolderId) {
 //
 
 const MailPageSize = 10;
+
+const FILTERED_OUT = {};
 
 function wrapMessageId(p: IMessageWithSource) {
 	const acc = p.meta.account as DomainAccount;
@@ -99,7 +101,7 @@ export class MailList<M = ILinkedMessage> {
 	@observable isLoading = true;
 	@observable isError = false;
 
-	@observable messages: M[] = [];
+	@observable.shallow private messagesData: { raw: IMessageWithSource; handled: M | typeof FILTERED_OUT }[] = [];
 
 	private stream: ListSourceDrainer | undefined;
 
@@ -206,18 +208,45 @@ export class MailList<M = ILinkedMessage> {
 		});
 	}
 
+	@computed
+	get messages() {
+		return this.messagesData.filter(m => m.handled !== FILTERED_OUT).map(m => m.handled as M);
+	}
+
 	private async handleMessages(messages: IMessageWithSource[]) {
-		const wrapped = await wrapMessages(messages);
-		const filtered = this.messagesFilter ? await this.messagesFilter(wrapped) : wrapped;
+		const newMessages = messages.filter(m => !this.messagesData.find(old => old.raw.msg.msgId === m.msg.msgId));
+		const newLinked = await wrapMessages(newMessages);
+		const newFiltered = this.messagesFilter ? await this.messagesFilter(newLinked) : newLinked;
 
 		return await Promise.all(
-			filtered.map(async m => (this.messageHandler ? await this.messageHandler(m) : (m as M))),
+			messages.map(async raw => {
+				// Message is processed already
+				const existing = this.messagesData.find(e => e.raw.msg.msgId === raw.msg.msgId);
+				if (existing) {
+					return existing;
+				}
+
+				// Message is filtered out
+				const linked = newLinked.find(nl => nl.msgId === raw.msg.msgId)!;
+				if (!newFiltered.includes(linked)) {
+					return {
+						raw,
+						handled: FILTERED_OUT,
+					};
+				}
+
+				// Message should be processed and saved
+				return {
+					raw,
+					handled: this.messageHandler ? await this.messageHandler(linked) : (linked as M),
+				};
+			}),
 		);
 	}
 
 	@autobind
 	private async onNewMessages({ messages }: { messages: IMessageWithSource[] }) {
-		this.messages = await this.handleMessages(messages);
+		this.messagesData = await this.handleMessages(messages);
 	}
 
 	loadNextPage() {
@@ -229,9 +258,9 @@ export class MailList<M = ILinkedMessage> {
 		return this.stream
 			.readMore(MailPageSize)
 			.then(messages =>
-				this.handleMessages(messages).then(wrapped => {
+				this.handleMessages(messages).then(data => {
 					transaction(() => {
-						this.messages = wrapped;
+						this.messagesData = data;
 						this.isNextPageAvailable = !this.stream?.drained;
 						this.isLoading = false;
 						this.isError = false;
