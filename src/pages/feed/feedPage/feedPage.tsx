@@ -3,6 +3,7 @@ import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { generatePath, useLocation, useParams } from 'react-router-dom';
 
 import { FeedCategory, FeedServerApi } from '../../../api/feedServerApi';
+import { VenomFilterApi } from '../../../api/venomFilterApi';
 import { ActionButton, ActionButtonLook, ActionButtonSize } from '../../../components/ActionButton/ActionButton';
 import { ErrorMessage, ErrorMessageLook } from '../../../components/errorMessage/errorMessage';
 import { NarrowContent } from '../../../components/genericLayout/content/narrowContent/narrowContent';
@@ -179,6 +180,11 @@ const VenomFeedContent = observer(() => {
 		const mailList = new MailList<{ message: ILinkedMessage; decoded: IMessageDecodedContent }>();
 
 		mailList.init({
+			messagesFilter: async messages => {
+				const ids = messages.map(m => m.msgId);
+				const { bannedPosts } = await VenomFilterApi.getPostsStatus({ ids });
+				return messages.filter(m => !bannedPosts.includes(m.msgId));
+			},
 			messageHandler: async message => ({
 				message,
 				decoded: await decodeMessage(message.msgId, message.msg),

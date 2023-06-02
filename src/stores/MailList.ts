@@ -100,6 +100,8 @@ export class MailList<M = ILinkedMessage> {
 	@observable messages: M[] = [];
 
 	private stream: ListSourceDrainer | undefined;
+
+	private messagesFilter: ((messages: ILinkedMessage[]) => ILinkedMessage[] | Promise<ILinkedMessage[]>) | undefined;
 	private messageHandler: ((message: ILinkedMessage) => M | Promise<M>) | undefined;
 
 	constructor() {
@@ -107,15 +109,15 @@ export class MailList<M = ILinkedMessage> {
 	}
 
 	async init(props: {
+		messagesFilter?: (messages: ILinkedMessage[]) => ILinkedMessage[] | Promise<ILinkedMessage[]>;
 		messageHandler?: (message: ILinkedMessage) => M | Promise<M>;
 		mailbox?: { folderId: FolderId; sender?: string; filter?: (id: string) => boolean };
 		venomFeed?: { account: DomainAccount };
 	}) {
-		const { messageHandler, mailbox, venomFeed } = props;
+		const { messagesFilter, messageHandler, mailbox, venomFeed } = props;
 
-		if (messageHandler) {
-			this.messageHandler = messageHandler;
-		}
+		this.messagesFilter = messagesFilter;
+		this.messageHandler = messageHandler;
 
 		if (mailbox) {
 			function buildMailboxSources(): ISourceWithMeta[] {
@@ -204,8 +206,10 @@ export class MailList<M = ILinkedMessage> {
 
 	private async handleMessages(messages: IMessageWithSource[]) {
 		const wrapped = await wrapMessages(messages);
+		const filtered = this.messagesFilter ? await this.messagesFilter(wrapped) : wrapped;
+
 		return await Promise.all(
-			wrapped.map(async m => (this.messageHandler ? await this.messageHandler(m) : (m as M))),
+			filtered.map(async m => (this.messageHandler ? await this.messageHandler(m) : (m as M))),
 		);
 	}
 
@@ -216,7 +220,8 @@ export class MailList<M = ILinkedMessage> {
 
 	loadNextPage() {
 		invariant(this.stream, 'Mail list not ready yet');
-		invariant(!this.isDestroyed, 'Mail destroyed already');
+		invariant(!this.isDestroyed, 'Mail list destroyed already');
+		invariant(this.isLoading, 'Mail list is loading already');
 
 		this.isLoading = true;
 
