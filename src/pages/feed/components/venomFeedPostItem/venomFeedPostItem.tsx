@@ -81,7 +81,7 @@ export function VenomFeedPostItem({ message, decoded: { decodedTextData, attachm
 									onSelect={async () => {
 										setMenuOpen(false);
 
-										VenomFilterApi.unbanPost({ id: message.msgId })
+										VenomFilterApi.unbanPost({ ids: [message.msgId] })
 											.then(() => {
 												toast('Un-banned 🔥');
 												setBanned(false);
@@ -100,7 +100,7 @@ export function VenomFeedPostItem({ message, decoded: { decodedTextData, attachm
 										setMenuOpen(false);
 
 										if (confirm('Are you sure?')) {
-											VenomFilterApi.banPost({ id: message.msgId })
+											VenomFilterApi.banPost({ ids: [message.msgId] })
 												.then(() => {
 													toast('Banned 🔥');
 													setBanned(true);
