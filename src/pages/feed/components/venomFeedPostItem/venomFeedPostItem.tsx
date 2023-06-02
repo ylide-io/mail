@@ -2,6 +2,7 @@ import { MessageAttachmentLinkV1 } from '@ylide/sdk';
 import React, { useMemo, useRef, useState } from 'react';
 
 import { VenomFilterApi } from '../../../../api/venomFilterApi';
+import { ActionButton } from '../../../../components/ActionButton/ActionButton';
 import { AdaptiveAddress } from '../../../../components/adaptiveAddress/adaptiveAddress';
 import { DropDown, DropDownItem } from '../../../../components/dropDown/dropDown';
 import { ErrorMessage, ErrorMessageLook } from '../../../../components/errorMessage/errorMessage';
@@ -39,6 +40,32 @@ export function VenomFeedPostItem({ message, decoded: { decodedTextData, attachm
 	const [isMenuOpen, setMenuOpen] = useState(false);
 
 	const [isBanned, setBanned] = useState(false);
+
+	const banPost = () => {
+		if (confirm('Are you sure?')) {
+			VenomFilterApi.banPost({ ids: [message.msgId] })
+				.then(() => {
+					toast('Banned 🔥');
+					setBanned(true);
+				})
+				.catch(e => {
+					toast('Error 🤦‍♀️');
+					throw e;
+				});
+		}
+	};
+
+	const unbanPost = () => {
+		VenomFilterApi.unbanPost({ ids: [message.msgId] })
+			.then(() => {
+				toast('Un-banned 🔥');
+				setBanned(false);
+			})
+			.catch(e => {
+				toast('Error 🤦‍♀️');
+				throw e;
+			});
+	};
 
 	return (
 		<div ref={selfRef} className={css.root}>
@@ -80,16 +107,7 @@ export function VenomFeedPostItem({ message, decoded: { decodedTextData, attachm
 								<DropDownItem
 									onSelect={async () => {
 										setMenuOpen(false);
-
-										VenomFilterApi.unbanPost({ ids: [message.msgId] })
-											.then(() => {
-												toast('Un-banned 🔥');
-												setBanned(false);
-											})
-											.catch(e => {
-												toast('Error 🤦‍♀️');
-												throw e;
-											});
+										unbanPost();
 									}}
 								>
 									Unban post
@@ -98,18 +116,7 @@ export function VenomFeedPostItem({ message, decoded: { decodedTextData, attachm
 								<DropDownItem
 									onSelect={async () => {
 										setMenuOpen(false);
-
-										if (confirm('Are you sure?')) {
-											VenomFilterApi.banPost({ ids: [message.msgId] })
-												.then(() => {
-													toast('Banned 🔥');
-													setBanned(true);
-												})
-												.catch(e => {
-													toast('Error 🤦‍♀️');
-													throw e;
-												});
-										}
+										banPost();
 									}}
 								>
 									Ban post
@@ -122,7 +129,10 @@ export function VenomFeedPostItem({ message, decoded: { decodedTextData, attachm
 
 			<div className={css.body}>
 				{isBanned ? (
-					<ErrorMessage look={ErrorMessageLook.INFO}>Post is banned</ErrorMessage>
+					<ErrorMessage look={ErrorMessageLook.INFO}>
+						Post banned 🔥
+						<ActionButton onClick={() => unbanPost()}>Undo</ActionButton>
+					</ErrorMessage>
 				) : (
 					<>
 						<NlToBr text={decodedText} />
