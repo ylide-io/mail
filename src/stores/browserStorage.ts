@@ -10,6 +10,7 @@ export interface FeedSourceSettings {
 }
 
 enum BrowserStorageKey {
+	IS_USER_ADMIN = 'ylide_isUserAdmin',
 	CAN_SKIP_REGISTRATION = 'can_skip_registration',
 	FEED_SOURCE_SETTINGS = 'ylide_feedSourceSettings',
 	SIDEBAR_FOLDED_SECTIONS = 'ylide_sidebarFoldedSections',
@@ -42,6 +43,24 @@ class BrowserStorage {
 		} else {
 			storage.removeItem(key);
 		}
+	}
+
+	//
+
+	private _isUserAdmin =
+		BrowserStorage.getItemWithTransform<boolean>(
+			BrowserStorageKey.IS_USER_ADMIN,
+			item => item === 'true',
+			sessionStorage,
+		) || false;
+
+	get isUserAdmin() {
+		return this._isUserAdmin;
+	}
+
+	set isUserAdmin(value: boolean) {
+		BrowserStorage.setItem(BrowserStorageKey.IS_USER_ADMIN, value || undefined, sessionStorage);
+		this._isUserAdmin = value;
 	}
 
 	//

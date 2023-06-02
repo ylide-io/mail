@@ -15,7 +15,7 @@ import {
 	YLIDE_MAIN_FEED_ID,
 } from '@ylide/sdk';
 import { autobind } from 'core-decorators';
-import { makeAutoObservable, makeObservable, observable, transaction } from 'mobx';
+import { computed, makeAutoObservable, makeObservable, observable, transaction } from 'mobx';
 
 import { VENOM_FEED_ID } from '../constants';
 import messagesDB, { MessagesDB } from '../indexedDB/impl/MessagesDB';
@@ -52,6 +52,8 @@ export function getFolderName(folderId: FolderId) {
 //
 
 const MailPageSize = 10;
+
+const FILTERED_OUT = {};
 
 function wrapMessageId(p: IMessageWithSource) {
 	const acc = p.meta.account as DomainAccount;
@@ -95,11 +97,15 @@ export interface ILinkedMessage {
 export class MailList<M = ILinkedMessage> {
 	private isDestroyed = false;
 
-	@observable isLoading = true;
 	@observable isNextPageAvailable = true;
-	@observable messages: M[] = [];
+	@observable isLoading = true;
+	@observable isError = false;
+
+	@observable.shallow private messagesData: { raw: IMessageWithSource; handled: M | typeof FILTERED_OUT }[] = [];
 
 	private stream: ListSourceDrainer | undefined;
+
+	private messagesFilter: ((messages: ILinkedMessage[]) => ILinkedMessage[] | Promise<ILinkedMessage[]>) | undefined;
 	private messageHandler: ((message: ILinkedMessage) => M | Promise<M>) | undefined;
 
 	constructor() {
@@ -107,15 +113,15 @@ export class MailList<M = ILinkedMessage> {
 	}
 
 	async init(props: {
+		messagesFilter?: (messages: ILinkedMessage[]) => ILinkedMessage[] | Promise<ILinkedMessage[]>;
 		messageHandler?: (message: ILinkedMessage) => M | Promise<M>;
 		mailbox?: { folderId: FolderId; sender?: string; filter?: (id: string) => boolean };
 		venomFeed?: { account: DomainAccount };
 	}) {
-		const { messageHandler, mailbox, venomFeed } = props;
+		const { messagesFilter, messageHandler, mailbox, venomFeed } = props;
 
-		if (messageHandler) {
-			this.messageHandler = messageHandler;
-		}
+		this.messagesFilter = messagesFilter;
+		this.messageHandler = messageHandler;
 
 		if (mailbox) {
 			function buildMailboxSources(): ISourceWithMeta[] {
@@ -197,38 +203,77 @@ export class MailList<M = ILinkedMessage> {
 
 		this.stream.on('messages', this.onNewMessages);
 
-		this.stream.resume().then(() => {
+		await this.stream.resume().then(() => {
 			this.loadNextPage();
 		});
 	}
 
+	@computed
+	get messages() {
+		return this.messagesData.filter(m => m.handled !== FILTERED_OUT).map(m => m.handled as M);
+	}
+
 	private async handleMessages(messages: IMessageWithSource[]) {
-		const wrapped = await wrapMessages(messages);
+		const newMessages = messages.filter(m => !this.messagesData.find(old => old.raw.msg.msgId === m.msg.msgId));
+		const newLinked = await wrapMessages(newMessages);
+		const newFiltered = this.messagesFilter ? await this.messagesFilter(newLinked) : newLinked;
+
 		return await Promise.all(
-			wrapped.map(async m => (this.messageHandler ? await this.messageHandler(m) : (m as M))),
+			messages.map(async raw => {
+				// Message is processed already
+				const existing = this.messagesData.find(e => e.raw.msg.msgId === raw.msg.msgId);
+				if (existing) {
+					return existing;
+				}
+
+				// Message is filtered out
+				const linked = newLinked.find(nl => nl.msgId === raw.msg.msgId)!;
+				if (!newFiltered.includes(linked)) {
+					return {
+						raw,
+						handled: FILTERED_OUT,
+					};
+				}
+
+				// Message should be processed and saved
+				return {
+					raw,
+					handled: this.messageHandler ? await this.messageHandler(linked) : (linked as M),
+				};
+			}),
 		);
 	}
 
 	@autobind
 	private async onNewMessages({ messages }: { messages: IMessageWithSource[] }) {
-		this.messages = await this.handleMessages(messages);
+		this.messagesData = await this.handleMessages(messages);
 	}
 
 	loadNextPage() {
 		invariant(this.stream, 'Mail list not ready yet');
-		invariant(!this.isDestroyed, 'Mail destroyed already');
+		invariant(!this.isDestroyed, 'Mail list destroyed already');
 
 		this.isLoading = true;
 
-		this.stream.readMore(MailPageSize).then(messages => {
-			this.handleMessages(messages).then(wrapped => {
+		return this.stream
+			.readMore(MailPageSize)
+			.then(messages =>
+				this.handleMessages(messages).then(data => {
+					transaction(() => {
+						this.messagesData = data;
+						this.isNextPageAvailable = !this.stream?.drained;
+						this.isLoading = false;
+						this.isError = false;
+					});
+				}),
+			)
+			.catch(e => {
 				transaction(() => {
-					this.messages = wrapped;
-					this.isNextPageAvailable = !this.stream?.drained;
 					this.isLoading = false;
+					this.isError = true;
 				});
+				throw e;
 			});
-		});
 	}
 
 	destroy() {

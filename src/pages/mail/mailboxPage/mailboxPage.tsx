@@ -5,6 +5,7 @@ import { useParams, useSearchParams } from 'react-router-dom';
 import AutoSizer from 'react-virtualized-auto-sizer';
 import { FixedSizeList, ListChildComponentProps } from 'react-window';
 
+import { ErrorMessage } from '../../../components/errorMessage/errorMessage';
 import { FullPageContent } from '../../../components/genericLayout/content/fullPageContent/fullPageContent';
 import { GenericLayout } from '../../../components/genericLayout/genericLayout';
 import { YlideLoader } from '../../../components/ylideLoader/ylideLoader';
@@ -115,7 +116,12 @@ export const MailboxPage = observer(() => {
 			autorun(() => {
 				const itemsHeight = itemSize * mailList.messages.length;
 				const offsetToEnd = itemsHeight - (scrollParams.height + scrollParams.offset);
-				if (offsetToEnd < itemSize && mailList.isNextPageAvailable && !mailList.isLoading) {
+				if (
+					offsetToEnd < itemSize &&
+					mailList.isNextPageAvailable &&
+					!mailList.isLoading &&
+					!mailList.isError
+				) {
 					mailList.loadNextPage();
 				}
 			}),
@@ -154,15 +160,7 @@ export const MailboxPage = observer(() => {
 					/>
 
 					<div className="mailbox">
-						{!mailList.messages.length && mailList.isLoading ? (
-							<div style={{ padding: '40px 0' }}>
-								<YlideLoader
-									reason={`Retrieving your mails from ${
-										Object.keys(domain.blockchains).length
-									} blockchains`}
-								/>
-							</div>
-						) : mailList.messages.length ? (
+						{mailList.messages.length ? (
 							<AutoSizer>
 								{({ width, height }) => {
 									// noinspection JSUnusedGlobalSymbols
@@ -206,6 +204,18 @@ export const MailboxPage = observer(() => {
 									);
 								}}
 							</AutoSizer>
+						) : mailList.isLoading ? (
+							<div style={{ padding: '40px 0' }}>
+								<YlideLoader
+									reason={`Retrieving your mails from ${
+										Object.keys(domain.blockchains).length
+									} blockchains`}
+								/>
+							</div>
+						) : mailList.isError ? (
+							<div style={{ padding: '40px' }}>
+								<ErrorMessage>Couldn't load messages.</ErrorMessage>
+							</div>
 						) : (
 							<MailboxEmpty folderId={folderId!} />
 						)}

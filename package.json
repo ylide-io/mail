@@ -25,6 +25,7 @@
 			"simple-import-sort"
 		],
 		"rules": {
+			"no-restricted-globals": "off",
 			"simple-import-sort/imports": "warn",
 			"simple-import-sort/exports": "warn"
 		}

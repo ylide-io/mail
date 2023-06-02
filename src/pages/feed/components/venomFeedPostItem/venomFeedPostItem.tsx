@@ -1,13 +1,21 @@
 import { MessageAttachmentLinkV1 } from '@ylide/sdk';
-import React, { useMemo, useRef } from 'react';
+import React, { useMemo, useRef, useState } from 'react';
 
+import { VenomFilterApi } from '../../../../api/venomFilterApi';
+import { ActionButton } from '../../../../components/ActionButton/ActionButton';
 import { AdaptiveAddress } from '../../../../components/adaptiveAddress/adaptiveAddress';
+import { DropDown, DropDownItem } from '../../../../components/dropDown/dropDown';
+import { ErrorMessage, ErrorMessageLook } from '../../../../components/errorMessage/errorMessage';
 import { NlToBr } from '../../../../components/nlToBr/nlToBr';
 import { ReadableDate } from '../../../../components/readableDate/readableDate';
+import { toast } from '../../../../components/toast/toast';
 import { ReactComponent as ContactSvg } from '../../../../icons/ic20/contact.svg';
 import { ReactComponent as ExternalSvg } from '../../../../icons/ic20/external.svg';
+import { ReactComponent as MenuSvg } from '../../../../icons/ic20/menu.svg';
 import { IMessageDecodedContent, MessageDecodedTextDataType } from '../../../../indexedDB/IndexedDB';
+import { browserStorage } from '../../../../stores/browserStorage';
 import { ILinkedMessage } from '../../../../stores/MailList';
+import { HorizontalAlignment } from '../../../../utils/alignment';
 import { ipfsToHttpUrl } from '../../../../utils/ipfs';
 import css from './venomFeedPostItem.module.scss';
 
@@ -27,6 +35,37 @@ export function VenomFeedPostItem({ message, decoded: { decodedTextData, attachm
 		[decodedTextData],
 	);
 	const attachment = attachments[0] as MessageAttachmentLinkV1 | undefined;
+
+	const menuButtonRef = useRef(null);
+	const [isMenuOpen, setMenuOpen] = useState(false);
+
+	const [isBanned, setBanned] = useState(false);
+
+	const banPost = () => {
+		if (confirm('Are you sure?')) {
+			VenomFilterApi.banPost({ ids: [message.msgId] })
+				.then(() => {
+					toast('Banned 🔥');
+					setBanned(true);
+				})
+				.catch(e => {
+					toast('Error 🤦‍♀️');
+					throw e;
+				});
+		}
+	};
+
+	const unbanPost = () => {
+		VenomFilterApi.unbanPost({ ids: [message.msgId] })
+			.then(() => {
+				toast('Un-banned 🔥');
+				setBanned(false);
+			})
+			.catch(e => {
+				toast('Error 🤦‍♀️');
+				throw e;
+			});
+	};
 
 	return (
 		<div ref={selfRef} className={css.root}>
@@ -51,13 +90,58 @@ export function VenomFeedPostItem({ message, decoded: { decodedTextData, attachm
 							<ExternalSvg />
 						</a>
 					)}
+
+					{browserStorage.isUserAdmin && (
+						<button ref={menuButtonRef} className={css.metaButton} onClick={() => setMenuOpen(!isMenuOpen)}>
+							<MenuSvg />
+						</button>
+					)}
+
+					{isMenuOpen && (
+						<DropDown
+							anchorRef={menuButtonRef}
+							horizontalAlign={HorizontalAlignment.END}
+							onCloseRequest={() => setMenuOpen(false)}
+						>
+							{isBanned ? (
+								<DropDownItem
+									onSelect={async () => {
+										setMenuOpen(false);
+										unbanPost();
+									}}
+								>
+									Unban post
+								</DropDownItem>
+							) : (
+								<DropDownItem
+									onSelect={async () => {
+										setMenuOpen(false);
+										banPost();
+									}}
+								>
+									Ban post
+								</DropDownItem>
+							)}
+						</DropDown>
+					)}
 				</div>
 			</div>
 
 			<div className={css.body}>
-				<NlToBr text={decodedText} />
+				{isBanned ? (
+					<ErrorMessage look={ErrorMessageLook.INFO}>
+						Post banned 🔥
+						<ActionButton onClick={() => unbanPost()}>Undo</ActionButton>
+					</ErrorMessage>
+				) : (
+					<>
+						<NlToBr text={decodedText} />
 
-				{attachment && <img className={css.cover} alt="Attachment" src={ipfsToHttpUrl(attachment.link)} />}
+						{attachment && (
+							<img className={css.cover} alt="Attachment" src={ipfsToHttpUrl(attachment.link)} />
+						)}
+					</>
+				)}
 			</div>
 		</div>
 	);

@@ -96,7 +96,7 @@ export const MailDetailsPage = observer(() => {
 							isDeleted: false,
 						})),
 					);
-				} else if (!threadMailList.isLoading) {
+				} else if (!threadMailList.isLoading && !threadMailList.isError) {
 					threadMailList.loadNextPage();
 				}
 			}),

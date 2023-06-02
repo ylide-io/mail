@@ -1,7 +1,7 @@
 import { observer } from 'mobx-react';
 import React, { useEffect, useState } from 'react';
 import { QueryClient, QueryClientProvider } from 'react-query';
-import { generatePath, Navigate, Route, Routes, useLocation } from 'react-router-dom';
+import { generatePath, Navigate, Route, Routes, useLocation, useSearchParams } from 'react-router-dom';
 
 import { MainViewOnboarding } from './components/mainViewOnboarding/mainViewOnboarding';
 import { PopupManager } from './components/popup/popupManager/popupManager';
@@ -30,9 +30,11 @@ import { TestPage } from './pages/TestPage/TestPage';
 import { MailboxWidget } from './pages/widgets/mailboxWidget/mailboxWidget';
 import { SendMessageWidget } from './pages/widgets/sendMessageWidget/sendMessageWidget';
 import { analytics } from './stores/Analytics';
+import { browserStorage } from './stores/browserStorage';
 import domain from './stores/Domain';
 import { RoutePath } from './stores/routePath';
 import walletConnect from './stores/WalletConnect';
+import { useNav } from './utils/url';
 
 export enum AppTheme {
 	V1 = 'v1',
@@ -40,6 +42,10 @@ export enum AppTheme {
 }
 
 const App = observer(() => {
+	const location = useLocation();
+	const [searchParams] = useSearchParams();
+	const navigate = useNav();
+
 	const [queryClient] = useState(
 		new QueryClient({
 			defaultOptions: {
@@ -52,7 +58,23 @@ const App = observer(() => {
 		}),
 	);
 
-	const location = useLocation();
+	useEffect(() => {
+		const adminParam = searchParams.get('admin');
+		if (adminParam) {
+			browserStorage.isUserAdmin = adminParam === 'yld1b';
+			searchParams.delete('admin');
+			navigate(
+				{
+					path: location.pathname,
+					search: searchParams,
+					hash: location.hash,
+				},
+				{
+					replace: true,
+				},
+			);
+		}
+	});
 
 	useEffect(() => {
 		document.title = APP_NAME;
