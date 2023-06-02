@@ -204,6 +204,8 @@ const VenomFeedContent = observer(() => {
 		callback: visible => visible && mailList?.loadNextPage(),
 	});
 
+	const renderLoadingError = () => <ErrorMessage>Couldn't load posts.</ErrorMessage>;
+
 	return (
 		<NarrowContent title="Venom feed">
 			{venomAccounts.length ? (
@@ -231,16 +233,20 @@ const VenomFeedContent = observer(() => {
 							<VenomFeedPostItem message={message.message} decoded={message.decoded} />
 						))}
 
-						{mailList.isNextPageAvailable && (
-							<div ref={loadingMoreRef} className={css.loader}>
-								<YlideLoader reason="Loading more posts ..." />
-							</div>
-						)}
+						{mailList.isError
+							? renderLoadingError()
+							: mailList.isNextPageAvailable && (
+									<div ref={loadingMoreRef} className={css.loader}>
+										<YlideLoader reason="Loading more posts ..." />
+									</div>
+							  )}
 					</>
 				) : mailList?.isLoading ? (
 					<div className={css.loader}>
 						<YlideLoader reason="Your feed is loading ..." />
 					</div>
+				) : mailList?.isError ? (
+					renderLoadingError()
 				) : (
 					<ErrorMessage look={ErrorMessageLook.INFO}>No messages yet</ErrorMessage>
 				)}

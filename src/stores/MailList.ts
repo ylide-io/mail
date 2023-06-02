@@ -95,8 +95,10 @@ export interface ILinkedMessage {
 export class MailList<M = ILinkedMessage> {
 	private isDestroyed = false;
 
-	@observable isLoading = true;
 	@observable isNextPageAvailable = true;
+	@observable isLoading = true;
+	@observable isError = false;
+
 	@observable messages: M[] = [];
 
 	private stream: ListSourceDrainer | undefined;
@@ -199,7 +201,7 @@ export class MailList<M = ILinkedMessage> {
 
 		this.stream.on('messages', this.onNewMessages);
 
-		this.stream.resume().then(() => {
+		await this.stream.resume().then(() => {
 			this.loadNextPage();
 		});
 	}
@@ -221,19 +223,28 @@ export class MailList<M = ILinkedMessage> {
 	loadNextPage() {
 		invariant(this.stream, 'Mail list not ready yet');
 		invariant(!this.isDestroyed, 'Mail list destroyed already');
-		invariant(this.isLoading, 'Mail list is loading already');
 
 		this.isLoading = true;
 
-		this.stream.readMore(MailPageSize).then(messages => {
-			this.handleMessages(messages).then(wrapped => {
+		return this.stream
+			.readMore(MailPageSize)
+			.then(messages =>
+				this.handleMessages(messages).then(wrapped => {
+					transaction(() => {
+						this.messages = wrapped;
+						this.isNextPageAvailable = !this.stream?.drained;
+						this.isLoading = false;
+						this.isError = false;
+					});
+				}),
+			)
+			.catch(e => {
 				transaction(() => {
-					this.messages = wrapped;
-					this.isNextPageAvailable = !this.stream?.drained;
 					this.isLoading = false;
+					this.isError = true;
 				});
+				throw e;
 			});
-		});
 	}
 
 	destroy() {
