@@ -4,12 +4,12 @@ import React, { useMemo, useRef, useState } from 'react';
 import { VenomFilterApi } from '../../../../api/venomFilterApi';
 import { ActionButton } from '../../../../components/ActionButton/ActionButton';
 import { AdaptiveAddress } from '../../../../components/adaptiveAddress/adaptiveAddress';
+import { Avatar } from '../../../../components/avatar/avatar';
 import { DropDown, DropDownItem } from '../../../../components/dropDown/dropDown';
 import { ErrorMessage, ErrorMessageLook } from '../../../../components/errorMessage/errorMessage';
 import { NlToBr } from '../../../../components/nlToBr/nlToBr';
 import { ReadableDate } from '../../../../components/readableDate/readableDate';
 import { toast } from '../../../../components/toast/toast';
-import { ReactComponent as ContactSvg } from '../../../../icons/ic20/contact.svg';
 import { ReactComponent as ExternalSvg } from '../../../../icons/ic20/external.svg';
 import { ReactComponent as MenuSvg } from '../../../../icons/ic20/menu.svg';
 import { IMessageDecodedContent, MessageDecodedTextDataType } from '../../../../indexedDB/IndexedDB';
@@ -69,9 +69,7 @@ export function VenomFeedPostItem({ message, decoded: { decodedTextData, attachm
 
 	return (
 		<div ref={selfRef} className={css.root}>
-			<div className={css.ava}>
-				<ContactSvg width="100%" height="100%" />
-			</div>
+			<Avatar className={css.ava} blockie={message.msg.senderAddress} />
 
 			<div className={css.meta}>
 				<AdaptiveAddress className={css.sender} maxLength={12} address={message.msg.senderAddress} />

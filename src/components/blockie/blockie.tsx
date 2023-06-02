@@ -10,5 +10,5 @@ interface BlockieProps extends PropsWithClassName, PropsWithCSSStyle {
 export function Blockie({ className, style, address }: BlockieProps) {
 	const url = useMemo(() => makeBlockie(address), [address]);
 
-	return <img className={className} src={url} alt="Blockie img" style={{ borderRadius: '50%', ...style }} />;
+	return <img className={className} src={url} alt="Blockie img" style={style} />;
 }
