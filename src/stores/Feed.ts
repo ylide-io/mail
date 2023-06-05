@@ -1,6 +1,6 @@
 import { makeObservable, observable } from 'mobx';
 
-import { FeedCategory, FeedPost, FeedServerApi, FeedSourceUserRelation } from '../api/feedServerApi';
+import { FeedCategory, FeedPost, FeedServerApi } from '../api/feedServerApi';
 import { analytics } from './Analytics';
 
 export function getFeedCategoryName(category: FeedCategory) {
@@ -48,27 +48,6 @@ export class FeedStore {
 				categories,
 				sourceId,
 				addressTokens: this.addressTokens,
-			});
-
-			// FIXME Temp
-			response.items.forEach(it => {
-				// NONE = 'NONE',
-				// HOLDING_TOKEN = 'HOLDING_TOKEN',
-				// HELD_TOKEN = 'HELD_TOKEN',
-				// USING_PROJECT = 'USING_PROJECT',
-				// USED_PROJECT = 'USED_PROJECT',
-				// it.tokens = [randomArrayElem(['BTC', 'ETH', 'USDT'])];
-				// it.userRelation = randomArrayElem(Object.values(FeedSourceUserRelation));
-				it.tokens = it.cryptoProjectName ? [it.cryptoProjectName] : [];
-				if (it.cryptoProjectReasons.includes('balance')) {
-					it.userRelation = FeedSourceUserRelation.HOLDING_TOKEN;
-				} else if (it.cryptoProjectReasons.includes('protocol')) {
-					it.userRelation = FeedSourceUserRelation.USING_PROJECT;
-				} else if (it.cryptoProjectReasons.includes('transaction')) {
-					it.userRelation = FeedSourceUserRelation.USED_PROJECT;
-				} else {
-					it.userRelation = FeedSourceUserRelation.NONE;
-				}
 			});
 
 			this.loaded = true;

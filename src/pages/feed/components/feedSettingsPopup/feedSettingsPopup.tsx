@@ -4,7 +4,7 @@ import React, { useMemo, useState } from 'react';
 import { useMutation, useQuery } from 'react-query';
 
 import { FeedManagerApi } from '../../../../api/feedManagerApi';
-import { FeedServerApi, FeedSource } from '../../../../api/feedServerApi';
+import { FeedReason, FeedServerApi, FeedSource } from '../../../../api/feedServerApi';
 import { ActionButton, ActionButtonLook } from '../../../../components/ActionButton/ActionButton';
 import { Avatar } from '../../../../components/avatar/avatar';
 import { CheckBox } from '../../../../components/checkBox/checkBox';
@@ -95,7 +95,7 @@ export const FeedSettingsPopup = observer(({ account, onClose }: FeedSettingsPop
 	const [isSearchOpen, setSearchOpen] = useState(false);
 	const [searchTerm, setSearchTerm] = useState('');
 
-	const sourcesByUserRelation = useMemo(() => {
+	const sourcesByReason = useMemo(() => {
 		const filteredSources = data?.sources.filter(source => {
 			const term = searchTerm.trim().toLowerCase();
 			if (!term) return true;
@@ -104,11 +104,11 @@ export const FeedSettingsPopup = observer(({ account, onClose }: FeedSettingsPop
 		});
 
 		return filteredSources?.reduce((res, s) => {
-			const reason = s.cryptoProjectReasons[0] || '';
+			const reason = s.cryptoProjectReasons[0] || FeedReason.NONE;
 			const list = (res[reason] = res[reason] || []);
 			list.push(s);
 			return res;
-		}, {} as Record<string, FeedSource[]>);
+		}, {} as Record<FeedReason, FeedSource[]>);
 	}, [data, searchTerm]);
 
 	const saveConfigMutation = useMutation({
@@ -155,15 +155,13 @@ export const FeedSettingsPopup = observer(({ account, onClose }: FeedSettingsPop
 			</div>
 
 			<div className={css.list}>
-				{sourcesByUserRelation ? (
-					Object.keys(sourcesByUserRelation).length ? (
-						(Object.entries(sourcesByUserRelation) as [string, FeedSource[]][]).map(([reason, sources]) => (
+				{sourcesByReason ? (
+					Object.keys(sourcesByReason).length ? (
+						(Object.entries(sourcesByReason) as [FeedReason, FeedSource[]][]).map(([reason, sources]) => (
 							<div className={css.listGroup}>
 								<div className={css.category}>
 									<CheckBox
-										isChecked={sourcesByUserRelation[reason].every(s =>
-											selectedSourceIds.includes(s.id),
-										)}
+										isChecked={sourcesByReason[reason].every(s => selectedSourceIds.includes(s.id))}
 										onChange={isChecked => {
 											const newSourceIds = selectedSourceIds.filter(
 												id => !sources.find(s => s.id === id),
@@ -173,7 +171,16 @@ export const FeedSettingsPopup = observer(({ account, onClose }: FeedSettingsPop
 											);
 										}}
 									/>
-									<div className={css.categoryReason}>{reason}</div>
+									<div className={css.categoryReason}>
+										{
+											{
+												[FeedReason.BALANCE]: 'Tokens you hold',
+												[FeedReason.PROTOCOL]: 'Projects you have position in',
+												[FeedReason.TRANSACTION]: 'Projects you used',
+												[FeedReason.NONE]: 'Others',
+											}[reason]
+										}
+									</div>
 									<div className={css.categoryProject}>Token / Project</div>
 								</div>
 

@@ -2,7 +2,7 @@ import clsx from 'clsx';
 import React, { MouseEvent, useEffect, useRef, useState } from 'react';
 import { generatePath } from 'react-router-dom';
 
-import { FeedPost, FeedSourceUserRelation, LinkType } from '../../../../api/feedServerApi';
+import { FeedPost, FeedReason, LinkType } from '../../../../api/feedServerApi';
 import { Avatar } from '../../../../components/avatar/avatar';
 import { DropDown, DropDownItem } from '../../../../components/dropDown/dropDown';
 import { GalleryModal } from '../../../../components/galleryModal/galleryModal';
@@ -105,6 +105,8 @@ export function FeedPostItem({ isInFeed, post }: FeedPostItemProps) {
 		navigate(generatePath(RoutePath.FEED_SOURCE, { source: post.sourceId }));
 	};
 
+	const reason = post.cryptoProjectReasons[0] || FeedReason.NONE;
+
 	return (
 		<div ref={selfRef} className={clsx(css.root, { [css.root_collapsed]: collapsed })}>
 			<div className={css.ava}>
@@ -128,18 +130,17 @@ export function FeedPostItem({ isInFeed, post }: FeedPostItemProps) {
 				</div>
 
 				<div className={css.metaRight}>
-					{post.userRelation && post.userRelation !== FeedSourceUserRelation.NONE && (
+					{reason !== FeedReason.NONE && (
 						<div className={css.reason} title="The reason why you see this post">
 							{
 								{
-									[FeedSourceUserRelation.HOLDING_TOKEN]: "You're holding ",
-									[FeedSourceUserRelation.HELD_TOKEN]: 'You held ',
-									[FeedSourceUserRelation.USING_PROJECT]: "You're in ",
-									[FeedSourceUserRelation.USED_PROJECT]: 'You used ',
-								}[post.userRelation]
+									[FeedReason.BALANCE]: "You're holding ",
+									[FeedReason.PROTOCOL]: "You're in ",
+									[FeedReason.TRANSACTION]: 'You used ',
+								}[reason]
 							}
 
-							{!!post.tokens.length && <b>{post.tokens.join(', ')}</b>}
+							<b>{post.cryptoProjectName}</b>
 						</div>
 					)}
 

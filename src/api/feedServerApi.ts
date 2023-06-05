@@ -5,19 +5,19 @@ import { randomArrayElem } from '../utils/array';
 import { invariant } from '../utils/assert';
 import { createCleanSerachParams } from '../utils/url';
 
-export interface FeedSource {
-	id: string;
-	category: FeedCategory;
-	name: string;
-	origin?: string;
-	avatar?: string;
-	link: string;
-	type: LinkType;
-	cryptoProject?: {
-		id: string;
-		name: string;
-	};
-	cryptoProjectReasons: string[];
+export enum LinkType {
+	TELEGRAM = 'telegram',
+	TWITTER = 'twitter',
+	MEDIUM = 'medium',
+	MIRROR = 'mirror',
+	DISCORD = 'discord',
+}
+
+export enum FeedReason {
+	NONE = 'none',
+	BALANCE = 'balance',
+	PROTOCOL = 'protocol',
+	TRANSACTION = 'transaction',
 }
 
 export enum FeedCategory {
@@ -31,12 +31,21 @@ export enum FeedCategory {
 	EDUCATION = 'Education',
 }
 
-export enum FeedSourceUserRelation {
-	NONE = 'NONE',
-	HOLDING_TOKEN = 'HOLDING_TOKEN',
-	HELD_TOKEN = 'HELD_TOKEN',
-	USING_PROJECT = 'USING_PROJECT',
-	USED_PROJECT = 'USED_PROJECT',
+//
+
+export interface FeedSource {
+	id: string;
+	category: FeedCategory;
+	name: string;
+	origin?: string;
+	avatar?: string;
+	link: string;
+	type: LinkType;
+	cryptoProject?: {
+		id: string;
+		name: string;
+	};
+	cryptoProjectReasons: FeedReason[];
 }
 
 //
@@ -61,19 +70,9 @@ export interface FeedPost {
 	sourceLink: string;
 	embeds: FeedPostEmbed[];
 	thread: FeedPost[];
-	tokens: string[];
-	userRelation: FeedSourceUserRelation;
 	cryptoProjectId: string | null;
 	cryptoProjectName: string | null;
-	cryptoProjectReasons: string[];
-}
-
-export enum LinkType {
-	TELEGRAM = 'telegram',
-	TWITTER = 'twitter',
-	MEDIUM = 'medium',
-	MIRROR = 'mirror',
-	DISCORD = 'discord',
+	cryptoProjectReasons: FeedReason[];
 }
 
 export interface FeedPostEmbed {
@@ -167,7 +166,12 @@ export namespace FeedServerApi {
 				{ id: nanoid(), name: 'USDT' },
 				{ id: nanoid(), name: 'BTC' },
 			]);
-			s.cryptoProjectReasons = randomArrayElem([['balance'], ['transaction'], []]);
+			s.cryptoProjectReasons = randomArrayElem([
+				[FeedReason.BALANCE, FeedReason.TRANSACTION],
+				[FeedReason.TRANSACTION],
+				[FeedReason.PROTOCOL],
+				[],
+			]);
 		});
 
 		return response;
