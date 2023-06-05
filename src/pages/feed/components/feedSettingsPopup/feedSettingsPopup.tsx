@@ -103,12 +103,32 @@ export const FeedSettingsPopup = observer(({ account, onClose }: FeedSettingsPop
 			return source.name.toLowerCase().includes(term) || source.origin?.toLowerCase().includes(term);
 		});
 
-		return filteredSources?.reduce((res, s) => {
+		const grouped = filteredSources?.reduce((res, s) => {
 			const reason = s.cryptoProjectReasons[0] || FeedReason.NONE;
 			const list = (res[reason] = res[reason] || []);
 			list.push(s);
 			return res;
 		}, {} as Record<FeedReason, FeedSource[]>);
+
+		return (
+			grouped &&
+			(Object.keys(grouped) as FeedReason[])
+				.sort((a: FeedReason, b: FeedReason) => {
+					const getOrder = (reason: FeedReason) =>
+						({
+							[FeedReason.BALANCE]: 1,
+							[FeedReason.PROTOCOL]: 2,
+							[FeedReason.TRANSACTION]: 3,
+							[FeedReason.NONE]: 4,
+						}[reason]);
+
+					return getOrder(a) - getOrder(b);
+				})
+				.reduce(
+					(res, reason) => ({ ...res, [reason]: grouped[reason] }),
+					{} as Record<FeedReason, FeedSource[]>,
+				)
+		);
 	}, [data, searchTerm]);
 
 	const saveConfigMutation = useMutation({
