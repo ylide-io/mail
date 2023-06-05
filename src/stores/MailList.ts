@@ -56,12 +56,12 @@ const MailPageSize = 10;
 const FILTERED_OUT = {};
 
 function wrapMessageId(p: IMessageWithSource) {
-	const acc = p.meta.account as DomainAccount;
-	return `${p.msg.msgId}:${acc.account.address}`;
+	const acc = p.meta?.account as DomainAccount | undefined;
+	return `${p.msg.msgId}${acc ? `:${acc.account.address}` : ''}`;
 }
 
 async function wrapMessage(p: IMessageWithSource): Promise<ILinkedMessage> {
-	const acc = p.meta.account as DomainAccount;
+	const acc = p.meta?.account as DomainAccount | undefined;
 	const reader = domain.ylide.controllers.blockchainsMap[p.msg.blockchain];
 
 	let recipients: string[] = [];
@@ -116,7 +116,7 @@ export class MailList<M = ILinkedMessage> {
 		messagesFilter?: (messages: ILinkedMessage[]) => ILinkedMessage[] | Promise<ILinkedMessage[]>;
 		messageHandler?: (message: ILinkedMessage) => M | Promise<M>;
 		mailbox?: { folderId: FolderId; sender?: string; filter?: (id: string) => boolean };
-		venomFeed?: { account: DomainAccount };
+		venomFeed?: boolean;
 	}) {
 		const { messagesFilter, messageHandler, mailbox, venomFeed } = props;
 
@@ -189,7 +189,6 @@ export class MailList<M = ILinkedMessage> {
 				return [
 					{
 						source: listSource,
-						meta: { account: venomFeed.account },
 					},
 				];
 			}

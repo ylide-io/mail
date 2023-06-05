@@ -175,8 +175,6 @@ const VenomFeedContent = observer(() => {
 		// Senceless code to make IDE treat this var as dependency
 		isNaN(rebuildMailListCounter);
 
-		if (!venomAccounts.length) return;
-
 		const mailList = new MailList<{ message: ILinkedMessage; decoded: IMessageDecodedContent }>();
 
 		mailList.init({
@@ -189,11 +187,11 @@ const VenomFeedContent = observer(() => {
 				message,
 				decoded: await decodeMessage(message.msgId, message.msg),
 			}),
-			venomFeed: { account: venomAccounts[0] },
+			venomFeed: true,
 		});
 
 		return mailList;
-	}, [rebuildMailListCounter, venomAccounts]);
+	}, [rebuildMailListCounter]);
 
 	useEffect(() => () => mailList?.destroy(), [mailList]);
 
