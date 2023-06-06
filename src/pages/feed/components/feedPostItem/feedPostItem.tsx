@@ -10,6 +10,7 @@ import { ReadableDate } from '../../../../components/readableDate/readableDate';
 import { SharePopup } from '../../../../components/sharePopup/sharePopup';
 import { ReactComponent as ContactSvg } from '../../../../icons/ic20/contact.svg';
 import { ReactComponent as MenuSvg } from '../../../../icons/ic20/menu.svg';
+import { DomainAccount } from '../../../../stores/models/DomainAccount';
 import { RoutePath } from '../../../../stores/routePath';
 import { HorizontalAlignment } from '../../../../utils/alignment';
 import { toAbsoluteUrl, useNav } from '../../../../utils/url';
@@ -82,10 +83,11 @@ export function FeedPostContent({ post }: FeedPostContentProps) {
 
 interface FeedPostItemProps {
 	isInFeed?: boolean;
+	realtedAccounts?: DomainAccount[];
 	post: FeedPost;
 }
 
-export function FeedPostItem({ isInFeed, post }: FeedPostItemProps) {
+export function FeedPostItem({ isInFeed, realtedAccounts, post }: FeedPostItemProps) {
 	const selfRef = useRef<HTMLDivElement>(null);
 	const [collapsed, setCollapsed] = useState(false);
 	const navigate = useNav();
@@ -185,6 +187,22 @@ export function FeedPostItem({ isInFeed, post }: FeedPostItemProps) {
 								<a href={post.sourceLink} target="_blank" rel="noreferrer">
 									<DropDownItem>Open post source</DropDownItem>
 								</a>
+							)}
+
+							{!!realtedAccounts?.length && (
+								<>
+									<DropDownItem>
+										Unfollow{' '}
+										<b>{post.authorName}</b>
+									</DropDownItem>
+
+									{!!post.cryptoProjectName && (
+										<DropDownItem>
+											Unfollow{' '}
+											<b>{post.cryptoProjectName}</b>
+										</DropDownItem>
+									)}
+								</>
 							)}
 						</DropDown>
 					)}
