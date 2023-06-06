@@ -12,6 +12,7 @@
 		"build-airswap": "REACT_APP__APP_MODE=OTC REACT_APP__OTC_PROVIDER=AIRSWAP react-app-rewired build",
 		"build-paraswap": "REACT_APP__APP_MODE=OTC REACT_APP__OTC_PROVIDER=PARASWAP react-app-rewired build",
 		"build-1inch": "REACT_APP__APP_MODE=OTC REACT_APP__OTC_PROVIDER=ONEINCH react-app-rewired build",
+		"check": "tsc && eslint --max-warnings 0 . && prettier --list-different .",
 		"test": "react-app-rewired test",
 		"eject": "react-app-rewired eject"
 	},
