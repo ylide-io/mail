@@ -37,6 +37,18 @@ $contentPadding: 6px;
 	background: var(--surface-hover-color);
 }
 
+.item_lite {
+	color: var(--secondary-text-color);
+	font-weight: $font-weight_light;
+	cursor: pointer;
+}
+
+.item_lite:hover,
+.item_lite:focus-visible {
+	color: var(--primary-text-color);
+	background: var(--surface-hover-color);
+}
+
 .item_highlighted {
 	background: var(--selected-light-background-color);
 	cursor: pointer;

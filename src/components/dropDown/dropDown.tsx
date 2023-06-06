@@ -55,6 +55,7 @@ export function DropDown({
 
 export enum DropDownItemMode {
 	REGULAR = 'REGULAR',
+	LITE = 'LITE',
 	HIGHLIGHTED = 'HIGHLIGHTED',
 	SELECTED = 'SELECTED',
 	DISABLED = 'DISABLED',
@@ -82,6 +83,7 @@ export function DropDownItem({ children, className, mode = DropDownItemMode.REGU
 				css.item,
 				{
 					[DropDownItemMode.REGULAR]: css.item_regular,
+					[DropDownItemMode.LITE]: css.item_lite,
 					[DropDownItemMode.HIGHLIGHTED]: css.item_highlighted,
 					[DropDownItemMode.SELECTED]: css.item_selected,
 					[DropDownItemMode.DISABLED]: css.item_disabled,

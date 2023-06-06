@@ -18,6 +18,7 @@ import { ReactComponent as SearchSvg } from '../../../../icons/ic28/search.svg';
 import { DomainAccount } from '../../../../stores/models/DomainAccount';
 import { toggleArrayItem } from '../../../../utils/array';
 import { invariant } from '../../../../utils/assert';
+import { getSelectedSourceIds, updateFeedConfig } from '../../../../utils/feed';
 import { FeedLinkTypeIcon } from '../feedLinkTypeIcon/feedLinkTypeIcon';
 import css from './feedSettingsPopup.module.scss';
 
@@ -73,16 +74,7 @@ export const FeedSettingsPopup = observer(({ account, onClose }: FeedSettingsPop
 				a.name.localeCompare(b.name),
 		);
 
-		const defaultProjectIds = config.defaultProjects.map(p => p.projectId);
-		setSelectedSourceIds(
-			sources
-				.filter(s =>
-					s.cryptoProject?.id && defaultProjectIds.includes(s.cryptoProject.id)
-						? !config.config.excludedProjectIds.includes(s.id)
-						: config.config.includedProjectIds.includes(s.id),
-				)
-				.map(s => s.id),
-		);
+		setSelectedSourceIds(getSelectedSourceIds(sources, config));
 
 		return {
 			sources,
@@ -134,34 +126,7 @@ export const FeedSettingsPopup = observer(({ account, onClose }: FeedSettingsPop
 	const saveConfigMutation = useMutation({
 		mutationFn: async () => {
 			invariant(data);
-
-			const defaultProjectIds = data.config.defaultProjects.map(p => p.projectId);
-
-			const excludedProjectIds = data.sources
-				.filter(
-					s =>
-						!selectedSourceIds.includes(s.id) &&
-						(!s.cryptoProject?.id || defaultProjectIds.includes(s.cryptoProject.id)),
-				)
-				.map(s => s.id);
-
-			const includedProjectIds = data.sources
-				.filter(
-					s =>
-						selectedSourceIds.includes(s.id) &&
-						s.cryptoProject?.id &&
-						!defaultProjectIds.includes(s.cryptoProject.id),
-				)
-				.map(s => s.id);
-
-			await FeedManagerApi.setConfig({
-				token: account.mainViewKey,
-				config: {
-					mode: data.config.config.mode,
-					excludedProjectIds,
-					includedProjectIds,
-				},
-			});
+			await updateFeedConfig(account.mainViewKey, selectedSourceIds, data.sources, data.config);
 		},
 		onSuccess: () => onClose?.(),
 		onError: () => toast("Couldn't save your feed settings. Please try again."),
