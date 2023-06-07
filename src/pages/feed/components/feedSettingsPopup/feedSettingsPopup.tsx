@@ -1,10 +1,9 @@
 import clsx from 'clsx';
 import { observer } from 'mobx-react';
 import React, { useMemo, useState } from 'react';
-import { useMutation, useQuery } from 'react-query';
+import { useMutation } from 'react-query';
 
-import { FeedManagerApi } from '../../../../api/feedManagerApi';
-import { FeedReason, FeedServerApi, FeedSource } from '../../../../api/feedServerApi';
+import { FeedReason, FeedSource } from '../../../../api/feedServerApi';
 import { ActionButton, ActionButtonLook } from '../../../../components/ActionButton/ActionButton';
 import { Avatar } from '../../../../components/avatar/avatar';
 import { CheckBox } from '../../../../components/checkBox/checkBox';
@@ -15,10 +14,10 @@ import { TextField, TextFieldLook } from '../../../../components/textField/textF
 import { toast } from '../../../../components/toast/toast';
 import { ReactComponent as ContactSvg } from '../../../../icons/ic20/contact.svg';
 import { ReactComponent as SearchSvg } from '../../../../icons/ic28/search.svg';
+import { feedSettings } from '../../../../stores/FeedSettings';
 import { DomainAccount } from '../../../../stores/models/DomainAccount';
 import { toggleArrayItem } from '../../../../utils/array';
 import { invariant } from '../../../../utils/assert';
-import { getSelectedSourceIds, updateFeedConfig } from '../../../../utils/feed';
 import { FeedLinkTypeIcon } from '../feedLinkTypeIcon/feedLinkTypeIcon';
 import css from './feedSettingsPopup.module.scss';
 
@@ -61,76 +60,57 @@ export interface FeedSettingsPopupProps {
 export const FeedSettingsPopup = observer(({ account, onClose }: FeedSettingsPopupProps) => {
 	invariant(account.mainViewKey, 'FeedSettings only supports MV accounts');
 
-	const { isLoading, data } = useQuery('feed-sources', async () => {
-		const mainViewKey = account.mainViewKey;
-
-		const [{ sources }, config] = await Promise.all([
-			FeedServerApi.getSources(),
-			FeedManagerApi.getConfig({ token: mainViewKey }),
-		]);
-
-		sources.sort(
-			(a, b) =>
-				b.type.localeCompare(a.type) ||
-				(a.origin || '').localeCompare(b.origin || '') ||
-				a.name.localeCompare(b.name),
-		);
-
-		setSelectedSourceIds(getSelectedSourceIds(sources, config));
-
-		return {
-			sources,
-			config,
-		};
-	});
-
-	const [selectedSourceIds, setSelectedSourceIds] = useState<string[]>([]);
+	const data = feedSettings.getData(account);
+	const [selectedSourceIds, setSelectedSourceIds] = useState(feedSettings.getSelectedSourceIds(account));
 
 	const [isSearchOpen, setSearchOpen] = useState(false);
 	const [searchTerm, setSearchTerm] = useState('');
 
 	const sourcesByReason = useMemo(() => {
-		const filteredSources = data?.sources.filter(source => {
+		const sources = feedSettings.sources
+			.slice()
+			.sort(
+				(a, b) =>
+					b.type.localeCompare(a.type) ||
+					(a.origin || '').localeCompare(b.origin || '') ||
+					a.name.localeCompare(b.name),
+			);
+
+		const filteredSources = sources.filter(source => {
 			const term = searchTerm.trim().toLowerCase();
 			if (!term) return true;
 
 			return source.name.toLowerCase().includes(term) || source.origin?.toLowerCase().includes(term);
 		});
 
-		const grouped = filteredSources?.reduce((res, s) => {
+		const grouped = filteredSources.reduce((res, s) => {
 			const reason = s.cryptoProjectReasons[0] || '';
 			const list = (res[reason] = res[reason] || []);
 			list.push(s);
 			return res;
 		}, {} as Record<FeedReasonOrEmpty, FeedSource[]>);
 
-		return (
-			grouped &&
-			(Object.keys(grouped) as FeedReasonOrEmpty[])
-				.sort((a: FeedReasonOrEmpty, b: FeedReasonOrEmpty) => {
-					const getOrder = (reason: FeedReasonOrEmpty) =>
-						reason
-							? {
-									[FeedReason.BALANCE]: 1,
-									[FeedReason.PROTOCOL]: 2,
-									[FeedReason.TRANSACTION]: 3,
-							  }[reason]
-							: 4;
+		return (Object.keys(grouped) as FeedReasonOrEmpty[])
+			.sort((a: FeedReasonOrEmpty, b: FeedReasonOrEmpty) => {
+				const getOrder = (reason: FeedReasonOrEmpty) =>
+					reason
+						? {
+								[FeedReason.BALANCE]: 1,
+								[FeedReason.PROTOCOL]: 2,
+								[FeedReason.TRANSACTION]: 3,
+						  }[reason]
+						: 4;
 
-					return getOrder(a) - getOrder(b);
-				})
-				.reduce(
-					(res, reason) => ({ ...res, [reason]: grouped[reason] }),
-					{} as Record<FeedReasonOrEmpty, FeedSource[]>,
-				)
-		);
-	}, [data, searchTerm]);
+				return getOrder(a) - getOrder(b);
+			})
+			.reduce(
+				(res, reason) => ({ ...res, [reason]: grouped[reason] }),
+				{} as Record<FeedReasonOrEmpty, FeedSource[]>,
+			);
+	}, [searchTerm]);
 
 	const saveConfigMutation = useMutation({
-		mutationFn: async () => {
-			invariant(data);
-			await updateFeedConfig(account.mainViewKey, selectedSourceIds, data.sources, data.config);
-		},
+		mutationFn: () => feedSettings.updateFeedConfig(account, selectedSourceIds),
 		onSuccess: () => onClose?.(),
 		onError: () => toast("Couldn't save your feed settings. Please try again."),
 	});
@@ -143,7 +123,7 @@ export const FeedSettingsPopup = observer(({ account, onClose }: FeedSettingsPop
 			</div>
 
 			<div className={css.list}>
-				{sourcesByReason ? (
+				{data ? (
 					Object.keys(sourcesByReason).length ? (
 						(Object.entries(sourcesByReason) as [FeedReasonOrEmpty, FeedSource[]][]).map(
 							([reason, sources]) => (
@@ -196,10 +176,10 @@ export const FeedSettingsPopup = observer(({ account, onClose }: FeedSettingsPop
 					) : (
 						<div className={css.noData}>- No sources found -</div>
 					)
-				) : isLoading ? (
-					<OverlappingLoader text="Loading sources ..." />
-				) : (
+				) : feedSettings.isError ? (
 					<ErrorMessage className={css.error}>Couldn't load source list</ErrorMessage>
+				) : (
+					<OverlappingLoader text="Loading sources ..." />
 				)}
 			</div>
 

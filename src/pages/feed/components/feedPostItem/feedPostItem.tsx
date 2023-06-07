@@ -3,8 +3,7 @@ import { observer } from 'mobx-react';
 import React, { MouseEvent, useEffect, useMemo, useRef, useState } from 'react';
 import { generatePath } from 'react-router-dom';
 
-import { FeedManagerApi } from '../../../../api/feedManagerApi';
-import { FeedPost, FeedReason, FeedServerApi, LinkType } from '../../../../api/feedServerApi';
+import { FeedPost, FeedReason, LinkType } from '../../../../api/feedServerApi';
 import { Avatar } from '../../../../components/avatar/avatar';
 import { CheckBox } from '../../../../components/checkBox/checkBox';
 import { DropDown, DropDownItem, DropDownItemMode } from '../../../../components/dropDown/dropDown';
@@ -16,12 +15,12 @@ import { toast } from '../../../../components/toast/toast';
 import { ReactComponent as ContactSvg } from '../../../../icons/ic20/contact.svg';
 import { ReactComponent as MenuSvg } from '../../../../icons/ic20/menu.svg';
 import { useDomainAccounts } from '../../../../stores/Domain';
+import { feedSettings } from '../../../../stores/FeedSettings';
 import { DomainAccount } from '../../../../stores/models/DomainAccount';
 import { RoutePath } from '../../../../stores/routePath';
 import { formatAccountName } from '../../../../utils/account';
 import { HorizontalAlignment } from '../../../../utils/alignment';
 import { invariant } from '../../../../utils/assert';
-import { getSelectedSourceIds, updateFeedConfig } from '../../../../utils/feed';
 import { toAbsoluteUrl, useNav } from '../../../../utils/url';
 import { FeedLinkTypeIcon } from '../feedLinkTypeIcon/feedLinkTypeIcon';
 import css from './feedPostItem.module.scss';
@@ -169,20 +168,19 @@ export function FeedPostItem({ isInFeed, realtedAccounts, post }: FeedPostItemPr
 				'Not all accounts have MV key',
 			);
 
-			const { sources } = await FeedServerApi.getSources();
 			const sourceIdsToExclude = entireProject
-				? sources.filter(s => s.cryptoProject?.id === post.cryptoProjectId).map(s => s.id)
+				? feedSettings.sources.filter(s => s.cryptoProject?.id === post.cryptoProjectId).map(s => s.id)
 				: [post.sourceId];
 
-			invariant(sourceIdsToExclude.length, `No source ids to exclude. post=${post}`);
+			invariant(sourceIdsToExclude.length, 'No source ids to exclude');
 
 			await Promise.all(
 				realtedAccounts.map(async account => {
-					const config = await FeedManagerApi.getConfig({ token: account.mainViewKey });
-					const selectedSourceIds = getSelectedSourceIds(sources, config).filter(
-						id => !sourceIdsToExclude.includes(id),
-					);
-					await updateFeedConfig(account.mainViewKey, selectedSourceIds, sources, config);
+					const selectedSourceIds = feedSettings
+						.getSelectedSourceIds(account)
+						.filter(id => !sourceIdsToExclude.includes(id));
+
+					await feedSettings.updateFeedConfig(account, selectedSourceIds);
 				}),
 			);
 
@@ -190,6 +188,7 @@ export function FeedPostItem({ isInFeed, realtedAccounts, post }: FeedPostItemPr
 		} catch (e) {
 			setUnfollowState('none');
 			toast("Couldn't unfollow 🤦‍♀️");
+			throw e;
 		}
 	};
 
