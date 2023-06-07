@@ -148,7 +148,7 @@ export function FeedPostItem({ isInFeed, realtedAccounts, post }: FeedPostItemPr
 		}
 	};
 
-	const reason = post.cryptoProjectReasons[0] || FeedReason.NONE;
+	const reason = post.cryptoProjectReasons[0];
 
 	return (
 		<>
@@ -179,7 +179,7 @@ export function FeedPostItem({ isInFeed, realtedAccounts, post }: FeedPostItemPr
 						</div>
 
 						<div className={css.metaRight}>
-							{reason !== FeedReason.NONE && (
+							{reason && (
 								<div className={css.reason} title="The reason why you see this post">
 									{
 										{

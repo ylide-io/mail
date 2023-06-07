@@ -51,6 +51,8 @@ export const Row = React.memo(({ source, isSelected, onSelect }: RowProps) => (
 
 //
 
+type FeedReasonOrEmpty = FeedReason | '';
+
 export interface FeedSettingsPopupProps {
 	account: DomainAccount;
 	onClose?: () => void;
@@ -96,29 +98,30 @@ export const FeedSettingsPopup = observer(({ account, onClose }: FeedSettingsPop
 		});
 
 		const grouped = filteredSources?.reduce((res, s) => {
-			const reason = s.cryptoProjectReasons[0] || FeedReason.NONE;
+			const reason = s.cryptoProjectReasons[0] || '';
 			const list = (res[reason] = res[reason] || []);
 			list.push(s);
 			return res;
-		}, {} as Record<FeedReason, FeedSource[]>);
+		}, {} as Record<FeedReasonOrEmpty, FeedSource[]>);
 
 		return (
 			grouped &&
-			(Object.keys(grouped) as FeedReason[])
-				.sort((a: FeedReason, b: FeedReason) => {
-					const getOrder = (reason: FeedReason) =>
-						({
-							[FeedReason.BALANCE]: 1,
-							[FeedReason.PROTOCOL]: 2,
-							[FeedReason.TRANSACTION]: 3,
-							[FeedReason.NONE]: 4,
-						}[reason]);
+			(Object.keys(grouped) as FeedReasonOrEmpty[])
+				.sort((a: FeedReasonOrEmpty, b: FeedReasonOrEmpty) => {
+					const getOrder = (reason: FeedReasonOrEmpty) =>
+						reason
+							? {
+									[FeedReason.BALANCE]: 1,
+									[FeedReason.PROTOCOL]: 2,
+									[FeedReason.TRANSACTION]: 3,
+							  }[reason]
+							: 4;
 
 					return getOrder(a) - getOrder(b);
 				})
 				.reduce(
 					(res, reason) => ({ ...res, [reason]: grouped[reason] }),
-					{} as Record<FeedReason, FeedSource[]>,
+					{} as Record<FeedReasonOrEmpty, FeedSource[]>,
 				)
 		);
 	}, [data, searchTerm]);
@@ -142,49 +145,54 @@ export const FeedSettingsPopup = observer(({ account, onClose }: FeedSettingsPop
 			<div className={css.list}>
 				{sourcesByReason ? (
 					Object.keys(sourcesByReason).length ? (
-						(Object.entries(sourcesByReason) as [FeedReason, FeedSource[]][]).map(([reason, sources]) => (
-							<div className={css.listGroup}>
-								<div className={css.category}>
-									<CheckBox
-										isChecked={sourcesByReason[reason].every(s => selectedSourceIds.includes(s.id))}
-										onChange={isChecked => {
-											const newSourceIds = selectedSourceIds.filter(
-												id => !sources.find(s => s.id === id),
-											);
-											setSelectedSourceIds(
-												isChecked ? [...newSourceIds, ...sources.map(s => s.id)] : newSourceIds,
-											);
-										}}
-									/>
-									<div className={css.categoryReason}>
-										{
-											{
-												[FeedReason.BALANCE]: 'Tokens you hold',
-												[FeedReason.PROTOCOL]: 'Projects you have position in',
-												[FeedReason.TRANSACTION]: 'Projects you used',
-												[FeedReason.NONE]: 'Others',
-											}[reason]
-										}
-									</div>
-									<div className={css.categoryProject}>Token / Project</div>
-								</div>
-
-								<div>
-									{sources.map(source => (
-										<Row
-											key={source.id}
-											source={source}
-											isSelected={selectedSourceIds.includes(source.id)}
-											onSelect={isSelected =>
-												setSelectedSourceIds(prev =>
-													toggleArrayItem(prev, source.id, isSelected),
-												)
-											}
+						(Object.entries(sourcesByReason) as [FeedReasonOrEmpty, FeedSource[]][]).map(
+							([reason, sources]) => (
+								<div className={css.listGroup}>
+									<div className={css.category}>
+										<CheckBox
+											isChecked={sourcesByReason[reason].every(s =>
+												selectedSourceIds.includes(s.id),
+											)}
+											onChange={isChecked => {
+												const newSourceIds = selectedSourceIds.filter(
+													id => !sources.find(s => s.id === id),
+												);
+												setSelectedSourceIds(
+													isChecked
+														? [...newSourceIds, ...sources.map(s => s.id)]
+														: newSourceIds,
+												);
+											}}
 										/>
-									))}
+										<div className={css.categoryReason}>
+											{reason
+												? {
+														[FeedReason.BALANCE]: 'Tokens you hold',
+														[FeedReason.PROTOCOL]: 'Projects you have position in',
+														[FeedReason.TRANSACTION]: 'Projects you used',
+												  }[reason]
+												: 'Others'}
+										</div>
+										<div className={css.categoryProject}>Token / Project</div>
+									</div>
+
+									<div>
+										{sources.map(source => (
+											<Row
+												key={source.id}
+												source={source}
+												isSelected={selectedSourceIds.includes(source.id)}
+												onSelect={isSelected =>
+													setSelectedSourceIds(prev =>
+														toggleArrayItem(prev, source.id, isSelected),
+													)
+												}
+											/>
+										))}
+									</div>
 								</div>
-							</div>
-						))
+							),
+						)
 					) : (
 						<div className={css.noData}>- No sources found -</div>
 					)

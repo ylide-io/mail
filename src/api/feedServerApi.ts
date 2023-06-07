@@ -14,7 +14,6 @@ export enum LinkType {
 }
 
 export enum FeedReason {
-	NONE = 'none',
 	BALANCE = 'balance',
 	PROTOCOL = 'protocol',
 	TRANSACTION = 'transaction',
