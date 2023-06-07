@@ -1,6 +1,6 @@
 import { EVMNetwork } from '@ylide/ethereum';
 import { ExternalYlidePublicKey, IGenericAccount, ServiceCode, YlideCore, YlideKey } from '@ylide/sdk';
-import { computed, makeAutoObservable, observable } from 'mobx';
+import { makeAutoObservable } from 'mobx';
 
 import { isBytesEqual } from '../../utils/isBytesEqual';
 import { browserStorage } from '../browserStorage';
@@ -13,8 +13,8 @@ export class DomainAccount {
 	readonly keyVersion: number;
 	private _name: string;
 
-	@observable remoteKey: ExternalYlidePublicKey | null = null;
-	@observable remoteKeys: Record<string, ExternalYlidePublicKey | null> = {};
+	remoteKey: ExternalYlidePublicKey | null = null;
+	remoteKeys: Record<string, ExternalYlidePublicKey | null> = {};
 
 	constructor(wallet: Wallet, account: IGenericAccount, key: YlideKey, keyVersion: number, name: string) {
 		makeAutoObservable(this);
@@ -70,15 +70,15 @@ export class DomainAccount {
 		return YlideCore.getSentAddress(this.wallet.controller.addressToUint256(this.account.address));
 	}
 
-	@computed get isCurrentlySelected() {
+	get isCurrentlySelected() {
 		return this.wallet.isItCurrentAccount(this);
 	}
 
-	@computed get isAnyKeyRegistered() {
+	get isAnyKeyRegistered() {
 		return !!this.remoteKey;
 	}
 
-	@computed get isLocalKeyRegistered() {
+	get isLocalKeyRegistered() {
 		return this.remoteKey && isBytesEqual(this.key.keypair.publicKey, this.remoteKey.publicKey.bytes);
 	}
 
