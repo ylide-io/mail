@@ -48,7 +48,7 @@ export class FeedSettings {
 		});
 	}
 
-	getData(account: DomainAccount) {
+	getData(account: DomainAccount): FeedSettingsData | undefined {
 		const data = this.data.get(account);
 		if (data && data !== 'loading') return data;
 	}
@@ -66,6 +66,10 @@ export class FeedSettings {
 					: data.includedProjectIds.includes(source.id),
 			)
 			.map(s => s.id);
+	}
+
+	isSourceSelected(account: DomainAccount, sourceId: string) {
+		return this.getSelectedSourceIds(account).includes(sourceId);
 	}
 
 	async updateFeedConfig(account: DomainAccount, selectedSourceIds: string[]) {

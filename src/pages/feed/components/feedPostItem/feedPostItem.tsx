@@ -11,6 +11,7 @@ import { ErrorMessage, ErrorMessageLook } from '../../../../components/errorMess
 import { GalleryModal } from '../../../../components/galleryModal/galleryModal';
 import { ReadableDate } from '../../../../components/readableDate/readableDate';
 import { SharePopup } from '../../../../components/sharePopup/sharePopup';
+import { Spinner } from '../../../../components/spinner/spinner';
 import { toast } from '../../../../components/toast/toast';
 import { ReactComponent as ContactSvg } from '../../../../icons/ic20/contact.svg';
 import { ReactComponent as MenuSvg } from '../../../../icons/ic20/menu.svg';
@@ -89,6 +90,47 @@ export function FeedPostContent({ post }: FeedPostContentProps) {
 
 //
 
+interface AddtoMyFeedItemProps {
+	post: FeedPost;
+	account: DomainAccount;
+}
+
+export const AddtoMyFeedItem = observer(({ post, account }: AddtoMyFeedItemProps) => {
+	const [isUpdating, setUpdating] = useState(false);
+
+	const isSelected = feedSettings.isSourceSelected(account, post.sourceId);
+
+	const toggle = async () => {
+		try {
+			setUpdating(true);
+
+			const selectedSourceIds = feedSettings.getSelectedSourceIds(account);
+
+			await feedSettings.updateFeedConfig(
+				account,
+				isSelected
+					? selectedSourceIds.filter(id => id !== post.sourceId)
+					: [...selectedSourceIds, post.sourceId],
+			);
+		} catch (e) {
+			toast('Error 🤦‍♀️');
+		} finally {
+			setUpdating(false);
+		}
+	};
+
+	return (
+		<DropDownItem mode={isUpdating ? DropDownItemMode.DISABLED : undefined} onSelect={toggle}>
+			{isUpdating ? (
+				<Spinner size={18} style={{ opacity: 0.8 }} />
+			) : (
+				<CheckBox isChecked={isSelected} onChange={toggle} />
+			)}
+			{formatAccountName(account)}
+		</DropDownItem>
+	);
+});
+
 interface AddToMyFeedButtonProps {
 	post: FeedPost;
 }
@@ -117,10 +159,7 @@ export const AddToMyFeedButton = observer(({ post }: AddToMyFeedButtonProps) => 
 					onCloseRequest={() => setListOpen(false)}
 				>
 					{mvAccounts.map(account => (
-						<DropDownItem>
-							<CheckBox />
-							{formatAccountName(account)}
-						</DropDownItem>
+						<AddtoMyFeedItem post={post} account={account} />
 					))}
 				</DropDown>
 			)}
