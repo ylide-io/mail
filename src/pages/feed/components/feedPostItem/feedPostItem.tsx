@@ -326,8 +326,10 @@ export function FeedPostItem({ isInFeed, realtedAccounts, post }: FeedPostItemPr
 									{!!realtedAccounts?.length && (
 										<>
 											<DropDownItem mode={DropDownItemMode.LITE} onSelect={() => unfollow(false)}>
-												Unfollow{' '}
-												<b>{post.authorName}</b>
+												<div>
+													Unfollow{' '}
+													<b>{post.authorName}</b>
+												</div>
 											</DropDownItem>
 
 											{!!post.cryptoProjectName && (
@@ -335,8 +337,10 @@ export function FeedPostItem({ isInFeed, realtedAccounts, post }: FeedPostItemPr
 													mode={DropDownItemMode.LITE}
 													onSelect={() => unfollow(true)}
 												>
-													Unfollow{' '}
-													<b>{post.cryptoProjectName}</b>
+													<div>
+														Unfollow{' '}
+														<b>{post.cryptoProjectName}</b>
+													</div>
 												</DropDownItem>
 											)}
 										</>
