@@ -126,14 +126,10 @@ export const SendMailButton = observer(({ className, mailData, disabled, onSent 
 												setMenuVisible(false);
 											}}
 										>
-											<>
-												<div style={{ marginRight: 7 }}>{bData.logo(16)}</div>
-												{bData.title} [
-												{Number(
-													evmBalances.balances[evmNameToNetwork(bc.blockchain)!].toFixed(3),
-												)}{' '}
-												{bData.ethNetwork!.nativeCurrency.symbol}]
-											</>
+											{bData.logo(16)}
+											{bData.title} [
+											{Number(evmBalances.balances[evmNameToNetwork(bc.blockchain)!].toFixed(3))}{' '}
+											{bData.ethNetwork!.nativeCurrency.symbol}]
 										</DropDownItem>
 									);
 								})}

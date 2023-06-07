@@ -1,10 +1,12 @@
 import clsx from 'clsx';
-import React, { MouseEvent, useEffect, useRef, useState } from 'react';
+import { observer } from 'mobx-react';
+import React, { MouseEvent, useEffect, useMemo, useRef, useState } from 'react';
 import { generatePath } from 'react-router-dom';
 
 import { FeedManagerApi } from '../../../../api/feedManagerApi';
 import { FeedPost, FeedReason, FeedServerApi, LinkType } from '../../../../api/feedServerApi';
 import { Avatar } from '../../../../components/avatar/avatar';
+import { CheckBox } from '../../../../components/checkBox/checkBox';
 import { DropDown, DropDownItem, DropDownItemMode } from '../../../../components/dropDown/dropDown';
 import { ErrorMessage, ErrorMessageLook } from '../../../../components/errorMessage/errorMessage';
 import { GalleryModal } from '../../../../components/galleryModal/galleryModal';
@@ -13,8 +15,10 @@ import { SharePopup } from '../../../../components/sharePopup/sharePopup';
 import { toast } from '../../../../components/toast/toast';
 import { ReactComponent as ContactSvg } from '../../../../icons/ic20/contact.svg';
 import { ReactComponent as MenuSvg } from '../../../../icons/ic20/menu.svg';
+import { useDomainAccounts } from '../../../../stores/Domain';
 import { DomainAccount } from '../../../../stores/models/DomainAccount';
 import { RoutePath } from '../../../../stores/routePath';
+import { formatAccountName } from '../../../../utils/account';
 import { HorizontalAlignment } from '../../../../utils/alignment';
 import { invariant } from '../../../../utils/assert';
 import { getSelectedSourceIds, updateFeedConfig } from '../../../../utils/feed';
@@ -83,6 +87,47 @@ export function FeedPostContent({ post }: FeedPostContentProps) {
 		</div>
 	);
 }
+
+//
+
+interface AddToMyFeedButtonProps {
+	post: FeedPost;
+}
+
+export const AddToMyFeedButton = observer(({ post }: AddToMyFeedButtonProps) => {
+	const accounts = useDomainAccounts();
+	const mvAccounts = useMemo(() => accounts.filter(a => a.mainViewKey), [accounts]);
+
+	const buttonRef = useRef(null);
+	const [isListOpen, setListOpen] = useState(false);
+
+	return (
+		<>
+			<div
+				ref={buttonRef}
+				className={clsx(css.reason, css.reason_button)}
+				onClick={() => setListOpen(!isListOpen)}
+			>
+				Add to My Feed
+			</div>
+
+			{isListOpen && (
+				<DropDown
+					anchorRef={buttonRef}
+					horizontalAlign={HorizontalAlignment.END}
+					onCloseRequest={() => setListOpen(false)}
+				>
+					{mvAccounts.map(account => (
+						<DropDownItem>
+							<CheckBox />
+							{formatAccountName(account)}
+						</DropDownItem>
+					))}
+				</DropDown>
+			)}
+		</>
+	);
+});
 
 //
 
@@ -179,18 +224,22 @@ export function FeedPostItem({ isInFeed, realtedAccounts, post }: FeedPostItemPr
 						</div>
 
 						<div className={css.metaRight}>
-							{reason && (
-								<div className={css.reason} title="The reason why you see this post">
-									{
+							{!realtedAccounts?.length ? (
+								<AddToMyFeedButton post={post} />
+							) : (
+								reason && (
+									<div className={css.reason} title="The reason why you see this post">
 										{
-											[FeedReason.BALANCE]: "You're holding ",
-											[FeedReason.PROTOCOL]: "You're in ",
-											[FeedReason.TRANSACTION]: 'You used ',
-										}[reason]
-									}
+											{
+												[FeedReason.BALANCE]: "You're holding ",
+												[FeedReason.PROTOCOL]: "You're in ",
+												[FeedReason.TRANSACTION]: 'You used ',
+											}[reason]
+										}
 
-									<b>{post.cryptoProjectName}</b>
-								</div>
+										<b>{post.cryptoProjectName}</b>
+									</div>
+								)
 							)}
 
 							<a

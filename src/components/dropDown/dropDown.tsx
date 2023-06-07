@@ -1,5 +1,5 @@
 import clsx from 'clsx';
-import { PropsWithChildren, RefObject, useEffect, useRef } from 'react';
+import { CSSProperties, PropsWithChildren, RefObject, useEffect, useRef } from 'react';
 
 import {
 	AlignmentDirection,
@@ -64,10 +64,17 @@ export enum DropDownItemMode {
 
 interface DropDownItemProps extends PropsWithChildren<{}>, PropsWithClassName {
 	mode?: DropDownItemMode;
+	style?: CSSProperties;
 	onSelect?: () => void;
 }
 
-export function DropDownItem({ children, className, mode = DropDownItemMode.REGULAR, onSelect }: DropDownItemProps) {
+export function DropDownItem({
+	children,
+	className,
+	mode = DropDownItemMode.REGULAR,
+	style,
+	onSelect,
+}: DropDownItemProps) {
 	const itemRef = useRef<HTMLDivElement>(null);
 
 	useEffect(() => {
@@ -91,6 +98,7 @@ export function DropDownItem({ children, className, mode = DropDownItemMode.REGU
 				}[mode || DropDownItemMode.REGULAR],
 				className,
 			)}
+			style={style}
 			onClick={() => {
 				if (mode !== DropDownItemMode.DISABLED) {
 					onSelect?.();

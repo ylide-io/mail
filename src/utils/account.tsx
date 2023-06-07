@@ -15,6 +15,16 @@ import { getQueryString } from './getQueryString';
 import { truncateInMiddle } from './string';
 import { walletsMeta } from './wallet';
 
+export function formatAccountName(account: DomainAccount) {
+	const walletName = walletsMeta[account.wallet.wallet].title;
+
+	return account.name
+		? `${account.name} (${truncateInMiddle(account.account.address, 8, '..')}, ${walletName})`
+		: `${truncateInMiddle(account.account.address, 12, '..')} (${walletName})`;
+}
+
+//
+
 export async function connectAccount(): Promise<DomainAccount | undefined> {
 	let wallet: Wallet | undefined;
 	const proxyAccount = domain.availableProxyAccounts[0];

@@ -19,8 +19,11 @@ $contentPadding: 6px;
 //
 
 .item {
-	display: flex;
+	display: grid;
+	grid-auto-flow: column;
 	align-items: center;
+	justify-content: start;
+	grid-gap: 8px;
 	padding: 0 12px;
 	min-height: $interactive-elem-size;
 	white-space: nowrap;
