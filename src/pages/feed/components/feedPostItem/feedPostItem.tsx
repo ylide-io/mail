@@ -14,6 +14,7 @@ import { ReadableDate } from '../../../../components/readableDate/readableDate';
 import { SharePopup } from '../../../../components/sharePopup/sharePopup';
 import { Spinner } from '../../../../components/spinner/spinner';
 import { toast } from '../../../../components/toast/toast';
+import { AppMode, REACT_APP__APP_MODE } from '../../../../env';
 import { ReactComponent as ContactSvg } from '../../../../icons/ic20/contact.svg';
 import { ReactComponent as MenuSvg } from '../../../../icons/ic20/menu.svg';
 import { useDomainAccounts } from '../../../../stores/Domain';
@@ -266,23 +267,21 @@ export function FeedPostItem({ isInFeed, realtedAccounts, post }: FeedPostItemPr
 						</div>
 
 						<div className={css.metaRight}>
-							{!realtedAccounts?.length ? (
-								<AddToMyFeedButton post={post} />
-							) : (
-								reason && (
-									<div className={css.reason} title="The reason why you see this post">
-										{
+							{!realtedAccounts?.length
+								? REACT_APP__APP_MODE === AppMode.MAIN_VIEW && <AddToMyFeedButton post={post} />
+								: reason && (
+										<div className={css.reason} title="The reason why you see this post">
 											{
-												[FeedReason.BALANCE]: "You're holding ",
-												[FeedReason.PROTOCOL]: "You're in ",
-												[FeedReason.TRANSACTION]: 'You used ',
-											}[reason]
-										}
+												{
+													[FeedReason.BALANCE]: "You're holding ",
+													[FeedReason.PROTOCOL]: "You're in ",
+													[FeedReason.TRANSACTION]: 'You used ',
+												}[reason]
+											}
 
-										<b>{post.cryptoProjectName}</b>
-									</div>
-								)
-							)}
+											<b>{post.cryptoProjectName}</b>
+										</div>
+								  )}
 
 							<a
 								className={css.date}
