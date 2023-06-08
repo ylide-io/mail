@@ -104,7 +104,6 @@ export class OutgoingMailData {
 	get readyForSending() {
 		return !!(
 			!this.sending &&
-			this.from &&
 			(this.mode === OutgoingMailDataMode.BROADCAST ||
 				(this.to.items.length &&
 					!this.to.items.some(r => r.isLoading) &&
