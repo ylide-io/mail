@@ -1,7 +1,4 @@
-import { nanoid } from 'nanoid';
-
 import { REACT_APP__FEED_SERVER } from '../env';
-import { randomArrayElem } from '../utils/array';
 import { invariant } from '../utils/assert';
 import { createCleanSerachParams } from '../utils/url';
 
@@ -159,18 +156,7 @@ export namespace FeedServerApi {
 
 		// FIXME Temp
 		response.sources.forEach(s => {
-			s.cryptoProject = randomArrayElem([
-				{ id: nanoid(), name: 'Ethereum' },
-				{ id: nanoid(), name: 'XDAI' },
-				{ id: nanoid(), name: 'USDT' },
-				{ id: nanoid(), name: 'BTC' },
-			]);
-			s.cryptoProjectReasons = randomArrayElem([
-				[FeedReason.BALANCE, FeedReason.TRANSACTION],
-				[FeedReason.TRANSACTION],
-				[FeedReason.PROTOCOL],
-				[],
-			]);
+			s.cryptoProjectReasons = s.cryptoProjectReasons || [];
 		});
 
 		return response;

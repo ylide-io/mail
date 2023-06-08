@@ -12,6 +12,7 @@ import { Modal } from '../../../../components/modal/modal';
 import { OverlappingLoader } from '../../../../components/overlappingLoader/overlappingLoader';
 import { TextField, TextFieldLook } from '../../../../components/textField/textField';
 import { toast } from '../../../../components/toast/toast';
+import { DASH } from '../../../../constants';
 import { ReactComponent as ContactSvg } from '../../../../icons/ic20/contact.svg';
 import { ReactComponent as SearchSvg } from '../../../../icons/ic28/search.svg';
 import { feedSettings } from '../../../../stores/FeedSettings';
@@ -44,7 +45,7 @@ export const Row = React.memo(({ source, isSelected, onSelect }: RowProps) => (
 			</a>
 		</div>
 
-		<div className={css.sourceProject}>{source.cryptoProject?.name}</div>
+		<div className={css.sourceProject}>{source.cryptoProject?.name || DASH}</div>
 	</div>
 ));
 
