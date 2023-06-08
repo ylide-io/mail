@@ -7,6 +7,7 @@ import { AdaptiveAddress } from '../../../../components/adaptiveAddress/adaptive
 import { Avatar } from '../../../../components/avatar/avatar';
 import { DropDown, DropDownItem } from '../../../../components/dropDown/dropDown';
 import { ErrorMessage, ErrorMessageLook } from '../../../../components/errorMessage/errorMessage';
+import { GalleryModal } from '../../../../components/galleryModal/galleryModal';
 import { NlToBr } from '../../../../components/nlToBr/nlToBr';
 import { ReadableDate } from '../../../../components/readableDate/readableDate';
 import { toast } from '../../../../components/toast/toast';
@@ -35,6 +36,7 @@ export function VenomFeedPostItem({ message, decoded: { decodedTextData, attachm
 		[decodedTextData],
 	);
 	const attachment = attachments[0] as MessageAttachmentLinkV1 | undefined;
+	const attachmentHttpUrl = attachment && ipfsToHttpUrl(attachment.link);
 
 	const menuButtonRef = useRef(null);
 	const [isMenuOpen, setMenuOpen] = useState(false);
@@ -135,8 +137,13 @@ export function VenomFeedPostItem({ message, decoded: { decodedTextData, attachm
 					<>
 						<NlToBr text={decodedText} />
 
-						{attachment && (
-							<img className={css.cover} alt="Attachment" src={ipfsToHttpUrl(attachment.link)} />
+						{attachmentHttpUrl && (
+							<img
+								className={css.cover}
+								alt="Attachment"
+								src={attachmentHttpUrl}
+								onClick={() => GalleryModal.show([attachmentHttpUrl])}
+							/>
 						)}
 					</>
 				)}
