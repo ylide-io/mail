@@ -26,7 +26,7 @@ $hPadding: 20px;
 
 .list {
 	flex: 1;
-	position: relative;
+	position: relative; // for preloader
 	overflow-y: auto;
 }
 
@@ -34,9 +34,37 @@ $hPadding: 20px;
 	position: relative;
 }
 
+.category {
+	display: grid;
+	grid-template-columns: auto 1.5fr 1fr;
+	grid-gap: 12px;
+	align-items: center;
+	position: sticky;
+	top: 0;
+	z-index: 1;
+	padding: 8px 12px 8px 20px;
+	height: 40px;
+	font-weight: $font-weight_bold;
+	background: var(--tertiary-surface-color);
+}
+
+.categoryReason {
+	@include truncate-text;
+}
+
+.categoryProject {
+	@include truncate-text;
+	text-align: right;
+
+	@include less480px {
+		display: none;
+	}
+}
+
 .row {
 	display: flex;
 	align-items: center;
+	padding: 0 20px;
 
 	&:nth-child(2n) {
 		background: var(--secondary-surface-color);
@@ -45,35 +73,6 @@ $hPadding: 20px;
 	> :not(:first-child) {
 		margin: 0 0 0 12px;
 	}
-}
-
-.row_category {
-	position: sticky;
-	top: 0;
-	z-index: 1;
-	padding: 0 12px 0 20px;
-	height: 40px;
-	background: var(--tertiary-surface-color);
-}
-
-.userRelation {
-	flex: 1.66 1;
-	font-weight: $font-weight_bold;
-}
-
-.token {
-	flex: 0.33 1;
-	white-space: nowrap;
-	font-weight: $font-weight_bold;
-
-	@include less480px {
-		display: none;
-	}
-}
-
-.row_data {
-	padding: 0 20px 0 36px;
-	height: 40px;
 
 	@include less480px {
 		display: grid;
@@ -81,9 +80,18 @@ $hPadding: 20px;
 		grid-row-gap: 8px;
 		padding-top: 8px;
 		padding-bottom: 8px;
+	}
+}
+
+.row_data {
+	height: 40px;
+
+	@include less480px {
 		height: auto;
 	}
 }
+
+//
 
 .sourceCheckBox {
 	@include less480px {
@@ -124,16 +132,18 @@ $hPadding: 20px;
 	@include truncate-text;
 }
 
-.sourceToken {
+.sourceProject {
 	@include truncate-text;
 	flex: 0.33 1;
-	font-weight: $font-weight_bold;
 	text-align: center;
+	font-weight: $font-weight_bold;
 
 	@include less480px {
 		text-align: left;
 	}
 }
+
+//
 
 .noData {
 	display: flex;

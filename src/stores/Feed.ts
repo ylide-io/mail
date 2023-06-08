@@ -1,8 +1,7 @@
 import { makeObservable, observable } from 'mobx';
 
-import { FeedCategory, FeedPost, FeedServerApi, FeedSourceUserRelation } from '../api/feedServerApi';
+import { FeedCategory, FeedPost, FeedServerApi } from '../api/feedServerApi';
 import { analytics } from './Analytics';
-import { browserStorage } from './browserStorage';
 
 export function getFeedCategoryName(category: FeedCategory) {
 	return category;
@@ -32,51 +31,23 @@ export class FeedStore {
 		makeObservable(this);
 	}
 
-	private async genericLoad(
-		params: {
-			needOld: boolean;
-			length: number;
-			lastPostId?: string;
-			firstPostId?: string;
-		},
-		isRetryWithNewSourceList: boolean = false,
-	): Promise<FeedServerApi.GetPostsResponse | undefined> {
+	private async genericLoad(params: {
+		needOld: boolean;
+		length: number;
+		lastPostId?: string;
+		firstPostId?: string;
+	}): Promise<FeedServerApi.GetPostsResponse | undefined> {
 		try {
 			this.loading = true;
 
 			const sourceId = this.sourceId;
-
-			const sourceListId = !sourceId ? browserStorage.feedSourceSettings?.listId : undefined;
-
-			const categories = sourceId || sourceListId ? undefined : this.categories;
+			const categories = sourceId ? undefined : this.categories;
 
 			const response = await FeedServerApi.getPosts({
 				...params,
 				categories,
 				sourceId,
-				sourceListId,
 				addressTokens: this.addressTokens,
-			});
-
-			// FIXME Temp
-			response.items.forEach(it => {
-				// NONE = 'NONE',
-				// HOLDING_TOKEN = 'HOLDING_TOKEN',
-				// HELD_TOKEN = 'HELD_TOKEN',
-				// USING_PROJECT = 'USING_PROJECT',
-				// USED_PROJECT = 'USED_PROJECT',
-				// it.tokens = [randomArrayElem(['BTC', 'ETH', 'USDT'])];
-				// it.userRelation = randomArrayElem(Object.values(FeedSourceUserRelation));
-				it.tokens = it.cryptoProjectName ? [it.cryptoProjectName] : [];
-				if (it.cryptoProjectReasons.includes('balance')) {
-					it.userRelation = FeedSourceUserRelation.HOLDING_TOKEN;
-				} else if (it.cryptoProjectReasons.includes('protocol')) {
-					it.userRelation = FeedSourceUserRelation.USING_PROJECT;
-				} else if (it.cryptoProjectReasons.includes('transaction')) {
-					it.userRelation = FeedSourceUserRelation.USED_PROJECT;
-				} else {
-					it.userRelation = FeedSourceUserRelation.NONE;
-				}
 			});
 
 			this.loaded = true;
@@ -89,26 +60,10 @@ export class FeedStore {
 			return response;
 		} catch (e) {
 			if (e instanceof FeedServerApi.FeedServerError) {
-				if (e.code !== FeedServerApi.ErrorCode.SOURCE_LIST_NOT_FOUND) {
-					this.error = e.code;
-					return;
-				} else if (!isRetryWithNewSourceList) {
-					const sourceIds = browserStorage.feedSourceSettings?.sourceIds;
-					if (sourceIds) {
-						try {
-							const data = await FeedServerApi.createSourceList(sourceIds);
-							browserStorage.feedSourceSettings = {
-								listId: data.sourceListId,
-								sourceIds,
-							};
-
-							return await this.genericLoad(params, true);
-						} catch (e) {}
-					}
-				}
+				this.error = e.code;
+			} else {
+				this.error = true;
 			}
-
-			this.error = true;
 		} finally {
 			this.loading = false;
 		}

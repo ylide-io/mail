@@ -35,13 +35,22 @@ const RegularFeedContent = observer(() => {
 
 	const { category, source, address } = useParams<{ category: FeedCategory; source: string; address: string }>();
 	const isAllPosts = location.pathname === generatePath(RoutePath.FEED_ALL);
-	const selectedAccount = accounts.find(a => a.account.address === address);
+
+	const selectedAccounts = useMemo(
+		() =>
+			address
+				? accounts.filter(a => a.account.address === address)
+				: !category && !source && !isAllPosts
+				? accounts
+				: [],
+		[accounts, address, category, isAllPosts, source],
+	);
 
 	useEffect(() => {
-		if (address && !selectedAccount) {
+		if (address && !selectedAccounts.length) {
 			navigate(generatePath(RoutePath.FEED));
 		}
-	}, [address, navigate, selectedAccount]);
+	}, [address, navigate, selectedAccounts]);
 
 	// We can NOT load smart feed if no suitable account connected
 	const canLoadFeed =
@@ -53,11 +62,7 @@ const RegularFeedContent = observer(() => {
 		const feed = new FeedStore({
 			categories: category ? [category] : isAllPosts ? Object.values(FeedCategory) : undefined,
 			sourceId: source,
-			addressTokens: selectedAccount
-				? [selectedAccount.mainViewKey]
-				: !category && !source && !isAllPosts
-				? accounts.map(a => a.mainViewKey)
-				: undefined,
+			addressTokens: selectedAccounts.map(a => a.mainViewKey),
 		});
 
 		genericLayoutApi.scrollToTop();
@@ -67,7 +72,7 @@ const RegularFeedContent = observer(() => {
 		}
 
 		return feed;
-	}, [accounts, canLoadFeed, category, genericLayoutApi, isAllPosts, selectedAccount, source]);
+	}, [canLoadFeed, category, genericLayoutApi, isAllPosts, selectedAccounts, source]);
 
 	const loadingMoreRef = useRef(null);
 	useIsInViewport({
@@ -118,7 +123,7 @@ const RegularFeedContent = observer(() => {
 				{feed.loaded ? (
 					<>
 						{feed.posts.map(post => (
-							<FeedPostItem isInFeed post={post} key={post.id} />
+							<FeedPostItem key={post.id} isInFeed realtedAccounts={selectedAccounts} post={post} />
 						))}
 
 						{feed.moreAvailable && (

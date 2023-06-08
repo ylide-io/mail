@@ -1,17 +1,29 @@
 import clsx from 'clsx';
-import React, { MouseEvent, useEffect, useRef, useState } from 'react';
+import { observer } from 'mobx-react';
+import React, { MouseEvent, useEffect, useMemo, useRef, useState } from 'react';
 import { generatePath } from 'react-router-dom';
 
-import { FeedPost, FeedSourceUserRelation, LinkType } from '../../../../api/feedServerApi';
+import { FeedPost, FeedReason, LinkType } from '../../../../api/feedServerApi';
 import { Avatar } from '../../../../components/avatar/avatar';
-import { DropDown, DropDownItem } from '../../../../components/dropDown/dropDown';
+import { GridRowBox, TruncateTextBox } from '../../../../components/boxes/boxes';
+import { CheckBox } from '../../../../components/checkBox/checkBox';
+import { DropDown, DropDownItem, DropDownItemMode } from '../../../../components/dropDown/dropDown';
+import { ErrorMessage, ErrorMessageLook } from '../../../../components/errorMessage/errorMessage';
 import { GalleryModal } from '../../../../components/galleryModal/galleryModal';
 import { ReadableDate } from '../../../../components/readableDate/readableDate';
 import { SharePopup } from '../../../../components/sharePopup/sharePopup';
+import { Spinner } from '../../../../components/spinner/spinner';
+import { toast } from '../../../../components/toast/toast';
+import { AppMode, REACT_APP__APP_MODE } from '../../../../env';
 import { ReactComponent as ContactSvg } from '../../../../icons/ic20/contact.svg';
 import { ReactComponent as MenuSvg } from '../../../../icons/ic20/menu.svg';
+import { useDomainAccounts } from '../../../../stores/Domain';
+import { feedSettings } from '../../../../stores/FeedSettings';
+import { DomainAccount } from '../../../../stores/models/DomainAccount';
 import { RoutePath } from '../../../../stores/routePath';
+import { formatAccountName } from '../../../../utils/account';
 import { HorizontalAlignment } from '../../../../utils/alignment';
+import { invariant } from '../../../../utils/assert';
 import { toAbsoluteUrl, useNav } from '../../../../utils/url';
 import { FeedLinkTypeIcon } from '../feedLinkTypeIcon/feedLinkTypeIcon';
 import css from './feedPostItem.module.scss';
@@ -80,12 +92,95 @@ export function FeedPostContent({ post }: FeedPostContentProps) {
 
 //
 
-interface FeedPostItemProps {
-	isInFeed?: boolean;
+interface AddtoMyFeedItemProps {
+	post: FeedPost;
+	account: DomainAccount;
+}
+
+export const AddtoMyFeedItem = observer(({ post, account }: AddtoMyFeedItemProps) => {
+	const [isUpdating, setUpdating] = useState(false);
+
+	const isSelected = feedSettings.isSourceSelected(account, post.sourceId);
+
+	const toggle = async () => {
+		try {
+			setUpdating(true);
+
+			const selectedSourceIds = feedSettings.getSelectedSourceIds(account);
+
+			await feedSettings.updateFeedConfig(
+				account,
+				isSelected
+					? selectedSourceIds.filter(id => id !== post.sourceId)
+					: [...selectedSourceIds, post.sourceId],
+			);
+		} catch (e) {
+			toast('Error 🤦‍♀️');
+		} finally {
+			setUpdating(false);
+		}
+	};
+
+	return (
+		<DropDownItem mode={isUpdating ? DropDownItemMode.DISABLED : undefined} onSelect={toggle}>
+			<GridRowBox>
+				{isUpdating ? (
+					<Spinner size={18} style={{ opacity: 0.8 }} />
+				) : (
+					<CheckBox isChecked={isSelected} onChange={toggle} />
+				)}
+
+				<TruncateTextBox>{formatAccountName(account)}</TruncateTextBox>
+			</GridRowBox>
+		</DropDownItem>
+	);
+});
+
+interface AddToMyFeedButtonProps {
 	post: FeedPost;
 }
 
-export function FeedPostItem({ isInFeed, post }: FeedPostItemProps) {
+export const AddToMyFeedButton = observer(({ post }: AddToMyFeedButtonProps) => {
+	const accounts = useDomainAccounts();
+	const mvAccounts = useMemo(() => accounts.filter(a => a.mainViewKey), [accounts]);
+
+	const buttonRef = useRef(null);
+	const [isListOpen, setListOpen] = useState(false);
+
+	return (
+		<>
+			<div
+				ref={buttonRef}
+				className={clsx(css.reason, css.reason_button)}
+				onClick={() => setListOpen(!isListOpen)}
+			>
+				Add to My Feed
+			</div>
+
+			{isListOpen && (
+				<DropDown
+					anchorRef={buttonRef}
+					horizontalAlign={HorizontalAlignment.END}
+					onCloseRequest={() => setListOpen(false)}
+				>
+					{mvAccounts.map(account => (
+						<AddtoMyFeedItem post={post} account={account} />
+					))}
+				</DropDown>
+			)}
+		</>
+	);
+});
+
+//
+
+interface FeedPostItemProps {
+	isInFeed?: boolean;
+	realtedAccounts?: DomainAccount[];
+	post: FeedPost;
+}
+
+export function FeedPostItem({ isInFeed, realtedAccounts, post }: FeedPostItemProps) {
 	const selfRef = useRef<HTMLDivElement>(null);
 	const [collapsed, setCollapsed] = useState(false);
 	const navigate = useNav();
@@ -105,114 +200,178 @@ export function FeedPostItem({ isInFeed, post }: FeedPostItemProps) {
 		navigate(generatePath(RoutePath.FEED_SOURCE, { source: post.sourceId }));
 	};
 
+	const [unfollowedState, setUnfollowState] = useState<'none' | 'unfollowing' | 'unfollowed'>('none');
+
+	const unfollow = async (entireProject: boolean) => {
+		try {
+			setUnfollowState('unfollowing');
+
+			invariant(realtedAccounts?.length, 'No accounts');
+			invariant(
+				realtedAccounts.every(a => a.mainViewKey),
+				'Not all accounts have MV key',
+			);
+
+			const sourceIdsToExclude = entireProject
+				? feedSettings.sources.filter(s => s.cryptoProject?.id === post.cryptoProjectId).map(s => s.id)
+				: [post.sourceId];
+
+			invariant(sourceIdsToExclude.length, 'No source ids to exclude');
+
+			await Promise.all(
+				realtedAccounts.map(async account => {
+					const selectedSourceIds = feedSettings
+						.getSelectedSourceIds(account)
+						.filter(id => !sourceIdsToExclude.includes(id));
+
+					await feedSettings.updateFeedConfig(account, selectedSourceIds);
+				}),
+			);
+
+			setUnfollowState('unfollowed');
+		} catch (e) {
+			setUnfollowState('none');
+			toast("Couldn't unfollow 🤦‍♀️");
+			throw e;
+		}
+	};
+
+	const reason = post.cryptoProjectReasons[0];
+
 	return (
-		<div ref={selfRef} className={clsx(css.root, { [css.root_collapsed]: collapsed })}>
-			<div className={css.ava}>
-				<Avatar image={post.authorAvatar} placeholder={<ContactSvg width="100%" height="100%" />} />
-				<FeedLinkTypeIcon className={css.avaSource} linkType={post.sourceType} />
-			</div>
+		<>
+			{unfollowedState !== 'none' ? (
+				<ErrorMessage look={ErrorMessageLook.INFO}>
+					{unfollowedState === 'unfollowing' ? 'Unfollowing ...' : 'You unfollowed such posts 👌'}
+				</ErrorMessage>
+			) : (
+				<div ref={selfRef} className={clsx(css.root, { [css.root_collapsed]: collapsed })}>
+					<div className={css.ava}>
+						<Avatar image={post.authorAvatar} placeholder={<ContactSvg width="100%" height="100%" />} />
+						<FeedLinkTypeIcon className={css.avaSource} linkType={post.sourceType} />
+					</div>
 
-			<div className={css.meta}>
-				<div className={css.source} onClick={onSourceIdClick}>
-					{!!post.authorName && <div>{post.authorName}</div>}
-					{!!post.authorNickname && <div className={css.sourceUser}>{post.authorNickname}</div>}
-					{!!post.sourceName && (
-						<>
-							<div>in</div>
-							<div className={css.sourceName}>
-								<FeedLinkTypeIcon linkType={post.sourceType} size={16} />
-								<div>{post.sourceName}</div>
-							</div>
-						</>
-					)}
-				</div>
-
-				<div className={css.metaRight}>
-					{post.userRelation && post.userRelation !== FeedSourceUserRelation.NONE && (
-						<div className={css.reason} title="The reason why you see this post">
-							{
-								{
-									[FeedSourceUserRelation.HOLDING_TOKEN]: "You're holding ",
-									[FeedSourceUserRelation.HELD_TOKEN]: 'You held ',
-									[FeedSourceUserRelation.USING_PROJECT]: "You're in ",
-									[FeedSourceUserRelation.USED_PROJECT]: 'You used ',
-								}[post.userRelation]
-							}
-
-							{!!post.tokens.length && <b>{post.tokens.join(', ')}</b>}
+					<div className={css.meta}>
+						<div className={css.source} onClick={onSourceIdClick}>
+							{!!post.authorName && <div>{post.authorName}</div>}
+							{!!post.authorNickname && <div className={css.sourceUser}>{post.authorNickname}</div>}
+							{!!post.sourceName && (
+								<>
+									<div>in</div>
+									<div className={css.sourceName}>
+										<FeedLinkTypeIcon linkType={post.sourceType} size={16} />
+										<div>{post.sourceName}</div>
+									</div>
+								</>
+							)}
 						</div>
-					)}
 
-					<a
-						className={css.date}
-						href={postPath}
-						onClick={e => {
-							e.preventDefault();
-							navigate(postPath);
-						}}
-					>
-						<ReadableDate value={Date.parse(post.date)} />
-					</a>
+						<div className={css.metaRight}>
+							{!realtedAccounts?.length
+								? REACT_APP__APP_MODE === AppMode.MAIN_VIEW && <AddToMyFeedButton post={post} />
+								: reason && (
+										<div className={css.reason} title="The reason why you see this post">
+											{
+												{
+													[FeedReason.BALANCE]: "You're holding ",
+													[FeedReason.PROTOCOL]: "You're in ",
+													[FeedReason.TRANSACTION]: 'You used ',
+												}[reason]
+											}
 
-					<button
-						ref={menuButtonRef}
-						className={css.metaButton}
-						onClick={() => {
-							setSharePopupOpen(false);
-							setMenuOpen(!isMenuOpen);
-						}}
-					>
-						<MenuSvg />
-					</button>
+											<b>{post.cryptoProjectName}</b>
+										</div>
+								  )}
 
-					{isMenuOpen && (
-						<DropDown
-							anchorRef={menuButtonRef}
-							horizontalAlign={HorizontalAlignment.END}
-							onCloseRequest={() => setMenuOpen(false)}
-						>
-							<DropDownItem
-								onSelect={() => {
-									setMenuOpen(false);
-									setSharePopupOpen(true);
+							<a
+								className={css.date}
+								href={postPath}
+								onClick={e => {
+									e.preventDefault();
+									navigate(postPath);
 								}}
 							>
-								Share post
-							</DropDownItem>
+								<ReadableDate value={Date.parse(post.date)} />
+							</a>
 
-							{!!post.sourceLink && (
-								<a href={post.sourceLink} target="_blank" rel="noreferrer">
-									<DropDownItem>Open post source</DropDownItem>
-								</a>
+							<button
+								ref={menuButtonRef}
+								className={css.metaButton}
+								onClick={() => {
+									setSharePopupOpen(false);
+									setMenuOpen(!isMenuOpen);
+								}}
+							>
+								<MenuSvg />
+							</button>
+
+							{isMenuOpen && (
+								<DropDown
+									anchorRef={menuButtonRef}
+									horizontalAlign={HorizontalAlignment.END}
+									onCloseRequest={() => setMenuOpen(false)}
+								>
+									<DropDownItem
+										onSelect={() => {
+											setMenuOpen(false);
+											setSharePopupOpen(true);
+										}}
+									>
+										Share post
+									</DropDownItem>
+
+									{!!post.sourceLink && (
+										<a href={post.sourceLink} target="_blank" rel="noreferrer">
+											<DropDownItem>Open post source</DropDownItem>
+										</a>
+									)}
+
+									{!!realtedAccounts?.length && (
+										<>
+											<DropDownItem mode={DropDownItemMode.LITE} onSelect={() => unfollow(false)}>
+												Unfollow <b>{post.authorName}</b>
+											</DropDownItem>
+
+											{!!post.cryptoProjectName && (
+												<DropDownItem
+													mode={DropDownItemMode.LITE}
+													onSelect={() => unfollow(true)}
+												>
+													Unfollow <b>{post.cryptoProjectName}</b>
+												</DropDownItem>
+											)}
+										</>
+									)}
+								</DropDown>
 							)}
-						</DropDown>
-					)}
 
-					{isSharePopupOpen && (
-						<SharePopup
-							anchorRef={menuButtonRef}
-							horizontalAlign={HorizontalAlignment.END}
-							onClose={() => setSharePopupOpen(false)}
-							subject="Check out this post on Ylide!"
-							url={toAbsoluteUrl(postPath)}
-						/>
+							{isSharePopupOpen && (
+								<SharePopup
+									anchorRef={menuButtonRef}
+									horizontalAlign={HorizontalAlignment.END}
+									onClose={() => setSharePopupOpen(false)}
+									subject="Check out this post on Ylide!"
+									url={toAbsoluteUrl(postPath)}
+								/>
+							)}
+						</div>
+					</div>
+
+					<div className={css.body}>
+						<FeedPostContent post={post} />
+
+						{post.thread.map(p => (
+							<FeedPostContent key={p.id} post={p} />
+						))}
+					</div>
+
+					{collapsed && (
+						<button className={css.readMore} onClick={() => setCollapsed(false)}>
+							Read more
+						</button>
 					)}
 				</div>
-			</div>
-
-			<div className={css.body}>
-				<FeedPostContent post={post} />
-
-				{post.thread.map(p => (
-					<FeedPostContent key={p.id} post={p} />
-				))}
-			</div>
-
-			{collapsed && (
-				<button className={css.readMore} onClick={() => setCollapsed(false)}>
-					Read more
-				</button>
 			)}
-		</div>
+		</>
 	);
 }

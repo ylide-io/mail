@@ -4,21 +4,11 @@ import React from 'react';
 import { ReactComponent as PlusSvg } from '../../icons/ic20/plus.svg';
 import domain from '../../stores/Domain';
 import { DomainAccount } from '../../stores/models/DomainAccount';
-import { connectAccount } from '../../utils/account';
-import { truncateInMiddle } from '../../utils/string';
-import { walletsMeta } from '../../utils/wallet';
+import { connectAccount, formatAccountName } from '../../utils/account';
 import { ActionButton, ActionButtonLook } from '../ActionButton/ActionButton';
 import { DropDownItem, DropDownItemMode } from '../dropDown/dropDown';
 import { PropsWithClassName } from '../props';
 import { Select } from '../select/select';
-
-export function formatFullAccountName(account: DomainAccount) {
-	const walletName = walletsMeta[account.wallet.wallet].title;
-
-	return account.name
-		? `${account.name} (${truncateInMiddle(account.account.address, 8, '..')}, ${walletName})`
-		: `${truncateInMiddle(account.account.address, 16, '..')} (${walletName})`;
-}
 
 interface AccountSelectProps extends PropsWithClassName {
 	accounts?: DomainAccount[];
@@ -32,7 +22,7 @@ export const AccountSelect = observer(({ className, activeAccount, onChange, ...
 	return (
 		<Select
 			className={className}
-			text={activeAccount && formatFullAccountName(activeAccount)}
+			text={activeAccount && formatAccountName(activeAccount)}
 			placeholder="Select account"
 		>
 			{onSelect => (
@@ -46,7 +36,7 @@ export const AccountSelect = observer(({ className, activeAccount, onChange, ...
 								onChange?.(account);
 							}}
 						>
-							{formatFullAccountName(account)}
+							{formatAccountName(account)}
 						</DropDownItem>
 					))}
 

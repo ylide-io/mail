@@ -23,8 +23,6 @@ $contentPadding: 6px;
 	align-items: center;
 	padding: 0 12px;
 	min-height: $interactive-elem-size;
-	white-space: nowrap;
-	overflow: hidden;
 }
 
 .item_regular {
@@ -34,6 +32,18 @@ $contentPadding: 6px;
 
 .item_regular:hover,
 .item_regular:focus-visible {
+	background: var(--surface-hover-color);
+}
+
+.item_lite {
+	color: var(--secondary-text-color);
+	font-weight: $font-weight_light;
+	cursor: pointer;
+}
+
+.item_lite:hover,
+.item_lite:focus-visible {
+	color: var(--primary-text-color);
 	background: var(--surface-hover-color);
 }
 
@@ -56,4 +66,9 @@ $contentPadding: 6px;
 	padding: 4px 12px;
 	height: auto;
 	min-height: $interactive-elem-size;
+}
+
+.itemContent {
+	@include truncate-text;
+	min-width: 0;
 }

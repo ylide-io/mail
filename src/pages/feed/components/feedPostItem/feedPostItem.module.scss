@@ -96,6 +96,12 @@
 	cursor: default;
 }
 
+.reason_button {
+	color: var(--on-accent-color);
+	background: var(--accent-color);
+	cursor: pointer;
+}
+
 .date {
 	color: var(--secondary-text-color);
 	font-weight: $font-weight_light;
