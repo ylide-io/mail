@@ -3,6 +3,7 @@ import clsx from 'clsx';
 import { observer } from 'mobx-react';
 import React, { ReactNode, useRef, useState } from 'react';
 
+import { GridRowBox, TruncateTextBox } from '../../../../../components/boxes/boxes';
 import { DropDown, DropDownItem, DropDownItemMode } from '../../../../../components/dropDown/dropDown';
 import { PropsWithClassName } from '../../../../../components/props';
 import { Spinner } from '../../../../../components/spinner/spinner';
@@ -126,10 +127,19 @@ export const SendMailButton = observer(({ className, mailData, disabled, onSent 
 												setMenuVisible(false);
 											}}
 										>
-											{bData.logo(16)}
-											{bData.title} [
-											{Number(evmBalances.balances[evmNameToNetwork(bc.blockchain)!].toFixed(3))}{' '}
-											{bData.ethNetwork!.nativeCurrency.symbol}]
+											<GridRowBox>
+												{bData.logo(16)}
+
+												<TruncateTextBox>
+													{bData.title} [
+													{Number(
+														evmBalances.balances[evmNameToNetwork(bc.blockchain)!].toFixed(
+															3,
+														),
+													)}{' '}
+													{bData.ethNetwork!.nativeCurrency.symbol}]
+												</TruncateTextBox>
+											</GridRowBox>
 										</DropDownItem>
 									);
 								})}

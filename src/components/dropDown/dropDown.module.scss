@@ -19,15 +19,10 @@ $contentPadding: 6px;
 //
 
 .item {
-	display: grid;
-	grid-auto-flow: column;
+	display: flex;
 	align-items: center;
-	justify-content: start;
-	grid-gap: 8px;
 	padding: 0 12px;
 	min-height: $interactive-elem-size;
-	white-space: nowrap;
-	overflow: hidden;
 }
 
 .item_regular {
@@ -71,4 +66,9 @@ $contentPadding: 6px;
 	padding: 4px 12px;
 	height: auto;
 	min-height: $interactive-elem-size;
+}
+
+.itemContent {
+	@include truncate-text;
+	min-width: 0;
 }

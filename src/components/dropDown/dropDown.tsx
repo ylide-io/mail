@@ -105,7 +105,7 @@ export function DropDownItem({
 				}
 			}}
 		>
-			{children}
+			<div className={css.itemContent}>{children}</div>
 		</div>
 	);
 }

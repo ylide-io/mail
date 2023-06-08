@@ -5,6 +5,7 @@ import { generatePath } from 'react-router-dom';
 
 import { FeedPost, FeedReason, LinkType } from '../../../../api/feedServerApi';
 import { Avatar } from '../../../../components/avatar/avatar';
+import { GridRowBox, TruncateTextBox } from '../../../../components/boxes/boxes';
 import { CheckBox } from '../../../../components/checkBox/checkBox';
 import { DropDown, DropDownItem, DropDownItemMode } from '../../../../components/dropDown/dropDown';
 import { ErrorMessage, ErrorMessageLook } from '../../../../components/errorMessage/errorMessage';
@@ -121,12 +122,15 @@ export const AddtoMyFeedItem = observer(({ post, account }: AddtoMyFeedItemProps
 
 	return (
 		<DropDownItem mode={isUpdating ? DropDownItemMode.DISABLED : undefined} onSelect={toggle}>
-			{isUpdating ? (
-				<Spinner size={18} style={{ opacity: 0.8 }} />
-			) : (
-				<CheckBox isChecked={isSelected} onChange={toggle} />
-			)}
-			{formatAccountName(account)}
+			<GridRowBox>
+				{isUpdating ? (
+					<Spinner size={18} style={{ opacity: 0.8 }} />
+				) : (
+					<CheckBox isChecked={isSelected} onChange={toggle} />
+				)}
+
+				<TruncateTextBox>{formatAccountName(account)}</TruncateTextBox>
+			</GridRowBox>
 		</DropDownItem>
 	);
 });
@@ -326,10 +330,7 @@ export function FeedPostItem({ isInFeed, realtedAccounts, post }: FeedPostItemPr
 									{!!realtedAccounts?.length && (
 										<>
 											<DropDownItem mode={DropDownItemMode.LITE} onSelect={() => unfollow(false)}>
-												<div>
-													Unfollow{' '}
-													<b>{post.authorName}</b>
-												</div>
+												Unfollow <b>{post.authorName}</b>
 											</DropDownItem>
 
 											{!!post.cryptoProjectName && (
@@ -337,10 +338,7 @@ export function FeedPostItem({ isInFeed, realtedAccounts, post }: FeedPostItemPr
 													mode={DropDownItemMode.LITE}
 													onSelect={() => unfollow(true)}
 												>
-													<div>
-														Unfollow{' '}
-														<b>{post.cryptoProjectName}</b>
-													</div>
+													Unfollow <b>{post.cryptoProjectName}</b>
 												</DropDownItem>
 											)}
 										</>
