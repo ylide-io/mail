@@ -25,8 +25,24 @@ export interface CreatePostFormProps extends PropsWithClassName {
 export const CreatePostForm = observer(({ className, accounts, onCreated }: CreatePostFormProps) => {
 	const mailData = useMemo(() => {
 		const mailData = new OutgoingMailData();
+
 		mailData.mode = OutgoingMailDataMode.BROADCAST;
 		mailData.feedId = VENOM_FEED_ID;
+
+		mailData.validator = () => {
+			if (mailData.plainTextData.length > 4096) {
+				toast('Text is too long 👀');
+				return false;
+			}
+
+			if (mailData.plainTextData.split('\n').length > 128) {
+				toast('Too many line breaks 👀');
+				return false;
+			}
+
+			return true;
+		};
+
 		return mailData;
 	}, []);
 

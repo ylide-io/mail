@@ -42,6 +42,7 @@ export class OutgoingMailData {
 
 	attachments: File[] = [];
 
+	validator?: () => boolean;
 	sending = false;
 
 	constructor() {
@@ -112,9 +113,16 @@ export class OutgoingMailData {
 		);
 	}
 
-	async send() {
+	/**
+	 * Returns TRUE - message sent succesfully.
+	 * Returns FALSE - sending was aborted by user.
+	 * Throws ERROR - error occured.
+	 */
+	async send(): Promise<boolean> {
 		try {
 			invariant(this.readyForSending, 'Not ready for sending');
+
+			if (this.validator?.() === false) return false;
 
 			this.sending = true;
 
@@ -122,7 +130,7 @@ export class OutgoingMailData {
 
 			if (!this.from) {
 				this.from = await connectAccount();
-				if (!this.from) return;
+				if (!this.from) return false;
 
 				if (this.from.wallet.factory.blockchainGroup === 'evm') {
 					const from = this.from;
@@ -131,7 +139,7 @@ export class OutgoingMailData {
 						<SelectNetworkModal wallet={from.wallet} account={from.account} onClose={resolve} />
 					));
 
-					if (!this.network) return;
+					if (!this.network) return false;
 				}
 			} else if (proxyAccount && proxyAccount.account.address !== this.from.account.address) {
 				const proceed = await showStaticComponent<boolean>(resolve => (
@@ -174,7 +182,7 @@ export class OutgoingMailData {
 					/>
 				));
 
-				if (!proceed) return;
+				if (!proceed) return false;
 			}
 
 			const curr = await this.from.wallet.getCurrentAccount();
@@ -213,6 +221,8 @@ export class OutgoingMailData {
 
 				console.log('Sending result: ', result);
 			}
+
+			return true;
 		} catch (e) {
 			console.log('Error sending message', e);
 			throw e;

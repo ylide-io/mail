@@ -59,9 +59,10 @@ export const SendMailButton = observer(({ className, mailData, disabled, onSent 
 
 	const sendMail = async () => {
 		try {
-			await mailData.send();
-			toast('Your message has been sent successfully 🔥');
-			onSent?.();
+			if (await mailData.send()) {
+				toast('Your message has been sent successfully 🔥');
+				onSent?.();
+			}
 		} catch (e) {
 			toast("Couldn't send your message 😒");
 		}
