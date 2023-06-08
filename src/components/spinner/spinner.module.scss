@@ -1,17 +1,20 @@
 .root {
+	width: 20px;
+}
+
+.inner {
 	position: relative;
 	padding: 0 0 100%;
-	width: 20px;
+}
 
-	svg {
-		position: absolute;
-		top: 0;
-		right: 0;
-		bottom: 0;
-		left: 0;
-		fill: currentColor;
-		animation: loader 1s infinite linear;
-	}
+.svg {
+	position: absolute;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	fill: currentColor;
+	animation: loader 1s infinite linear;
 }
 
 @keyframes loader {
