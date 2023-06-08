@@ -1,6 +1,6 @@
 import clsx from 'clsx';
 import { observer } from 'mobx-react';
-import React, { MouseEvent, useEffect, useMemo, useRef, useState } from 'react';
+import React, { MouseEvent, useMemo, useRef, useState } from 'react';
 import { generatePath } from 'react-router-dom';
 
 import { FeedPost, FeedReason, LinkType } from '../../../../api/feedServerApi';
@@ -26,6 +26,7 @@ import { HorizontalAlignment } from '../../../../utils/alignment';
 import { invariant } from '../../../../utils/assert';
 import { toAbsoluteUrl, useNav } from '../../../../utils/url';
 import { FeedLinkTypeIcon } from '../feedLinkTypeIcon/feedLinkTypeIcon';
+import { PostItemContainer } from '../postItemContainer/postItemContainer';
 import css from './feedPostItem.module.scss';
 
 interface FeedPostContentProps {
@@ -181,20 +182,12 @@ interface FeedPostItemProps {
 }
 
 export function FeedPostItem({ isInFeed, realtedAccounts, post }: FeedPostItemProps) {
-	const selfRef = useRef<HTMLDivElement>(null);
-	const [collapsed, setCollapsed] = useState(false);
 	const navigate = useNav();
 	const postPath = generatePath(RoutePath.FEED_POST, { id: post.id });
 
 	const menuButtonRef = useRef(null);
 	const [isMenuOpen, setMenuOpen] = useState(false);
 	const [isSharePopupOpen, setSharePopupOpen] = useState(false);
-
-	useEffect(() => {
-		if (isInFeed && selfRef.current && selfRef.current.getBoundingClientRect().height > 600) {
-			setCollapsed(true);
-		}
-	}, [isInFeed]);
 
 	const onSourceIdClick = () => {
 		navigate(generatePath(RoutePath.FEED_SOURCE, { source: post.sourceId }));
@@ -245,7 +238,7 @@ export function FeedPostItem({ isInFeed, realtedAccounts, post }: FeedPostItemPr
 					{unfollowedState === 'unfollowing' ? 'Unfollowing ...' : 'You unfollowed such posts 👌'}
 				</ErrorMessage>
 			) : (
-				<div ref={selfRef} className={clsx(css.root, { [css.root_collapsed]: collapsed })}>
+				<PostItemContainer className={css.root} collapsable={isInFeed}>
 					<div className={css.ava}>
 						<Avatar image={post.authorAvatar} placeholder={<ContactSvg width="100%" height="100%" />} />
 						<FeedLinkTypeIcon className={css.avaSource} linkType={post.sourceType} />
@@ -364,13 +357,7 @@ export function FeedPostItem({ isInFeed, realtedAccounts, post }: FeedPostItemPr
 							<FeedPostContent key={p.id} post={p} />
 						))}
 					</div>
-
-					{collapsed && (
-						<button className={css.readMore} onClick={() => setCollapsed(false)}>
-							Read more
-						</button>
-					)}
-				</div>
+				</PostItemContainer>
 			)}
 		</>
 	);

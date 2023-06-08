@@ -18,6 +18,7 @@ import { browserStorage } from '../../../../stores/browserStorage';
 import { ILinkedMessage } from '../../../../stores/MailList';
 import { HorizontalAlignment } from '../../../../utils/alignment';
 import { ipfsToHttpUrl } from '../../../../utils/ipfs';
+import { PostItemContainer } from '../postItemContainer/postItemContainer';
 import css from './venomFeedPostItem.module.scss';
 
 interface VenomFeedPostItemProps {
@@ -26,8 +27,6 @@ interface VenomFeedPostItemProps {
 }
 
 export function VenomFeedPostItem({ message, decoded: { decodedTextData, attachments } }: VenomFeedPostItemProps) {
-	const selfRef = useRef<HTMLDivElement>(null);
-
 	const decodedText = useMemo(
 		() =>
 			decodedTextData.type === MessageDecodedTextDataType.PLAIN
@@ -70,7 +69,7 @@ export function VenomFeedPostItem({ message, decoded: { decodedTextData, attachm
 	};
 
 	return (
-		<div ref={selfRef} className={css.root}>
+		<PostItemContainer collapsable className={css.root}>
 			<Avatar className={css.ava} blockie={message.msg.senderAddress} />
 
 			<div className={css.meta}>
@@ -148,6 +147,6 @@ export function VenomFeedPostItem({ message, decoded: { decodedTextData, attachm
 					</>
 				)}
 			</div>
-		</div>
+		</PostItemContainer>
 	);
 }

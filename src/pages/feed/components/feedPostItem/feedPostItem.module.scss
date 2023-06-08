@@ -3,21 +3,6 @@
 	grid-template-columns: auto 1fr;
 	grid-template-rows: auto 1fr;
 	grid-gap: 4px 12px;
-	position: relative;
-	padding: 12px;
-	background: var(--surface-color);
-	border: 1px solid var(--border-color);
-	border-radius: 12px;
-
-	@include less720px {
-		border-width: 1px 0;
-		border-radius: 0;
-	}
-}
-
-.root_collapsed {
-	max-height: 600px;
-	overflow: hidden;
 }
 
 .ava {
