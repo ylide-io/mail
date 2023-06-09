@@ -1,15 +1,16 @@
 import clsx from 'clsx';
+import { ReactNode } from 'react';
 
-import { PropsWithClassName } from '../props';
+import { PropsWithClassName, PropsWithCSSStyle } from '../props';
 import css from './ylideLoader.module.scss';
 
-interface YlideLoaderProps extends PropsWithClassName {
-	reason?: string;
+interface YlideLoaderProps extends PropsWithClassName, PropsWithCSSStyle {
+	reason?: ReactNode;
 }
 
-export function YlideLoader({ className, reason }: YlideLoaderProps) {
+export function YlideLoader({ className, style, reason }: YlideLoaderProps) {
 	return (
-		<div className={clsx(css.root, className)}>
+		<div className={clsx(css.root, className)} style={style}>
 			<div className={css.loader}>
 				<svg
 					width="48"

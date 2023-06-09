@@ -2,6 +2,7 @@ import React from 'react';
 
 import { ActionButton, ActionButtonLook, ActionButtonSize } from '../components/ActionButton/ActionButton';
 import { ActionModal } from '../components/actionModal/actionModal';
+import { showLoadingModal } from '../components/loadingModal/loadingModal';
 import { NewPasswordModal } from '../components/newPasswordModal/newPasswordModal';
 import { SelectWalletModal } from '../components/selectWalletModal/selectWalletModal';
 import { showStaticComponent } from '../components/staticComponentManager/staticComponentManager';
@@ -25,6 +26,8 @@ export function formatAccountName(account: DomainAccount) {
 //
 
 export async function connectAccount(): Promise<DomainAccount | undefined> {
+	const closeLoadingModal = showLoadingModal({ reason: 'Connecting account ...' });
+
 	try {
 		let wallet: Wallet | undefined;
 		const proxyAccount = domain.availableProxyAccounts[0];
@@ -129,6 +132,8 @@ export async function connectAccount(): Promise<DomainAccount | undefined> {
 		}
 	} catch (e) {
 		console.error(e);
+	} finally {
+		closeLoadingModal();
 	}
 }
 
