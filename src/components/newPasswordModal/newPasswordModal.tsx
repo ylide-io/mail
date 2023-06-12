@@ -22,6 +22,7 @@ import { ActionModal } from '../actionModal/actionModal';
 import { BlockChainLabel } from '../BlockChainLabel/BlockChainLabel';
 import { ErrorMessage, ErrorMessageLook } from '../errorMessage/errorMessage';
 import { ForgotPasswordModal } from '../forgotPasswordModal/forgotPasswordModal';
+import { LoadingModal } from '../loadingModal/loadingModal';
 import { SelectNetworkModal } from '../selectNetworkModal/selectNetworkModal';
 import { showStaticComponent } from '../staticComponentManager/staticComponentManager';
 import { TextField, TextFieldLook } from '../textField/textField';
@@ -29,6 +30,7 @@ import { toast } from '../toast/toast';
 import { YlideLoader } from '../ylideLoader/ylideLoader';
 
 enum Step {
+	LOADING,
 	ENTER_PASSWORD,
 	GENERATE_KEY,
 	SELECT_NETWORK,
@@ -84,8 +86,6 @@ export function NewPasswordModal({ faucetType, bonus, wallet, account, remoteKey
 	}, [account.address, wallet]);
 
 	const [domainAccount, setDomainAccount] = useState<DomainAccount>();
-
-	const [pleaseWait, setPleaseWait] = useState(false);
 
 	async function publishLocalKey(account: DomainAccount) {
 		setStep(Step.PUBLISH_KEY);
@@ -147,6 +147,8 @@ export function NewPasswordModal({ faucetType, bonus, wallet, account, remoteKey
 			return;
 		}
 
+		setStep(Step.LOADING);
+
 		if (!freshestKey) {
 			const domainAccount = await wallet.instantiateNewAccount(account, tempLocalKey, keyVersion);
 			setDomainAccount(domainAccount);
@@ -172,7 +174,9 @@ export function NewPasswordModal({ faucetType, bonus, wallet, account, remoteKey
 						registrar,
 						timestampLock,
 					);
-					setPleaseWait(true);
+
+					setStep(Step.LOADING);
+
 					domain.isTxPublishing = true;
 					analytics.walletRegistered(
 						wallet.factory.wallet,
@@ -273,7 +277,9 @@ export function NewPasswordModal({ faucetType, bonus, wallet, account, remoteKey
 
 	return (
 		<>
-			{step === Step.ENTER_PASSWORD ? (
+			{step === Step.LOADING ? (
+				<LoadingModal reason="Please wait ..." />
+			) : step === Step.ENTER_PASSWORD ? (
 				<ActionModal
 					title={
 						keyParams.isPasswordNeeded
@@ -407,45 +413,37 @@ export function NewPasswordModal({ faucetType, bonus, wallet, account, remoteKey
 					)}
 				</ActionModal>
 			) : step === Step.GENERATE_KEY ? (
-				pleaseWait ? (
-					<ActionModal>
-						<YlideLoader reason="Your transaction is being confirmed..." />
-					</ActionModal>
-				) : (
-					<ActionModal
-						buttons={
-							<ActionButton
-								size={ActionButtonSize.XLARGE}
-								onClick={() =>
-									keyParams.isPasswordNeeded ? setStep(Step.ENTER_PASSWORD) : onClose?.()
-								}
-							>
-								Back
-							</ActionButton>
-						}
-						onClose={onClose}
-					>
-						<div
-							style={{
-								display: 'flex',
-								justifyContent: 'flex-end',
-								paddingTop: 40,
-								paddingRight: 24,
-								paddingBottom: 20,
-							}}
+				<ActionModal
+					buttons={
+						<ActionButton
+							size={ActionButtonSize.XLARGE}
+							onClick={() => (keyParams.isPasswordNeeded ? setStep(Step.ENTER_PASSWORD) : onClose?.())}
 						>
-							<ProceedToWalletArrowSvg />
-						</div>
+							Back
+						</ActionButton>
+					}
+					onClose={onClose}
+				>
+					<div
+						style={{
+							display: 'flex',
+							justifyContent: 'flex-end',
+							paddingTop: 40,
+							paddingRight: 24,
+							paddingBottom: 20,
+						}}
+					>
+						<ProceedToWalletArrowSvg />
+					</div>
 
-						<div style={{ textAlign: 'center', fontSize: '180%' }}>Confirm the message</div>
+					<div style={{ textAlign: 'center', fontSize: '180%' }}>Confirm the message</div>
 
-						<div>
-							{keyParams.isPasswordNeeded
-								? 'We need you to sign your password so we can generate you a unique communication key.'
-								: 'We need you to sign authorization message so we can generate you a unique communication key.'}
-						</div>
-					</ActionModal>
-				)
+					<div>
+						{keyParams.isPasswordNeeded
+							? 'We need you to sign your password so we can generate you a unique communication key.'
+							: 'We need you to sign authorization message so we can generate you a unique communication key.'}
+					</div>
+				</ActionModal>
 			) : step === Step.SELECT_NETWORK ? (
 				<SelectNetworkModal
 					wallet={wallet}
