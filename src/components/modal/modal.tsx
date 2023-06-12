@@ -13,26 +13,16 @@ export interface ModalProps extends PropsWithChildren<{}>, PropsWithClassName {
 	isMinimized?: boolean;
 	onMinimize?: () => void;
 
-	noOverlay?: boolean;
-
 	closeOnOutsideClick?: boolean;
 	onClose?: () => void;
 }
 
-export function Modal({
-	children,
-	className,
-	isMinimized,
-	onMinimize,
-	noOverlay,
-	closeOnOutsideClick,
-	onClose,
-}: ModalProps) {
+export function Modal({ children, className, isMinimized, onMinimize, closeOnOutsideClick, onClose }: ModalProps) {
 	const isFoldable = !!onMinimize;
 
 	return (
 		<>
-			{!!noOverlay || <Overlay isHidden={isMinimized} onClick={() => closeOnOutsideClick && onClose?.()} />}
+			<Overlay isHidden={isMinimized} onClick={() => closeOnOutsideClick && onClose?.()} />
 
 			<Popup
 				className={clsx(css.root, isMinimized && css.root_hidden)}

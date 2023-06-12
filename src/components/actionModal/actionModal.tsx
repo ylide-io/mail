@@ -7,13 +7,12 @@ export interface ActionModalProps {
 	title?: ReactNode;
 	description?: ReactNode;
 	buttons?: ReactNode;
-	noOverlay?: boolean;
 	onClose?: () => void;
 }
 
-export function ActionModal({ title, description, buttons, noOverlay, onClose }: ActionModalProps) {
+export function ActionModal({ title, description, buttons, onClose }: ActionModalProps) {
 	return (
-		<Modal className={css.root} noOverlay={noOverlay} onClose={onClose}>
+		<Modal className={css.root} onClose={onClose}>
 			{title != null && <div className={css.title}>{title}</div>}
 
 			{description != null && <div className={css.description}>{description}</div>}
