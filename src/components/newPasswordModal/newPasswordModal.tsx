@@ -14,7 +14,7 @@ import { chainIdByFaucetType, publishKeyThroughFaucet, requestFaucetSignature } 
 import { DomainAccount } from '../../stores/models/DomainAccount';
 import { Wallet } from '../../stores/models/Wallet';
 import { RoutePath } from '../../stores/routePath';
-import { assertUnreachable, invariant } from '../../utils/assert';
+import { assertUnreachable } from '../../utils/assert';
 import { isBytesEqual } from '../../utils/isBytesEqual';
 import { getEvmWalletNetwork } from '../../utils/wallet';
 import { ActionButton, ActionButtonLook, ActionButtonSize } from '../ActionButton/ActionButton';
@@ -87,22 +87,27 @@ export function NewPasswordModal({ faucetType, bonus, wallet, account, remoteKey
 
 	const [domainAccount, setDomainAccount] = useState<DomainAccount>();
 
+	function exitWithError(message: string, error: any) {
+		console.error(message, error);
+		toast(message);
+		onClose?.();
+	}
+
 	async function publishLocalKey(account: DomainAccount) {
+		console.log(`publishLocalKey`);
 		setStep(Step.PUBLISH_KEY);
 		try {
-			await account.attachRemoteKey(network);
+			await Promise.all([
+				account.attachRemoteKey(network),
+				// Display loader after 3 seconds
+				asyncDelay(3000).then(() => setStep(Step.LOADING)),
+			]);
 			await asyncDelay(7000);
 			await account.init();
 			analytics.walletRegistered(wallet.factory.wallet, account.account.address, domain.accounts.accounts.length);
 			onClose?.(account);
-		} catch (err) {
-			console.error('Publish error: ', err);
-			if (wallet.factory.blockchainGroup === 'evm') {
-				setStep(Step.SELECT_NETWORK);
-			} else {
-				setStep(Step.ENTER_PASSWORD);
-			}
-			toast('Transaction was not published. Please, try again');
+		} catch (e) {
+			exitWithError('Transaction was not published. Please, try again', e);
 		}
 	}
 
@@ -113,37 +118,43 @@ export function NewPasswordModal({ faucetType, bonus, wallet, account, remoteKey
 		let keyVersion;
 		try {
 			if (wallet.factory.blockchainGroup === 'everscale') {
+				console.log('createLocalKey', 'everscale');
 				tempLocalKey = await wallet.constructLocalKeyV1(account, password);
 				keyVersion = YlidePublicKeyVersion.INSECURE_KEY_V1;
 			} else if (forceNew) {
+				console.log('createLocalKey', 'everscale');
 				tempLocalKey = await wallet.constructLocalKeyV2(account, password);
 				keyVersion = YlidePublicKeyVersion.KEY_V2;
 			} else if (freshestKey?.key.keyVersion === YlidePublicKeyVersion.INSECURE_KEY_V1) {
-				if (freshestKey?.blockchain === 'venom-testnet') {
+				if (freshestKey.blockchain === 'venom-testnet') {
 					// strange... I'm not sure Qamon keys work here
+					console.log('createLocalKey', 'INSECURE_KEY_V1 venom-testnet');
 					tempLocalKey = await wallet.constructLocalKeyV2(account, password);
 					keyVersion = YlidePublicKeyVersion.KEY_V2;
 				} else {
 					// strange... I'm not sure Qamon keys work here
+					console.log('createLocalKey', 'INSECURE_KEY_V1');
 					tempLocalKey = await wallet.constructLocalKeyV1(account, password);
 					keyVersion = YlidePublicKeyVersion.INSECURE_KEY_V1;
 				}
 			} else if (freshestKey?.key.keyVersion === YlidePublicKeyVersion.KEY_V2) {
 				// if user already using password - we should use it too
+				console.log('createLocalKey', 'KEY_V2');
 				tempLocalKey = await wallet.constructLocalKeyV2(account, password);
 				keyVersion = YlidePublicKeyVersion.KEY_V2;
 			} else if (freshestKey?.key.keyVersion === YlidePublicKeyVersion.KEY_V3) {
 				// if user is not using password - we should not use it too
+				console.log('createLocalKey', 'KEY_V3');
 				tempLocalKey = await wallet.constructLocalKeyV3(account);
 				keyVersion = YlidePublicKeyVersion.KEY_V3;
 			} else {
 				// user have no key at all - use passwordless version
+				console.log('createLocalKey', 'no key');
 				tempLocalKey = await wallet.constructLocalKeyV3(account);
 				keyVersion = YlidePublicKeyVersion.KEY_V3;
 			}
-		} catch (err) {
-			console.log('createLocalKey ', err);
-			setStep(Step.ENTER_PASSWORD);
+		} catch (e) {
+			exitWithError('Failed to create local key 😒', e);
 			return;
 		}
 
@@ -246,7 +257,7 @@ export function NewPasswordModal({ faucetType, bonus, wallet, account, remoteKey
 				if (wallet.factory.blockchainGroup === 'evm') {
 					setStep(Step.SELECT_NETWORK);
 				} else {
-					return await publishLocalKey(domainAccount);
+					await publishLocalKey(domainAccount);
 				}
 			}
 		} else if (isBytesEqual(freshestKey.key.publicKey.bytes, tempLocalKey.publicKey)) {
@@ -256,23 +267,17 @@ export function NewPasswordModal({ faucetType, bonus, wallet, account, remoteKey
 		} else if (forceNew) {
 			const domainAccount = await wallet.instantiateNewAccount(account, tempLocalKey, keyVersion);
 			setDomainAccount(domainAccount);
-			return await publishLocalKey(domainAccount);
+			await publishLocalKey(domainAccount);
 		} else {
-			toast('Ylide password was wrong, please, try again');
+			toast('Password is wrong. Please try again ❤');
 			setStep(Step.ENTER_PASSWORD);
-			return;
 		}
 	}
 
 	async function networkSelect(network: EVMNetwork) {
 		setNetwork(network);
 		setStep(Step.PUBLISH_KEY);
-		try {
-			invariant(domainAccount);
-			await publishLocalKey(domainAccount);
-		} catch (err) {
-			setStep(Step.SELECT_NETWORK);
-		}
+		await publishLocalKey(domainAccount!);
 	}
 
 	return (
@@ -284,8 +289,8 @@ export function NewPasswordModal({ faucetType, bonus, wallet, account, remoteKey
 					title={
 						keyParams.isPasswordNeeded
 							? keyParams.keyExists
-								? `Enter password`
-								: `Create password`
+								? 'Enter password'
+								: 'Create password'
 							: 'Sign authorization message'
 					}
 					buttons={
@@ -298,31 +303,29 @@ export function NewPasswordModal({ faucetType, bonus, wallet, account, remoteKey
 								{keyParams.isPasswordNeeded ? 'Continue' : 'Sign'}
 							</ActionButton>
 							<ActionButton size={ActionButtonSize.XLARGE} onClick={() => onClose?.()}>
-								Back
+								Cancel
 							</ActionButton>
 						</>
 					}
 					onClose={onClose}
 				>
-					<div>
-						{keyParams.isPasswordNeeded ? (
-							keyParams.keyExists ? (
-								<>
-									We found your key in <BlockChainLabel blockchain={freshestKey.blockchain} />{' '}
-									blockchain. Please, enter your Ylide Password to access it.
-								</>
-							) : (
-								'This password will be used to encrypt and decrypt your mails.'
-							)
-						) : keyParams.keyExists ? (
-							<>
+					{keyParams.isPasswordNeeded ? (
+						keyParams.keyExists ? (
+							<div>
+								We found your key in <BlockChainLabel blockchain={freshestKey.blockchain} /> blockchain.
+								Please, enter your Ylide Password to access it.
+							</div>
+						) : (
+							'This password will be used to encrypt and decrypt your mails.'
+						)
+					) : (
+						keyParams.keyExists && (
+							<div>
 								We found your key in <BlockChainLabel blockchain={freshestKey.blockchain} /> blockchain.
 								Please, sign authroization message to access it.
-							</>
-						) : (
-							''
-						)}
-					</div>
+							</div>
+						)
+					)}
 
 					{keyParams.isPasswordNeeded ? (
 						keyParams.keyExists ? (
