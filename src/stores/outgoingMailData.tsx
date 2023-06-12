@@ -144,23 +144,6 @@ export class OutgoingMailData {
 				const proceed = await showStaticComponent<boolean>(resolve => (
 					<ActionModal
 						title="Different accounts"
-						description={
-							<>
-								You're going to send the message using
-								<br />
-								<b>
-									<AdaptiveText text={this.from!.account.address} />
-								</b>
-								<br />
-								But the parent application uses
-								<br />
-								<b>
-									<AdaptiveText text={proxyAccount.account.address} />
-								</b>
-								<br />
-								Are you sure you want to continue sending the message?
-							</>
-						}
 						buttons={[
 							<ActionButton
 								size={ActionButtonSize.XLARGE}
@@ -178,7 +161,21 @@ export class OutgoingMailData {
 							</ActionButton>,
 						]}
 						onClose={resolve}
-					/>
+					>
+						You're going to send the message using
+						<br />
+						<b>
+							<AdaptiveText text={this.from!.account.address} />
+						</b>
+						<br />
+						But the parent application uses
+						<br />
+						<b>
+							<AdaptiveText text={proxyAccount.account.address} />
+						</b>
+						<br />
+						Are you sure you want to continue sending the message?
+					</ActionModal>
 				));
 
 				if (!proceed) return false;

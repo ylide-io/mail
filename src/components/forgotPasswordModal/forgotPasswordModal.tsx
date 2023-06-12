@@ -34,72 +34,6 @@ export function ForgotPasswordModal({ onClose }: ForgotPasswordModalProps) {
 	return (
 		<ActionModal
 			title="Reset Password"
-			description={
-				step === Step.FIRST_WARNING ? (
-					<>
-						<p>
-							Ylide is a decentralized protocol that stands for privacy and security without any
-							compromises. We have no central server where your messages are stored decrypted.
-						</p>
-						<p>
-							Your password is a necessary part of your communication key which is used to decrypt your
-							messages. Without your password, it is impossible to decrypt old messages which were written
-							to you.
-						</p>
-						<p>
-							You can create a new password and continue using Ylide and receive new messages, but the old
-							ones will stay encrypted forever (or until you find your old password).
-						</p>
-					</>
-				) : step === Step.SECOND_WARNING ? (
-					<>
-						<p>
-							Sorry, but we have to repeat. If you create a new password - you won't be able to read your
-							old messages. You will be able to read only the new ones.
-						</p>
-						<p>However, your recipients will be able to read the messages you've sent to them.</p>
-						<p>Are you sure you want to continue and don't want to try to recall your old password?</p>
-					</>
-				) : (
-					<>
-						<p>This password will be used to encrypt and decrypt your mails.</p>
-						<p>
-							Please save it securely, because if you lose it, you won't be able to access your messages.
-						</p>
-
-						<div
-							style={{
-								display: 'grid',
-								gridGap: 16,
-								padding: 16,
-							}}
-						>
-							<TextField
-								autoFocus
-								type="password"
-								placeholder="Enter Ylide password"
-								value={password}
-								onValueChange={setPassword}
-							/>
-
-							<TextField
-								type="password"
-								placeholder="Repeat your password"
-								value={passwordRepeat}
-								onValueChange={setPasswordRepeat}
-							/>
-						</div>
-
-						<p>
-							<b style={{ textAlign: 'center' }}>
-								Ylide doesn't save your password anywhere,
-								<br />
-								and we won't be able to help you recover it.
-							</b>
-						</p>
-					</>
-				)
-			}
 			onClose={onClose}
 			buttons={
 				step === Step.FIRST_WARNING
@@ -153,6 +87,69 @@ export function ForgotPasswordModal({ onClose }: ForgotPasswordModalProps) {
 							</ActionButton>,
 					  ]
 			}
-		/>
+		>
+			{step === Step.FIRST_WARNING ? (
+				<>
+					<p>
+						Ylide is a decentralized protocol that stands for privacy and security without any compromises.
+						We have no central server where your messages are stored decrypted.
+					</p>
+					<p>
+						Your password is a necessary part of your communication key which is used to decrypt your
+						messages. Without your password, it is impossible to decrypt old messages which were written to
+						you.
+					</p>
+					<p>
+						You can create a new password and continue using Ylide and receive new messages, but the old
+						ones will stay encrypted forever (or until you find your old password).
+					</p>
+				</>
+			) : step === Step.SECOND_WARNING ? (
+				<>
+					<p>
+						Sorry, but we have to repeat. If you create a new password - you won't be able to read your old
+						messages. You will be able to read only the new ones.
+					</p>
+					<p>However, your recipients will be able to read the messages you've sent to them.</p>
+					<p>Are you sure you want to continue and don't want to try to recall your old password?</p>
+				</>
+			) : (
+				<>
+					<p>This password will be used to encrypt and decrypt your mails.</p>
+					<p>Please save it securely, because if you lose it, you won't be able to access your messages.</p>
+
+					<div
+						style={{
+							display: 'grid',
+							gridGap: 16,
+							padding: 16,
+						}}
+					>
+						<TextField
+							autoFocus
+							type="password"
+							placeholder="Enter Ylide password"
+							value={password}
+							onValueChange={setPassword}
+						/>
+
+						<TextField
+							type="password"
+							placeholder="Repeat your password"
+							value={passwordRepeat}
+							onValueChange={setPasswordRepeat}
+						/>
+					</div>
+
+					<p>
+						<b style={{ textAlign: 'center' }}>
+							Ylide doesn't save your password anywhere,
+							<br />
+							and we won't be able to help you recover it.
+						</b>
+					</p>
+				</>
+			)}
+		</ActionModal>
 	);
 }

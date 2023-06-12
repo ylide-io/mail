@@ -20,12 +20,3 @@
 	grid-gap: 8px;
 	padding: 16px 0;
 }
-
-.ylide-callout {
-	@include flex-column(flex-start, center);
-	font-size: 14px;
-	background: rgba(var(--error-rgb-color), 0.2);
-	border-radius: 22px;
-	padding: 16px 20px;
-	margin-top: 16px;
-}

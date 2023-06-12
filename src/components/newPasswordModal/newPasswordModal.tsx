@@ -4,6 +4,7 @@ import SmartBuffer from '@ylide/smart-buffer';
 import React, { useEffect, useMemo, useState } from 'react';
 import { generatePath } from 'react-router-dom';
 
+import { ReactComponent as ProceedToWalletArrowSvg } from '../../assets/proceedTOWalletArrow.svg';
 import { AppMode, REACT_APP__APP_MODE } from '../../env';
 import { analytics } from '../../stores/Analytics';
 import { browserStorage } from '../../stores/browserStorage';
@@ -14,17 +15,17 @@ import { DomainAccount } from '../../stores/models/DomainAccount';
 import { Wallet } from '../../stores/models/Wallet';
 import { RoutePath } from '../../stores/routePath';
 import { assertUnreachable, invariant } from '../../utils/assert';
-import { blockchainMeta } from '../../utils/blockchain';
 import { isBytesEqual } from '../../utils/isBytesEqual';
 import { getEvmWalletNetwork } from '../../utils/wallet';
 import { ActionButton, ActionButtonLook, ActionButtonSize } from '../ActionButton/ActionButton';
+import { ActionModal } from '../actionModal/actionModal';
+import { BlockChainLabel } from '../BlockChainLabel/BlockChainLabel';
+import { ErrorMessage, ErrorMessageLook } from '../errorMessage/errorMessage';
 import { ForgotPasswordModal } from '../forgotPasswordModal/forgotPasswordModal';
-import { Modal } from '../modal/modal';
 import { SelectNetworkModal } from '../selectNetworkModal/selectNetworkModal';
 import { showStaticComponent } from '../staticComponentManager/staticComponentManager';
 import { TextField, TextFieldLook } from '../textField/textField';
 import { toast } from '../toast/toast';
-import { WalletTag } from '../walletTag/walletTag';
 import { YlideLoader } from '../ylideLoader/ylideLoader';
 
 enum Step {
@@ -85,79 +86,6 @@ export function NewPasswordModal({ faucetType, bonus, wallet, account, remoteKey
 	const [domainAccount, setDomainAccount] = useState<DomainAccount>();
 
 	const [pleaseWait, setPleaseWait] = useState(false);
-
-	async function publishThroughFaucet(
-		account: DomainAccount,
-		keyVersion: number,
-		faucetType: 'polygon' | 'gnosis' | 'fantom',
-		bonus: boolean,
-		doWait: boolean,
-	) {
-		browserStorage.canSkipRegistration = true;
-		console.log('public key: ', '0x' + new SmartBuffer(account.key.keypair.publicKey).toHexString());
-		setStep(Step.GENERATE_KEY);
-		const chainId = chainIdByFaucetType(faucetType);
-		const timestampLock = Math.floor(Date.now() / 1000) - 90;
-		const registrar = 1;
-		const signature = await requestFaucetSignature(
-			account.wallet,
-			account.key.keypair.publicKey,
-			account.account,
-			chainId,
-			registrar,
-			timestampLock,
-		);
-		setPleaseWait(true);
-		domain.isTxPublishing = true;
-		analytics.walletRegistered(wallet.factory.wallet, account.account.address, domain.accounts.accounts.length);
-		domain.txChain = faucetType;
-		domain.txPlateVisible = true;
-		domain.txWithBonus = bonus;
-
-		const promise = publishKeyThroughFaucet(
-			faucetType,
-			account.key.keypair.publicKey,
-			account.account,
-			signature,
-			registrar,
-			timestampLock,
-			keyVersion,
-		)
-			.then(async result => {
-				if (result.result) {
-					if (doWait) {
-						await asyncDelay(20000);
-					} else {
-						await asyncDelay(7000);
-					}
-					await account.init();
-					domain.publishingTxHash = result.hash;
-					domain.isTxPublishing = false;
-				} else {
-					domain.isTxPublishing = false;
-					if (result.errorCode === 'ALREADY_EXISTS') {
-						alert(
-							`Your address has been already registered or the previous transaction is in progress. Please try connecting another address or wait for transaction to finalize (1-2 minutes).`,
-						);
-						document.location.href = generatePath(RoutePath.WALLETS);
-					} else {
-						alert('Something went wrong with key publishing :(\n\n' + JSON.stringify(result, null, '\t'));
-						document.location.href = generatePath(RoutePath.WALLETS);
-					}
-				}
-			})
-			.catch(err => {
-				console.log('faucet publication error: ', err);
-				domain.isTxPublishing = false;
-				domain.txPlateVisible = false;
-			});
-
-		if (doWait) {
-			await promise;
-		}
-
-		onClose?.(account);
-	}
 
 	async function publishLocalKey(account: DomainAccount) {
 		setStep(Step.PUBLISH_KEY);
@@ -223,6 +151,86 @@ export function NewPasswordModal({ faucetType, bonus, wallet, account, remoteKey
 			const domainAccount = await wallet.instantiateNewAccount(account, tempLocalKey, keyVersion);
 			setDomainAccount(domainAccount);
 			if (faucetType && wallet.factory.blockchainGroup === 'evm') {
+				async function publishThroughFaucet(
+					account: DomainAccount,
+					keyVersion: number,
+					faucetType: 'polygon' | 'gnosis' | 'fantom',
+					bonus: boolean,
+					doWait: boolean,
+				) {
+					browserStorage.canSkipRegistration = true;
+					console.log('public key: ', '0x' + new SmartBuffer(account.key.keypair.publicKey).toHexString());
+					setStep(Step.GENERATE_KEY);
+					const chainId = chainIdByFaucetType(faucetType);
+					const timestampLock = Math.floor(Date.now() / 1000) - 90;
+					const registrar = 1;
+					const signature = await requestFaucetSignature(
+						account.wallet,
+						account.key.keypair.publicKey,
+						account.account,
+						chainId,
+						registrar,
+						timestampLock,
+					);
+					setPleaseWait(true);
+					domain.isTxPublishing = true;
+					analytics.walletRegistered(
+						wallet.factory.wallet,
+						account.account.address,
+						domain.accounts.accounts.length,
+					);
+					domain.txChain = faucetType;
+					domain.txPlateVisible = true;
+					domain.txWithBonus = bonus;
+
+					const promise = publishKeyThroughFaucet(
+						faucetType,
+						account.key.keypair.publicKey,
+						account.account,
+						signature,
+						registrar,
+						timestampLock,
+						keyVersion,
+					)
+						.then(async result => {
+							if (result.result) {
+								if (doWait) {
+									await asyncDelay(20000);
+								} else {
+									await asyncDelay(7000);
+								}
+								await account.init();
+								domain.publishingTxHash = result.hash;
+								domain.isTxPublishing = false;
+							} else {
+								domain.isTxPublishing = false;
+								if (result.errorCode === 'ALREADY_EXISTS') {
+									alert(
+										`Your address has been already registered or the previous transaction is in progress. Please try connecting another address or wait for transaction to finalize (1-2 minutes).`,
+									);
+									document.location.href = generatePath(RoutePath.WALLETS);
+								} else {
+									alert(
+										'Something went wrong with key publishing :(\n\n' +
+											JSON.stringify(result, null, '\t'),
+									);
+									document.location.href = generatePath(RoutePath.WALLETS);
+								}
+							}
+						})
+						.catch(err => {
+							console.log('faucet publication error: ', err);
+							domain.isTxPublishing = false;
+							domain.txPlateVisible = false;
+						});
+
+					if (doWait) {
+						await promise;
+					}
+
+					onClose?.(account);
+				}
+
 				await publishThroughFaucet(
 					domainAccount,
 					keyVersion,
@@ -263,65 +271,61 @@ export function NewPasswordModal({ faucetType, bonus, wallet, account, remoteKey
 		}
 	}
 
-	if (step === Step.SELECT_NETWORK) {
-		return (
-			<SelectNetworkModal
-				wallet={wallet}
-				account={account}
-				onClose={network => (network ? networkSelect(network) : onClose?.())}
-			/>
-		);
-	}
-
 	return (
-		<Modal className="account-modal wallet-modal" onClose={onClose}>
-			<div
-				style={{
-					padding: 24,
-					paddingTop: 12,
-					display: 'flex',
-					alignItems: 'center',
-					justifyContent: 'center',
-				}}
-			>
-				<WalletTag wallet={wallet.factory.wallet} address={account.address} />
-			</div>
-
+		<>
 			{step === Step.ENTER_PASSWORD ? (
-				<>
-					<h3 className="wm-title">
-						{keyParams.isPasswordNeeded
+				<ActionModal
+					title={
+						keyParams.isPasswordNeeded
 							? keyParams.keyExists
 								? `Enter password`
 								: `Create password`
-							: 'Sign authorization message'}
-					</h3>
-
-					<h4 className="wm-subtitle">
+							: 'Sign authorization message'
+					}
+					buttons={
+						<>
+							<ActionButton
+								size={ActionButtonSize.XLARGE}
+								look={ActionButtonLook.PRIMARY}
+								onClick={() => createLocalKey(password)}
+							>
+								{keyParams.isPasswordNeeded ? 'Continue' : 'Sign'}
+							</ActionButton>
+							<ActionButton size={ActionButtonSize.XLARGE} onClick={() => onClose?.()}>
+								Back
+							</ActionButton>
+						</>
+					}
+					onClose={onClose}
+				>
+					<div>
 						{keyParams.isPasswordNeeded ? (
 							keyParams.keyExists ? (
 								<>
-									We found your key in the {blockchainMeta[freshestKey.blockchain].logo(12)}{' '}
-									<b>{blockchainMeta[freshestKey.blockchain].title}</b> blockchain. Please, enter your
-									Ylide Password to access it.
+									We found your key in <BlockChainLabel blockchain={freshestKey.blockchain} />{' '}
+									blockchain. Please, enter your Ylide Password to access it.
 								</>
 							) : (
-								`This password will be used to encrypt and decrypt your mails.`
+								'This password will be used to encrypt and decrypt your mails.'
 							)
 						) : keyParams.keyExists ? (
 							<>
-								We found your key in the {blockchainMeta[freshestKey.blockchain].logo(12)}{' '}
-								<b>{blockchainMeta[freshestKey.blockchain].title}</b> blockchain. Please, sign
-								authroization message to access it.
+								We found your key in <BlockChainLabel blockchain={freshestKey.blockchain} /> blockchain.
+								Please, sign authroization message to access it.
 							</>
 						) : (
 							''
 						)}
-					</h4>
+					</div>
 
 					{keyParams.isPasswordNeeded ? (
 						keyParams.keyExists ? (
-							<div className="wm-body centered" style={{ padding: '0 20px' }}>
+							<div
+								style={{
+									paddingTop: 40,
+									paddingBottom: 40,
+								}}
+							>
 								<TextField
 									look={TextFieldLook.PROMO}
 									autoFocus
@@ -354,13 +358,13 @@ export function NewPasswordModal({ faucetType, bonus, wallet, account, remoteKey
 								</div>
 							</div>
 						) : (
-							<div className="wm-body">
+							<div>
 								<form
 									name="sign-up"
 									style={{
 										display: 'grid',
 										gridGap: 12,
-										padding: '20px 16px 8px',
+										paddingBottom: 20,
 									}}
 									action="/"
 									method="POST"
@@ -383,159 +387,74 @@ export function NewPasswordModal({ faucetType, bonus, wallet, account, remoteKey
 										onValueChange={setPasswordRepeat}
 									/>
 								</form>
-								<div className="ylide-callout">
+
+								<ErrorMessage look={ErrorMessageLook.INFO}>
 									<div>
 										Ylide <b>doesn't save</b> your password anywhere.
 									</div>
-									<br />
 									<div>
 										Please, save it securely, because if you lose it, you will not be able to access
 										your mail.
 									</div>
-								</div>
+								</ErrorMessage>
 							</div>
 						)
 					) : (
-						<div
-							className="wm-body centered"
-							style={{ textAlign: 'center', fontSize: 14, lineHeight: '150%' }}
-						>
+						<div>
 							To get your private Ylide communication key, please, press "Sign" button below and sign the
 							authorization message in your wallet.
 						</div>
 					)}
-
-					<div className="wm-footer">
-						<ActionButton size={ActionButtonSize.XLARGE} onClick={() => onClose?.()}>
-							Back
-						</ActionButton>
-						<ActionButton
-							size={ActionButtonSize.XLARGE}
-							look={ActionButtonLook.PRIMARY}
-							onClick={() => createLocalKey(password)}
-						>
-							{keyParams.isPasswordNeeded ? 'Continue' : 'Sign'}
-						</ActionButton>
-					</div>
-				</>
+				</ActionModal>
 			) : step === Step.GENERATE_KEY ? (
-				<>
-					{pleaseWait ? (
-						<>
-							<div className="wm-body centered">
-								<h3 className="wm-title">Please, wait</h3>
-								<h4 className="wm-subtitle">Your transaction is being confirmed</h4>
-							</div>
-						</>
-					) : (
-						<>
-							<div className="wm-body centered">
-								<div
-									style={{
-										display: 'flex',
-										flexDirection: 'row',
-										alignItems: 'flex-start',
-										justifyContent: 'flex-end',
-										paddingRight: 24,
-										paddingBottom: 20,
-									}}
-								>
-									<svg
-										width="164"
-										height="104"
-										viewBox="0 0 164 104"
-										fill="none"
-										xmlns="http://www.w3.org/2000/svg"
-									>
-										<path
-											d="M2 102.498C2 61.4999 69.5 15.4999 162 10.4785M162 10.4785L133.5 1.50183M162 10.4785L141.562 31.6153"
-											stroke="url(#paint0_linear_54_5088)"
-											strokeWidth="3"
-											strokeLinecap="round"
-											strokeLinejoin="round"
-										/>
-										<defs>
-											<linearGradient
-												id="paint0_linear_54_5088"
-												x1="82"
-												y1="1.50183"
-												x2="82"
-												y2="102.498"
-												gradientUnits="userSpaceOnUse"
-											>
-												<stop stopColor="#97A1FF" />
-												<stop offset="1" stopColor="#FFB571" />
-											</linearGradient>
-										</defs>
-									</svg>
-								</div>
-								<h3 className="wm-title">Confirm the message</h3>
-								<h4 className="wm-subtitle">
-									{keyParams.isPasswordNeeded
-										? 'We need you to sign your password so we can generate you a unique communication key'
-										: 'We need you to sign authorization message so we can generate you a unique communication key'}
-								</h4>
-							</div>
-						</>
-					)}
-
-					<div className="wm-footer">
-						<ActionButton
-							size={ActionButtonSize.XLARGE}
-							onClick={() => (keyParams.isPasswordNeeded ? setStep(Step.ENTER_PASSWORD) : onClose?.())}
-						>
-							Back
-						</ActionButton>
-					</div>
-				</>
-			) : step === Step.PUBLISH_KEY ? (
-				<>
-					<div className="wm-body centered">
+				pleaseWait ? (
+					<ActionModal>
+						<YlideLoader reason="Your transaction is being confirmed..." />
+					</ActionModal>
+				) : (
+					<ActionModal
+						buttons={
+							<ActionButton
+								size={ActionButtonSize.XLARGE}
+								onClick={() =>
+									keyParams.isPasswordNeeded ? setStep(Step.ENTER_PASSWORD) : onClose?.()
+								}
+							>
+								Back
+							</ActionButton>
+						}
+						onClose={onClose}
+					>
 						<div
 							style={{
 								display: 'flex',
-								flexDirection: 'row',
-								alignItems: 'flex-start',
 								justifyContent: 'flex-end',
+								paddingTop: 40,
 								paddingRight: 24,
 								paddingBottom: 20,
 							}}
 						>
-							<svg
-								width="164"
-								height="104"
-								viewBox="0 0 164 104"
-								fill="none"
-								xmlns="http://www.w3.org/2000/svg"
-							>
-								<path
-									d="M2 102.498C2 61.4999 69.5 15.4999 162 10.4785M162 10.4785L133.5 1.50183M162 10.4785L141.562 31.6153"
-									stroke="url(#paint0_linear_54_5088)"
-									strokeWidth="3"
-									strokeLinecap="round"
-									strokeLinejoin="round"
-								/>
-								<defs>
-									<linearGradient
-										id="paint0_linear_54_5088"
-										x1="82"
-										y1="1.50183"
-										x2="82"
-										y2="102.498"
-										gradientUnits="userSpaceOnUse"
-									>
-										<stop stopColor="#97A1FF" />
-										<stop offset="1" stopColor="#FFB571" />
-									</linearGradient>
-								</defs>
-							</svg>
+							<ProceedToWalletArrowSvg />
 						</div>
-						<h3 className="wm-title">Confirm the transaction</h3>
-						<h4 className="wm-subtitle">
-							Please sign the transaction in your wallet to publish your unique communication key
-						</h4>
-					</div>
-					<div className="wm-footer">
+
+						<div style={{ textAlign: 'center', fontSize: '180%' }}>Confirm the message</div>
+
+						<div>
+							{keyParams.isPasswordNeeded
+								? 'We need you to sign your password so we can generate you a unique communication key.'
+								: 'We need you to sign authorization message so we can generate you a unique communication key.'}
+						</div>
+					</ActionModal>
+				)
+			) : step === Step.SELECT_NETWORK ? (
+				<SelectNetworkModal
+					wallet={wallet}
+					account={account}
+					onClose={network => (network ? networkSelect(network) : onClose?.())}
+				/>
+			) : step === Step.PUBLISH_KEY ? (
+				<ActionModal
+					buttons={
 						<ActionButton
 							size={ActionButtonSize.XLARGE}
 							onClick={() =>
@@ -550,28 +469,45 @@ export function NewPasswordModal({ faucetType, bonus, wallet, account, remoteKey
 						>
 							Back
 						</ActionButton>
+					}
+					onClose={onClose}
+				>
+					<div
+						style={{
+							display: 'flex',
+							justifyContent: 'flex-end',
+							paddingTop: 40,
+							paddingRight: 24,
+							paddingBottom: 20,
+						}}
+					>
+						<ProceedToWalletArrowSvg />
 					</div>
-				</>
+
+					<div style={{ textAlign: 'center', fontSize: '180%' }}>Confirm the transaction</div>
+
+					<div>Please sign the transaction in your wallet to publish your unique communication key.</div>
+				</ActionModal>
 			) : step === Step.PUBLISHING_KEY ? (
-				<>
-					<div className="wm-body centered">
-						<div
-							style={{
-								display: 'flex',
-								alignItems: 'center',
-								justifyContent: 'center',
-								paddingBottom: 40,
-							}}
-						>
-							<YlideLoader />
-						</div>
-						<h3 className="wm-title">Publishing the key</h3>
-						<h4 className="wm-subtitle">Please, wait for the transaction to be completed</h4>
+				<ActionModal onClose={onClose}>
+					<div
+						style={{
+							display: 'flex',
+							justifyContent: 'center',
+							paddingTop: 20,
+							paddingBottom: 20,
+						}}
+					>
+						<YlideLoader />
 					</div>
-				</>
+
+					<div style={{ textAlign: 'center', fontSize: '180%' }}>Publishing the key</div>
+
+					<div>Please, wait for the transaction to be completed</div>
+				</ActionModal>
 			) : (
 				assertUnreachable(step)
 			)}
-		</Modal>
+		</>
 	);
 }

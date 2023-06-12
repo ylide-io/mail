@@ -10,8 +10,10 @@ export interface BlockChainLabelProps {
 export function BlockChainLabel({ blockchain }: BlockChainLabelProps) {
 	return (
 		<div className={css.root}>
-			{blockchainMeta[blockchain].logo(12)}
-			{blockchain.toUpperCase()}
+			<div className={css.inner}>
+				{blockchainMeta[blockchain].logo(12)}
+				{blockchain.toUpperCase()}
+			</div>
 		</div>
 	);
 }

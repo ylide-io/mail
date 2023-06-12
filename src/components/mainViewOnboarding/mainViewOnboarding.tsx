@@ -153,7 +153,6 @@ export const MainViewOnboarding = observer(() => {
 			{step === Step.CONNECT_ACCOUNT_INFO && (
 				<ActionModal
 					title="Connect Account"
-					description={`You need to connect a crypto wallet in order to use ${APP_NAME}`}
 					buttons={
 						<ActionButton
 							size={ActionButtonSize.XLARGE}
@@ -163,37 +162,14 @@ export const MainViewOnboarding = observer(() => {
 							Proceed
 						</ActionButton>
 					}
-				/>
+				>
+					You need to connect a crypto wallet in order to use {APP_NAME}
+				</ActionModal>
 			)}
 
 			{step === Step.ENTER_INVITE_CODE && (
 				<ActionModal
 					title={`Access ${APP_NAME}`}
-					description={
-						<>
-							<div>
-								{APP_NAME} is currently available by invitation only. Please enter the invite code you
-								received to unlock access to our personalized crypto news aggregator.
-							</div>
-
-							{unathorizedAccount && (
-								<div>
-									Account:
-									<b>
-										<AdaptiveAddress address={unathorizedAccount.account.address} />
-									</b>
-								</div>
-							)}
-
-							<TextField
-								autoFocus
-								disabled={inviteCodeLoading}
-								placeholder="Invite code"
-								value={inviteCode}
-								onValueChange={setInviteCode}
-							/>
-						</>
-					}
 					buttons={[
 						<ActionButton
 							size={ActionButtonSize.XLARGE}
@@ -214,23 +190,48 @@ export const MainViewOnboarding = observer(() => {
 							</ActionButton>
 						),
 					]}
-				/>
+				>
+					<div>
+						{APP_NAME} is currently available by invitation only. Please enter the invite code you received
+						to unlock access to our personalized crypto news aggregator.
+					</div>
+
+					{unathorizedAccount && (
+						<div>
+							Account:
+							<b>
+								<AdaptiveAddress address={unathorizedAccount.account.address} />
+							</b>
+						</div>
+					)}
+
+					<TextField
+						autoFocus
+						disabled={inviteCodeLoading}
+						placeholder="Invite code"
+						value={inviteCode}
+						onValueChange={setInviteCode}
+					/>
+				</ActionModal>
 			)}
 
 			{step === Step.SIGN_AUTH && (
 				<ActionModal
 					title="Authenticate your wallet"
-					description="Please, sign a special string so we can verify that you are the owner of the wallet."
 					buttons={<ActionButton isLoading size={ActionButtonSize.XLARGE} look={ActionButtonLook.PRIMARY} />}
-				/>
+				>
+					Please, sign a special string so we can verify that you are the owner of the wallet.
+				</ActionModal>
 			)}
 
 			{step === Step.BUILDING_FEED && (
 				<ActionModal
 					title="We're setting up your personalized feed"
-					description="We're currently fetching data about your tokens and transactions to create a tailored experience just for you. This may take a few moments. Thank you for your patience."
 					buttons={<ActionButton isLoading size={ActionButtonSize.XLARGE} look={ActionButtonLook.PRIMARY} />}
-				/>
+				>
+					We're currently fetching data about your tokens and transactions to create a tailored experience
+					just for you. This may take a few moments. Thank you for your patience.
+				</ActionModal>
 			)}
 		</>
 	);

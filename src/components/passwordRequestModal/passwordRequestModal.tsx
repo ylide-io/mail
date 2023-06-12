@@ -17,35 +17,6 @@ export function PasswordRequestModal({ reason, onClose }: PasswordRequestModalPr
 	return (
 		<ActionModal
 			title="Password request"
-			description={
-				<>
-					<p>Please, enter your Ylide password to {reason}</p>
-
-					<TextField
-						value={password}
-						onValueChange={setPassword}
-						type="password"
-						placeholder="Enter your Ylide password"
-					/>
-
-					<div style={{ textAlign: 'right', marginTop: 8, marginRight: 8 }}>
-						<button
-							onClick={() =>
-								showStaticComponent(resolve => (
-									<ForgotPasswordModal
-										onClose={password => {
-											resolve();
-											password && onClose?.(password);
-										}}
-									/>
-								))
-							}
-						>
-							Forgot password?
-						</button>
-					</div>
-				</>
-			}
 			buttons={[
 				<ActionButton
 					size={ActionButtonSize.XLARGE}
@@ -58,7 +29,33 @@ export function PasswordRequestModal({ reason, onClose }: PasswordRequestModalPr
 					Cancel
 				</ActionButton>,
 			]}
-		/>
+		>
+			<p>Please, enter your Ylide password to {reason}</p>
+
+			<TextField
+				value={password}
+				onValueChange={setPassword}
+				type="password"
+				placeholder="Enter your Ylide password"
+			/>
+
+			<div style={{ textAlign: 'right', marginTop: 8, marginRight: 8 }}>
+				<button
+					onClick={() =>
+						showStaticComponent(resolve => (
+							<ForgotPasswordModal
+								onClose={password => {
+									resolve();
+									password && onClose?.(password);
+								}}
+							/>
+						))
+					}
+				>
+					Forgot password?
+				</button>
+			</div>
+		</ActionModal>
 	);
 }
 
