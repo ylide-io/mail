@@ -77,7 +77,7 @@ const Header = observer(() => {
 							onClick={() => setAccountsPopupOpen(!isAccountsPopupOpen)}
 						>
 							<div>
-								{domain.accounts.accounts.map(acc => (
+								{domain.accounts.activeAccounts.map(acc => (
 									<Avatar
 										key={acc.account.address}
 										className={css.usersAvatar}
@@ -87,8 +87,8 @@ const Header = observer(() => {
 							</div>
 
 							<div className={css.usersText}>
-								{domain.accounts.accounts.length} account
-								{domain.accounts.accounts.length > 1 ? 's' : ''}
+								{domain.accounts.activeAccounts.length} account
+								{domain.accounts.activeAccounts.length > 1 ? 's' : ''}
 								<span>&nbsp;connected</span>
 							</div>
 

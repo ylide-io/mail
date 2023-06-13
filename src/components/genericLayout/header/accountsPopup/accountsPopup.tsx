@@ -31,7 +31,7 @@ export const AccountsPopup = observer(({ anchorRef, onClose }: AccountsPopupProp
 			onCloseRequest={onClose}
 		>
 			<div className={css.content}>
-				{domain.accounts.accounts.map(account => (
+				{domain.accounts.activeAccounts.map(account => (
 					<div key={account.account.address} className={css.item}>
 						<Avatar className={css.itemIcon} blockie={account.account.address} />
 						<div className={css.itemBody}>

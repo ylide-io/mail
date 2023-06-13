@@ -79,7 +79,7 @@ export class DomainAccount {
 	}
 
 	get isLocalKeyRegistered() {
-		return this.remoteKey && isBytesEqual(this.key.keypair.publicKey, this.remoteKey.publicKey.bytes);
+		return !!this.remoteKey && isBytesEqual(this.key.keypair.publicKey, this.remoteKey.publicKey.bytes);
 	}
 
 	async attachRemoteKey(preferredNetwork?: EVMNetwork) {

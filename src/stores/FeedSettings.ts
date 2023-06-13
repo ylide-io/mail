@@ -27,7 +27,7 @@ export class FeedSettings {
 			.catch(() => (this.isError = true));
 
 		autorun(() => {
-			domain.accounts.accounts
+			domain.accounts.activeAccounts
 				.filter(account => account.mainViewKey && !this.data.has(account))
 				.forEach(async account => {
 					try {

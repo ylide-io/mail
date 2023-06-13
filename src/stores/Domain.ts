@@ -582,12 +582,12 @@ export class Domain {
 }
 
 export function useDomainAccounts() {
-	const [accounts, setAccounts] = useState(() => domain.accounts.accounts);
+	const [accounts, setAccounts] = useState(() => domain.accounts.activeAccounts);
 
 	useEffect(
 		() =>
 			reaction(
-				() => [...domain.accounts.accounts],
+				() => [...domain.accounts.activeAccounts],
 				arg => setAccounts(arg),
 			),
 		[],
