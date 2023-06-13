@@ -422,7 +422,7 @@ export function NewPasswordModal({ faucetType, bonus, wallet, account, remoteKey
 							size={ActionButtonSize.XLARGE}
 							onClick={() => (keyParams.isPasswordNeeded ? setStep(Step.ENTER_PASSWORD) : onClose?.())}
 						>
-							Back
+							Cancel
 						</ActionButton>
 					}
 					onClose={onClose}
@@ -468,7 +468,7 @@ export function NewPasswordModal({ faucetType, bonus, wallet, account, remoteKey
 								)
 							}
 						>
-							Back
+							Cancel
 						</ActionButton>
 					}
 					onClose={onClose}
