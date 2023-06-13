@@ -1,7 +1,7 @@
 import { EVMNetwork } from '@ylide/ethereum';
 import { asyncDelay, ExternalYlidePublicKey, IGenericAccount, YlideKeyPair, YlidePublicKeyVersion } from '@ylide/sdk';
 import SmartBuffer from '@ylide/smart-buffer';
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { generatePath } from 'react-router-dom';
 
 import { ReactComponent as ProceedToWalletArrowSvg } from '../../assets/proceedTOWalletArrow.svg';
@@ -14,7 +14,8 @@ import { chainIdByFaucetType, publishKeyThroughFaucet, requestFaucetSignature } 
 import { DomainAccount } from '../../stores/models/DomainAccount';
 import { Wallet } from '../../stores/models/Wallet';
 import { RoutePath } from '../../stores/routePath';
-import { assertUnreachable } from '../../utils/assert';
+import { disconnectAccount } from '../../utils/account';
+import { assertUnreachable, invariant } from '../../utils/assert';
 import { isBytesEqual } from '../../utils/isBytesEqual';
 import { getEvmWalletNetwork } from '../../utils/wallet';
 import { ActionButton, ActionButtonLook, ActionButtonSize } from '../ActionButton/ActionButton';
@@ -85,18 +86,38 @@ export function NewPasswordModal({ faucetType, bonus, wallet, account, remoteKey
 		}
 	}, [account.address, wallet]);
 
-	const [domainAccount, setDomainAccount] = useState<DomainAccount>();
+	const domainAccountRef = useRef<DomainAccount>();
 
-	function exitWithError(message: string, error: any) {
-		console.error(message, error);
-		toast(message);
+	async function createDomainAccount(
+		wallet: Wallet,
+		account: IGenericAccount,
+		keypair: YlideKeyPair,
+		keyVersion: YlidePublicKeyVersion,
+	) {
+		return (domainAccountRef.current = await wallet.instantiateNewAccount(account, keypair, keyVersion));
+	}
+
+	function exitUnsuccessfully(error?: { message: string; e?: any }) {
+		if (error) {
+			console.error(error.message, error.e);
+			toast(error.message);
+		}
+
+		if (domainAccountRef.current) {
+			disconnectAccount(domainAccountRef.current).catch();
+		}
+
 		onClose?.();
 	}
 
-	async function publishLocalKey(account: DomainAccount) {
-		console.log(`publishLocalKey`);
-		setStep(Step.PUBLISH_KEY);
+	async function publishLocalKey() {
 		try {
+			console.log(`publishLocalKey`);
+			setStep(Step.PUBLISH_KEY);
+
+			const account = domainAccountRef.current;
+			invariant(account);
+
 			await Promise.all([
 				account.attachRemoteKey(network),
 				// Display loader after 3 seconds
@@ -107,7 +128,7 @@ export function NewPasswordModal({ faucetType, bonus, wallet, account, remoteKey
 			analytics.walletRegistered(wallet.factory.wallet, account.account.address, domain.accounts.accounts.length);
 			onClose?.(account);
 		} catch (e) {
-			exitWithError('Transaction was not published. Please, try again', e);
+			exitUnsuccessfully({ message: 'Transaction was not published. Please, try again', e });
 		}
 	}
 
@@ -154,15 +175,14 @@ export function NewPasswordModal({ faucetType, bonus, wallet, account, remoteKey
 				keyVersion = YlidePublicKeyVersion.KEY_V3;
 			}
 		} catch (e) {
-			exitWithError('Failed to create local key 😒', e);
+			exitUnsuccessfully({ message: 'Failed to create local key 😒', e });
 			return;
 		}
 
 		setStep(Step.LOADING);
 
 		if (!freshestKey) {
-			const domainAccount = await wallet.instantiateNewAccount(account, tempLocalKey, keyVersion);
-			setDomainAccount(domainAccount);
+			const domainAccount = await createDomainAccount(wallet, account, tempLocalKey, keyVersion);
 			if (faucetType && wallet.factory.blockchainGroup === 'evm') {
 				async function publishThroughFaucet(
 					account: DomainAccount,
@@ -257,17 +277,16 @@ export function NewPasswordModal({ faucetType, bonus, wallet, account, remoteKey
 				if (wallet.factory.blockchainGroup === 'evm') {
 					setStep(Step.SELECT_NETWORK);
 				} else {
-					await publishLocalKey(domainAccount);
+					await publishLocalKey();
 				}
 			}
 		} else if (isBytesEqual(freshestKey.key.publicKey.bytes, tempLocalKey.publicKey)) {
-			const domainAccount = await wallet.instantiateNewAccount(account, tempLocalKey, keyVersion);
+			const domainAccount = await createDomainAccount(wallet, account, tempLocalKey, keyVersion);
 			analytics.walletConnected(wallet.factory.wallet, account.address, domain.accounts.accounts.length);
 			onClose?.(domainAccount);
 		} else if (forceNew) {
-			const domainAccount = await wallet.instantiateNewAccount(account, tempLocalKey, keyVersion);
-			setDomainAccount(domainAccount);
-			await publishLocalKey(domainAccount);
+			await createDomainAccount(wallet, account, tempLocalKey, keyVersion);
+			await publishLocalKey();
 		} else {
 			toast('Password is wrong. Please try again ❤');
 			setStep(Step.ENTER_PASSWORD);
@@ -277,7 +296,7 @@ export function NewPasswordModal({ faucetType, bonus, wallet, account, remoteKey
 	async function networkSelect(network: EVMNetwork) {
 		setNetwork(network);
 		setStep(Step.PUBLISH_KEY);
-		await publishLocalKey(domainAccount!);
+		await publishLocalKey();
 	}
 
 	return (
@@ -302,12 +321,12 @@ export function NewPasswordModal({ faucetType, bonus, wallet, account, remoteKey
 							>
 								{keyParams.isPasswordNeeded ? 'Continue' : 'Sign'}
 							</ActionButton>
-							<ActionButton size={ActionButtonSize.XLARGE} onClick={() => onClose?.()}>
+							<ActionButton size={ActionButtonSize.XLARGE} onClick={() => exitUnsuccessfully()}>
 								Cancel
 							</ActionButton>
 						</>
 					}
-					onClose={onClose}
+					onClose={() => exitUnsuccessfully()}
 				>
 					{keyParams.isPasswordNeeded ? (
 						keyParams.keyExists ? (
@@ -420,12 +439,14 @@ export function NewPasswordModal({ faucetType, bonus, wallet, account, remoteKey
 					buttons={
 						<ActionButton
 							size={ActionButtonSize.XLARGE}
-							onClick={() => (keyParams.isPasswordNeeded ? setStep(Step.ENTER_PASSWORD) : onClose?.())}
+							onClick={() =>
+								keyParams.isPasswordNeeded ? setStep(Step.ENTER_PASSWORD) : exitUnsuccessfully()
+							}
 						>
 							Cancel
 						</ActionButton>
 					}
-					onClose={onClose}
+					onClose={() => exitUnsuccessfully()}
 				>
 					<div
 						style={{
@@ -451,7 +472,7 @@ export function NewPasswordModal({ faucetType, bonus, wallet, account, remoteKey
 				<SelectNetworkModal
 					wallet={wallet}
 					account={account}
-					onClose={network => (network ? networkSelect(network) : onClose?.())}
+					onClose={network => (network ? networkSelect(network) : exitUnsuccessfully())}
 				/>
 			) : step === Step.PUBLISH_KEY ? (
 				<ActionModal
@@ -471,7 +492,7 @@ export function NewPasswordModal({ faucetType, bonus, wallet, account, remoteKey
 							Cancel
 						</ActionButton>
 					}
-					onClose={onClose}
+					onClose={() => exitUnsuccessfully()}
 				>
 					<div
 						style={{
@@ -490,7 +511,7 @@ export function NewPasswordModal({ faucetType, bonus, wallet, account, remoteKey
 					<div>Please sign the transaction in your wallet to publish your unique communication key.</div>
 				</ActionModal>
 			) : step === Step.PUBLISHING_KEY ? (
-				<ActionModal onClose={onClose}>
+				<ActionModal onClose={() => exitUnsuccessfully()}>
 					<div
 						style={{
 							display: 'flex',
