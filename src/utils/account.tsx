@@ -54,11 +54,13 @@ export async function connectAccount(): Promise<DomainAccount | undefined> {
 					]}
 					onClose={resolve}
 				>
-					We noticed that you're using Ylide within another application. You can connect the same account as
-					the parent application uses – <b>{truncateInMiddle(proxyAccount.account.address, 8, '...')}</b>
-					<br />
-					<br />
-					We recommend connecting the same account to get seamless user experience.
+					<div>
+						We noticed that you're using Ylide within another application. You can connect the same account
+						as the parent application uses –{' '}
+						<b>{truncateInMiddle(proxyAccount.account.address, 8, '...')}</b>
+					</div>
+
+					<div>We recommend connecting the same account to get seamless user experience.</div>
 				</ActionModal>
 			));
 
