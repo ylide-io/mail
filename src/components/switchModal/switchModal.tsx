@@ -30,15 +30,17 @@ export class SwitchModal extends PureComponent<SwitchModalProps> {
 	}
 
 	async requestSwitch() {
-		if (this.props.wallet.controller.isMultipleAccountsSupported()) {
-			await this.props.wallet.controller.requestAuthentication();
-		} else {
-			const acc = await this.props.wallet.getCurrentAccount();
-			if (acc) {
-				await this.props.wallet.controller.disconnectAccount(acc);
+		try {
+			if (this.props.wallet.controller.isMultipleAccountsSupported()) {
+				await this.props.wallet.controller.requestAuthentication();
+			} else {
+				const acc = await this.props.wallet.getCurrentAccount();
+				if (acc) {
+					await this.props.wallet.controller.disconnectAccount(acc);
+				}
+				await this.props.wallet.controller.requestAuthentication();
 			}
-			await this.props.wallet.controller.requestAuthentication();
-		}
+		} catch (e) {}
 	}
 
 	@autobind
