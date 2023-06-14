@@ -14,6 +14,7 @@ import { ReactComponent as ContactSvg } from '../../../icons/ic20/contact.svg';
 import { ReactComponent as ForwardSvg } from '../../../icons/ic20/forward.svg';
 import { ReactComponent as ReplySvg } from '../../../icons/ic20/reply.svg';
 import { IMessageDecodedContent } from '../../../indexedDB/IndexedDB';
+import { useDomainAccounts } from '../../../stores/Domain';
 import { FolderId, ILinkedMessage, MailList, mailStore } from '../../../stores/MailList';
 import { globalOutgoingMailData, OutgoingMailData } from '../../../stores/outgoingMailData';
 import { RoutePath } from '../../../stores/routePath';
@@ -64,6 +65,8 @@ export const MailDetailsPage = observer(() => {
 
 	const deletedMessageIds = mailStore.deletedMessageIds;
 
+	const accounts = useDomainAccounts();
+
 	const threadMailList = useMemo(() => {
 		if (folderId !== FolderId.Inbox || !initialMessage?.msg.senderAddress) return;
 
@@ -71,6 +74,7 @@ export const MailDetailsPage = observer(() => {
 
 		list.init({
 			mailbox: {
+				accounts,
 				folderId: FolderId.Inbox,
 				sender: initialMessage?.msg.senderAddress,
 				filter: (id: string) => !deletedMessageIds.has(id),
@@ -78,7 +82,7 @@ export const MailDetailsPage = observer(() => {
 		});
 
 		return list;
-	}, [deletedMessageIds, folderId, initialMessage?.msg.senderAddress]);
+	}, [accounts, deletedMessageIds, folderId, initialMessage?.msg.senderAddress]);
 
 	useEffect(() => () => threadMailList?.destroy(), [threadMailList]);
 

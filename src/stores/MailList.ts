@@ -115,7 +115,7 @@ export class MailList<M = ILinkedMessage> {
 	async init(props: {
 		messagesFilter?: (messages: ILinkedMessage[]) => ILinkedMessage[] | Promise<ILinkedMessage[]>;
 		messageHandler?: (message: ILinkedMessage) => M | Promise<M>;
-		mailbox?: { folderId: FolderId; sender?: string; filter?: (id: string) => boolean };
+		mailbox?: { accounts: DomainAccount[]; folderId: FolderId; sender?: string; filter?: (id: string) => boolean };
 		venomFeed?: boolean;
 	}) {
 		const { messagesFilter, messageHandler, mailbox, venomFeed } = props;
@@ -144,14 +144,12 @@ export class MailList<M = ILinkedMessage> {
 						.map(source => ({ source, meta: { account } }));
 				}
 
-				const activeAccounts = domain.accounts.activeAccounts;
-
 				if (mailbox.folderId === FolderId.Inbox || mailbox.folderId === FolderId.Archive) {
-					return activeAccounts
+					return mailbox.accounts
 						.map(acc => getDirectWithMeta(acc.uint256Address, mailbox.sender || null, acc))
 						.flat();
 				} else if (mailbox.folderId === FolderId.Sent) {
-					return activeAccounts.map(acc => getDirectWithMeta(acc.sentAddress, null, acc)).flat();
+					return mailbox.accounts.map(acc => getDirectWithMeta(acc.sentAddress, null, acc)).flat();
 				} else {
 					const tag = tags.tags.find(t => String(t.id) === mailbox.folderId);
 					if (!tag) {
@@ -159,7 +157,7 @@ export class MailList<M = ILinkedMessage> {
 					}
 					const contactsV = contacts.contacts.filter(c => c.tags.includes(tag.id));
 					return contactsV
-						.map(v => activeAccounts.map(acc => getDirectWithMeta(acc.uint256Address, v.address, acc)))
+						.map(v => mailbox.accounts.map(acc => getDirectWithMeta(acc.uint256Address, v.address, acc)))
 						.flat()
 						.flat();
 				}
@@ -203,6 +201,7 @@ export class MailList<M = ILinkedMessage> {
 		this.stream.on('messages', this.onNewMessages);
 
 		await this.stream.resume().then(() => {
+			if (this.isDestroyed) return;
 			this.loadNextPage();
 		});
 	}

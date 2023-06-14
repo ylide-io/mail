@@ -1,6 +1,6 @@
 import { autorun } from 'mobx';
 import { observer } from 'mobx-react';
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useParams, useSearchParams } from 'react-router-dom';
 import AutoSizer from 'react-virtualized-auto-sizer';
 import { FixedSizeList, ListChildComponentProps } from 'react-window';
@@ -10,7 +10,7 @@ import { FullPageContent } from '../../../components/genericLayout/content/fullP
 import { GenericLayout } from '../../../components/genericLayout/genericLayout';
 import { YlideLoader } from '../../../components/ylideLoader/ylideLoader';
 import { analytics } from '../../../stores/Analytics';
-import domain from '../../../stores/Domain';
+import domain, { useDomainAccounts } from '../../../stores/Domain';
 import { FolderId, ILinkedMessage, MailList, mailStore } from '../../../stores/MailList';
 import { useNav } from '../../../utils/url';
 import { useWindowSize } from '../../../utils/useWindowSize';
@@ -73,27 +73,25 @@ export const MailboxPage = observer(() => {
 
 	const deletedMessageIds = mailStore.deletedMessageIds;
 
-	const messageFilter = useCallback(
-		(id: string) => {
-			const isDeleted = deletedMessageIds.has(id);
-			return folderId === FolderId.Archive ? isDeleted : !isDeleted;
-		},
-		[deletedMessageIds, folderId],
-	);
+	const accounts = useDomainAccounts();
 
 	const mailList = useMemo(() => {
 		const list = new MailList();
 
 		list.init({
 			mailbox: {
+				accounts,
 				folderId: folderId!,
 				sender: filterBySender,
-				filter: messageFilter,
+				filter: (id: string) => {
+					const isDeleted = deletedMessageIds.has(id);
+					return folderId === FolderId.Archive ? isDeleted : !isDeleted;
+				},
 			},
 		});
 
 		return list;
-	}, [filterBySender, folderId, messageFilter]);
+	}, [accounts, deletedMessageIds, filterBySender, folderId]);
 
 	useEffect(() => () => mailList.destroy(), [mailList]);
 
