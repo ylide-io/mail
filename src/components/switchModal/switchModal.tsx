@@ -3,10 +3,12 @@ import { useEffect, useState } from 'react';
 
 import { Wallet } from '../../stores/models/Wallet';
 import { requestSwitchAccount } from '../../utils/account';
+import { ActionButton, ActionButtonLook, ActionButtonSize } from '../ActionButton/ActionButton';
 import { ActionModal } from '../actionModal/actionModal';
 import { BlockChainLabel } from '../BlockChainLabel/BlockChainLabel';
 import { GridRowBox } from '../boxes/boxes';
 import { ErrorMessage } from '../errorMessage/errorMessage';
+import { Spinner } from '../spinner/spinner';
 import { showStaticComponent } from '../staticComponentManager/staticComponentManager';
 import { WalletTag } from '../walletTag/walletTag';
 
@@ -23,36 +25,20 @@ export function SwitchModal({ type, wallet, needAccount, needNetwork, onConfirm 
 
 	useEffect(() => {
 		function handleAccountUpdate(account: IGenericAccount | null) {
-			if (needAccount !== undefined) {
-				if (!account) {
-					// requestSwitchAccount(wallet);
-					// setError('You logged out...');
-				} else if (account.address !== needAccount.address) {
-					requestSwitchAccount(wallet);
-					setError('Wrong account 😒 Please try again.');
-				} else {
-					onConfirm(true);
-				}
+			if (!account) return;
+
+			if (!needAccount || account.address === needAccount.address) {
+				onConfirm(true);
 			} else {
-				if (account !== null) {
-					onConfirm(true);
-				} else {
-					// requestSwitchAccount(wallet);
-					// setError('You logged out...');
-				}
+				setError('Wrong account 😒 Please try again.');
 			}
 		}
 
 		function handleNetworkUpdate(network: string) {
-			if (needNetwork !== undefined) {
-				if (network !== needNetwork) {
-					requestSwitchAccount(wallet);
-					setError('Wrong network 😒 Please try again.');
-				} else {
-					onConfirm(true);
-				}
-			} else {
+			if (!needNetwork || network === needNetwork) {
 				onConfirm(true);
+			} else {
+				setError('Wrong network 😒 Please try again.');
 			}
 		}
 
@@ -86,11 +72,30 @@ export function SwitchModal({ type, wallet, needAccount, needNetwork, onConfirm 
 						</GridRowBox>
 					)}
 
-					{error && <ErrorMessage>{error}</ErrorMessage>}
-
 					<div>
 						Please unlock you wallet and make sure that both account and network are selected correctly.
 					</div>
+
+					{error ? (
+						<>
+							<ErrorMessage>{error}</ErrorMessage>
+
+							<ActionButton
+								size={ActionButtonSize.MEDIUM}
+								look={ActionButtonLook.PRIMARY}
+								onClick={() => {
+									setError('');
+									requestSwitchAccount(wallet);
+								}}
+							>
+								Try again
+							</ActionButton>
+						</>
+					) : (
+						<GridRowBox>
+							<Spinner /> Opening wallet app ...
+						</GridRowBox>
+					)}
 				</ActionModal>
 			)}
 		</>
