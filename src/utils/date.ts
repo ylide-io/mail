@@ -1,3 +1,6 @@
+// Chrome 80 shows timestamp "24:xx" instead of "00:00".
+// https://stackoverflow.com/questions/60886186/intl-datetimeformat-shows-time-being-2459
+
 const LOCALE = 'en-US';
 
 export type UnixTime = number;
@@ -5,7 +8,7 @@ export type UnixTime = number;
 //
 
 const sameDayFormat = new Intl.DateTimeFormat(LOCALE, {
-	hour12: false,
+	hourCycle: 'h23',
 	hour: 'numeric',
 	minute: 'numeric',
 });
@@ -22,7 +25,7 @@ const anotherYearFormat = new Intl.DateTimeFormat(LOCALE, {
 });
 
 const longFormat = new Intl.DateTimeFormat(LOCALE, {
-	hour12: false,
+	hourCycle: 'h23',
 	hour: 'numeric',
 	minute: 'numeric',
 	day: 'numeric',
