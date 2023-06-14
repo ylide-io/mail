@@ -578,6 +578,22 @@ export class Domain {
 		await tags.getTags();
 		await mailStore.init();
 		this.initialized = true;
+
+		// hacks for VenomWallet again :(
+		let scTimes = 0;
+		const schedule = () => {
+			setTimeout(async () => {
+				await domain.reloadAvailableWallets();
+				await domain.extractWalletsData();
+				await domain.accounts.handleKeysUpdate(domain.keystore.keys);
+				scTimes++;
+				if (scTimes < 5) {
+					schedule();
+				}
+			}, 500);
+		};
+
+		schedule();
 	}
 }
 
