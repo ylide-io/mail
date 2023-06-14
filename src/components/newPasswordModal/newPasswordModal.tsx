@@ -28,6 +28,7 @@ import { SelectNetworkModal } from '../selectNetworkModal/selectNetworkModal';
 import { showStaticComponent } from '../staticComponentManager/staticComponentManager';
 import { TextField, TextFieldLook } from '../textField/textField';
 import { toast } from '../toast/toast';
+import { WalletTag } from '../walletTag/walletTag';
 import { YlideLoader } from '../ylideLoader/ylideLoader';
 
 enum Step {
@@ -328,6 +329,8 @@ export function NewPasswordModal({ faucetType, bonus, wallet, account, remoteKey
 					}
 					onClose={() => exitUnsuccessfully()}
 				>
+					<WalletTag wallet={wallet.factory.wallet} address={account.address} />
+
 					{keyParams.isPasswordNeeded ? (
 						keyParams.keyExists ? (
 							<div>
@@ -448,6 +451,8 @@ export function NewPasswordModal({ faucetType, bonus, wallet, account, remoteKey
 					}
 					onClose={() => exitUnsuccessfully()}
 				>
+					<WalletTag wallet={wallet.factory.wallet} address={account.address} />
+
 					<div
 						style={{
 							display: 'flex',
@@ -494,6 +499,8 @@ export function NewPasswordModal({ faucetType, bonus, wallet, account, remoteKey
 					}
 					onClose={() => exitUnsuccessfully()}
 				>
+					<WalletTag wallet={wallet.factory.wallet} address={account.address} />
+
 					<div
 						style={{
 							display: 'flex',
@@ -512,6 +519,8 @@ export function NewPasswordModal({ faucetType, bonus, wallet, account, remoteKey
 				</ActionModal>
 			) : step === Step.PUBLISHING_KEY ? (
 				<ActionModal onClose={() => exitUnsuccessfully()}>
+					<WalletTag wallet={wallet.factory.wallet} address={account.address} />
+
 					<div
 						style={{
 							display: 'flex',
