@@ -57,7 +57,9 @@ const MailboxListRow: React.FC<MailboxListRowProps> = observer(
 				} finally {
 					setLoading(false);
 				}
-				navigate(generatePath(RoutePath.MAIL_DETAILS, { folderId: folderId!, id: message.id }));
+				navigate(
+					generatePath(RoutePath.MAIL_DETAILS, { folderId: folderId!, id: encodeURIComponent(message.id) }),
+				);
 			}
 		};
 
