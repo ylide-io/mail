@@ -281,8 +281,49 @@ if (useVenomChain) {
 				const posts = await VenomFilterApi.getPosts({ beforeTimestamp: 0, withBanned: false });
 				setIsNextPageAvailable(posts.length === 10);
 				setMessages(
-					await Promise.all(
-						posts.map(async p => {
+					posts.map(p => {
+						const msg: IMessage = {
+							...p.meta,
+							key: new Uint8Array(p.meta.key),
+						};
+						return {
+							original: p,
+							msg,
+							decoded: decodeBroadcastContent(
+								msg.msgId,
+								msg,
+								p.content
+									? p.content.corrupted
+										? p.content
+										: {
+												...p.content,
+												content: new Uint8Array(p.content.content),
+										  }
+									: null,
+							),
+						};
+					}),
+				);
+				setIsLoading(false);
+			} catch (err) {
+				setIsLoading(false);
+				setIsError(true);
+				console.error(`Couldn't load posts`, err);
+			}
+		}, []);
+
+		const loadNextFeedPage = useCallback(async () => {
+			setIsLoading(true);
+			setIsError(false);
+			try {
+				const posts = await VenomFilterApi.getPosts({
+					beforeTimestamp: messages[messages.length - 1]?.original.createTimestamp,
+					withBanned: false,
+				});
+				setIsNextPageAvailable(posts.length === 10);
+				setMessages(
+					messages.concat(
+						posts.map(p => {
 							const msg: IMessage = {
 								...p.meta,
 								key: new Uint8Array(p.meta.key),
@@ -304,40 +345,6 @@ if (useVenomChain) {
 								),
 							};
 						}),
-					),
-				);
-				setIsLoading(false);
-			} catch (err) {
-				setIsLoading(false);
-				setIsError(true);
-				console.error(`Couldn't load posts`, err);
-			}
-		}, []);
-
-		const loadNextFeedPage = useCallback(async () => {
-			setIsLoading(true);
-			setIsError(false);
-			try {
-				const posts = await VenomFilterApi.getPosts({
-					beforeTimestamp: messages[messages.length - 1]?.original.createTimestamp,
-					withBanned: false,
-				});
-				setIsNextPageAvailable(posts.length === 10);
-				setMessages(
-					messages.concat(
-						await Promise.all(
-							posts.map(async p => {
-								const msg: IMessage = {
-									...p.meta,
-									key: new Uint8Array(p.meta.key),
-								};
-								return {
-									original: p,
-									msg,
-									decoded: await decodeMessage(msg.msgId, msg),
-								};
-							}),
-						),
 					),
 				);
 				setIsLoading(false);
