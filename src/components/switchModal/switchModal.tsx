@@ -1,8 +1,5 @@
 import { IGenericAccount } from '@ylide/sdk';
-import { autobind } from 'core-decorators';
-import { makeObservable, observable } from 'mobx';
-import { observer } from 'mobx-react';
-import { PureComponent } from 'react';
+import { useEffect, useState } from 'react';
 
 import { Wallet } from '../../stores/models/Wallet';
 import { requestSwitchAccount } from '../../utils/account';
@@ -21,93 +18,83 @@ interface SwitchModalProps {
 	onConfirm: (result: boolean) => void;
 }
 
-@observer
-export class SwitchModal extends PureComponent<SwitchModalProps> {
-	@observable error: string = '';
+export function SwitchModal({ type, wallet, needAccount, needNetwork, onConfirm }: SwitchModalProps) {
+	const [error, setError] = useState('');
 
-	constructor(props: SwitchModalProps) {
-		super(props);
-
-		makeObservable(this);
-	}
-
-	@autobind
-	handleAccountUpdate(account: IGenericAccount | null) {
-		if (this.props.needAccount !== undefined) {
-			if (!account) {
-				// this.requestSwitch();
-				// this.error = `You've logged out instead of selecting account. Please, try again`;
-			} else if (account.address !== this.props.needAccount.address) {
-				requestSwitchAccount(this.props.wallet);
-				this.error = 'Wrong account 😒 Please try again.';
+	useEffect(() => {
+		function handleAccountUpdate(account: IGenericAccount | null) {
+			if (needAccount !== undefined) {
+				if (!account) {
+					// requestSwitchAccount(wallet);
+					// setError('You logged out...');
+				} else if (account.address !== needAccount.address) {
+					requestSwitchAccount(wallet);
+					setError('Wrong account 😒 Please try again.');
+				} else {
+					onConfirm(true);
+				}
 			} else {
-				this.props.onConfirm(true);
-			}
-		} else {
-			if (account !== null) {
-				this.props.onConfirm(true);
-			} else {
-				// this.requestSwitch();
-				// this.error = `You've logged out instead of selecting account. Please, try again`;
+				if (account !== null) {
+					onConfirm(true);
+				} else {
+					// requestSwitchAccount(wallet);
+					// setError('You logged out...');
+				}
 			}
 		}
-	}
 
-	@autobind
-	handleNetworkUpdate(network: string) {
-		if (this.props.needNetwork !== undefined) {
-			if (network !== this.props.needNetwork) {
-				requestSwitchAccount(this.props.wallet);
-				this.error = 'Wrong network 😒 Please try again.';
+		function handleNetworkUpdate(network: string) {
+			if (needNetwork !== undefined) {
+				if (network !== needNetwork) {
+					requestSwitchAccount(wallet);
+					setError('Wrong network 😒 Please try again.');
+				} else {
+					onConfirm(true);
+				}
 			} else {
-				this.props.onConfirm(true);
+				onConfirm(true);
 			}
+		}
+
+		if (type === 'account') {
+			wallet.on('accountUpdate', handleAccountUpdate);
 		} else {
-			this.props.onConfirm(true);
-		}
-	}
-
-	componentWillUnmount(): void {
-		if (this.props.type === 'account') {
-			this.props.wallet.off('accountUpdate', this.handleAccountUpdate);
-		} else {
-			this.props.wallet.off('networkUpdate', this.handleNetworkUpdate);
-		}
-	}
-
-	componentDidMount(): void {
-		if (this.props.type === 'account') {
-			this.props.wallet.on('accountUpdate', this.handleAccountUpdate);
-		} else {
-			this.props.wallet.on('chainUpdate', this.handleNetworkUpdate);
-		}
-		requestSwitchAccount(this.props.wallet);
-	}
-
-	render() {
-		const { wallet, needAccount, needNetwork } = this.props;
-
-		if (wallet.wallet === 'everwallet') {
-			return null;
+			wallet.on('chainUpdate', handleNetworkUpdate);
 		}
 
-		return (
-			<ActionModal title="Activate account" onClose={() => this.props.onConfirm(false)}>
-				{needAccount && <WalletTag wallet={wallet.wallet} address={needAccount.address} />}
+		requestSwitchAccount(wallet);
 
-				{needNetwork && (
-					<GridRowBox>
-						Network
-						<BlockChainLabel blockchain={needNetwork} />
-					</GridRowBox>
-				)}
+		return () => {
+			if (type === 'account') {
+				wallet.off('accountUpdate', handleAccountUpdate);
+			} else {
+				wallet.off('chainUpdate', handleNetworkUpdate);
+			}
+		};
+	}, [needAccount, needNetwork, onConfirm, type, wallet]);
 
-				{this.error && <ErrorMessage>{this.error}</ErrorMessage>}
+	return (
+		<>
+			{wallet.wallet !== 'everwallet' && (
+				<ActionModal title="Activate account" onClose={() => onConfirm(false)}>
+					{needAccount && <WalletTag wallet={wallet.wallet} address={needAccount.address} />}
 
-				<div>Please unlock you wallet and make sure that both account and network are selected correctly.</div>
-			</ActionModal>
-		);
-	}
+					{needNetwork && (
+						<GridRowBox>
+							Network
+							<BlockChainLabel blockchain={needNetwork} />
+						</GridRowBox>
+					)}
+
+					{error && <ErrorMessage>{error}</ErrorMessage>}
+
+					<div>
+						Please unlock you wallet and make sure that both account and network are selected correctly.
+					</div>
+				</ActionModal>
+			)}
+		</>
+	);
 }
 
 export namespace SwitchModal {
