@@ -4,13 +4,14 @@ import { makeObservable, observable } from 'mobx';
 import { observer } from 'mobx-react';
 import { PureComponent } from 'react';
 
-import metamaskSwitchVideo from '../../assets/video/metamask-switch.mp4';
 import { Wallet } from '../../stores/models/Wallet';
 import { requestSwitchAccount } from '../../utils/account';
-import { truncateInMiddle } from '../../utils/string';
+import { ActionModal } from '../actionModal/actionModal';
+import { BlockChainLabel } from '../BlockChainLabel/BlockChainLabel';
+import { GridRowBox } from '../boxes/boxes';
 import { ErrorMessage } from '../errorMessage/errorMessage';
-import { Modal } from '../modal/modal';
 import { showStaticComponent } from '../staticComponentManager/staticComponentManager';
+import { WalletTag } from '../walletTag/walletTag';
 
 interface SwitchModalProps {
 	type: 'account' | 'network';
@@ -38,7 +39,7 @@ export class SwitchModal extends PureComponent<SwitchModalProps> {
 				// this.error = `You've logged out instead of selecting account. Please, try again`;
 			} else if (account.address !== this.props.needAccount.address) {
 				requestSwitchAccount(this.props.wallet);
-				this.error = `You've selected wrong account. Please, try again`;
+				this.error = 'Wrong account 😒 Please try again.';
 			} else {
 				this.props.onConfirm(true);
 			}
@@ -57,7 +58,7 @@ export class SwitchModal extends PureComponent<SwitchModalProps> {
 		if (this.props.needNetwork !== undefined) {
 			if (network !== this.props.needNetwork) {
 				requestSwitchAccount(this.props.wallet);
-				this.error = `You've selected wrong network. Please, try again`;
+				this.error = 'Wrong network 😒 Please try again.';
 			} else {
 				this.props.onConfirm(true);
 			}
@@ -84,38 +85,27 @@ export class SwitchModal extends PureComponent<SwitchModalProps> {
 	}
 
 	render() {
-		const wallet = this.props.wallet;
+		const { wallet, needAccount, needNetwork } = this.props;
+
 		if (wallet.wallet === 'everwallet') {
 			return null;
 		}
 
 		return (
-			<Modal onClose={() => this.props.onConfirm(false)}>
-				<div
-					style={{
-						display: 'grid',
-						justifyItems: 'center',
-						gridGap: 16,
-						padding: 32,
-						width: '100%',
-					}}
-				>
-					<div style={{ fontSize: 20 }}>Activate account</div>
+			<ActionModal title="Activate account" onClose={() => this.props.onConfirm(false)}>
+				{needAccount && <WalletTag wallet={wallet.wallet} address={needAccount.address} />}
 
-					<div>
-						Please unlock you wallet and make sure that both account and network are selected correctly.
-					</div>
+				{needNetwork && (
+					<GridRowBox>
+						Network
+						<BlockChainLabel blockchain={needNetwork} />
+					</GridRowBox>
+				)}
 
-					{this.props.needAccount && (
-						<div>Account: {truncateInMiddle(this.props.needAccount.address, 16, '..')}</div>
-					)}
-					{this.props.needNetwork && <div>Network: {this.props.needNetwork}</div>}
+				{this.error && <ErrorMessage>{this.error}</ErrorMessage>}
 
-					{this.error && <ErrorMessage>{this.error}</ErrorMessage>}
-
-					<video src={metamaskSwitchVideo} autoPlay loop style={{ width: 300, maxWidth: '100%' }} />
-				</div>
-			</Modal>
+				<div>Please unlock you wallet and make sure that both account and network are selected correctly.</div>
+			</ActionModal>
 		);
 	}
 }
