@@ -93,8 +93,12 @@ export async function connectAccount(): Promise<DomainAccount | undefined> {
 				}
 
 				if (currentAccount && wallet.isAccountRegistered(currentAccount)) {
-					const result = await SwitchModal.show('account', wallet);
-					if (!result) return;
+					if (wallet.factory.blockchainGroup === 'evm') {
+						const result = await SwitchModal.show('account', wallet);
+						if (!result) return;
+					} else {
+						await requestSwitchAccount(wallet);
+					}
 
 					currentAccount = await wallet.getCurrentAccount();
 				}
@@ -143,4 +147,18 @@ export async function disconnectAccount(account: DomainAccount) {
 	if (account.wallet.factory.wallet === 'walletconnect') {
 		domain.disconnectWalletConnect();
 	}
+}
+
+export async function requestSwitchAccount(wallet: Wallet) {
+	try {
+		if (wallet.controller.isMultipleAccountsSupported()) {
+			await wallet.controller.requestAuthentication();
+		} else {
+			const account = await wallet.getCurrentAccount();
+			if (account) {
+				await wallet.controller.disconnectAccount(account);
+			}
+			await wallet.controller.requestAuthentication();
+		}
+	} catch (e) {}
 }

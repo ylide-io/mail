@@ -6,6 +6,7 @@ import { PureComponent } from 'react';
 
 import metamaskSwitchVideo from '../../assets/video/metamask-switch.mp4';
 import { Wallet } from '../../stores/models/Wallet';
+import { requestSwitchAccount } from '../../utils/account';
 import { truncateInMiddle } from '../../utils/string';
 import { ErrorMessage } from '../errorMessage/errorMessage';
 import { Modal } from '../modal/modal';
@@ -29,20 +30,6 @@ export class SwitchModal extends PureComponent<SwitchModalProps> {
 		makeObservable(this);
 	}
 
-	async requestSwitch() {
-		try {
-			if (this.props.wallet.controller.isMultipleAccountsSupported()) {
-				await this.props.wallet.controller.requestAuthentication();
-			} else {
-				const acc = await this.props.wallet.getCurrentAccount();
-				if (acc) {
-					await this.props.wallet.controller.disconnectAccount(acc);
-				}
-				await this.props.wallet.controller.requestAuthentication();
-			}
-		} catch (e) {}
-	}
-
 	@autobind
 	handleAccountUpdate(account: IGenericAccount | null) {
 		if (this.props.needAccount !== undefined) {
@@ -50,7 +37,7 @@ export class SwitchModal extends PureComponent<SwitchModalProps> {
 				// this.requestSwitch();
 				// this.error = `You've logged out instead of selecting account. Please, try again`;
 			} else if (account.address !== this.props.needAccount.address) {
-				this.requestSwitch();
+				requestSwitchAccount(this.props.wallet);
 				this.error = `You've selected wrong account. Please, try again`;
 			} else {
 				this.props.onConfirm(true);
@@ -69,7 +56,7 @@ export class SwitchModal extends PureComponent<SwitchModalProps> {
 	handleNetworkUpdate(network: string) {
 		if (this.props.needNetwork !== undefined) {
 			if (network !== this.props.needNetwork) {
-				this.requestSwitch();
+				requestSwitchAccount(this.props.wallet);
 				this.error = `You've selected wrong network. Please, try again`;
 			} else {
 				this.props.onConfirm(true);
@@ -93,7 +80,7 @@ export class SwitchModal extends PureComponent<SwitchModalProps> {
 		} else {
 			this.props.wallet.on('chainUpdate', this.handleNetworkUpdate);
 		}
-		this.requestSwitch();
+		requestSwitchAccount(this.props.wallet);
 	}
 
 	render() {
