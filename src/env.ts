@@ -1,5 +1,6 @@
 export const REACT_APP__FEED_SERVER = process.env.REACT_APP__FEED_SERVER as string | undefined;
 export const REACT_APP__FEED_MANAGER = process.env.REACT_APP__FEED_MANAGER as string | undefined;
+export const REACT_APP__FEED_VENOM = process.env.REACT_APP__FEED_VENOM as string | undefined;
 
 export enum AppMode {
 	HUB = 'HUB',

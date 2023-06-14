@@ -1,9 +1,10 @@
+import { IMessage } from '@ylide/sdk';
 import { observer } from 'mobx-react';
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { generatePath, useLocation, useParams } from 'react-router-dom';
 
 import { FeedCategory, FeedServerApi } from '../../../api/feedServerApi';
-import { VenomFilterApi } from '../../../api/venomFilterApi';
+import { IVenomFeedPost, VenomFilterApi } from '../../../api/venomFilterApi';
 import { ActionButton, ActionButtonLook, ActionButtonSize } from '../../../components/ActionButton/ActionButton';
 import { ErrorMessage, ErrorMessageLook } from '../../../components/errorMessage/errorMessage';
 import { NarrowContent } from '../../../components/genericLayout/content/narrowContent/narrowContent';
@@ -18,7 +19,7 @@ import { FeedStore, getFeedCategoryName } from '../../../stores/Feed';
 import { ILinkedMessage, MailList } from '../../../stores/MailList';
 import { RoutePath } from '../../../stores/routePath';
 import { connectAccount } from '../../../utils/account';
-import { decodeMessage } from '../../../utils/mail';
+import { decodeBroadcastContent, decodeMessage } from '../../../utils/mail';
 import { useIsInViewport } from '../../../utils/ui';
 import { useNav } from '../../../utils/url';
 import { CreatePostForm } from '../components/createPostForm/createPostForm';
@@ -172,91 +173,243 @@ const RegularFeedContent = observer(() => {
 	);
 });
 
-const VenomFeedContent = observer(() => {
-	const venomAccounts = useVenomAccounts();
+const useVenomChain = false;
 
-	const [rebuildMailListCounter, setRebuildMailListCounter] = useState(1);
-	const mailList = useMemo(() => {
-		// Senceless code to make IDE treat this var as dependency
-		isNaN(rebuildMailListCounter);
+let VenomFeedContent: () => JSX.Element;
 
-		const mailList = new MailList<{ message: ILinkedMessage; decoded: IMessageDecodedContent }>();
+if (useVenomChain) {
+	VenomFeedContent = observer(() => {
+		const venomAccounts = useVenomAccounts();
 
-		mailList.init({
-			messagesFilter: async messages => {
-				const ids = messages.map(m => m.msgId);
-				const { bannedPosts } = await VenomFilterApi.getPostsStatus({ ids });
-				return messages.filter(m => !bannedPosts.includes(m.msgId));
-			},
-			messageHandler: async message => ({
-				message,
-				decoded: await decodeMessage(message.msgId, message.msg),
-			}),
-			venomFeed: true,
+		const [rebuildMailListCounter, setRebuildMailListCounter] = useState(1);
+		const mailList = useMemo(() => {
+			// Senceless code to make IDE treat this var as dependency
+			isNaN(rebuildMailListCounter);
+
+			const mailList = new MailList<{ message: ILinkedMessage; decoded: IMessageDecodedContent }>();
+
+			mailList.init({
+				messagesFilter: async messages => {
+					const ids = messages.map(m => m.msgId);
+					const { bannedPosts } = await VenomFilterApi.getPostsStatus({ ids });
+					return messages.filter(m => !bannedPosts.includes(m.msgId));
+				},
+				messageHandler: async message => ({
+					message,
+					decoded: await decodeMessage(message.msgId, message.msg),
+				}),
+				venomFeed: true,
+			});
+
+			return mailList;
+		}, [rebuildMailListCounter]);
+
+		useEffect(() => () => mailList?.destroy(), [mailList]);
+
+		const loadingMoreRef = useRef(null);
+		useIsInViewport({
+			ref: loadingMoreRef,
+			threshold: 100,
+			callback: visible => visible && mailList?.loadNextPage(),
 		});
 
-		return mailList;
-	}, [rebuildMailListCounter]);
+		const renderLoadingError = () => <ErrorMessage>Couldn't load posts.</ErrorMessage>;
 
-	useEffect(() => () => mailList?.destroy(), [mailList]);
-
-	const loadingMoreRef = useRef(null);
-	useIsInViewport({
-		ref: loadingMoreRef,
-		threshold: 100,
-		callback: visible => visible && mailList?.loadNextPage(),
-	});
-
-	const renderLoadingError = () => <ErrorMessage>Couldn't load posts.</ErrorMessage>;
-
-	return (
-		<NarrowContent title="Venom feed">
-			{venomAccounts.length ? (
-				<CreatePostForm
-					className={css.createPostForm}
-					accounts={venomAccounts}
-					onCreated={() => setRebuildMailListCounter(i => i + 1)}
-				/>
-			) : (
-				<ErrorMessage look={ErrorMessageLook.INFO}>
-					<div>Connect your Venom wallet to post messages to Venom feed.</div>
-
-					<ActionButton look={ActionButtonLook.PRIMARY} onClick={() => connectAccount()}>
-						Connect account
-					</ActionButton>
-				</ErrorMessage>
-			)}
-
-			<div className={css.divider} />
-
-			<div className={css.posts}>
-				{mailList?.messages.length ? (
-					<>
-						{mailList.messages.map(message => (
-							<VenomFeedPostItem message={message.message} decoded={message.decoded} />
-						))}
-
-						{mailList.isError
-							? renderLoadingError()
-							: mailList.isNextPageAvailable && (
-									<div ref={loadingMoreRef} className={css.loader}>
-										<YlideLoader reason="Loading more posts ..." />
-									</div>
-							  )}
-					</>
-				) : mailList?.isLoading ? (
-					<div className={css.loader}>
-						<YlideLoader reason="Your feed is loading ..." />
-					</div>
-				) : mailList?.isError ? (
-					renderLoadingError()
+		return (
+			<NarrowContent title="Venom feed">
+				{venomAccounts.length ? (
+					<CreatePostForm
+						className={css.createPostForm}
+						accounts={venomAccounts}
+						onCreated={() => setRebuildMailListCounter(i => i + 1)}
+					/>
 				) : (
-					<ErrorMessage look={ErrorMessageLook.INFO}>No messages yet</ErrorMessage>
+					<ErrorMessage look={ErrorMessageLook.INFO}>
+						<div>Connect your Venom wallet to post messages to Venom feed.</div>
+
+						<ActionButton look={ActionButtonLook.PRIMARY} onClick={() => connectAccount()}>
+							Connect account
+						</ActionButton>
+					</ErrorMessage>
 				)}
-			</div>
-		</NarrowContent>
-	);
-});
+
+				<div className={css.divider} />
+
+				<div className={css.posts}>
+					{mailList?.messages.length ? (
+						<>
+							{mailList.messages.map(message => (
+								<VenomFeedPostItem msg={message.message.msg} decoded={message.decoded} />
+							))}
+
+							{mailList.isError
+								? renderLoadingError()
+								: mailList.isNextPageAvailable && (
+										<div ref={loadingMoreRef} className={css.loader}>
+											<YlideLoader reason="Loading more posts ..." />
+										</div>
+								  )}
+						</>
+					) : mailList?.isLoading ? (
+						<div className={css.loader}>
+							<YlideLoader reason="Your feed is loading ..." />
+						</div>
+					) : mailList?.isError ? (
+						renderLoadingError()
+					) : (
+						<ErrorMessage look={ErrorMessageLook.INFO}>No messages yet</ErrorMessage>
+					)}
+				</div>
+			</NarrowContent>
+		);
+	});
+} else {
+	VenomFeedContent = observer(() => {
+		const venomAccounts = useVenomAccounts();
+
+		const [messages, setMessages] = useState<
+			{ original: IVenomFeedPost; msg: IMessage; decoded: IMessageDecodedContent }[]
+		>([]);
+		const [isLoading, setIsLoading] = useState(false);
+		const [isError, setIsError] = useState(false);
+		const [isNextPageAvailable, setIsNextPageAvailable] = useState(false);
+
+		const reloadFeed = useCallback(async () => {
+			setIsLoading(true);
+			setIsError(false);
+			try {
+				const posts = await VenomFilterApi.getPosts({ beforeTimestamp: 0, withBanned: false });
+				setIsNextPageAvailable(posts.length === 10);
+				setMessages(
+					await Promise.all(
+						posts.map(async p => {
+							const msg: IMessage = {
+								...p.meta,
+								key: new Uint8Array(p.meta.key),
+							};
+							return {
+								original: p,
+								msg,
+								decoded: decodeBroadcastContent(
+									msg.msgId,
+									msg,
+									p.content
+										? p.content.corrupted
+											? p.content
+											: {
+													...p.content,
+													content: new Uint8Array(p.content.content),
+											  }
+										: null,
+								),
+							};
+						}),
+					),
+				);
+				setIsLoading(false);
+			} catch (err) {
+				setIsLoading(false);
+				setIsError(true);
+				console.error(`Couldn't load posts`, err);
+			}
+		}, []);
+
+		const loadNextFeedPage = useCallback(async () => {
+			setIsLoading(true);
+			setIsError(false);
+			try {
+				const posts = await VenomFilterApi.getPosts({
+					beforeTimestamp: messages[messages.length - 1]?.original.createTimestamp,
+					withBanned: false,
+				});
+				setIsNextPageAvailable(posts.length === 10);
+				setMessages(
+					messages.concat(
+						await Promise.all(
+							posts.map(async p => {
+								const msg: IMessage = {
+									...p.meta,
+									key: new Uint8Array(p.meta.key),
+								};
+								return {
+									original: p,
+									msg,
+									decoded: await decodeMessage(msg.msgId, msg),
+								};
+							}),
+						),
+					),
+				);
+				setIsLoading(false);
+			} catch (err) {
+				setIsLoading(false);
+				setIsError(true);
+				console.error(`Couldn't load posts`, err);
+			}
+		}, [messages]);
+
+		useEffect(() => {
+			reloadFeed();
+		}, [reloadFeed]);
+
+		const loadingMoreRef = useRef(null);
+		useIsInViewport({
+			ref: loadingMoreRef,
+			threshold: 100,
+			callback: visible => visible && loadNextFeedPage(),
+		});
+
+		const renderLoadingError = () => <ErrorMessage>Couldn't load posts.</ErrorMessage>;
+
+		return (
+			<NarrowContent title="Venom feed">
+				{venomAccounts.length ? (
+					<CreatePostForm
+						className={css.createPostForm}
+						accounts={venomAccounts}
+						onCreated={() => reloadFeed()}
+					/>
+				) : (
+					<ErrorMessage look={ErrorMessageLook.INFO}>
+						<div>Connect your Venom wallet to post messages to Venom feed.</div>
+
+						<ActionButton look={ActionButtonLook.PRIMARY} onClick={() => connectAccount()}>
+							Connect account
+						</ActionButton>
+					</ErrorMessage>
+				)}
+
+				<div className={css.divider} />
+
+				<div className={css.posts}>
+					{messages.length ? (
+						<>
+							{messages.map(message => (
+								<VenomFeedPostItem msg={message.msg} decoded={message.decoded} />
+							))}
+
+							{isError
+								? renderLoadingError()
+								: isNextPageAvailable && (
+										<div ref={loadingMoreRef} className={css.loader}>
+											<YlideLoader reason="Loading more posts ..." />
+										</div>
+								  )}
+						</>
+					) : isLoading ? (
+						<div className={css.loader}>
+							<YlideLoader reason="Your feed is loading ..." />
+						</div>
+					) : isError ? (
+						renderLoadingError()
+					) : (
+						<ErrorMessage look={ErrorMessageLook.INFO}>No messages yet</ErrorMessage>
+					)}
+				</div>
+			</NarrowContent>
+		);
+	});
+}
 
 //
 

@@ -1,4 +1,4 @@
-import { MessageAttachmentLinkV1 } from '@ylide/sdk';
+import { IMessage, MessageAttachmentLinkV1 } from '@ylide/sdk';
 import React, { useMemo, useRef, useState } from 'react';
 
 import { VenomFilterApi } from '../../../../api/venomFilterApi';
@@ -15,18 +15,17 @@ import { ReactComponent as ExternalSvg } from '../../../../icons/ic20/external.s
 import { ReactComponent as MenuSvg } from '../../../../icons/ic20/menu.svg';
 import { IMessageDecodedContent, MessageDecodedTextDataType } from '../../../../indexedDB/IndexedDB';
 import { browserStorage } from '../../../../stores/browserStorage';
-import { ILinkedMessage } from '../../../../stores/MailList';
 import { HorizontalAlignment } from '../../../../utils/alignment';
 import { ipfsToHttpUrl } from '../../../../utils/ipfs';
 import { PostItemContainer } from '../postItemContainer/postItemContainer';
 import css from './venomFeedPostItem.module.scss';
 
 interface VenomFeedPostItemProps {
-	message: ILinkedMessage;
+	msg: IMessage;
 	decoded: IMessageDecodedContent;
 }
 
-export function VenomFeedPostItem({ message, decoded: { decodedTextData, attachments } }: VenomFeedPostItemProps) {
+export function VenomFeedPostItem({ msg, decoded: { decodedTextData, attachments } }: VenomFeedPostItemProps) {
 	const decodedText = useMemo(
 		() =>
 			decodedTextData.type === MessageDecodedTextDataType.PLAIN
@@ -44,7 +43,7 @@ export function VenomFeedPostItem({ message, decoded: { decodedTextData, attachm
 
 	const banPost = () => {
 		if (confirm('Are you sure?')) {
-			VenomFilterApi.banPost({ ids: [message.msgId] })
+			VenomFilterApi.banPost({ ids: [msg.msgId] })
 				.then(() => {
 					toast('Banned 🔥');
 					setBanned(true);
@@ -57,7 +56,7 @@ export function VenomFeedPostItem({ message, decoded: { decodedTextData, attachm
 	};
 
 	const unbanPost = () => {
-		VenomFilterApi.unbanPost({ ids: [message.msgId] })
+		VenomFilterApi.unbanPost({ ids: [msg.msgId] })
 			.then(() => {
 				toast('Un-banned 🔥');
 				setBanned(false);
@@ -70,18 +69,18 @@ export function VenomFeedPostItem({ message, decoded: { decodedTextData, attachm
 
 	return (
 		<PostItemContainer collapsable className={css.root}>
-			<Avatar className={css.ava} blockie={message.msg.senderAddress} />
+			<Avatar className={css.ava} blockie={msg.senderAddress} />
 
 			<div className={css.meta}>
-				<AdaptiveAddress className={css.sender} maxLength={12} address={message.msg.senderAddress} />
+				<AdaptiveAddress className={css.sender} maxLength={12} address={msg.senderAddress} />
 
 				<div className={css.metaRight}>
-					<ReadableDate className={css.date} value={message.msg.createdAt * 1000} />
+					<ReadableDate className={css.date} value={msg.createdAt * 1000} />
 
-					{!!message.msg.$$meta.id && (
+					{!!msg.$$meta.id && (
 						<a
 							className={css.metaButton}
-							href={`https://testnet.venomscan.com/messages/${message.msg.$$meta.id}`}
+							href={`https://testnet.venomscan.com/messages/${msg.$$meta.id}`}
 							target="_blank"
 							rel="noreferrer"
 							title="Details"

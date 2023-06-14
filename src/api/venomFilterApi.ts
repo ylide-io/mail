@@ -1,7 +1,20 @@
+import { ITVMMessage } from '@ylide/everscale';
+import { IMessageContent, IMessageCorruptedContent } from '@ylide/sdk';
+
+import { REACT_APP__FEED_VENOM } from '../env';
 import { invariant } from '../utils/assert';
 import { createCleanSerachParams } from '../utils/url';
 
 const SECRET_QUERY = { secret: 'yollo' };
+
+export interface IVenomFeedPost {
+	id: string;
+	createTimestamp: number;
+	sender: string;
+	meta: Exclude<ITVMMessage, 'key'> & { key: number[] };
+	content: IMessageCorruptedContent | (Exclude<IMessageContent, 'content'> & { content: number[] }) | null;
+	banned: boolean;
+}
 
 export namespace VenomFilterApi {
 	async function request<Data = string>(
@@ -11,7 +24,9 @@ export namespace VenomFilterApi {
 		const query = Object.assign({}, opts?.query);
 
 		const response = await fetch(
-			`https://vfl.ylide.io${path}?${query ? createCleanSerachParams(query) : ''}`,
+			`${REACT_APP__FEED_VENOM || `https://venom.ylide.io`}${path}?${
+				query ? createCleanSerachParams(query) : ''
+			}`,
 			opts?.params,
 		);
 		invariant(response.status >= 200 && response.status < 300, 'Request failed');
@@ -40,6 +55,12 @@ export namespace VenomFilterApi {
 			params: {
 				method: 'DELETE',
 			},
+		});
+	}
+
+	export async function getPosts(params: { beforeTimestamp: number; withBanned?: boolean }) {
+		return await request<IVenomFeedPost[]>('/posts', {
+			query: { beforeTimestamp: params.beforeTimestamp, withBanned: params.withBanned },
 		});
 	}
 }

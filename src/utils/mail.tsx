@@ -8,6 +8,8 @@ import { IMessageDecodedContent, IMessageDecodedTextData, MessageDecodedTextData
 import {
 	IGenericAccount,
 	IMessage,
+	IMessageContent,
+	IMessageCorruptedContent,
 	IYMFTagNode,
 	MessageAttachmentLinkV1,
 	MessageAttachmentType,
@@ -189,6 +191,30 @@ async function getMessageContent(msg: IMessage) {
 	const content = await domain.ylide.core.getMessageContent(msg);
 	invariant(content && !content.corrupted, 'Content is not available or corrupted');
 	return content;
+}
+
+export function decodeBroadcastContent(
+	msgId: string,
+	msg: IMessage,
+	content: IMessageContent | IMessageCorruptedContent | null,
+): IMessageDecodedContent {
+	invariant(content && !content.corrupted, 'Content is not available or corrupted');
+	const result = domain.ylide.core.decryptBroadcastContent(msg, content);
+	return {
+		msgId,
+		decodedSubject: result.content.subject,
+		decodedTextData:
+			result.content.content instanceof YMF
+				? {
+						type: MessageDecodedTextDataType.YMF,
+						value: result.content.content,
+				  }
+				: {
+						type: MessageDecodedTextDataType.PLAIN,
+						value: result.content.content,
+				  },
+		attachments: result.content instanceof MessageContentV4 ? result.content.attachments : [],
+	};
 }
 
 export async function decodeMessage(
