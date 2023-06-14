@@ -63,4 +63,8 @@ export namespace VenomFilterApi {
 			query: { beforeTimestamp: params.beforeTimestamp, withBanned: params.withBanned },
 		});
 	}
+
+	export async function getTextIdea() {
+		return await request<string>('/get-idea');
+	}
 }
