@@ -2,6 +2,7 @@ import { EthereumBlockchainController } from '@ylide/ethereum';
 import { EverscaleBlockchainController } from '@ylide/everscale';
 import {
 	AbstractBlockchainController,
+	asyncDelay,
 	BlockchainSourceType,
 	IBlockchainSourceSubject,
 	IMessage,
@@ -118,6 +119,9 @@ export class MailList<M = ILinkedMessage> {
 		mailbox?: { accounts: DomainAccount[]; folderId: FolderId; sender?: string; filter?: (id: string) => boolean };
 		venomFeed?: boolean;
 	}) {
+		// hotfix https://trello.com/c/sEtvpbrG
+		await asyncDelay(100);
+
 		const { messagesFilter, messageHandler, mailbox, venomFeed } = props;
 
 		this.messagesFilter = messagesFilter;
@@ -200,7 +204,7 @@ export class MailList<M = ILinkedMessage> {
 
 		this.stream.on('messages', this.onNewMessages);
 
-		await this.stream.resume().then(() => {
+		await this.stream.resume().then(async () => {
 			if (this.isDestroyed) return;
 			this.loadNextPage();
 		});
