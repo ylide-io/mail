@@ -1,4 +1,5 @@
-import WalletConnectProvider from '@walletconnect/web3-provider';
+import { EthereumProvider } from '@walletconnect/ethereum-provider';
+import { getAccountsFromNamespaces } from '@walletconnect/utils';
 import {
 	EthereumWalletController,
 	EVM_CHAINS,
@@ -152,11 +153,15 @@ export class Domain {
 
 	@observable walletConnectState:
 		| { loading: true }
-		| { loading: false; connected: true; walletName: string; provider: any }
-		| { loading: false; connected: false; url: string; onConnect: Promise<{ walletName: string; provider: any }> } =
-		{
-			loading: true,
-		};
+		| {
+				loading: false;
+				connected: true;
+				walletName: string;
+				provider: any;
+		  }
+		| { loading: false; connected: false; url: string } = {
+		loading: true,
+	};
 
 	genericNameServices: { blockchain: string; service: AbstractNameService }[] = [
 		{ blockchain: 'ETHEREUM', service: new NFT3NameService() },
@@ -365,7 +370,7 @@ export class Domain {
 			return;
 		}
 
-		const rpcsData = {
+		const rpcMap = {
 			[EVM_CHAINS[EVMNetwork.ETHEREUM]]: EVM_RPCS[EVMNetwork.ETHEREUM].find(r => !r.rpc.startsWith('ws'))!.rpc,
 			[EVM_CHAINS[EVMNetwork.AVALANCHE]]: EVM_RPCS[EVMNetwork.AVALANCHE].find(r => !r.rpc.startsWith('ws'))!.rpc,
 			[EVM_CHAINS[EVMNetwork.ARBITRUM]]: EVM_RPCS[EVMNetwork.ARBITRUM].find(r => !r.rpc.startsWith('ws'))!.rpc,
@@ -373,78 +378,106 @@ export class Domain {
 			[EVM_CHAINS[EVMNetwork.OPTIMISM]]: EVM_RPCS[EVMNetwork.OPTIMISM].find(r => !r.rpc.startsWith('ws'))!.rpc,
 			[EVM_CHAINS[EVMNetwork.POLYGON]]: EVM_RPCS[EVMNetwork.POLYGON].find(r => !r.rpc.startsWith('ws'))!.rpc,
 			[EVM_CHAINS[EVMNetwork.FANTOM]]: EVM_RPCS[EVMNetwork.FANTOM].find(r => !r.rpc.startsWith('ws'))!.rpc,
-			[EVM_CHAINS[EVMNetwork.KLAYTN]]: EVM_RPCS[EVMNetwork.KLAYTN].find(r => !r.rpc.startsWith('ws'))!.rpc,
-			[EVM_CHAINS[EVMNetwork.GNOSIS]]: EVM_RPCS[EVMNetwork.GNOSIS].find(r => !r.rpc.startsWith('ws'))!.rpc,
 			[EVM_CHAINS[EVMNetwork.AURORA]]: EVM_RPCS[EVMNetwork.AURORA].find(r => !r.rpc.startsWith('ws'))!.rpc,
 			[EVM_CHAINS[EVMNetwork.CELO]]: EVM_RPCS[EVMNetwork.CELO].find(r => !r.rpc.startsWith('ws'))!.rpc,
 			[EVM_CHAINS[EVMNetwork.CRONOS]]: EVM_RPCS[EVMNetwork.CRONOS].find(r => !r.rpc.startsWith('ws'))!.rpc,
-			[EVM_CHAINS[EVMNetwork.MOONBEAM]]: EVM_RPCS[EVMNetwork.MOONBEAM].find(r => !r.rpc.startsWith('ws'))!.rpc,
-			[EVM_CHAINS[EVMNetwork.MOONRIVER]]: EVM_RPCS[EVMNetwork.MOONRIVER].find(r => !r.rpc.startsWith('ws'))!.rpc,
-			[EVM_CHAINS[EVMNetwork.METIS]]: EVM_RPCS[EVMNetwork.METIS].find(r => !r.rpc.startsWith('ws'))!.rpc,
-			[EVM_CHAINS[EVMNetwork.ASTAR]]: EVM_RPCS[EVMNetwork.ASTAR].find(r => !r.rpc.startsWith('ws'))!.rpc,
+			// TODO: Not supported bt WC2 - error: Requested chains are not supported
+			// [EVM_CHAINS[EVMNetwork.KLAYTN]]: EVM_RPCS[EVMNetwork.KLAYTN].find(r => !r.rpc.startsWith('ws'))!.rpc,
+			// [EVM_CHAINS[EVMNetwork.GNOSIS]]: EVM_RPCS[EVMNetwork.GNOSIS].find(r => !r.rpc.startsWith('ws'))!.rpc,
+			// [EVM_CHAINS[EVMNetwork.MOONBEAM]]: EVM_RPCS[EVMNetwork.MOONBEAM].find(r => !r.rpc.startsWith('ws'))!.rpc,
+			// [EVM_CHAINS[EVMNetwork.MOONRIVER]]: EVM_RPCS[EVMNetwork.MOONRIVER].find(r => !r.rpc.startsWith('ws'))!.rpc,
+			// [EVM_CHAINS[EVMNetwork.METIS]]: EVM_RPCS[EVMNetwork.METIS].find(r => !r.rpc.startsWith('ws'))!.rpc,
+			// [EVM_CHAINS[EVMNetwork.ASTAR]]: EVM_RPCS[EVMNetwork.ASTAR].find(r => !r.rpc.startsWith('ws'))!.rpc,
 		};
 
+		const chains = Object.keys(rpcMap).map(Number);
+		console.log(chains);
 		let isAvailable = true;
-
-		const wcTest = new WalletConnectProvider({
-			rpc: rpcsData,
-			qrcodeModal: {
-				async open(uri, cb, opts?) {
-					// fired this method? means disconnected
-					isAvailable = false;
-					cb();
-				},
-				close() {
-					// will not be fired in test mode
-				},
-			},
+		const wcTest = await EthereumProvider.init({
+			projectId: 'd6c2e9408725b77204b9e628d482e980',
+			chains,
+			rpcMap,
+			showQrModal: true,
 		});
-
+		wcTest.modal?.subscribeModal(({ open }: { open: boolean }) => {
+			if (open) {
+				wcTest.modal?.closeModal();
+				isAvailable = false;
+			}
+		});
 		try {
 			await wcTest.enable();
 		} catch (err) {
-			// no-op
+			isAvailable = false;
 		}
 
 		if (isAvailable) {
 			domain.walletConnectState = {
 				loading: false,
 				connected: true,
-				walletName: wcTest.wc.peerMeta?.name || '',
+				walletName: wcTest.namespace,
 				provider: wcTest,
 			};
-			// console.log('wallet connect available on start: ', wcTest);
 			await this.extractWalletsData();
 		} else {
-			let resolve = (val: { walletName: string; provider: any }) => {};
 			const self = this;
-			const wcReal = new WalletConnectProvider({
-				rpc: rpcsData,
-				qrcodeModal: {
-					async open(uri, cb, opts?) {
-						domain.walletConnectState = {
-							loading: false,
-							connected: false,
-							url: uri,
-							onConnect: new Promise<{ walletName: string; provider: any }>(_resolve => {
-								resolve = _resolve;
-							}),
-						};
-						// console.log('a5: ', toJS(domain.walletConnectState));
-					},
-					async close() {
-						domain.walletConnectState = {
-							loading: false,
-							connected: true,
-							walletName: wcReal.wc.peerMeta?.name || '',
-							provider: wcReal,
-						};
-						// console.log('wallet connect close (good close): ', wcReal);
-						await self.extractWalletsData();
-						resolve({ walletName: wcReal.wc.peerMeta?.name || '', provider: wcReal });
-					},
-				},
+			const wcReal = await EthereumProvider.init({
+				projectId: 'd6c2e9408725b77204b9e628d482e980',
+				chains,
+				rpcMap,
+				showQrModal: false,
 			});
+			wcReal.on('display_uri', url => {
+				domain.walletConnectState = {
+					loading: false,
+					connected: false,
+					url,
+				};
+			});
+			wcReal.on('connect', async ({ chainId }) => {
+				domain.walletConnectState = {
+					loading: false,
+					connected: true,
+					walletName: wcReal.namespace,
+					provider: wcReal,
+				};
+				await self.extractWalletsData();
+				setTimeout(() => {
+					// @ts-ignore
+					const d = window.domain as Domain;
+					if ('provider' in d.walletConnectState) {
+						console.log(d.walletConnectState.provider.session);
+						console.log(d.walletConnectState.provider.namespace);
+						console.log(
+							getAccountsFromNamespaces(
+								d.walletConnectState.provider.session.namespaces,
+								d.walletConnectState.provider.namespace,
+							),
+						);
+					}
+				}, 5000);
+			});
+			const events = [
+				'connect',
+				'disconnect',
+				'message',
+				'chainChanged',
+				'accountsChanged',
+				'session_delete',
+				'session_event',
+				'session_update',
+				'display_uri',
+			];
+
+			for (const event of events) {
+				// @ts-ignore
+				wcReal.on(event, args => {
+					console.log('=========');
+					console.log(event + ': ' + args);
+					console.log(args);
+					console.log('=========');
+				});
+			}
 
 			wcReal
 				.enable()

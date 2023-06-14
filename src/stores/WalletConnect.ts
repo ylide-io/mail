@@ -1,4 +1,3 @@
-import { IAppRegistry } from '@walletconnect/types';
 import { computed, observable } from 'mobx';
 
 export interface WalletInterface {
@@ -42,7 +41,7 @@ export interface WalletInterface {
 }
 
 class WalletConnectStore {
-	registry: IAppRegistry = {};
+	registry: any = {};
 
 	@observable wallets: WalletInterface[] = [];
 	@observable loaded = false;
