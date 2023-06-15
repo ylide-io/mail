@@ -6,14 +6,10 @@ import { AccountSelect } from '../../../../components/accountSelect/accountSelec
 import { ActionButton, ActionButtonLook, ActionButtonSize } from '../../../../components/ActionButton/ActionButton';
 import { AutoSizeTextArea } from '../../../../components/autoSizeTextArea/autoSizeTextArea';
 import { PropsWithClassName } from '../../../../components/props';
-import { Spinner } from '../../../../components/spinner/spinner';
 import { toast } from '../../../../components/toast/toast';
 import { VENOM_FEED_ID } from '../../../../constants';
-import { ReactComponent as TrashSvg } from '../../../../icons/ic20/trash.svg';
-import { ReactComponent as ImageSvg } from '../../../../icons/ic28/image.svg';
 import { DomainAccount } from '../../../../stores/models/DomainAccount';
 import { OutgoingMailData, OutgoingMailDataMode } from '../../../../stores/outgoingMailData';
-import { openFilePicker, readFileAsDataURL } from '../../../../utils/file';
 import { SendMailButton } from '../../../mail/components/composeMailForm/sendMailButton/sendMailButton';
 import css from './createPostForm.module.scss';
 
@@ -52,40 +48,6 @@ export const CreatePostForm = observer(({ className, accounts, onCreated }: Crea
 
 	const [expanded, setExpanded] = useState(false);
 
-	const [preview, setPreview] = useState('');
-	const [previewLoading, setPreviewLoading] = useState(false);
-
-	const attachFile = async () => {
-		const files = await openFilePicker({ accept: 'image/png, image/jpeg' });
-		const file = files[0];
-		if (file) {
-			setPreview('');
-			setPreviewLoading(true);
-
-			function success(src: string) {
-				setPreview(src);
-				setPreviewLoading(false);
-				mailData.attachments = [file];
-			}
-
-			function error() {
-				setPreviewLoading(false);
-				mailData.attachments = [];
-				toast("Couldn't load the image 😒");
-			}
-
-			try {
-				const src = await readFileAsDataURL(file);
-				const img = document.createElement('img');
-				img.onload = () => success(src);
-				img.onerror = error;
-				img.src = src;
-			} catch (e) {
-				error();
-			}
-		}
-	};
-
 	const onSent = () => {
 		mailData.reset({
 			mode: OutgoingMailDataMode.BROADCAST,
@@ -93,7 +55,6 @@ export const CreatePostForm = observer(({ className, accounts, onCreated }: Crea
 			from: mailData.from,
 		});
 
-		setPreview('');
 		setExpanded(false);
 
 		onCreated?.();
@@ -117,18 +78,6 @@ export const CreatePostForm = observer(({ className, accounts, onCreated }: Crea
 
 			{expanded ? (
 				<>
-					{(!!preview || previewLoading) && (
-						<>
-							<div className={css.divider} />
-
-							{previewLoading ? (
-								<Spinner className={css.previewLoader} />
-							) : (
-								<img className={css.previewImage} alt="Preview" src={preview} />
-							)}
-						</>
-					)}
-
 					<div className={css.divider} />
 
 					<div className={css.footer}>
@@ -140,32 +89,7 @@ export const CreatePostForm = observer(({ className, accounts, onCreated }: Crea
 						/>
 
 						<div className={css.footerRight}>
-							{mailData.attachments.length ? (
-								<ActionButton
-									isDisabled={mailData.sending}
-									size={ActionButtonSize.MEDIUM}
-									look={ActionButtonLook.DANGEROUS}
-									icon={<TrashSvg />}
-									title="Remove attachment"
-									onClick={() => {
-										setPreview('');
-										mailData.attachments = [];
-									}}
-								>
-									Attachment
-								</ActionButton>
-							) : (
-								<ActionButton
-									isDisabled={previewLoading || mailData.sending}
-									size={ActionButtonSize.MEDIUM}
-									look={ActionButtonLook.LITE}
-									icon={<ImageSvg />}
-									title="Attach image"
-									onClick={attachFile}
-								/>
-							)}
-
-							<SendMailButton disabled={previewLoading} mailData={mailData} onSent={onSent} />
+							<SendMailButton mailData={mailData} onSent={onSent} />
 						</div>
 					</div>
 				</>
