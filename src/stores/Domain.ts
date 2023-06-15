@@ -381,21 +381,28 @@ export class Domain {
 			[EVM_CHAINS[EVMNetwork.AURORA]]: EVM_RPCS[EVMNetwork.AURORA].find(r => !r.rpc.startsWith('ws'))!.rpc,
 			[EVM_CHAINS[EVMNetwork.CELO]]: EVM_RPCS[EVMNetwork.CELO].find(r => !r.rpc.startsWith('ws'))!.rpc,
 			[EVM_CHAINS[EVMNetwork.CRONOS]]: EVM_RPCS[EVMNetwork.CRONOS].find(r => !r.rpc.startsWith('ws'))!.rpc,
-			// TODO: Not supported bt WC2 - error: Requested chains are not supported
+
+			// TODO: Add after WalletConnect fix: error: Requested chains are not supported.
+			// Opened issue - https://github.com/WalletConnect/walletconnect-monorepo/issues/2643
+
 			// [EVM_CHAINS[EVMNetwork.KLAYTN]]: EVM_RPCS[EVMNetwork.KLAYTN].find(r => !r.rpc.startsWith('ws'))!.rpc,
 			// [EVM_CHAINS[EVMNetwork.GNOSIS]]: EVM_RPCS[EVMNetwork.GNOSIS].find(r => !r.rpc.startsWith('ws'))!.rpc,
 			// [EVM_CHAINS[EVMNetwork.MOONBEAM]]: EVM_RPCS[EVMNetwork.MOONBEAM].find(r => !r.rpc.startsWith('ws'))!.rpc,
 			// [EVM_CHAINS[EVMNetwork.MOONRIVER]]: EVM_RPCS[EVMNetwork.MOONRIVER].find(r => !r.rpc.startsWith('ws'))!.rpc,
+
+			// TODO: those networks are not supported according to https://docs.walletconnect.com/2.0/advanced/multichain/chain-list
+
 			// [EVM_CHAINS[EVMNetwork.METIS]]: EVM_RPCS[EVMNetwork.METIS].find(r => !r.rpc.startsWith('ws'))!.rpc,
 			// [EVM_CHAINS[EVMNetwork.ASTAR]]: EVM_RPCS[EVMNetwork.ASTAR].find(r => !r.rpc.startsWith('ws'))!.rpc,
 		};
 
 		const chains = Object.keys(rpcMap).map(Number);
-		console.log(chains);
 		let isAvailable = true;
 		const wcTest = await EthereumProvider.init({
 			projectId: 'd6c2e9408725b77204b9e628d482e980',
 			chains,
+			// TODO: remove after fix by WalletConnect - https://github.com/WalletConnect/walletconnect-monorepo/issues/2641
+			optionalChains: [100500],
 			rpcMap,
 			showQrModal: true,
 		});
@@ -415,7 +422,7 @@ export class Domain {
 			domain.walletConnectState = {
 				loading: false,
 				connected: true,
-				walletName: wcTest.namespace,
+				walletName: wcTest.session?.peer.metadata.name || '',
 				provider: wcTest,
 			};
 			await this.extractWalletsData();
@@ -424,6 +431,8 @@ export class Domain {
 			const wcReal = await EthereumProvider.init({
 				projectId: 'd6c2e9408725b77204b9e628d482e980',
 				chains,
+				// TODO: remove after fix by WalletConnect - https://github.com/WalletConnect/walletconnect-monorepo/issues/2641
+				optionalChains: [100500],
 				rpcMap,
 				showQrModal: false,
 			});
@@ -438,46 +447,11 @@ export class Domain {
 				domain.walletConnectState = {
 					loading: false,
 					connected: true,
-					walletName: wcReal.namespace,
+					walletName: wcReal.session?.peer.metadata.name || '',
 					provider: wcReal,
 				};
 				await self.extractWalletsData();
-				setTimeout(() => {
-					// @ts-ignore
-					const d = window.domain as Domain;
-					if ('provider' in d.walletConnectState) {
-						console.log(d.walletConnectState.provider.session);
-						console.log(d.walletConnectState.provider.namespace);
-						console.log(
-							getAccountsFromNamespaces(
-								d.walletConnectState.provider.session.namespaces,
-								d.walletConnectState.provider.namespace,
-							),
-						);
-					}
-				}, 5000);
 			});
-			const events = [
-				'connect',
-				'disconnect',
-				'message',
-				'chainChanged',
-				'accountsChanged',
-				'session_delete',
-				'session_event',
-				'session_update',
-				'display_uri',
-			];
-
-			for (const event of events) {
-				// @ts-ignore
-				wcReal.on(event, args => {
-					console.log('=========');
-					console.log(event + ': ' + args);
-					console.log(args);
-					console.log('=========');
-				});
-			}
 
 			wcReal
 				.enable()
