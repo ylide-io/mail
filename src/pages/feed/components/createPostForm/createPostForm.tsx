@@ -24,18 +24,6 @@ import { hashToIpfsUrl, ipfsToHttpUrl } from '../../../../utils/ipfs';
 import { SendMailButton } from '../../../mail/components/composeMailForm/sendMailButton/sendMailButton';
 import css from './createPostForm.module.scss';
 
-const stickerIpfsIds = [
-	'QmeXyjgDKFYTjnHZ3Aw3pmsYZmBBXwR7GmnooKJruCXPBb',
-	'QmcoCy3NRmLUrKqVwK3b4AxM4ZuuwCADECQ3t52wHj65rV',
-	'QmSVgrVnbX91n2VEEEgHdaGVCnGokNnoLmnXUiDuFyiUy1',
-	'QmbTfqQgspytbRPcL2KD7JK7JJkm6Up6hGhBsk96FrrsJy',
-	'QmYj9HrD21KYkomc4MDEEAMzsYbEHNT1TyertEri79QeLP',
-];
-
-stickerIpfsIds.push(...stickerIpfsIds);
-stickerIpfsIds.push(...stickerIpfsIds);
-stickerIpfsIds.push(...stickerIpfsIds);
-
 export interface CreatePostFormProps extends PropsWithClassName {
 	accounts: DomainAccount[];
 	onCreated?: () => void;
@@ -177,6 +165,9 @@ export const CreatePostForm = observer(({ className, accounts, onCreated }: Crea
 										className={css.stickerPopup}
 										anchorRef={stickerButtonRef}
 										horizontalAlign={HorizontalAlignment.END}
+										alignerOptions={{
+											fitLeftToViewport: true,
+										}}
 										onCloseRequest={() => setStickerPopupOpen(false)}
 									>
 										<div className={css.stickerPopupContent}>
@@ -217,3 +208,17 @@ export const CreatePostForm = observer(({ className, accounts, onCreated }: Crea
 		</div>
 	);
 });
+
+//
+
+const stickerIpfsIds = [
+	'QmeXyjgDKFYTjnHZ3Aw3pmsYZmBBXwR7GmnooKJruCXPBb',
+	'QmcoCy3NRmLUrKqVwK3b4AxM4ZuuwCADECQ3t52wHj65rV',
+	'QmSVgrVnbX91n2VEEEgHdaGVCnGokNnoLmnXUiDuFyiUy1',
+	'QmbTfqQgspytbRPcL2KD7JK7JJkm6Up6hGhBsk96FrrsJy',
+	'QmYj9HrD21KYkomc4MDEEAMzsYbEHNT1TyertEri79QeLP',
+];
+
+stickerIpfsIds.push(...stickerIpfsIds);
+stickerIpfsIds.push(...stickerIpfsIds);
+stickerIpfsIds.push(...stickerIpfsIds);
