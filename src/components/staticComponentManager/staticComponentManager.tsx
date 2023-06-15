@@ -4,13 +4,21 @@ import { Fragment, ReactNode } from 'react';
 
 let keyCounter = 0;
 
-const staticComponents = observable<{ node: ReactNode; resolve: (data?: any) => void; singletonKey?: string }>([], {
+const staticComponents = observable<{
+	node: ReactNode;
+	resolve: (data?: any) => void;
+	singletonKey?: StaticComponentSingletonKey;
+}>([], {
 	deep: false,
 });
 
+export enum StaticComponentSingletonKey {
+	COMPOSE_MAIL_POPUP = 'COMPOSE_MAIL_POPUP',
+}
+
 export function showStaticComponent<Result = undefined>(
 	factory: (resolve: (data?: Result) => void) => ReactNode,
-	options?: { singletonKey?: string },
+	options?: { singletonKey?: StaticComponentSingletonKey },
 ) {
 	return new Promise<Result | undefined>(resolve => {
 		if (options?.singletonKey) {

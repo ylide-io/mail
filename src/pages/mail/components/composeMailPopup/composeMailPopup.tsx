@@ -15,8 +15,6 @@ import { useOnMountAnimation } from '../../../../utils/useOnMountAnimation';
 import { ComposeMailForm } from '../composeMailForm/composeMailForm';
 import css from './composeMailPopup.module.scss';
 
-export const COMPOSE_MAIL_POPUP_SINGLETON_KEY = 'COMPOSE_MAIL_POPUP';
-
 export interface ComposeMailPopupProps {
 	mailData: OutgoingMailData;
 	onClose?: () => void;

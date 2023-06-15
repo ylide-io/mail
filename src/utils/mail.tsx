@@ -29,11 +29,11 @@ import { globalOutgoingMailData, OutgoingMailData } from '../stores/outgoingMail
 import { RoutePath } from '../stores/routePath';
 import { browserStorage } from '../stores/browserStorage';
 import { WidgetId } from '../pages/widgets/widgets';
-import { showStaticComponent } from '../components/staticComponentManager/staticComponentManager';
 import {
-	COMPOSE_MAIL_POPUP_SINGLETON_KEY,
-	ComposeMailPopup,
-} from '../pages/mail/components/composeMailPopup/composeMailPopup';
+	showStaticComponent,
+	StaticComponentSingletonKey,
+} from '../components/staticComponentManager/staticComponentManager';
+import { ComposeMailPopup } from '../pages/mail/components/composeMailPopup/composeMailPopup';
 import { invariant } from './assert';
 import domain from '../stores/Domain';
 import { DomainAccount } from '../stores/models/DomainAccount';
@@ -42,6 +42,7 @@ import { analytics } from '../stores/Analytics';
 import { readFileAsArrayBuffer } from './file';
 import { getEvmWalletNetwork } from './wallet';
 import { VENOM_SERVICE_CODE } from '../constants';
+import { useCallback } from 'react';
 
 export async function sendMessage({
 	sender,
@@ -534,17 +535,20 @@ export function useOpenMailCopmpose() {
 	const location = useLocation();
 	const navigate = useNav();
 
-	return ({ mailData }: { mailData?: OutgoingMailData } = {}) => {
-		if (location.pathname !== generatePath(RoutePath.MAIL_COMPOSE)) {
-			if (browserStorage.widgetId === WidgetId.MAILBOX) {
-				globalOutgoingMailData.reset(mailData);
-				navigate(generatePath(RoutePath.MAIL_COMPOSE));
-			} else {
-				showStaticComponent(
-					resolve => <ComposeMailPopup mailData={mailData || new OutgoingMailData()} onClose={resolve} />,
-					{ singletonKey: COMPOSE_MAIL_POPUP_SINGLETON_KEY },
-				);
+	return useCallback(
+		({ mailData }: { mailData?: OutgoingMailData } = {}) => {
+			if (location.pathname !== generatePath(RoutePath.MAIL_COMPOSE)) {
+				if (browserStorage.widgetId === WidgetId.MAILBOX) {
+					globalOutgoingMailData.reset(mailData);
+					navigate(generatePath(RoutePath.MAIL_COMPOSE));
+				} else {
+					showStaticComponent(
+						resolve => <ComposeMailPopup mailData={mailData || new OutgoingMailData()} onClose={resolve} />,
+						{ singletonKey: StaticComponentSingletonKey.COMPOSE_MAIL_POPUP },
+					);
+				}
 			}
-		}
-	};
+		},
+		[location.pathname, navigate],
+	);
 }
