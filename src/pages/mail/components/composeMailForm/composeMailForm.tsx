@@ -33,12 +33,12 @@ export const ComposeMailForm = observer(
 		async function attachFile() {
 			const files = await openFilePicker({ multiple: true });
 			if (files.length) {
-				mailData.attachments.push(...files);
+				mailData.attachmentFiles.push(...files);
 			}
 		}
 
 		function removeAttachment(file: File) {
-			mailData.attachments = mailData.attachments.filter(it => it !== file);
+			mailData.attachmentFiles = mailData.attachmentFiles.filter(it => it !== file);
 		}
 
 		return (
@@ -78,7 +78,7 @@ export const ComposeMailForm = observer(
 						onClick={() => attachFile()}
 					/>
 
-					{!!mailData.attachments.length && (
+					{!!mailData.attachmentFiles.length && (
 						<>
 							<ActionButton
 								ref={attachButtonRef}
@@ -86,7 +86,9 @@ export const ComposeMailForm = observer(
 								look={ActionButtonLook.LITE}
 								onClick={() => setAttachmentPopupOpen(!isAttachmentPopupOpen)}
 							>
-								{mailData.attachments.length === 1 ? '1 file' : `${mailData.attachments.length} files`}{' '}
+								{mailData.attachmentFiles.length === 1
+									? '1 file'
+									: `${mailData.attachmentFiles.length} files`}{' '}
 								attached
 							</ActionButton>
 
@@ -96,7 +98,7 @@ export const ComposeMailForm = observer(
 									alignmentDirection={AlignmentDirection.TOP}
 									onCloseRequest={() => setAttachmentPopupOpen(false)}
 								>
-									{mailData.attachments.map(file => (
+									{mailData.attachmentFiles.map(file => (
 										<div className={css.attachment}>
 											<div className={css.attachmentName}>{file.name}</div>
 											<div className={css.attachmentSize}>{formatFileSize(file.size)}</div>
@@ -108,7 +110,7 @@ export const ComposeMailForm = observer(
 												onClick={() => {
 													removeAttachment(file);
 
-													if (!mailData.attachments.length) {
+													if (!mailData.attachmentFiles.length) {
 														setAttachmentPopupOpen(false);
 													}
 												}}

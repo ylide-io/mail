@@ -1,3 +1,7 @@
+export function hashToIpfsUrl(hash: string) {
+	return `ipfs://${hash}`;
+}
+
 export function getIpfsHashFromUrl(url: string) {
 	return url.replace('ipfs://', '');
 }

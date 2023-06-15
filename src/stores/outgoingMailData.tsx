@@ -1,6 +1,6 @@
 import { OutputData } from '@editorjs/editorjs';
 import { EVMNetwork } from '@ylide/ethereum';
-import { Uint256, YMF } from '@ylide/sdk';
+import { MessageAttachment, Uint256, YMF } from '@ylide/sdk';
 import { autorun, makeAutoObservable, transaction } from 'mobx';
 import React from 'react';
 
@@ -40,7 +40,8 @@ export class OutgoingMailData {
 	editorData?: OutputData;
 	plainTextData: string = '';
 
-	attachments: File[] = [];
+	attachments: MessageAttachment[] = [];
+	attachmentFiles: File[] = [];
 
 	validator?: () => boolean;
 	sending = false;
@@ -83,7 +84,8 @@ export class OutgoingMailData {
 		editorData?: OutputData;
 		plainTextData?: string;
 
-		attachments?: File[];
+		attachments?: MessageAttachment[];
+		attachmentFiles?: File[];
 	}) {
 		transaction(() => {
 			this.mode = data?.mode || OutgoingMailDataMode.MESSAGE;
@@ -98,6 +100,7 @@ export class OutgoingMailData {
 			this.plainTextData = data?.plainTextData || '';
 
 			this.attachments = data?.attachments || [];
+			this.attachmentFiles = data?.attachmentFiles || [];
 		});
 	}
 
@@ -108,7 +111,7 @@ export class OutgoingMailData {
 				(this.to.items.length &&
 					!this.to.items.some(r => r.isLoading) &&
 					!this.to.items.some(r => !r.routing?.details))) &&
-			(this.hasEditorData || this.hasPlainTextData || this.attachments.length)
+			(this.hasEditorData || this.hasPlainTextData || this.attachments.length || this.attachmentFiles.length)
 		);
 	}
 
@@ -199,6 +202,7 @@ export class OutgoingMailData {
 					subject: this.subject,
 					text: content,
 					attachments: this.attachments,
+					attachmentFiles: this.attachmentFiles,
 					recipients: this.to.items.map(r => r.routing?.address!),
 					network: this.network,
 					feedId: this.feedId,
@@ -211,6 +215,7 @@ export class OutgoingMailData {
 					subject: this.subject,
 					text: content,
 					attachments: this.attachments,
+					attachmentFiles: this.attachmentFiles,
 					feedId: this.feedId,
 					network: this.network,
 				});

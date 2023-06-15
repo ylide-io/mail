@@ -11,6 +11,7 @@ import {
 	IMessageContent,
 	IMessageCorruptedContent,
 	IYMFTagNode,
+	MessageAttachment,
 	MessageAttachmentLinkV1,
 	MessageAttachmentType,
 	MessageContainer,
@@ -43,12 +44,14 @@ import { readFileAsArrayBuffer } from './file';
 import { getEvmWalletNetwork } from './wallet';
 import { VENOM_SERVICE_CODE } from '../constants';
 import { useCallback } from 'react';
+import { hashToIpfsUrl } from './ipfs';
 
 export async function sendMessage({
 	sender,
 	subject,
 	text,
 	attachments,
+	attachmentFiles,
 	recipients,
 	network,
 	feedId,
@@ -56,7 +59,8 @@ export async function sendMessage({
 	sender: DomainAccount;
 	subject: string;
 	text: YMF;
-	attachments: File[];
+	attachments: MessageAttachment[];
+	attachmentFiles: File[];
 	recipients: string[];
 	network?: EVMNetwork;
 	feedId?: Uint256;
@@ -66,23 +70,26 @@ export async function sendMessage({
 	const secureContext = MessageSecureContext.create();
 	const ipfsStorage = new YlideIpfsStorage();
 
-	const messageAttachments = await Promise.all(
-		attachments.map(async file => {
-			const buffer = await readFileAsArrayBuffer(file);
-			const uint8Array = new Uint8Array(buffer);
-			const encrypted = secureContext.encrypt(uint8Array);
-			const uploaded = await ipfsStorage.uploadToIpfs(encrypted);
+	const messageAttachments = [
+		...attachments,
+		...(await Promise.all(
+			attachmentFiles.map(async file => {
+				const buffer = await readFileAsArrayBuffer(file);
+				const uint8Array = new Uint8Array(buffer);
+				const encrypted = secureContext.encrypt(uint8Array);
+				const uploaded = await ipfsStorage.uploadToIpfs(encrypted);
 
-			return new MessageAttachmentLinkV1({
-				type: MessageAttachmentType.LINK_V1,
-				previewLink: '',
-				link: `ipfs://${uploaded.hash}`,
-				fileName: file.name,
-				fileSize: file.size,
-				isEncrypted: true,
-			});
-		}),
-	);
+				return new MessageAttachmentLinkV1({
+					type: MessageAttachmentType.LINK_V1,
+					previewLink: '',
+					link: hashToIpfsUrl(uploaded.hash),
+					fileName: file.name,
+					fileSize: file.size,
+					isEncrypted: true,
+				});
+			}),
+		)),
+	];
 
 	const content = new MessageContentV4({
 		sendingAgentName: 'ysh',
@@ -123,13 +130,15 @@ export async function broadcastMessage({
 	subject,
 	text,
 	attachments,
+	attachmentFiles,
 	feedId,
 	network,
 }: {
 	sender: DomainAccount;
 	subject: string;
 	text: YMF;
-	attachments: File[];
+	attachments: MessageAttachment[];
+	attachmentFiles: File[];
 	feedId: Uint256;
 	network?: EVMNetwork;
 }): Promise<SendBroadcastResult> {
@@ -137,22 +146,25 @@ export async function broadcastMessage({
 
 	const ipfsStorage = new YlideIpfsStorage();
 
-	const messageAttachments = await Promise.all(
-		attachments.map(async file => {
-			const buffer = await readFileAsArrayBuffer(file);
-			const uint8Array = new Uint8Array(buffer);
-			const uploaded = await ipfsStorage.uploadToIpfs(uint8Array);
+	const messageAttachments = [
+		...attachments,
+		...(await Promise.all(
+			attachmentFiles.map(async file => {
+				const buffer = await readFileAsArrayBuffer(file);
+				const uint8Array = new Uint8Array(buffer);
+				const uploaded = await ipfsStorage.uploadToIpfs(uint8Array);
 
-			return new MessageAttachmentLinkV1({
-				type: MessageAttachmentType.LINK_V1,
-				previewLink: '',
-				link: `ipfs://${uploaded.hash}`,
-				fileName: file.name,
-				fileSize: file.size,
-				isEncrypted: true,
-			});
-		}),
-	);
+				return new MessageAttachmentLinkV1({
+					type: MessageAttachmentType.LINK_V1,
+					previewLink: '',
+					link: hashToIpfsUrl(uploaded.hash),
+					fileName: file.name,
+					fileSize: file.size,
+					isEncrypted: false,
+				});
+			}),
+		)),
+	];
 
 	const content = new MessageContentV4({
 		sendingAgentName: 'ysh',

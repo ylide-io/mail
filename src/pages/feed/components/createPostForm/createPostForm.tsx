@@ -1,20 +1,40 @@
+import { MessageAttachmentLinkV1, MessageAttachmentType } from '@ylide/sdk';
 import clsx from 'clsx';
 import { observer } from 'mobx-react';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useMutation } from 'react-query';
 
 import { VenomFilterApi } from '../../../../api/venomFilterApi';
 import { AccountSelect } from '../../../../components/accountSelect/accountSelect';
 import { ActionButton, ActionButtonLook, ActionButtonSize } from '../../../../components/ActionButton/ActionButton';
 import { AutoSizeTextArea } from '../../../../components/autoSizeTextArea/autoSizeTextArea';
+import { GridRowBox } from '../../../../components/boxes/boxes';
+import { GalleryModal } from '../../../../components/galleryModal/galleryModal';
+import { AnchoredPopup } from '../../../../components/popup/anchoredPopup/anchoredPopup';
 import { PropsWithClassName } from '../../../../components/props';
 import { toast } from '../../../../components/toast/toast';
 import { VENOM_FEED_ID } from '../../../../constants';
+import { ReactComponent as TrashSvg } from '../../../../icons/ic20/trash.svg';
 import { ReactComponent as BulbSvg } from '../../../../icons/ic28/bulb.svg';
+import { ReactComponent as StickerSvg } from '../../../../icons/ic28/sticker.svg';
 import { DomainAccount } from '../../../../stores/models/DomainAccount';
 import { OutgoingMailData, OutgoingMailDataMode } from '../../../../stores/outgoingMailData';
+import { HorizontalAlignment } from '../../../../utils/alignment';
+import { hashToIpfsUrl, ipfsToHttpUrl } from '../../../../utils/ipfs';
 import { SendMailButton } from '../../../mail/components/composeMailForm/sendMailButton/sendMailButton';
 import css from './createPostForm.module.scss';
+
+const stickerIpfsIds = [
+	'QmeXyjgDKFYTjnHZ3Aw3pmsYZmBBXwR7GmnooKJruCXPBb',
+	'QmcoCy3NRmLUrKqVwK3b4AxM4ZuuwCADECQ3t52wHj65rV',
+	'QmSVgrVnbX91n2VEEEgHdaGVCnGokNnoLmnXUiDuFyiUy1',
+	'QmbTfqQgspytbRPcL2KD7JK7JJkm6Up6hGhBsk96FrrsJy',
+	'QmYj9HrD21KYkomc4MDEEAMzsYbEHNT1TyertEri79QeLP',
+];
+
+stickerIpfsIds.push(...stickerIpfsIds);
+stickerIpfsIds.push(...stickerIpfsIds);
+stickerIpfsIds.push(...stickerIpfsIds);
 
 export interface CreatePostFormProps extends PropsWithClassName {
 	accounts: DomainAccount[];
@@ -59,6 +79,13 @@ export const CreatePostForm = observer(({ className, accounts, onCreated }: Crea
 		onError: () => toast('Failed to get idea 🤦‍♀️'),
 	});
 
+	const stickerButtonRef = useRef(null);
+	const [isStickerPopupOpen, setStickerPopupOpen] = useState(false);
+
+	const attachmentUrl = mailData.attachments.length
+		? ipfsToHttpUrl((mailData.attachments[0] as MessageAttachmentLinkV1).link)
+		: undefined;
+
 	const onSent = () => {
 		mailData.reset({
 			mode: OutgoingMailDataMode.BROADCAST,
@@ -89,6 +116,31 @@ export const CreatePostForm = observer(({ className, accounts, onCreated }: Crea
 
 			{expanded ? (
 				<>
+					{attachmentUrl && (
+						<>
+							<div className={css.divider} />
+
+							<div className={css.preview}>
+								<img
+									className={css.previewImage}
+									alt="Preview"
+									src={attachmentUrl}
+									onClick={() => GalleryModal.show([attachmentUrl])}
+								/>
+
+								<ActionButton
+									className={css.removeImageButton}
+									isDisabled={mailData.sending}
+									look={ActionButtonLook.DANGEROUS}
+									icon={<TrashSvg />}
+									onClick={() => (mailData.attachments = [])}
+								>
+									Remove
+								</ActionButton>
+							</div>
+						</>
+					)}
+
 					<div className={css.divider} />
 
 					<div className={css.footer}>
@@ -100,14 +152,58 @@ export const CreatePostForm = observer(({ className, accounts, onCreated }: Crea
 						/>
 
 						<div className={css.footerRight}>
-							<ActionButton
-								isDisabled={mailData.sending || isIdeaLoading}
-								size={ActionButtonSize.MEDIUM}
-								look={ActionButtonLook.LITE}
-								icon={<BulbSvg />}
-								title="Get idea!"
-								onClick={() => loadIdea()}
-							/>
+							<GridRowBox gap={4}>
+								<ActionButton
+									isDisabled={mailData.sending || isIdeaLoading}
+									size={ActionButtonSize.MEDIUM}
+									look={ActionButtonLook.LITE}
+									icon={<BulbSvg />}
+									title="Get idea!"
+									onClick={() => loadIdea()}
+								/>
+
+								<ActionButton
+									ref={stickerButtonRef}
+									isDisabled={mailData.sending}
+									size={ActionButtonSize.MEDIUM}
+									look={ActionButtonLook.LITE}
+									icon={<StickerSvg />}
+									title="Stickers"
+									onClick={() => setStickerPopupOpen(!isStickerPopupOpen)}
+								/>
+
+								{isStickerPopupOpen && (
+									<AnchoredPopup
+										className={css.stickerPopup}
+										anchorRef={stickerButtonRef}
+										horizontalAlign={HorizontalAlignment.END}
+										onCloseRequest={() => setStickerPopupOpen(false)}
+									>
+										<div className={css.stickerPopupContent}>
+											{stickerIpfsIds.map((id, i) => (
+												<img
+													key={i}
+													alt="Sticker"
+													src={ipfsToHttpUrl(id)}
+													onClick={() => {
+														setStickerPopupOpen(false);
+														mailData.attachments = [
+															new MessageAttachmentLinkV1({
+																type: MessageAttachmentType.LINK_V1,
+																previewLink: '',
+																link: hashToIpfsUrl(id),
+																fileName: 'Venom sticker',
+																fileSize: 0,
+																isEncrypted: false,
+															}),
+														];
+													}}
+												/>
+											))}
+										</div>
+									</AnchoredPopup>
+								)}
+							</GridRowBox>
 
 							<SendMailButton disabled={isIdeaLoading} mailData={mailData} onSent={onSent} />
 						</div>
