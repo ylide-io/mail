@@ -172,7 +172,9 @@ const App = observer(() => {
 								to={
 									REACT_APP__APP_MODE === AppMode.OTC
 										? generatePath(RoutePath.OTC_ASSETS)
-										: generatePath(RoutePath.FEED)
+										: REACT_APP__APP_MODE === AppMode.MAIN_VIEW
+										? generatePath(RoutePath.FEED)
+										: generatePath(RoutePath.FEED_VENOM)
 								}
 							/>
 						}
