@@ -531,7 +531,7 @@ export function formatSubject(subject: string, prefix?: string) {
 
 //
 
-export function useOpenMailCopmpose() {
+export function useOpenMailCompose() {
 	const location = useLocation();
 	const navigate = useNav();
 

@@ -13,7 +13,7 @@ import domain from '../../../stores/Domain';
 import { globalOutgoingMailData } from '../../../stores/outgoingMailData';
 import { RoutePath } from '../../../stores/routePath';
 import { connectAccount } from '../../../utils/account';
-import { useOpenMailCopmpose } from '../../../utils/mail';
+import { useOpenMailCompose } from '../../../utils/mail';
 import { useNav } from '../../../utils/url';
 import { ActionButton, ActionButtonLook, ActionButtonSize } from '../../ActionButton/ActionButton';
 import { AppLogo } from '../../appLogo/appLogo';
@@ -25,7 +25,7 @@ import css from './header.module.scss';
 
 const Header = observer(() => {
 	const navigate = useNav();
-	const openMailCopmpose = useOpenMailCopmpose();
+	const openMailCompose = useOpenMailCompose();
 
 	const accountsPopupButtonRef = useRef(null);
 	const [isAccountsPopupOpen, setAccountsPopupOpen] = useState(false);
@@ -38,7 +38,7 @@ const Header = observer(() => {
 				<ActionButton
 					className={css.composeButton}
 					look={ActionButtonLook.PRIMARY}
-					onClick={() => openMailCopmpose()}
+					onClick={() => openMailCompose()}
 				>
 					Compose Mail
 				</ActionButton>

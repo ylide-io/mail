@@ -23,7 +23,7 @@ import {
 	decodedTextDataToEditorJsData,
 	formatSubject,
 	plainTextToEditorJsData,
-	useOpenMailCopmpose,
+	useOpenMailCompose,
 } from '../../../utils/mail';
 import { useNav } from '../../../utils/url';
 import css from './mailDetailsPage.module.scss';
@@ -38,7 +38,7 @@ export const MailDetailsPage = observer(() => {
 	const navigate = useNav();
 	const { folderId, id } = useParams<{ folderId: FolderId; id: string }>();
 
-	const openMailCopmpose = useOpenMailCopmpose();
+	const openMailCompose = useOpenMailCompose();
 
 	const initialMessage = mailStore.lastMessagesList.find(m => m.id === id!);
 	const initialDecodedContent: IMessageDecodedContent | undefined =
@@ -135,7 +135,7 @@ export const MailDetailsPage = observer(() => {
 		mailData.to = new Recipients([senderAddress]);
 		mailData.subject = formatSubject(subject || '', 'Re: ');
 
-		openMailCopmpose({ mailData });
+		openMailCompose({ mailData });
 	};
 
 	const onForwardClick = (message: ILinkedMessage, decodedContent: IMessageDecodedContent) => {

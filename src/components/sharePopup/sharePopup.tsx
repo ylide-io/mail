@@ -11,7 +11,7 @@ import { AppMode, REACT_APP__APP_MODE } from '../../env';
 import { OutgoingMailData } from '../../stores/outgoingMailData';
 import { HorizontalAlignment } from '../../utils/alignment';
 import { copyToClipboard } from '../../utils/clipboard';
-import { plainTextToEditorJsData, useOpenMailCopmpose } from '../../utils/mail';
+import { plainTextToEditorJsData, useOpenMailCompose } from '../../utils/mail';
 import { AnchoredPopup } from '../popup/anchoredPopup/anchoredPopup';
 import { toast } from '../toast/toast';
 import { ReactComponent as ClipboardSvg } from './icons/clipboard.svg';
@@ -35,7 +35,7 @@ export interface SharePopupProps {
 export function SharePopup({ anchorRef, horizontalAlign, onClose, url, subject }: SharePopupProps) {
 	const realUrl = url || window.location.toString();
 
-	const openMailCopmpose = useOpenMailCopmpose();
+	const openMailCompose = useOpenMailCompose();
 
 	return (
 		<AnchoredPopup
@@ -57,7 +57,7 @@ export function SharePopup({ anchorRef, horizontalAlign, onClose, url, subject }
 								mailData.subject = subject;
 								mailData.editorData = plainTextToEditorJsData(realUrl);
 
-								openMailCopmpose({ mailData });
+								openMailCompose({ mailData });
 
 								onClose();
 							}}

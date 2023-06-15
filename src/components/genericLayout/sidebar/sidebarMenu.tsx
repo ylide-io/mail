@@ -37,7 +37,7 @@ import { getFeedCategoryName } from '../../../stores/Feed';
 import { FolderId } from '../../../stores/MailList';
 import { DomainAccount } from '../../../stores/models/DomainAccount';
 import { RoutePath } from '../../../stores/routePath';
-import { useOpenMailCopmpose } from '../../../utils/mail';
+import { useOpenMailCompose } from '../../../utils/mail';
 import { useNav } from '../../../utils/url';
 import { ActionButton, ActionButtonLook, ActionButtonSize } from '../../ActionButton/ActionButton';
 import { AdaptiveText } from '../../adaptiveText/adaptiveText';
@@ -173,7 +173,7 @@ const getFeedCategoryIcon = (category: FeedCategory) => {
 };
 
 export const SidebarMenu = observer(() => {
-	const openMailCopmpose = useOpenMailCopmpose();
+	const openMailCompose = useOpenMailCompose();
 
 	const [isFeedSettingsAccount, setFeedSettingsAccount] = useState<DomainAccount>();
 
@@ -266,7 +266,7 @@ export const SidebarMenu = observer(() => {
 					className={css.sectionButton}
 					onClick={() => {
 						isSidebarOpen.set(false);
-						openMailCopmpose();
+						openMailCompose();
 					}}
 				>
 					Compose mail
