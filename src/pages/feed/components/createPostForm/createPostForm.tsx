@@ -1,13 +1,16 @@
 import clsx from 'clsx';
 import { observer } from 'mobx-react';
 import { useEffect, useMemo, useState } from 'react';
+import { useMutation } from 'react-query';
 
+import { VenomFilterApi } from '../../../../api/venomFilterApi';
 import { AccountSelect } from '../../../../components/accountSelect/accountSelect';
 import { ActionButton, ActionButtonLook, ActionButtonSize } from '../../../../components/ActionButton/ActionButton';
 import { AutoSizeTextArea } from '../../../../components/autoSizeTextArea/autoSizeTextArea';
 import { PropsWithClassName } from '../../../../components/props';
 import { toast } from '../../../../components/toast/toast';
 import { VENOM_FEED_ID } from '../../../../constants';
+import { ReactComponent as BulbSvg } from '../../../../icons/ic28/bulb.svg';
 import { DomainAccount } from '../../../../stores/models/DomainAccount';
 import { OutgoingMailData, OutgoingMailDataMode } from '../../../../stores/outgoingMailData';
 import { SendMailButton } from '../../../mail/components/composeMailForm/sendMailButton/sendMailButton';
@@ -47,6 +50,14 @@ export const CreatePostForm = observer(({ className, accounts, onCreated }: Crea
 	}, [mailData, accounts]);
 
 	const [expanded, setExpanded] = useState(false);
+
+	const { mutate: loadIdea, isLoading: isIdeaLoading } = useMutation({
+		mutationFn: () => VenomFilterApi.getTextIdea(),
+		onSuccess: data => {
+			mailData.plainTextData = [mailData.plainTextData, data].filter(Boolean).join('\n\n');
+		},
+		onError: () => toast('Failed to get idea 🤦‍♀️'),
+	});
 
 	const onSent = () => {
 		mailData.reset({
@@ -89,7 +100,16 @@ export const CreatePostForm = observer(({ className, accounts, onCreated }: Crea
 						/>
 
 						<div className={css.footerRight}>
-							<SendMailButton mailData={mailData} onSent={onSent} />
+							<ActionButton
+								isDisabled={mailData.sending || isIdeaLoading}
+								size={ActionButtonSize.MEDIUM}
+								look={ActionButtonLook.LITE}
+								icon={<BulbSvg />}
+								title="Get idea!"
+								onClick={() => loadIdea()}
+							/>
+
+							<SendMailButton disabled={isIdeaLoading} mailData={mailData} onSent={onSent} />
 						</div>
 					</div>
 				</>
