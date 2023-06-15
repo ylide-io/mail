@@ -13,7 +13,6 @@ import { HorizontalAlignment } from '../../utils/alignment';
 import { copyToClipboard } from '../../utils/clipboard';
 import { plainTextToEditorJsData, useOpenMailCompose } from '../../utils/mail';
 import { AnchoredPopup } from '../popup/anchoredPopup/anchoredPopup';
-import { toast } from '../toast/toast';
 import { ReactComponent as ClipboardSvg } from './icons/clipboard.svg';
 import { ReactComponent as FacebookSvg } from './icons/facebook.svg';
 import { ReactComponent as MailSvg } from './icons/mail.svg';
@@ -70,8 +69,7 @@ export function SharePopup({ anchorRef, horizontalAlign, onClose, url, subject }
 					<button
 						className={css.primaryButton}
 						onClick={() => {
-							copyToClipboard(realUrl);
-							toast('Link copied to clipboard 👍');
+							copyToClipboard(realUrl, { toast: 'Link copied to clipboard 👍' });
 							onClose();
 						}}
 					>

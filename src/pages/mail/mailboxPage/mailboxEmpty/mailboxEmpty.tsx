@@ -4,7 +4,6 @@ import { generatePath } from 'react-router-dom';
 
 import { ActionButton, ActionButtonLook, ActionButtonSize } from '../../../../components/ActionButton/ActionButton';
 import { AdaptiveAddress } from '../../../../components/adaptiveAddress/adaptiveAddress';
-import { toast } from '../../../../components/toast/toast';
 import { ReactComponent as ClipboardSvg } from '../../../../icons/ic20/clipboard.svg';
 import { ReactComponent as PlusSvg } from '../../../../icons/ic20/plus.svg';
 import domain from '../../../../stores/Domain';
@@ -51,10 +50,7 @@ const MailboxEmpty = observer(({ folderId }: MailboxEmptyProps) => {
 									look={ActionButtonLook.PRIMARY}
 									icon={<ClipboardSvg />}
 									title="Copy to clipboard"
-									onClick={async () => {
-										await copyToClipboard(a.account.address);
-										toast('Copied to clipboard 🔥');
-									}}
+									onClick={() => copyToClipboard(a.account.address, { toast: true })}
 								/>
 
 								<AdaptiveAddress address={a.account.address} />

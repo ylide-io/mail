@@ -1,12 +1,12 @@
 import useResizeObserver from '@react-hook/resize-observer';
 import clsx from 'clsx';
-import { useEffect, useRef, useState } from 'react';
+import { HTMLAttributes, useEffect, useRef, useState } from 'react';
 
 import { truncateInMiddle } from '../../utils/string';
 import { PropsWithClassName } from '../props';
 import css from './adaptiveText.module.scss';
 
-interface AdaptiveTextProps extends PropsWithClassName {
+interface AdaptiveTextProps extends PropsWithClassName, HTMLAttributes<HTMLDivElement> {
 	text: string;
 	maxLength?: number;
 	separator?: string;
@@ -14,12 +14,20 @@ interface AdaptiveTextProps extends PropsWithClassName {
 	title?: string;
 }
 
-export function AdaptiveText({ className, text, textAlign = 'left', title, ...props }: AdaptiveTextProps) {
+export function AdaptiveText({
+	className,
+	text,
+	textAlign = 'left',
+	title,
+	maxLength: maxLengthRaw,
+	separator: separatorRaw,
+	...props
+}: AdaptiveTextProps) {
 	const rootRef = useRef<HTMLDivElement>(null);
 	const visibleRef = useRef<HTMLDivElement>(null);
 
-	const separator = props.separator != null ? props.separator : '..';
-	const maxLength = props.maxLength || text.length;
+	const separator = separatorRaw != null ? separatorRaw : '..';
+	const maxLength = maxLengthRaw || text.length;
 
 	const initialText = truncateInMiddle(text, maxLength, separator);
 
@@ -55,10 +63,10 @@ export function AdaptiveText({ className, text, textAlign = 'left', title, ...pr
 
 	return (
 		<div
+			{...props}
 			ref={rootRef}
 			className={clsx(css.root, textAlign === 'left' ? css.textAlignLeft : css.textAlignRight, className)}
 			title={title}
-			{...props}
 		>
 			<div className={css.invisible}>{initialText}</div>
 			<div ref={visibleRef} className={css.visible}>

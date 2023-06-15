@@ -21,6 +21,7 @@ import { browserStorage } from '../../../../stores/browserStorage';
 import { useVenomAccounts } from '../../../../stores/Domain';
 import { OutgoingMailData } from '../../../../stores/outgoingMailData';
 import { HorizontalAlignment } from '../../../../utils/alignment';
+import { copyToClipboard } from '../../../../utils/clipboard';
 import { ipfsToHttpUrl } from '../../../../utils/ipfs';
 import { useOpenMailCompose } from '../../../../utils/mail';
 import { PostItemContainer } from '../postItemContainer/postItemContainer';
@@ -82,7 +83,12 @@ export function VenomFeedPostItem({ msg, decoded: { decodedTextData, attachments
 
 			<div className={css.meta}>
 				<GridRowBox gap={2}>
-					<AdaptiveAddress className={css.sender} maxLength={12} address={msg.senderAddress} />
+					<AdaptiveAddress
+						className={css.sender}
+						maxLength={12}
+						address={msg.senderAddress}
+						onClick={() => copyToClipboard(msg.senderAddress, { toast: true })}
+					/>
 
 					<ActionButton
 						className={css.composeButton}

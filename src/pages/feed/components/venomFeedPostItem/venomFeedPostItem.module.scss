@@ -45,6 +45,11 @@
 .sender {
 	font-size: 14px;
 	font-weight: $font-weight_bold;
+	cursor: pointer;
+
+	&:hover {
+		color: var(--link-color);
+	}
 }
 
 .composeButton {
