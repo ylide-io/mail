@@ -68,6 +68,27 @@
 	margin: 0 0 0 auto;
 }
 
+.ideaButton_animated {
+	animation-name: ideaButtonAnumation;
+	animation-duration: 1s;
+	animation-timing-function: ease-in-out;
+}
+
+@keyframes ideaButtonAnumation {
+	from {
+		transform: scale(1, 1);
+	}
+	30% {
+		transform: scale(2, 2) rotate(50deg);
+	}
+	70% {
+		transform: scale(2, 2) rotate(-50deg);
+	}
+	to {
+		transform: scale(1, 1);
+	}
+}
+
 .stickerPopup {
 	position: fixed;
 	padding: 4px 0;

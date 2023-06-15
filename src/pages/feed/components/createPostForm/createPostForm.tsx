@@ -75,6 +75,11 @@ export const CreatePostForm = observer(({ className, accounts, onCreated }: Crea
 
 	const [expanded, setExpanded] = useState(false);
 
+	const [isIdeaAnimated, setIdeaAnimated] = useState(false);
+	useEffect(() => {
+		setTimeout(() => setIdeaAnimated(expanded), 1000);
+	}, [expanded]);
+
 	const [lastIdea, setLastIdea] = useState('');
 
 	const { mutate: loadIdea, isLoading: isIdeaLoading } = useMutation({
@@ -167,6 +172,7 @@ export const CreatePostForm = observer(({ className, accounts, onCreated }: Crea
 						<div className={css.footerRight}>
 							<GridRowBox gap={4}>
 								<ActionButton
+									className={clsx(isIdeaAnimated && css.ideaButton_animated)}
 									isDisabled={mailData.sending || isIdeaLoading}
 									size={ActionButtonSize.MEDIUM}
 									look={ActionButtonLook.LITE}
