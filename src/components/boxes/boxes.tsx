@@ -12,8 +12,14 @@ export function TruncateTextBox({ children, className }: TruncateTextBoxProps) {
 
 //
 
-export interface GridRowBoxProps extends PropsWithChildren<{}>, PropsWithClassName {}
+export interface GridRowBoxProps extends PropsWithChildren<{}>, PropsWithClassName {
+	gap?: number;
+}
 
-export function GridRowBox({ children, className }: GridRowBoxProps) {
-	return <div className={clsx(css.gridRow, className)}>{children}</div>;
+export function GridRowBox({ children, className, gap }: GridRowBoxProps) {
+	return (
+		<div className={clsx(css.gridRow, className)} style={{ gridGap: gap }}>
+			{children}
+		</div>
+	);
 }

@@ -47,6 +47,16 @@
 	font-weight: $font-weight_bold;
 }
 
+.composeButton {
+	margin: -99px 0;
+	opacity: 0.2;
+	transition: opacity 500ms;
+
+	&:hover {
+		opacity: 1;
+	}
+}
+
 .date {
 	color: var(--secondary-text-color);
 	font-weight: $font-weight_light;

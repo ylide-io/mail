@@ -2,21 +2,27 @@ import { IMessage, MessageAttachmentLinkV1 } from '@ylide/sdk';
 import React, { useMemo, useRef, useState } from 'react';
 
 import { VenomFilterApi } from '../../../../api/venomFilterApi';
-import { ActionButton } from '../../../../components/ActionButton/ActionButton';
+import { ActionButton, ActionButtonLook } from '../../../../components/ActionButton/ActionButton';
 import { AdaptiveAddress } from '../../../../components/adaptiveAddress/adaptiveAddress';
 import { Avatar } from '../../../../components/avatar/avatar';
+import { GridRowBox } from '../../../../components/boxes/boxes';
 import { DropDown, DropDownItem } from '../../../../components/dropDown/dropDown';
 import { ErrorMessage, ErrorMessageLook } from '../../../../components/errorMessage/errorMessage';
 import { GalleryModal } from '../../../../components/galleryModal/galleryModal';
 import { NlToBr } from '../../../../components/nlToBr/nlToBr';
 import { ReadableDate } from '../../../../components/readableDate/readableDate';
+import { Recipients } from '../../../../components/recipientInput/recipientInput';
 import { toast } from '../../../../components/toast/toast';
 import { ReactComponent as ExternalSvg } from '../../../../icons/ic20/external.svg';
+import { ReactComponent as MailSvg } from '../../../../icons/ic20/mail.svg';
 import { ReactComponent as MenuSvg } from '../../../../icons/ic20/menu.svg';
 import { IMessageDecodedContent, MessageDecodedTextDataType } from '../../../../indexedDB/IndexedDB';
 import { browserStorage } from '../../../../stores/browserStorage';
+import { useVenomAccounts } from '../../../../stores/Domain';
+import { OutgoingMailData } from '../../../../stores/outgoingMailData';
 import { HorizontalAlignment } from '../../../../utils/alignment';
 import { ipfsToHttpUrl } from '../../../../utils/ipfs';
+import { useOpenMailCompose } from '../../../../utils/mail';
 import { PostItemContainer } from '../postItemContainer/postItemContainer';
 import css from './venomFeedPostItem.module.scss';
 
@@ -40,6 +46,9 @@ export function VenomFeedPostItem({ msg, decoded: { decodedTextData, attachments
 	const [isMenuOpen, setMenuOpen] = useState(false);
 
 	const [isBanned, setBanned] = useState(false);
+
+	const openMailCompose = useOpenMailCompose();
+	const venomAccounts = useVenomAccounts();
 
 	const banPost = () => {
 		if (confirm('Are you sure?')) {
@@ -72,7 +81,23 @@ export function VenomFeedPostItem({ msg, decoded: { decodedTextData, attachments
 			<Avatar className={css.ava} blockie={msg.senderAddress} />
 
 			<div className={css.meta}>
-				<AdaptiveAddress className={css.sender} maxLength={12} address={msg.senderAddress} />
+				<GridRowBox gap={2}>
+					<AdaptiveAddress className={css.sender} maxLength={12} address={msg.senderAddress} />
+
+					<ActionButton
+						className={css.composeButton}
+						look={ActionButtonLook.LITE}
+						icon={<MailSvg />}
+						title="Compose mail"
+						onClick={() => {
+							const mailData = new OutgoingMailData();
+							mailData.from = venomAccounts[0];
+							mailData.to = new Recipients([msg.senderAddress]);
+
+							openMailCompose({ mailData });
+						}}
+					/>
+				</GridRowBox>
 
 				<div className={css.metaRight}>
 					<ReadableDate className={css.date} value={msg.createdAt * 1000} />
