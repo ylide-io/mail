@@ -75,10 +75,19 @@ export const CreatePostForm = observer(({ className, accounts, onCreated }: Crea
 
 	const [expanded, setExpanded] = useState(false);
 
+	const [lastIdea, setLastIdea] = useState('');
+
 	const { mutate: loadIdea, isLoading: isIdeaLoading } = useMutation({
 		mutationFn: () => VenomFilterApi.getTextIdea(),
 		onSuccess: data => {
-			mailData.plainTextData = [mailData.plainTextData, data].filter(Boolean).join('\n\n');
+			let text = mailData.plainTextData;
+
+			if (lastIdea && text.endsWith(lastIdea)) {
+				text = text.slice(0, text.length - lastIdea.length);
+			}
+
+			mailData.plainTextData = [text.trim(), data].filter(Boolean).join('\n\n');
+			setLastIdea(data);
 		},
 		onError: () => toast('Failed to get idea 🤦‍♀️'),
 	});
