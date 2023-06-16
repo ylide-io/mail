@@ -406,6 +406,7 @@ export class Domain {
 		const chains = Object.keys(rpcMap).map(Number);
 		let isAvailable = true;
 		const wcTest = await EthereumProvider.init({
+			// TODO: change to Ylide project id
 			projectId: 'd6c2e9408725b77204b9e628d482e980',
 			chains,
 			// TODO: remove after fix by WalletConnect - https://github.com/WalletConnect/walletconnect-monorepo/issues/2641
@@ -436,6 +437,7 @@ export class Domain {
 		} else {
 			const self = this;
 			const wcReal = await EthereumProvider.init({
+				// TODO: change to Ylide project id
 				projectId: 'd6c2e9408725b77204b9e628d482e980',
 				chains,
 				// TODO: remove after fix by WalletConnect - https://github.com/WalletConnect/walletconnect-monorepo/issues/2641
