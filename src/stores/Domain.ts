@@ -1,5 +1,4 @@
 import { EthereumProvider } from '@walletconnect/ethereum-provider';
-import { getAccountsFromNamespaces } from '@walletconnect/utils';
 import {
 	EthereumWalletController,
 	EVM_CHAINS,
@@ -157,7 +156,7 @@ export class Domain {
 				loading: false;
 				connected: true;
 				walletName: string;
-				provider: any;
+				provider: InstanceType<typeof EthereumProvider>;
 		  }
 		| { loading: false; connected: false; url: string } = {
 		loading: true,
@@ -335,19 +334,27 @@ export class Domain {
 	async switchEVMChain(wallet: Wallet, needNetwork: EVMNetwork) {
 		try {
 			const bData = blockchainMeta[EVM_NAMES[needNetwork]];
-
-			await (wallet.controller as EthereumWalletController).providerObject.request({
-				method: 'wallet_addEthereumChain',
-				params: [bData.ethNetwork!],
-			});
+			if ('provider' in this.walletConnectState === false) {
+				await (wallet.controller as EthereumWalletController).providerObject.request({
+					method: 'wallet_addEthereumChain',
+					params: [bData.ethNetwork!],
+				});
+			}
 		} catch (error) {
 			console.log('error: ', error);
 		}
 		try {
-			await (wallet.controller as EthereumWalletController).providerObject.request({
-				method: 'wallet_switchEthereumChain',
-				params: [{ chainId: '0x' + Number(EVM_CHAINS[needNetwork]).toString(16) }], // chainId must be in hexadecimal numbers
-			});
+			if ('provider' in this.walletConnectState) {
+				// @ts-ignore
+				await domain.walletControllers.evm.walletconnect.signer.provider.send('wallet_switchEthereumChain', [
+					{ chainId: '0x' + Number(EVM_CHAINS[needNetwork]).toString(16) },
+				]);
+			} else {
+				await (wallet.controller as EthereumWalletController).providerObject.request({
+					method: 'wallet_switchEthereumChain',
+					params: [{ chainId: '0x' + Number(EVM_CHAINS[needNetwork]).toString(16) }], // chainId must be in hexadecimal numbers
+				});
+			}
 		} catch (err) {
 			throw err;
 		}
@@ -372,15 +379,15 @@ export class Domain {
 
 		const rpcMap = {
 			[EVM_CHAINS[EVMNetwork.ETHEREUM]]: EVM_RPCS[EVMNetwork.ETHEREUM].find(r => !r.rpc.startsWith('ws'))!.rpc,
-			[EVM_CHAINS[EVMNetwork.AVALANCHE]]: EVM_RPCS[EVMNetwork.AVALANCHE].find(r => !r.rpc.startsWith('ws'))!.rpc,
-			[EVM_CHAINS[EVMNetwork.ARBITRUM]]: EVM_RPCS[EVMNetwork.ARBITRUM].find(r => !r.rpc.startsWith('ws'))!.rpc,
-			[EVM_CHAINS[EVMNetwork.BNBCHAIN]]: EVM_RPCS[EVMNetwork.BNBCHAIN].find(r => !r.rpc.startsWith('ws'))!.rpc,
-			[EVM_CHAINS[EVMNetwork.OPTIMISM]]: EVM_RPCS[EVMNetwork.OPTIMISM].find(r => !r.rpc.startsWith('ws'))!.rpc,
-			[EVM_CHAINS[EVMNetwork.POLYGON]]: EVM_RPCS[EVMNetwork.POLYGON].find(r => !r.rpc.startsWith('ws'))!.rpc,
-			[EVM_CHAINS[EVMNetwork.FANTOM]]: EVM_RPCS[EVMNetwork.FANTOM].find(r => !r.rpc.startsWith('ws'))!.rpc,
-			[EVM_CHAINS[EVMNetwork.AURORA]]: EVM_RPCS[EVMNetwork.AURORA].find(r => !r.rpc.startsWith('ws'))!.rpc,
-			[EVM_CHAINS[EVMNetwork.CELO]]: EVM_RPCS[EVMNetwork.CELO].find(r => !r.rpc.startsWith('ws'))!.rpc,
-			[EVM_CHAINS[EVMNetwork.CRONOS]]: EVM_RPCS[EVMNetwork.CRONOS].find(r => !r.rpc.startsWith('ws'))!.rpc,
+			// [EVM_CHAINS[EVMNetwork.AVALANCHE]]: EVM_RPCS[EVMNetwork.AVALANCHE].find(r => !r.rpc.startsWith('ws'))!.rpc,
+			// [EVM_CHAINS[EVMNetwork.ARBITRUM]]: EVM_RPCS[EVMNetwork.ARBITRUM].find(r => !r.rpc.startsWith('ws'))!.rpc,
+			// [EVM_CHAINS[EVMNetwork.BNBCHAIN]]: EVM_RPCS[EVMNetwork.BNBCHAIN].find(r => !r.rpc.startsWith('ws'))!.rpc,
+			// [EVM_CHAINS[EVMNetwork.OPTIMISM]]: EVM_RPCS[EVMNetwork.OPTIMISM].find(r => !r.rpc.startsWith('ws'))!.rpc,
+			// [EVM_CHAINS[EVMNetwork.POLYGON]]: EVM_RPCS[EVMNetwork.POLYGON].find(r => !r.rpc.startsWith('ws'))!.rpc,
+			// [EVM_CHAINS[EVMNetwork.FANTOM]]: EVM_RPCS[EVMNetwork.FANTOM].find(r => !r.rpc.startsWith('ws'))!.rpc,
+			// [EVM_CHAINS[EVMNetwork.AURORA]]: EVM_RPCS[EVMNetwork.AURORA].find(r => !r.rpc.startsWith('ws'))!.rpc,
+			// [EVM_CHAINS[EVMNetwork.CELO]]: EVM_RPCS[EVMNetwork.CELO].find(r => !r.rpc.startsWith('ws'))!.rpc,
+			// [EVM_CHAINS[EVMNetwork.CRONOS]]: EVM_RPCS[EVMNetwork.CRONOS].find(r => !r.rpc.startsWith('ws'))!.rpc,
 
 			// TODO: Add after WalletConnect fix: error: Requested chains are not supported.
 			// Opened issue - https://github.com/WalletConnect/walletconnect-monorepo/issues/2643
