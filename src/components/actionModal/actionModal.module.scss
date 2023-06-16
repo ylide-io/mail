@@ -1,7 +1,14 @@
+/*
+"display: grid" somehow doesn't work in Venom browser on iOS:
+https://trello.com/c/i9GAsOaF
+ */
+
 .root {
-	display: grid;
-	grid-gap: 24px;
 	padding: 32px;
+
+	> :not(:last-child) {
+		margin: 0 0 24px;
+	}
 }
 
 .title {
@@ -10,18 +17,19 @@
 }
 
 .content {
-	display: grid;
-	grid-gap: 24px;
-	min-width: 0;
 	font-size: 14px;
 	line-height: $line-height_text;
 
-	> * {
-		min-width: 0;
+	> :not(:last-child) {
+		margin: 0 0 24px;
 	}
 }
 
 .buttons {
-	display: grid;
-	grid-gap: 8px;
+	display: flex;
+	flex-direction: column;
+
+	> :not(:last-child) {
+		margin: 0 0 8px;
+	}
 }
