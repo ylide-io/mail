@@ -11,6 +11,9 @@ import { autobind } from 'core-decorators';
 import EventEmitter from 'eventemitter3';
 import { computed, makeObservable, observable } from 'mobx';
 
+import { AdaptiveAddress } from '../../components/adaptiveAddress/adaptiveAddress';
+import { toast } from '../../components/toast/toast';
+import { invariant } from '../../utils/assert';
 import { browserStorage } from '../browserStorage';
 import { Domain } from '../Domain';
 import { DomainAccount } from './DomainAccount';
@@ -164,6 +167,26 @@ export class Wallet extends EventEmitter {
 			if (result.freshestKey) {
 				browserStorage.setAccountRemoteKeys(account.address, result);
 			}
+		} else {
+			this.domain.ylide.core.getAddressKeys(account.address).then(actual => {
+				invariant(result);
+
+				const cachedFK = result.freshestKey;
+				const actualFK = actual.freshestKey;
+
+				if (cachedFK?.publicKey.toHex() !== actualFK?.publicKey.toHex()) {
+					toast(
+						<>
+							<b>
+								<AdaptiveAddress maxLength={12} address={account.address} />
+							</b>
+							<div>
+								Your Ylide public keys for this account have been updated. Please re-connect it ❤️
+							</div>
+						</>,
+					);
+				}
+			});
 		}
 
 		return {
