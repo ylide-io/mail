@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { QueryClient, QueryClientProvider } from 'react-query';
 import { generatePath, Navigate, Route, Routes, useLocation, useSearchParams } from 'react-router-dom';
 
+import { ActionButton, ActionButtonSize } from './components/ActionButton/ActionButton';
 import { MainViewOnboarding } from './components/mainViewOnboarding/mainViewOnboarding';
 import { PopupManager } from './components/popup/popupManager/popupManager';
 import { StaticComponentManager } from './components/staticComponentManager/staticComponentManager';
@@ -81,13 +82,18 @@ const App = observer(() => {
 		document.documentElement.dataset.theme = REACT_APP__APP_MODE === AppMode.MAIN_VIEW ? AppTheme.V2 : AppTheme.V1;
 	}, []);
 
+	const [isInitError, setInitError] = useState(false);
+
 	useEffect(() => {
 		if (location.pathname !== generatePath(RoutePath.TEST)) {
 			const start = Date.now();
 			domain
 				.init()
-				.catch(err => console.log('Initialization error: ', JSON.stringify(err), err))
-				.then(() => console.log(`Initialized in ${Date.now() - start}ms`));
+				.catch(err => {
+					setInitError(true);
+					console.log('Initialization error: ', JSON.stringify(err), err);
+				})
+				.finally(() => console.log(`Initialization took ${Date.now() - start}ms`));
 		}
 	}, [location.pathname]);
 
@@ -102,93 +108,112 @@ const App = observer(() => {
 		analytics.pageView(location.pathname);
 	}, [location.pathname]);
 
-	if (location.pathname !== generatePath(RoutePath.TEST) && !domain.initialized) {
-		return (
-			<div
-				style={{
-					display: 'flex',
-					flexDirection: 'column',
-					justifyContent: 'center',
-					paddingBottom: '10vh',
-					width: '100vw',
-					height: '100vh',
-				}}
-			>
-				<YlideLoader reason="Loading your account data from blockchain ..." />
-			</div>
-		);
-	}
-
 	return (
-		<QueryClientProvider client={queryClient}>
-			<PopupManager>
-				<Routes>
-					<Route path={RoutePath.TEST} element={<TestPage />} />
-					<Route path={RoutePath.WALLETS} element={<NewWalletsPage />} />
-					<Route path={RoutePath.SETTINGS} element={<SettingsPage />} />
-					<Route path={RoutePath.ADMIN} element={<AdminPage />} />
-					<Route path={RoutePath.ADMIN_FEED} element={<AdminFeedPage />} />
+		<>
+			{isInitError ? (
+				<div
+					style={{
+						display: 'grid',
+						alignContent: 'center',
+						justifyItems: 'center',
+						gridGap: 20,
+						paddingBottom: '10vh',
+						width: '100vw',
+						height: '100vh',
+						fontSize: 18,
+					}}
+				>
+					<div>Initialization error 😭</div>
 
-					<Route
-						path={RoutePath.FEED}
-						element={
-							<Navigate
-								replace
-								to={
-									REACT_APP__APP_MODE === AppMode.MAIN_VIEW
-										? generatePath(RoutePath.FEED_SMART)
-										: generatePath(RoutePath.FEED_ALL)
+					<ActionButton size={ActionButtonSize.MEDIUM} onClick={() => window.location.reload()}>
+						Try again
+					</ActionButton>
+				</div>
+			) : location.pathname !== generatePath(RoutePath.TEST) && !domain.initialized ? (
+				<div
+					style={{
+						display: 'flex',
+						flexDirection: 'column',
+						justifyContent: 'center',
+						paddingBottom: '10vh',
+						width: '100vw',
+						height: '100vh',
+					}}
+				>
+					<YlideLoader reason="Loading your account data from blockchain ..." />
+				</div>
+			) : (
+				<QueryClientProvider client={queryClient}>
+					<PopupManager>
+						<Routes>
+							<Route path={RoutePath.TEST} element={<TestPage />} />
+							<Route path={RoutePath.WALLETS} element={<NewWalletsPage />} />
+							<Route path={RoutePath.SETTINGS} element={<SettingsPage />} />
+							<Route path={RoutePath.ADMIN} element={<AdminPage />} />
+							<Route path={RoutePath.ADMIN_FEED} element={<AdminFeedPage />} />
+
+							<Route
+								path={RoutePath.FEED}
+								element={
+									<Navigate
+										replace
+										to={
+											REACT_APP__APP_MODE === AppMode.MAIN_VIEW
+												? generatePath(RoutePath.FEED_SMART)
+												: generatePath(RoutePath.FEED_ALL)
+										}
+									/>
 								}
 							/>
-						}
-					/>
-					<Route path={RoutePath.FEED_ALL} element={<FeedPage />} />
-					<Route path={RoutePath.FEED_POST} element={<FeedPostPage />} />
-					<Route path={RoutePath.FEED_CATEGORY} element={<FeedPage />} />
-					<Route path={RoutePath.FEED_SOURCE} element={<FeedPage />} />
-					<Route path={RoutePath.FEED_SMART} element={<FeedPage />} />
-					<Route path={RoutePath.FEED_SMART_ADDRESS} element={<FeedPage />} />
-					<Route path={RoutePath.FEED_VENOM} element={<FeedPage />} />
+							<Route path={RoutePath.FEED_ALL} element={<FeedPage />} />
+							<Route path={RoutePath.FEED_POST} element={<FeedPostPage />} />
+							<Route path={RoutePath.FEED_CATEGORY} element={<FeedPage />} />
+							<Route path={RoutePath.FEED_SOURCE} element={<FeedPage />} />
+							<Route path={RoutePath.FEED_SMART} element={<FeedPage />} />
+							<Route path={RoutePath.FEED_SMART_ADDRESS} element={<FeedPage />} />
+							<Route path={RoutePath.FEED_VENOM} element={<FeedPage />} />
 
-					<Route path={RoutePath.MAIL_COMPOSE} element={<ComposePage />} />
-					<Route path={RoutePath.MAIL_CONTACTS} element={<ContactListPage />} />
-					<Route path={RoutePath.MAIL_CONTACT_TAGS} element={<ContactTagsPage />} />
-					<Route path={RoutePath.MAIL_FOLDER} element={<MailboxPage />} />
-					<Route path={RoutePath.MAIL_DETAILS} element={<MailDetailsPage />} />
+							<Route path={RoutePath.MAIL_COMPOSE} element={<ComposePage />} />
+							<Route path={RoutePath.MAIL_CONTACTS} element={<ContactListPage />} />
+							<Route path={RoutePath.MAIL_CONTACT_TAGS} element={<ContactTagsPage />} />
+							<Route path={RoutePath.MAIL_FOLDER} element={<MailboxPage />} />
+							<Route path={RoutePath.MAIL_DETAILS} element={<MailDetailsPage />} />
 
-					<Route path={RoutePath.OTC_ASSETS} element={<OtcAssetsPage />} />
-					<Route path={RoutePath.OTC_WALLETS} element={<OtcWalletsPage />} />
-					<Route path={RoutePath.OTC_CHATS} element={<OtcChatsPage />} />
-					<Route path={RoutePath.OTC_CHAT} element={<OtcChatPage />} />
+							<Route path={RoutePath.OTC_ASSETS} element={<OtcAssetsPage />} />
+							<Route path={RoutePath.OTC_WALLETS} element={<OtcWalletsPage />} />
+							<Route path={RoutePath.OTC_CHATS} element={<OtcChatsPage />} />
+							<Route path={RoutePath.OTC_CHAT} element={<OtcChatPage />} />
 
-					<Route path={RoutePath.SEND_MESSAGE_WIDGET} element={<SendMessageWidget />} />
-					<Route path={RoutePath.MAILBOX_WIDGET} element={<MailboxWidget />} />
+							<Route path={RoutePath.SEND_MESSAGE_WIDGET} element={<SendMessageWidget />} />
+							<Route path={RoutePath.MAILBOX_WIDGET} element={<MailboxWidget />} />
 
-					<Route
-						path={RoutePath.ANY}
-						element={
-							<Navigate
-								replace
-								to={
-									REACT_APP__APP_MODE === AppMode.OTC
-										? generatePath(RoutePath.OTC_ASSETS)
-										: REACT_APP__APP_MODE === AppMode.MAIN_VIEW
-										? generatePath(RoutePath.FEED)
-										: generatePath(RoutePath.FEED_VENOM)
+							<Route
+								path={RoutePath.ANY}
+								element={
+									<Navigate
+										replace
+										to={
+											REACT_APP__APP_MODE === AppMode.OTC
+												? generatePath(RoutePath.OTC_ASSETS)
+												: REACT_APP__APP_MODE === AppMode.MAIN_VIEW
+												? generatePath(RoutePath.FEED)
+												: generatePath(RoutePath.FEED_VENOM)
+										}
+									/>
 								}
 							/>
-						}
-					/>
-				</Routes>
+						</Routes>
 
-				{domain.txPlateVisible && REACT_APP__APP_MODE !== AppMode.MAIN_VIEW && <TransactionPopup />}
+						{domain.txPlateVisible && REACT_APP__APP_MODE !== AppMode.MAIN_VIEW && <TransactionPopup />}
 
-				<StaticComponentManager />
-				<ToastManager />
+						<StaticComponentManager />
+						<ToastManager />
 
-				{REACT_APP__APP_MODE === AppMode.MAIN_VIEW && <MainViewOnboarding />}
-			</PopupManager>
-		</QueryClientProvider>
+						{REACT_APP__APP_MODE === AppMode.MAIN_VIEW && <MainViewOnboarding />}
+					</PopupManager>
+				</QueryClientProvider>
+			)}
+		</>
 	);
 });
 
