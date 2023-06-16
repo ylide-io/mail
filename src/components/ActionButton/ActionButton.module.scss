@@ -1,4 +1,5 @@
 .root {
+	@include expand-click-area(2px);
 	display: inline-grid;
 	grid-auto-flow: column;
 	grid-gap: 4px;
