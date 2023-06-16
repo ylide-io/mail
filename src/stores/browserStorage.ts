@@ -1,4 +1,6 @@
-import { makeAutoObservable } from 'mobx';
+import { PublicKey } from '@ylide/sdk';
+import { ExternalYlidePublicKey } from '@ylide/sdk/src';
+import { makeAutoObservable, toJS } from 'mobx';
 
 import { Section } from '../components/genericLayout/sidebar/sidebarMenu';
 import { WidgetId } from '../pages/widgets/widgets';
@@ -6,11 +8,27 @@ import { toggleArrayItem } from '../utils/array';
 
 enum BrowserStorageKey {
 	IS_USER_ADMIN = 'ylide_isUserAdmin',
+	ACCOUNT_REMOTE_KEYS = 'ylide_accountRemoteKeys',
 	CAN_SKIP_REGISTRATION = 'can_skip_registration',
 	SIDEBAR_FOLDED_SECTIONS = 'ylide_sidebarFoldedSections',
 	SAVE_DECODED_MESSAGES = 'ylide_saveDecodedMessages',
 	WIDGET_ID = 'ylide_widgetId',
 	MAIN_VIEW_KEYS = 'ylide_mainViewKeys',
+}
+
+interface AccountRemotePublicKey {
+	keyVersion: number;
+	publicKey: {
+		type: number;
+		hex: string;
+	};
+	timestamp: number;
+	registrar: number;
+}
+
+interface AccountRemoteKeys {
+	freshestKey: AccountRemotePublicKey | null;
+	remoteKeys: Record<string, AccountRemotePublicKey | null>;
 }
 
 class BrowserStorage {
@@ -55,6 +73,82 @@ class BrowserStorage {
 	set isUserAdmin(value: boolean) {
 		BrowserStorage.setItem(BrowserStorageKey.IS_USER_ADMIN, value || undefined, sessionStorage);
 		this._isUserAdmin = value;
+	}
+
+	//
+
+	private _accountRemoteKeys =
+		BrowserStorage.getItemWithTransform<Record<string, AccountRemoteKeys>>(
+			BrowserStorageKey.ACCOUNT_REMOTE_KEYS,
+			JSON.parse,
+		) || {};
+
+	getAccountRemoteKeys(address: string):
+		| {
+				freshestKey: ExternalYlidePublicKey | null;
+				remoteKeys: Record<string, ExternalYlidePublicKey | null>;
+		  }
+		| undefined {
+		try {
+			const { freshestKey: freshestKeyRaw, remoteKeys: remoteKeysRaw } =
+				toJS(this._accountRemoteKeys[address]) || {};
+
+			const deserialize = (raw: AccountRemotePublicKey): ExternalYlidePublicKey => ({
+				...raw,
+				publicKey: PublicKey.fromHexString(raw.publicKey.type, raw.publicKey.hex),
+			});
+
+			return freshestKeyRaw
+				? {
+						freshestKey: deserialize(freshestKeyRaw),
+						remoteKeys: remoteKeysRaw
+							? Object.keys(remoteKeysRaw).reduce((res, key) => {
+									const keyRaw = remoteKeysRaw[key];
+									res[key] = keyRaw && deserialize(keyRaw);
+									return res;
+							  }, {} as Record<string, ExternalYlidePublicKey | null>)
+							: {},
+				  }
+				: undefined;
+		} catch (e) {
+			return undefined;
+		}
+	}
+
+	setAccountRemoteKeys(
+		address: string,
+		keys:
+			| {
+					freshestKey: ExternalYlidePublicKey | null;
+					remoteKeys: Record<string, ExternalYlidePublicKey | null>;
+			  }
+			| undefined,
+	) {
+		const serialize = (ylideKey: ExternalYlidePublicKey): AccountRemotePublicKey => ({
+			...ylideKey,
+			publicKey: {
+				type: ylideKey.publicKey.type,
+				hex: ylideKey.publicKey.toHex(),
+			},
+		});
+
+		const _accountRemoteKeys = toJS(this._accountRemoteKeys);
+
+		if (keys?.freshestKey) {
+			_accountRemoteKeys[address] = {
+				freshestKey: serialize(keys.freshestKey),
+				remoteKeys: Object.keys(keys.remoteKeys).reduce((res, key) => {
+					const keyRaw = keys.remoteKeys[key];
+					res[key] = keyRaw && serialize(keyRaw);
+					return res;
+				}, {} as Record<string, AccountRemotePublicKey | null>),
+			};
+		} else {
+			delete _accountRemoteKeys[address];
+		}
+
+		this._accountRemoteKeys = _accountRemoteKeys;
+		BrowserStorage.setItem(BrowserStorageKey.ACCOUNT_REMOTE_KEYS, JSON.stringify(_accountRemoteKeys));
 	}
 
 	//

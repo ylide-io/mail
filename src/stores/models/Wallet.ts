@@ -11,6 +11,7 @@ import { autobind } from 'core-decorators';
 import EventEmitter from 'eventemitter3';
 import { computed, makeObservable, observable } from 'mobx';
 
+import { browserStorage } from '../browserStorage';
 import { Domain } from '../Domain';
 import { DomainAccount } from './DomainAccount';
 
@@ -155,7 +156,15 @@ export class Wallet extends EventEmitter {
 	}
 
 	async readRemoteKeys(account: IGenericAccount) {
-		const result = await this.domain.ylide.core.getAddressKeys(account.address);
+		let result = browserStorage.getAccountRemoteKeys(account.address);
+
+		if (!result) {
+			result = await this.domain.ylide.core.getAddressKeys(account.address);
+
+			if (result.freshestKey) {
+				browserStorage.setAccountRemoteKeys(account.address, result);
+			}
+		}
 
 		return {
 			remoteKey: result.freshestKey,

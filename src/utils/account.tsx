@@ -8,6 +8,7 @@ import { SelectWalletModal } from '../components/selectWalletModal/selectWalletM
 import { showStaticComponent } from '../components/staticComponentManager/staticComponentManager';
 import { SwitchModal } from '../components/switchModal/switchModal';
 import { toast } from '../components/toast/toast';
+import { browserStorage } from '../stores/browserStorage';
 import domain from '../stores/Domain';
 import { DomainAccount } from '../stores/models/DomainAccount';
 import { Wallet } from '../stores/models/Wallet';
@@ -143,6 +144,7 @@ export async function disconnectAccount(account: DomainAccount) {
 	await account.wallet.disconnectAccount(account);
 	await domain.accounts.removeAccount(account);
 	account.mainViewKey = '';
+	browserStorage.setAccountRemoteKeys(account.account.address, undefined);
 
 	if (account.wallet.factory.wallet === 'walletconnect') {
 		domain.disconnectWalletConnect();
