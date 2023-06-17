@@ -175,10 +175,10 @@ const RegularFeedContent = observer(() => {
 
 const useVenomChain = false;
 
-let VenomFeedContent: () => JSX.Element;
+let VenomFeedContent: ({ admin }: { admin: boolean }) => JSX.Element;
 
 if (useVenomChain) {
-	VenomFeedContent = observer(() => {
+	VenomFeedContent = observer(({ admin }: { admin: boolean }) => {
 		const venomAccounts = useVenomAccounts();
 
 		const [rebuildMailListCounter, setRebuildMailListCounter] = useState(1);
@@ -264,7 +264,8 @@ if (useVenomChain) {
 		);
 	});
 } else {
-	VenomFeedContent = observer(() => {
+	VenomFeedContent = observer(({ admin }: { admin: boolean }) => {
+		console.log('admin: ', admin);
 		const venomAccounts = useVenomAccounts();
 
 		const [messages, setMessages] = useState<
@@ -278,7 +279,7 @@ if (useVenomChain) {
 			setIsLoading(true);
 			setIsError(false);
 			try {
-				const posts = await VenomFilterApi.getPosts({ beforeTimestamp: 0, withBanned: false });
+				const posts = await VenomFilterApi.getPosts({ beforeTimestamp: 0, adminMode: admin });
 				setIsNextPageAvailable(posts.length === 10);
 				setMessages(
 					posts.map(p => {
@@ -318,7 +319,7 @@ if (useVenomChain) {
 			try {
 				const posts = await VenomFilterApi.getPosts({
 					beforeTimestamp: messages[messages.length - 1]?.original.createTimestamp,
-					withBanned: false,
+					adminMode: admin,
 				});
 				setIsNextPageAvailable(posts.length === 10);
 				setMessages(
@@ -420,15 +421,17 @@ if (useVenomChain) {
 
 //
 
-const FeedPageContent = observer(() => {
+const FeedPageContent = observer(({ admin }: { admin: boolean }) => {
 	const location = useLocation();
-	const isVenomFeed = location.pathname === generatePath(RoutePath.FEED_VENOM);
+	const isVenomFeed =
+		location.pathname === generatePath(RoutePath.FEED_VENOM) ||
+		location.pathname === generatePath(RoutePath.FEED_VENOM_ADMIN);
 
-	return isVenomFeed ? <VenomFeedContent /> : <RegularFeedContent />;
+	return isVenomFeed ? <VenomFeedContent admin={admin} /> : <RegularFeedContent />;
 });
 
-export const FeedPage = () => (
+export const FeedPage = ({ admin = false }: { admin?: boolean }) => (
 	<GenericLayout>
-		<FeedPageContent />
+		<FeedPageContent admin={admin} />
 	</GenericLayout>
 );

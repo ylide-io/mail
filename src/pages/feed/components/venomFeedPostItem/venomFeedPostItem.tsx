@@ -6,21 +6,19 @@ import { ActionButton, ActionButtonLook } from '../../../../components/ActionBut
 import { AdaptiveAddress } from '../../../../components/adaptiveAddress/adaptiveAddress';
 import { Avatar } from '../../../../components/avatar/avatar';
 import { GridRowBox } from '../../../../components/boxes/boxes';
-import { DropDown, DropDownItem } from '../../../../components/dropDown/dropDown';
 import { ErrorMessage, ErrorMessageLook } from '../../../../components/errorMessage/errorMessage';
 import { GalleryModal } from '../../../../components/galleryModal/galleryModal';
 import { NlToBr } from '../../../../components/nlToBr/nlToBr';
 import { ReadableDate } from '../../../../components/readableDate/readableDate';
 import { Recipients } from '../../../../components/recipientInput/recipientInput';
 import { toast } from '../../../../components/toast/toast';
+import { ReactComponent as CrossSvg } from '../../../../icons/ic20/cross.svg';
 import { ReactComponent as ExternalSvg } from '../../../../icons/ic20/external.svg';
 import { ReactComponent as MailSvg } from '../../../../icons/ic20/mail.svg';
-import { ReactComponent as MenuSvg } from '../../../../icons/ic20/menu.svg';
 import { IMessageDecodedContent, MessageDecodedTextDataType } from '../../../../indexedDB/IndexedDB';
 import { browserStorage } from '../../../../stores/browserStorage';
 import { useVenomAccounts } from '../../../../stores/Domain';
 import { OutgoingMailData } from '../../../../stores/outgoingMailData';
-import { HorizontalAlignment } from '../../../../utils/alignment';
 import { copyToClipboard } from '../../../../utils/clipboard';
 import { ipfsToHttpUrl } from '../../../../utils/ipfs';
 import { useOpenMailCompose } from '../../../../utils/mail';
@@ -43,8 +41,7 @@ export function VenomFeedPostItem({ msg, decoded: { decodedTextData, attachments
 	const attachment = attachments[0] as MessageAttachmentLinkV1 | undefined;
 	const attachmentHttpUrl = attachment && ipfsToHttpUrl(attachment.link);
 
-	const menuButtonRef = useRef(null);
-	const [isMenuOpen, setMenuOpen] = useState(false);
+	const [clicks, setClicks] = useState<number[]>([]);
 
 	const [isBanned, setBanned] = useState(false);
 
@@ -52,21 +49,23 @@ export function VenomFeedPostItem({ msg, decoded: { decodedTextData, attachments
 	const venomAccounts = useVenomAccounts();
 
 	const banPost = () => {
-		if (confirm('Are you sure?')) {
-			VenomFilterApi.banPost({ ids: [msg.msgId] })
-				.then(() => {
-					toast('Banned 🔥');
-					setBanned(true);
-				})
-				.catch(e => {
+		VenomFilterApi.banPost({ ids: [msg.msgId], secret: browserStorage.userAdminPassword || '' })
+			.then(() => {
+				toast('Banned 🔥');
+				setBanned(true);
+			})
+			.catch(e => {
+				if (e.message === 'Request failed') {
+					toast('Wrong password 🤦‍♀️');
+				} else {
 					toast('Error 🤦‍♀️');
 					throw e;
-				});
-		}
+				}
+			});
 	};
 
 	const unbanPost = () => {
-		VenomFilterApi.unbanPost({ ids: [msg.msgId] })
+		VenomFilterApi.unbanPost({ ids: [msg.msgId], secret: browserStorage.userAdminPassword || '' })
 			.then(() => {
 				toast('Un-banned 🔥');
 				setBanned(false);
@@ -78,7 +77,20 @@ export function VenomFeedPostItem({ msg, decoded: { decodedTextData, attachments
 	};
 
 	return (
-		<PostItemContainer collapsable className={css.root}>
+		<PostItemContainer
+			collapsable
+			className={css.root}
+			onClick={e => {
+				e.stopPropagation();
+				e.preventDefault();
+				const newClicks = [Date.now(), ...clicks].slice(0, 3);
+				if (newClicks.length === 3 && newClicks[0] - newClicks[2] < 600) {
+					banPost();
+				} else {
+					setClicks(newClicks);
+				}
+			}}
+		>
 			<Avatar className={css.ava} blockie={msg.senderAddress} />
 
 			<div className={css.meta}>
@@ -121,37 +133,9 @@ export function VenomFeedPostItem({ msg, decoded: { decodedTextData, attachments
 					)}
 
 					{browserStorage.isUserAdmin && (
-						<button ref={menuButtonRef} className={css.metaButton} onClick={() => setMenuOpen(!isMenuOpen)}>
-							<MenuSvg />
+						<button className={css.metaButton} onClick={() => banPost()}>
+							<CrossSvg />
 						</button>
-					)}
-
-					{isMenuOpen && (
-						<DropDown
-							anchorRef={menuButtonRef}
-							horizontalAlign={HorizontalAlignment.END}
-							onCloseRequest={() => setMenuOpen(false)}
-						>
-							{isBanned ? (
-								<DropDownItem
-									onSelect={async () => {
-										setMenuOpen(false);
-										unbanPost();
-									}}
-								>
-									Unban post
-								</DropDownItem>
-							) : (
-								<DropDownItem
-									onSelect={async () => {
-										setMenuOpen(false);
-										banPost();
-									}}
-								>
-									Ban post
-								</DropDownItem>
-							)}
-						</DropDown>
 					)}
 				</div>
 			</div>

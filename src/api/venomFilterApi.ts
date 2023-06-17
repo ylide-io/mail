@@ -5,8 +5,6 @@ import { REACT_APP__FEED_VENOM } from '../env';
 import { invariant } from '../utils/assert';
 import { createCleanSerachParams } from '../utils/url';
 
-const SECRET_QUERY = { secret: 'yollo' };
-
 export interface IVenomFeedPost {
 	id: string;
 	createTimestamp: number;
@@ -45,22 +43,25 @@ export namespace VenomFilterApi {
 		return await request<{ bannedPosts: string[] }>('/posts-status', { query: { id: params.ids } });
 	}
 
-	export async function banPost(params: { ids: string[] }) {
-		return await request('/ban-posts', { query: { ...SECRET_QUERY, id: params.ids }, params: { method: 'POST' } });
+	export async function banPost(params: { ids: string[]; secret: string }) {
+		return await request('/ban-posts', {
+			query: { secret: params.secret, id: params.ids },
+			params: { method: 'POST' },
+		});
 	}
 
-	export async function unbanPost(params: { ids: string[] }) {
+	export async function unbanPost(params: { ids: string[]; secret: string }) {
 		return await request('/unban-posts', {
-			query: { ...SECRET_QUERY, id: params.ids },
+			query: { secret: params.secret, id: params.ids },
 			params: {
 				method: 'DELETE',
 			},
 		});
 	}
 
-	export async function getPosts(params: { beforeTimestamp: number; withBanned?: boolean }) {
+	export async function getPosts(params: { beforeTimestamp: number; adminMode?: boolean }) {
 		return await request<IVenomFeedPost[]>('/posts', {
-			query: { beforeTimestamp: params.beforeTimestamp, withBanned: params.withBanned },
+			query: { beforeTimestamp: params.beforeTimestamp, adminMode: params.adminMode },
 		});
 	}
 
