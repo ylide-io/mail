@@ -265,7 +265,6 @@ if (useVenomChain) {
 	});
 } else {
 	VenomFeedContent = observer(({ admin }: { admin: boolean }) => {
-		console.log('admin: ', admin);
 		const venomAccounts = useVenomAccounts();
 
 		const [messages, setMessages] = useState<

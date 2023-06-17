@@ -60,8 +60,8 @@ dependencies:
     specifier: 0.8.0-beta.34
     version: 0.8.0-beta.34(@ethersproject/abstract-signer@5.7.0)(@ethersproject/address@5.7.0)(@ethersproject/bignumber@5.7.0)(@ethersproject/bytes@5.7.0)(@ethersproject/contracts@5.7.0)(@ethersproject/keccak256@5.7.0)(@ethersproject/solidity@5.7.0)(@ethersproject/strings@5.7.0)(@ethersproject/transactions@5.7.0)(@ethersproject/web@5.7.1)
   '@ylide/everscale':
-    specifier: 0.8.0-beta.24
-    version: 0.8.0-beta.24
+    specifier: 0.8.0-beta.28
+    version: 0.8.0-beta.28
   '@ylide/sdk':
     specifier: 0.8.0-beta.14
     version: 0.8.0-beta.14
@@ -4312,13 +4312,13 @@ packages:
       - utf-8-validate
     dev: false
 
-  /@ylide/everscale@0.8.0-beta.24:
-    resolution: {integrity: sha512-D9Rpojl/YOjIaWniGg/wTwNDmXLBY9PIZQR5355yMNkfHjMl1Ut1O/K3Vvi00d1f3KNuOaS5mUF9yoU1w5/Jew==}
+  /@ylide/everscale@0.8.0-beta.28:
+    resolution: {integrity: sha512-KrCYVlnodH9Q6ix69HvAvX7GOcedofqa9z6kSBW4FJiCjSC9+BVVM5BWxI7cfeLbG9Wq2cboDtx0f1/ijIVoCQ==}
     dependencies:
       '@ylide/sdk': 0.8.0-beta.14
       '@ylide/smart-buffer': 0.0.11
       everscale-inpage-provider: 0.3.61
-      everscale-standalone-client: 2.1.18
+      everscale-standalone-client: 2.1.19
       nekoton-wasm: 1.1.7
     transitivePeerDependencies:
       - encoding
@@ -7634,8 +7634,8 @@ packages:
     resolution: {integrity: sha512-PsAuVLToMDTBaO2gBqc7Yi7EDMjU01v3mf2qPeBuJmyNEX6tNhOEueQSmK3Xhy/QszaGWsU2GrqAfvMDB1od7Q==}
     dev: false
 
-  /everscale-standalone-client@2.1.18:
-    resolution: {integrity: sha512-Uool0hKu0U+DAiXqwon1mqQ6+z52h7D8dLgvDvwbdzZZ3cni8OY9nFTZsxZPFZVEtKj4qK4CsofrRhKMdxPDpQ==}
+  /everscale-standalone-client@2.1.19:
+    resolution: {integrity: sha512-QI9i55NPGZ2BGzDJXvdnCL1l6lKz3/Ov64lpnlfLOSFQTmsXBrwIMZfAtEbaYcUV5v/Ruh0zH/OzNHZpuxPAiA==}
     dependencies:
       '@broxus/await-semaphore': 0.1.5
       bignumber.js: 9.1.1
