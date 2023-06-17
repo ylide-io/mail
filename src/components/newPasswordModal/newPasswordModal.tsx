@@ -139,14 +139,10 @@ export function NewPasswordModal({ faucetType, bonus, wallet, account, remoteKey
 		let tempLocalKey: YlideKeyPair;
 		let keyVersion;
 		try {
-			if (wallet.factory.blockchainGroup === 'everscale') {
-				console.log('createLocalKey', 'everscale');
-				tempLocalKey = await wallet.constructLocalKeyV1(account, password);
-				keyVersion = YlidePublicKeyVersion.INSECURE_KEY_V1;
-			} else if (forceNew) {
-				console.log('createLocalKey', 'everscale');
-				tempLocalKey = await wallet.constructLocalKeyV2(account, password);
-				keyVersion = YlidePublicKeyVersion.KEY_V2;
+			if (forceNew) {
+				console.log('createLocalKey', 'forceNew');
+				tempLocalKey = await wallet.constructLocalKeyV3(account);
+				keyVersion = YlidePublicKeyVersion.KEY_V3;
 			} else if (freshestKey?.key.keyVersion === YlidePublicKeyVersion.INSECURE_KEY_V1) {
 				if (freshestKey.blockchain === 'venom-testnet') {
 					// strange... I'm not sure Qamon keys work here
