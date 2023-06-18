@@ -12,6 +12,7 @@ import { TransactionPopup } from './components/TransactionPopup/TransactionPopup
 import { YlideLoader } from './components/ylideLoader/ylideLoader';
 import { APP_NAME } from './constants';
 import { AppMode, REACT_APP__APP_MODE } from './env';
+import { ReactComponent as CrossSvg } from './icons/ic20/cross.svg';
 import { AdminFeedPage } from './pages/AdminFeedPage';
 import { AdminPage } from './pages/AdminPage';
 import { FeedPage } from './pages/feed/feedPage/feedPage';
@@ -111,6 +112,31 @@ const App = observer(() => {
 
 	return (
 		<>
+			{browserStorage.showMainviewBanner ? (
+				<div
+					style={{
+						width: '100vw',
+						paddingTop: 8,
+						paddingBottom: 8,
+						textAlign: 'center',
+						backgroundColor: '#000000',
+						color: '#ffffff',
+						fontSize: 14,
+						position: 'relative',
+					}}
+				>
+					Introducing Mainview – your personalized crypto news hub! Stay ahead with dynamic news feeds
+					tailored to your token portfolio. Be the first – join the waitlist at{' '}
+					<a href="https://app.mainview.io">mainview.io</a>!
+					<CrossSvg
+						style={{ position: 'absolute', top: '50%', marginTop: -10, right: 20, cursor: 'pointer' }}
+						onClick={() => {
+							browserStorage.showMainviewBanner = false;
+						}}
+					/>
+				</div>
+			) : null}
+
 			{isInitError ? (
 				<div
 					style={{

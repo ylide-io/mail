@@ -1,5 +1,5 @@
 import { observer } from 'mobx-react';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 import { FeedManagerApi } from '../../api/feedManagerApi';
 import { APP_NAME } from '../../constants';
@@ -18,6 +18,7 @@ enum Step {
 	CONNECT_ACCOUNT = 'CONNECT_ACCOUNT',
 	CONNECT_ACCOUNT_INFO = 'CONNECT_ACCOUNT_INFO',
 	ENTER_INVITE_CODE = 'ENTER_INVITE_CODE',
+	JOIN_WAITLIST = 'JOIN_WAITLIST',
 	SIGN_AUTH = 'SIGN_AUTH',
 	BUILDING_FEED = 'BUILDING_FEED',
 }
@@ -30,6 +31,7 @@ export const MainViewOnboarding = observer(() => {
 
 	const [inviteCode, setInviteCode] = useState('');
 	const [inviteCodeLoading, setInviteCodeLoading] = useState(false);
+	const divForScriptRef = useRef<HTMLDivElement>(null);
 
 	const reset = useCallback(() => {
 		setInviteCode('');
@@ -83,7 +85,12 @@ export const MainViewOnboarding = observer(() => {
 					}
 					// Request invide code
 					else {
-						setStep(Step.ENTER_INVITE_CODE);
+						setStep(Step.JOIN_WAITLIST);
+						setTimeout(() => {
+							const script = document.createElement('script');
+							script.src = 'https://prod-waitlist-widget.s3.us-east-2.amazonaws.com/getwaitlist.min.js';
+							divForScriptRef.current?.appendChild(script);
+						}, 500);
 					}
 				}
 			} catch (e) {
@@ -164,6 +171,37 @@ export const MainViewOnboarding = observer(() => {
 					}
 				>
 					You need to connect a crypto wallet in order to use {APP_NAME}
+				</ActionModal>
+			)}
+
+			{step === Step.JOIN_WAITLIST && (
+				<ActionModal
+					buttons={[
+						<ActionButton
+							size={ActionButtonSize.XLARGE}
+							look={ActionButtonLook.LITE}
+							isLoading={inviteCodeLoading}
+							onClick={() => {
+								setStep(Step.ENTER_INVITE_CODE);
+							}}
+						>
+							I already have an invite code
+						</ActionButton>,
+						unathorizedAccount && (
+							<ActionButton
+								size={ActionButtonSize.XLARGE}
+								look={ActionButtonLook.LITE}
+								isDisabled={inviteCodeLoading}
+								onClick={() => disconnect(unathorizedAccount)}
+							>
+								Disconnect this account
+							</ActionButton>
+						),
+					]}
+				>
+					<div id="getWaitlistContainer" data-waitlist_id="8428"></div>
+
+					<div ref={divForScriptRef} />
 				</ActionModal>
 			)}
 

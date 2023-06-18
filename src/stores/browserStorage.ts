@@ -9,6 +9,7 @@ import { toggleArrayItem } from '../utils/array';
 enum BrowserStorageKey {
 	IS_USER_ADMIN = 'ylide_isUserAdmin',
 	USER_ADMIN_PASSWORD = 'ylide_userAdminPassword',
+	SHOW_MAINVIEW_BANNER = 'ylide_showMainviewBanner',
 	ACCOUNT_REMOTE_KEYS = 'ylide_accountRemoteKeys',
 	CAN_SKIP_REGISTRATION = 'can_skip_registration',
 	SIDEBAR_FOLDED_SECTIONS = 'ylide_sidebarFoldedSections',
@@ -74,6 +75,23 @@ class BrowserStorage {
 	set isUserAdmin(value: boolean) {
 		BrowserStorage.setItem(BrowserStorageKey.IS_USER_ADMIN, value || undefined, sessionStorage);
 		this._isUserAdmin = value;
+	}
+
+	//
+
+	private _showMainviewBanner =
+		BrowserStorage.getItemWithTransform<boolean>(
+			BrowserStorageKey.SHOW_MAINVIEW_BANNER,
+			item => item !== 'false',
+		) ?? true;
+
+	get showMainviewBanner() {
+		return this._showMainviewBanner;
+	}
+
+	set showMainviewBanner(value: boolean) {
+		BrowserStorage.setItem(BrowserStorageKey.SHOW_MAINVIEW_BANNER, value);
+		this._showMainviewBanner = value;
 	}
 
 	//
