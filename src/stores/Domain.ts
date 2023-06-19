@@ -22,7 +22,7 @@ import {
 	BlockchainControllerFactory,
 	BlockchainMap,
 	BlockchainWalletMap,
-	BrowserIframeStorage,
+	BrowserLocalStorage,
 	DynamicEncryptionRouter,
 	IGenericAccount,
 	WalletControllerFactory,
@@ -116,7 +116,7 @@ if (REACT_APP__APP_MODE === AppMode.OTC) {
 export class Domain {
 	savedPassword: string | null = null;
 
-	storage = new BrowserIframeStorage();
+	storage = new BrowserLocalStorage();
 	keystore = new YlideKeyStore(this.storage, {
 		onPasswordRequest: this.handlePasswordRequest.bind(this),
 		onDeriveRequest: this.handleDeriveRequest.bind(this),
