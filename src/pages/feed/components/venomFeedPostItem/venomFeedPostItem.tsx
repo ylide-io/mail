@@ -1,5 +1,5 @@
 import { IMessage, MessageAttachmentLinkV1 } from '@ylide/sdk';
-import React, { useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import { VenomFilterApi } from '../../../../api/venomFilterApi';
 import { ActionButton, ActionButtonLook } from '../../../../components/ActionButton/ActionButton';
@@ -22,15 +22,23 @@ import { OutgoingMailData } from '../../../../stores/outgoingMailData';
 import { copyToClipboard } from '../../../../utils/clipboard';
 import { ipfsToHttpUrl } from '../../../../utils/ipfs';
 import { useOpenMailCompose } from '../../../../utils/mail';
+import { useShiftPressed } from '../../../../utils/useShiftPressed';
 import { PostItemContainer } from '../postItemContainer/postItemContainer';
 import css from './venomFeedPostItem.module.scss';
 
 interface VenomFeedPostItemProps {
 	msg: IMessage;
 	decoded: IMessageDecodedContent;
+	isFirstPost: boolean;
+	onNextPost: () => void;
 }
 
-export function VenomFeedPostItem({ msg, decoded: { decodedTextData, attachments } }: VenomFeedPostItemProps) {
+export function VenomFeedPostItem({
+	msg,
+	decoded: { decodedTextData, attachments },
+	isFirstPost,
+	onNextPost,
+}: VenomFeedPostItemProps) {
 	const decodedText = useMemo(
 		() =>
 			decodedTextData.type === MessageDecodedTextDataType.PLAIN
@@ -44,11 +52,13 @@ export function VenomFeedPostItem({ msg, decoded: { decodedTextData, attachments
 	let [clicks] = useState<number[]>([]);
 
 	const [isBanned, setBanned] = useState(false);
+	const [isApproved, setApproved] = useState(false);
+	const isShiftPressed = useShiftPressed();
 
 	const openMailCompose = useOpenMailCompose();
 	const venomAccounts = useVenomAccounts();
 
-	const banAddress = () => {
+	const banAddress = useCallback(() => {
 		VenomFilterApi.banAddresses({ addresses: [msg.senderAddress], secret: browserStorage.userAdminPassword || '' })
 			.then(() => {
 				toast('Banned 🔥');
@@ -62,12 +72,28 @@ export function VenomFeedPostItem({ msg, decoded: { decodedTextData, attachments
 					throw e;
 				}
 			});
-	};
+	}, [msg.senderAddress]);
 
-	const banPost = () => {
+	const banPost = useCallback(() => {
 		VenomFilterApi.banPost({ ids: [msg.msgId], secret: browserStorage.userAdminPassword || '' })
 			.then(() => {
 				toast('Banned 🔥');
+				setApproved(true);
+			})
+			.catch(e => {
+				if (e.message === 'Request failed') {
+					toast('Wrong password 🤦‍♀️');
+				} else {
+					toast('Error 🤦‍♀️');
+					throw e;
+				}
+			});
+	}, [msg.msgId]);
+
+	const approvePost = useCallback(() => {
+		VenomFilterApi.approvePost({ ids: [msg.msgId], secret: browserStorage.userAdminPassword || '' })
+			.then(() => {
+				toast('Approved 🔥');
 				setBanned(true);
 			})
 			.catch(e => {
@@ -78,9 +104,9 @@ export function VenomFeedPostItem({ msg, decoded: { decodedTextData, attachments
 					throw e;
 				}
 			});
-	};
+	}, [msg.msgId]);
 
-	const unbanPost = () => {
+	const unbanPost = useCallback(() => {
 		VenomFilterApi.unbanPost({ ids: [msg.msgId], secret: browserStorage.userAdminPassword || '' })
 			.then(() => {
 				toast('Un-banned 🔥');
@@ -90,7 +116,42 @@ export function VenomFeedPostItem({ msg, decoded: { decodedTextData, attachments
 				toast('Error 🤦‍♀️');
 				throw e;
 			});
-	};
+	}, [msg.msgId]);
+
+	useEffect(() => {
+		if (isFirstPost) {
+			const downHandler = (e: KeyboardEvent) => {
+				// shift + left arrow:
+				if (e.shiftKey && e.keyCode === 37) {
+					banPost();
+					onNextPost();
+				}
+				// shift + right arrow:
+				if (e.shiftKey && e.keyCode === 39) {
+					approvePost();
+					onNextPost();
+				}
+			};
+			window.addEventListener('keydown', downHandler);
+			return () => {
+				window.removeEventListener('keydown', downHandler);
+			};
+		}
+	}, [banPost, isFirstPost, approvePost, onNextPost]);
+
+	const scrollRef = useRef<HTMLDivElement>(null);
+
+	useEffect(() => {
+		if (isFirstPost && isShiftPressed) {
+			scrollRef.current?.scrollIntoView({ behavior: 'smooth' });
+			setTimeout(() => {
+				scrollRef.current?.scrollIntoView({ behavior: 'smooth' });
+			}, 100);
+			setTimeout(() => {
+				scrollRef.current?.scrollIntoView({ behavior: 'smooth' });
+			}, 200);
+		}
+	}, [isFirstPost, isShiftPressed]);
 
 	return (
 		<PostItemContainer
@@ -159,14 +220,54 @@ export function VenomFeedPostItem({ msg, decoded: { decodedTextData, attachments
 			</div>
 
 			<div className={css.body}>
+				<div ref={scrollRef} style={{ position: 'absolute', top: -100 }} />
 				{isBanned ? (
 					<ErrorMessage look={ErrorMessageLook.INFO}>
 						Post banned 🔥
 						<ActionButton onClick={() => unbanPost()}>Undo</ActionButton>
 					</ErrorMessage>
+				) : isApproved ? (
+					<ErrorMessage look={ErrorMessageLook.INFO}>Post approved 🔥</ErrorMessage>
 				) : (
 					<>
 						<NlToBr text={decodedText} />
+
+						{isFirstPost && isShiftPressed && (
+							<div
+								style={{
+									display: 'flex',
+									justifyContent: 'space-between',
+									marginTop: 10,
+								}}
+							>
+								<div
+									style={{
+										display: 'flex',
+										flexDirection: 'column',
+										alignItems: 'center',
+										justifyContent: 'center',
+										margin: 20,
+										color: 'red',
+									}}
+								>
+									<div style={{ fontSize: 100, marginBottom: 10 }}>←</div>
+									<div>Shift + Left arrow to ban post</div>
+								</div>
+								<div
+									style={{
+										display: 'flex',
+										flexDirection: 'column',
+										alignItems: 'center',
+										justifyContent: 'center',
+										margin: 20,
+										color: 'green',
+									}}
+								>
+									<div style={{ fontSize: 100, marginBottom: 10 }}>→</div>
+									<div>Shift + Right arrow to approve post</div>
+								</div>
+							</div>
+						)}
 
 						{attachmentHttpUrl && (
 							<img

@@ -64,6 +64,13 @@ export namespace VenomFilterApi {
 		});
 	}
 
+	export async function approvePost(params: { ids: string[]; secret: string }) {
+		return await request('/approve-posts', {
+			query: { secret: params.secret, id: params.ids },
+			params: { method: 'POST' },
+		});
+	}
+
 	export async function unbanPost(params: { ids: string[]; secret: string }) {
 		return await request('/unban-posts', {
 			query: { secret: params.secret, id: params.ids },

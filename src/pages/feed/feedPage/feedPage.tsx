@@ -256,8 +256,13 @@ if (useVenomChain) {
 				<div className={css.posts}>
 					{mailList?.messages.length ? (
 						<>
-							{mailList.messages.map(message => (
-								<VenomFeedPostItem msg={message.message.msg} decoded={message.decoded} />
+							{mailList.messages.map((message, idx) => (
+								<VenomFeedPostItem
+									isFirstPost={idx === 0}
+									msg={message.message.msg}
+									decoded={message.decoded}
+									onNextPost={() => {}}
+								/>
 							))}
 
 							{mailList.isError
@@ -284,6 +289,8 @@ if (useVenomChain) {
 } else {
 	VenomFeedContent = observer(({ admin }: { admin: boolean }) => {
 		const venomAccounts = useVenomAccounts();
+
+		const [currentPost, setCurrentPost] = useState<number>(0);
 
 		const postsQuery = useInfiniteQuery(['feed', 'venom', 'load'], {
 			queryFn: async ({ pageParam = 0 }) => {
@@ -347,6 +354,7 @@ if (useVenomChain) {
 
 		const reloadFeed = () => {
 			setHasNewPosts(false);
+			setCurrentPost(0);
 			postsQuery.remove();
 			postsQuery.refetch();
 		};
@@ -393,8 +401,13 @@ if (useVenomChain) {
 				<div className={css.posts}>
 					{messages.length ? (
 						<>
-							{messages.map(message => (
-								<VenomFeedPostItem msg={message.msg} decoded={message.decoded} />
+							{messages.map((message, idx) => (
+								<VenomFeedPostItem
+									isFirstPost={idx === currentPost}
+									msg={message.msg}
+									decoded={message.decoded}
+									onNextPost={() => setCurrentPost(idx + 1)}
+								/>
 							))}
 
 							{postsQuery.isError
