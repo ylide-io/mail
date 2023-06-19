@@ -25,7 +25,7 @@ import {
 	YlideIpfsStorage,
 	YMF,
 } from '@ylide/sdk';
-import { generatePath, useLocation } from 'react-router-dom';
+import { generatePath, matchPath, useLocation } from 'react-router-dom';
 import { useNav } from './url';
 import { globalOutgoingMailData, OutgoingMailData } from '../stores/outgoingMailData';
 import { RoutePath } from '../stores/routePath';
@@ -561,7 +561,7 @@ export function useOpenMailCompose() {
 
 	return useCallback(
 		({ mailData }: { mailData?: OutgoingMailData } = {}) => {
-			if (location.pathname !== generatePath(RoutePath.MAIL_COMPOSE)) {
+			if (!matchPath(RoutePath.MAIL_COMPOSE, location.pathname)) {
 				if (browserStorage.widgetId === WidgetId.MAILBOX) {
 					globalOutgoingMailData.reset(mailData);
 					navigate(generatePath(RoutePath.MAIL_COMPOSE));

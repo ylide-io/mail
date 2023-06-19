@@ -1,7 +1,7 @@
 import { observer } from 'mobx-react';
 import React, { useEffect, useState } from 'react';
 import { QueryClient, QueryClientProvider } from 'react-query';
-import { generatePath, Navigate, Route, Routes, useLocation, useSearchParams } from 'react-router-dom';
+import { generatePath, matchPath, Navigate, Route, Routes, useLocation, useSearchParams } from 'react-router-dom';
 
 import { ActionButton, ActionButtonLook, ActionButtonSize } from './components/ActionButton/ActionButton';
 import { MainViewOnboarding } from './components/mainViewOnboarding/mainViewOnboarding';
@@ -87,7 +87,7 @@ const App = observer(() => {
 	const [isInitError, setInitError] = useState(false);
 
 	useEffect(() => {
-		if (location.pathname !== generatePath(RoutePath.TEST)) {
+		if (!matchPath(RoutePath.TEST, location.pathname)) {
 			const start = Date.now();
 			domain
 				.init()
@@ -131,7 +131,7 @@ const App = observer(() => {
 						Try again
 					</ActionButton>
 				</div>
-			) : location.pathname !== generatePath(RoutePath.TEST) && !domain.initialized ? (
+			) : !matchPath(RoutePath.TEST, location.pathname) && !domain.initialized ? (
 				<div
 					style={{
 						display: 'flex',
