@@ -1,10 +1,11 @@
 import { IMessage } from '@ylide/sdk';
 import { observer } from 'mobx-react';
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { useInfiniteQuery } from 'react-query';
 import { generatePath, useLocation, useParams } from 'react-router-dom';
 
 import { FeedCategory, FeedServerApi } from '../../../api/feedServerApi';
-import { IVenomFeedPost, VenomFilterApi } from '../../../api/venomFilterApi';
+import { VenomFilterApi } from '../../../api/venomFilterApi';
 import { ActionButton, ActionButtonLook, ActionButtonSize } from '../../../components/ActionButton/ActionButton';
 import { ErrorMessage, ErrorMessageLook } from '../../../components/errorMessage/errorMessage';
 import { NarrowContent } from '../../../components/genericLayout/content/narrowContent/narrowContent';
@@ -268,103 +269,44 @@ if (useVenomChain) {
 	VenomFeedContent = observer(({ admin }: { admin: boolean }) => {
 		const venomAccounts = useVenomAccounts();
 
-		const [messages, setMessages] = useState<
-			{ original: IVenomFeedPost; msg: IMessage; decoded: IMessageDecodedContent }[]
-		>([]);
-		const [isLoading, setIsLoading] = useState(false);
-		const [isError, setIsError] = useState(false);
-		const [isNextPageAvailable, setIsNextPageAvailable] = useState(false);
+		const { data, isLoading, isError, hasNextPage, fetchNextPage } = useInfiniteQuery(['feed', 'venom', 'load'], {
+			queryFn: async ({ pageParam = 0 }) => {
+				const posts = await VenomFilterApi.getPosts({ beforeTimestamp: pageParam, adminMode: admin });
 
-		const reloadFeed = useCallback(async () => {
-			setIsLoading(true);
-			setIsError(false);
-			try {
-				const posts = await VenomFilterApi.getPosts({ beforeTimestamp: 0, adminMode: admin });
-				setIsNextPageAvailable(posts.length === 10);
-				setMessages(
-					posts.map(p => {
-						const msg: IMessage = {
-							...p.meta,
-							key: new Uint8Array(p.meta.key),
-						};
-						return {
-							original: p,
+				return posts.map(p => {
+					const msg: IMessage = {
+						...p.meta,
+						key: new Uint8Array(p.meta.key),
+					};
+					return {
+						original: p,
+						msg,
+						decoded: decodeBroadcastContent(
+							msg.msgId,
 							msg,
-							decoded: decodeBroadcastContent(
-								msg.msgId,
-								msg,
-								p.content
-									? p.content.corrupted
-										? p.content
-										: {
-												...p.content,
-												content: new Uint8Array(p.content.content),
-										  }
-									: null,
-							),
-						};
-					}),
-				);
-				setIsLoading(false);
-			} catch (err) {
-				setIsLoading(false);
-				setIsError(true);
-				console.error(`Couldn't load posts`, err);
-			}
-		}, []);
-
-		const loadNextFeedPage = useCallback(async () => {
-			setIsLoading(true);
-			setIsError(false);
-			try {
-				const posts = await VenomFilterApi.getPosts({
-					beforeTimestamp: messages[messages.length - 1]?.original.createTimestamp,
-					adminMode: admin,
+							p.content
+								? p.content.corrupted
+									? p.content
+									: {
+											...p.content,
+											content: new Uint8Array(p.content.content),
+									  }
+								: null,
+						),
+					};
 				});
-				setIsNextPageAvailable(posts.length === 10);
-				setMessages(
-					messages.concat(
-						posts.map(p => {
-							const msg: IMessage = {
-								...p.meta,
-								key: new Uint8Array(p.meta.key),
-							};
-							return {
-								original: p,
-								msg,
-								decoded: decodeBroadcastContent(
-									msg.msgId,
-									msg,
-									p.content
-										? p.content.corrupted
-											? p.content
-											: {
-													...p.content,
-													content: new Uint8Array(p.content.content),
-											  }
-										: null,
-								),
-							};
-						}),
-					),
-				);
-				setIsLoading(false);
-			} catch (err) {
-				setIsLoading(false);
-				setIsError(true);
-				console.error(`Couldn't load posts`, err);
-			}
-		}, [messages]);
+			},
+			getNextPageParam: lastPage =>
+				lastPage.length ? lastPage[lastPage.length - 1].original.createTimestamp : undefined,
+		});
 
-		useEffect(() => {
-			reloadFeed();
-		}, [reloadFeed]);
+		const messages = data?.pages.flat() || [];
 
 		const loadingMoreRef = useRef(null);
 		useIsInViewport({
 			ref: loadingMoreRef,
 			threshold: 100,
-			callback: visible => visible && loadNextFeedPage(),
+			callback: visible => visible && fetchNextPage(),
 		});
 
 		const renderLoadingError = () => <ErrorMessage>Couldn't load posts.</ErrorMessage>;
@@ -398,7 +340,7 @@ if (useVenomChain) {
 
 							{isError
 								? renderLoadingError()
-								: isNextPageAvailable && (
+								: hasNextPage && (
 										<div ref={loadingMoreRef} className={css.loader}>
 											<YlideLoader reason="Loading more posts ..." />
 										</div>
