@@ -16,6 +16,7 @@ import {
 	MessageAttachmentType,
 	MessageContainer,
 	MessageContentV4,
+	MessageContentV5,
 	MessageSecureContext,
 	SendBroadcastResult,
 	SendMailResult,
@@ -45,6 +46,7 @@ import { getEvmWalletNetwork } from './wallet';
 import { VENOM_SERVICE_CODE } from '../constants';
 import { useCallback } from 'react';
 import { hashToIpfsUrl } from './ipfs';
+import { RecipientInfo } from '@ylide/sdk/lib/content/RecipientInfo';
 
 export async function sendMessage({
 	sender,
@@ -91,7 +93,7 @@ export async function sendMessage({
 		)),
 	];
 
-	const content = new MessageContentV4({
+	const content = new MessageContentV5({
 		sendingAgentName: 'ysh',
 		sendingAgentVersion: { major: 1, minor: 0, patch: 0 },
 		subject,
@@ -99,6 +101,7 @@ export async function sendMessage({
 		attachments: messageAttachments,
 		extraBytes: new Uint8Array(0),
 		extraJson: {},
+		recipientInfos: recipients.map(address => new RecipientInfo({ address, blockchain: '' })),
 	});
 
 	if (!network && sender.wallet.factory.blockchainGroup === 'evm') {
@@ -166,7 +169,7 @@ export async function broadcastMessage({
 		)),
 	];
 
-	const content = new MessageContentV4({
+	const content = new MessageContentV5({
 		sendingAgentName: 'ysh',
 		sendingAgentVersion: { major: 1, minor: 0, patch: 0 },
 		subject,
@@ -174,6 +177,7 @@ export async function broadcastMessage({
 		attachments: messageAttachments,
 		extraBytes: new Uint8Array(0),
 		extraJson: {},
+		recipientInfos: [],
 	});
 
 	if (!network && sender.wallet.factory.blockchainGroup === 'evm') {
@@ -226,7 +230,11 @@ export function decodeBroadcastContent(
 						type: MessageDecodedTextDataType.PLAIN,
 						value: result.content.content,
 				  },
-		attachments: result.content instanceof MessageContentV4 ? result.content.attachments : [],
+		attachments:
+			result.content instanceof MessageContentV4 || result.content instanceof MessageContentV5
+				? result.content.attachments
+				: [],
+		recipientInfos: [],
 	};
 }
 
@@ -254,7 +262,11 @@ export async function decodeMessage(
 						type: MessageDecodedTextDataType.PLAIN,
 						value: result.content.content,
 				  },
-		attachments: result.content instanceof MessageContentV4 ? result.content.attachments : [],
+		attachments:
+			result.content instanceof MessageContentV4 || result.content instanceof MessageContentV5
+				? result.content.attachments
+				: [],
+		recipientInfos: result.content instanceof MessageContentV5 ? result.content.recipientInfos : [],
 	};
 }
 

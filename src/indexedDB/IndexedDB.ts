@@ -1,4 +1,5 @@
 import { IMessage, MessageAttachment, YMF } from '@ylide/sdk';
+import { RecipientInfo } from '@ylide/sdk/lib/content/RecipientInfo';
 import { DBSchema, IDBPDatabase, openDB } from 'idb';
 
 export enum MessageDecodedTextDataType {
@@ -15,6 +16,7 @@ export interface IMessageDecodedContent {
 	decodedTextData: IMessageDecodedTextData;
 	decodedSubject: string;
 	attachments: MessageAttachment[];
+	recipientInfos: RecipientInfo[];
 }
 
 export interface IMessageDecodedSerializedContent {
@@ -24,6 +26,7 @@ export interface IMessageDecodedSerializedContent {
 		| { type: MessageDecodedTextDataType.YMF; value: string };
 	decodedSubject: string;
 	attachments?: Uint8Array[];
+	recipientInfos?: Uint8Array[];
 }
 
 export interface IContact {

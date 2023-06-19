@@ -1,4 +1,5 @@
 import { IMessage, YMF } from '@ylide/sdk';
+import { RecipientInfo } from '@ylide/sdk/lib/content/RecipientInfo';
 import { toJS } from 'mobx';
 
 import { bytesToAttachment } from '../../utils/mail';
@@ -19,6 +20,7 @@ export class MessagesDB extends IndexedDB {
 				value: content.decodedTextData.value.toString(),
 			},
 			attachments: content.attachments.map(a => a.toBytes()),
+			recipientInfos: content.recipientInfos.map(a => a.toBytes()),
 		};
 	}
 
@@ -38,6 +40,7 @@ export class MessagesDB extends IndexedDB {
 							value: content.decodedTextData.value,
 					  },
 			attachments: content.attachments?.map(bytesToAttachment) || [],
+			recipientInfos: content.recipientInfos?.map(a => RecipientInfo.fromBytes(a)) || [],
 		};
 	}
 
