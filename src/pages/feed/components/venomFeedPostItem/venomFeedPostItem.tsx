@@ -7,7 +7,6 @@ import { AdaptiveAddress } from '../../../../components/adaptiveAddress/adaptive
 import { Avatar } from '../../../../components/avatar/avatar';
 import { GridRowBox } from '../../../../components/boxes/boxes';
 import { ErrorMessage, ErrorMessageLook } from '../../../../components/errorMessage/errorMessage';
-import { GalleryModal } from '../../../../components/galleryModal/galleryModal';
 import { NlToBr } from '../../../../components/nlToBr/nlToBr';
 import { ReadableDate } from '../../../../components/readableDate/readableDate';
 import { Recipients } from '../../../../components/recipientInput/recipientInput';
@@ -269,14 +268,7 @@ export function VenomFeedPostItem({
 							</div>
 						)}
 
-						{attachmentHttpUrl && (
-							<img
-								className={css.cover}
-								alt="Attachment"
-								src={attachmentHttpUrl}
-								onClick={() => GalleryModal.show([attachmentHttpUrl])}
-							/>
-						)}
+						{attachmentHttpUrl && <img className={css.cover} alt="Attachment" src={attachmentHttpUrl} />}
 					</>
 				)}
 			</div>
