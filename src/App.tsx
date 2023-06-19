@@ -112,41 +112,6 @@ const App = observer(() => {
 
 	return (
 		<>
-			{browserStorage.showMainviewBanner ? (
-				<div
-					style={{
-						display: 'grid',
-						gridTemplateColumns: '1fr auto',
-						alignItems: 'center',
-						justifyItems: 'center',
-						gridGap: 8,
-						padding: 8,
-						color: '#fff',
-						fontSize: 14,
-						textAlign: 'center',
-						background: '#000',
-					}}
-				>
-					<div>
-						Introducing Mainview – your personalized crypto news hub! Stay ahead with dynamic news feeds
-						tailored to your token portfolio. Be the first – join the waitlist at{' '}
-						<a href="https://app.mainview.io" target="_blank" rel="noreferrer">
-							mainview.io
-						</a>
-						!
-					</div>
-
-					<ActionButton
-						style={{ color: '#fff' }}
-						look={ActionButtonLook.LITE}
-						icon={<CrossSvg />}
-						onClick={() => {
-							browserStorage.showMainviewBanner = false;
-						}}
-					/>
-				</div>
-			) : null}
-
 			{isInitError ? (
 				<div
 					style={{
@@ -180,76 +145,113 @@ const App = observer(() => {
 					<YlideLoader reason="Loading your account data from blockchain ..." />
 				</div>
 			) : (
-				<QueryClientProvider client={queryClient}>
-					<PopupManager>
-						<Routes>
-							<Route path={RoutePath.TEST} element={<TestPage />} />
-							<Route path={RoutePath.WALLETS} element={<NewWalletsPage />} />
-							<Route path={RoutePath.SETTINGS} element={<SettingsPage />} />
-							<Route path={RoutePath.ADMIN} element={<AdminPage />} />
-							<Route path={RoutePath.ADMIN_FEED} element={<AdminFeedPage />} />
+				<>
+					{browserStorage.showMainviewBanner && (
+						<div
+							style={{
+								display: 'grid',
+								gridTemplateColumns: '1fr auto',
+								alignItems: 'center',
+								justifyItems: 'center',
+								gridGap: 8,
+								padding: 8,
+								color: '#fff',
+								fontSize: 14,
+								textAlign: 'center',
+								background: '#000',
+							}}
+						>
+							<div>
+								Introducing Mainview – your personalized crypto news hub! Stay ahead with dynamic news
+								feeds tailored to your token portfolio. Be the first – join the waitlist at{' '}
+								<a href="https://app.mainview.io" target="_blank" rel="noreferrer">
+									mainview.io
+								</a>
+								!
+							</div>
 
-							<Route
-								path={RoutePath.FEED}
-								element={
-									<Navigate
-										replace
-										to={
-											REACT_APP__APP_MODE === AppMode.MAIN_VIEW
-												? generatePath(RoutePath.FEED_SMART)
-												: generatePath(RoutePath.FEED_ALL)
-										}
-									/>
-								}
+							<ActionButton
+								style={{ color: '#fff' }}
+								look={ActionButtonLook.LITE}
+								icon={<CrossSvg />}
+								onClick={() => {
+									browserStorage.showMainviewBanner = false;
+								}}
 							/>
-							<Route path={RoutePath.FEED_ALL} element={<FeedPage />} />
-							<Route path={RoutePath.FEED_POST} element={<FeedPostPage />} />
-							<Route path={RoutePath.FEED_CATEGORY} element={<FeedPage />} />
-							<Route path={RoutePath.FEED_SOURCE} element={<FeedPage />} />
-							<Route path={RoutePath.FEED_SMART} element={<FeedPage />} />
-							<Route path={RoutePath.FEED_SMART_ADDRESS} element={<FeedPage />} />
-							<Route path={RoutePath.FEED_VENOM_ADMIN} element={<FeedPage admin={true} />} />
-							<Route path={RoutePath.FEED_VENOM} element={<FeedPage />} />
+						</div>
+					)}
 
-							<Route path={RoutePath.MAIL_COMPOSE} element={<ComposePage />} />
-							<Route path={RoutePath.MAIL_CONTACTS} element={<ContactListPage />} />
-							<Route path={RoutePath.MAIL_CONTACT_TAGS} element={<ContactTagsPage />} />
-							<Route path={RoutePath.MAIL_FOLDER} element={<MailboxPage />} />
-							<Route path={RoutePath.MAIL_DETAILS} element={<MailDetailsPage />} />
+					<QueryClientProvider client={queryClient}>
+						<PopupManager>
+							<Routes>
+								<Route path={RoutePath.TEST} element={<TestPage />} />
+								<Route path={RoutePath.WALLETS} element={<NewWalletsPage />} />
+								<Route path={RoutePath.SETTINGS} element={<SettingsPage />} />
+								<Route path={RoutePath.ADMIN} element={<AdminPage />} />
+								<Route path={RoutePath.ADMIN_FEED} element={<AdminFeedPage />} />
 
-							<Route path={RoutePath.OTC_ASSETS} element={<OtcAssetsPage />} />
-							<Route path={RoutePath.OTC_WALLETS} element={<OtcWalletsPage />} />
-							<Route path={RoutePath.OTC_CHATS} element={<OtcChatsPage />} />
-							<Route path={RoutePath.OTC_CHAT} element={<OtcChatPage />} />
+								<Route
+									path={RoutePath.FEED}
+									element={
+										<Navigate
+											replace
+											to={
+												REACT_APP__APP_MODE === AppMode.MAIN_VIEW
+													? generatePath(RoutePath.FEED_SMART)
+													: generatePath(RoutePath.FEED_ALL)
+											}
+										/>
+									}
+								/>
+								<Route path={RoutePath.FEED_ALL} element={<FeedPage />} />
+								<Route path={RoutePath.FEED_POST} element={<FeedPostPage />} />
+								<Route path={RoutePath.FEED_CATEGORY} element={<FeedPage />} />
+								<Route path={RoutePath.FEED_SOURCE} element={<FeedPage />} />
+								<Route path={RoutePath.FEED_SMART} element={<FeedPage />} />
+								<Route path={RoutePath.FEED_SMART_ADDRESS} element={<FeedPage />} />
+								<Route path={RoutePath.FEED_VENOM_ADMIN} element={<FeedPage admin={true} />} />
+								<Route path={RoutePath.FEED_VENOM} element={<FeedPage />} />
 
-							<Route path={RoutePath.SEND_MESSAGE_WIDGET} element={<SendMessageWidget />} />
-							<Route path={RoutePath.MAILBOX_WIDGET} element={<MailboxWidget />} />
+								<Route path={RoutePath.MAIL_COMPOSE} element={<ComposePage />} />
+								<Route path={RoutePath.MAIL_CONTACTS} element={<ContactListPage />} />
+								<Route path={RoutePath.MAIL_CONTACT_TAGS} element={<ContactTagsPage />} />
+								<Route path={RoutePath.MAIL_FOLDER} element={<MailboxPage />} />
+								<Route path={RoutePath.MAIL_DETAILS} element={<MailDetailsPage />} />
 
-							<Route
-								path={RoutePath.ANY}
-								element={
-									<Navigate
-										replace
-										to={
-											REACT_APP__APP_MODE === AppMode.OTC
-												? generatePath(RoutePath.OTC_ASSETS)
-												: REACT_APP__APP_MODE === AppMode.MAIN_VIEW
-												? generatePath(RoutePath.FEED)
-												: generatePath(RoutePath.FEED_VENOM)
-										}
-									/>
-								}
-							/>
-						</Routes>
+								<Route path={RoutePath.OTC_ASSETS} element={<OtcAssetsPage />} />
+								<Route path={RoutePath.OTC_WALLETS} element={<OtcWalletsPage />} />
+								<Route path={RoutePath.OTC_CHATS} element={<OtcChatsPage />} />
+								<Route path={RoutePath.OTC_CHAT} element={<OtcChatPage />} />
 
-						{domain.txPlateVisible && REACT_APP__APP_MODE !== AppMode.MAIN_VIEW && <TransactionPopup />}
+								<Route path={RoutePath.SEND_MESSAGE_WIDGET} element={<SendMessageWidget />} />
+								<Route path={RoutePath.MAILBOX_WIDGET} element={<MailboxWidget />} />
 
-						<StaticComponentManager />
-						<ToastManager />
+								<Route
+									path={RoutePath.ANY}
+									element={
+										<Navigate
+											replace
+											to={
+												REACT_APP__APP_MODE === AppMode.OTC
+													? generatePath(RoutePath.OTC_ASSETS)
+													: REACT_APP__APP_MODE === AppMode.MAIN_VIEW
+													? generatePath(RoutePath.FEED)
+													: generatePath(RoutePath.FEED_VENOM)
+											}
+										/>
+									}
+								/>
+							</Routes>
 
-						{REACT_APP__APP_MODE === AppMode.MAIN_VIEW && <MainViewOnboarding />}
-					</PopupManager>
-				</QueryClientProvider>
+							{domain.txPlateVisible && REACT_APP__APP_MODE !== AppMode.MAIN_VIEW && <TransactionPopup />}
+
+							<StaticComponentManager />
+							<ToastManager />
+
+							{REACT_APP__APP_MODE === AppMode.MAIN_VIEW && <MainViewOnboarding />}
+						</PopupManager>
+					</QueryClientProvider>
+				</>
 			)}
 		</>
 	);
