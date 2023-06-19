@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { QueryClient, QueryClientProvider } from 'react-query';
 import { generatePath, Navigate, Route, Routes, useLocation, useSearchParams } from 'react-router-dom';
 
-import { ActionButton, ActionButtonSize } from './components/ActionButton/ActionButton';
+import { ActionButton, ActionButtonLook, ActionButtonSize } from './components/ActionButton/ActionButton';
 import { MainViewOnboarding } from './components/mainViewOnboarding/mainViewOnboarding';
 import { PopupManager } from './components/popup/popupManager/popupManager';
 import { StaticComponentManager } from './components/staticComponentManager/staticComponentManager';
@@ -115,21 +115,31 @@ const App = observer(() => {
 			{browserStorage.showMainviewBanner ? (
 				<div
 					style={{
-						width: '100vw',
-						paddingTop: 8,
-						paddingBottom: 8,
-						textAlign: 'center',
-						backgroundColor: '#000000',
-						color: '#ffffff',
+						display: 'grid',
+						gridTemplateColumns: '1fr auto',
+						alignItems: 'center',
+						justifyItems: 'center',
+						gridGap: 8,
+						padding: 8,
+						color: '#fff',
 						fontSize: 14,
-						position: 'relative',
+						textAlign: 'center',
+						background: '#000',
 					}}
 				>
-					Introducing Mainview – your personalized crypto news hub! Stay ahead with dynamic news feeds
-					tailored to your token portfolio. Be the first – join the waitlist at{' '}
-					<a href="https://app.mainview.io">mainview.io</a>!
-					<CrossSvg
-						style={{ position: 'absolute', top: '50%', marginTop: -10, right: 20, cursor: 'pointer' }}
+					<div>
+						Introducing Mainview – your personalized crypto news hub! Stay ahead with dynamic news feeds
+						tailored to your token portfolio. Be the first – join the waitlist at{' '}
+						<a href="https://app.mainview.io" target="_blank" rel="noreferrer">
+							mainview.io
+						</a>
+						!
+					</div>
+
+					<ActionButton
+						style={{ color: '#fff' }}
+						look={ActionButtonLook.LITE}
+						icon={<CrossSvg />}
 						onClick={() => {
 							browserStorage.showMainviewBanner = false;
 						}}

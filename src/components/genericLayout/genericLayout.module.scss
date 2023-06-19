@@ -1,10 +1,11 @@
 .root {
+	flex: 1 1 auto;
 	display: grid;
 	grid-template-rows: auto 1fr;
 	margin: auto;
 	padding: 0 20px 20px;
+	width: 100%;
 	max-width: 1140px;
-	min-height: 100%;
 
 	@include less920px {
 		padding: 0;
