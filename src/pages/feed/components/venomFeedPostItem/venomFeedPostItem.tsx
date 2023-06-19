@@ -78,7 +78,7 @@ export function VenomFeedPostItem({
 		VenomFilterApi.banPost({ ids: [msg.msgId], secret: browserStorage.userAdminPassword || '' })
 			.then(() => {
 				toast('Banned 🔥');
-				setApproved(true);
+				setBanned(true);
 			})
 			.catch(e => {
 				if (e.message === 'Request failed') {
@@ -94,7 +94,7 @@ export function VenomFeedPostItem({
 		VenomFilterApi.approvePost({ ids: [msg.msgId], secret: browserStorage.userAdminPassword || '' })
 			.then(() => {
 				toast('Approved 🔥');
-				setBanned(true);
+				setApproved(true);
 			})
 			.catch(e => {
 				if (e.message === 'Request failed') {

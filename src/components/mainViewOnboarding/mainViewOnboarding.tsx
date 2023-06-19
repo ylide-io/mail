@@ -12,6 +12,7 @@ import { ActionModal } from '../actionModal/actionModal';
 import { AdaptiveAddress } from '../adaptiveAddress/adaptiveAddress';
 import { TextField } from '../textField/textField';
 import { toast } from '../toast/toast';
+import css from './mainViewOnboarding.module.scss';
 import ErrorCode = FeedManagerApi.ErrorCode;
 
 enum Step {
@@ -176,6 +177,7 @@ export const MainViewOnboarding = observer(() => {
 
 			{step === Step.JOIN_WAITLIST && (
 				<ActionModal
+					className={css.modalWide}
 					buttons={[
 						<ActionButton
 							size={ActionButtonSize.XLARGE}
