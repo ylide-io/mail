@@ -15,18 +15,28 @@ export interface IVenomFeedPost {
 }
 
 export namespace VenomFilterApi {
+	export function getUrl() {
+		return (
+			REACT_APP__FEED_VENOM ||
+			[
+				'https://venom1.ylide.io',
+				'https://venom2.ylide.io',
+				'https://venom3.ylide.io',
+				'https://venom4.ylide.io',
+				'https://venom5.ylide.io',
+			][Math.floor(Math.random() * 5)]
+		);
+	}
+
+	const url = getUrl();
+
 	async function request<Data = string>(
 		path: string,
 		opts?: { query?: Record<string, any>; params?: RequestInit },
 	): Promise<Data> {
 		const query = Object.assign({}, opts?.query);
 
-		const response = await fetch(
-			`${REACT_APP__FEED_VENOM || `https://venom.ylide.io`}${path}?${
-				query ? createCleanSerachParams(query) : ''
-			}`,
-			opts?.params,
-		);
+		const response = await fetch(`${url}${path}?${query ? createCleanSerachParams(query) : ''}`, opts?.params);
 		invariant(response.status >= 200 && response.status < 300, 'Request failed');
 
 		const text = await response.text();
