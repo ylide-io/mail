@@ -9,6 +9,7 @@ import { ActionButton, ActionButtonLook, ActionButtonSize } from '../../../compo
 import { ErrorMessage, ErrorMessageLook } from '../../../components/errorMessage/errorMessage';
 import { NarrowContent } from '../../../components/genericLayout/content/narrowContent/narrowContent';
 import { GenericLayout, useGenericLayoutApi } from '../../../components/genericLayout/genericLayout';
+import { toast } from '../../../components/toast/toast';
 import { YlideLoader } from '../../../components/ylideLoader/ylideLoader';
 import { AppMode, REACT_APP__APP_MODE } from '../../../env';
 import { ReactComponent as ArrowUpSvg } from '../../../icons/ic20/arrowUp.svg';
@@ -374,7 +375,7 @@ if (useVenomChain) {
 					<CreatePostForm
 						className={css.createPostForm}
 						accounts={venomAccounts}
-						onCreated={() => reloadFeed()}
+						onCreated={() => toast('Good job! Your post will appear shortly 🔥')}
 					/>
 				) : (
 					<ErrorMessage look={ErrorMessageLook.INFO}>
