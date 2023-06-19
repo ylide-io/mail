@@ -1,7 +1,7 @@
 import { IMessage } from '@ylide/sdk';
 import { observer } from 'mobx-react';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { useInfiniteQuery } from 'react-query';
+import { useInfiniteQuery, useQuery } from 'react-query';
 import { generatePath, useLocation, useParams } from 'react-router-dom';
 
 import { FeedCategory, FeedServerApi } from '../../../api/feedServerApi';
@@ -269,7 +269,7 @@ if (useVenomChain) {
 	VenomFeedContent = observer(({ admin }: { admin: boolean }) => {
 		const venomAccounts = useVenomAccounts();
 
-		const { data, isLoading, isError, hasNextPage, fetchNextPage } = useInfiniteQuery(['feed', 'venom', 'load'], {
+		const postsQuery = useInfiniteQuery(['feed', 'venom', 'load'], {
 			queryFn: async ({ pageParam = 0 }) => {
 				const posts = await VenomFilterApi.getPosts({ beforeTimestamp: pageParam, adminMode: admin });
 
@@ -300,19 +300,46 @@ if (useVenomChain) {
 				lastPage.length ? lastPage[lastPage.length - 1].original.createTimestamp : undefined,
 		});
 
-		const messages = data?.pages.flat() || [];
+		const messages = postsQuery.data?.pages.flat() || [];
+
+		const [hasNewPosts, setHasNewPosts] = useState(false);
+
+		useQuery(['feed', 'venom', 'new-posts'], {
+			queryFn: async () => {
+				if (!hasNewPosts) {
+					const posts = await VenomFilterApi.getPosts({ beforeTimestamp: 0, adminMode: admin });
+					setHasNewPosts(!!(posts.length && messages.length && posts[0].id !== messages[0].original.id));
+				}
+			},
+			refetchInterval: 15 * 1000,
+		});
+
+		const reloadFeed = () => {
+			setHasNewPosts(false);
+			postsQuery.remove();
+			postsQuery.refetch();
+		};
 
 		const loadingMoreRef = useRef(null);
 		useIsInViewport({
 			ref: loadingMoreRef,
 			threshold: 100,
-			callback: visible => visible && fetchNextPage(),
+			callback: visible => visible && postsQuery.fetchNextPage(),
 		});
 
 		const renderLoadingError = () => <ErrorMessage>Couldn't load posts.</ErrorMessage>;
 
 		return (
-			<NarrowContent title="Venom feed">
+			<NarrowContent
+				title="Venom feed"
+				titleRight={
+					hasNewPosts && (
+						<ActionButton look={ActionButtonLook.SECONDARY} onClick={() => reloadFeed()}>
+							Load new posts
+						</ActionButton>
+					)
+				}
+			>
 				{venomAccounts.length ? (
 					<CreatePostForm
 						className={css.createPostForm}
@@ -338,19 +365,19 @@ if (useVenomChain) {
 								<VenomFeedPostItem msg={message.msg} decoded={message.decoded} />
 							))}
 
-							{isError
+							{postsQuery.isError
 								? renderLoadingError()
-								: hasNextPage && (
+								: postsQuery.hasNextPage && (
 										<div ref={loadingMoreRef} className={css.loader}>
 											<YlideLoader reason="Loading more posts ..." />
 										</div>
 								  )}
 						</>
-					) : isLoading ? (
+					) : postsQuery.isLoading ? (
 						<div className={css.loader}>
 							<YlideLoader reason="Your feed is loading ..." />
 						</div>
-					) : isError ? (
+					) : postsQuery.isError ? (
 						renderLoadingError()
 					) : (
 						<ErrorMessage look={ErrorMessageLook.INFO}>No messages yet</ErrorMessage>
