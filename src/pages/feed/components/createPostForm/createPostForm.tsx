@@ -227,12 +227,15 @@ export const CreatePostForm = observer(({ className, accounts, onCreated, servic
 									</AnchoredPopup>
 								)}
 							</GridRowBox>
-
-							<SendMailButton
-								disabled={isIdeaLoading || serviceStatus !== 'ACTIVE'}
-								mailData={mailData}
-								onSent={onSent}
-							/>
+							{serviceStatus !== 'ACTIVE' ? (
+								<div>Can't post now. Wait a minute.</div>
+							) : (
+								<SendMailButton
+									disabled={isIdeaLoading || serviceStatus !== 'ACTIVE'}
+									mailData={mailData}
+									onSent={onSent}
+								/>
+							)}
 						</div>
 					</div>
 				</>
