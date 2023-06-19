@@ -2,7 +2,7 @@ import { IMessage } from '@ylide/sdk';
 import { observer } from 'mobx-react';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useInfiniteQuery, useQuery } from 'react-query';
-import { generatePath, useLocation, useParams } from 'react-router-dom';
+import { generatePath, matchPath, useLocation, useParams } from 'react-router-dom';
 
 import { FeedCategory, FeedServerApi } from '../../../api/feedServerApi';
 import { VenomFilterApi } from '../../../api/venomFilterApi';
@@ -37,7 +37,7 @@ const RegularFeedContent = observer(() => {
 	const genericLayoutApi = useGenericLayoutApi();
 
 	const { category, source, address } = useParams<{ category: FeedCategory; source: string; address: string }>();
-	const isAllPosts = location.pathname === generatePath(RoutePath.FEED_ALL);
+	const isAllPosts = !!matchPath(RoutePath.FEED_ALL, location.pathname);
 
 	const selectedAccounts = useMemo(
 		() =>
@@ -438,8 +438,8 @@ if (useVenomChain) {
 const FeedPageContent = observer(({ admin }: { admin: boolean }) => {
 	const location = useLocation();
 	const isVenomFeed =
-		location.pathname === generatePath(RoutePath.FEED_VENOM) ||
-		location.pathname === generatePath(RoutePath.FEED_VENOM_ADMIN);
+		!!matchPath(RoutePath.FEED_VENOM, location.pathname) ||
+		!!matchPath(RoutePath.FEED_VENOM_ADMIN, location.pathname);
 
 	return isVenomFeed ? <VenomFeedContent admin={admin} /> : <RegularFeedContent />;
 });
