@@ -27,10 +27,11 @@ import css from './createPostForm.module.scss';
 
 export interface CreatePostFormProps extends PropsWithClassName {
 	accounts: DomainAccount[];
+	serviceStatus: string;
 	onCreated?: () => void;
 }
 
-export const CreatePostForm = observer(({ className, accounts, onCreated }: CreatePostFormProps) => {
+export const CreatePostForm = observer(({ className, accounts, onCreated, serviceStatus }: CreatePostFormProps) => {
 	const mailData = useMemo(() => {
 		const mailData = new OutgoingMailData();
 
@@ -227,7 +228,11 @@ export const CreatePostForm = observer(({ className, accounts, onCreated }: Crea
 								)}
 							</GridRowBox>
 
-							<SendMailButton disabled={isIdeaLoading} mailData={mailData} onSent={onSent} />
+							<SendMailButton
+								disabled={isIdeaLoading || serviceStatus !== 'ACTIVE'}
+								mailData={mailData}
+								onSent={onSent}
+							/>
 						</div>
 					</div>
 				</>

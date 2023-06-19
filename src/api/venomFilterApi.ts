@@ -43,6 +43,20 @@ export namespace VenomFilterApi {
 		return await request<{ bannedPosts: string[] }>('/posts-status', { query: { id: params.ids } });
 	}
 
+	export async function banAddresses(params: { addresses: string[]; secret: string }) {
+		return await request('/ban-addresses', {
+			query: { secret: params.secret, address: params.addresses },
+			params: { method: 'POST' },
+		});
+	}
+
+	export async function unbanAddresses(params: { addresses: string[]; secret: string }) {
+		return await request('/unban-addresses', {
+			query: { secret: params.secret, address: params.addresses },
+			params: { method: 'POST' },
+		});
+	}
+
 	export async function banPost(params: { ids: string[]; secret: string }) {
 		return await request('/ban-posts', {
 			query: { secret: params.secret, id: params.ids },
@@ -67,5 +81,23 @@ export namespace VenomFilterApi {
 
 	export async function getTextIdea() {
 		return await request<string>('/get-idea');
+	}
+
+	export async function getServiceStatus() {
+		return await request<{ status: string }>('/service-status');
+	}
+
+	export async function startService(params: { secret: string }) {
+		return await request('/start-service', {
+			query: { secret: params.secret },
+			params: { method: 'GET' },
+		});
+	}
+
+	export async function stopService(params: { secret: string }) {
+		return await request('/stop-service', {
+			query: { secret: params.secret },
+			params: { method: 'GET' },
+		});
 	}
 }

@@ -48,6 +48,22 @@ export function VenomFeedPostItem({ msg, decoded: { decodedTextData, attachments
 	const openMailCompose = useOpenMailCompose();
 	const venomAccounts = useVenomAccounts();
 
+	const banAddress = () => {
+		VenomFilterApi.banAddresses({ addresses: [msg.senderAddress], secret: browserStorage.userAdminPassword || '' })
+			.then(() => {
+				toast('Banned 🔥');
+				setBanned(true);
+			})
+			.catch(e => {
+				if (e.message === 'Request failed') {
+					toast('Wrong password 🤦‍♀️');
+				} else {
+					toast('Error 🤦‍♀️');
+					throw e;
+				}
+			});
+	};
+
 	const banPost = () => {
 		VenomFilterApi.banPost({ ids: [msg.msgId], secret: browserStorage.userAdminPassword || '' })
 			.then(() => {
@@ -95,7 +111,13 @@ export function VenomFeedPostItem({ msg, decoded: { decodedTextData, attachments
 						className={css.sender}
 						maxLength={12}
 						address={msg.senderAddress}
-						onClick={() => copyToClipboard(msg.senderAddress, { toast: true })}
+						onClick={e => {
+							if (e.shiftKey && browserStorage.isUserAdmin) {
+								banAddress();
+							} else {
+								copyToClipboard(msg.senderAddress, { toast: true });
+							}
+						}}
 					/>
 
 					<ActionButton

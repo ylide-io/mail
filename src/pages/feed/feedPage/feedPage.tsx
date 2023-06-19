@@ -1,6 +1,6 @@
 import { IMessage } from '@ylide/sdk';
 import { observer } from 'mobx-react';
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useInfiniteQuery, useQuery } from 'react-query';
 import { generatePath, useLocation, useParams } from 'react-router-dom';
 
@@ -208,6 +208,21 @@ if (useVenomChain) {
 
 		useEffect(() => () => mailList?.destroy(), [mailList]);
 
+		const [serviceStatus, setServiceStatus] = useState<string>('ACTIVE');
+
+		const reloadServiceStatus = useCallback(async () => {
+			const result = await VenomFilterApi.getServiceStatus();
+			setServiceStatus(result.status);
+		}, []);
+
+		useEffect(() => {
+			reloadServiceStatus();
+			const timer = setInterval(reloadServiceStatus, 10000);
+			return () => {
+				clearInterval(timer);
+			};
+		}, [reloadServiceStatus]);
+
 		const loadingMoreRef = useRef(null);
 		useIsInViewport({
 			ref: loadingMoreRef,
@@ -223,6 +238,7 @@ if (useVenomChain) {
 					<CreatePostForm
 						className={css.createPostForm}
 						accounts={venomAccounts}
+						serviceStatus={serviceStatus}
 						onCreated={() => setRebuildMailListCounter(i => i + 1)}
 					/>
 				) : (
@@ -314,6 +330,21 @@ if (useVenomChain) {
 			refetchInterval: 15 * 1000,
 		});
 
+		const [serviceStatus, setServiceStatus] = useState<string>('ACTIVE');
+
+		const reloadServiceStatus = useCallback(async () => {
+			const result = await VenomFilterApi.getServiceStatus();
+			setServiceStatus(result.status);
+		}, []);
+
+		useEffect(() => {
+			reloadServiceStatus();
+			const timer = setInterval(reloadServiceStatus, 10000);
+			return () => {
+				clearInterval(timer);
+			};
+		}, [reloadServiceStatus]);
+
 		const reloadFeed = () => {
 			setHasNewPosts(false);
 			postsQuery.remove();
@@ -345,6 +376,7 @@ if (useVenomChain) {
 						className={css.createPostForm}
 						accounts={venomAccounts}
 						onCreated={() => toast('Good job! Your post will appear shortly 🔥')}
+						serviceStatus={serviceStatus}
 					/>
 				) : (
 					<ErrorMessage look={ErrorMessageLook.INFO}>
