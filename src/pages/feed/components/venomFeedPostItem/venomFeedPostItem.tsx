@@ -1,5 +1,5 @@
 import { IMessage, MessageAttachmentLinkV1 } from '@ylide/sdk';
-import React, { useMemo, useRef, useState } from 'react';
+import React, { useMemo, useState } from 'react';
 
 import { VenomFilterApi } from '../../../../api/venomFilterApi';
 import { ActionButton, ActionButtonLook } from '../../../../components/ActionButton/ActionButton';
@@ -41,7 +41,7 @@ export function VenomFeedPostItem({ msg, decoded: { decodedTextData, attachments
 	const attachment = attachments[0] as MessageAttachmentLinkV1 | undefined;
 	const attachmentHttpUrl = attachment && ipfsToHttpUrl(attachment.link);
 
-	const [clicks, setClicks] = useState<number[]>([]);
+	let [clicks] = useState<number[]>([]);
 
 	const [isBanned, setBanned] = useState(false);
 
@@ -80,14 +80,10 @@ export function VenomFeedPostItem({ msg, decoded: { decodedTextData, attachments
 		<PostItemContainer
 			collapsable
 			className={css.root}
-			onClick={e => {
-				e.stopPropagation();
-				e.preventDefault();
-				const newClicks = [Date.now(), ...clicks].slice(0, 3);
-				if (newClicks.length === 3 && newClicks[0] - newClicks[2] < 600) {
+			onClick={() => {
+				clicks = [Date.now(), ...clicks].slice(0, 3);
+				if (browserStorage.isUserAdmin && clicks.length === 3 && clicks[0] - clicks[2] < 600) {
 					banPost();
-				} else {
-					setClicks(newClicks);
 				}
 			}}
 		>

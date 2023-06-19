@@ -1,11 +1,12 @@
 import clsx from 'clsx';
-import React, { PropsWithChildren, useEffect, useRef, useState } from 'react';
+import React, { MouseEventHandler, PropsWithChildren, useEffect, useRef, useState } from 'react';
 
 import { PropsWithClassName } from '../../../../components/props';
 import css from './postItemContainer.module.scss';
 
-export interface PostItemContainerProps extends PropsWithChildren<{ onClick?: (e: any) => void }>, PropsWithClassName {
+export interface PostItemContainerProps extends PropsWithChildren<{}>, PropsWithClassName {
 	collapsable?: boolean;
+	onClick?: MouseEventHandler<HTMLDivElement>;
 }
 
 export function PostItemContainer({ children, className, collapsable, onClick }: PostItemContainerProps) {
