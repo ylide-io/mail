@@ -232,7 +232,7 @@ export function VenomFeedPostItem({
 					<>
 						<NlToBr text={decodedText} />
 
-						{isFirstPost && isShiftPressed && (
+						{isFirstPost && isShiftPressed && browserStorage.isUserAdmin && (
 							<div
 								style={{
 									display: 'flex',
