@@ -122,6 +122,9 @@ dependencies:
   react-infinite-scroll-component:
     specifier: ^6.1.0
     version: 6.1.0(react@17.0.2)
+  react-intersection-observer:
+    specifier: ^9.5.0
+    version: 9.5.0(react@17.0.2)
   react-qr-code:
     specifier: ^2.0.8
     version: 2.0.8(react@17.0.2)
@@ -12609,6 +12612,14 @@ packages:
     dependencies:
       react: 17.0.2
       throttle-debounce: 2.3.0
+    dev: false
+
+  /react-intersection-observer@9.5.0(react@17.0.2):
+    resolution: {integrity: sha512-bQbfe6Jl8KSynbWfQWz8LoGCCmG6fhsilljgc6dc1NMYpNmP20wfFsrF7CE5N9+LbWx33DUgJdkNBVhU1JzIRA==}
+    peerDependencies:
+      react: ^15.0.0 || ^16.0.0 || ^17.0.0 || ^18.0.0
+    dependencies:
+      react: 17.0.2
     dev: false
 
   /react-is@16.13.1:

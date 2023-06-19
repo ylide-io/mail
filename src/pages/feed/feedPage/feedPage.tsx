@@ -1,6 +1,7 @@
 import { IMessage } from '@ylide/sdk';
 import { observer } from 'mobx-react';
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { InView } from 'react-intersection-observer';
 import { useInfiniteQuery, useQuery } from 'react-query';
 import { generatePath, matchPath, useLocation, useParams } from 'react-router-dom';
 
@@ -22,7 +23,6 @@ import { ILinkedMessage, MailList } from '../../../stores/MailList';
 import { RoutePath } from '../../../stores/routePath';
 import { connectAccount } from '../../../utils/account';
 import { decodeBroadcastContent, decodeMessage } from '../../../utils/mail';
-import { useIsInViewport } from '../../../utils/ui';
 import { useNav } from '../../../utils/url';
 import { CreatePostForm } from '../components/createPostForm/createPostForm';
 import { FeedPostItem } from '../components/feedPostItem/feedPostItem';
@@ -77,13 +77,6 @@ const RegularFeedContent = observer(() => {
 		return feed;
 	}, [canLoadFeed, category, genericLayoutApi, isAllPosts, selectedAccounts, source]);
 
-	const loadingMoreRef = useRef(null);
-	useIsInViewport({
-		ref: loadingMoreRef,
-		threshold: 100,
-		callback: visible => visible && feed.loadMore(),
-	});
-
 	return (
 		<NarrowContent
 			title={
@@ -130,9 +123,13 @@ const RegularFeedContent = observer(() => {
 						))}
 
 						{feed.moreAvailable && (
-							<div ref={loadingMoreRef} className={css.loader}>
+							<InView
+								className={css.loader}
+								rootMargin="100px"
+								onChange={inView => inView && feed.loadMore()}
+							>
 								<YlideLoader reason="Loading more posts ..." />
-							</div>
+							</InView>
 						)}
 					</>
 				) : feed.error ? (
@@ -223,13 +220,6 @@ if (useVenomChain) {
 			};
 		}, [reloadServiceStatus]);
 
-		const loadingMoreRef = useRef(null);
-		useIsInViewport({
-			ref: loadingMoreRef,
-			threshold: 100,
-			callback: visible => visible && mailList?.loadNextPage(),
-		});
-
 		const renderLoadingError = () => <ErrorMessage>Couldn't load posts.</ErrorMessage>;
 
 		return (
@@ -268,9 +258,13 @@ if (useVenomChain) {
 							{mailList.isError
 								? renderLoadingError()
 								: mailList.isNextPageAvailable && (
-										<div ref={loadingMoreRef} className={css.loader}>
+										<InView
+											className={css.loader}
+											rootMargin="100px"
+											onChange={inView => inView && mailList?.loadNextPage()}
+										>
 											<YlideLoader reason="Loading more posts ..." />
-										</div>
+										</InView>
 								  )}
 						</>
 					) : mailList?.isLoading ? (
@@ -359,13 +353,6 @@ if (useVenomChain) {
 			postsQuery.refetch();
 		};
 
-		const loadingMoreRef = useRef(null);
-		useIsInViewport({
-			ref: loadingMoreRef,
-			threshold: 100,
-			callback: visible => visible && postsQuery.fetchNextPage(),
-		});
-
 		const renderLoadingError = () => <ErrorMessage>Couldn't load posts.</ErrorMessage>;
 
 		return (
@@ -413,9 +400,13 @@ if (useVenomChain) {
 							{postsQuery.isError
 								? renderLoadingError()
 								: postsQuery.hasNextPage && (
-										<div ref={loadingMoreRef} className={css.loader}>
+										<InView
+											className={css.loader}
+											rootMargin="100px"
+											onChange={inView => inView && postsQuery.fetchNextPage()}
+										>
 											<YlideLoader reason="Loading more posts ..." />
-										</div>
+										</InView>
 								  )}
 						</>
 					) : postsQuery.isLoading ? (
