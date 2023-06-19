@@ -119,7 +119,7 @@ export function VenomFeedPostItem({
 	}, [msg.msgId]);
 
 	useEffect(() => {
-		if (isFirstPost) {
+		if (isFirstPost && browserStorage.isUserAdmin) {
 			const downHandler = (e: KeyboardEvent) => {
 				// shift + left arrow:
 				if (e.shiftKey && e.keyCode === 37) {
@@ -142,7 +142,7 @@ export function VenomFeedPostItem({
 	const scrollRef = useRef<HTMLDivElement>(null);
 
 	useEffect(() => {
-		if (isFirstPost && isShiftPressed) {
+		if (isFirstPost && isShiftPressed && browserStorage.isUserAdmin) {
 			scrollRef.current?.scrollIntoView({ behavior: 'smooth' });
 			setTimeout(() => {
 				scrollRef.current?.scrollIntoView({ behavior: 'smooth' });
