@@ -188,7 +188,7 @@ const App = observer(() => {
 					<div>
 						Introducing Mainview – your personalized crypto news hub! Stay ahead with dynamic news feeds
 						tailored to your token portfolio. Be the first – join the waitlist at{' '}
-						<a href="https://app.mainview.io" target="_blank" rel="noreferrer">
+						<a href="https://mainview.io" target="_blank" rel="noreferrer">
 							mainview.io
 						</a>
 						!
