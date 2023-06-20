@@ -10,7 +10,6 @@ import { ReactComponent as ArchiveSvg } from '../../../icons/archive.svg';
 import { ReactComponent as ArrowDownSvg } from '../../../icons/ic20/arrowDown.svg';
 import { ReactComponent as ArrowUpSvg } from '../../../icons/ic20/arrowUp.svg';
 import { ReactComponent as ContactSvg } from '../../../icons/ic20/contact.svg';
-import { ReactComponent as SettingsSvg } from '../../../icons/ic20/settings.svg';
 import { ReactComponent as SidebarMenuSvg } from '../../../icons/ic28/sidebarMenu.svg';
 import { ReactComponent as SidebarMenuCloseSvg } from '../../../icons/ic28/sidebarMenu_close.svg';
 import { ReactComponent as InboxSvg } from '../../../icons/inbox.svg';
@@ -42,7 +41,6 @@ import { useNav } from '../../../utils/url';
 import { ActionButton, ActionButtonLook, ActionButtonSize } from '../../ActionButton/ActionButton';
 import { AdaptiveText } from '../../adaptiveText/adaptiveText';
 import { PropsWithClassName } from '../../props';
-import { toast } from '../../toast/toast';
 import css from './sidebarMenu.module.scss';
 
 interface SidebarBurgerProps extends PropsWithClassName, PropsWithChildren<{}> {}
@@ -212,20 +210,6 @@ export const SidebarMenu = observer(() => {
 								href={generatePath(RoutePath.FEED_SMART_ADDRESS, { address: account.account.address })}
 								icon={<ContactSvg />}
 								name={<AdaptiveText text={account.name || account.account.address} />}
-								rightButton={
-									REACT_APP__APP_MODE === AppMode.MAIN_VIEW
-										? {
-												icon: <SettingsSvg />,
-												onClick: () => {
-													if (!account.mainViewKey) {
-														return toast('Please complete the onboarding first ❤');
-													}
-
-													setFeedSettingsAccount(account);
-												},
-										  }
-										: undefined
-								}
 							/>
 						))}
 					</SidebarSection>
