@@ -47,6 +47,10 @@ import { VENOM_SERVICE_CODE } from '../constants';
 import { useCallback } from 'react';
 import { hashToIpfsUrl } from './ipfs';
 import { RecipientInfo } from '@ylide/sdk/lib/content/RecipientInfo';
+import { ILinkedMessage } from '../stores/MailList';
+import { formatAddress } from './blockchain';
+
+// SENDING
 
 export async function sendMessage({
 	sender,
@@ -202,7 +206,7 @@ export async function broadcastMessage({
 	return result;
 }
 
-//
+// CONTENT
 
 async function getMessageContent(msg: IMessage) {
 	const content = await domain.ylide.core.getMessageContent(msg);
@@ -285,7 +289,29 @@ export function bytesToAttachment(bytes: Uint8Array) {
 	}
 }
 
-//
+// META
+
+export function formatSubject(subject: string, prefix?: string) {
+	return `${prefix || ''}${subject || '(no subject)'}`;
+}
+
+export function getRecipients(
+	isIncoming: boolean,
+	message: ILinkedMessage,
+	decoded?: IMessageDecodedContent,
+): string[] {
+	if (isIncoming) {
+		return [message.msg.senderAddress];
+	} else {
+		return decoded?.recipientInfos.length
+			? decoded.recipientInfos.map(r => r.address)
+			: message.recipients.length
+			? message.recipients
+			: [formatAddress(message.msg.recipientAddress)];
+	}
+}
+
+// TEXT
 
 const EMPTY_OUTPUT_DATA: OutputData = {
 	time: 1676587472156,
@@ -547,13 +573,7 @@ export function isEmptyYMF(ymf: YMF) {
 	return !ymf.toString();
 }
 
-//
-
-export function formatSubject(subject: string, prefix?: string) {
-	return `${prefix || ''}${subject || '(no subject)'}`;
-}
-
-//
+// UI
 
 export function useOpenMailCompose() {
 	const location = useLocation();

@@ -18,7 +18,6 @@ import { IContact, IMessageDecodedContent } from '../../../../indexedDB/IndexedD
 import contacts from '../../../../stores/Contacts';
 import { FolderId, ILinkedMessage, mailStore } from '../../../../stores/MailList';
 import { invariant } from '../../../../utils/assert';
-import { formatAddress } from '../../../../utils/blockchain';
 import { DateFormatStyle } from '../../../../utils/date';
 import { downloadFile, formatFileSize } from '../../../../utils/file';
 import { getIpfsHashFromUrl } from '../../../../utils/ipfs';
@@ -27,6 +26,7 @@ import {
 	decodedTextDataToEditorJsData,
 	EDITOR_JS_TOOLS,
 	formatSubject,
+	getRecipients,
 } from '../../../../utils/mail';
 import css from './mailMessage.module.scss';
 
@@ -56,6 +56,8 @@ export const MailMessage = observer(
 				onReady?.();
 			}
 		}, [isEditorReady, onReady]);
+
+		const recipients = getRecipients(folderId !== FolderId.Sent, message, decoded);
 
 		return (
 			<div className={css.root}>
@@ -88,21 +90,11 @@ export const MailMessage = observer(
 
 				<div className={css.sender}>
 					<div className={css.senderLabel}>
-						{folderId === FolderId.Sent
-							? message.recipients.length > 1
-								? 'Receivers'
-								: 'Receiver'
-							: 'Sender'}
-						:
+						{folderId === FolderId.Sent ? (recipients.length > 1 ? 'Receivers' : 'Receiver') : 'Sender'}:
 					</div>
 
 					<div className={css.senderList}>
-						{(folderId === FolderId.Sent
-							? message.recipients.length
-								? message.recipients
-								: [formatAddress(message.msg.recipientAddress)]
-							: [message.msg.senderAddress]
-						).map(address => {
+						{recipients.map(address => {
 							const contact = contacts.find({ address });
 
 							return (
