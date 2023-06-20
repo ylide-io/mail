@@ -96,6 +96,12 @@ export namespace VenomFilterApi {
 		});
 	}
 
+	export async function getPost(params: { id: string; adminMode?: boolean }) {
+		return await request<IVenomFeedPost | null>('/post', {
+			query: { id: params.id, adminMode: params.adminMode },
+		});
+	}
+
 	export async function getTextIdea() {
 		return await request<string>('/get-idea');
 	}

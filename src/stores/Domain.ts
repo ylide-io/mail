@@ -502,6 +502,13 @@ export class Domain {
 	}
 
 	async extractWalletsData() {
+		let last = Date.now();
+		const tick = (t: string) => {
+			const now = Date.now();
+			console.log(t, now - last + 'ms');
+			last = now;
+		};
+
 		this.registeredWallets = Ylide.walletsList.map(w => w.factory);
 		this.registeredBlockchains = Ylide.blockchainsList.map(b => b.factory);
 
@@ -511,6 +518,7 @@ export class Domain {
 				!this.walletControllers[factory.blockchainGroup][factory.wallet]
 			) {
 				await this.initWallet(factory);
+				tick('wallet ' + factory.wallet + ' inited');
 			}
 		}
 		for (const factory of this.registeredBlockchains) {
@@ -522,6 +530,7 @@ export class Domain {
 							? ['https://mainnet.evercloud.dev/695e40eeac6b4e3fa4a11666f6e0d6af/graphql']
 							: ['https://gql-testnet.venom.foundation/graphql'],
 				});
+				tick('blockchain ' + factory.blockchain + ' inited');
 			}
 		}
 
@@ -539,6 +548,7 @@ export class Domain {
 			if (!this.wallets.find(w => w.factory.wallet === factory.wallet)) {
 				const newWallet = new Wallet(this, factory, controller);
 				await newWallet.init();
+				tick('internal wallet ' + factory.wallet + ' inited');
 				this.wallets.push(newWallet);
 			}
 		}
@@ -570,31 +580,45 @@ export class Domain {
 		if (this.initialized) {
 			return;
 		}
+		let last = Date.now();
+		const tick = (t: string) => {
+			const now = Date.now();
+			console.log(t, now - last + 'ms');
+			last = now;
+		};
 		await this.reloadAvailableWallets();
+		tick('this.reloadAvailableWallets();');
 		await this.initWalletConnect();
+		tick('this.initWalletConnect();');
 		await this.extractWalletsData();
+		tick('this.extractWalletsData();');
 		await this.keystore.init();
+		tick('this.keystore.init();');
 		await this.accounts.accountsProcessed;
+		tick('this.accounts.accountsProcessed;');
 		await contacts.init();
+		tick('contacts.init();');
 		await tags.getTags();
+		tick('tags.getTags();');
 		await mailStore.init();
+		tick('mailStore.init();');
 		this.initialized = true;
 
 		// hacks for VenomWallet again :(
-		let scTimes = 0;
-		const schedule = () => {
-			setTimeout(async () => {
-				await domain.reloadAvailableWallets();
-				await domain.extractWalletsData();
-				await domain.accounts.handleKeysUpdate(domain.keystore.keys);
-				scTimes++;
-				if (scTimes < 5) {
-					schedule();
-				}
-			}, 500);
-		};
+		// let scTimes = 0;
+		// const schedule = () => {
+		// 	setTimeout(async () => {
+		// 		await domain.reloadAvailableWallets();
+		// 		await domain.extractWalletsData();
+		// 		await domain.accounts.handleKeysUpdate(domain.keystore.keys);
+		// 		scTimes++;
+		// 		if (scTimes < 5) {
+		// 			schedule();
+		// 		}
+		// 	}, 500);
+		// };
 
-		schedule();
+		// schedule();
 	}
 }
 
