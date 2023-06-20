@@ -130,6 +130,7 @@ export class Domain {
 	@observable txWithBonus: boolean = false;
 	@observable txPlateVisible: boolean = false;
 	@observable isTxPublishing: boolean = false;
+	@observable enforceMainViewOnboarding: boolean = false;
 	@observable publishingTxHash: string = '';
 
 	@observable devMode = false; //document.location.href.includes('localhost');

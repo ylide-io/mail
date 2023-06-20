@@ -3,7 +3,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 
 import { FeedManagerApi } from '../../api/feedManagerApi';
 import { APP_NAME } from '../../constants';
-import { useDomainAccounts } from '../../stores/Domain';
+import domain, { useDomainAccounts } from '../../stores/Domain';
 import { DomainAccount } from '../../stores/models/DomainAccount';
 import { connectAccount, disconnectAccount } from '../../utils/account';
 import { invariant } from '../../utils/assert';
@@ -87,11 +87,6 @@ export const MainViewOnboarding = observer(() => {
 					// Request invide code
 					else {
 						setStep(Step.JOIN_WAITLIST);
-						setTimeout(() => {
-							const script = document.createElement('script');
-							script.src = 'https://prod-waitlist-widget.s3.us-east-2.amazonaws.com/getwaitlist.min.js';
-							divForScriptRef.current?.appendChild(script);
-						}, 500);
 					}
 				}
 			} catch (e) {
@@ -101,6 +96,22 @@ export const MainViewOnboarding = observer(() => {
 		},
 		[disconnect, reset],
 	);
+
+	useEffect(() => {
+		if (domain.enforceMainViewOnboarding) {
+			setStep(Step.JOIN_WAITLIST);
+		}
+	}, [domain.enforceMainViewOnboarding]);
+
+	useEffect(() => {
+		if (step === Step.JOIN_WAITLIST) {
+			setTimeout(() => {
+				const script = document.createElement('script');
+				script.src = 'https://prod-waitlist-widget.s3.us-east-2.amazonaws.com/getwaitlist.min.js';
+				divForScriptRef.current?.appendChild(script);
+			}, 500);
+		}
+	}, [step]);
 
 	const connect = useCallback(async () => {
 		setStep(Step.CONNECT_ACCOUNT);

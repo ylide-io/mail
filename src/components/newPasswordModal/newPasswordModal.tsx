@@ -236,17 +236,18 @@ export function NewPasswordModal({ faucetType, bonus, wallet, account, remoteKey
 								domain.isTxPublishing = false;
 							} else {
 								domain.isTxPublishing = false;
+								domain.enforceMainViewOnboarding = true;
 								if (result.errorCode === 'ALREADY_EXISTS') {
-									alert(
+									console.log(
 										`Your address has been already registered or the previous transaction is in progress. Please try connecting another address or wait for transaction to finalize (1-2 minutes).`,
 									);
-									document.location.href = generatePath(RoutePath.WALLETS);
+									// document.location.href = generatePath(RoutePath.WALLETS);
 								} else {
-									alert(
+									console.log(
 										'Something went wrong with key publishing :(\n\n' +
 											JSON.stringify(result, null, '\t'),
 									);
-									document.location.href = generatePath(RoutePath.WALLETS);
+									// document.location.href = generatePath(RoutePath.WALLETS);
 								}
 							}
 						})
