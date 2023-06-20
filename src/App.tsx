@@ -170,7 +170,7 @@ const App = observer(() => {
 
 	return (
 		<>
-			{browserStorage.showMainviewBanner && (
+			{browserStorage.isMainViewBannerHidden || REACT_APP__APP_MODE === AppMode.MAIN_VIEW || (
 				<div
 					style={{
 						display: 'grid',
@@ -199,7 +199,7 @@ const App = observer(() => {
 						look={ActionButtonLook.LITE}
 						icon={<CrossSvg />}
 						onClick={() => {
-							browserStorage.showMainviewBanner = false;
+							browserStorage.isMainViewBannerHidden = true;
 						}}
 					/>
 				</div>

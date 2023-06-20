@@ -9,7 +9,7 @@ import { toggleArrayItem } from '../utils/array';
 enum BrowserStorageKey {
 	IS_USER_ADMIN = 'ylide_isUserAdmin',
 	USER_ADMIN_PASSWORD = 'ylide_userAdminPassword',
-	SHOW_MAINVIEW_BANNER = 'ylide_showMainviewBanner',
+	IS_MAIN_VIEW_BANNER_HIDDEN = 'ylide_isMainViewBannerHidden',
 	ACCOUNT_REMOTE_KEYS = 'ylide_accountRemoteKeys',
 	CAN_SKIP_REGISTRATION = 'can_skip_registration',
 	SIDEBAR_FOLDED_SECTIONS = 'ylide_sidebarFoldedSections',
@@ -61,12 +61,7 @@ class BrowserStorage {
 
 	//
 
-	private _isUserAdmin =
-		BrowserStorage.getItemWithTransform<boolean>(
-			BrowserStorageKey.IS_USER_ADMIN,
-			item => item === 'true',
-			sessionStorage,
-		) || false;
+	private _isUserAdmin = BrowserStorage.getItem(BrowserStorageKey.IS_USER_ADMIN, sessionStorage) === 'true';
 
 	get isUserAdmin() {
 		return this._isUserAdmin;
@@ -79,19 +74,15 @@ class BrowserStorage {
 
 	//
 
-	private _showMainviewBanner =
-		BrowserStorage.getItemWithTransform<boolean>(
-			BrowserStorageKey.SHOW_MAINVIEW_BANNER,
-			item => item !== 'false',
-		) ?? true;
+	private _isMainViewBannerHidden = BrowserStorage.getItem(BrowserStorageKey.IS_MAIN_VIEW_BANNER_HIDDEN) === 'true';
 
-	get showMainviewBanner() {
-		return this._showMainviewBanner;
+	get isMainViewBannerHidden() {
+		return this._isMainViewBannerHidden;
 	}
 
-	set showMainviewBanner(value: boolean) {
-		BrowserStorage.setItem(BrowserStorageKey.SHOW_MAINVIEW_BANNER, value);
-		this._showMainviewBanner = value;
+	set isMainViewBannerHidden(value: boolean) {
+		BrowserStorage.setItem(BrowserStorageKey.IS_MAIN_VIEW_BANNER_HIDDEN, value);
+		this._isMainViewBannerHidden = value;
 	}
 
 	//
