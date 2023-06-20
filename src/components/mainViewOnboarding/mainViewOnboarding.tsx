@@ -34,6 +34,11 @@ export const MainViewOnboarding = observer(() => {
 	const [inviteCodeLoading, setInviteCodeLoading] = useState(false);
 	const divForScriptRef = useRef<HTMLDivElement>(null);
 
+	// Disconnect inactive accounts before begin
+	useEffect(() => {
+		domain.accounts.accounts.filter(a => !domain.accounts.isActiveAccount(a)).forEach(a => disconnectAccount(a));
+	}, []);
+
 	const reset = useCallback(() => {
 		setInviteCode('');
 		setStep(undefined);
