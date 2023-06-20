@@ -7,5 +7,6 @@ export function getIpfsHashFromUrl(url: string) {
 }
 
 export function ipfsToHttpUrl(url: string) {
-	return `https://ipfs.ylide.io/file/${getIpfsHashFromUrl(url)}`;
+	const ipfsUrls = ['https://ipfs1.ylide.io', 'https://ipfs2.ylide.io', 'https://ipfs3.ylide.io'];
+	return `${ipfsUrls[Math.floor(ipfsUrls.length * Math.random())]}/file/${getIpfsHashFromUrl(url)}`;
 }
