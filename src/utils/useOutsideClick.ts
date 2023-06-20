@@ -1,6 +1,6 @@
 import { RefObject, useEffect } from 'react';
 
-import { getElementParentOrSelf } from './dom';
+import { getElementParentOrSelf } from './ui';
 
 export function useOutsideClick(
 	rootRef: RefObject<Element>,

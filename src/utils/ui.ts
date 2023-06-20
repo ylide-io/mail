@@ -1,11 +1,22 @@
 import { Rect } from './rect';
 
+// SCROLL
+
 export function scrollWindowToTop() {
 	window.scrollTo({
 		top: 0,
 		behavior: 'smooth',
 	});
 }
+
+export function scrollIntoViewIfNeeded(elem: Element) {
+	elem.scrollIntoView
+		? elem.scrollIntoView({ block: 'nearest', inline: 'nearest' })
+		: // @ts-ignore
+		  elem.scrollIntoViewIfNeeded && elem.scrollIntoViewIfNeeded();
+}
+
+// BOUNDARIES
 
 export function getViewportRect() {
 	return new Rect(
@@ -22,9 +33,44 @@ export function getElementRect(element: HTMLElement): Rect {
 	return new Rect(clientRect.left, clientRect.top, clientRect.width, clientRect.height);
 }
 
-export function scrollIntoViewIfNeeded(elem: Element) {
-	elem.scrollIntoView
-		? elem.scrollIntoView({ block: 'nearest', inline: 'nearest' })
-		: // @ts-ignore
-		  elem.scrollIntoViewIfNeeded && elem.scrollIntoViewIfNeeded();
+// TREE
+
+export function getElementParent(
+	element: HTMLElement,
+	predicate: (parent: HTMLElement) => boolean,
+): HTMLElement | null {
+	let parent: HTMLElement = element;
+	while (parent.parentElement != null) {
+		parent = parent.parentElement;
+		if (predicate(parent)) {
+			return parent;
+		}
+	}
+	return null;
+}
+
+export function getElementParentOrSelf(
+	element: HTMLElement,
+	predicate: (parent: HTMLElement) => boolean,
+): HTMLElement | null {
+	return predicate(element) ? element : getElementParent(element, predicate);
+}
+
+// MUTATIONS
+
+const MutationObserver = window.MutationObserver || (window as any)['WebKitMutationObserver'];
+
+export function observeMutations(
+	target: Node,
+	callback: () => void,
+	options: MutationObserverInit | undefined = {
+		childList: true,
+		subtree: true,
+		attributes: true,
+		characterData: true,
+	},
+) {
+	const observer = new MutationObserver(() => callback());
+	observer.observe(target, options);
+	return () => observer.disconnect();
 }

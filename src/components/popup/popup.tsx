@@ -37,10 +37,14 @@ export function Popup({
 
 		alignPopup();
 
+		const timer = setInterval(() => alignPopup(), 500);
+
 		window.addEventListener('resize', alignPopup, false);
 		window.addEventListener('scroll', alignPopup, false);
 
 		return () => {
+			clearInterval(timer);
+
 			window.removeEventListener('resize', alignPopup, false);
 			window.removeEventListener('scroll', alignPopup, false);
 		};
