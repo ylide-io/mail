@@ -266,7 +266,6 @@ const stickerIpfsIds = [
 	'QmTAGJ7HEEFtmqPaUe3bJZwZ8RUKwBDug94AKG5rJ28puT',
 	'QmdguqNpb2bUKg6znVSyXtKRaNrtrYVxchaof7xryjarhE',
 	'QmW4oWhz6onHJSaWYBTVF68XCgvr8MSrs6m73dJd3tRLTb',
-	'QmX9QLWtfw1Q2RddP6UNEzRFSkZwy7NcNbwxstqRpBg5P2',
 	'QmZVpzzAyKnFXDLpJze7H22p8igxRfuLHCikPA3YMRhLg7',
 	'QmSwxecFnFjbe44HJ3pQdLrytrZNcM48XGPbvaTbxWZsCk',
 	'QmbYpa9m8QsCuyTG4tPYHtok2Cf7raJrtap9kMsND5Y25x',
