@@ -153,14 +153,15 @@ export async function disconnectAccount(account: DomainAccount) {
 
 export async function requestSwitchAccount(wallet: Wallet) {
 	try {
-		if (wallet.controller.isMultipleAccountsSupported()) {
-			await wallet.controller.requestAuthentication();
-		} else {
+		if (!wallet.controller.isMultipleAccountsSupported()) {
 			const account = await wallet.getCurrentAccount();
 			if (account) {
 				await wallet.controller.disconnectAccount(account);
 			}
-			await wallet.controller.requestAuthentication();
 		}
-	} catch (e) {}
+
+		await wallet.controller.requestAuthentication();
+	} catch (e) {
+		console.log('Error in requestSwitchAccount', e);
+	}
 }
