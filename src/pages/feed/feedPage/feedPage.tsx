@@ -223,20 +223,11 @@ const VenomFeedContent = observer(() => {
 		refetchInterval: 15 * 1000,
 	});
 
-	const [serviceStatus, setServiceStatus] = useState<string>('ACTIVE');
-
-	const reloadServiceStatus = useCallback(async () => {
-		const result = await VenomFilterApi.getServiceStatus();
-		setServiceStatus(result.status);
-	}, []);
-
-	useEffect(() => {
-		reloadServiceStatus();
-		const timer = setInterval(reloadServiceStatus, 10000);
-		return () => {
-			clearInterval(timer);
-		};
-	}, [reloadServiceStatus]);
+	const serviceStatus = useQuery(['feed', 'venom', 'service-status'], {
+		queryFn: async () => (await VenomFilterApi.getServiceStatus()).status,
+		initialData: 'ACTIVE',
+		refetchInterval: 10000,
+	});
 
 	const reloadFeed = () => {
 		setHasNewPosts(false);
@@ -262,8 +253,8 @@ const VenomFeedContent = observer(() => {
 				<CreatePostForm
 					className={css.createPostForm}
 					accounts={venomAccounts}
+					isAnavailable={serviceStatus.data !== 'ACTIVE'}
 					onCreated={() => toast('Good job! Your post will appear shortly 🔥')}
-					serviceStatus={serviceStatus}
 				/>
 			) : (
 				<ErrorMessage look={ErrorMessageLook.INFO}>

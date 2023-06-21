@@ -26,11 +26,11 @@ import css from './createPostForm.module.scss';
 
 export interface CreatePostFormProps extends PropsWithClassName {
 	accounts: DomainAccount[];
-	serviceStatus: string;
+	isAnavailable: boolean;
 	onCreated?: () => void;
 }
 
-export const CreatePostForm = observer(({ className, accounts, onCreated, serviceStatus }: CreatePostFormProps) => {
+export const CreatePostForm = observer(({ className, accounts, isAnavailable, onCreated }: CreatePostFormProps) => {
 	const mailData = useMemo(() => {
 		const mailData = new OutgoingMailData();
 
@@ -220,14 +220,11 @@ export const CreatePostForm = observer(({ className, accounts, onCreated, servic
 									</AnchoredPopup>
 								)}
 							</GridRowBox>
-							{serviceStatus !== 'ACTIVE' ? (
+
+							{isAnavailable ? (
 								<div>Can't post now. Wait a minute.</div>
 							) : (
-								<SendMailButton
-									disabled={isIdeaLoading || serviceStatus !== 'ACTIVE'}
-									mailData={mailData}
-									onSent={onSent}
-								/>
+								<SendMailButton disabled={isIdeaLoading} mailData={mailData} onSent={onSent} />
 							)}
 						</div>
 					</div>
