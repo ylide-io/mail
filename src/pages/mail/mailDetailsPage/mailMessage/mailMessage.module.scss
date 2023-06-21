@@ -26,41 +26,41 @@
 	grid-gap: 4px;
 }
 
-.sender {
-	display: flex;
+.recipients {
+	display: grid;
+	grid-template-columns: minmax(60px, auto) 1fr;
+	grid-gap: 8px;
 	min-width: 0;
-
-	> :not(:first-child) {
-		margin-left: 8px;
-	}
 }
 
-.senderLabel {
+.recipientsLabel {
 	color: var(--secondary-text-color);
 }
 
-.senderList {
+.recipientsList {
 	display: grid;
-	grid-gap: 8px;
+	max-height: 200px;
+	overflow-y: auto;
+	overflow-x: hidden; // horizontal scrollbar appears somehow
 }
 
-.senderRow {
+.recipientsRow {
 	display: flex;
 	align-items: center;
 	min-width: 0;
+	min-height: 20px;
 
 	> :not(:first-child) {
-		margin-left: 8px;
+		margin-left: 4px;
 	}
 }
 
-.addContactButton {
-	margin: -99px 0;
+.recipientsButton {
 	opacity: 0;
 	transition: opacity 200ms;
 }
 
-.senderRow:hover .addContactButton {
+.recipientsRow:hover .recipientsButton {
 	opacity: 1;
 }
 

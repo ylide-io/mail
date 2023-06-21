@@ -295,22 +295,18 @@ export function formatSubject(subject: string, prefix?: string) {
 	return `${prefix || ''}${subject || '(no subject)'}`;
 }
 
-export function getRecipients(
-	isIncoming: boolean,
-	message: ILinkedMessage,
-	decoded?: IMessageDecodedContent,
-): string[] {
-	if (isIncoming) {
-		return [message.msg.senderAddress];
-	} else {
-		return decoded?.recipientInfos.length
-			? decoded.recipientInfos.map(r => r.address)
-			: !isEvmBlockchain(message.msg.blockchain)
-			? []
-			: message.recipients.length
-			? message.recipients
-			: [formatAddress(message.msg.recipientAddress)];
-	}
+export function getMessageSenders(message: ILinkedMessage) {
+	return [message.msg.senderAddress];
+}
+
+export function getMessageReceivers(message: ILinkedMessage, decoded?: IMessageDecodedContent) {
+	return decoded?.recipientInfos.length
+		? decoded.recipientInfos.map(r => r.address)
+		: !isEvmBlockchain(message.msg.blockchain)
+		? []
+		: message.recipients.length
+		? message.recipients
+		: [formatAddress(message.msg.recipientAddress)];
 }
 
 // TEXT

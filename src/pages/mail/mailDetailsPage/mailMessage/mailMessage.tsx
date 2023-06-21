@@ -1,6 +1,6 @@
 import { MessageAttachment, MessageAttachmentLinkV1, YlideIpfsStorage } from '@ylide/sdk';
 import { observer } from 'mobx-react';
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { ReactNode, useEffect, useMemo, useState } from 'react';
 import { createReactEditorJS } from 'react-editor-js';
 
 import { ActionButton, ActionButtonLook } from '../../../../components/ActionButton/ActionButton';
@@ -26,7 +26,8 @@ import {
 	decodedTextDataToEditorJsData,
 	EDITOR_JS_TOOLS,
 	formatSubject,
-	getRecipients,
+	getMessageReceivers,
+	getMessageSenders,
 } from '../../../../utils/mail';
 import css from './mailMessage.module.scss';
 
@@ -57,7 +58,47 @@ export const MailMessage = observer(
 			}
 		}, [isEditorReady, onReady]);
 
-		const recipients = getRecipients(folderId !== FolderId.Sent, message, decoded);
+		function renderRecipients(label: ReactNode, addresses: string[]) {
+			return (
+				<>
+					<div className={css.recipientsLabel}>{label}</div>
+
+					<div className={css.recipientsList}>
+						{addresses.map(address => {
+							const contact = contacts.find({ address });
+
+							return (
+								<div className={css.recipientsRow}>
+									<ContactName address={address} />
+
+									{!contact && (
+										<button
+											className={css.recipientsButton}
+											title="Create contact"
+											onClick={() => {
+												const name = prompt('Enter contact name:')?.trim();
+												if (!name) return;
+
+												const contact: IContact = {
+													name,
+													description: '',
+													address,
+													tags: [],
+												};
+
+												contacts.createContact(contact).catch(() => toast("Couldn't save 😒"));
+											}}
+										>
+											<AddContactSvg />
+										</button>
+									)}
+								</div>
+							);
+						})}
+					</div>
+				</>
+			);
+		}
 
 		return (
 			<div className={css.root}>
@@ -88,43 +129,10 @@ export const MailMessage = observer(
 					)}
 				</div>
 
-				<div className={css.sender}>
-					<div className={css.senderLabel}>
-						{folderId === FolderId.Sent ? (recipients.length > 1 ? 'Receivers' : 'Receiver') : 'Sender'}:
-					</div>
+				<div className={css.recipients}>
+					{renderRecipients('From:', getMessageSenders(message))}
 
-					<div className={css.senderList}>
-						{recipients.map(address => {
-							const contact = contacts.find({ address });
-
-							return (
-								<div className={css.senderRow}>
-									<ContactName address={address} />
-
-									{!contact && (
-										<ActionButton
-											className={css.addContactButton}
-											icon={<AddContactSvg />}
-											title="Create contact"
-											onClick={() => {
-												const name = prompt('Enter contact name:')?.trim();
-												if (!name) return;
-
-												const contact: IContact = {
-													name,
-													description: '',
-													address,
-													tags: [],
-												};
-
-												contacts.createContact(contact).catch(() => toast("Couldn't save 😒"));
-											}}
-										/>
-									)}
-								</div>
-							);
-						})}
-					</div>
+					{renderRecipients('To:', getMessageReceivers(message, decoded))}
 				</div>
 
 				<ReadableDate className={css.date} style={DateFormatStyle.LONG} value={message.msg.createdAt * 1000} />

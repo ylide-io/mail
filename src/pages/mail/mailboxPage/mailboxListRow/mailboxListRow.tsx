@@ -13,7 +13,12 @@ import contacts from '../../../../stores/Contacts';
 import domain from '../../../../stores/Domain';
 import { FolderId, ILinkedMessage, mailStore } from '../../../../stores/MailList';
 import { RoutePath } from '../../../../stores/routePath';
-import { decodedTextDataToPlainText, formatSubject, getRecipients } from '../../../../utils/mail';
+import {
+	decodedTextDataToPlainText,
+	formatSubject,
+	getMessageReceivers,
+	getMessageSenders,
+} from '../../../../utils/mail';
 import { useNav } from '../../../../utils/url';
 import css from './mailboxListRow.module.scss';
 
@@ -35,7 +40,8 @@ const MailboxListRow: React.FC<MailboxListRowProps> = observer(
 		const decoded = mailStore.decodedMessagesById[message.msgId];
 		const isRead = mailStore.readMessageIds.has(message.id);
 
-		const recipients = getRecipients(folderId !== FolderId.Sent, message, decoded);
+		const recipients =
+			folderId === FolderId.Sent ? getMessageReceivers(message, decoded) : getMessageSenders(message);
 
 		const messageClickHandler = async () => {
 			if (decoded) {
