@@ -1,4 +1,5 @@
 import { IMessage, MessageAttachmentLinkV1 } from '@ylide/sdk';
+import clsx from 'clsx';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import { VenomFilterApi } from '../../../../api/venomFilterApi';
@@ -196,11 +197,13 @@ export function VenomFeedPostItem({
 				</GridRowBox>
 
 				<div className={css.metaRight}>
-					<ReadableDate className={css.date} value={msg.createdAt * 1000} />
+					<ReadableDate className={css.metaAction} value={msg.createdAt * 1000} />
+
+					<button className={clsx(css.metaAction, css.metaAction_interactive)}>Reply</button>
 
 					{!!msg.$$meta.id && (
 						<a
-							className={css.metaButton}
+							className={clsx(css.metaAction, css.metaAction_icon, css.metaAction_interactive)}
 							href={`https://testnet.venomscan.com/messages/${msg.$$meta.id}`}
 							target="_blank"
 							rel="noreferrer"
@@ -211,7 +214,10 @@ export function VenomFeedPostItem({
 					)}
 
 					{browserStorage.isUserAdmin && (
-						<button className={css.metaButton} onClick={() => banPost()}>
+						<button
+							className={clsx(css.metaAction, css.metaAction_icon, css.metaAction_interactive)}
+							onClick={() => banPost()}
+						>
 							<CrossSvg />
 						</button>
 					)}
