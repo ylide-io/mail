@@ -48,7 +48,7 @@ import { useCallback } from 'react';
 import { hashToIpfsUrl } from './ipfs';
 import { RecipientInfo } from '@ylide/sdk/lib/content/RecipientInfo';
 import { ILinkedMessage } from '../stores/MailList';
-import { formatAddress } from './blockchain';
+import { formatAddress, isEvmBlockchain } from './blockchain';
 
 // SENDING
 
@@ -305,6 +305,8 @@ export function getRecipients(
 	} else {
 		return decoded?.recipientInfos.length
 			? decoded.recipientInfos.map(r => r.address)
+			: !isEvmBlockchain(message.msg.blockchain)
+			? []
 			: message.recipients.length
 			? message.recipients
 			: [formatAddress(message.msg.recipientAddress)];

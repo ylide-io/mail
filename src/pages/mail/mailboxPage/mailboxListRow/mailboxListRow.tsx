@@ -7,6 +7,7 @@ import { BlockChainLabel } from '../../../../components/BlockChainLabel/BlockCha
 import { CheckBox } from '../../../../components/checkBox/checkBox';
 import { ContactName } from '../../../../components/contactName/contactName';
 import { ReadableDate } from '../../../../components/readableDate/readableDate';
+import { DASH } from '../../../../constants';
 import { ReactComponent as FilterSvg } from '../../../../icons/ic20/filter.svg';
 import contacts from '../../../../stores/Contacts';
 import domain from '../../../../stores/Domain';
@@ -84,31 +85,37 @@ const MailboxListRow: React.FC<MailboxListRowProps> = observer(
 				</div>
 
 				<div className={css.contact}>
-					<ContactName className={css.contactValue} address={recipients[0]} />
+					{recipients.length ? (
+						<>
+							<ContactName className={css.contactValue} address={recipients[0]} />
 
-					{recipients.length > 1 && (
-						<div
-							className={css.contactsNumber}
-							title={recipients
-								.filter((_, i) => i)
-								.map(address => contacts.find({ address })?.name || address)
-								.join('\n')}
-						>
-							+{recipients.length - 1}
-						</div>
-					)}
+							{recipients.length > 1 && (
+								<div
+									className={css.contactsNumber}
+									title={recipients
+										.filter((_, i) => i)
+										.map(address => contacts.find({ address })?.name || address)
+										.join('\n')}
+								>
+									+{recipients.length - 1}
+								</div>
+							)}
 
-					{onFilterBySenderClick && (
-						<div
-							className={css.filterBySenderButton}
-							title="Show all incoming messages from this sender"
-							onClick={e => {
-								e.stopPropagation();
-								onFilterBySenderClick();
-							}}
-						>
-							<FilterSvg />
-						</div>
+							{onFilterBySenderClick && (
+								<div
+									className={css.filterBySenderButton}
+									title="Show all incoming messages from this sender"
+									onClick={e => {
+										e.stopPropagation();
+										onFilterBySenderClick();
+									}}
+								>
+									<FilterSvg />
+								</div>
+							)}
+						</>
+					) : (
+						DASH
 					)}
 				</div>
 

@@ -462,6 +462,10 @@ export const evmNetworks = (Object.keys(EVM_NAMES) as unknown as EVMNetwork[]).m
 	network: Number(network) as EVMNetwork,
 }));
 
-export function evmNameToNetwork(name: string) {
+export function evmNameToNetwork(name: string): EVMNetwork | undefined {
 	return evmNetworks.find(n => n.name === name)?.network;
+}
+
+export function isEvmBlockchain(blockchain: string) {
+	return !!evmNameToNetwork(blockchain);
 }
