@@ -12,6 +12,21 @@
 	grid-template-columns: 1fr;
 }
 
+.replyToHeader {
+	display: grid;
+	grid-auto-flow: column;
+	align-items: center;
+	justify-content: space-between;
+	grid-gap: 8px;
+}
+
+.replyToTitle {
+	padding: 0 0 0 12px;
+	font-size: 14px;
+	font-weight: $font-weight_bold;
+	text-transform: uppercase;
+}
+
 .textarea {
 	padding: 8px;
 }

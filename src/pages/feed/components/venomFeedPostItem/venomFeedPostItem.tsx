@@ -44,7 +44,7 @@ interface VenomFeedPostItemViewProps {
 
 export function VenomFeedPostItemView({
 	msg,
-	decoded: { decodedTextData, attachments },
+	decoded,
 
 	isBanned,
 	isApproved,
@@ -57,6 +57,7 @@ export function VenomFeedPostItemView({
 	onBanClick,
 	onUnbanClick,
 }: VenomFeedPostItemViewProps) {
+	const decodedTextData = decoded.decodedTextData;
 	const decodedText = useMemo(
 		() =>
 			decodedTextData.type === MessageDecodedTextDataType.PLAIN
@@ -64,7 +65,8 @@ export function VenomFeedPostItemView({
 				: decodedTextData.value.toPlainText(),
 		[decodedTextData],
 	);
-	const attachment = attachments[0] as MessageAttachmentLinkV1 | undefined;
+
+	const attachment = decoded.attachments[0] as MessageAttachmentLinkV1 | undefined;
 	const attachmentHttpUrl = attachment && ipfsToHttpUrl(attachment.link);
 
 	return (
@@ -187,9 +189,10 @@ interface VenomFeedPostItemProps {
 	decoded: IMessageDecodedContent;
 	isFirstPost: boolean;
 	onNextPost: () => void;
+	onReplyClick: () => void;
 }
 
-export function VenomFeedPostItem({ msg, decoded, isFirstPost, onNextPost }: VenomFeedPostItemProps) {
+export function VenomFeedPostItem({ msg, decoded, isFirstPost, onNextPost, onReplyClick }: VenomFeedPostItemProps) {
 	let [clicks] = useState<number[]>([]);
 
 	const [isBanned, setBanned] = useState(false);
@@ -297,6 +300,7 @@ export function VenomFeedPostItem({ msg, decoded, isFirstPost, onNextPost }: Ven
 	return (
 		<div style={{ position: 'relative' }}>
 			<div ref={scrollRef} style={{ position: 'absolute', top: -100 }} />
+
 			<VenomFeedPostItemView
 				msg={msg}
 				decoded={decoded}
@@ -323,6 +327,7 @@ export function VenomFeedPostItem({ msg, decoded, isFirstPost, onNextPost }: Ven
 
 					openMailCompose({ mailData });
 				}}
+				onReplyClick={onReplyClick}
 				onBanClick={browserStorage.isUserAdmin ? () => banPost() : undefined}
 				onUnbanClick={() => unbanPost()}
 			/>
