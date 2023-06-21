@@ -235,7 +235,7 @@ const App = observer(() => {
 						<Route path={RoutePath.FEED_SOURCE} element={<FeedPage />} />
 						<Route path={RoutePath.FEED_SMART} element={<FeedPage />} />
 						<Route path={RoutePath.FEED_SMART_ADDRESS} element={<FeedPage />} />
-						<Route path={RoutePath.FEED_VENOM_ADMIN} element={<FeedPage admin={true} />} />
+						<Route path={RoutePath.FEED_VENOM_ADMIN} element={<FeedPage />} />
 						<Route path={RoutePath.FEED_VENOM} element={<FeedPage />} />
 
 						<Route path={RoutePath.MAIL_COMPOSE} element={<ComposePage />} />

@@ -170,14 +170,17 @@ const RegularFeedContent = observer(() => {
 	);
 });
 
-const VenomFeedContent = observer(({ admin }: { admin: boolean }) => {
+const VenomFeedContent = observer(() => {
+	const location = useLocation();
+	const isAdminMode = !!matchPath(RoutePath.FEED_VENOM_ADMIN, location.pathname);
+
 	const venomAccounts = useVenomAccounts();
 
 	const [currentPost, setCurrentPost] = useState<number>(0);
 
 	const postsQuery = useInfiniteQuery(['feed', 'venom', 'load'], {
 		queryFn: async ({ pageParam = 0 }) => {
-			const posts = await VenomFilterApi.getPosts({ beforeTimestamp: pageParam, adminMode: admin });
+			const posts = await VenomFilterApi.getPosts({ beforeTimestamp: pageParam, adminMode: isAdminMode });
 
 			return posts.map(p => {
 				const msg: IMessage = {
@@ -213,7 +216,7 @@ const VenomFeedContent = observer(({ admin }: { admin: boolean }) => {
 	useQuery(['feed', 'venom', 'new-posts'], {
 		queryFn: async () => {
 			if (!hasNewPosts) {
-				const posts = await VenomFilterApi.getPosts({ beforeTimestamp: 0, adminMode: admin });
+				const posts = await VenomFilterApi.getPosts({ beforeTimestamp: 0, adminMode: isAdminMode });
 				setHasNewPosts(!!(posts.length && messages.length && posts[0].id !== messages[0].original.id));
 			}
 		},
@@ -314,17 +317,11 @@ const VenomFeedContent = observer(({ admin }: { admin: boolean }) => {
 
 //
 
-const FeedPageContent = observer(({ admin }: { admin: boolean }) => {
+export const FeedPage = () => {
 	const location = useLocation();
 	const isVenomFeed =
 		!!matchPath(RoutePath.FEED_VENOM, location.pathname) ||
 		!!matchPath(RoutePath.FEED_VENOM_ADMIN, location.pathname);
 
-	return isVenomFeed ? <VenomFeedContent admin={admin} /> : <RegularFeedContent />;
-});
-
-export const FeedPage = ({ admin = false }: { admin?: boolean }) => (
-	<GenericLayout>
-		<FeedPageContent admin={admin} />
-	</GenericLayout>
-);
+	return <GenericLayout>{isVenomFeed ? <VenomFeedContent /> : <RegularFeedContent />}</GenericLayout>;
+};
