@@ -16,13 +16,11 @@ import { YlideLoader } from '../../../components/ylideLoader/ylideLoader';
 import { AppMode, REACT_APP__APP_MODE } from '../../../env';
 import { ReactComponent as ArrowUpSvg } from '../../../icons/ic20/arrowUp.svg';
 import { ReactComponent as CrossSvg } from '../../../icons/ic20/cross.svg';
-import { IMessageDecodedContent } from '../../../indexedDB/IndexedDB';
 import { useDomainAccounts, useVenomAccounts } from '../../../stores/Domain';
 import { FeedStore, getFeedCategoryName } from '../../../stores/Feed';
-import { ILinkedMessage, MailList } from '../../../stores/MailList';
 import { RoutePath } from '../../../stores/routePath';
 import { connectAccount } from '../../../utils/account';
-import { decodeBroadcastContent, decodeMessage } from '../../../utils/mail';
+import { decodeBroadcastContent } from '../../../utils/mail';
 import { useNav } from '../../../utils/url';
 import { CreatePostForm } from '../components/createPostForm/createPostForm';
 import { FeedPostItem } from '../components/feedPostItem/feedPostItem';
@@ -172,257 +170,147 @@ const RegularFeedContent = observer(() => {
 	);
 });
 
-const useVenomChain = false;
+const VenomFeedContent = observer(({ admin }: { admin: boolean }) => {
+	const venomAccounts = useVenomAccounts();
 
-let VenomFeedContent: ({ admin }: { admin: boolean }) => JSX.Element;
+	const [currentPost, setCurrentPost] = useState<number>(0);
 
-if (useVenomChain) {
-	VenomFeedContent = observer(({ admin }: { admin: boolean }) => {
-		const venomAccounts = useVenomAccounts();
+	const postsQuery = useInfiniteQuery(['feed', 'venom', 'load'], {
+		queryFn: async ({ pageParam = 0 }) => {
+			const posts = await VenomFilterApi.getPosts({ beforeTimestamp: pageParam, adminMode: admin });
 
-		const [rebuildMailListCounter, setRebuildMailListCounter] = useState(1);
-		const mailList = useMemo(() => {
-			// Senceless code to make IDE treat this var as dependency
-			isNaN(rebuildMailListCounter);
-
-			const mailList = new MailList<{ message: ILinkedMessage; decoded: IMessageDecodedContent }>();
-
-			mailList.init({
-				messagesFilter: async messages => {
-					const ids = messages.map(m => m.msgId);
-					const { bannedPosts } = await VenomFilterApi.getPostsStatus({ ids });
-					return messages.filter(m => !bannedPosts.includes(m.msgId));
-				},
-				messageHandler: async message => ({
-					message,
-					decoded: await decodeMessage(message.msgId, message.msg),
-				}),
-				venomFeed: true,
-			});
-
-			return mailList;
-		}, [rebuildMailListCounter]);
-
-		useEffect(() => () => mailList?.destroy(), [mailList]);
-
-		const [serviceStatus, setServiceStatus] = useState<string>('ACTIVE');
-
-		const reloadServiceStatus = useCallback(async () => {
-			const result = await VenomFilterApi.getServiceStatus();
-			setServiceStatus(result.status);
-		}, []);
-
-		useEffect(() => {
-			reloadServiceStatus();
-			const timer = setInterval(reloadServiceStatus, 10000);
-			return () => {
-				clearInterval(timer);
-			};
-		}, [reloadServiceStatus]);
-
-		const renderLoadingError = () => <ErrorMessage>Couldn't load posts.</ErrorMessage>;
-
-		return (
-			<NarrowContent title="Venom feed">
-				{venomAccounts.length ? (
-					<CreatePostForm
-						className={css.createPostForm}
-						accounts={venomAccounts}
-						serviceStatus={serviceStatus}
-						onCreated={() => setRebuildMailListCounter(i => i + 1)}
-					/>
-				) : (
-					<ErrorMessage look={ErrorMessageLook.INFO}>
-						<div>Connect your Venom wallet to post messages to Venom feed.</div>
-
-						<ActionButton look={ActionButtonLook.PRIMARY} onClick={() => connectAccount()}>
-							Connect account
-						</ActionButton>
-					</ErrorMessage>
-				)}
-
-				<div className={css.divider} />
-
-				<div className={css.posts}>
-					{mailList?.messages.length ? (
-						<>
-							{mailList.messages.map((message, idx) => (
-								<VenomFeedPostItem
-									isFirstPost={idx === 0}
-									msg={message.message.msg}
-									decoded={message.decoded}
-									onNextPost={() => {}}
-								/>
-							))}
-
-							{mailList.isError
-								? renderLoadingError()
-								: mailList.isNextPageAvailable && (
-										<InView
-											className={css.loader}
-											rootMargin="100px"
-											onChange={inView => inView && mailList?.loadNextPage()}
-										>
-											<YlideLoader reason="Loading more posts ..." />
-										</InView>
-								  )}
-						</>
-					) : mailList?.isLoading ? (
-						<div className={css.loader}>
-							<YlideLoader reason="Your feed is loading ..." />
-						</div>
-					) : mailList?.isError ? (
-						renderLoadingError()
-					) : (
-						<ErrorMessage look={ErrorMessageLook.INFO}>No messages yet</ErrorMessage>
-					)}
-				</div>
-			</NarrowContent>
-		);
-	});
-} else {
-	VenomFeedContent = observer(({ admin }: { admin: boolean }) => {
-		const venomAccounts = useVenomAccounts();
-
-		const [currentPost, setCurrentPost] = useState<number>(0);
-
-		const postsQuery = useInfiniteQuery(['feed', 'venom', 'load'], {
-			queryFn: async ({ pageParam = 0 }) => {
-				const posts = await VenomFilterApi.getPosts({ beforeTimestamp: pageParam, adminMode: admin });
-
-				return posts.map(p => {
-					const msg: IMessage = {
-						...p.meta,
-						key: new Uint8Array(p.meta.key),
-					};
-					return {
-						original: p,
+			return posts.map(p => {
+				const msg: IMessage = {
+					...p.meta,
+					key: new Uint8Array(p.meta.key),
+				};
+				return {
+					original: p,
+					msg,
+					decoded: decodeBroadcastContent(
+						msg.msgId,
 						msg,
-						decoded: decodeBroadcastContent(
-							msg.msgId,
-							msg,
-							p.content
-								? p.content.corrupted
-									? p.content
-									: {
-											...p.content,
-											content: new Uint8Array(p.content.content),
-									  }
-								: null,
-						),
-					};
-				});
-			},
-			getNextPageParam: lastPage =>
-				lastPage.length ? lastPage[lastPage.length - 1].original.createTimestamp : undefined,
-		});
-
-		const messages = postsQuery.data?.pages.flat() || [];
-
-		const [hasNewPosts, setHasNewPosts] = useState(false);
-
-		useQuery(['feed', 'venom', 'new-posts'], {
-			queryFn: async () => {
-				if (!hasNewPosts) {
-					const posts = await VenomFilterApi.getPosts({ beforeTimestamp: 0, adminMode: admin });
-					setHasNewPosts(!!(posts.length && messages.length && posts[0].id !== messages[0].original.id));
-				}
-			},
-			refetchInterval: 15 * 1000,
-		});
-
-		const [serviceStatus, setServiceStatus] = useState<string>('ACTIVE');
-
-		const reloadServiceStatus = useCallback(async () => {
-			const result = await VenomFilterApi.getServiceStatus();
-			setServiceStatus(result.status);
-		}, []);
-
-		useEffect(() => {
-			reloadServiceStatus();
-			const timer = setInterval(reloadServiceStatus, 10000);
-			return () => {
-				clearInterval(timer);
-			};
-		}, [reloadServiceStatus]);
-
-		const reloadFeed = () => {
-			setHasNewPosts(false);
-			setCurrentPost(0);
-			postsQuery.remove();
-			postsQuery.refetch();
-		};
-
-		const renderLoadingError = () => <ErrorMessage>Couldn't load posts.</ErrorMessage>;
-
-		return (
-			<NarrowContent
-				title="Venom feed"
-				titleRight={
-					hasNewPosts && (
-						<ActionButton look={ActionButtonLook.SECONDARY} onClick={() => reloadFeed()}>
-							Load new posts
-						</ActionButton>
-					)
-				}
-			>
-				{venomAccounts.length ? (
-					<CreatePostForm
-						className={css.createPostForm}
-						accounts={venomAccounts}
-						onCreated={() => toast('Good job! Your post will appear shortly 🔥')}
-						serviceStatus={serviceStatus}
-					/>
-				) : (
-					<ErrorMessage look={ErrorMessageLook.INFO}>
-						<div>Connect your Venom wallet to post messages to Venom feed.</div>
-
-						<ActionButton look={ActionButtonLook.PRIMARY} onClick={() => connectAccount()}>
-							Connect account
-						</ActionButton>
-					</ErrorMessage>
-				)}
-
-				<div className={css.divider} />
-
-				<div className={css.posts}>
-					{messages.length ? (
-						<>
-							{messages.map((message, idx) => (
-								<VenomFeedPostItem
-									isFirstPost={idx === currentPost}
-									msg={message.msg}
-									decoded={message.decoded}
-									onNextPost={() => setCurrentPost(idx + 1)}
-								/>
-							))}
-
-							{postsQuery.isError
-								? renderLoadingError()
-								: postsQuery.hasNextPage && (
-										<InView
-											className={css.loader}
-											rootMargin="100px"
-											onChange={inView => inView && postsQuery.fetchNextPage()}
-										>
-											<YlideLoader reason="Loading more posts ..." />
-										</InView>
-								  )}
-						</>
-					) : postsQuery.isLoading ? (
-						<div className={css.loader}>
-							<YlideLoader reason="Your feed is loading ..." />
-						</div>
-					) : postsQuery.isError ? (
-						renderLoadingError()
-					) : (
-						<ErrorMessage look={ErrorMessageLook.INFO}>No messages yet</ErrorMessage>
-					)}
-				</div>
-			</NarrowContent>
-		);
+						p.content
+							? p.content.corrupted
+								? p.content
+								: {
+										...p.content,
+										content: new Uint8Array(p.content.content),
+								  }
+							: null,
+					),
+				};
+			});
+		},
+		getNextPageParam: lastPage =>
+			lastPage.length ? lastPage[lastPage.length - 1].original.createTimestamp : undefined,
 	});
-}
+
+	const messages = postsQuery.data?.pages.flat() || [];
+
+	const [hasNewPosts, setHasNewPosts] = useState(false);
+
+	useQuery(['feed', 'venom', 'new-posts'], {
+		queryFn: async () => {
+			if (!hasNewPosts) {
+				const posts = await VenomFilterApi.getPosts({ beforeTimestamp: 0, adminMode: admin });
+				setHasNewPosts(!!(posts.length && messages.length && posts[0].id !== messages[0].original.id));
+			}
+		},
+		refetchInterval: 15 * 1000,
+	});
+
+	const [serviceStatus, setServiceStatus] = useState<string>('ACTIVE');
+
+	const reloadServiceStatus = useCallback(async () => {
+		const result = await VenomFilterApi.getServiceStatus();
+		setServiceStatus(result.status);
+	}, []);
+
+	useEffect(() => {
+		reloadServiceStatus();
+		const timer = setInterval(reloadServiceStatus, 10000);
+		return () => {
+			clearInterval(timer);
+		};
+	}, [reloadServiceStatus]);
+
+	const reloadFeed = () => {
+		setHasNewPosts(false);
+		setCurrentPost(0);
+		postsQuery.remove();
+		postsQuery.refetch();
+	};
+
+	const renderLoadingError = () => <ErrorMessage>Couldn't load posts.</ErrorMessage>;
+
+	return (
+		<NarrowContent
+			title="Venom feed"
+			titleRight={
+				hasNewPosts && (
+					<ActionButton look={ActionButtonLook.SECONDARY} onClick={() => reloadFeed()}>
+						Load new posts
+					</ActionButton>
+				)
+			}
+		>
+			{venomAccounts.length ? (
+				<CreatePostForm
+					className={css.createPostForm}
+					accounts={venomAccounts}
+					onCreated={() => toast('Good job! Your post will appear shortly 🔥')}
+					serviceStatus={serviceStatus}
+				/>
+			) : (
+				<ErrorMessage look={ErrorMessageLook.INFO}>
+					<div>Connect your Venom wallet to post messages to Venom feed.</div>
+
+					<ActionButton look={ActionButtonLook.PRIMARY} onClick={() => connectAccount()}>
+						Connect account
+					</ActionButton>
+				</ErrorMessage>
+			)}
+
+			<div className={css.divider} />
+
+			<div className={css.posts}>
+				{messages.length ? (
+					<>
+						{messages.map((message, idx) => (
+							<VenomFeedPostItem
+								isFirstPost={idx === currentPost}
+								msg={message.msg}
+								decoded={message.decoded}
+								onNextPost={() => setCurrentPost(idx + 1)}
+							/>
+						))}
+
+						{postsQuery.isError
+							? renderLoadingError()
+							: postsQuery.hasNextPage && (
+									<InView
+										className={css.loader}
+										rootMargin="100px"
+										onChange={inView => inView && postsQuery.fetchNextPage()}
+									>
+										<YlideLoader reason="Loading more posts ..." />
+									</InView>
+							  )}
+					</>
+				) : postsQuery.isLoading ? (
+					<div className={css.loader}>
+						<YlideLoader reason="Your feed is loading ..." />
+					</div>
+				) : postsQuery.isError ? (
+					renderLoadingError()
+				) : (
+					<ErrorMessage look={ErrorMessageLook.INFO}>No messages yet</ErrorMessage>
+				)}
+			</div>
+		</NarrowContent>
+	);
+});
 
 //
 
