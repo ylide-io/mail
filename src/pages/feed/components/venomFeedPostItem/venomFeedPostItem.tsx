@@ -1,6 +1,6 @@
 import { IMessage, MessageAttachmentLinkV1 } from '@ylide/sdk';
 import clsx from 'clsx';
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, { MouseEventHandler, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import { VenomFilterApi } from '../../../../api/venomFilterApi';
 import { ActionButton, ActionButtonLook } from '../../../../components/ActionButton/ActionButton';
@@ -26,19 +26,37 @@ import { useShiftPressed } from '../../../../utils/useShiftPressed';
 import { PostItemContainer } from '../postItemContainer/postItemContainer';
 import css from './venomFeedPostItem.module.scss';
 
-interface VenomFeedPostItemProps {
+interface VenomFeedPostItemViewProps {
 	msg: IMessage;
 	decoded: IMessageDecodedContent;
-	isFirstPost: boolean;
-	onNextPost: () => void;
+
+	isBanned?: boolean;
+	isApproved?: boolean;
+	isAdminHelpVisible?: boolean;
+
+	onClick?: MouseEventHandler<HTMLElement>;
+	onAddressClick?: MouseEventHandler<HTMLElement>;
+	onComposeClick?: MouseEventHandler<HTMLElement>;
+	onReplyClick?: MouseEventHandler<HTMLElement>;
+	onBanClick?: MouseEventHandler<HTMLElement>;
+	onUnbanClick?: MouseEventHandler<HTMLElement>;
 }
 
-export function VenomFeedPostItem({
+export function VenomFeedPostItemView({
 	msg,
 	decoded: { decodedTextData, attachments },
-	isFirstPost,
-	onNextPost,
-}: VenomFeedPostItemProps) {
+
+	isBanned,
+	isApproved,
+	isAdminHelpVisible,
+
+	onClick,
+	onAddressClick,
+	onComposeClick,
+	onReplyClick,
+	onBanClick,
+	onUnbanClick,
+}: VenomFeedPostItemViewProps) {
 	const decodedText = useMemo(
 		() =>
 			decodedTextData.type === MessageDecodedTextDataType.PLAIN
@@ -49,6 +67,129 @@ export function VenomFeedPostItem({
 	const attachment = attachments[0] as MessageAttachmentLinkV1 | undefined;
 	const attachmentHttpUrl = attachment && ipfsToHttpUrl(attachment.link);
 
+	return (
+		<PostItemContainer collapsable className={css.root} onClick={onClick}>
+			<Avatar className={css.ava} blockie={msg.senderAddress} />
+
+			<div className={css.meta}>
+				<GridRowBox gap={2}>
+					<AdaptiveAddress
+						className={css.sender}
+						maxLength={12}
+						address={msg.senderAddress}
+						onClick={onAddressClick}
+					/>
+
+					{onComposeClick && (
+						<ActionButton
+							className={css.composeButton}
+							look={ActionButtonLook.LITE}
+							icon={<MailSvg />}
+							title="Compose mail"
+							onClick={onComposeClick}
+						/>
+					)}
+				</GridRowBox>
+
+				<div className={css.metaRight}>
+					<ReadableDate className={css.metaAction} value={msg.createdAt * 1000} />
+
+					{onReplyClick && (
+						<button className={clsx(css.metaAction, css.metaAction_interactive)} onClick={onReplyClick}>
+							Reply
+						</button>
+					)}
+
+					{!!msg.$$meta.id && (
+						<a
+							className={clsx(css.metaAction, css.metaAction_icon, css.metaAction_interactive)}
+							href={`https://testnet.venomscan.com/messages/${msg.$$meta.id}`}
+							target="_blank"
+							rel="noreferrer"
+							title="Details"
+						>
+							<ExternalSvg />
+						</a>
+					)}
+
+					{onBanClick && (
+						<button
+							className={clsx(css.metaAction, css.metaAction_icon, css.metaAction_interactive)}
+							onClick={onBanClick}
+						>
+							<CrossSvg />
+						</button>
+					)}
+				</div>
+			</div>
+
+			<div className={css.body}>
+				{isBanned ? (
+					<ErrorMessage look={ErrorMessageLook.INFO}>
+						Post banned 🔥
+						<ActionButton onClick={onUnbanClick}>Undo</ActionButton>
+					</ErrorMessage>
+				) : isApproved ? (
+					<ErrorMessage look={ErrorMessageLook.INFO}>Post approved 🔥</ErrorMessage>
+				) : (
+					<>
+						<NlToBr text={decodedText} />
+
+						{isAdminHelpVisible && (
+							<div
+								style={{
+									display: 'flex',
+									justifyContent: 'space-between',
+									marginTop: 10,
+								}}
+							>
+								<div
+									style={{
+										display: 'flex',
+										flexDirection: 'column',
+										alignItems: 'center',
+										justifyContent: 'center',
+										margin: 20,
+										color: 'red',
+									}}
+								>
+									<div style={{ fontSize: 100, marginBottom: 10 }}>←</div>
+									<div>Shift + Left arrow to ban post</div>
+								</div>
+								<div
+									style={{
+										display: 'flex',
+										flexDirection: 'column',
+										alignItems: 'center',
+										justifyContent: 'center',
+										margin: 20,
+										color: 'green',
+									}}
+								>
+									<div style={{ fontSize: 100, marginBottom: 10 }}>→</div>
+									<div>Shift + Right arrow to approve post</div>
+								</div>
+							</div>
+						)}
+
+						{attachmentHttpUrl && <img className={css.cover} alt="Attachment" src={attachmentHttpUrl} />}
+					</>
+				)}
+			</div>
+		</PostItemContainer>
+	);
+}
+
+//
+
+interface VenomFeedPostItemProps {
+	msg: IMessage;
+	decoded: IMessageDecodedContent;
+	isFirstPost: boolean;
+	onNextPost: () => void;
+}
+
+export function VenomFeedPostItem({ msg, decoded, isFirstPost, onNextPost }: VenomFeedPostItemProps) {
 	let [clicks] = useState<number[]>([]);
 
 	const [isBanned, setBanned] = useState(false);
@@ -154,130 +295,37 @@ export function VenomFeedPostItem({
 	}, [isFirstPost, isShiftPressed]);
 
 	return (
-		<PostItemContainer
-			collapsable
-			className={css.root}
-			onClick={() => {
-				clicks = [Date.now(), ...clicks].slice(0, 3);
-				if (browserStorage.isUserAdmin && clicks.length === 3 && clicks[0] - clicks[2] < 600) {
-					banPost();
-				}
-			}}
-		>
-			<Avatar className={css.ava} blockie={msg.senderAddress} />
+		<div style={{ position: 'relative' }}>
+			<div ref={scrollRef} style={{ position: 'absolute', top: -100 }} />
+			<VenomFeedPostItemView
+				msg={msg}
+				decoded={decoded}
+				isBanned={isBanned}
+				isApproved={isApproved}
+				isAdminHelpVisible={browserStorage.isUserAdmin && isFirstPost && isShiftPressed}
+				onClick={() => {
+					clicks = [Date.now(), ...clicks].slice(0, 3);
+					if (browserStorage.isUserAdmin && clicks.length === 3 && clicks[0] - clicks[2] < 600) {
+						banPost();
+					}
+				}}
+				onAddressClick={e => {
+					if (e.shiftKey && browserStorage.isUserAdmin) {
+						banAddress();
+					} else {
+						copyToClipboard(msg.senderAddress, { toast: true });
+					}
+				}}
+				onComposeClick={() => {
+					const mailData = new OutgoingMailData();
+					mailData.from = venomAccounts[0];
+					mailData.to = new Recipients([msg.senderAddress]);
 
-			<div className={css.meta}>
-				<GridRowBox gap={2}>
-					<AdaptiveAddress
-						className={css.sender}
-						maxLength={12}
-						address={msg.senderAddress}
-						onClick={e => {
-							if (e.shiftKey && browserStorage.isUserAdmin) {
-								banAddress();
-							} else {
-								copyToClipboard(msg.senderAddress, { toast: true });
-							}
-						}}
-					/>
-
-					<ActionButton
-						className={css.composeButton}
-						look={ActionButtonLook.LITE}
-						icon={<MailSvg />}
-						title="Compose mail"
-						onClick={() => {
-							const mailData = new OutgoingMailData();
-							mailData.from = venomAccounts[0];
-							mailData.to = new Recipients([msg.senderAddress]);
-
-							openMailCompose({ mailData });
-						}}
-					/>
-				</GridRowBox>
-
-				<div className={css.metaRight}>
-					<ReadableDate className={css.metaAction} value={msg.createdAt * 1000} />
-
-					<button className={clsx(css.metaAction, css.metaAction_interactive)}>Reply</button>
-
-					{!!msg.$$meta.id && (
-						<a
-							className={clsx(css.metaAction, css.metaAction_icon, css.metaAction_interactive)}
-							href={`https://testnet.venomscan.com/messages/${msg.$$meta.id}`}
-							target="_blank"
-							rel="noreferrer"
-							title="Details"
-						>
-							<ExternalSvg />
-						</a>
-					)}
-
-					{browserStorage.isUserAdmin && (
-						<button
-							className={clsx(css.metaAction, css.metaAction_icon, css.metaAction_interactive)}
-							onClick={() => banPost()}
-						>
-							<CrossSvg />
-						</button>
-					)}
-				</div>
-			</div>
-
-			<div className={css.body}>
-				<div ref={scrollRef} style={{ position: 'absolute', top: -100 }} />
-				{isBanned ? (
-					<ErrorMessage look={ErrorMessageLook.INFO}>
-						Post banned 🔥
-						<ActionButton onClick={() => unbanPost()}>Undo</ActionButton>
-					</ErrorMessage>
-				) : isApproved ? (
-					<ErrorMessage look={ErrorMessageLook.INFO}>Post approved 🔥</ErrorMessage>
-				) : (
-					<>
-						<NlToBr text={decodedText} />
-
-						{isFirstPost && isShiftPressed && browserStorage.isUserAdmin && (
-							<div
-								style={{
-									display: 'flex',
-									justifyContent: 'space-between',
-									marginTop: 10,
-								}}
-							>
-								<div
-									style={{
-										display: 'flex',
-										flexDirection: 'column',
-										alignItems: 'center',
-										justifyContent: 'center',
-										margin: 20,
-										color: 'red',
-									}}
-								>
-									<div style={{ fontSize: 100, marginBottom: 10 }}>←</div>
-									<div>Shift + Left arrow to ban post</div>
-								</div>
-								<div
-									style={{
-										display: 'flex',
-										flexDirection: 'column',
-										alignItems: 'center',
-										justifyContent: 'center',
-										margin: 20,
-										color: 'green',
-									}}
-								>
-									<div style={{ fontSize: 100, marginBottom: 10 }}>→</div>
-									<div>Shift + Right arrow to approve post</div>
-								</div>
-							</div>
-						)}
-
-						{attachmentHttpUrl && <img className={css.cover} alt="Attachment" src={attachmentHttpUrl} />}
-					</>
-				)}
-			</div>
-		</PostItemContainer>
+					openMailCompose({ mailData });
+				}}
+				onBanClick={browserStorage.isUserAdmin ? () => banPost() : undefined}
+				onUnbanClick={() => unbanPost()}
+			/>
+		</div>
 	);
 }
