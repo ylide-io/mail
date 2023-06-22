@@ -1,4 +1,3 @@
-import clsx from 'clsx';
 import { ReactNode } from 'react';
 
 import { Blockie } from '../blockie/blockie';
@@ -13,7 +12,7 @@ interface AvatarProps extends PropsWithClassName {
 
 export function Avatar({ className, image, blockie, placeholder }: AvatarProps) {
 	return (
-		<div className={clsx(css.root, className)}>
+		<div className={className}>
 			<div className={css.inner}>
 				<div className={css.inner2}>
 					{image ? (
