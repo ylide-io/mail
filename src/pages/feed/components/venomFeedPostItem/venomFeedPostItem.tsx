@@ -61,6 +61,9 @@ export function VenomFeedPostItemView({
 	onBanClick,
 	onUnbanClick,
 }: VenomFeedPostItemViewProps) {
+	const openMailCompose = useOpenMailCompose();
+	const venomAccounts = useVenomAccounts();
+
 	const decodedTextData = post.decoded.decodedTextData;
 	const decodedText = useMemo(
 		() =>
@@ -169,7 +172,14 @@ export function VenomFeedPostItemView({
 										post={repliedPostQuery.data}
 										isCompact
 										onAddressClick={() => {
-											copyToClipboard(post.msg.senderAddress, { toast: true });
+											copyToClipboard(repliedPostQuery.data!.msg.senderAddress, { toast: true });
+										}}
+										onComposeClick={() => {
+											const mailData = new OutgoingMailData();
+											mailData.from = venomAccounts[0];
+											mailData.to = new Recipients([repliedPostQuery.data!.msg.senderAddress]);
+
+											openMailCompose({ mailData });
 										}}
 									/>
 								) : repliedPostQuery.isLoading ? (
