@@ -1,4 +1,4 @@
-import { RefObject, TextareaHTMLAttributes, useEffect, useRef } from 'react';
+import { forwardRef, Ref, RefObject, TextareaHTMLAttributes, useEffect, useImperativeHandle, useRef } from 'react';
 
 export function useAutoSizeTextArea({
 	textareaRef,
@@ -27,6 +27,10 @@ export function useAutoSizeTextArea({
 	}, [maxHeight, textareaRef, value, resetKey]);
 }
 
+export interface AutoSizeTextAreaApi {
+	focus: () => void;
+}
+
 interface AutoSizeTextAreaProps extends TextareaHTMLAttributes<HTMLTextAreaElement> {
 	resetKey?: any;
 	maxHeight?: number;
@@ -34,19 +38,25 @@ interface AutoSizeTextAreaProps extends TextareaHTMLAttributes<HTMLTextAreaEleme
 	onChangeValue?: (value: string) => void;
 }
 
-export function AutoSizeTextArea({ resetKey, maxHeight, value, onChangeValue, ...props }: AutoSizeTextAreaProps) {
-	const textareaRef = useRef(null);
-	useAutoSizeTextArea({ textareaRef, value, maxHeight, resetKey });
+export const AutoSizeTextArea = forwardRef(
+	({ resetKey, maxHeight, value, onChangeValue, ...props }: AutoSizeTextAreaProps, ref: Ref<AutoSizeTextAreaApi>) => {
+		const textareaRef = useRef<HTMLTextAreaElement>(null);
+		useAutoSizeTextArea({ textareaRef, value, maxHeight, resetKey });
 
-	return (
-		<textarea
-			ref={textareaRef}
-			{...props}
-			value={value}
-			onChange={e => {
-				onChangeValue?.(e.target.value);
-				props.onChange?.(e);
-			}}
-		/>
-	);
-}
+		useImperativeHandle(ref, () => ({
+			focus: () => textareaRef.current?.focus(),
+		}));
+
+		return (
+			<textarea
+				ref={textareaRef}
+				{...props}
+				value={value}
+				onChange={e => {
+					onChangeValue?.(e.target.value);
+					props.onChange?.(e);
+				}}
+			/>
+		);
+	},
+);

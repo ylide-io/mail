@@ -1,12 +1,11 @@
-import { IMessage } from '@ylide/sdk';
 import { observer } from 'mobx-react';
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { InView } from 'react-intersection-observer';
 import { useInfiniteQuery, useQuery } from 'react-query';
 import { generatePath, matchPath, useLocation, useParams } from 'react-router-dom';
 
 import { FeedCategory, FeedServerApi } from '../../../api/feedServerApi';
-import { VenomFilterApi } from '../../../api/venomFilterApi';
+import { DecodedVenomFeedPost, decodeVenomFeedPost, VenomFilterApi } from '../../../api/venomFilterApi';
 import { ActionButton, ActionButtonLook, ActionButtonSize } from '../../../components/ActionButton/ActionButton';
 import { ErrorMessage, ErrorMessageLook } from '../../../components/errorMessage/errorMessage';
 import { NarrowContent } from '../../../components/genericLayout/content/narrowContent/narrowContent';
@@ -20,9 +19,8 @@ import { useDomainAccounts, useVenomAccounts } from '../../../stores/Domain';
 import { FeedStore, getFeedCategoryName } from '../../../stores/Feed';
 import { RoutePath } from '../../../stores/routePath';
 import { connectAccount } from '../../../utils/account';
-import { decodeBroadcastContent } from '../../../utils/mail';
 import { useNav } from '../../../utils/url';
-import { CreatePostForm } from '../components/createPostForm/createPostForm';
+import { CreatePostForm, CreatePostFormApi } from '../components/createPostForm/createPostForm';
 import { FeedPostItem } from '../components/feedPostItem/feedPostItem';
 import { VenomFeedPostItem } from '../components/venomFeedPostItem/venomFeedPostItem';
 import css from './feedPage.module.scss';
@@ -178,32 +176,10 @@ const VenomFeedContent = observer(() => {
 
 	const [currentPost, setCurrentPost] = useState<number>(0);
 
-	const postsQuery = useInfiniteQuery(['feed', 'venom', 'load'], {
+	const postsQuery = useInfiniteQuery<DecodedVenomFeedPost[]>(['feed', 'venom', 'load'], {
 		queryFn: async ({ pageParam = 0 }) => {
 			const posts = await VenomFilterApi.getPosts({ beforeTimestamp: pageParam, adminMode: isAdminMode });
-
-			return posts.map(p => {
-				const msg: IMessage = {
-					...p.meta,
-					key: new Uint8Array(p.meta.key),
-				};
-				return {
-					original: p,
-					msg,
-					decoded: decodeBroadcastContent(
-						msg.msgId,
-						msg,
-						p.content
-							? p.content.corrupted
-								? p.content
-								: {
-										...p.content,
-										content: new Uint8Array(p.content.content),
-								  }
-							: null,
-					),
-				};
-			});
+			return posts.map(decodeVenomFeedPost);
 		},
 		getNextPageParam: lastPage =>
 			lastPage.length ? lastPage[lastPage.length - 1].original.createTimestamp : undefined,
@@ -238,6 +214,8 @@ const VenomFeedContent = observer(() => {
 
 	const renderLoadingError = () => <ErrorMessage>Couldn't load posts.</ErrorMessage>;
 
+	const createPostFormRef = useRef<CreatePostFormApi>(null);
+
 	return (
 		<NarrowContent
 			title="Venom feed"
@@ -251,6 +229,7 @@ const VenomFeedContent = observer(() => {
 		>
 			{venomAccounts.length ? (
 				<CreatePostForm
+					ref={createPostFormRef}
 					className={css.createPostForm}
 					accounts={venomAccounts}
 					isAnavailable={serviceStatus.data !== 'ACTIVE'}
@@ -274,9 +253,9 @@ const VenomFeedContent = observer(() => {
 						{messages.map((message, idx) => (
 							<VenomFeedPostItem
 								isFirstPost={idx === currentPost}
-								msg={message.msg}
-								decoded={message.decoded}
+								post={message}
 								onNextPost={() => setCurrentPost(idx + 1)}
+								onReplyClick={() => createPostFormRef.current?.replyTo(message)}
 							/>
 						))}
 

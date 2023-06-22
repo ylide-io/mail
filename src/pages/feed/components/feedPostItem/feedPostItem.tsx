@@ -238,7 +238,7 @@ export function FeedPostItem({ isInFeed, realtedAccounts, post }: FeedPostItemPr
 					{unfollowedState === 'unfollowing' ? 'Unfollowing ...' : 'You unfollowed such posts 👌'}
 				</ErrorMessage>
 			) : (
-				<PostItemContainer className={css.root} collapsable={isInFeed}>
+				<PostItemContainer className={css.root} isCollapsable={isInFeed}>
 					<div className={css.ava}>
 						<Avatar image={post.authorAvatar} placeholder={<ContactSvg width="100%" height="100%" />} />
 						<FeedLinkTypeIcon className={css.avaSource} linkType={post.sourceType} />

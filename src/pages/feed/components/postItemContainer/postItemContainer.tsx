@@ -5,22 +5,27 @@ import { PropsWithClassName } from '../../../../components/props';
 import css from './postItemContainer.module.scss';
 
 export interface PostItemContainerProps extends PropsWithChildren<{}>, PropsWithClassName {
-	collapsable?: boolean;
+	isCompact?: boolean;
+	isCollapsable?: boolean;
 	onClick?: MouseEventHandler<HTMLDivElement>;
 }
 
-export function PostItemContainer({ children, className, collapsable, onClick }: PostItemContainerProps) {
+export function PostItemContainer({ children, className, isCompact, isCollapsable, onClick }: PostItemContainerProps) {
 	const rootRef = useRef<HTMLDivElement>(null);
 	const [collapsed, setCollapsed] = useState(false);
 
 	useEffect(() => {
-		if (collapsable && rootRef.current && rootRef.current.getBoundingClientRect().height > 600) {
+		if (isCollapsable && rootRef.current && rootRef.current.getBoundingClientRect().height > 600) {
 			setCollapsed(true);
 		}
-	}, [collapsable]);
+	}, [isCollapsable]);
 
 	return (
-		<div ref={rootRef} onClick={onClick} className={clsx(css.root, collapsed && css.root_collapsed, className)}>
+		<div
+			ref={rootRef}
+			onClick={onClick}
+			className={clsx(css.root, isCompact && css.root_compact, collapsed && css.root_collapsed, className)}
+		>
 			{children}
 
 			{collapsed && (

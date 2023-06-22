@@ -1,11 +1,13 @@
 import { ITVMMessage } from '@ylide/everscale';
-import { IMessageContent, IMessageCorruptedContent } from '@ylide/sdk';
+import { IMessage, IMessageContent, IMessageCorruptedContent } from '@ylide/sdk';
 
 import { REACT_APP__FEED_VENOM } from '../env';
+import { IMessageDecodedContent } from '../indexedDB/IndexedDB';
 import { invariant } from '../utils/assert';
+import { decodeBroadcastContent } from '../utils/mail';
 import { createCleanSerachParams } from '../utils/url';
 
-export interface IVenomFeedPost {
+export interface VenomFeedPost {
 	id: string;
 	createTimestamp: number;
 	sender: string;
@@ -13,6 +15,53 @@ export interface IVenomFeedPost {
 	content: IMessageCorruptedContent | (Exclude<IMessageContent, 'content'> & { content: number[] }) | null;
 	banned: boolean;
 }
+
+export interface DecodedVenomFeedPost {
+	original: VenomFeedPost;
+	msg: IMessage;
+	decoded: IMessageDecodedContent;
+}
+
+export function decodeVenomFeedPost(p: VenomFeedPost): DecodedVenomFeedPost {
+	const msg: IMessage = {
+		...p.meta,
+		key: new Uint8Array(p.meta.key),
+	};
+
+	const decoded = decodeBroadcastContent(
+		msg.msgId,
+		msg,
+		p.content
+			? p.content.corrupted
+				? p.content
+				: {
+						...p.content,
+						content: new Uint8Array(p.content.content),
+				  }
+			: null,
+	);
+
+	// if (decoded.decodedTextData.type === MessageDecodedTextDataType.YMF) {
+	// 	decoded.decodedTextData.value.root.children.unshift({
+	// 		parent: decoded.decodedTextData.value.root,
+	// 		type: 'tag',
+	// 		tag: 'reply-to',
+	// 		attributes: {
+	// 			id: 'yA1TeDLKGWN7Vk82NvYG7G5cq8d/S+Ef7R/oy7l8wJPaoQ==',
+	// 		},
+	// 		singular: true,
+	// 		children: [],
+	// 	});
+	// }
+
+	return {
+		original: p,
+		msg,
+		decoded: decoded,
+	};
+}
+
+//
 
 export namespace VenomFilterApi {
 	export function getUrl() {
@@ -91,13 +140,13 @@ export namespace VenomFilterApi {
 	}
 
 	export async function getPosts(params: { beforeTimestamp: number; adminMode?: boolean }) {
-		return await request<IVenomFeedPost[]>('/posts', {
+		return await request<VenomFeedPost[]>('/posts', {
 			query: { beforeTimestamp: params.beforeTimestamp, adminMode: params.adminMode },
 		});
 	}
 
 	export async function getPost(params: { id: string; adminMode?: boolean }) {
-		return await request<IVenomFeedPost | null>('/post', {
+		return await request<VenomFeedPost | null>('/post', {
 			query: { id: params.id, adminMode: params.adminMode },
 		});
 	}

@@ -1,13 +1,13 @@
 import { MessageAttachmentLinkV1, MessageAttachmentType } from '@ylide/sdk';
 import clsx from 'clsx';
 import { observer } from 'mobx-react';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { forwardRef, Ref, useEffect, useImperativeHandle, useMemo, useRef, useState } from 'react';
 import { useMutation } from 'react-query';
 
-import { VenomFilterApi } from '../../../../api/venomFilterApi';
+import { DecodedVenomFeedPost, VenomFilterApi } from '../../../../api/venomFilterApi';
 import { AccountSelect } from '../../../../components/accountSelect/accountSelect';
 import { ActionButton, ActionButtonLook, ActionButtonSize } from '../../../../components/ActionButton/ActionButton';
-import { AutoSizeTextArea } from '../../../../components/autoSizeTextArea/autoSizeTextArea';
+import { AutoSizeTextArea, AutoSizeTextAreaApi } from '../../../../components/autoSizeTextArea/autoSizeTextArea';
 import { GridRowBox } from '../../../../components/boxes/boxes';
 import { AnchoredPopup } from '../../../../components/popup/anchoredPopup/anchoredPopup';
 import { PropsWithClassName } from '../../../../components/props';
@@ -22,7 +22,12 @@ import { HorizontalAlignment } from '../../../../utils/alignment';
 import { hashToIpfsUrl, ipfsToHttpUrl } from '../../../../utils/ipfs';
 import { escapeRegex } from '../../../../utils/regex';
 import { SendMailButton } from '../../../mail/components/composeMailForm/sendMailButton/sendMailButton';
+import { VenomFeedPostItemView } from '../venomFeedPostItem/venomFeedPostItem';
 import css from './createPostForm.module.scss';
+
+export interface CreatePostFormApi {
+	replyTo: (post: DecodedVenomFeedPost) => void;
+}
 
 export interface CreatePostFormProps extends PropsWithClassName {
 	accounts: DomainAccount[];
@@ -30,213 +35,270 @@ export interface CreatePostFormProps extends PropsWithClassName {
 	onCreated?: () => void;
 }
 
-export const CreatePostForm = observer(({ className, accounts, isAnavailable, onCreated }: CreatePostFormProps) => {
-	const mailData = useMemo(() => {
-		const mailData = new OutgoingMailData();
+export const CreatePostForm = observer(
+	forwardRef(
+		({ className, accounts, isAnavailable, onCreated }: CreatePostFormProps, ref: Ref<CreatePostFormApi>) => {
+			const textAreaApiRef = useRef<AutoSizeTextAreaApi>(null);
 
-		mailData.mode = OutgoingMailDataMode.BROADCAST;
-		mailData.feedId = VENOM_FEED_ID;
+			const mailData = useMemo(() => {
+				const mailData = new OutgoingMailData();
 
-		mailData.validator = () => {
-			const text = mailData.plainTextData;
+				mailData.mode = OutgoingMailDataMode.BROADCAST;
+				mailData.feedId = VENOM_FEED_ID;
 
-			if (text.length > 4096) {
-				toast('Text is too long 👀');
-				return false;
-			}
+				mailData.validator = () => {
+					const text = mailData.plainTextData;
 
-			if (text.split('\n').length > 128) {
-				toast('Too many line breaks 👀');
-				return false;
-			}
+					if (text.length > 4096) {
+						toast('Text is too long 👀');
+						return false;
+					}
 
-			if (new RegExp('\\b(' + stopWords.map(escapeRegex).join('|') + ')\\b', 'i').test(text)) {
-				toast(
-					<>
-						<b>Whoops, no inappropriate stuff allowed.</b>
-						<div>
-							Your message didn't go through because it contains inappropriate content. Let's keep it
-							chill and respectful.
-						</div>
-					</>,
-				);
-				return false;
-			}
+					if (text.split('\n').length > 128) {
+						toast('Too many line breaks 👀');
+						return false;
+					}
 
-			return true;
-		};
+					if (new RegExp('\\b(' + stopWords.map(escapeRegex).join('|') + ')\\b', 'i').test(text)) {
+						toast(
+							<>
+								<b>Whoops, no inappropriate stuff allowed.</b>
+								<div>
+									Your message didn't go through because it contains inappropriate content. Let's keep
+									it chill and respectful.
+								</div>
+							</>,
+						);
+						return false;
+					}
 
-		return mailData;
-	}, []);
+					return true;
+				};
 
-	useEffect(() => {
-		mailData.from = mailData.from && accounts.includes(mailData.from) ? mailData.from : accounts[0];
-	}, [mailData, accounts]);
+				return mailData;
+			}, []);
 
-	const [expanded, setExpanded] = useState(false);
+			useEffect(() => {
+				mailData.from = mailData.from && accounts.includes(mailData.from) ? mailData.from : accounts[0];
+			}, [mailData, accounts]);
 
-	const [isIdeaAnimated, setIdeaAnimated] = useState(false);
-	useEffect(() => {
-		setTimeout(() => setIdeaAnimated(expanded), 1000);
-	}, [expanded]);
+			const [expanded, setExpanded] = useState(false);
 
-	const [lastIdea, setLastIdea] = useState('');
+			const [isIdeaAnimated, setIdeaAnimated] = useState(false);
+			useEffect(() => {
+				setTimeout(() => setIdeaAnimated(expanded), 1000);
+			}, [expanded]);
 
-	const { mutate: loadIdea, isLoading: isIdeaLoading } = useMutation({
-		mutationFn: () => VenomFilterApi.getTextIdea(),
-		onSuccess: data => {
-			let text = mailData.plainTextData;
+			const [lastIdea, setLastIdea] = useState('');
 
-			if (lastIdea && text.endsWith(lastIdea)) {
-				text = text.slice(0, text.length - lastIdea.length);
-			}
+			const { mutate: loadIdea, isLoading: isIdeaLoading } = useMutation({
+				mutationFn: () => VenomFilterApi.getTextIdea(),
+				onSuccess: data => {
+					let text = mailData.plainTextData;
 
-			mailData.plainTextData = [text.trim(), data].filter(Boolean).join('\n\n');
-			setLastIdea(data);
-		},
-		onError: () => toast('Failed to get idea 🤦‍♀️'),
-	});
+					if (lastIdea && text.endsWith(lastIdea)) {
+						text = text.slice(0, text.length - lastIdea.length);
+					}
 
-	const stickerButtonRef = useRef(null);
-	const [isStickerPopupOpen, setStickerPopupOpen] = useState(false);
+					mailData.plainTextData = [text.trim(), data].filter(Boolean).join('\n\n');
+					setLastIdea(data);
+				},
+				onError: () => toast('Failed to get idea 🤦‍♀️'),
+			});
 
-	const attachmentUrl = mailData.attachments.length
-		? ipfsToHttpUrl((mailData.attachments[0] as MessageAttachmentLinkV1).link)
-		: undefined;
+			const stickerButtonRef = useRef(null);
+			const [isStickerPopupOpen, setStickerPopupOpen] = useState(false);
 
-	const onSent = () => {
-		mailData.reset({
-			mode: OutgoingMailDataMode.BROADCAST,
-			feedId: VENOM_FEED_ID,
-			from: mailData.from,
-		});
+			const attachmentUrl = mailData.attachments.length
+				? ipfsToHttpUrl((mailData.attachments[0] as MessageAttachmentLinkV1).link)
+				: undefined;
 
-		setExpanded(false);
+			const onSent = () => {
+				mailData.reset({
+					mode: OutgoingMailDataMode.BROADCAST,
+					feedId: VENOM_FEED_ID,
+					from: mailData.from,
+				});
 
-		onCreated?.();
-	};
+				setReplyTo(undefined);
+				setExpanded(false);
 
-	return (
-		<div className={clsx(css.form, expanded && css.form_expanded, className)}>
-			<AutoSizeTextArea
-				resetKey={expanded}
-				className={css.textarea}
-				disabled={mailData.sending}
-				placeholder="Make a new post"
-				maxHeight={400}
-				rows={expanded ? 4 : 1}
-				value={mailData.plainTextData}
-				onChangeValue={value => {
-					mailData.plainTextData = value;
-				}}
-				onFocus={() => setExpanded(true)}
-			/>
+				onCreated?.();
+			};
 
-			{expanded ? (
-				<>
-					{attachmentUrl && (
+			const [replyTo, setReplyTo] = useState<DecodedVenomFeedPost>();
+
+			useEffect(() => {
+				mailData.processContent = ymf => {
+					if (replyTo) {
+						ymf.root.children.unshift({
+							parent: ymf.root,
+							type: 'tag',
+							tag: 'reply-to',
+							attributes: {
+								id: replyTo.original.id,
+							},
+							singular: true,
+							children: [],
+						});
+					}
+
+					return ymf;
+				};
+			}, [mailData, replyTo]);
+
+			useImperativeHandle(
+				ref,
+				() => ({
+					replyTo: post => {
+						setExpanded(true);
+						setReplyTo(post);
+						textAreaApiRef.current?.focus();
+					},
+				}),
+				[],
+			);
+
+			return (
+				<div className={clsx(css.form, expanded && css.form_expanded, className)}>
+					{replyTo && (
 						<>
-							<div className={css.divider} />
+							<div className={css.replyToHeader}>
+								<div className={css.replyToTitle}>Reply to:</div>
 
-							<div className={css.preview}>
-								<img className={css.previewImage} alt="Preview" src={attachmentUrl} />
-
-								<ActionButton
-									isDisabled={mailData.sending}
-									look={ActionButtonLook.DANGEROUS}
-									icon={<TrashSvg />}
-									onClick={() => (mailData.attachments = [])}
-								>
-									Remove
+								<ActionButton look={ActionButtonLook.DANGEROUS} onClick={() => setReplyTo(undefined)}>
+									Cancel
 								</ActionButton>
 							</div>
+
+							<VenomFeedPostItemView post={replyTo} isCompact />
+
+							<div className={css.divider} />
 						</>
 					)}
 
-					<div className={css.divider} />
+					<AutoSizeTextArea
+						ref={textAreaApiRef}
+						resetKey={expanded}
+						className={css.textarea}
+						disabled={mailData.sending}
+						placeholder="Make a new post"
+						maxHeight={400}
+						rows={expanded ? 4 : 1}
+						value={mailData.plainTextData}
+						onChangeValue={value => {
+							mailData.plainTextData = value;
+						}}
+						onFocus={() => setExpanded(true)}
+					/>
 
-					<div className={css.footer}>
-						<AccountSelect
-							className={css.accontSelect}
-							accounts={accounts}
-							activeAccount={mailData.from}
-							onChange={account => (mailData.from = account)}
-						/>
+					{expanded ? (
+						<>
+							{attachmentUrl && (
+								<>
+									<div className={css.divider} />
 
-						<div className={css.footerRight}>
-							<GridRowBox gap={4}>
-								<ActionButton
-									className={clsx(isIdeaAnimated && css.ideaButton_animated)}
-									isDisabled={mailData.sending || isIdeaLoading}
-									size={ActionButtonSize.MEDIUM}
-									look={ActionButtonLook.LITE}
-									icon={<BulbSvg />}
-									title="Get idea!"
-									onClick={() => loadIdea()}
-								/>
+									<div className={css.preview}>
+										<img className={css.previewImage} alt="Preview" src={attachmentUrl} />
 
-								<ActionButton
-									ref={stickerButtonRef}
-									isDisabled={mailData.sending}
-									size={ActionButtonSize.MEDIUM}
-									look={ActionButtonLook.LITE}
-									icon={<StickerSvg />}
-									title="Stickers"
-									onClick={() => setStickerPopupOpen(!isStickerPopupOpen)}
-								/>
-
-								{isStickerPopupOpen && (
-									<AnchoredPopup
-										className={css.stickerPopup}
-										anchorRef={stickerButtonRef}
-										horizontalAlign={HorizontalAlignment.END}
-										alignerOptions={{
-											fitLeftToViewport: true,
-										}}
-										onCloseRequest={() => setStickerPopupOpen(false)}
-									>
-										<div className={css.stickerPopupContent}>
-											{stickerIpfsIds.map((id, i) => (
-												<img
-													key={i}
-													alt="Sticker"
-													src={ipfsToHttpUrl(id)}
-													onClick={() => {
-														setStickerPopupOpen(false);
-														mailData.attachments = [
-															new MessageAttachmentLinkV1({
-																type: MessageAttachmentType.LINK_V1,
-																previewLink: '',
-																link: hashToIpfsUrl(id),
-																fileName: 'Venom sticker',
-																fileSize: 0,
-																isEncrypted: false,
-															}),
-														];
-													}}
-												/>
-											))}
-										</div>
-									</AnchoredPopup>
-								)}
-							</GridRowBox>
-
-							{isAnavailable ? (
-								<div>Can't post now. Wait a minute.</div>
-							) : (
-								<SendMailButton disabled={isIdeaLoading} mailData={mailData} onSent={onSent} />
+										<ActionButton
+											isDisabled={mailData.sending}
+											look={ActionButtonLook.DANGEROUS}
+											icon={<TrashSvg />}
+											onClick={() => (mailData.attachments = [])}
+										>
+											Remove
+										</ActionButton>
+									</div>
+								</>
 							)}
-						</div>
-					</div>
-				</>
-			) : (
-				<ActionButton isDisabled size={ActionButtonSize.MEDIUM} look={ActionButtonLook.SECONDARY}>
-					Post
-				</ActionButton>
-			)}
-		</div>
-	);
-});
+
+							<div className={css.divider} />
+
+							<div className={css.footer}>
+								<AccountSelect
+									className={css.accontSelect}
+									accounts={accounts}
+									activeAccount={mailData.from}
+									onChange={account => (mailData.from = account)}
+								/>
+
+								<div className={css.footerRight}>
+									<GridRowBox gap={4}>
+										<ActionButton
+											className={clsx(isIdeaAnimated && css.ideaButton_animated)}
+											isDisabled={mailData.sending || isIdeaLoading}
+											size={ActionButtonSize.MEDIUM}
+											look={ActionButtonLook.LITE}
+											icon={<BulbSvg />}
+											title="Get idea!"
+											onClick={() => loadIdea()}
+										/>
+
+										<ActionButton
+											ref={stickerButtonRef}
+											isDisabled={mailData.sending}
+											size={ActionButtonSize.MEDIUM}
+											look={ActionButtonLook.LITE}
+											icon={<StickerSvg />}
+											title="Stickers"
+											onClick={() => setStickerPopupOpen(!isStickerPopupOpen)}
+										/>
+
+										{isStickerPopupOpen && (
+											<AnchoredPopup
+												className={css.stickerPopup}
+												anchorRef={stickerButtonRef}
+												horizontalAlign={HorizontalAlignment.END}
+												alignerOptions={{
+													fitLeftToViewport: true,
+												}}
+												onCloseRequest={() => setStickerPopupOpen(false)}
+											>
+												<div className={css.stickerPopupContent}>
+													{stickerIpfsIds.map((id, i) => (
+														<img
+															key={i}
+															alt="Sticker"
+															src={ipfsToHttpUrl(id)}
+															onClick={() => {
+																setStickerPopupOpen(false);
+																mailData.attachments = [
+																	new MessageAttachmentLinkV1({
+																		type: MessageAttachmentType.LINK_V1,
+																		previewLink: '',
+																		link: hashToIpfsUrl(id),
+																		fileName: 'Venom sticker',
+																		fileSize: 0,
+																		isEncrypted: false,
+																	}),
+																];
+															}}
+														/>
+													))}
+												</div>
+											</AnchoredPopup>
+										)}
+									</GridRowBox>
+
+									{isAnavailable ? (
+										<div>Can't post now. Wait a minute.</div>
+									) : (
+										<SendMailButton disabled={isIdeaLoading} mailData={mailData} onSent={onSent} />
+									)}
+								</div>
+							</div>
+						</>
+					) : (
+						<ActionButton isDisabled size={ActionButtonSize.MEDIUM} look={ActionButtonLook.SECONDARY}>
+							Post
+						</ActionButton>
+					)}
+				</div>
+			);
+		},
+	),
+);
 
 //
 
