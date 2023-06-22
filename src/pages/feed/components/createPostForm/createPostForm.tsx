@@ -4,7 +4,7 @@ import { observer } from 'mobx-react';
 import { forwardRef, Ref, useEffect, useImperativeHandle, useMemo, useRef, useState } from 'react';
 import { useMutation } from 'react-query';
 
-import { VenomFilterApi } from '../../../../api/venomFilterApi';
+import { IVenomFeedPost, VenomFilterApi } from '../../../../api/venomFilterApi';
 import { AccountSelect } from '../../../../components/accountSelect/accountSelect';
 import { ActionButton, ActionButtonLook, ActionButtonSize } from '../../../../components/ActionButton/ActionButton';
 import { AutoSizeTextArea, AutoSizeTextAreaApi } from '../../../../components/autoSizeTextArea/autoSizeTextArea';
@@ -27,10 +27,11 @@ import { VenomFeedPostItemView } from '../venomFeedPostItem/venomFeedPostItem';
 import css from './createPostForm.module.scss';
 
 export interface CreatePostFormApi {
-	replyTo: (msg: IMessage, decoded: IMessageDecodedContent) => void;
+	replyTo: (data: ReplyToParams) => void;
 }
 
 interface ReplyToParams {
+	post: IVenomFeedPost;
 	msg: IMessage;
 	decoded: IMessageDecodedContent;
 }
@@ -126,6 +127,7 @@ export const CreatePostForm = observer(
 					from: mailData.from,
 				});
 
+				setReplyTo(undefined);
 				setExpanded(false);
 
 				onCreated?.();
@@ -133,12 +135,31 @@ export const CreatePostForm = observer(
 
 			const [replyTo, setReplyTo] = useState<ReplyToParams>();
 
+			useEffect(() => {
+				mailData.processContent = ymf => {
+					if (replyTo) {
+						ymf.root.children.unshift({
+							parent: ymf.root,
+							type: 'tag',
+							tag: 'reply-to',
+							attributes: {
+								id: replyTo.post.id,
+							},
+							singular: true,
+							children: [],
+						});
+					}
+
+					return ymf;
+				};
+			}, [mailData, replyTo]);
+
 			useImperativeHandle(
 				ref,
 				() => ({
-					replyTo: (msg: IMessage, decoded: IMessageDecodedContent) => {
+					replyTo: data => {
 						setExpanded(true);
-						setReplyTo({ msg, decoded });
+						setReplyTo(data);
 						textAreaApiRef.current?.focus();
 					},
 				}),

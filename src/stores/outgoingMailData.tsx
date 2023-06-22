@@ -33,17 +33,18 @@ export class OutgoingMailData {
 	feedId = DEFAULT_FEED_ID;
 
 	from?: DomainAccount;
-	to: Recipients = new Recipients();
+	to = new Recipients();
 	network?: EVMNetwork;
 
 	subject = '';
 	editorData?: OutputData;
-	plainTextData: string = '';
+	plainTextData = '';
 
 	attachments: MessageAttachment[] = [];
 	attachmentFiles: File[] = [];
 
 	validator?: () => boolean;
+	processContent?: (ymf: YMF) => YMF;
 	sending = false;
 
 	constructor() {
@@ -194,6 +195,10 @@ export class OutgoingMailData {
 				content = editorJsToYMF(this.editorData);
 			} else {
 				content = YMF.fromPlainText(this.plainTextData.trim());
+			}
+
+			if (this.processContent) {
+				content = this.processContent(content);
 			}
 
 			if (this.mode === OutgoingMailDataMode.MESSAGE) {

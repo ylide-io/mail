@@ -288,7 +288,13 @@ const VenomFeedContent = observer(() => {
 								msg={message.msg}
 								decoded={message.decoded}
 								onNextPost={() => setCurrentPost(idx + 1)}
-								onReplyClick={() => createPostFormRef.current?.replyTo(message.msg, message.decoded)}
+								onReplyClick={() =>
+									createPostFormRef.current?.replyTo({
+										post: message.original,
+										msg: message.msg,
+										decoded: message.decoded,
+									})
+								}
 							/>
 						))}
 
