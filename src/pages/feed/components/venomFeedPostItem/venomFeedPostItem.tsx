@@ -1,8 +1,9 @@
-import { IMessage, MessageAttachmentLinkV1 } from '@ylide/sdk';
+import { MessageAttachmentLinkV1 } from '@ylide/sdk';
 import clsx from 'clsx';
 import React, { MouseEventHandler, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useQuery } from 'react-query';
 
-import { VenomFilterApi } from '../../../../api/venomFilterApi';
+import { DecodedVenomFeedPost, decodeVenomFeedPost, VenomFilterApi } from '../../../../api/venomFilterApi';
 import { ActionButton, ActionButtonLook } from '../../../../components/ActionButton/ActionButton';
 import { AdaptiveAddress } from '../../../../components/adaptiveAddress/adaptiveAddress';
 import { Avatar } from '../../../../components/avatar/avatar';
@@ -11,11 +12,12 @@ import { ErrorMessage, ErrorMessageLook } from '../../../../components/errorMess
 import { NlToBr } from '../../../../components/nlToBr/nlToBr';
 import { ReadableDate } from '../../../../components/readableDate/readableDate';
 import { Recipients } from '../../../../components/recipientInput/recipientInput';
+import { Spinner, SpinnerLook } from '../../../../components/spinner/spinner';
 import { toast } from '../../../../components/toast/toast';
 import { ReactComponent as CrossSvg } from '../../../../icons/ic20/cross.svg';
 import { ReactComponent as ExternalSvg } from '../../../../icons/ic20/external.svg';
 import { ReactComponent as MailSvg } from '../../../../icons/ic20/mail.svg';
-import { IMessageDecodedContent, MessageDecodedTextDataType } from '../../../../indexedDB/IndexedDB';
+import { MessageDecodedTextDataType } from '../../../../indexedDB/IndexedDB';
 import { browserStorage } from '../../../../stores/browserStorage';
 import { useVenomAccounts } from '../../../../stores/Domain';
 import { OutgoingMailData } from '../../../../stores/outgoingMailData';
@@ -27,12 +29,13 @@ import { PostItemContainer } from '../postItemContainer/postItemContainer';
 import css from './venomFeedPostItem.module.scss';
 
 interface VenomFeedPostItemViewProps {
-	msg: IMessage;
-	decoded: IMessageDecodedContent;
+	post: DecodedVenomFeedPost;
 
+	isCompact?: boolean;
 	isBanned?: boolean;
 	isApproved?: boolean;
 	isAdminHelpVisible?: boolean;
+	loadReplyIfNeeded?: boolean;
 
 	onClick?: MouseEventHandler<HTMLElement>;
 	onAddressClick?: MouseEventHandler<HTMLElement>;
@@ -43,12 +46,13 @@ interface VenomFeedPostItemViewProps {
 }
 
 export function VenomFeedPostItemView({
-	msg,
-	decoded,
+	post,
 
+	isCompact,
 	isBanned,
 	isApproved,
 	isAdminHelpVisible,
+	loadReplyIfNeeded,
 
 	onClick,
 	onAddressClick,
@@ -57,7 +61,7 @@ export function VenomFeedPostItemView({
 	onBanClick,
 	onUnbanClick,
 }: VenomFeedPostItemViewProps) {
-	const decodedTextData = decoded.decodedTextData;
+	const decodedTextData = post.decoded.decodedTextData;
 	const decodedText = useMemo(
 		() =>
 			decodedTextData.type === MessageDecodedTextDataType.PLAIN
@@ -66,19 +70,42 @@ export function VenomFeedPostItemView({
 		[decodedTextData],
 	);
 
-	const attachment = decoded.attachments[0] as MessageAttachmentLinkV1 | undefined;
+	const replyToId = useMemo(() => {
+		if (loadReplyIfNeeded && decodedTextData.type === MessageDecodedTextDataType.YMF) {
+			const firstChild = decodedTextData.value.root.children[0];
+
+			if (firstChild?.type === 'tag' && firstChild.tag === 'reply-to') {
+				return firstChild.attributes.id || undefined;
+			}
+		}
+	}, [decodedTextData, loadReplyIfNeeded]);
+
+	const repliedPostQuery = useQuery(['feed', 'venom', 'reply-to', replyToId], {
+		enabled: !!replyToId,
+		queryFn: async () => {
+			const post = await VenomFilterApi.getPost({ id: replyToId! });
+			return post ? decodeVenomFeedPost(post) : undefined;
+		},
+	});
+
+	const attachment = post.decoded.attachments[0] as MessageAttachmentLinkV1 | undefined;
 	const attachmentHttpUrl = attachment && ipfsToHttpUrl(attachment.link);
 
 	return (
-		<PostItemContainer collapsable className={css.root} onClick={onClick}>
-			<Avatar className={css.ava} blockie={msg.senderAddress} />
+		<PostItemContainer
+			isCollapsable
+			isCompact={isCompact}
+			className={clsx(css.root, isCompact && css.root_compact)}
+			onClick={onClick}
+		>
+			<Avatar className={css.ava} blockie={post.msg.senderAddress} />
 
 			<div className={css.meta}>
 				<GridRowBox gap={2}>
 					<AdaptiveAddress
 						className={css.sender}
 						maxLength={12}
-						address={msg.senderAddress}
+						address={post.msg.senderAddress}
 						onClick={onAddressClick}
 					/>
 
@@ -94,7 +121,7 @@ export function VenomFeedPostItemView({
 				</GridRowBox>
 
 				<div className={css.metaRight}>
-					<ReadableDate className={css.metaAction} value={msg.createdAt * 1000} />
+					<ReadableDate className={css.metaAction} value={post.msg.createdAt * 1000} />
 
 					{onReplyClick && (
 						<button className={clsx(css.metaAction, css.metaAction_interactive)} onClick={onReplyClick}>
@@ -102,10 +129,10 @@ export function VenomFeedPostItemView({
 						</button>
 					)}
 
-					{!!msg.$$meta.id && (
+					{!!post.msg.$$meta.id && (
 						<a
 							className={clsx(css.metaAction, css.metaAction_icon, css.metaAction_interactive)}
-							href={`https://testnet.venomscan.com/messages/${msg.$$meta.id}`}
+							href={`https://testnet.venomscan.com/messages/${post.msg.$$meta.id}`}
 							target="_blank"
 							rel="noreferrer"
 							title="Details"
@@ -135,7 +162,24 @@ export function VenomFeedPostItemView({
 					<ErrorMessage look={ErrorMessageLook.INFO}>Post approved 🔥</ErrorMessage>
 				) : (
 					<>
-						<NlToBr text={decodedText} />
+						{replyToId && (
+							<>
+								{repliedPostQuery.data ? (
+									<VenomFeedPostItemView post={repliedPostQuery.data} isCompact />
+								) : repliedPostQuery.isLoading ? (
+									<GridRowBox>
+										<Spinner look={SpinnerLook.SECONDARY} />
+										Loading original post ...
+									</GridRowBox>
+								) : (
+									"Couldn't load original post"
+								)}
+							</>
+						)}
+
+						<div className={css.text}>
+							<NlToBr text={decodedText} />
+						</div>
 
 						{isAdminHelpVisible && (
 							<div
@@ -185,14 +229,13 @@ export function VenomFeedPostItemView({
 //
 
 interface VenomFeedPostItemProps {
-	msg: IMessage;
-	decoded: IMessageDecodedContent;
+	post: DecodedVenomFeedPost;
 	isFirstPost: boolean;
 	onNextPost: () => void;
 	onReplyClick: () => void;
 }
 
-export function VenomFeedPostItem({ msg, decoded, isFirstPost, onNextPost, onReplyClick }: VenomFeedPostItemProps) {
+export function VenomFeedPostItem({ post, isFirstPost, onNextPost, onReplyClick }: VenomFeedPostItemProps) {
 	let [clicks] = useState<number[]>([]);
 
 	const [isBanned, setBanned] = useState(false);
@@ -203,7 +246,10 @@ export function VenomFeedPostItem({ msg, decoded, isFirstPost, onNextPost, onRep
 	const venomAccounts = useVenomAccounts();
 
 	const banAddress = useCallback(() => {
-		VenomFilterApi.banAddresses({ addresses: [msg.senderAddress], secret: browserStorage.userAdminPassword || '' })
+		VenomFilterApi.banAddresses({
+			addresses: [post.msg.senderAddress],
+			secret: browserStorage.userAdminPassword || '',
+		})
 			.then(() => {
 				toast('Banned 🔥');
 				setBanned(true);
@@ -216,10 +262,10 @@ export function VenomFeedPostItem({ msg, decoded, isFirstPost, onNextPost, onRep
 					throw e;
 				}
 			});
-	}, [msg.senderAddress]);
+	}, [post.msg.senderAddress]);
 
 	const banPost = useCallback(() => {
-		VenomFilterApi.banPost({ ids: [msg.msgId], secret: browserStorage.userAdminPassword || '' })
+		VenomFilterApi.banPost({ ids: [post.msg.msgId], secret: browserStorage.userAdminPassword || '' })
 			.then(() => {
 				toast('Banned 🔥');
 				setBanned(true);
@@ -232,10 +278,10 @@ export function VenomFeedPostItem({ msg, decoded, isFirstPost, onNextPost, onRep
 					throw e;
 				}
 			});
-	}, [msg.msgId]);
+	}, [post.msg.msgId]);
 
 	const approvePost = useCallback(() => {
-		VenomFilterApi.approvePost({ ids: [msg.msgId], secret: browserStorage.userAdminPassword || '' })
+		VenomFilterApi.approvePost({ ids: [post.msg.msgId], secret: browserStorage.userAdminPassword || '' })
 			.then(() => {
 				toast('Approved 🔥');
 				setApproved(true);
@@ -248,10 +294,10 @@ export function VenomFeedPostItem({ msg, decoded, isFirstPost, onNextPost, onRep
 					throw e;
 				}
 			});
-	}, [msg.msgId]);
+	}, [post.msg.msgId]);
 
 	const unbanPost = useCallback(() => {
-		VenomFilterApi.unbanPost({ ids: [msg.msgId], secret: browserStorage.userAdminPassword || '' })
+		VenomFilterApi.unbanPost({ ids: [post.msg.msgId], secret: browserStorage.userAdminPassword || '' })
 			.then(() => {
 				toast('Un-banned 🔥');
 				setBanned(false);
@@ -260,7 +306,7 @@ export function VenomFeedPostItem({ msg, decoded, isFirstPost, onNextPost, onRep
 				toast('Error 🤦‍♀️');
 				throw e;
 			});
-	}, [msg.msgId]);
+	}, [post.msg.msgId]);
 
 	useEffect(() => {
 		if (isFirstPost && browserStorage.isUserAdmin) {
@@ -302,11 +348,11 @@ export function VenomFeedPostItem({ msg, decoded, isFirstPost, onNextPost, onRep
 			<div ref={scrollRef} style={{ position: 'absolute', top: -100 }} />
 
 			<VenomFeedPostItemView
-				msg={msg}
-				decoded={decoded}
+				post={post}
 				isBanned={isBanned}
 				isApproved={isApproved}
 				isAdminHelpVisible={browserStorage.isUserAdmin && isFirstPost && isShiftPressed}
+				loadReplyIfNeeded
 				onClick={() => {
 					clicks = [Date.now(), ...clicks].slice(0, 3);
 					if (browserStorage.isUserAdmin && clicks.length === 3 && clicks[0] - clicks[2] < 600) {
@@ -317,13 +363,13 @@ export function VenomFeedPostItem({ msg, decoded, isFirstPost, onNextPost, onRep
 					if (e.shiftKey && browserStorage.isUserAdmin) {
 						banAddress();
 					} else {
-						copyToClipboard(msg.senderAddress, { toast: true });
+						copyToClipboard(post.msg.senderAddress, { toast: true });
 					}
 				}}
 				onComposeClick={() => {
 					const mailData = new OutgoingMailData();
 					mailData.from = venomAccounts[0];
-					mailData.to = new Recipients([msg.senderAddress]);
+					mailData.to = new Recipients([post.msg.senderAddress]);
 
 					openMailCompose({ mailData });
 				}}

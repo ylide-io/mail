@@ -1,10 +1,10 @@
-import { IMessage, MessageAttachmentLinkV1, MessageAttachmentType } from '@ylide/sdk';
+import { MessageAttachmentLinkV1, MessageAttachmentType } from '@ylide/sdk';
 import clsx from 'clsx';
 import { observer } from 'mobx-react';
 import { forwardRef, Ref, useEffect, useImperativeHandle, useMemo, useRef, useState } from 'react';
 import { useMutation } from 'react-query';
 
-import { IVenomFeedPost, VenomFilterApi } from '../../../../api/venomFilterApi';
+import { DecodedVenomFeedPost, VenomFilterApi } from '../../../../api/venomFilterApi';
 import { AccountSelect } from '../../../../components/accountSelect/accountSelect';
 import { ActionButton, ActionButtonLook, ActionButtonSize } from '../../../../components/ActionButton/ActionButton';
 import { AutoSizeTextArea, AutoSizeTextAreaApi } from '../../../../components/autoSizeTextArea/autoSizeTextArea';
@@ -16,7 +16,6 @@ import { VENOM_FEED_ID } from '../../../../constants';
 import { ReactComponent as TrashSvg } from '../../../../icons/ic20/trash.svg';
 import { ReactComponent as BulbSvg } from '../../../../icons/ic28/bulb.svg';
 import { ReactComponent as StickerSvg } from '../../../../icons/ic28/sticker.svg';
-import { IMessageDecodedContent } from '../../../../indexedDB/IndexedDB';
 import { DomainAccount } from '../../../../stores/models/DomainAccount';
 import { OutgoingMailData, OutgoingMailDataMode } from '../../../../stores/outgoingMailData';
 import { HorizontalAlignment } from '../../../../utils/alignment';
@@ -27,13 +26,7 @@ import { VenomFeedPostItemView } from '../venomFeedPostItem/venomFeedPostItem';
 import css from './createPostForm.module.scss';
 
 export interface CreatePostFormApi {
-	replyTo: (data: ReplyToParams) => void;
-}
-
-interface ReplyToParams {
-	post: IVenomFeedPost;
-	msg: IMessage;
-	decoded: IMessageDecodedContent;
+	replyTo: (post: DecodedVenomFeedPost) => void;
 }
 
 export interface CreatePostFormProps extends PropsWithClassName {
@@ -133,7 +126,7 @@ export const CreatePostForm = observer(
 				onCreated?.();
 			};
 
-			const [replyTo, setReplyTo] = useState<ReplyToParams>();
+			const [replyTo, setReplyTo] = useState<DecodedVenomFeedPost>();
 
 			useEffect(() => {
 				mailData.processContent = ymf => {
@@ -143,7 +136,7 @@ export const CreatePostForm = observer(
 							type: 'tag',
 							tag: 'reply-to',
 							attributes: {
-								id: replyTo.post.id,
+								id: replyTo.original.id,
 							},
 							singular: true,
 							children: [],
@@ -157,9 +150,9 @@ export const CreatePostForm = observer(
 			useImperativeHandle(
 				ref,
 				() => ({
-					replyTo: data => {
+					replyTo: post => {
 						setExpanded(true);
-						setReplyTo(data);
+						setReplyTo(post);
 						textAreaApiRef.current?.focus();
 					},
 				}),
@@ -178,7 +171,7 @@ export const CreatePostForm = observer(
 								</ActionButton>
 							</div>
 
-							<VenomFeedPostItemView msg={replyTo.msg} decoded={replyTo.decoded} />
+							<VenomFeedPostItemView post={replyTo} isCompact />
 
 							<div className={css.divider} />
 						</>

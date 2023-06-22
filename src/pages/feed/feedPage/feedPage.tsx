@@ -1,4 +1,3 @@
-import { IMessage } from '@ylide/sdk';
 import { observer } from 'mobx-react';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { InView } from 'react-intersection-observer';
@@ -6,7 +5,7 @@ import { useInfiniteQuery, useQuery } from 'react-query';
 import { generatePath, matchPath, useLocation, useParams } from 'react-router-dom';
 
 import { FeedCategory, FeedServerApi } from '../../../api/feedServerApi';
-import { IVenomFeedPost, VenomFilterApi } from '../../../api/venomFilterApi';
+import { DecodedVenomFeedPost, decodeVenomFeedPost, VenomFilterApi } from '../../../api/venomFilterApi';
 import { ActionButton, ActionButtonLook, ActionButtonSize } from '../../../components/ActionButton/ActionButton';
 import { ErrorMessage, ErrorMessageLook } from '../../../components/errorMessage/errorMessage';
 import { NarrowContent } from '../../../components/genericLayout/content/narrowContent/narrowContent';
@@ -16,12 +15,10 @@ import { YlideLoader } from '../../../components/ylideLoader/ylideLoader';
 import { AppMode, REACT_APP__APP_MODE } from '../../../env';
 import { ReactComponent as ArrowUpSvg } from '../../../icons/ic20/arrowUp.svg';
 import { ReactComponent as CrossSvg } from '../../../icons/ic20/cross.svg';
-import { IMessageDecodedContent } from '../../../indexedDB/IndexedDB';
 import { useDomainAccounts, useVenomAccounts } from '../../../stores/Domain';
 import { FeedStore, getFeedCategoryName } from '../../../stores/Feed';
 import { RoutePath } from '../../../stores/routePath';
 import { connectAccount } from '../../../utils/account';
-import { decodeBroadcastContent } from '../../../utils/mail';
 import { useNav } from '../../../utils/url';
 import { CreatePostForm, CreatePostFormApi } from '../components/createPostForm/createPostForm';
 import { FeedPostItem } from '../components/feedPostItem/feedPostItem';
@@ -171,12 +168,6 @@ const RegularFeedContent = observer(() => {
 	);
 });
 
-interface VenomMessageData {
-	original: IVenomFeedPost;
-	msg: IMessage;
-	decoded: IMessageDecodedContent;
-}
-
 const VenomFeedContent = observer(() => {
 	const location = useLocation();
 	const isAdminMode = !!matchPath(RoutePath.FEED_VENOM_ADMIN, location.pathname);
@@ -185,33 +176,10 @@ const VenomFeedContent = observer(() => {
 
 	const [currentPost, setCurrentPost] = useState<number>(0);
 
-	const postsQuery = useInfiniteQuery<VenomMessageData[]>(['feed', 'venom', 'load'], {
+	const postsQuery = useInfiniteQuery<DecodedVenomFeedPost[]>(['feed', 'venom', 'load'], {
 		queryFn: async ({ pageParam = 0 }) => {
 			const posts = await VenomFilterApi.getPosts({ beforeTimestamp: pageParam, adminMode: isAdminMode });
-
-			return posts.map(p => {
-				const msg: IMessage = {
-					...p.meta,
-					key: new Uint8Array(p.meta.key),
-				};
-
-				return {
-					original: p,
-					msg,
-					decoded: decodeBroadcastContent(
-						msg.msgId,
-						msg,
-						p.content
-							? p.content.corrupted
-								? p.content
-								: {
-										...p.content,
-										content: new Uint8Array(p.content.content),
-								  }
-							: null,
-					),
-				};
-			});
+			return posts.map(decodeVenomFeedPost);
 		},
 		getNextPageParam: lastPage =>
 			lastPage.length ? lastPage[lastPage.length - 1].original.createTimestamp : undefined,
@@ -285,16 +253,9 @@ const VenomFeedContent = observer(() => {
 						{messages.map((message, idx) => (
 							<VenomFeedPostItem
 								isFirstPost={idx === currentPost}
-								msg={message.msg}
-								decoded={message.decoded}
+								post={message}
 								onNextPost={() => setCurrentPost(idx + 1)}
-								onReplyClick={() =>
-									createPostFormRef.current?.replyTo({
-										post: message.original,
-										msg: message.msg,
-										decoded: message.decoded,
-									})
-								}
+								onReplyClick={() => createPostFormRef.current?.replyTo(message)}
 							/>
 						))}
 

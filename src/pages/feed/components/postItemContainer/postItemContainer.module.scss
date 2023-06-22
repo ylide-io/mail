@@ -11,6 +11,16 @@
 	}
 }
 
+.root_compact {
+	grid-gap: 4px 8px;
+	padding: 8px;
+
+	@include less720px {
+		border-width: 1px;
+		border-radius: 8px;
+	}
+}
+
 .root_collapsed {
 	max-height: 600px;
 	overflow: hidden;
