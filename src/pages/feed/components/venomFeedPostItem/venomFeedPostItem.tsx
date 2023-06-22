@@ -165,7 +165,13 @@ export function VenomFeedPostItemView({
 						{replyToId && (
 							<>
 								{repliedPostQuery.data ? (
-									<VenomFeedPostItemView post={repliedPostQuery.data} isCompact />
+									<VenomFeedPostItemView
+										post={repliedPostQuery.data}
+										isCompact
+										onAddressClick={() => {
+											copyToClipboard(post.msg.senderAddress, { toast: true });
+										}}
+									/>
 								) : repliedPostQuery.isLoading ? (
 									<GridRowBox>
 										<Spinner look={SpinnerLook.SECONDARY} />
