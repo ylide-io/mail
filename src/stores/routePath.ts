@@ -28,6 +28,7 @@ export enum RoutePath {
 	FEED_SMART_ADDRESS = '/feed/smart/:address',
 	FEED_VENOM = '/feed/venom',
 	FEED_VENOM_ADMIN = '/feed/venom/admin',
+	FEED_VENOM_PROJECT = '/feed/venom/:project',
 
 	OTC_ASSETS = '/otc/assets',
 	OTC_WALLETS = '/otc/wallets',

@@ -35,6 +35,7 @@ import { getFeedCategoryName } from '../../../stores/Feed';
 import { FolderId } from '../../../stores/MailList';
 import { DomainAccount } from '../../../stores/models/DomainAccount';
 import { RoutePath } from '../../../stores/routePath';
+import { VenomProjectId, venomProjectsMeta } from '../../../stores/venomProjects/venomProjects';
 import { useOpenMailCompose } from '../../../utils/mail';
 import { useNav } from '../../../utils/url';
 import { ActionButton, ActionButtonLook, ActionButtonSize } from '../../ActionButton/ActionButton';
@@ -150,6 +151,7 @@ export const SidebarButton = observer(({ look, href, icon, name, rightButton }: 
 export const isSidebarOpen = observable.box(false);
 
 export enum Section {
+	VENOM_PROJECTS = 'venom_projects',
 	FEED = 'feed',
 	FEED_DISCOVERY = 'feed_discovery',
 	MAIL = 'mail',
@@ -205,15 +207,35 @@ export const SidebarMenu = observer(() => {
 		);
 	}
 
-	function renderVenomFeedSection() {
+	function renderVenomProjectsSection() {
 		if (REACT_APP__APP_MODE !== AppMode.HUB) return;
 
 		return (
-			<SidebarButton
-				look={SidebarButtonLook.SECTION}
-				href={generatePath(RoutePath.FEED_VENOM)}
-				name="Venom feed"
-			/>
+			<SidebarSection section={Section.VENOM_PROJECTS} title="Venom Ecosystem">
+				{[
+					VenomProjectId.VENOM_BLOCKCHAIN,
+					VenomProjectId.VENOM_WALLET,
+					VenomProjectId.VENOM_SCAN,
+					VenomProjectId.SNIPA,
+					VenomProjectId.WEB3_WORLD,
+					VenomProjectId.VENOM_BRIDGE,
+					VenomProjectId.OASIS_GALLERY,
+					VenomProjectId.VENOM_PAD,
+					VenomProjectId.VENOM_STAKE,
+					VenomProjectId.NUMI,
+					VenomProjectId.YLIDE,
+				].map(id => {
+					const meta = venomProjectsMeta[id];
+
+					return (
+						<SidebarButton
+							href={generatePath(RoutePath.FEED_VENOM_PROJECT, { project: meta.id })}
+							name={meta.name}
+							icon={meta.icon}
+						/>
+					);
+				})}
+			</SidebarSection>
 		);
 	}
 
@@ -288,7 +310,7 @@ export const SidebarMenu = observer(() => {
 		<div className={css.root}>
 			{renderOtcSection()}
 			{renderSmartFeedSection()}
-			{renderVenomFeedSection()}
+			{renderVenomProjectsSection()}
 			{renderFeedDiscoverySection()}
 			{renderMailSection()}
 

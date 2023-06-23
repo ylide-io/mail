@@ -2,7 +2,7 @@ import { observer } from 'mobx-react';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { InView } from 'react-intersection-observer';
 import { useInfiniteQuery, useQuery } from 'react-query';
-import { generatePath, matchPath, useLocation, useParams } from 'react-router-dom';
+import { generatePath, matchPath, matchRoutes, useLocation, useParams } from 'react-router-dom';
 
 import { FeedCategory, FeedServerApi } from '../../../api/feedServerApi';
 import { DecodedVenomFeedPost, decodeVenomFeedPost, VenomFilterApi } from '../../../api/venomFilterApi';
@@ -289,9 +289,10 @@ const VenomFeedContent = observer(() => {
 
 export const FeedPage = () => {
 	const location = useLocation();
-	const isVenomFeed =
-		!!matchPath(RoutePath.FEED_VENOM, location.pathname) ||
-		!!matchPath(RoutePath.FEED_VENOM_ADMIN, location.pathname);
+	const isVenomFeed = !!matchRoutes(
+		[{ path: RoutePath.FEED_VENOM }, { path: RoutePath.FEED_VENOM_PROJECT }, { path: RoutePath.FEED_VENOM_ADMIN }],
+		location.pathname,
+	)?.length;
 
 	return <GenericLayout>{isVenomFeed ? <VenomFeedContent /> : <RegularFeedContent />}</GenericLayout>;
 };
