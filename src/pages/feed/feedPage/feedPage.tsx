@@ -183,7 +183,7 @@ const VenomFeedContent = observer(() => {
 
 	const [currentPost, setCurrentPost] = useState<number>(0);
 
-	const postsQuery = useInfiniteQuery<DecodedVenomFeedPost[]>(['feed', 'venom', 'load'], {
+	const postsQuery = useInfiniteQuery<DecodedVenomFeedPost[]>(['feed', 'venom', 'posts', project], {
 		queryFn: async ({ pageParam = 0 }) => {
 			const posts = await VenomFilterApi.getPosts({ beforeTimestamp: pageParam, adminMode: isAdminMode });
 			return posts.map(decodeVenomFeedPost);
@@ -196,11 +196,13 @@ const VenomFeedContent = observer(() => {
 
 	const [hasNewPosts, setHasNewPosts] = useState(false);
 
-	useQuery(['feed', 'venom', 'new-posts'], {
+	useQuery(['feed', 'venom', 'new-posts', project], {
 		queryFn: async () => {
-			if (!hasNewPosts) {
+			if (!postsQuery.isLoading) {
 				const posts = await VenomFilterApi.getPosts({ beforeTimestamp: 0, adminMode: isAdminMode });
 				setHasNewPosts(!!(posts.length && messages.length && posts[0].id !== messages[0].original.id));
+			} else {
+				setHasNewPosts(false);
 			}
 		},
 		refetchInterval: 15 * 1000,
