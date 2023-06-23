@@ -63,8 +63,7 @@ export const venomProjectsMeta: Record<VenomProjectId, VenomProjectMeta> = {
 		id: VenomProjectId.VENOM_BLOCKCHAIN,
 		feedId: VENOM_FEED_ID,
 		name: 'Venom Blockchain',
-		description:
-			'Venom is a versatile and innovative blockchain that offers a range of use cases across various industries.',
+		description: 'Versatile and innovative blockchain that offers a range of use cases across various industries.',
 		logo: <VenomBlockchainSvg />,
 	},
 	[VenomProjectId.VENOM_BRIDGE]: {

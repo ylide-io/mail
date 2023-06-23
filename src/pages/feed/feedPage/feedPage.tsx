@@ -18,7 +18,9 @@ import { ReactComponent as CrossSvg } from '../../../icons/ic20/cross.svg';
 import { useDomainAccounts, useVenomAccounts } from '../../../stores/Domain';
 import { FeedStore, getFeedCategoryName } from '../../../stores/Feed';
 import { RoutePath } from '../../../stores/routePath';
+import { VenomProjectId, venomProjectsMeta } from '../../../stores/venomProjects/venomProjects';
 import { connectAccount } from '../../../utils/account';
+import { invariant } from '../../../utils/assert';
 import { useNav } from '../../../utils/url';
 import { CreatePostForm, CreatePostFormApi } from '../components/createPostForm/createPostForm';
 import { FeedPostItem } from '../components/feedPostItem/feedPostItem';
@@ -170,6 +172,11 @@ const RegularFeedContent = observer(() => {
 
 const VenomFeedContent = observer(() => {
 	const location = useLocation();
+
+	const { project } = useParams<{ project: VenomProjectId }>();
+	invariant(project, 'Venom project must be specified');
+	const projectMeta = venomProjectsMeta[project];
+
 	const isAdminMode = !!matchPath(RoutePath.FEED_VENOM_ADMIN, location.pathname);
 
 	const venomAccounts = useVenomAccounts();
@@ -217,16 +224,27 @@ const VenomFeedContent = observer(() => {
 	const createPostFormRef = useRef<CreatePostFormApi>(null);
 
 	return (
-		<NarrowContent
-			title="Venom feed"
-			titleRight={
-				hasNewPosts && (
-					<ActionButton look={ActionButtonLook.SECONDARY} onClick={() => reloadFeed()}>
+		<NarrowContent contentClassName={css.venomProjecsContent}>
+			<div className={css.venomProjectTitle}>
+				<div className={css.venomProjectLogo}>{projectMeta.logo}</div>
+				<div className={css.venomProjectName}>{projectMeta.name}</div>
+				<div className={css.venomProjectDescription}>{projectMeta.description}</div>
+			</div>
+
+			{hasNewPosts && (
+				<div className={css.newPostsButtonWrapper}>
+					<ActionButton
+						className={css.newPostsButton}
+						look={ActionButtonLook.SECONDARY}
+						onClick={() => reloadFeed()}
+					>
 						Load new posts
 					</ActionButton>
-				)
-			}
-		>
+				</div>
+			)}
+
+			<div className={css.divider} />
+
 			{venomAccounts.length ? (
 				<CreatePostForm
 					ref={createPostFormRef}
@@ -244,8 +262,6 @@ const VenomFeedContent = observer(() => {
 					</ActionButton>
 				</ErrorMessage>
 			)}
-
-			<div className={css.divider} />
 
 			<div className={css.posts}>
 				{messages.length ? (

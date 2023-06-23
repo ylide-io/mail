@@ -231,7 +231,7 @@ export const SidebarMenu = observer(() => {
 						<SidebarButton
 							href={generatePath(RoutePath.FEED_VENOM_PROJECT, { project: meta.id })}
 							name={meta.name}
-							icon={meta.icon}
+							icon={meta.logo}
 						/>
 					);
 				})}
