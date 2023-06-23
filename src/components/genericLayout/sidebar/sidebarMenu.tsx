@@ -211,7 +211,7 @@ export const SidebarMenu = observer(() => {
 		if (REACT_APP__APP_MODE !== AppMode.HUB) return;
 
 		return (
-			<SidebarSection section={Section.VENOM_PROJECTS} title="Venom Ecosystem">
+			<SidebarSection section={Section.VENOM_PROJECTS} title="Venom Projects">
 				{[
 					VenomProjectId.VENOM_BLOCKCHAIN,
 					VenomProjectId.VENOM_WALLET,
