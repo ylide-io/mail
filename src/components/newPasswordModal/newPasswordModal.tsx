@@ -1,8 +1,7 @@
 import { EVMNetwork } from '@ylide/ethereum';
 import { asyncDelay, ExternalYlidePublicKey, IGenericAccount, YlideKeyPair, YlidePublicKeyVersion } from '@ylide/sdk';
 import SmartBuffer from '@ylide/smart-buffer';
-import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { generatePath } from 'react-router-dom';
+import { useEffect, useMemo, useRef, useState } from 'react';
 
 import { ReactComponent as ProceedToWalletArrowSvg } from '../../assets/proceedTOWalletArrow.svg';
 import { AppMode, REACT_APP__APP_MODE } from '../../env';
@@ -13,7 +12,6 @@ import { evmBalances } from '../../stores/evmBalances';
 import { chainIdByFaucetType, publishKeyThroughFaucet, requestFaucetSignature } from '../../stores/KeyManagement';
 import { DomainAccount } from '../../stores/models/DomainAccount';
 import { Wallet } from '../../stores/models/Wallet';
-import { RoutePath } from '../../stores/routePath';
 import { disconnectAccount } from '../../utils/account';
 import { assertUnreachable, invariant } from '../../utils/assert';
 import { isBytesEqual } from '../../utils/isBytesEqual';
@@ -62,17 +60,24 @@ export function NewPasswordModal({ faucetType, bonus, wallet, account, remoteKey
 		[remoteKeys],
 	);
 
-	const keyParams = useMemo(
-		() => ({
+	const keyParams = useMemo(() => {
+		if (REACT_APP__APP_MODE === AppMode.MAIN_VIEW) {
+			return {
+				keyExists: !!freshestKey && freshestKey.key.keyVersion === 3,
+				keyVersion: freshestKey && freshestKey.key.keyVersion === 3 ? freshestKey.key.keyVersion : 0,
+				isPasswordNeeded: false,
+				registrar: freshestKey && freshestKey.key.keyVersion === 3 ? freshestKey.key.registrar : 0,
+			};
+		}
+		return {
 			keyExists: !!freshestKey,
 			keyVersion: freshestKey ? freshestKey.key.keyVersion : 0,
 			isPasswordNeeded: freshestKey
 				? freshestKey.key.keyVersion === 1 || freshestKey.key.keyVersion === 2
 				: false,
 			registrar: freshestKey ? freshestKey.key.registrar : 0,
-		}),
-		[freshestKey],
-	);
+		};
+	}, [freshestKey]);
 
 	const [step, setStep] = useState(Step.ENTER_PASSWORD);
 
@@ -138,38 +143,49 @@ export function NewPasswordModal({ faucetType, bonus, wallet, account, remoteKey
 
 		let tempLocalKey: YlideKeyPair;
 		let keyVersion;
+		let needToRepublishKey = false;
 		try {
-			if (forceNew) {
-				console.log('createLocalKey', 'forceNew');
-				tempLocalKey = await wallet.constructLocalKeyV2(account, password);
-				keyVersion = YlidePublicKeyVersion.KEY_V2;
-			} else if (freshestKey?.key.keyVersion === YlidePublicKeyVersion.INSECURE_KEY_V1) {
-				if (freshestKey.blockchain === 'venom-testnet') {
-					// strange... I'm not sure Qamon keys work here
-					console.log('createLocalKey', 'INSECURE_KEY_V1 venom-testnet');
+			if (REACT_APP__APP_MODE === AppMode.MAIN_VIEW) {
+				// in MainView we support only v3 keys
+				console.log('createLocalKey');
+				tempLocalKey = await wallet.constructLocalKeyV3(account);
+				keyVersion = YlidePublicKeyVersion.KEY_V3;
+				needToRepublishKey =
+					freshestKey?.key.keyVersion === YlidePublicKeyVersion.INSECURE_KEY_V1 ||
+					freshestKey?.key.keyVersion === YlidePublicKeyVersion.KEY_V2;
+			} else {
+				if (forceNew) {
+					console.log('createLocalKey', 'forceNew');
 					tempLocalKey = await wallet.constructLocalKeyV2(account, password);
 					keyVersion = YlidePublicKeyVersion.KEY_V2;
+				} else if (freshestKey?.key.keyVersion === YlidePublicKeyVersion.INSECURE_KEY_V1) {
+					if (freshestKey.blockchain === 'venom-testnet') {
+						// strange... I'm not sure Qamon keys work here
+						console.log('createLocalKey', 'INSECURE_KEY_V1 venom-testnet');
+						tempLocalKey = await wallet.constructLocalKeyV2(account, password);
+						keyVersion = YlidePublicKeyVersion.KEY_V2;
+					} else {
+						// strange... I'm not sure Qamon keys work here
+						console.log('createLocalKey', 'INSECURE_KEY_V1');
+						tempLocalKey = await wallet.constructLocalKeyV1(account, password);
+						keyVersion = YlidePublicKeyVersion.INSECURE_KEY_V1;
+					}
+				} else if (freshestKey?.key.keyVersion === YlidePublicKeyVersion.KEY_V2) {
+					// if user already using password - we should use it too
+					console.log('createLocalKey', 'KEY_V2');
+					tempLocalKey = await wallet.constructLocalKeyV2(account, password);
+					keyVersion = YlidePublicKeyVersion.KEY_V2;
+				} else if (freshestKey?.key.keyVersion === YlidePublicKeyVersion.KEY_V3) {
+					// if user is not using password - we should not use it too
+					console.log('createLocalKey', 'KEY_V3');
+					tempLocalKey = await wallet.constructLocalKeyV3(account);
+					keyVersion = YlidePublicKeyVersion.KEY_V3;
 				} else {
-					// strange... I'm not sure Qamon keys work here
-					console.log('createLocalKey', 'INSECURE_KEY_V1');
-					tempLocalKey = await wallet.constructLocalKeyV1(account, password);
-					keyVersion = YlidePublicKeyVersion.INSECURE_KEY_V1;
+					// user have no key at all - use passwordless version
+					console.log('createLocalKey', 'no key');
+					tempLocalKey = await wallet.constructLocalKeyV3(account);
+					keyVersion = YlidePublicKeyVersion.KEY_V3;
 				}
-			} else if (freshestKey?.key.keyVersion === YlidePublicKeyVersion.KEY_V2) {
-				// if user already using password - we should use it too
-				console.log('createLocalKey', 'KEY_V2');
-				tempLocalKey = await wallet.constructLocalKeyV2(account, password);
-				keyVersion = YlidePublicKeyVersion.KEY_V2;
-			} else if (freshestKey?.key.keyVersion === YlidePublicKeyVersion.KEY_V3) {
-				// if user is not using password - we should not use it too
-				console.log('createLocalKey', 'KEY_V3');
-				tempLocalKey = await wallet.constructLocalKeyV3(account);
-				keyVersion = YlidePublicKeyVersion.KEY_V3;
-			} else {
-				// user have no key at all - use passwordless version
-				console.log('createLocalKey', 'no key');
-				tempLocalKey = await wallet.constructLocalKeyV3(account);
-				keyVersion = YlidePublicKeyVersion.KEY_V3;
 			}
 		} catch (e) {
 			exitUnsuccessfully({ message: 'Failed to create local key 😒', e });
@@ -178,7 +194,7 @@ export function NewPasswordModal({ faucetType, bonus, wallet, account, remoteKey
 
 		setStep(Step.LOADING);
 
-		if (!freshestKey) {
+		if (!freshestKey || needToRepublishKey) {
 			const domainAccount = await createDomainAccount(wallet, account, tempLocalKey, keyVersion);
 			if (faucetType && wallet.factory.blockchainGroup === 'evm') {
 				async function publishThroughFaucet(
@@ -267,7 +283,8 @@ export function NewPasswordModal({ faucetType, bonus, wallet, account, remoteKey
 				await publishThroughFaucet(
 					domainAccount,
 					keyVersion,
-					faucetType,
+					// we will publish v3 keys for users having v1 and v2 to polygon
+					needToRepublishKey ? 'polygon' : faucetType,
 					bonus,
 					REACT_APP__APP_MODE === AppMode.OTC,
 				);
