@@ -2,6 +2,7 @@ import { useState } from 'react';
 
 import { ActionButton, ActionButtonLook, ActionButtonSize } from '../ActionButton/ActionButton';
 import { ActionModal } from '../actionModal/actionModal';
+import { CheckBox } from '../checkBox/checkBox';
 import { TextField } from '../textField/textField';
 import { toast } from '../toast/toast';
 
@@ -12,7 +13,7 @@ enum Step {
 }
 
 export interface ForgotPasswordModalProps {
-	onClose?: (password?: string) => void;
+	onClose?: (args?: { password?: string; withoutPassword?: boolean }) => void;
 }
 
 export function ForgotPasswordModal({ onClose }: ForgotPasswordModalProps) {
@@ -21,14 +22,24 @@ export function ForgotPasswordModal({ onClose }: ForgotPasswordModalProps) {
 	const [password, setPassword] = useState('');
 	const [passwordRepeat, setPasswordRepeat] = useState('');
 
+	const [withoutPassword, setWithoutPassword] = useState(false);
+
 	function onSave() {
-		if (password.length < 5) {
-			toast('Minimal length is 5 symbols');
-		} else if (password !== passwordRepeat) {
-			toast(`Passwords don't match`);
+		if (withoutPassword) {
+			onClose?.({ withoutPassword: true });
 		} else {
-			onClose?.(password);
+			if (password.length < 5) {
+				toast('Minimal length is 5 symbols');
+			} else if (password !== passwordRepeat) {
+				toast(`Passwords don't match`);
+			} else {
+				onClose?.({ password });
+			}
 		}
+	}
+
+	function toggle(checked: boolean) {
+		setWithoutPassword(checked);
 	}
 
 	return (
@@ -76,7 +87,7 @@ export function ForgotPasswordModal({ onClose }: ForgotPasswordModalProps) {
 								look={ActionButtonLook.PRIMARY}
 								onClick={() => onSave()}
 							>
-								Save Password
+								{withoutPassword ? 'Reset Password' : 'Save Password'}
 							</ActionButton>,
 							<ActionButton
 								size={ActionButtonSize.XLARGE}
@@ -131,6 +142,7 @@ export function ForgotPasswordModal({ onClose }: ForgotPasswordModalProps) {
 							placeholder="Enter Ylide password"
 							value={password}
 							onValueChange={setPassword}
+							disabled={withoutPassword}
 						/>
 
 						<TextField
@@ -138,7 +150,13 @@ export function ForgotPasswordModal({ onClose }: ForgotPasswordModalProps) {
 							placeholder="Repeat your password"
 							value={passwordRepeat}
 							onValueChange={setPasswordRepeat}
+							disabled={withoutPassword}
 						/>
+
+						<p style={{ cursor: 'pointer', display: 'flex', alignItems: 'center' }}>
+							<CheckBox isChecked={withoutPassword} onChange={toggle} />
+							<span>&nbsp; Without password</span>
+						</p>
 					</div>
 
 					<p>

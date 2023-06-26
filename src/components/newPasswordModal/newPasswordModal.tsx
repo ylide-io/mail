@@ -138,7 +138,15 @@ export function NewPasswordModal({ faucetType, bonus, wallet, account, remoteKey
 		}
 	}
 
-	async function createLocalKey(password: string, forceNew?: boolean) {
+	async function createLocalKey({
+		password,
+		forceNew,
+		withoutPassword,
+	}: {
+		password: string;
+		forceNew?: boolean;
+		withoutPassword?: boolean;
+	}) {
 		setStep(Step.GENERATE_KEY);
 
 		let tempLocalKey: YlideKeyPair;
@@ -154,7 +162,11 @@ export function NewPasswordModal({ faucetType, bonus, wallet, account, remoteKey
 					freshestKey?.key.keyVersion === YlidePublicKeyVersion.INSECURE_KEY_V1 ||
 					freshestKey?.key.keyVersion === YlidePublicKeyVersion.KEY_V2;
 			} else {
-				if (forceNew) {
+				if (withoutPassword) {
+					console.log('createLocalKey', 'withoutPassword');
+					tempLocalKey = await wallet.constructLocalKeyV3(account);
+					keyVersion = YlidePublicKeyVersion.KEY_V3;
+				} else if (forceNew) {
 					console.log('createLocalKey', 'forceNew');
 					tempLocalKey = await wallet.constructLocalKeyV2(account, password);
 					keyVersion = YlidePublicKeyVersion.KEY_V2;
@@ -299,7 +311,7 @@ export function NewPasswordModal({ faucetType, bonus, wallet, account, remoteKey
 			const domainAccount = await createDomainAccount(wallet, account, tempLocalKey, keyVersion);
 			analytics.walletConnected(wallet.factory.wallet, account.address, domain.accounts.accounts.length);
 			onClose?.(domainAccount);
-		} else if (forceNew) {
+		} else if (forceNew || withoutPassword) {
 			await createDomainAccount(wallet, account, tempLocalKey, keyVersion);
 			await publishLocalKey();
 		} else {
@@ -332,7 +344,7 @@ export function NewPasswordModal({ faucetType, bonus, wallet, account, remoteKey
 							<ActionButton
 								size={ActionButtonSize.XLARGE}
 								look={ActionButtonLook.PRIMARY}
-								onClick={() => createLocalKey(password)}
+								onClick={() => createLocalKey({ password })}
 							>
 								{keyParams.isPasswordNeeded ? 'Continue' : 'Sign'}
 							</ActionButton>
@@ -390,9 +402,21 @@ export function NewPasswordModal({ faucetType, bonus, wallet, account, remoteKey
 										onClick={() =>
 											showStaticComponent<string>(resolve => (
 												<ForgotPasswordModal
-													onClose={password => {
-														resolve(password);
-														password && createLocalKey(password, true);
+													onClose={args => {
+														if (args) {
+															resolve(args.password);
+															if (args.withoutPassword) {
+																createLocalKey({
+																	password: '',
+																	withoutPassword: true,
+																});
+															} else if (args.password) {
+																createLocalKey({
+																	password: args.password,
+																	forceNew: true,
+																});
+															}
+														}
 													}}
 												/>
 											))
