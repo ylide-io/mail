@@ -517,6 +517,7 @@ export class Domain {
 				!this.walletControllers[factory.blockchainGroup] ||
 				!this.walletControllers[factory.blockchainGroup][factory.wallet]
 			) {
+				console.log('Initing wallet: ', factory.wallet);
 				await this.initWallet(factory);
 				tick('wallet ' + factory.wallet + ' inited');
 			}
