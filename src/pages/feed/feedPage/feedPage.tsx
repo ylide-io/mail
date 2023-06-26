@@ -2,7 +2,7 @@ import { observer } from 'mobx-react';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { InView } from 'react-intersection-observer';
 import { useInfiniteQuery, useQuery } from 'react-query';
-import { generatePath, matchPath, useLocation, useParams } from 'react-router-dom';
+import { generatePath, matchPath, matchRoutes, useLocation, useParams } from 'react-router-dom';
 
 import { FeedCategory, FeedServerApi } from '../../../api/feedServerApi';
 import { DecodedVenomFeedPost, decodeVenomFeedPost, VenomFilterApi } from '../../../api/venomFilterApi';
@@ -18,7 +18,9 @@ import { ReactComponent as CrossSvg } from '../../../icons/ic20/cross.svg';
 import { useDomainAccounts, useVenomAccounts } from '../../../stores/Domain';
 import { FeedStore, getFeedCategoryName } from '../../../stores/Feed';
 import { RoutePath } from '../../../stores/routePath';
+import { VenomProjectId, venomProjectsMeta } from '../../../stores/venomProjects/venomProjects';
 import { connectAccount } from '../../../utils/account';
+import { invariant } from '../../../utils/assert';
 import { useNav } from '../../../utils/url';
 import { CreatePostForm, CreatePostFormApi } from '../components/createPostForm/createPostForm';
 import { FeedPostItem } from '../components/feedPostItem/feedPostItem';
@@ -170,15 +172,24 @@ const RegularFeedContent = observer(() => {
 
 const VenomFeedContent = observer(() => {
 	const location = useLocation();
+
+	const { project } = useParams<{ project: VenomProjectId }>();
+	invariant(project, 'Venom project must be specified');
+	const projectMeta = venomProjectsMeta[project];
+
 	const isAdminMode = !!matchPath(RoutePath.FEED_VENOM_ADMIN, location.pathname);
 
 	const venomAccounts = useVenomAccounts();
 
 	const [currentPost, setCurrentPost] = useState<number>(0);
 
-	const postsQuery = useInfiniteQuery<DecodedVenomFeedPost[]>(['feed', 'venom', 'load'], {
+	const postsQuery = useInfiniteQuery<DecodedVenomFeedPost[]>(['feed', 'venom', 'posts', project], {
 		queryFn: async ({ pageParam = 0 }) => {
-			const posts = await VenomFilterApi.getPosts({ beforeTimestamp: pageParam, adminMode: isAdminMode });
+			const posts = await VenomFilterApi.getPosts({
+				feedId: projectMeta.feedId,
+				beforeTimestamp: pageParam,
+				adminMode: isAdminMode,
+			});
 			return posts.map(decodeVenomFeedPost);
 		},
 		getNextPageParam: lastPage =>
@@ -189,11 +200,17 @@ const VenomFeedContent = observer(() => {
 
 	const [hasNewPosts, setHasNewPosts] = useState(false);
 
-	useQuery(['feed', 'venom', 'new-posts'], {
+	useQuery(['feed', 'venom', 'new-posts', project], {
 		queryFn: async () => {
-			if (!hasNewPosts) {
-				const posts = await VenomFilterApi.getPosts({ beforeTimestamp: 0, adminMode: isAdminMode });
+			if (!postsQuery.isLoading) {
+				const posts = await VenomFilterApi.getPosts({
+					feedId: projectMeta.feedId,
+					beforeTimestamp: 0,
+					adminMode: isAdminMode,
+				});
 				setHasNewPosts(!!(posts.length && messages.length && posts[0].id !== messages[0].original.id));
+			} else {
+				setHasNewPosts(false);
 			}
 		},
 		refetchInterval: 15 * 1000,
@@ -217,19 +234,31 @@ const VenomFeedContent = observer(() => {
 	const createPostFormRef = useRef<CreatePostFormApi>(null);
 
 	return (
-		<NarrowContent
-			title="Venom feed"
-			titleRight={
-				hasNewPosts && (
-					<ActionButton look={ActionButtonLook.SECONDARY} onClick={() => reloadFeed()}>
+		<NarrowContent contentClassName={css.venomProjecsContent}>
+			<div className={css.venomProjectTitle}>
+				<div className={css.venomProjectLogo}>{projectMeta.logo}</div>
+				<div className={css.venomProjectName}>{projectMeta.name}</div>
+				<div className={css.venomProjectDescription}>{projectMeta.description}</div>
+			</div>
+
+			{hasNewPosts && (
+				<div className={css.newPostsButtonWrapper}>
+					<ActionButton
+						className={css.newPostsButton}
+						look={ActionButtonLook.SECONDARY}
+						onClick={() => reloadFeed()}
+					>
 						Load new posts
 					</ActionButton>
-				)
-			}
-		>
+				</div>
+			)}
+
+			<div className={css.divider} />
+
 			{venomAccounts.length ? (
 				<CreatePostForm
 					ref={createPostFormRef}
+					feedId={projectMeta.feedId}
 					className={css.createPostForm}
 					accounts={venomAccounts}
 					isAnavailable={serviceStatus.data !== 'ACTIVE'}
@@ -244,8 +273,6 @@ const VenomFeedContent = observer(() => {
 					</ActionButton>
 				</ErrorMessage>
 			)}
-
-			<div className={css.divider} />
 
 			<div className={css.posts}>
 				{messages.length ? (
@@ -289,9 +316,10 @@ const VenomFeedContent = observer(() => {
 
 export const FeedPage = () => {
 	const location = useLocation();
-	const isVenomFeed =
-		!!matchPath(RoutePath.FEED_VENOM, location.pathname) ||
-		!!matchPath(RoutePath.FEED_VENOM_ADMIN, location.pathname);
+	const isVenomFeed = !!matchRoutes(
+		[{ path: RoutePath.FEED_VENOM }, { path: RoutePath.FEED_VENOM_PROJECT }, { path: RoutePath.FEED_VENOM_ADMIN }],
+		location.pathname,
+	)?.length;
 
 	return <GenericLayout>{isVenomFeed ? <VenomFeedContent /> : <RegularFeedContent />}</GenericLayout>;
 };

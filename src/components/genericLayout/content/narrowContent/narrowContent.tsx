@@ -3,25 +3,28 @@ import { PropsWithChildren, ReactNode } from 'react';
 import css from './narrowContent.module.scss';
 
 export interface NarrowContentProps extends PropsWithChildren<{}> {
-	title: ReactNode;
+	title?: ReactNode;
 	titleSubItem?: ReactNode;
 	titleRight?: ReactNode;
+	contentClassName?: string;
 }
 
-export function NarrowContent({ children, title, titleSubItem, titleRight }: NarrowContentProps) {
+export function NarrowContent({ children, title, titleSubItem, titleRight, contentClassName }: NarrowContentProps) {
 	return (
 		<div className={css.root}>
-			<div className={css.header}>
-				<div className={css.title}>
-					<div className={css.titleText}>{title}</div>
+			{title != null && (
+				<div className={css.header}>
+					<div className={css.title}>
+						<div className={css.titleText}>{title}</div>
 
-					{titleSubItem}
+						{titleSubItem}
+					</div>
+
+					{titleRight != null && <div className={css.titleRight}>{titleRight}</div>}
 				</div>
+			)}
 
-				{titleRight != null && <div className={css.titleRight}>{titleRight}</div>}
-			</div>
-
-			<div>{children}</div>
+			<div className={contentClassName}>{children}</div>
 		</div>
 	);
 }

@@ -139,9 +139,9 @@ export namespace VenomFilterApi {
 		});
 	}
 
-	export async function getPosts(params: { beforeTimestamp: number; adminMode?: boolean }) {
+	export async function getPosts(params: { feedId: string; beforeTimestamp: number; adminMode?: boolean }) {
 		return await request<VenomFeedPost[]>('/posts', {
-			query: { beforeTimestamp: params.beforeTimestamp, adminMode: params.adminMode },
+			query: { feedId: params.feedId, beforeTimestamp: params.beforeTimestamp, adminMode: params.adminMode },
 		});
 	}
 

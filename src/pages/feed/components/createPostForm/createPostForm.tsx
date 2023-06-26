@@ -1,4 +1,5 @@
 import { MessageAttachmentLinkV1, MessageAttachmentType } from '@ylide/sdk';
+import { Uint256 } from '@ylide/sdk';
 import clsx from 'clsx';
 import { observer } from 'mobx-react';
 import { forwardRef, Ref, useEffect, useImperativeHandle, useMemo, useRef, useState } from 'react';
@@ -32,19 +33,23 @@ export interface CreatePostFormApi {
 export interface CreatePostFormProps extends PropsWithClassName {
 	accounts: DomainAccount[];
 	isAnavailable: boolean;
+	feedId: Uint256;
 	onCreated?: () => void;
 }
 
 export const CreatePostForm = observer(
 	forwardRef(
-		({ className, accounts, isAnavailable, onCreated }: CreatePostFormProps, ref: Ref<CreatePostFormApi>) => {
+		(
+			{ className, feedId, accounts, isAnavailable, onCreated }: CreatePostFormProps,
+			ref: Ref<CreatePostFormApi>,
+		) => {
 			const textAreaApiRef = useRef<AutoSizeTextAreaApi>(null);
 
 			const mailData = useMemo(() => {
 				const mailData = new OutgoingMailData();
 
 				mailData.mode = OutgoingMailDataMode.BROADCAST;
-				mailData.feedId = VENOM_FEED_ID;
+				mailData.feedId = feedId;
 
 				mailData.validator = () => {
 					const text = mailData.plainTextData;
@@ -76,7 +81,7 @@ export const CreatePostForm = observer(
 				};
 
 				return mailData;
-			}, []);
+			}, [feedId]);
 
 			useEffect(() => {
 				mailData.from = mailData.from && accounts.includes(mailData.from) ? mailData.from : accounts[0];

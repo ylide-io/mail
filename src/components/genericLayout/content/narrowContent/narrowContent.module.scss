@@ -11,7 +11,9 @@
 }
 
 .header {
-	display: flex;
+	display: grid;
+	grid-auto-flow: column;
+	grid-gap: 8px;
 	align-items: center;
 	justify-content: space-between;
 	padding: 0 0 16px 12px;
