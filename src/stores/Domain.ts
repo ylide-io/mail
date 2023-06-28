@@ -46,6 +46,8 @@ import { Wallet } from './models/Wallet';
 import { OTCStore } from './OTC';
 import tags from './Tags';
 
+Ylide.verbose();
+
 let INDEXER_BLOCKCHAINS: string[];
 
 if (REACT_APP__APP_MODE === AppMode.OTC) {
@@ -463,6 +465,9 @@ export class Domain {
 				return false;
 			}
 		}
+		const somethingWentWrongTimer = setTimeout(() => {
+			console.log(`Something went wrong with ${factory.wallet} wallet`);
+		}, 10000);
 		this.walletControllers[factory.blockchainGroup] = {
 			...(this.walletControllers[factory.blockchainGroup] || {}),
 			[factory.wallet]: await this.ylide.controllers.addWallet(factory.blockchainGroup, factory.wallet, {
@@ -498,6 +503,7 @@ export class Domain {
 				provider: factory.wallet === 'everwallet-proxy' ? (window as any).__everProxy : undefined,
 			}),
 		};
+		clearTimeout(somethingWentWrongTimer);
 		return true;
 	}
 
