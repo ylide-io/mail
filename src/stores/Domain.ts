@@ -386,32 +386,33 @@ export class Domain {
 						)!.rpc,
 				  }
 				: {
+						// Metamask only supports ethereum chain :(
 						[EVM_CHAINS[EVMNetwork.ETHEREUM]]: EVM_RPCS[EVMNetwork.ETHEREUM].find(
 							r => !r.rpc.startsWith('ws'),
 						)!.rpc,
-						[EVM_CHAINS[EVMNetwork.AVALANCHE]]: EVM_RPCS[EVMNetwork.AVALANCHE].find(
-							r => !r.rpc.startsWith('ws'),
-						)!.rpc,
-						[EVM_CHAINS[EVMNetwork.ARBITRUM]]: EVM_RPCS[EVMNetwork.ARBITRUM].find(
-							r => !r.rpc.startsWith('ws'),
-						)!.rpc,
-						[EVM_CHAINS[EVMNetwork.BNBCHAIN]]: EVM_RPCS[EVMNetwork.BNBCHAIN].find(
-							r => !r.rpc.startsWith('ws'),
-						)!.rpc,
-						[EVM_CHAINS[EVMNetwork.OPTIMISM]]: EVM_RPCS[EVMNetwork.OPTIMISM].find(
-							r => !r.rpc.startsWith('ws'),
-						)!.rpc,
-						[EVM_CHAINS[EVMNetwork.POLYGON]]: EVM_RPCS[EVMNetwork.POLYGON].find(
-							r => !r.rpc.startsWith('ws'),
-						)!.rpc,
-						[EVM_CHAINS[EVMNetwork.FANTOM]]: EVM_RPCS[EVMNetwork.FANTOM].find(r => !r.rpc.startsWith('ws'))!
-							.rpc,
-						[EVM_CHAINS[EVMNetwork.AURORA]]: EVM_RPCS[EVMNetwork.AURORA].find(r => !r.rpc.startsWith('ws'))!
-							.rpc,
-						[EVM_CHAINS[EVMNetwork.CELO]]: EVM_RPCS[EVMNetwork.CELO].find(r => !r.rpc.startsWith('ws'))!
-							.rpc,
-						[EVM_CHAINS[EVMNetwork.CRONOS]]: EVM_RPCS[EVMNetwork.CRONOS].find(r => !r.rpc.startsWith('ws'))!
-							.rpc,
+						// [EVM_CHAINS[EVMNetwork.AVALANCHE]]: EVM_RPCS[EVMNetwork.AVALANCHE].find(
+						// 	r => !r.rpc.startsWith('ws'),
+						// )!.rpc,
+						// [EVM_CHAINS[EVMNetwork.ARBITRUM]]: EVM_RPCS[EVMNetwork.ARBITRUM].find(
+						// 	r => !r.rpc.startsWith('ws'),
+						// )!.rpc,
+						// [EVM_CHAINS[EVMNetwork.BNBCHAIN]]: EVM_RPCS[EVMNetwork.BNBCHAIN].find(
+						// 	r => !r.rpc.startsWith('ws'),
+						// )!.rpc,
+						// [EVM_CHAINS[EVMNetwork.OPTIMISM]]: EVM_RPCS[EVMNetwork.OPTIMISM].find(
+						// 	r => !r.rpc.startsWith('ws'),
+						// )!.rpc,
+						// [EVM_CHAINS[EVMNetwork.POLYGON]]: EVM_RPCS[EVMNetwork.POLYGON].find(
+						// 	r => !r.rpc.startsWith('ws'),
+						// )!.rpc,
+						// [EVM_CHAINS[EVMNetwork.FANTOM]]: EVM_RPCS[EVMNetwork.FANTOM].find(r => !r.rpc.startsWith('ws'))!
+						// 	.rpc,
+						// [EVM_CHAINS[EVMNetwork.AURORA]]: EVM_RPCS[EVMNetwork.AURORA].find(r => !r.rpc.startsWith('ws'))!
+						// 	.rpc,
+						// [EVM_CHAINS[EVMNetwork.CELO]]: EVM_RPCS[EVMNetwork.CELO].find(r => !r.rpc.startsWith('ws'))!
+						// 	.rpc,
+						// [EVM_CHAINS[EVMNetwork.CRONOS]]: EVM_RPCS[EVMNetwork.CRONOS].find(r => !r.rpc.startsWith('ws'))!
+						// 	.rpc,
 
 						// TODO: Chains below are not supported by TrustWallet.
 						// Certain chains above are not supported by other wallets.

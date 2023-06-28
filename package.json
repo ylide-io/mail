@@ -58,7 +58,6 @@
 		"@types/react": "^18.2.12",
 		"@types/react-dom": "^18.2.5",
 		"@walletconnect/browser-utils": "^1.8.0",
-		"@walletconnect/qrcode-modal": "^1.8.0",
 		"@ylide/ethereum": "0.8.0-beta.37",
 		"@ylide/everscale": "0.8.0-beta.29",
 		"@ylide/sdk": "0.8.0-beta.15",
