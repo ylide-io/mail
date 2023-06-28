@@ -57,8 +57,8 @@ dependencies:
     specifier: ^1.8.0
     version: 1.8.0(@babel/core@7.22.5)
   '@ylide/ethereum':
-    specifier: 0.8.0-beta.38
-    version: 0.8.0-beta.38(@ethersproject/abstract-signer@5.7.0)(@ethersproject/address@5.7.0)(@ethersproject/bignumber@5.7.0)(@ethersproject/bytes@5.7.0)(@ethersproject/contracts@5.7.0)(@ethersproject/keccak256@5.7.0)(@ethersproject/solidity@5.7.0)(@ethersproject/strings@5.7.0)(@ethersproject/transactions@5.7.0)(@ethersproject/web@5.7.1)
+    specifier: 0.8.0-beta.39
+    version: 0.8.0-beta.39(@ethersproject/abstract-signer@5.7.0)(@ethersproject/address@5.7.0)(@ethersproject/bignumber@5.7.0)(@ethersproject/bytes@5.7.0)(@ethersproject/contracts@5.7.0)(@ethersproject/keccak256@5.7.0)(@ethersproject/solidity@5.7.0)(@ethersproject/strings@5.7.0)(@ethersproject/transactions@5.7.0)(@ethersproject/web@5.7.1)
   '@ylide/everscale':
     specifier: 0.8.0-beta.30
     version: 0.8.0-beta.30
@@ -4295,8 +4295,8 @@ packages:
       - utf-8-validate
     dev: false
 
-  /@ylide/ethereum@0.8.0-beta.38(@ethersproject/abstract-signer@5.7.0)(@ethersproject/address@5.7.0)(@ethersproject/bignumber@5.7.0)(@ethersproject/bytes@5.7.0)(@ethersproject/contracts@5.7.0)(@ethersproject/keccak256@5.7.0)(@ethersproject/solidity@5.7.0)(@ethersproject/strings@5.7.0)(@ethersproject/transactions@5.7.0)(@ethersproject/web@5.7.1):
-    resolution: {integrity: sha512-JH/p9ndtv06YfW9cCpqd4R8Vw6u44rKogsnYHuqY6klYvDkr6P/tcTSNGsbdbtuhh+Wyuw2DR7UuzhuIX2nrFw==}
+  /@ylide/ethereum@0.8.0-beta.39(@ethersproject/abstract-signer@5.7.0)(@ethersproject/address@5.7.0)(@ethersproject/bignumber@5.7.0)(@ethersproject/bytes@5.7.0)(@ethersproject/contracts@5.7.0)(@ethersproject/keccak256@5.7.0)(@ethersproject/solidity@5.7.0)(@ethersproject/strings@5.7.0)(@ethersproject/transactions@5.7.0)(@ethersproject/web@5.7.1):
+    resolution: {integrity: sha512-zphpvw97oYcgY7NfaWd/PRjHnZqyxerD2NKmcBPFFdSPdHavE2+4Oq5Xwbz/Ros51YDEM4VLrviM/hXVWtYVpw==}
     dependencies:
       '@ensdomains/ensjs': 3.0.0-alpha.64(@ethersproject/abi@5.7.0)(@ethersproject/abstract-provider@5.7.0)(@ethersproject/abstract-signer@5.7.0)(@ethersproject/address@5.7.0)(@ethersproject/bignumber@5.7.0)(@ethersproject/bytes@5.7.0)(@ethersproject/contracts@5.7.0)(@ethersproject/keccak256@5.7.0)(@ethersproject/providers@5.7.2)(@ethersproject/solidity@5.7.0)(@ethersproject/strings@5.7.0)(@ethersproject/transactions@5.7.0)(@ethersproject/web@5.7.1)
       '@ethersproject/abi': 5.7.0
