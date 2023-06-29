@@ -227,7 +227,7 @@ const VenomFeedContent = observer(() => {
 				)
 			}
 		>
-			{venomAccounts.length ? (
+			{/* {venomAccounts.length ? (
 				<CreatePostForm
 					ref={createPostFormRef}
 					className={css.createPostForm}
@@ -243,12 +243,12 @@ const VenomFeedContent = observer(() => {
 						Connect account
 					</ActionButton>
 				</ErrorMessage>
-			)}
+			)} */}
 
-			{/* <ErrorMessage look={ErrorMessageLook.INFO}>
+			<ErrorMessage look={ErrorMessageLook.INFO}>
 				Venom Blockchain Is Under Maintenance: To stay informed about the latest developments and announcements,
 				we encourage you to check Venom’s official social media channels.
-			</ErrorMessage> */}
+			</ErrorMessage>
 
 			<div className={css.divider} />
 
