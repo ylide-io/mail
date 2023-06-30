@@ -56,14 +56,14 @@ dependencies:
     specifier: ^2.8.0
     version: 2.8.0
   '@ylide/ethereum':
-    specifier: 0.8.0-beta.37
-    version: 0.8.0-beta.37(@ethersproject/abstract-signer@5.7.0)(@ethersproject/address@5.7.0)(@ethersproject/bignumber@5.7.0)(@ethersproject/bytes@5.7.0)(@ethersproject/contracts@5.7.0)(@ethersproject/keccak256@5.7.0)(@ethersproject/solidity@5.7.0)(@ethersproject/strings@5.7.0)(@ethersproject/transactions@5.7.0)(@ethersproject/web@5.7.1)
+    specifier: 0.8.0-beta.39
+    version: 0.8.0-beta.39(@ethersproject/abstract-signer@5.7.0)(@ethersproject/address@5.7.0)(@ethersproject/bignumber@5.7.0)(@ethersproject/bytes@5.7.0)(@ethersproject/contracts@5.7.0)(@ethersproject/keccak256@5.7.0)(@ethersproject/solidity@5.7.0)(@ethersproject/strings@5.7.0)(@ethersproject/transactions@5.7.0)(@ethersproject/web@5.7.1)
   '@ylide/everscale':
-    specifier: 0.8.0-beta.29
-    version: 0.8.0-beta.29
+    specifier: 0.8.0-beta.30
+    version: 0.8.0-beta.30
   '@ylide/sdk':
-    specifier: 0.8.0-beta.15
-    version: 0.8.0-beta.15
+    specifier: 0.8.0-beta.16
+    version: 0.8.0-beta.16
   '@ylide/smart-buffer':
     specifier: 0.0.11
     version: 0.0.11
@@ -2098,8 +2098,8 @@ packages:
       - utf-8-validate
     dev: false
 
-  /@ensdomains/ensjs@3.0.0-alpha.53(@ethersproject/abi@5.7.0)(@ethersproject/abstract-provider@5.7.0)(@ethersproject/abstract-signer@5.7.0)(@ethersproject/address@5.7.0)(@ethersproject/bignumber@5.7.0)(@ethersproject/bytes@5.7.0)(@ethersproject/contracts@5.7.0)(@ethersproject/keccak256@5.7.0)(@ethersproject/providers@5.7.2)(@ethersproject/solidity@5.7.0)(@ethersproject/strings@5.7.0)(@ethersproject/transactions@5.7.0)(@ethersproject/web@5.7.1):
-    resolution: {integrity: sha512-vlyvyRoUrdm8OEsCOKR2yPWOO53XHVEFsMfBUkCfLBE5h0JQHXPCoyrUR7fZzL3O6s6nnj5NgHUMQto8YYsBnw==}
+  /@ensdomains/ensjs@3.0.0-alpha.64(@ethersproject/abi@5.7.0)(@ethersproject/abstract-provider@5.7.0)(@ethersproject/abstract-signer@5.7.0)(@ethersproject/address@5.7.0)(@ethersproject/bignumber@5.7.0)(@ethersproject/bytes@5.7.0)(@ethersproject/contracts@5.7.0)(@ethersproject/keccak256@5.7.0)(@ethersproject/providers@5.7.2)(@ethersproject/solidity@5.7.0)(@ethersproject/strings@5.7.0)(@ethersproject/transactions@5.7.0)(@ethersproject/web@5.7.1):
+    resolution: {integrity: sha512-UJhj0c1C3cas6Wfb7tB+Hoa6/9HRDM/yKBGckq+HGoynkWL6oqujRGYnSpbfLw26Lmg9xbHLKVG/VEDIfnPGiQ==}
     peerDependencies:
       '@ethersproject/abi': ^5.6.4
       '@ethersproject/abstract-provider': ^5.7.0
@@ -4701,17 +4701,17 @@ packages:
       - utf-8-validate
     dev: false
 
-  /@ylide/ethereum@0.8.0-beta.37(@ethersproject/abstract-signer@5.7.0)(@ethersproject/address@5.7.0)(@ethersproject/bignumber@5.7.0)(@ethersproject/bytes@5.7.0)(@ethersproject/contracts@5.7.0)(@ethersproject/keccak256@5.7.0)(@ethersproject/solidity@5.7.0)(@ethersproject/strings@5.7.0)(@ethersproject/transactions@5.7.0)(@ethersproject/web@5.7.1):
-    resolution: {integrity: sha512-A5mpwChOfU+pstbpTP0Xm4Q2SDsFy7XMHElcZm1QX2nmM4C7qgTjAroSOPufZp7eFqAjrY4Af2Z7rBM00OmtgA==}
+  /@ylide/ethereum@0.8.0-beta.39(@ethersproject/abstract-signer@5.7.0)(@ethersproject/address@5.7.0)(@ethersproject/bignumber@5.7.0)(@ethersproject/bytes@5.7.0)(@ethersproject/contracts@5.7.0)(@ethersproject/keccak256@5.7.0)(@ethersproject/solidity@5.7.0)(@ethersproject/strings@5.7.0)(@ethersproject/transactions@5.7.0)(@ethersproject/web@5.7.1):
+    resolution: {integrity: sha512-zphpvw97oYcgY7NfaWd/PRjHnZqyxerD2NKmcBPFFdSPdHavE2+4Oq5Xwbz/Ros51YDEM4VLrviM/hXVWtYVpw==}
     dependencies:
-      '@ensdomains/ensjs': 3.0.0-alpha.53(@ethersproject/abi@5.7.0)(@ethersproject/abstract-provider@5.7.0)(@ethersproject/abstract-signer@5.7.0)(@ethersproject/address@5.7.0)(@ethersproject/bignumber@5.7.0)(@ethersproject/bytes@5.7.0)(@ethersproject/contracts@5.7.0)(@ethersproject/keccak256@5.7.0)(@ethersproject/providers@5.7.2)(@ethersproject/solidity@5.7.0)(@ethersproject/strings@5.7.0)(@ethersproject/transactions@5.7.0)(@ethersproject/web@5.7.1)
+      '@ensdomains/ensjs': 3.0.0-alpha.64(@ethersproject/abi@5.7.0)(@ethersproject/abstract-provider@5.7.0)(@ethersproject/abstract-signer@5.7.0)(@ethersproject/address@5.7.0)(@ethersproject/bignumber@5.7.0)(@ethersproject/bytes@5.7.0)(@ethersproject/contracts@5.7.0)(@ethersproject/keccak256@5.7.0)(@ethersproject/providers@5.7.2)(@ethersproject/solidity@5.7.0)(@ethersproject/strings@5.7.0)(@ethersproject/transactions@5.7.0)(@ethersproject/web@5.7.1)
       '@ethersproject/abi': 5.7.0
       '@ethersproject/abstract-provider': 5.7.0
       '@ethersproject/logger': 5.7.0
       '@ethersproject/properties': 5.7.0
       '@ethersproject/providers': 5.7.2
       '@ylide/ethereum-contracts': 0.8.0-beta.17
-      '@ylide/sdk': 0.8.0-beta.15
+      '@ylide/sdk': 0.8.0-beta.16
       '@ylide/smart-buffer': 0.0.11
       ethers: 5.7.2
       eventemitter3: 5.0.1
@@ -4732,10 +4732,10 @@ packages:
       - utf-8-validate
     dev: false
 
-  /@ylide/everscale@0.8.0-beta.29:
-    resolution: {integrity: sha512-RruYPR1PNZmfYxRs/HZeVHXvBchnHpKbE68UTHEOMJcYlmuSWXc8Q1pxOR0Gyeszl1K634FTXJFgkifhecNjJQ==}
+  /@ylide/everscale@0.8.0-beta.30:
+    resolution: {integrity: sha512-Os1/C2rRCk9WTq9M/yNkSVXffrP6PvqvRFIFYmT63ve39912uCIoI868TQ7A5FBhwILf6n7jhp+64z62nvF77g==}
     dependencies:
-      '@ylide/sdk': 0.8.0-beta.15
+      '@ylide/sdk': 0.8.0-beta.16
       '@ylide/smart-buffer': 0.0.11
       everscale-inpage-provider: 0.3.61
       everscale-standalone-client: 2.1.19
@@ -4744,8 +4744,8 @@ packages:
       - encoding
     dev: false
 
-  /@ylide/sdk@0.8.0-beta.15:
-    resolution: {integrity: sha512-4ailkM8DC4SAF+sD6iA1P7qpJ9LqrRCs20i6HrZuy6hELY62MBxG0jTBCKAPjUgMPOd5P1Es4FvQYAwM6AO8yg==}
+  /@ylide/sdk@0.8.0-beta.16:
+    resolution: {integrity: sha512-u3em67faVZ+PJVWWDvbpjH1UCzKrEKtq95O3LSNi8pxiQ6/QEyt7pV+AGXOx5tFb9sPR243TIRg5PlYZHW6wfg==}
     dependencies:
       '@datastructures-js/binary-search-tree': 5.3.1
       '@datastructures-js/linked-list': 5.2.5

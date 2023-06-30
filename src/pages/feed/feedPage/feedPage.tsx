@@ -274,6 +274,13 @@ const VenomFeedContent = observer(() => {
 				</ErrorMessage>
 			)}
 
+			{/* <ErrorMessage look={ErrorMessageLook.INFO}>
+				Venom Blockchain Is Under Maintenance: To stay informed about the latest developments and announcements,
+				we encourage you to check Venom’s official social media channels.
+			</ErrorMessage> */}
+
+			<div className={css.divider} />
+
 			<div className={css.posts}>
 				{messages.length ? (
 					<>
