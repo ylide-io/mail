@@ -7,8 +7,8 @@ import { DomainAccount } from './models/DomainAccount';
 
 export interface FeedSettingsData {
 	mode: FeedManagerApi.ConfigMode;
-	includedProjectIds: string[];
-	excludedProjectIds: string[];
+	includedSourceIds: string[];
+	excludedSourceIds: string[];
 	defaultProjects: FeedManagerApi.UserProject[];
 }
 
@@ -37,8 +37,8 @@ export class FeedSettings {
 
 						this.data.set(account, {
 							mode: config.config.mode,
-							includedProjectIds: config.config.includedProjectIds,
-							excludedProjectIds: config.config.excludedProjectIds,
+							includedSourceIds: config.config.includedSourceIds,
+							excludedSourceIds: config.config.excludedSourceIds,
 							defaultProjects: config.defaultProjects,
 						});
 					} catch (e) {
@@ -62,8 +62,8 @@ export class FeedSettings {
 		return this.sources
 			.filter(source =>
 				source.cryptoProject?.id && defaultProjectIds.includes(source.cryptoProject.id)
-					? !data.excludedProjectIds.includes(source.id)
-					: data.includedProjectIds.includes(source.id),
+					? !data.excludedSourceIds.includes(source.id)
+					: data.includedSourceIds.includes(source.id),
 			)
 			.map(s => s.id);
 	}
@@ -78,7 +78,7 @@ export class FeedSettings {
 
 		const defaultProjectIds = data.defaultProjects.map(p => p.projectId);
 
-		data.excludedProjectIds = this.sources
+		data.excludedSourceIds = this.sources
 			.filter(
 				source =>
 					!selectedSourceIds.includes(source.id) &&
@@ -86,7 +86,7 @@ export class FeedSettings {
 			)
 			.map(s => s.id);
 
-		data.includedProjectIds = this.sources
+		data.includedSourceIds = this.sources
 			.filter(
 				source =>
 					selectedSourceIds.includes(source.id) &&
@@ -99,8 +99,8 @@ export class FeedSettings {
 			token: account.mainViewKey,
 			config: {
 				mode: data.mode,
-				excludedProjectIds: data.excludedProjectIds,
-				includedProjectIds: data.includedProjectIds,
+				excludedSourceIds: data.excludedSourceIds,
+				includedSourceIds: data.includedSourceIds,
 			},
 		});
 	}

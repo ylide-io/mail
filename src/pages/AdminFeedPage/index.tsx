@@ -30,6 +30,7 @@ const scanners: Record<string, string> = {
 	astar: 'https://astar.subscan.io',
 };
 
+// TODO: Change to Debank Crawler Service url
 const baseUrl = 'http://localhost:8271'; // 'https://fm-api.ylide.io';
 
 @observer

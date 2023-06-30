@@ -33,6 +33,7 @@ export namespace FeedManagerApi {
 
 	async function request<Res = void>(path: string, query?: Record<string, any>, data?: any): Promise<Res> {
 		const response = await fetch(
+			// TODO: change REACT_APP__FEED_MANAGER, it will be new service - mainview-api
 			`${REACT_APP__FEED_MANAGER}${path}?${query ? createCleanSerachParams(query) : ''}`,
 			{
 				method: data ? 'POST' : 'GET',
@@ -65,15 +66,8 @@ export namespace FeedManagerApi {
 		}
 	}
 
-	//
-
-	export interface CheckInviteResponse {
-		used: boolean;
-		usedByThisAddress: boolean;
-	}
-
 	export async function checkInvite(invite: string, address: string) {
-		return await request<CheckInviteResponse>(`/check-invite`, {
+		return await request(`/check-invite`, {
 			invite,
 			address,
 		});
@@ -95,12 +89,6 @@ export namespace FeedManagerApi {
 	}
 
 	//
-
-	export async function init(token: string) {
-		return await request(`/init`, {
-			token,
-		});
-	}
 
 	export async function isAddressActive(address: string) {
 		return await request<boolean>(`/is-address-active`, {
@@ -126,8 +114,8 @@ export namespace FeedManagerApi {
 	export interface ConfigEntity {
 		address: string;
 		mode: ConfigMode;
-		includedProjectIds: string[];
-		excludedProjectIds: string[];
+		includedSourceIds: string[];
+		excludedSourceIds: string[];
 		lastLoginTimestamp: number;
 	}
 
@@ -144,8 +132,8 @@ export namespace FeedManagerApi {
 		token: string;
 		config: {
 			mode: ConfigMode;
-			includedProjectIds: string[];
-			excludedProjectIds: string[];
+			includedSourceIds: string[];
+			excludedSourceIds: string[];
 		};
 	}) {
 		return await request(`/set-config`, {}, data);
