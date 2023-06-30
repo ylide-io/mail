@@ -90,6 +90,12 @@ export namespace FeedManagerApi {
 
 	//
 
+	export async function init(token: string) {
+		return await request(`/init`, {
+			token,
+		});
+	}
+
 	export async function isAddressActive(address: string) {
 		return await request<boolean>(`/is-address-active`, {
 			address,

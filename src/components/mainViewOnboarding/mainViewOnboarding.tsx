@@ -70,7 +70,7 @@ export const MainViewOnboarding = observer(() => {
 
 					setStep(Step.BUILDING_FEED);
 
-					await FeedManagerApi.getConfig({ token });
+					await FeedManagerApi.init(token);
 
 					// Update keys after Feed Manager initialized
 					account.mainViewKey = token;
