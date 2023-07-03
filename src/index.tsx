@@ -10,27 +10,6 @@ import { BrowserRouter } from 'react-router-dom';
 
 import packageJson from '../package.json';
 import App from './App';
-// import { startRemoteConsole } from './utils/startRemoteConsole';
-
-// let isRemoteSessionActive = false;
-// let touchesDone = 0;
-// let firstTouchTime = 0;
-// window.addEventListener('touchstart', e => {
-// 	if (!isRemoteSessionActive && e.touches.length === 3) {
-// 		if (touchesDone === 0) {
-// 			firstTouchTime = Date.now();
-// 		}
-// 		touchesDone++;
-// 		if (touchesDone === 5) {
-// 			if (Date.now() - firstTouchTime < 5000) {
-// 				isRemoteSessionActive = true;
-// 				const channelName = startRemoteConsole();
-// 				alert('Channel name: ' + channelName);
-// 			}
-// 			touchesDone = 0;
-// 		}
-// 	}
-// });
 
 if (document.location.hostname !== 'localhost') {
 	Sentry.init({
