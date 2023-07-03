@@ -4,6 +4,7 @@ import { AdaptiveText } from '../adaptiveText/adaptiveText';
 import { PropsWithClassName } from '../props';
 
 interface AdaptiveAddressProps extends PropsWithClassName, HTMLAttributes<HTMLDivElement> {
+	contentClassName?: string;
 	address: string;
 	maxLength?: number;
 	textAlign?: 'left' | 'right';
@@ -12,6 +13,7 @@ interface AdaptiveAddressProps extends PropsWithClassName, HTMLAttributes<HTMLDi
 
 export function AdaptiveAddress({
 	className,
+	contentClassName,
 	address,
 	maxLength,
 	textAlign = 'left',
@@ -21,9 +23,10 @@ export function AdaptiveAddress({
 	return (
 		<AdaptiveText
 			{...props}
+			className={className}
+			contentClassName={contentClassName}
 			maxLength={maxLength}
 			textAlign={textAlign}
-			className={className}
 			text={address}
 			title={noTooltip ? undefined : address}
 		/>

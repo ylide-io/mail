@@ -14,6 +14,7 @@ export interface VenomFeedPost {
 	meta: Exclude<ITVMMessage, 'key'> & { key: number[] };
 	content: IMessageCorruptedContent | (Exclude<IMessageContent, 'content'> & { content: number[] }) | null;
 	banned: boolean;
+	isAdmin?: boolean;
 }
 
 export interface DecodedVenomFeedPost {

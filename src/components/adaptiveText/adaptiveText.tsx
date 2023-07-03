@@ -7,6 +7,7 @@ import { PropsWithClassName } from '../props';
 import css from './adaptiveText.module.scss';
 
 interface AdaptiveTextProps extends PropsWithClassName, HTMLAttributes<HTMLDivElement> {
+	contentClassName?: string;
 	text: string;
 	maxLength?: number;
 	separator?: string;
@@ -16,6 +17,7 @@ interface AdaptiveTextProps extends PropsWithClassName, HTMLAttributes<HTMLDivEl
 
 export function AdaptiveText({
 	className,
+	contentClassName,
 	text,
 	textAlign = 'left',
 	title,
@@ -69,7 +71,7 @@ export function AdaptiveText({
 			title={title}
 		>
 			<div className={css.invisible}>{initialText}</div>
-			<div ref={visibleRef} className={css.visible}>
+			<div ref={visibleRef} className={clsx(css.visible, contentClassName)}>
 				{initialText}
 			</div>
 		</div>
