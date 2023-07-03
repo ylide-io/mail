@@ -191,3 +191,11 @@ iframe {
 	flex-direction: column;
 	min-height: 100vh;
 }
+
+/*
+Hide Wallet Connect modal.
+It's never used, but it causes UI blinking during initialization.
+ */
+wcm-modal {
+	visibility: hidden;
+}
