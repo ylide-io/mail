@@ -6,18 +6,18 @@ import { Spinner } from '../spinner/spinner';
 import css from './ActionButton.module.scss';
 
 export enum ActionButtonSize {
-	SMALL,
-	MEDIUM,
-	LARGE,
-	XLARGE,
+	SMALL = 'SMALL',
+	MEDIUM = 'MEDIUM',
+	LARGE = 'LARGE',
+	XLARGE = 'XLARGE',
 }
 
 export enum ActionButtonLook {
-	DEFAULT,
-	PRIMARY,
-	SECONDARY,
-	DANGEROUS,
-	LITE,
+	DEFAULT = 'DEFAULT',
+	PRIMARY = 'PRIMARY',
+	SECONDARY = 'SECONDARY',
+	DANGEROUS = 'DANGEROUS',
+	LITE = 'LITE',
 }
 
 interface ActionButtonProps extends PropsWithChildren<{}>, PropsWithClassName, ButtonHTMLAttributes<HTMLButtonElement> {

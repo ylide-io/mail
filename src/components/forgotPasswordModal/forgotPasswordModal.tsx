@@ -50,14 +50,15 @@ export function ForgotPasswordModal({ onClose }: ForgotPasswordModalProps) {
 				step === Step.FIRST_WARNING
 					? [
 							<ActionButton
-								size={ActionButtonSize.XLARGE}
+								isMultiline
+								size={ActionButtonSize.LARGE}
 								look={ActionButtonLook.DANGEROUS}
 								onClick={() => setStep(Step.SECOND_WARNING)}
 							>
 								I understand I won't be able to read old messages
 							</ActionButton>,
 							<ActionButton
-								size={ActionButtonSize.XLARGE}
+								size={ActionButtonSize.LARGE}
 								look={ActionButtonLook.LITE}
 								onClick={() => onClose?.()}
 							>
@@ -67,14 +68,15 @@ export function ForgotPasswordModal({ onClose }: ForgotPasswordModalProps) {
 					: step === Step.SECOND_WARNING
 					? [
 							<ActionButton
-								size={ActionButtonSize.XLARGE}
+								isMultiline
+								size={ActionButtonSize.LARGE}
 								look={ActionButtonLook.DANGEROUS}
 								onClick={() => setStep(Step.ENTER_PASSWORD)}
 							>
 								I clearly understand the consequences
 							</ActionButton>,
 							<ActionButton
-								size={ActionButtonSize.XLARGE}
+								size={ActionButtonSize.LARGE}
 								look={ActionButtonLook.LITE}
 								onClick={() => onClose?.()}
 							>
@@ -83,14 +85,14 @@ export function ForgotPasswordModal({ onClose }: ForgotPasswordModalProps) {
 					  ]
 					: [
 							<ActionButton
-								size={ActionButtonSize.XLARGE}
+								size={ActionButtonSize.LARGE}
 								look={ActionButtonLook.PRIMARY}
 								onClick={() => onSave()}
 							>
 								{withoutPassword ? 'Reset Password' : 'Save Password'}
 							</ActionButton>,
 							<ActionButton
-								size={ActionButtonSize.XLARGE}
+								size={ActionButtonSize.LARGE}
 								look={ActionButtonLook.LITE}
 								onClick={() => onClose?.()}
 							>
