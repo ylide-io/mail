@@ -240,7 +240,7 @@ export const SidebarMenu = observer(() => {
 	}
 
 	function renderFeedDiscoverySection() {
-		if (REACT_APP__APP_MODE === AppMode.OTC) return;
+		if (REACT_APP__APP_MODE !== AppMode.MAIN_VIEW) return;
 
 		return (
 			<SidebarSection
