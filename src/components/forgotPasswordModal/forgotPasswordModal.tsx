@@ -13,7 +13,7 @@ enum Step {
 }
 
 export interface ForgotPasswordModalProps {
-	onClose?: (args?: { password?: string; withoutPassword?: boolean }) => void;
+	onClose?: (result?: { password?: string; withoutPassword?: boolean }) => void;
 }
 
 export function ForgotPasswordModal({ onClose }: ForgotPasswordModalProps) {

@@ -400,23 +400,22 @@ export function NewPasswordModal({ faucetType, bonus, wallet, account, remoteKey
 								>
 									<button
 										onClick={() =>
-											showStaticComponent<string>(resolve => (
+											showStaticComponent(resolve => (
 												<ForgotPasswordModal
-													onClose={args => {
-														if (args) {
-															resolve(args.password);
-															if (args.withoutPassword) {
-																createLocalKey({
-																	password: '',
-																	withoutPassword: true,
-																});
-															} else if (args.password) {
-																createLocalKey({
-																	password: args.password,
-																	forceNew: true,
-																});
-															}
+													onClose={result => {
+														if (result?.withoutPassword) {
+															createLocalKey({
+																password: '',
+																withoutPassword: true,
+															});
+														} else if (result?.password) {
+															createLocalKey({
+																password: result.password,
+																forceNew: true,
+															});
 														}
+
+														resolve();
 													}}
 												/>
 											))
