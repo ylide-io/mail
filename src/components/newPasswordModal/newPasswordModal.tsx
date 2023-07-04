@@ -403,6 +403,13 @@ export function NewPasswordModal({ faucetType, bonus, wallet, account, remoteKey
 											showStaticComponent(resolve => (
 												<ForgotPasswordModal
 													onClose={result => {
+														if (result) {
+															browserStorage.setAccountRemoteKeys(
+																account.address,
+																undefined,
+															);
+														}
+
 														if (result?.withoutPassword) {
 															createLocalKey({
 																password: '',
