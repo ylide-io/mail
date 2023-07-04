@@ -225,7 +225,12 @@ export const TestPage = observer(() => {
 
 			<Row>
 				with label
+				<CheckBox>Label</CheckBox>
 				<CheckBox isChecked>Label</CheckBox>
+				<CheckBox isDisabled>Disabled</CheckBox>
+				<CheckBox isChecked isDisabled>
+					Disabled
+				</CheckBox>
 			</Row>
 
 			<hr style={{ margin: '32px 0' }} />

@@ -1,15 +1,23 @@
 .root {
-	@include expand-click-area(8px);
-	display: block;
-	position: relative;
-	width: 18px;
-	height: 18px;
+	display: grid;
+	grid-auto-flow: column;
+	align-items: center;
+	justify-content: start;
+	grid-gap: 8px;
 }
 
 .root_disabled {
 	pointer-events: none;
 	cursor: default;
 	opacity: 0.65;
+}
+
+.checkBox {
+	@include expand-click-area(8px);
+	display: block;
+	position: relative;
+	width: 18px;
+	height: 18px;
 }
 
 .input {
@@ -30,36 +38,27 @@
 	height: 100%;
 	border-radius: 4px;
 	border: 1px solid transparent;
-}
 
-.root_regular .view {
-	background: var(--surface-color);
-	border-color: var(--border-color);
+	.root_checked & {
+		background: var(--accent2-color);
 
-	&:hover,
-	.input:focus-visible + & {
-		border-color: var(--border-heavy-color);
+		svg {
+			fill: var(--surface-color);
+		}
 	}
-}
 
-.root_checked .view {
-	background: var(--accent2-color);
-
-	&:hover,
-	.input:focus-visible + & {
+	.root_checked:hover &,
+	.root_checked .input:focus-visible + & {
 		background: var(--accent2-hover-color);
 	}
 
-	> svg {
-		fill: var(--surface-color);
+	.root_unchecked & {
+		background: var(--surface-color);
+		border-color: var(--border-color);
 	}
-}
 
-//
-
-.wrapper {
-	display: grid;
-	grid-template-columns: auto 1fr;
-	align-items: center;
-	grid-gap: 8px;
+	.root_unchecked:hover &,
+	.root_unchecked .input:focus-visible + & {
+		border-color: var(--border-heavy-color);
+	}
 }

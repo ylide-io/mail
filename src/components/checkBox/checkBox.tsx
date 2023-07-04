@@ -12,33 +12,29 @@ export interface CheckBoxProps extends PropsWithChildren<{}>, PropsWithClassName
 }
 
 export function CheckBox({ children, className, isDisabled, isChecked, onChange }: CheckBoxProps) {
-	const checkBox = (
+	return (
 		<label
 			className={clsx(
 				css.root,
 				isDisabled && css.root_disabled,
-				isChecked ? css.root_checked : css.root_regular,
+				isChecked ? css.root_checked : css.root_unchecked,
 				className,
 			)}
 			onClick={e => e.stopPropagation()}
 		>
-			<input
-				className={css.input}
-				type="checkbox"
-				disabled={isDisabled}
-				checked={isChecked}
-				onChange={e => onChange?.(e.target.checked)}
-			/>
+			<div className={css.checkBox}>
+				<input
+					className={css.input}
+					type="checkbox"
+					disabled={isDisabled}
+					checked={isChecked}
+					onChange={e => onChange?.(e.target.checked)}
+				/>
 
-			<div className={css.view}>{isChecked && <TickSvg />}</div>
-		</label>
-	);
+				<div className={css.view}>{isChecked && <TickSvg />}</div>
+			</div>
 
-	return children != null ? (
-		<label className={css.wrapper}>
-			{checkBox} {children}
+			{children != null && <div>{children}</div>}
 		</label>
-	) : (
-		checkBox
 	);
 }
