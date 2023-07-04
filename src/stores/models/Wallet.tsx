@@ -163,10 +163,6 @@ export class Wallet extends EventEmitter {
 
 		if (!result) {
 			result = await this.domain.ylide.core.getAddressKeys(account.address);
-
-			if (result.freshestKey) {
-				browserStorage.setAccountRemoteKeys(account.address, result);
-			}
 		} else {
 			this.domain.ylide.core.getAddressKeys(account.address).then(actual => {
 				invariant(result);
