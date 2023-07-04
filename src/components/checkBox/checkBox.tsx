@@ -1,17 +1,18 @@
 import clsx from 'clsx';
+import { PropsWithChildren } from 'react';
 
 import { PropsWithClassName } from '../props';
 import css from './checkBox.module.scss';
 import { ReactComponent as TickSvg } from './tick.svg';
 
-export interface CheckBoxProps extends PropsWithClassName {
+export interface CheckBoxProps extends PropsWithChildren<{}>, PropsWithClassName {
 	isDisabled?: boolean;
 	isChecked?: boolean;
 	onChange?: (isChecked: boolean) => void;
 }
 
-export function CheckBox({ className, isDisabled, isChecked, onChange }: CheckBoxProps) {
-	return (
+export function CheckBox({ children, className, isDisabled, isChecked, onChange }: CheckBoxProps) {
+	const checkBox = (
 		<label
 			className={clsx(
 				css.root,
@@ -31,5 +32,13 @@ export function CheckBox({ className, isDisabled, isChecked, onChange }: CheckBo
 
 			<div className={css.view}>{isChecked && <TickSvg />}</div>
 		</label>
+	);
+
+	return children != null ? (
+		<label className={css.wrapper}>
+			{checkBox} {children}
+		</label>
+	) : (
+		checkBox
 	);
 }

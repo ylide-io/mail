@@ -155,10 +155,9 @@ export function ForgotPasswordModal({ onClose }: ForgotPasswordModalProps) {
 							disabled={withoutPassword}
 						/>
 
-						<p style={{ cursor: 'pointer', display: 'flex', alignItems: 'center' }}>
-							<CheckBox isChecked={withoutPassword} onChange={toggle} />
-							<span>&nbsp; Without password</span>
-						</p>
+						<CheckBox isChecked={withoutPassword} onChange={toggle}>
+							Without password
+						</CheckBox>
 					</div>
 
 					<p>

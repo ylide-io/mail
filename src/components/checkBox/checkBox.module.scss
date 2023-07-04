@@ -54,3 +54,12 @@
 		fill: var(--surface-color);
 	}
 }
+
+//
+
+.wrapper {
+	display: grid;
+	grid-template-columns: auto 1fr;
+	align-items: center;
+	grid-gap: 8px;
+}

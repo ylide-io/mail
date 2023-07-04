@@ -225,10 +225,7 @@ export const TestPage = observer(() => {
 
 			<Row>
 				with label
-				<label style={{ display: 'grid', gridAutoFlow: 'column', alignItems: 'center', gridGap: 4 }}>
-					<CheckBox isChecked />
-					Label
-				</label>
+				<CheckBox isChecked>Label</CheckBox>
 			</Row>
 
 			<hr style={{ margin: '32px 0' }} />
