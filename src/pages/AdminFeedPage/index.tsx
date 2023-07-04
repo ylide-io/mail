@@ -1,379 +1,61 @@
-import { makeObservable, observable } from 'mobx';
-import { observer } from 'mobx-react';
-import React, { RefObject } from 'react';
-import { PureComponent, Ref } from 'react';
+import { useEffect, useState } from 'react';
 
-export interface IProjectEntity {
-	id: string;
-	slug: string;
-	name: string;
-	logo: string | null;
-	meta: any;
-}
+import { Button } from './Button';
+import { BASE_URL, DEFAULT_PAGINATOR, SCANNERS } from './constants';
+import { GuessProjectModal } from './GuessProjectModal';
+import { IProjectEntity, ITokenEntity, Paginator } from './types';
 
-const scanners: Record<string, string> = {
-	cro: 'https://cronoscan.com',
-	eth: 'https://etherscan.io',
-	bsc: 'https://bscscan.com',
-	arb: 'https://arbiscan.io',
-	avax: 'https://snowtrace.io',
-	op: 'https://optimistic.etherscan.io',
-	matic: 'https://polygonscan.com',
-	ftm: 'https://ftmscan.com',
-	klay: 'https://scope.klaytn.com',
-	xdai: 'https://gnosisscan.io',
-	aurora: 'https://aurorascan.dev',
-	celo: 'https://celoscan.io',
-	mobm: 'https://moonbeam.moonscan.io',
-	movr: 'https://moonriver.moonscan.io',
-	metis: 'https://andromeda-explorer.metis.io',
-	astar: 'https://astar.subscan.io',
-};
+export const AdminFeedPage = () => {
+	const [projects, setProjects] = useState<Paginator<IProjectEntity>>(DEFAULT_PAGINATOR);
+	const [tokens, setTokens] = useState<Paginator<ITokenEntity>>(DEFAULT_PAGINATOR);
+	const [nonPinnedTokens, setNonPinnedTokens] = useState<Paginator<ITokenEntity>>(DEFAULT_PAGINATOR);
+	const [tab, setTab] = useState<'tokens' | 'projects'>('tokens');
+	const [selectedProjects, setSelectedProjects] = useState<IProjectEntity[]>([]);
+	const [selectedTokens, setSelectedTokens] = useState<ITokenEntity[]>([]);
+	const [guessData, setGuessData] = useState('');
+	const [projectQuery, setProjectQuery] = useState('');
+	const [tokenQuery, setTokenQuery] = useState('');
 
-const baseUrl = 'http://localhost:8271'; // 'https://fm-api.ylide.io';
+	useEffect(() => {
+		// fetchTokens();
+		fetchNonPinnedTokens();
+		fetchProjects();
+	}, []);
 
-@observer
-class GuessProjectModal extends PureComponent<{
-	token: string;
-	guessData: string | null;
-	onClose: (refresh: boolean) => void;
-}> {
-	@observable selectedProjectId: string | null = null;
-	@observable debankResult: any = null;
-	@observable debankId: string = '';
-	@observable projectQuery: string = '';
-
-	ref = React.createRef<HTMLDivElement>();
-
-	@observable projects: IProjectEntity[] = [];
-
-	constructor(props: any) {
-		super(props);
-
-		makeObservable(this);
+	async function fetchProjects() {
+		const response = await fetch(`${BASE_URL}/projects?query=` + encodeURIComponent(projectQuery));
+		const { data } = await response.json();
+		setProjects(data);
+		setSelectedProjects([]);
 	}
 
-	async getDebankProject(query: string) {
-		const res = await fetch(`${baseUrl}/debank-project?id=${query}`);
-		const data = await res.json();
-		this.debankResult = data;
-		this.ref.current!.scrollTo(0, 10000);
+	async function fetchNonPinnedTokens() {
+		const response = await fetch(`${BASE_URL}/non-pinned-tokens?query=` + encodeURIComponent(tokenQuery));
+		const { data } = await response.json();
+		setNonPinnedTokens(data);
 	}
 
-	async getDebankToken(chain: string, id: string) {
-		const res = await fetch(`${baseUrl}/debank-token?chain=${chain}&id=${id}`);
-		const data = await res.json();
-		this.debankResult = data;
-		this.ref.current!.scrollTo(0, 10000);
+	async function fetchTokens() {
+		const response = await fetch(`${BASE_URL}/tokens?query=` + encodeURIComponent(tokenQuery));
+		const { data } = await response.json();
+		setTokens(data);
 	}
 
-	async getProjects(query: string) {
-		const res = await fetch(`${baseUrl}/projects?query=${query}`);
-		const data = await res.json();
-		this.projects = data;
-	}
-
-	async attachTokenToProject(token: string, pid: string) {
-		const response = await fetch(`${baseUrl}/pin-token-to-project`, {
-			method: 'POST',
-			headers: {
-				'Content-Type': 'application/json',
-			},
-			body: JSON.stringify({ projectId: pid, token }),
-		});
+	async function smartGuessToken(token: ITokenEntity) {
+		const response = await fetch(`${BASE_URL}/smart-guess-token?token=` + encodeURIComponent(token.token));
 		const result = await response.json();
-		alert(JSON.stringify(result));
-		if (result.success) {
-			this.props.onClose(true);
+		console.log(result);
+		if (result.result) {
+			setSelectedTokens([token]);
+			setGuessData(JSON.stringify(result.data, null, '  '));
 		}
 	}
 
-	render() {
-		const { token, guessData, onClose } = this.props;
-
-		return (
-			<div
-				style={{
-					position: 'fixed',
-					width: '90vw',
-					height: '90vh',
-					padding: 10,
-					backgroundColor: 'white',
-					border: '1px solid black',
-					top: '50%',
-					left: '50%',
-					marginTop: '-45vh',
-					marginLeft: '-45vw',
-					boxShadow: '0 0 10px rgba(0,0,0,0.5)',
-					borderRadius: 10,
-					overflow: 'hidden',
-				}}
-			>
-				<style>
-					{`.sel-prj:hover {
-						cursor: pointer;
-						background-color: #ffffff;
-					}`}
-				</style>
-				<div
-					style={{
-						display: 'flex',
-						justifyContent: 'flex-start',
-						alignItems: 'stretch',
-						flexDirection: 'column',
-						width: '100%',
-					}}
-				>
-					<div
-						style={{
-							display: 'flex',
-							justifyContent: 'flex-start',
-							alignItems: 'stretch',
-							flexDirection: 'row',
-							flexGrow: 0,
-							flexShrink: 0,
-						}}
-					>
-						<a
-							href="#"
-							onClick={e => {
-								e.preventDefault();
-								onClose(false);
-							}}
-						>
-							Close
-						</a>
-						&nbsp;&nbsp;&nbsp;&nbsp;
-						{token}{' '}
-						<a
-							href="#"
-							onClick={e => {
-								e.preventDefault();
-								const [chain, ...rest] = token.split(':');
-								const id = rest.join(':');
-								this.getDebankToken(chain, id);
-							}}
-						>
-							Get debank data
-						</a>
-					</div>
-					<div
-						style={{
-							display: 'flex',
-							justifyContent: 'flex-start',
-							alignItems: 'stretch',
-							flexDirection: 'row',
-							flexGrow: 1,
-							flexShrink: 1,
-							maxHeight: '80vh',
-						}}
-					>
-						<div
-							style={{
-								display: 'flex',
-								justifyContent: 'flex-start',
-								alignItems: 'flex-start',
-								flexDirection: 'column',
-								flexGrow: 1,
-								flexShrink: 1,
-								overflow: 'auto',
-							}}
-							ref={this.ref}
-						>
-							<pre>{guessData}</pre>
-							<input
-								type="text"
-								style={{ border: '1px solid #e0e0e0', margin: 10 }}
-								value={this.debankId}
-								onChange={e => (this.debankId = e.target.value)}
-								onKeyDown={e => {
-									if (e.key === 'Enter') {
-										e.preventDefault();
-										e.stopPropagation();
-										this.getDebankProject(this.debankId);
-									}
-								}}
-							/>
-							{this.debankResult && (
-								<div>
-									<h3>Debank result</h3>
-									<pre>{JSON.stringify(this.debankResult, null, 2)}</pre>
-								</div>
-							)}
-						</div>
-						<div
-							style={{
-								display: 'flex',
-								justifyContent: 'flex-start',
-								alignItems: 'flex-start',
-								flexDirection: 'column',
-								flexGrow: 0,
-								flexShrink: 0,
-								flexBasis: 300,
-								backgroundColor: '#e0e0e0',
-								overflow: 'auto',
-							}}
-						>
-							<input
-								type="text"
-								value={this.projectQuery}
-								style={{ border: '1px solid #e0e0e0', margin: 10, backgroundColor: 'white' }}
-								onChange={e => (this.projectQuery = e.target.value)}
-								onKeyDown={e => {
-									if (e.key === 'Enter') {
-										e.preventDefault();
-										e.stopPropagation();
-										this.getProjects(this.projectQuery);
-									}
-								}}
-							/>
-							<br />
-							<div
-								style={{
-									display: 'flex',
-									justifyContent: 'flex-start',
-									alignItems: 'stretch',
-									flexDirection: 'column',
-								}}
-							>
-								{this.projects.map(p => (
-									<div
-										key={p.id}
-										className="sel-prj"
-										onClick={e => {
-											e.preventDefault();
-											this.selectedProjectId = p.id;
-										}}
-										style={{
-											display: 'flex',
-											justifyContent: 'flex-start',
-											alignItems: 'stretch',
-											flexDirection: 'column',
-											flexGrow: 0,
-											flexShrink: 0,
-											padding: 10,
-											borderBottom: '1px solid #e0e0e0',
-										}}
-									>
-										<div
-											style={{
-												display: 'flex',
-												justifyContent: 'flex-start',
-												alignItems: 'stretch',
-												flexDirection: 'row',
-												flexGrow: 0,
-												flexShrink: 0,
-												marginBottom: 4,
-											}}
-										>
-											{p.name}
-											&nbsp;
-											{this.selectedProjectId === p.id ? (
-												<a
-													href="#"
-													onClick={e => {
-														e.preventDefault();
-														this.attachTokenToProject(token, p.id);
-													}}
-												>
-													Confirm
-												</a>
-											) : null}
-										</div>
-										<div
-											style={{
-												display: 'flex',
-												justifyContent: 'flex-start',
-												alignItems: 'stretch',
-												flexDirection: 'row',
-												flexGrow: 0,
-												flexShrink: 0,
-												padding: 5,
-												fontSize: 10,
-												borderBottom: '1px solid #e0e0e0',
-											}}
-										>
-											{p.meta?.coingecko?.links?.homepage}
-											<br />
-											{JSON.stringify(p.meta?.coingecko)}
-										</div>
-									</div>
-								))}
-							</div>
-						</div>
-					</div>
-					<div
-						style={{
-							display: 'flex',
-							justifyContent: 'flex-start',
-							alignItems: 'flex-start',
-							flexDirection: 'column',
-							flexGrow: 0,
-							flexShrink: 0,
-						}}
-					>
-						footer
-					</div>
-				</div>
-			</div>
-		);
-	}
-}
-
-@observer
-export class AdminFeedPage extends PureComponent<{}> {
-	@observable projects: IProjectEntity[] = [];
-	@observable tokens: string[] = [];
-	@observable tab: 'tokens' | 'projects' = 'tokens'; //projects
-
-	@observable selectedProjectIds: string[] = [];
-	@observable selectedToken: string | null = null;
-	@observable guessData: string | null = null;
-	@observable projectsQuery: string = '';
-
-	mouseDown = false;
-	idxStart: number = -1;
-	idxEnd: number = -1;
-
-	constructor(props: {}) {
-		super(props);
-
-		makeObservable(this);
-	}
-
-	async componentDidMount() {
-		await this.fetchNonPinnedTokens();
-		await this.fetchProjects();
-	}
-
-	async fetchProjects() {
-		const response = await fetch(`${baseUrl}/projects?query=` + encodeURIComponent(this.projectsQuery));
-		const projects = await response.json();
-		this.projects = projects;
-		this.selectedProjectIds = [];
-	}
-
-	async fetchNonPinnedTokens() {
-		const response = await fetch(`${baseUrl}/non-pinned-tokens`);
-		const tokens = await response.json();
-		this.tokens = tokens;
-	}
-
-	async smartGuessToken(token: string) {
-		const response = await fetch(`${baseUrl}/smart-guess-token?token=` + encodeURIComponent(token));
-		const result = await response.json();
-		if (result.success) {
-			this.selectedToken = token;
-			this.guessData = JSON.stringify(result.datas, null, '  ');
-			// await this.fetchNonPinnedTokens();
-		}
-	}
-
-	async mergeProjects(projectIds: string[]) {
-		const firstProject = this.projects.find(p => p.id === projectIds[0]);
+	async function mergeProjects(projectIds: string[]) {
+		const firstProject = projects.items.find(p => p.id === projectIds[0]);
 		const newName = prompt('New name: ', firstProject?.name);
 		if (!newName) return;
-		const response = await fetch(`${baseUrl}/merge-projects`, {
+		const response = await fetch(`${BASE_URL}/merge-projects`, {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json',
@@ -382,29 +64,36 @@ export class AdminFeedPage extends PureComponent<{}> {
 		});
 		const result = await response.json();
 		if (result.success) {
-			await this.fetchProjects();
+			await fetchProjects();
 		}
 	}
 
-	async doMergeProjects() {
-		if (this.selectedProjectIds.length < 2) return;
-		await this.mergeProjects(this.selectedProjectIds);
+	const isMergeDisabled = selectedProjects.length < 2;
+
+	async function doMergeProjects() {
+		if (isMergeDisabled) return;
+		await mergeProjects(selectedProjects.map(p => p.id));
 	}
 
-	async attachTokenToProject(projectId: string, token: string) {
-		const response = await fetch(`${baseUrl}/pin-token-to-project`, {
+	const tokenAttachmentDisabled = selectedProjects.length !== 1 || selectedTokens.length === 0;
+
+	async function attachTokensToProject() {
+		if (tokenAttachmentDisabled) {
+			return;
+		}
+		const response = await fetch(`${BASE_URL}/pin-token-to-project`, {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json',
 			},
-			body: JSON.stringify({ projectId, token }),
+			body: JSON.stringify({ projectId: selectedProjects[0].id, tokens: selectedTokens.map(t => t.token) }),
 		});
 		const result = await response.json();
 		return result.success;
 	}
 
-	async createProject(data: { name: string; logo: string | null; meta: any; slug: string }) {
-		const response = await fetch(`${baseUrl}/create-project`, {
+	async function createProject(data: { name: string; logo: string | null; meta: any; slug: string }) {
+		const response = await fetch(`${BASE_URL}/create-project`, {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json',
@@ -415,105 +104,133 @@ export class AdminFeedPage extends PureComponent<{}> {
 		return result.success;
 	}
 
-	async doCreateProject() {
+	async function doCreateProject() {
 		const name = prompt('Name');
 		if (!name) return;
-		await this.createProject({
+		await createProject({
 			name: name || '',
 			logo: null,
 			meta: {},
 			slug: name.toLowerCase().replaceAll(/\s/g, '-'),
 		});
-		await this.fetchProjects();
+		await fetchProjects();
 	}
 
-	render() {
-		return (
-			<>
-				{this.guessData ? (
-					<GuessProjectModal
-						token={this.selectedToken!}
-						guessData={this.guessData}
-						onClose={refresh => {
-							this.guessData = null;
-							if (refresh) {
-								this.fetchNonPinnedTokens();
-							}
-						}}
-					/>
-				) : null}
+	console.log(guessData);
 
-				<div
-					style={{
-						padding: 20,
-						display: 'flex',
-						flexDirection: 'column',
-						alignItems: 'stretch',
-						justifyContent: 'flex-start',
+	return (
+		<>
+			{guessData ? (
+				<GuessProjectModal
+					token={selectedTokens[0].token}
+					guessData={guessData}
+					onClose={refresh => {
+						setGuessData('');
+						if (refresh) {
+							fetchNonPinnedTokens();
+						}
 					}}
-				>
-					<h2 style={{ fontSize: 26, marginBottom: 30 }}>AdminFeedPage</h2>
-					<div>
-						<button
-							style={{ border: '1px solid black', padding: '5px 10px', margin: 5, borderRadius: 20 }}
-							onClick={() => this.fetchNonPinnedTokens()}
-						>
-							Refresh
-						</button>
-						<button
-							style={{ border: '1px solid black', padding: '5px 10px', margin: 5, borderRadius: 20 }}
-							onClick={() => this.doCreateProject()}
-						>
-							Create project
-						</button>
-						<button
-							style={{ border: '1px solid black', padding: '5px 10px', margin: 5, borderRadius: 20 }}
-							onClick={() => this.doMergeProjects()}
-						>
-							Merge projects
-						</button>
-					</div>
-					<div>
-						<button
+				/>
+			) : null}
+
+			<div
+				style={{
+					padding: 20,
+					display: 'flex',
+					flexDirection: 'column',
+					alignItems: 'stretch',
+					justifyContent: 'flex-start',
+				}}
+			>
+				<h2 style={{ fontSize: 26, marginBottom: 30 }}>AdminFeedPage</h2>
+				<div>
+					<Button onClick={fetchNonPinnedTokens} disabled={false} text={'Refresh'} />
+					<Button onClick={doCreateProject} disabled={false} text={'Create project'} />
+					<Button onClick={doMergeProjects} disabled={isMergeDisabled} text={'Merge projects'} />
+					<Button onClick={attachTokensToProject} disabled={tokenAttachmentDisabled} text={'Attach tokens'} />
+				</div>
+				<div>
+					<button
+						style={{
+							background: tab === 'tokens' ? 'black' : 'transparent',
+							color: tab === 'tokens' ? 'white' : 'black',
+							border: '1px solid black',
+							padding: '5px 10px',
+							margin: 5,
+							borderRadius: 20,
+						}}
+						onClick={() => setTab('tokens')}
+					>
+						Non Pinned Tokens{nonPinnedTokens ? ` (${nonPinnedTokens.items.length})` : ''}
+					</button>
+					<button
+						style={{
+							background: tab === 'projects' ? 'black' : 'transparent',
+							color: tab === 'projects' ? 'white' : 'black',
+							border: '1px solid black',
+							padding: '5px 10px',
+							margin: 5,
+							borderRadius: 20,
+						}}
+						onClick={() => setTab('projects')}
+					>
+						Projects{projects ? ` (${projects.items.length})` : ''}
+					</button>
+				</div>
+				{tab === 'tokens' ? (
+					<>
+						<input
+							type="search"
 							style={{
-								background: this.tab === 'tokens' ? 'black' : 'transparent',
-								color: this.tab === 'tokens' ? 'white' : 'black',
-								border: '1px solid black',
-								padding: '5px 10px',
-								margin: 5,
-								borderRadius: 20,
+								border: '1px solid #e0e0e0',
+								margin: 20,
+								height: 30,
+								backgroundColor: 'white',
+								width: 300,
+								appearance: 'auto',
 							}}
-							onClick={() => (this.tab = 'tokens')}
-						>
-							Non-pinned tokens{this.tokens ? ` (${this.tokens.length})` : ''}
-						</button>
-						<button
-							style={{
-								background: this.tab === 'projects' ? 'black' : 'transparent',
-								color: this.tab === 'projects' ? 'white' : 'black',
-								border: '1px solid black',
-								padding: '5px 10px',
-								margin: 5,
-								borderRadius: 20,
+							value={tokenQuery}
+							onChange={e => {
+								setTokenQuery(e.target.value);
 							}}
-							onClick={() => (this.tab = 'projects')}
-						>
-							Projects{this.projects ? ` (${this.projects.length})` : ''}
-						</button>
-					</div>
-					{this.tab === 'tokens' ? (
+							onKeyDown={e => {
+								if (e.key === 'Enter') {
+									e.preventDefault();
+									fetchNonPinnedTokens();
+								}
+							}}
+							placeholder="Search tokens"
+						/>
 						<table style={{ marginTop: 30 }}>
 							<thead>
 								<tr>
+									<th style={{ textAlign: 'left', paddingBottom: 10 }}></th>
 									<th style={{ textAlign: 'left', paddingBottom: 10 }}>Token</th>
+									<th style={{ textAlign: 'left', paddingBottom: 10 }}>Symbol</th>
 									<th style={{ textAlign: 'left', paddingBottom: 10 }}>Scan</th>
 									<th style={{ textAlign: 'left', paddingBottom: 10 }}>Smart guess</th>
 									<th style={{ textAlign: 'left', paddingBottom: 10 }}>Attach</th>
 								</tr>
 							</thead>
 							<tbody>
-								{this.tokens.map((token, index) => (
+								{nonPinnedTokens.items.map((token, index) => (
 									<tr key={index}>
+										<td style={{ verticalAlign: 'top' }}>
+											<input
+												style={{ appearance: 'auto' }}
+												type="checkbox"
+												checked={selectedTokens.some(t => t.token === token.token)}
+												onChange={e => {
+													if (e.target.checked) {
+														setSelectedTokens(t => [...t, token]);
+													} else {
+														setSelectedTokens(t =>
+															t.filter(_t => _t.token !== token.token),
+														);
+													}
+												}}
+											/>
+										</td>
 										<td
 											style={{
 												marginBottom: 5,
@@ -521,7 +238,16 @@ export class AdminFeedPage extends PureComponent<{}> {
 												borderBottom: '1px solid #e0e0e0',
 											}}
 										>
-											{token}
+											{token.name}
+										</td>
+										<td
+											style={{
+												marginBottom: 5,
+												paddingBottom: 5,
+												borderBottom: '1px solid #e0e0e0',
+											}}
+										>
+											{token.symbol}
 										</td>
 										<td
 											style={{
@@ -532,15 +258,15 @@ export class AdminFeedPage extends PureComponent<{}> {
 										>
 											<a
 												href={
-													scanners[token.split(':')[0]] +
+													SCANNERS[token.token.split(':')[0]] +
 													'/address/' +
-													token.split(':').slice(1).join(':') +
+													token.token.split(':').slice(1).join(':') +
 													'#code'
 												}
 												target="_blank"
 												rel="noreferrer"
 											>
-												{token}
+												{token.token}
 											</a>
 										</td>
 										<td
@@ -554,7 +280,7 @@ export class AdminFeedPage extends PureComponent<{}> {
 												href="#"
 												onClick={e => {
 													e.preventDefault();
-													this.smartGuessToken(token);
+													smartGuessToken(token);
 												}}
 											>
 												Extract data
@@ -573,139 +299,83 @@ export class AdminFeedPage extends PureComponent<{}> {
 								))}
 							</tbody>
 						</table>
-					) : (
-						<>
-							<input
-								type="search"
-								style={{
-									border: '1px solid #e0e0e0',
-									margin: 20,
-									height: 30,
-									backgroundColor: 'white',
-									width: 300,
-									appearance: 'auto',
-								}}
-								value={this.projectsQuery}
-								onChange={e => {
-									this.projectsQuery = e.target.value;
-								}}
-								onKeyDown={e => {
-									if (e.key === 'Enter') {
-										e.preventDefault();
-										this.fetchProjects();
-									}
-								}}
-								placeholder="Search projects"
-							/>
-							<table style={{ userSelect: 'none' }}>
-								<thead>
-									<tr>
-										<th> </th>
-										<th>Project</th>
-										<th>Associated tokens</th>
-										<th>Smth</th>
+					</>
+				) : (
+					<>
+						<input
+							type="search"
+							style={{
+								border: '1px solid #e0e0e0',
+								margin: 20,
+								height: 30,
+								backgroundColor: 'white',
+								width: 300,
+								appearance: 'auto',
+							}}
+							value={projectQuery}
+							onChange={e => {
+								setProjectQuery(e.target.value);
+							}}
+							onKeyDown={e => {
+								if (e.key === 'Enter') {
+									e.preventDefault();
+									fetchProjects();
+								}
+							}}
+							placeholder="Search projects"
+						/>
+						<table>
+							<thead>
+								<tr>
+									<th> </th>
+									<th>Project</th>
+									<th>Associated tokens</th>
+									<th>Smth</th>
+								</tr>
+							</thead>
+							<tbody>
+								{projects.items.map((project, index) => (
+									<tr
+										key={index}
+										style={{
+											marginBottom: 5,
+											borderBottom: '1px solid #e0e0e0',
+										}}
+									>
+										<td style={{ verticalAlign: 'top' }}>
+											<input
+												style={{ appearance: 'auto' }}
+												type="checkbox"
+												checked={selectedProjects.some(p => p.id === project.id)}
+												onChange={e => {
+													if (e.target.checked) {
+														setSelectedProjects(p => [...p, project]);
+													} else {
+														setSelectedProjects(p => p.filter(_p => _p.id !== project.id));
+													}
+												}}
+											/>
+										</td>
+										<td style={{ verticalAlign: 'top' }}>{project.name}</td>
+										<td style={{ verticalAlign: 'top' }}>
+											{project.links?.map(l => (
+												<p>{l.token}</p>
+											))}
+										</td>
+										<td style={{ verticalAlign: 'top' }}>
+											<pre style={{ fontSize: 10 }}>
+												{Array.isArray(project.meta)
+													? JSON.stringify(project.meta, null, 2)
+													: JSON.stringify(project.meta?.coingecko, null, 2)}
+											</pre>
+										</td>
 									</tr>
-								</thead>
-								<tbody>
-									{this.projects.map((project, index) => (
-										<tr
-											key={index}
-											style={{
-												marginBottom: 5,
-												borderBottom: '1px solid #e0e0e0',
-											}}
-											onMouseMove={e => {
-												if (this.mouseDown) {
-													this.idxEnd = index;
-													if (Math.abs(this.idxStart - this.idxEnd) > 0) {
-														const newIds: string[] = [];
-														for (
-															let i = Math.min(this.idxStart, this.idxEnd);
-															i <= Math.max(this.idxStart, this.idxEnd);
-															i++
-														) {
-															newIds.push(this.projects[i].id);
-														}
-														this.selectedProjectIds = newIds;
-													} else {
-														this.selectedProjectIds = [project.id];
-													}
-												}
-											}}
-											onMouseUp={e => {
-												if (this.mouseDown) {
-													this.mouseDown = false;
-													if (Math.abs(this.idxStart - this.idxEnd) > 0) {
-														const newIds: string[] = [];
-														for (
-															let i = Math.min(this.idxStart, this.idxEnd);
-															i <= Math.max(this.idxStart, this.idxEnd);
-															i++
-														) {
-															newIds.push(this.projects[i].id);
-														}
-														this.selectedProjectIds = newIds;
-													} else {
-														this.selectedProjectIds = [project.id];
-													}
-												}
-											}}
-										>
-											<td style={{ verticalAlign: 'top' }}>
-												<input
-													onClick={e => {
-														if (e.shiftKey) {
-															e.stopPropagation();
-															if (this.selectedProjectIds.includes(project.id)) {
-																this.selectedProjectIds =
-																	this.selectedProjectIds.filter(
-																		id => id !== project.id,
-																	);
-															} else {
-																this.selectedProjectIds.push(project.id);
-															}
-														}
-													}}
-													onMouseDown={e => {
-														if (e.shiftKey) {
-															return;
-														}
-														e.stopPropagation();
-														this.mouseDown = true;
-														this.idxStart = index;
-														this.idxEnd = index;
-													}}
-													style={{ appearance: 'auto' }}
-													type="checkbox"
-													checked={this.selectedProjectIds.includes(project.id)}
-													// onChange={e => {
-													// 	if (e.target.checked) {
-													// 		this.selectedProjectIds.push(project.id);
-													// 	} else {
-													// 		this.selectedProjectIds = this.selectedProjectIds.filter(
-													// 			id => id !== project.id,
-													// 		);
-													// 	}
-													// }}
-												/>
-											</td>
-											<td style={{ verticalAlign: 'top' }}>{project.name}</td>
-											<td style={{ verticalAlign: 'top' }}>Will be here...</td>
-											<td style={{ verticalAlign: 'top' }}>
-												<pre style={{ fontSize: 10 }}>
-													{Array.isArray(project.meta)
-														? JSON.stringify(project.meta[0]?.coingecko?.links, null, 2)
-														: JSON.stringify(project.meta?.coingecko, null, 2)}
-												</pre>
-											</td>
-										</tr>
-									))}
-								</tbody>
-							</table>
-						</>
-					)}
-				</div>
-			</>
-		);
-	}
-}
+								))}
+							</tbody>
+						</table>
+					</>
+				)}
+			</div>
+		</>
+	);
+};
