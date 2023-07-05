@@ -18,7 +18,6 @@ import { broadcastMessage, editorJsToYMF, isEmptyEditorJsData, sendMessage } fro
 import { truncateInMiddle } from '../utils/string';
 import { getEvmWalletNetwork } from '../utils/wallet';
 import domain from './Domain';
-import { evmBalances } from './evmBalances';
 import { DomainAccount } from './models/DomainAccount';
 
 const DEFAULT_FEED_ID = REACT_APP__APP_MODE === AppMode.OTC ? OTC_FEED_ID : HUB_FEED_ID;
@@ -60,7 +59,6 @@ export class OutgoingMailData {
 		autorun(async () => {
 			if (this.from?.wallet.factory.blockchainGroup === 'evm') {
 				this.network = await getEvmWalletNetwork(this.from.wallet);
-				await evmBalances.updateBalances(this.from.wallet, this.from.account.address);
 			}
 		});
 	}

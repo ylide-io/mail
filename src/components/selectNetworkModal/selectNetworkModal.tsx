@@ -1,9 +1,11 @@
 import { EVMNetwork } from '@ylide/ethereum';
 import { IGenericAccount } from '@ylide/sdk';
 import clsx from 'clsx';
+import { observer } from 'mobx-react';
+import { useMemo } from 'react';
 
 import domain from '../../stores/Domain';
-import { evmBalances } from '../../stores/evmBalances';
+import { EvmBalances } from '../../stores/evmBalances';
 import { Wallet } from '../../stores/models/Wallet';
 import { blockchainMeta, evmNameToNetwork } from '../../utils/blockchain';
 import { Modal } from '../modal/modal';
@@ -37,7 +39,13 @@ export interface SelectNetworkModalProps {
 	onClose?: (network?: EVMNetwork) => void;
 }
 
-export function SelectNetworkModal({ wallet, account, onClose }: SelectNetworkModalProps) {
+export const SelectNetworkModal = observer(({ wallet, account, onClose }: SelectNetworkModalProps) => {
+	const evmBalances = useMemo(() => {
+		const balances = new EvmBalances();
+		balances.updateBalances(wallet, account.address);
+		return balances;
+	}, [account.address, wallet]);
+
 	return (
 		<Modal className="account-modal wallet-modal" onClose={onClose}>
 			<div
@@ -113,4 +121,4 @@ export function SelectNetworkModal({ wallet, account, onClose }: SelectNetworkMo
 			</div>
 		</Modal>
 	);
-}
+});

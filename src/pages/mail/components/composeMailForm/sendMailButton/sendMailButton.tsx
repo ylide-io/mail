@@ -1,7 +1,7 @@
 import { EVM_NAMES } from '@ylide/ethereum';
 import clsx from 'clsx';
 import { observer } from 'mobx-react';
-import React, { useRef, useState } from 'react';
+import React, { useMemo, useRef, useState } from 'react';
 
 import { GridRowBox, TruncateTextBox } from '../../../../../components/boxes/boxes';
 import { DropDown, DropDownItem, DropDownItemMode } from '../../../../../components/dropDown/dropDown';
@@ -11,7 +11,7 @@ import { toast } from '../../../../../components/toast/toast';
 import { ReactComponent as ArrowDownSvg } from '../../../../../icons/ic20/arrowDown.svg';
 import { ReactComponent as ReplySvg } from '../../../../../icons/ic20/reply.svg';
 import domain from '../../../../../stores/Domain';
-import { evmBalances } from '../../../../../stores/evmBalances';
+import { EvmBalances } from '../../../../../stores/evmBalances';
 import { OutgoingMailData } from '../../../../../stores/outgoingMailData';
 import { AlignmentDirection, HorizontalAlignment } from '../../../../../utils/alignment';
 import { blockchainMeta, evmNameToNetwork } from '../../../../../utils/blockchain';
@@ -28,6 +28,17 @@ export const SendMailButton = observer(({ className, mailData, disabled, onSent 
 
 	const menuAnchorRef = useRef(null);
 	const [menuVisible, setMenuVisible] = useState(false);
+
+	const evmBalances = useMemo(() => {
+		const balances = new EvmBalances();
+
+		const from = mailData.from;
+		if (from) {
+			balances.updateBalances(from.wallet, from.account.address);
+		}
+
+		return balances;
+	}, [mailData.from]);
 
 	const sendMail = async () => {
 		try {

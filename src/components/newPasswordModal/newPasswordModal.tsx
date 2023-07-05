@@ -8,7 +8,6 @@ import { AppMode, REACT_APP__APP_MODE } from '../../env';
 import { analytics } from '../../stores/Analytics';
 import { browserStorage } from '../../stores/browserStorage';
 import domain from '../../stores/Domain';
-import { evmBalances } from '../../stores/evmBalances';
 import { chainIdByFaucetType, publishKeyThroughFaucet, requestFaucetSignature } from '../../stores/KeyManagement';
 import { DomainAccount } from '../../stores/models/DomainAccount';
 import { Wallet } from '../../stores/models/Wallet';
@@ -88,9 +87,8 @@ export function NewPasswordModal({ faucetType, bonus, wallet, account, remoteKey
 	useEffect(() => {
 		if (wallet.factory.blockchainGroup === 'evm') {
 			getEvmWalletNetwork(wallet).then(setNetwork);
-			evmBalances.updateBalances(wallet, account.address);
 		}
-	}, [account.address, wallet]);
+	}, [wallet]);
 
 	const domainAccountRef = useRef<DomainAccount>();
 

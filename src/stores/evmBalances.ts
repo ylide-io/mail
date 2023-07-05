@@ -4,7 +4,7 @@ import { makeAutoObservable } from 'mobx';
 import { evmNameToNetwork } from '../utils/blockchain';
 import { Wallet } from './models/Wallet';
 
-class EvmBalances {
+export class EvmBalances {
 	balances = {
 		[EVMNetwork.LOCAL_HARDHAT]: 0,
 		[EVMNetwork.ETHEREUM]: 0,
@@ -45,8 +45,3 @@ class EvmBalances {
 		return result;
 	}
 }
-
-export const evmBalances = new EvmBalances();
-
-// @ts-ignore
-window.evmBalances = evmBalances;
