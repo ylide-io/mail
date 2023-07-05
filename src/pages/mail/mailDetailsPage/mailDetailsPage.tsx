@@ -16,7 +16,7 @@ import { ReactComponent as ReplySvg } from '../../../icons/ic20/reply.svg';
 import { IMessageDecodedContent } from '../../../indexedDB/IndexedDB';
 import { useDomainAccounts } from '../../../stores/Domain';
 import { FolderId, ILinkedMessage, MailList, mailStore } from '../../../stores/MailList';
-import { globalOutgoingMailData, OutgoingMailData } from '../../../stores/outgoingMailData';
+import { getGlobalOutgoingMailData, OutgoingMailData } from '../../../stores/outgoingMailData';
 import { RoutePath } from '../../../stores/routePath';
 import { DateFormatStyle, formatDate } from '../../../utils/date';
 import {
@@ -154,8 +154,11 @@ export const MailDetailsPage = observer(() => {
 			editorData.blocks = [...forwardedData.blocks, ...editorData.blocks];
 		}
 
-		globalOutgoingMailData.editorData = editorData;
-		globalOutgoingMailData.subject = formatSubject(decodedContent.decodedSubject.replace(/^Fwd:\s+/i, ''), 'Fwd: ');
+		getGlobalOutgoingMailData().editorData = editorData;
+		getGlobalOutgoingMailData().subject = formatSubject(
+			decodedContent.decodedSubject.replace(/^Fwd:\s+/i, ''),
+			'Fwd: ',
+		);
 
 		navigate(RoutePath.MAIL_COMPOSE);
 	};

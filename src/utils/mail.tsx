@@ -27,7 +27,7 @@ import {
 } from '@ylide/sdk';
 import { generatePath, matchPath, useLocation } from 'react-router-dom';
 import { useNav } from './url';
-import { globalOutgoingMailData, OutgoingMailData } from '../stores/outgoingMailData';
+import { getGlobalOutgoingMailData, OutgoingMailData } from '../stores/outgoingMailData';
 import { RoutePath } from '../stores/routePath';
 import { browserStorage } from '../stores/browserStorage';
 import { WidgetId } from '../pages/widgets/widgets';
@@ -581,7 +581,7 @@ export function useOpenMailCompose() {
 		({ mailData }: { mailData?: OutgoingMailData } = {}) => {
 			if (!matchPath(RoutePath.MAIL_COMPOSE, location.pathname)) {
 				if (browserStorage.widgetId === WidgetId.MAILBOX) {
-					globalOutgoingMailData.reset(mailData);
+					getGlobalOutgoingMailData().reset(mailData);
 					navigate(generatePath(RoutePath.MAIL_COMPOSE));
 				} else {
 					showStaticComponent(

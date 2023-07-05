@@ -238,4 +238,10 @@ export class OutgoingMailData {
 	}
 }
 
-export const globalOutgoingMailData = new OutgoingMailData();
+//
+
+let globalOutgoingMailDataX: OutgoingMailData | undefined;
+
+export function getGlobalOutgoingMailData() {
+	return (globalOutgoingMailDataX = globalOutgoingMailDataX || new OutgoingMailData());
+}
