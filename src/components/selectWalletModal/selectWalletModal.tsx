@@ -93,7 +93,6 @@ export const SelectWalletModal = observer(({ onClose }: SelectWalletModalProps) 
 				<br />
 				<br />
 				<ActionButton
-					isMultiline
 					size={ActionButtonSize.MEDIUM}
 					look={ActionButtonLook.SECONDARY}
 					onClick={() => domain.disconnectWalletConnect()}

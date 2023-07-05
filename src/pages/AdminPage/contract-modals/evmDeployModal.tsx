@@ -116,7 +116,7 @@ export const EVMDeployContractModal: FC<EVMDeployContractModalProps> = ({ contra
 				</div>
 			) : (
 				<div className={css.actionRow}>
-					<ActionButton isMultiline isDisabled={loading} onClick={deployContract}>
+					<ActionButton isDisabled={loading} onClick={deployContract}>
 						{loading ? (
 							<div style={{ display: 'flex', flexDirection: 'row' }}>
 								<div style={{ zoom: '0.25' }}>

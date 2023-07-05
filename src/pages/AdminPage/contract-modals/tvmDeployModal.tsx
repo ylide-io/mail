@@ -95,12 +95,7 @@ export const TVMDeployContractModal: FC<TVMDeployContractModalProps> = ({ contra
 				</div>
 			) : (
 				<div className={css.actionRow}>
-					<ActionButton
-						isMultiline
-						isDisabled={loading}
-						size={ActionButtonSize.XLARGE}
-						onClick={deployContract}
-					>
+					<ActionButton isDisabled={loading} size={ActionButtonSize.XLARGE} onClick={deployContract}>
 						{loading ? (
 							<div style={{ display: 'flex', flexDirection: 'row' }}>
 								<div style={{ zoom: '0.25' }}>

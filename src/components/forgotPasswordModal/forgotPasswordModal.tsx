@@ -50,7 +50,6 @@ export function ForgotPasswordModal({ onClose }: ForgotPasswordModalProps) {
 				step === Step.FIRST_WARNING
 					? [
 							<ActionButton
-								isMultiline
 								size={ActionButtonSize.LARGE}
 								look={ActionButtonLook.DANGEROUS}
 								onClick={() => setStep(Step.SECOND_WARNING)}
@@ -68,7 +67,6 @@ export function ForgotPasswordModal({ onClose }: ForgotPasswordModalProps) {
 					: step === Step.SECOND_WARNING
 					? [
 							<ActionButton
-								isMultiline
 								size={ActionButtonSize.LARGE}
 								look={ActionButtonLook.DANGEROUS}
 								onClick={() => setStep(Step.ENTER_PASSWORD)}

@@ -94,18 +94,14 @@ export const TestPage = observer(() => {
 
 			<Row>
 				multiline
-				<ActionButton isMultiline size={ActionButtonSize.SMALL}>
-					Multiline Small
-				</ActionButton>
-				<ActionButton isMultiline size={ActionButtonSize.MEDIUM}>
-					Multiline Medium
-				</ActionButton>
-				<ActionButton isMultiline size={ActionButtonSize.SMALL}>
+				<ActionButton size={ActionButtonSize.SMALL}>Multiline Small</ActionButton>
+				<ActionButton size={ActionButtonSize.MEDIUM}>Multiline Medium</ActionButton>
+				<ActionButton size={ActionButtonSize.SMALL}>
 					Multiline
 					<br />
 					Small
 				</ActionButton>
-				<ActionButton isMultiline size={ActionButtonSize.MEDIUM}>
+				<ActionButton size={ActionButtonSize.MEDIUM}>
 					Multiline
 					<br />
 					Medium
@@ -114,24 +110,24 @@ export const TestPage = observer(() => {
 
 			<Row>
 				multiline
-				<ActionButton isMultiline size={ActionButtonSize.SMALL} icon={<SettingsSvg />}>
+				<ActionButton size={ActionButtonSize.SMALL} icon={<SettingsSvg />}>
 					Multiline
 					<br />
 					Small
 				</ActionButton>
-				<ActionButton isMultiline size={ActionButtonSize.MEDIUM} icon={<SettingsSvg />}>
+				<ActionButton size={ActionButtonSize.MEDIUM} icon={<SettingsSvg />}>
 					Multiline
 					<br />
 					Medium
 				</ActionButton>
-				<ActionButton isMultiline size={ActionButtonSize.SMALL}>
+				<ActionButton size={ActionButtonSize.SMALL}>
 					Multiline
 					<br />
 					Small
 					<br />
 					Button
 				</ActionButton>
-				<ActionButton isMultiline size={ActionButtonSize.MEDIUM}>
+				<ActionButton size={ActionButtonSize.MEDIUM}>
 					Multiline
 					<br />
 					Medium
@@ -166,7 +162,7 @@ export const TestPage = observer(() => {
 				<ActionButton isLoading icon={<SettingsSvg />}>
 					With Icon
 				</ActionButton>
-				<ActionButton isLoading isMultiline size={ActionButtonSize.MEDIUM} look={ActionButtonLook.PRIMARY}>
+				<ActionButton isLoading size={ActionButtonSize.MEDIUM} look={ActionButtonLook.PRIMARY}>
 					Multiline
 					<br />
 					Medium

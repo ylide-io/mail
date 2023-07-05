@@ -69,15 +69,10 @@
 .root_smallSize {
 	$size: $interactive-elem-size_small;
 
+	padding-top: 3px;
+	padding-bottom: 3px;
 	min-width: $size;
-	height: $size;
-
-	&.root_multiline {
-		padding-top: 3px;
-		padding-bottom: 3px;
-		height: auto;
-		min-height: $size;
-	}
+	min-height: $size;
 
 	&.root_hasContent {
 		padding-right: 11px;
@@ -101,15 +96,10 @@
 .root_mediumSize {
 	$size: $interactive-elem-size;
 
+	padding-top: 3px;
+	padding-bottom: 3px;
 	min-width: $size;
-	height: $size;
-
-	&.root_multiline {
-		padding-top: 3px;
-		padding-bottom: 3px;
-		height: auto;
-		min-height: $size;
-	}
+	min-height: $size;
 
 	&.root_hasContent {
 		padding-right: 13px;
@@ -133,15 +123,10 @@
 .root_largeSize {
 	$size: $interactive-elem-size_large;
 
+	padding-top: 3px;
+	padding-bottom: 3px;
 	min-width: $size;
-	height: $size;
-
-	&.root_multiline {
-		padding-top: 3px;
-		padding-bottom: 3px;
-		height: auto;
-		min-height: $size;
-	}
+	min-height: $size;
 
 	&.root_hasContent {
 		padding-right: 15px;
@@ -170,15 +155,10 @@
 .root_xlargeSize {
 	$size: $interactive-elem-size_xlarge;
 
+	padding-top: 3px;
+	padding-bottom: 3px;
 	min-width: $size;
-	height: $size;
-
-	&.root_multiline {
-		padding-top: 3px;
-		padding-bottom: 3px;
-		height: auto;
-		min-height: $size;
-	}
+	min-height: $size;
 
 	&.root_hasContent {
 		padding-right: 17px;
