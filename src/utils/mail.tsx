@@ -456,13 +456,17 @@ export function parseEditorJsJson(json: any) {
 	return result.replaceAll('<br>', '\n');
 }
 
-export function editorJsToYMF(json: any) {
-	console.log('editorJsToYMF', toJS(json));
+export function editorJsToYMF(data: OutputData | undefined) {
+	console.log('editorJsToYMF', toJS(data));
+
+	if (!data) {
+		return YMF.fromPlainText('');
+	}
 
 	const prepareText = (text: string) => htmlSelfClosingTagsToXHtml(text);
 
 	const nodes: string[] = [];
-	for (const block of json.blocks) {
+	for (const block of data.blocks) {
 		if (block.type === 'paragraph') {
 			nodes.push(`<p ejs-id="${block.id}">${prepareText(block.data.text)}</p>`); // data.text
 		} else if (block.type === 'header') {
