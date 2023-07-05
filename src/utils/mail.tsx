@@ -49,6 +49,8 @@ import { hashToIpfsUrl } from './ipfs';
 import { RecipientInfo } from '@ylide/sdk/lib/content/RecipientInfo';
 import { ILinkedMessage } from '../stores/MailList';
 import { formatAddress, isEvmBlockchain } from './blockchain';
+import { htmlSelfClosingTagsToXHtml } from './string';
+import { toJS } from 'mobx';
 
 // SENDING
 
@@ -455,28 +457,33 @@ export function parseEditorJsJson(json: any) {
 }
 
 export function editorJsToYMF(json: any) {
-	console.log(json);
+	console.log('editorJsToYMF', toJS(json));
+
+	const prepareText = (text: string) => htmlSelfClosingTagsToXHtml(text);
+
 	const nodes: string[] = [];
 	for (const block of json.blocks) {
 		if (block.type === 'paragraph') {
-			nodes.push(`<p ejs-id="${block.id}">${block.data.text}</p>`); // data.text
+			nodes.push(`<p ejs-id="${block.id}">${prepareText(block.data.text)}</p>`); // data.text
 		} else if (block.type === 'header') {
 			// data.level -- number
 			// data.text -- string
-			nodes.push(`<h${block.data.level} ejs-id="${block.id}">${block.data.text}</h${block.data.level}>`);
+			nodes.push(
+				`<h${block.data.level} ejs-id="${block.id}">${prepareText(block.data.text)}</h${block.data.level}>`,
+			);
 		} else if (block.type === 'list') {
 			// data.style: 'ordered' | 'unordered'
 			// data.items: string[]
 			if (block.data.style === 'ordered') {
 				const innerNodes: string[] = [];
 				for (let i = 0; i < block.data.items.length; i++) {
-					innerNodes.push(`<li><ejs-bullet>${i + 1}. </ejs-bullet>${block.data.items[i]}</li>`);
+					innerNodes.push(`<li><ejs-bullet>${i + 1}. </ejs-bullet>${prepareText(block.data.items[i])}</li>`);
 				}
 				nodes.push(`<ol ejs-id="${block.id}">${innerNodes.join('\n')}</ol>`);
 			} else if (block.data.style === 'unordered') {
 				const innerNodes: string[] = [];
 				for (let i = 0; i < block.data.items.length; i++) {
-					innerNodes.push(`<li><ejs-bullet>• </ejs-bullet>${block.data.items[i]}</li>`);
+					innerNodes.push(`<li><ejs-bullet>• </ejs-bullet>${prepareText(block.data.items[i])}</li>`);
 				}
 				nodes.push(`<ul ejs-id="${block.id}">${innerNodes.join('\n')}</ul>`);
 			}
@@ -484,6 +491,9 @@ export function editorJsToYMF(json: any) {
 			// nothing
 		}
 	}
+
+	console.log('editorJsToYMF nodes', nodes);
+
 	return YMF.fromYMFText(`<editorjs>${nodes.join('\n')}</editorjs>`);
 }
 

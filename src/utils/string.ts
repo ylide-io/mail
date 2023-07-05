@@ -12,3 +12,10 @@ export function truncateInMiddle(string: string, maxLength: number, separator?: 
 		return string.slice(0, leftSize);
 	}
 }
+
+export function htmlSelfClosingTagsToXHtml(html: string) {
+	return html.replace(
+		/<(area|base|br|col|embed|hr|img|input|link|meta|param|source|track|wbr|command|keygen|menuitem|frame)\b(.*?)[ /]*>/,
+		'<$1$2 />',
+	);
+}
