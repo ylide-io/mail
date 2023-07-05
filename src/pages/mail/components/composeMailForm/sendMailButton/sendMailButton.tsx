@@ -126,7 +126,7 @@ export const SendMailButton = observer(({ className, mailData, disabled, onSent 
 										<DropDownItem
 											key={bc.blockchain}
 											mode={
-												Number(evmBalances.balances[network].toFixed(3)) === 0
+												!Number(evmBalances.getBalance(network).toFixed(4))
 													? DropDownItemMode.DISABLED
 													: undefined
 											}
@@ -148,9 +148,9 @@ export const SendMailButton = observer(({ className, mailData, disabled, onSent 
 												<TruncateTextBox>
 													{bData.title} [
 													{Number(
-														evmBalances.balances[evmNameToNetwork(bc.blockchain)!].toFixed(
-															3,
-														),
+														evmBalances
+															.getBalance(evmNameToNetwork(bc.blockchain)!)
+															.toFixed(4),
 													)}{' '}
 													{bData.ethNetwork!.nativeCurrency.symbol}]
 												</TruncateTextBox>
