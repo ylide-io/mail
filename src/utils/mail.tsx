@@ -356,7 +356,7 @@ export function plainTextToEditorJsData(text: string): OutputData {
 }
 
 export function editorJsDataToPlainText(data: OutputData | undefined) {
-	return data?.blocks.map((b: any) => b.data.text).join('\n');
+	return editorJsToYMF(data).toPlainText();
 }
 
 export function isEmptyEditorJsData(data: OutputData | undefined) {
