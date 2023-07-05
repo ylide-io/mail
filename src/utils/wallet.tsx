@@ -8,7 +8,6 @@ import { TrustWalletLogo } from '../icons/wallets/TrustWalletLogo';
 import { VenomLogo } from '../icons/wallets/VenomLogo';
 import { WalletConnectLogo } from '../icons/wallets/WalletConnectLogo';
 import { Wallet } from '../stores/models/Wallet';
-import { invariant } from './assert';
 import { evmNameToNetwork } from './blockchain';
 
 export interface WalletMeta {
@@ -151,9 +150,13 @@ export const walletsMeta: Record<string, WalletMeta> = {
 	},
 };
 
-export async function getEvmWalletNetwork(wallet: Wallet) {
-	invariant(wallet.factory.blockchainGroup === 'evm', 'Not an EVM wallet');
-
-	const blockchainName = await wallet.controller.getCurrentBlockchain();
-	return evmNameToNetwork(blockchainName);
+export async function getEvmWalletNetwork(wallet: Wallet): Promise<EVMNetwork | undefined> {
+	try {
+		if (wallet.factory.blockchainGroup === 'evm') {
+			const blockchainName = await wallet.controller.getCurrentBlockchain();
+			return evmNameToNetwork(blockchainName);
+		}
+	} catch (e) {
+		console.log(`Failed to get EVM network (${wallet.wallet})`);
+	}
 }

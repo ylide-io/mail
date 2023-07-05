@@ -10,6 +10,7 @@ import { AdaptiveText } from '../components/adaptiveText/adaptiveText';
 import { Recipients } from '../components/recipientInput/recipientInput';
 import { SelectNetworkModal } from '../components/selectNetworkModal/selectNetworkModal';
 import { showStaticComponent } from '../components/staticComponentManager/staticComponentManager';
+import { toast } from '../components/toast/toast';
 import { HUB_FEED_ID, OTC_FEED_ID } from '../constants';
 import { AppMode, REACT_APP__APP_MODE } from '../env';
 import { connectAccount } from '../utils/account';
@@ -181,6 +182,19 @@ export class OutgoingMailData {
 				));
 
 				if (!proceed) return false;
+			}
+
+			if (
+				this.from.wallet.factory.blockchainGroup === 'evm' &&
+				(await getEvmWalletNetwork(this.from.wallet)) == null
+			) {
+				toast(
+					<>
+						<b>Unsupported EVM network 😒</b>
+						<div>Please select another one and try again.</div>
+					</>,
+				);
+				return false;
 			}
 
 			const curr = await this.from.wallet.getCurrentAccount();

@@ -14,6 +14,7 @@ import domain from '../../../../../stores/Domain';
 import { EvmBalances } from '../../../../../stores/evmBalances';
 import { OutgoingMailData } from '../../../../../stores/outgoingMailData';
 import { AlignmentDirection, HorizontalAlignment } from '../../../../../utils/alignment';
+import { invariant } from '../../../../../utils/assert';
 import { blockchainMeta, evmNameToNetwork } from '../../../../../utils/blockchain';
 import css from './sendMailButton.module.scss';
 
@@ -24,7 +25,8 @@ export interface SendMailButtonProps extends PropsWithClassName {
 }
 
 export const SendMailButton = observer(({ className, mailData, disabled, onSent }: SendMailButtonProps) => {
-	const blockchainGroup = mailData.from?.wallet.factory.blockchainGroup;
+	const from = mailData.from;
+	const blockchainGroup = from?.wallet.factory.blockchainGroup;
 
 	const menuAnchorRef = useRef(null);
 	const [menuVisible, setMenuVisible] = useState(false);
@@ -32,13 +34,12 @@ export const SendMailButton = observer(({ className, mailData, disabled, onSent 
 	const evmBalances = useMemo(() => {
 		const balances = new EvmBalances();
 
-		const from = mailData.from;
 		if (from) {
 			balances.updateBalances(from.wallet, from.account.address);
 		}
 
 		return balances;
-	}, [mailData.from]);
+	}, [from]);
 
 	const sendMail = async () => {
 		try {
@@ -131,11 +132,13 @@ export const SendMailButton = observer(({ className, mailData, disabled, onSent 
 													: undefined
 											}
 											onSelect={async () => {
+												invariant(from);
+
 												const currentBlockchainName =
-													await mailData.from!.wallet.controller.getCurrentBlockchain();
+													await from.wallet.controller.getCurrentBlockchain();
 
 												if (currentBlockchainName !== bc.blockchain) {
-													await domain.switchEVMChain(mailData.from?.wallet!, network);
+													await domain.switchEVMChain(from.wallet!, network);
 													mailData.network = network;
 												}
 
