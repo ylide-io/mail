@@ -17,7 +17,7 @@ import { ReactComponent as YlideSvg } from './icons/ylide.svg';
 export enum VenomProjectId {
 	// NUMI = 'numi',
 	OASIS_GALLERY = 'oasis_gallery',
-	// SNIPA = 'snipa',
+	SNIPA = 'snipa',
 	VENOM_BLOCKCHAIN = 'venom_blockchain',
 	VENOM_BRIDGE = 'venom_bridge',
 	// VENOM_PAD = 'venom_pad',
@@ -53,13 +53,13 @@ export const venomProjectsMeta: Record<VenomProjectId, VenomProjectMeta> = {
 		description: "Trade unique digital assets on Venom blockchain's NFT marketplace.",
 		logo: <OasisGallerySvg />,
 	},
-	// [VenomProjectId.SNIPA]: {
-	// 	id: VenomProjectId.SNIPA,
-	// 	feedId: '1000000000000000000000000000000000000000000000000000000000000007' as Uint256,
-	// 	name: 'Snipa',
-	// 	description: 'DeFi portfolio tracker designed for users to manage their assets.',
-	// 	logo: <SnipaSvg />,
-	// },
+	[VenomProjectId.SNIPA]: {
+		id: VenomProjectId.SNIPA,
+		feedId: '1000000000000000000000000000000000000000000000000000000000000007' as Uint256,
+		name: 'Snipa',
+		description: 'DeFi portfolio tracker designed for users to manage their assets.',
+		logo: <SnipaSvg />,
+	},
 	[VenomProjectId.VENOM_BLOCKCHAIN]: {
 		id: VenomProjectId.VENOM_BLOCKCHAIN,
 		feedId: VENOM_FEED_ID,

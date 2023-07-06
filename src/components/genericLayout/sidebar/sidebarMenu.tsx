@@ -216,7 +216,7 @@ export const SidebarMenu = observer(() => {
 					VenomProjectId.VENOM_BLOCKCHAIN,
 					// VenomProjectId.VENOM_WALLET,
 					// VenomProjectId.VENOM_SCAN,
-					// VenomProjectId.SNIPA,
+					VenomProjectId.SNIPA,
 					VenomProjectId.WEB3_WORLD,
 					VenomProjectId.VENOM_BRIDGE,
 					VenomProjectId.OASIS_GALLERY,
