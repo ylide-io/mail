@@ -258,7 +258,7 @@ const VenomFeedContent = observer(() => {
 			{venomAccounts.length ? (
 				<CreatePostForm
 					ref={createPostFormRef}
-					feedId={projectMeta.sendFeedId || projectMeta.feedId}
+					feedId={projectMeta.feedId}
 					className={css.createPostForm}
 					accounts={venomAccounts}
 					isAnavailable={serviceStatus.data !== 'ACTIVE'}

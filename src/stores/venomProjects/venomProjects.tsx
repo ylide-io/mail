@@ -31,7 +31,6 @@ export enum VenomProjectId {
 export interface VenomProjectMeta {
 	id: VenomProjectId;
 	feedId: Uint256;
-	sendFeedId?: Uint256;
 	name: string;
 	description: string;
 	logo: ReactNode;
