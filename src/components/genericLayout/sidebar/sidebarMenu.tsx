@@ -214,15 +214,15 @@ export const SidebarMenu = observer(() => {
 			<SidebarSection section={Section.VENOM_PROJECTS} title="Venom Projects">
 				{[
 					VenomProjectId.VENOM_BLOCKCHAIN,
-					VenomProjectId.VENOM_WALLET,
-					VenomProjectId.VENOM_SCAN,
-					VenomProjectId.SNIPA,
+					// VenomProjectId.VENOM_WALLET,
+					// VenomProjectId.VENOM_SCAN,
+					// VenomProjectId.SNIPA,
 					VenomProjectId.WEB3_WORLD,
 					VenomProjectId.VENOM_BRIDGE,
 					VenomProjectId.OASIS_GALLERY,
-					VenomProjectId.VENOM_PAD,
-					VenomProjectId.VENOM_STAKE,
-					VenomProjectId.NUMI,
+					// VenomProjectId.VENOM_PAD,
+					// VenomProjectId.VENOM_STAKE,
+					// VenomProjectId.NUMI,
 					VenomProjectId.YLIDE,
 				].map(id => {
 					const meta = venomProjectsMeta[id];
