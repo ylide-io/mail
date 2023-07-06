@@ -58,7 +58,7 @@
 		"@walletconnect/modal": "2.5.9",
 		"@walletconnect/types": "2.8.6",
 		"@walletconnect/utils": "2.8.6",
-		"@ylide/ethereum": "0.8.0-beta.39",
+		"@ylide/ethereum": "0.8.0-beta.40",
 		"@ylide/everscale": "0.8.0-beta.32",
 		"@ylide/sdk": "0.8.0-beta.16",
 		"@ylide/smart-buffer": "0.0.11",
