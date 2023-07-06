@@ -9,7 +9,7 @@ import { OverlappingLoader } from '../../../components/overlappingLoader/overlap
 import { ReactComponent as CrossSvg } from '../../../icons/ic20/cross.svg';
 import { analytics } from '../../../stores/Analytics';
 import { mailStore } from '../../../stores/MailList';
-import { globalOutgoingMailData } from '../../../stores/outgoingMailData';
+import { getGlobalOutgoingMailData } from '../../../stores/outgoingMailData';
 import { RoutePath } from '../../../stores/routePath';
 import { useNav } from '../../../utils/url';
 import { ComposeMailForm } from '../components/composeMailForm/composeMailForm';
@@ -22,7 +22,7 @@ export const ComposePage = observer(() => {
 		analytics.composeOpened();
 	}, []);
 
-	useEffect(() => () => globalOutgoingMailData.reset(), []);
+	useEffect(() => () => getGlobalOutgoingMailData().reset(), []);
 
 	return (
 		<GenericLayout>
@@ -47,13 +47,13 @@ export const ComposePage = observer(() => {
 
 				<ComposeMailForm
 					className={css.form}
-					mailData={globalOutgoingMailData}
+					mailData={getGlobalOutgoingMailData()}
 					onSent={() =>
 						navigate(generatePath(RoutePath.MAIL_FOLDER, { folderId: mailStore.lastActiveFolderId }))
 					}
 				/>
 
-				{globalOutgoingMailData.sending && (
+				{getGlobalOutgoingMailData().sending && (
 					<OverlappingLoader text="Broadcasting your message to blockchain ..." />
 				)}
 			</FullPageContent>

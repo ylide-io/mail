@@ -29,13 +29,13 @@ import { sideProjectsIcon } from '../../../icons/static/sideProjectsIcon';
 import { sideSecurityIcon } from '../../../icons/static/sideSecurityIcon';
 import { sideTechnologyIcon } from '../../../icons/static/sideTechnologyIcon';
 import { FeedSettingsPopup } from '../../../pages/feed/components/feedSettingsPopup/feedSettingsPopup';
-import { WidgetId } from '../../../pages/widgets/widgets';
 import { browserStorage } from '../../../stores/browserStorage';
 import domain from '../../../stores/Domain';
 import { getFeedCategoryName } from '../../../stores/Feed';
 import { FolderId } from '../../../stores/MailList';
 import { DomainAccount } from '../../../stores/models/DomainAccount';
 import { RoutePath } from '../../../stores/routePath';
+import { VenomProjectId, venomProjectsMeta } from '../../../stores/venomProjects/venomProjects';
 import { useOpenMailCompose } from '../../../utils/mail';
 import { useNav } from '../../../utils/url';
 import { ActionButton, ActionButtonLook, ActionButtonSize } from '../../ActionButton/ActionButton';
@@ -151,6 +151,7 @@ export const SidebarButton = observer(({ look, href, icon, name, rightButton }: 
 export const isSidebarOpen = observable.box(false);
 
 export enum Section {
+	VENOM_PROJECTS = 'venom_projects',
 	FEED = 'feed',
 	FEED_DISCOVERY = 'feed_discovery',
 	MAIL = 'mail',
@@ -176,6 +177,8 @@ export const SidebarMenu = observer(() => {
 	const [isFeedSettingsAccount, setFeedSettingsAccount] = useState<DomainAccount>();
 
 	function renderOtcSection() {
+		if (REACT_APP__APP_MODE !== AppMode.OTC) return;
+
 		return (
 			<SidebarSection section={Section.OTC} title="OTC Trading">
 				<SidebarButton href={generatePath(RoutePath.OTC_ASSETS)} icon={<InboxSvg />} name="Asset Explorer" />
@@ -185,64 +188,90 @@ export const SidebarMenu = observer(() => {
 		);
 	}
 
-	function renderFeedSection() {
+	function renderSmartFeedSection() {
+		if (REACT_APP__APP_MODE !== AppMode.MAIN_VIEW) return;
+
 		return (
-			<>
-				{REACT_APP__APP_MODE !== AppMode.MAIN_VIEW && (
+			<SidebarSection section={Section.FEED} title="Feed">
+				<SidebarButton href={generatePath(RoutePath.FEED_SMART)} icon={sideFeedIcon(14)} name="Smart feed" />
+
+				{domain.accounts.activeAccounts.map(account => (
 					<SidebarButton
-						look={SidebarButtonLook.SECTION}
-						href={generatePath(RoutePath.FEED_VENOM)}
-						name="Venom feed"
+						look={SidebarButtonLook.SUBMENU}
+						href={generatePath(RoutePath.FEED_SMART_ADDRESS, { address: account.account.address })}
+						icon={<ContactSvg />}
+						name={<AdaptiveText text={account.name || account.account.address} />}
+					/>
+				))}
+			</SidebarSection>
+		);
+	}
+
+	function renderVenomProjectsSection() {
+		if (REACT_APP__APP_MODE !== AppMode.HUB) return;
+
+		return (
+			<SidebarSection section={Section.VENOM_PROJECTS} title="Venom Projects">
+				{[
+					VenomProjectId.VENOM_BLOCKCHAIN,
+					// VenomProjectId.VENOM_WALLET,
+					// VenomProjectId.VENOM_SCAN,
+					VenomProjectId.SNIPA,
+					VenomProjectId.WEB3_WORLD,
+					VenomProjectId.VENOM_BRIDGE,
+					VenomProjectId.OASIS_GALLERY,
+					// VenomProjectId.VENOM_PAD,
+					// VenomProjectId.VENOM_STAKE,
+					// VenomProjectId.NUMI,
+					VenomProjectId.YLIDE,
+				].map(id => {
+					const meta = venomProjectsMeta[id];
+
+					return (
+						<SidebarButton
+							href={generatePath(RoutePath.FEED_VENOM_PROJECT, { project: meta.id })}
+							name={meta.name}
+							icon={meta.logo}
+						/>
+					);
+				})}
+			</SidebarSection>
+		);
+	}
+
+	function renderFeedDiscoverySection() {
+		if (REACT_APP__APP_MODE !== AppMode.MAIN_VIEW) return;
+
+		return (
+			<SidebarSection
+				section={Section.FEED_DISCOVERY}
+				title={REACT_APP__APP_MODE === AppMode.MAIN_VIEW ? 'Discovery' : 'Feed'}
+			>
+				<SidebarButton href={generatePath(RoutePath.FEED_ALL)} icon={sideFeedIcon(14)} name="All topics" />
+
+				{Object.values<FeedCategory>(FeedCategory)
+					.filter(c => c !== FeedCategory.POLICY && c !== FeedCategory.EDUCATION)
+					.map(category => (
+						<SidebarButton
+							href={generatePath(RoutePath.FEED_CATEGORY, { category })}
+							icon={getFeedCategoryIcon(category)}
+							name={getFeedCategoryName(category)}
+						/>
+					))}
+
+				{isFeedSettingsAccount && (
+					<FeedSettingsPopup
+						account={isFeedSettingsAccount}
+						onClose={() => setFeedSettingsAccount(undefined)}
 					/>
 				)}
-
-				{REACT_APP__APP_MODE === AppMode.MAIN_VIEW && (
-					<SidebarSection section={Section.FEED} title="Feed">
-						<SidebarButton
-							href={generatePath(RoutePath.FEED_SMART)}
-							icon={sideFeedIcon(14)}
-							name="Smart feed"
-						/>
-
-						{domain.accounts.activeAccounts.map(account => (
-							<SidebarButton
-								look={SidebarButtonLook.SUBMENU}
-								href={generatePath(RoutePath.FEED_SMART_ADDRESS, { address: account.account.address })}
-								icon={<ContactSvg />}
-								name={<AdaptiveText text={account.name || account.account.address} />}
-							/>
-						))}
-					</SidebarSection>
-				)}
-
-				<SidebarSection
-					section={Section.FEED_DISCOVERY}
-					title={REACT_APP__APP_MODE === AppMode.MAIN_VIEW ? 'Discovery' : 'Feed'}
-				>
-					<SidebarButton href={generatePath(RoutePath.FEED_ALL)} icon={sideFeedIcon(14)} name="All topics" />
-
-					{Object.values<FeedCategory>(FeedCategory)
-						.filter(c => c !== FeedCategory.POLICY && c !== FeedCategory.EDUCATION)
-						.map(category => (
-							<SidebarButton
-								href={generatePath(RoutePath.FEED_CATEGORY, { category })}
-								icon={getFeedCategoryIcon(category)}
-								name={getFeedCategoryName(category)}
-							/>
-						))}
-
-					{isFeedSettingsAccount && (
-						<FeedSettingsPopup
-							account={isFeedSettingsAccount}
-							onClose={() => setFeedSettingsAccount(undefined)}
-						/>
-					)}
-				</SidebarSection>
-			</>
+			</SidebarSection>
 		);
 	}
 
 	function renderMailSection() {
+		if (REACT_APP__APP_MODE !== AppMode.HUB) return;
+
 		return (
 			<SidebarSection section={Section.MAIL} title="Mail">
 				<ActionButton
@@ -279,17 +308,11 @@ export const SidebarMenu = observer(() => {
 
 	return (
 		<div className={css.root}>
-			{REACT_APP__APP_MODE === AppMode.OTC ? (
-				renderOtcSection()
-			) : REACT_APP__APP_MODE === AppMode.MAIN_VIEW ? (
-				renderFeedSection()
-			) : (
-				<>
-					{browserStorage.widgetId !== WidgetId.MAILBOX && renderFeedSection()}
-
-					{renderMailSection()}
-				</>
-			)}
+			{renderOtcSection()}
+			{renderSmartFeedSection()}
+			{renderVenomProjectsSection()}
+			{renderFeedDiscoverySection()}
+			{renderMailSection()}
 
 			<div className={css.socials}>
 				<a href="https://t.me/ylide_chat" target="_blank noreferrer" title="Telegram">

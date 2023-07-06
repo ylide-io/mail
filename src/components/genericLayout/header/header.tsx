@@ -10,7 +10,7 @@ import { ReactComponent as ContactsSvg } from '../../../icons/ic28/contacts.svg'
 import { postWidgetMessage, WidgetId, WidgetMessageType } from '../../../pages/widgets/widgets';
 import { browserStorage } from '../../../stores/browserStorage';
 import domain from '../../../stores/Domain';
-import { globalOutgoingMailData } from '../../../stores/outgoingMailData';
+import { getGlobalOutgoingMailData } from '../../../stores/outgoingMailData';
 import { RoutePath } from '../../../stores/routePath';
 import { connectAccount } from '../../../utils/account';
 import { useOpenMailCompose } from '../../../utils/mail';
@@ -120,7 +120,7 @@ const Header = observer(() => {
 						icon={<CrossSvg style={{ width: 28, height: 28 }} />}
 						title="Close"
 						onClick={() => {
-							if (globalOutgoingMailData.sending) {
+							if (getGlobalOutgoingMailData().sending) {
 								toast('Please wait. Sending is in progress 👌');
 							} else {
 								postWidgetMessage(WidgetMessageType.MAILBOX__CLOSE);

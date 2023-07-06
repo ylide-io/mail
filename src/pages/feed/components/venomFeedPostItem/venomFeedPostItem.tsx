@@ -94,6 +94,8 @@ export function VenomFeedPostItemView({
 	const attachment = post.decoded.attachments[0] as MessageAttachmentLinkV1 | undefined;
 	const attachmentHttpUrl = attachment && ipfsToHttpUrl(attachment.link);
 
+	const isAdmin = !!post.original.isAdmin;
+
 	return (
 		<PostItemContainer
 			isCollapsable
@@ -104,9 +106,12 @@ export function VenomFeedPostItemView({
 			<Avatar className={css.ava} blockie={post.msg.senderAddress} />
 
 			<div className={css.meta}>
-				<GridRowBox gap={2}>
+				<GridRowBox gap={4}>
+					{isAdmin && <div className={css.adminTag}>Admin</div>}
+
 					<AdaptiveAddress
 						className={css.sender}
+						contentClassName={isAdmin ? css.senderContent_admin : undefined}
 						maxLength={12}
 						address={post.msg.senderAddress}
 						onClick={onAddressClick}

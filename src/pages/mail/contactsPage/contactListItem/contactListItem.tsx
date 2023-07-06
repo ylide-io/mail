@@ -15,7 +15,7 @@ import { ReactComponent as TrashSvg } from '../../../../icons/ic20/trash.svg';
 import { IContact } from '../../../../indexedDB/IndexedDB';
 import contacts from '../../../../stores/Contacts';
 import domain from '../../../../stores/Domain';
-import { globalOutgoingMailData } from '../../../../stores/outgoingMailData';
+import { getGlobalOutgoingMailData } from '../../../../stores/outgoingMailData';
 import { RoutePath } from '../../../../stores/routePath';
 import TagsStore from '../../../../stores/Tags';
 import { useNav } from '../../../../utils/url';
@@ -106,7 +106,7 @@ export const ContactListItem = observer(({ contact, isNew }: ContactListItemProp
 	};
 
 	const mailThisContact = () => {
-		globalOutgoingMailData.to = new Recipients([contact.name]);
+		getGlobalOutgoingMailData().to = new Recipients([contact.name]);
 		navigate(RoutePath.MAIL_COMPOSE);
 	};
 

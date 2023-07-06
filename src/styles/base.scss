@@ -1,3 +1,7 @@
+:root {
+	--venom-background: linear-gradient(-45deg, #3f6ccb, #4ebc6a);
+}
+
 [data-theme='v1'] {
 	--background-color: #f7f7ee;
 
@@ -104,6 +108,7 @@
 
 body {
 	background: var(--background-color);
+	transition: background-color 1s;
 }
 
 body,
@@ -186,4 +191,12 @@ iframe {
 	display: flex;
 	flex-direction: column;
 	min-height: 100vh;
+}
+
+/*
+Hide Wallet Connect modal.
+It's never used, but it causes UI blinking during initialization.
+ */
+wcm-modal {
+	visibility: hidden;
 }

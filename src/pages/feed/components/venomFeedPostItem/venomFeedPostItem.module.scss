@@ -27,6 +27,15 @@
 	}
 }
 
+.adminTag {
+	padding: 2px 4px;
+	font-size: 11px;
+	color: #fff;
+	background: var(--venom-background);
+	border-radius: 4px;
+	cursor: default;
+}
+
 .sender {
 	font-size: 14px;
 	font-weight: $font-weight_bold;
@@ -41,8 +50,18 @@
 	}
 }
 
+.senderContent_admin {
+	background: var(--venom-background);
+	background-clip: text;
+	-webkit-text-fill-color: transparent;
+
+	&:hover {
+		-webkit-text-fill-color: currentColor;
+	}
+}
+
 .composeButton {
-	margin: -99px 0;
+	margin: -99px -2px;
 	opacity: 0.2;
 	transition: opacity 500ms;
 

@@ -44,9 +44,9 @@ export function PasswordRequestModal({ reason, onClose }: PasswordRequestModalPr
 					onClick={() =>
 						showStaticComponent(resolve => (
 							<ForgotPasswordModal
-								onClose={password => {
+								onClose={result => {
 									resolve();
-									password && onClose?.(password);
+									onClose?.(result?.password);
 								}}
 							/>
 						))

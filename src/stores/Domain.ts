@@ -1,4 +1,4 @@
-import WalletConnectProvider from '@walletconnect/web3-provider';
+import { EthereumProvider } from '@walletconnect/ethereum-provider';
 import {
 	EthereumWalletController,
 	EVM_CHAINS,
@@ -154,11 +154,15 @@ export class Domain {
 
 	@observable walletConnectState:
 		| { loading: true }
-		| { loading: false; connected: true; walletName: string; provider: any }
-		| { loading: false; connected: false; url: string; onConnect: Promise<{ walletName: string; provider: any }> } =
-		{
-			loading: true,
-		};
+		| {
+				loading: false;
+				connected: true;
+				walletName: string;
+				provider: InstanceType<typeof EthereumProvider>;
+		  }
+		| { loading: false; connected: false; url: string } = {
+		loading: true,
+	};
 
 	genericNameServices: { blockchain: string; service: AbstractNameService }[] = [
 		{ blockchain: 'ETHEREUM', service: new NFT3NameService() },
@@ -332,19 +336,27 @@ export class Domain {
 	async switchEVMChain(wallet: Wallet, needNetwork: EVMNetwork) {
 		try {
 			const bData = blockchainMeta[EVM_NAMES[needNetwork]];
-
-			await (wallet.controller as EthereumWalletController).providerObject.request({
-				method: 'wallet_addEthereumChain',
-				params: [bData.ethNetwork!],
-			});
+			if ('provider' in this.walletConnectState === false) {
+				await (wallet.controller as EthereumWalletController).providerObject.request({
+					method: 'wallet_addEthereumChain',
+					params: [bData.ethNetwork!],
+				});
+			}
 		} catch (error) {
 			console.log('error: ', error);
 		}
 		try {
-			await (wallet.controller as EthereumWalletController).providerObject.request({
-				method: 'wallet_switchEthereumChain',
-				params: [{ chainId: '0x' + Number(EVM_CHAINS[needNetwork]).toString(16) }], // chainId must be in hexadecimal numbers
-			});
+			if ('provider' in this.walletConnectState) {
+				// @ts-ignore
+				await domain.walletControllers.evm.walletconnect.signer.provider.send('wallet_switchEthereumChain', [
+					{ chainId: '0x' + Number(EVM_CHAINS[needNetwork]).toString(16) },
+				]);
+			} else {
+				await (wallet.controller as EthereumWalletController).providerObject.request({
+					method: 'wallet_switchEthereumChain',
+					params: [{ chainId: '0x' + Number(EVM_CHAINS[needNetwork]).toString(16) }], // chainId must be in hexadecimal numbers
+				});
+			}
 		} catch (err) {
 			throw err;
 		}
@@ -367,85 +379,118 @@ export class Domain {
 			return;
 		}
 
-		const rpcsData = {
-			[EVM_CHAINS[EVMNetwork.ETHEREUM]]: EVM_RPCS[EVMNetwork.ETHEREUM].find(r => !r.rpc.startsWith('ws'))!.rpc,
-			[EVM_CHAINS[EVMNetwork.AVALANCHE]]: EVM_RPCS[EVMNetwork.AVALANCHE].find(r => !r.rpc.startsWith('ws'))!.rpc,
-			[EVM_CHAINS[EVMNetwork.ARBITRUM]]: EVM_RPCS[EVMNetwork.ARBITRUM].find(r => !r.rpc.startsWith('ws'))!.rpc,
-			[EVM_CHAINS[EVMNetwork.BNBCHAIN]]: EVM_RPCS[EVMNetwork.BNBCHAIN].find(r => !r.rpc.startsWith('ws'))!.rpc,
-			[EVM_CHAINS[EVMNetwork.OPTIMISM]]: EVM_RPCS[EVMNetwork.OPTIMISM].find(r => !r.rpc.startsWith('ws'))!.rpc,
-			[EVM_CHAINS[EVMNetwork.POLYGON]]: EVM_RPCS[EVMNetwork.POLYGON].find(r => !r.rpc.startsWith('ws'))!.rpc,
-			[EVM_CHAINS[EVMNetwork.FANTOM]]: EVM_RPCS[EVMNetwork.FANTOM].find(r => !r.rpc.startsWith('ws'))!.rpc,
-			[EVM_CHAINS[EVMNetwork.KLAYTN]]: EVM_RPCS[EVMNetwork.KLAYTN].find(r => !r.rpc.startsWith('ws'))!.rpc,
-			[EVM_CHAINS[EVMNetwork.GNOSIS]]: EVM_RPCS[EVMNetwork.GNOSIS].find(r => !r.rpc.startsWith('ws'))!.rpc,
-			[EVM_CHAINS[EVMNetwork.AURORA]]: EVM_RPCS[EVMNetwork.AURORA].find(r => !r.rpc.startsWith('ws'))!.rpc,
-			[EVM_CHAINS[EVMNetwork.CELO]]: EVM_RPCS[EVMNetwork.CELO].find(r => !r.rpc.startsWith('ws'))!.rpc,
-			[EVM_CHAINS[EVMNetwork.CRONOS]]: EVM_RPCS[EVMNetwork.CRONOS].find(r => !r.rpc.startsWith('ws'))!.rpc,
-			[EVM_CHAINS[EVMNetwork.MOONBEAM]]: EVM_RPCS[EVMNetwork.MOONBEAM].find(r => !r.rpc.startsWith('ws'))!.rpc,
-			[EVM_CHAINS[EVMNetwork.MOONRIVER]]: EVM_RPCS[EVMNetwork.MOONRIVER].find(r => !r.rpc.startsWith('ws'))!.rpc,
-			[EVM_CHAINS[EVMNetwork.METIS]]: EVM_RPCS[EVMNetwork.METIS].find(r => !r.rpc.startsWith('ws'))!.rpc,
-			[EVM_CHAINS[EVMNetwork.ASTAR]]: EVM_RPCS[EVMNetwork.ASTAR].find(r => !r.rpc.startsWith('ws'))!.rpc,
-		};
+		const rpcMap =
+			REACT_APP__APP_MODE === AppMode.MAIN_VIEW
+				? {
+						// For MainView we can start with Ethereum only.
+						[EVM_CHAINS[EVMNetwork.ETHEREUM]]: EVM_RPCS[EVMNetwork.ETHEREUM].find(
+							r => !r.rpc.startsWith('ws'),
+						)!.rpc,
+				  }
+				: {
+						// Metamask only supports ethereum chain :(
+						[EVM_CHAINS[EVMNetwork.ETHEREUM]]: EVM_RPCS[EVMNetwork.ETHEREUM].find(
+							r => !r.rpc.startsWith('ws'),
+						)!.rpc,
+						// [EVM_CHAINS[EVMNetwork.AVALANCHE]]: EVM_RPCS[EVMNetwork.AVALANCHE].find(
+						// 	r => !r.rpc.startsWith('ws'),
+						// )!.rpc,
+						// [EVM_CHAINS[EVMNetwork.ARBITRUM]]: EVM_RPCS[EVMNetwork.ARBITRUM].find(
+						// 	r => !r.rpc.startsWith('ws'),
+						// )!.rpc,
+						// [EVM_CHAINS[EVMNetwork.BNBCHAIN]]: EVM_RPCS[EVMNetwork.BNBCHAIN].find(
+						// 	r => !r.rpc.startsWith('ws'),
+						// )!.rpc,
+						// [EVM_CHAINS[EVMNetwork.OPTIMISM]]: EVM_RPCS[EVMNetwork.OPTIMISM].find(
+						// 	r => !r.rpc.startsWith('ws'),
+						// )!.rpc,
+						// [EVM_CHAINS[EVMNetwork.POLYGON]]: EVM_RPCS[EVMNetwork.POLYGON].find(
+						// 	r => !r.rpc.startsWith('ws'),
+						// )!.rpc,
+						// [EVM_CHAINS[EVMNetwork.FANTOM]]: EVM_RPCS[EVMNetwork.FANTOM].find(r => !r.rpc.startsWith('ws'))!
+						// 	.rpc,
+						// [EVM_CHAINS[EVMNetwork.AURORA]]: EVM_RPCS[EVMNetwork.AURORA].find(r => !r.rpc.startsWith('ws'))!
+						// 	.rpc,
+						// [EVM_CHAINS[EVMNetwork.CELO]]: EVM_RPCS[EVMNetwork.CELO].find(r => !r.rpc.startsWith('ws'))!
+						// 	.rpc,
+						// [EVM_CHAINS[EVMNetwork.CRONOS]]: EVM_RPCS[EVMNetwork.CRONOS].find(r => !r.rpc.startsWith('ws'))!
+						// 	.rpc,
 
+						// TODO: Chains below are not supported by TrustWallet.
+						// Certain chains above are not supported by other wallets.
+						// We should find out how to circumvent connection error...
+
+						// [EVM_CHAINS[EVMNetwork.KLAYTN]]: EVM_RPCS[EVMNetwork.KLAYTN].find(r => !r.rpc.startsWith('ws'))!.rpc,
+						// [EVM_CHAINS[EVMNetwork.GNOSIS]]: EVM_RPCS[EVMNetwork.GNOSIS].find(r => !r.rpc.startsWith('ws'))!.rpc,
+						// [EVM_CHAINS[EVMNetwork.MOONBEAM]]: EVM_RPCS[EVMNetwork.MOONBEAM].find(r => !r.rpc.startsWith('ws'))!.rpc,
+						// [EVM_CHAINS[EVMNetwork.MOONRIVER]]: EVM_RPCS[EVMNetwork.MOONRIVER].find(r => !r.rpc.startsWith('ws'))!.rpc,
+
+						// TODO: those networks are not supported according to https://docs.walletconnect.com/2.0/advanced/multichain/chain-list
+
+						// [EVM_CHAINS[EVMNetwork.METIS]]: EVM_RPCS[EVMNetwork.METIS].find(r => !r.rpc.startsWith('ws'))!.rpc,
+						// [EVM_CHAINS[EVMNetwork.ASTAR]]: EVM_RPCS[EVMNetwork.ASTAR].find(r => !r.rpc.startsWith('ws'))!.rpc,
+				  };
+
+		const chains = Object.keys(rpcMap).map(Number);
 		let isAvailable = true;
-
-		const wcTest = new WalletConnectProvider({
-			rpc: rpcsData,
-			qrcodeModal: {
-				async open(uri, cb, opts?) {
-					// fired this method? means disconnected
-					isAvailable = false;
-					cb();
-				},
-				close() {
-					// will not be fired in test mode
-				},
-			},
+		const wcTest = await EthereumProvider.init({
+			projectId: 'e9deead089b3383b2db777961e3fa244',
+			chains,
+			// TODO: remove after fix by WalletConnect - https://github.com/WalletConnect/walletconnect-monorepo/issues/2641
+			// WalletConnect couldn't reproduce the issue, but we had it.
+			// Need further to debug, but currently it does not break anything. Propose to leave it.
+			optionalChains: [100500],
+			rpcMap,
+			showQrModal: true,
 		});
-
+		wcTest.modal?.subscribeModal(({ open }: { open: boolean }) => {
+			if (open) {
+				wcTest.modal?.closeModal();
+				isAvailable = false;
+			}
+		});
 		try {
 			await wcTest.enable();
 		} catch (err) {
-			// no-op
+			isAvailable = false;
 		}
 
 		if (isAvailable) {
 			domain.walletConnectState = {
 				loading: false,
 				connected: true,
-				walletName: wcTest.wc.peerMeta?.name || '',
+				walletName: wcTest.session?.peer.metadata.name || '',
 				provider: wcTest,
 			};
-			// console.log('wallet connect available on start: ', wcTest);
 			await this.extractWalletsData();
 		} else {
-			let resolve = (val: { walletName: string; provider: any }) => {};
 			const self = this;
-			const wcReal = new WalletConnectProvider({
-				rpc: rpcsData,
-				qrcodeModal: {
-					async open(uri, cb, opts?) {
-						domain.walletConnectState = {
-							loading: false,
-							connected: false,
-							url: uri,
-							onConnect: new Promise<{ walletName: string; provider: any }>(_resolve => {
-								resolve = _resolve;
-							}),
-						};
-						// console.log('a5: ', toJS(domain.walletConnectState));
-					},
-					async close() {
-						domain.walletConnectState = {
-							loading: false,
-							connected: true,
-							walletName: wcReal.wc.peerMeta?.name || '',
-							provider: wcReal,
-						};
-						// console.log('wallet connect close (good close): ', wcReal);
-						await self.extractWalletsData();
-						resolve({ walletName: wcReal.wc.peerMeta?.name || '', provider: wcReal });
-					},
-				},
+			const wcReal = await EthereumProvider.init({
+				// TODO: change to Ylide project id
+				projectId: 'd6c2e9408725b77204b9e628d482e980',
+				chains,
+				// TODO: remove after fix by WalletConnect - https://github.com/WalletConnect/walletconnect-monorepo/issues/2641
+				// WalletConnect couldn't reproduce the issue, but we had it.
+				// Need further to debug, but currently it does not break anything. Propose to leave it.
+				optionalChains: [100500],
+				rpcMap,
+				showQrModal: false,
+			});
+			wcReal.on('display_uri', url => {
+				domain.walletConnectState = {
+					loading: false,
+					connected: false,
+					url,
+				};
+			});
+			wcReal.on('connect', async ({ chainId }) => {
+				domain.walletConnectState = {
+					loading: false,
+					connected: true,
+					walletName: wcReal.session?.peer.metadata.name || '',
+					provider: wcReal,
+				};
+				await self.extractWalletsData();
 			});
 
 			wcReal

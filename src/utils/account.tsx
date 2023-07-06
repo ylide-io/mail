@@ -122,7 +122,7 @@ export async function connectAccount(): Promise<DomainAccount | undefined> {
 			const remoteKeys = await wallet.readRemoteKeys(account);
 			const qqs = getQueryString();
 
-			return await showStaticComponent<DomainAccount>(resolve => (
+			const domainAccount = await showStaticComponent<DomainAccount>(resolve => (
 				<NewPasswordModal
 					faucetType={['polygon', 'fantom', 'gnosis'].includes(qqs.faucet) ? (qqs.faucet as any) : 'gnosis'}
 					bonus={qqs.bonus === 'true'}
@@ -132,6 +132,20 @@ export async function connectAccount(): Promise<DomainAccount | undefined> {
 					onClose={resolve}
 				/>
 			));
+
+			if (domainAccount) {
+				browserStorage.setAccountRemoteKeys(
+					domainAccount.account.address,
+					domainAccount.remoteKey
+						? {
+								freshestKey: domainAccount.remoteKey,
+								remoteKeys: domainAccount.remoteKeys,
+						  }
+						: undefined,
+				);
+			}
+
+			return domainAccount;
 		}
 	} catch (e) {
 		console.error(e);

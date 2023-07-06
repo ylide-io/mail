@@ -27,7 +27,7 @@ import {
 } from '@ylide/sdk';
 import { generatePath, matchPath, useLocation } from 'react-router-dom';
 import { useNav } from './url';
-import { globalOutgoingMailData, OutgoingMailData } from '../stores/outgoingMailData';
+import { getGlobalOutgoingMailData, OutgoingMailData } from '../stores/outgoingMailData';
 import { RoutePath } from '../stores/routePath';
 import { browserStorage } from '../stores/browserStorage';
 import { WidgetId } from '../pages/widgets/widgets';
@@ -49,6 +49,8 @@ import { hashToIpfsUrl } from './ipfs';
 import { RecipientInfo } from '@ylide/sdk/lib/content/RecipientInfo';
 import { ILinkedMessage } from '../stores/MailList';
 import { formatAddress, isEvmBlockchain } from './blockchain';
+import { htmlSelfClosingTagsToXHtml } from './string';
+import { toJS } from 'mobx';
 
 // SENDING
 
@@ -354,7 +356,7 @@ export function plainTextToEditorJsData(text: string): OutputData {
 }
 
 export function editorJsDataToPlainText(data: OutputData | undefined) {
-	return data?.blocks.map((b: any) => b.data.text).join('\n');
+	return editorJsToYMF(data).toPlainText();
 }
 
 export function isEmptyEditorJsData(data: OutputData | undefined) {
@@ -454,29 +456,38 @@ export function parseEditorJsJson(json: any) {
 	return result.replaceAll('<br>', '\n');
 }
 
-export function editorJsToYMF(json: any) {
-	console.log(json);
+export function editorJsToYMF(data: OutputData | undefined) {
+	console.log('editorJsToYMF', toJS(data));
+
+	if (!data) {
+		return YMF.fromPlainText('');
+	}
+
+	const prepareText = (text: string) => htmlSelfClosingTagsToXHtml(text);
+
 	const nodes: string[] = [];
-	for (const block of json.blocks) {
+	for (const block of data.blocks) {
 		if (block.type === 'paragraph') {
-			nodes.push(`<p ejs-id="${block.id}">${block.data.text}</p>`); // data.text
+			nodes.push(`<p ejs-id="${block.id}">${prepareText(block.data.text)}</p>`); // data.text
 		} else if (block.type === 'header') {
 			// data.level -- number
 			// data.text -- string
-			nodes.push(`<h${block.data.level} ejs-id="${block.id}">${block.data.text}</h${block.data.level}>`);
+			nodes.push(
+				`<h${block.data.level} ejs-id="${block.id}">${prepareText(block.data.text)}</h${block.data.level}>`,
+			);
 		} else if (block.type === 'list') {
 			// data.style: 'ordered' | 'unordered'
 			// data.items: string[]
 			if (block.data.style === 'ordered') {
 				const innerNodes: string[] = [];
 				for (let i = 0; i < block.data.items.length; i++) {
-					innerNodes.push(`<li><ejs-bullet>${i + 1}. </ejs-bullet>${block.data.items[i]}</li>`);
+					innerNodes.push(`<li><ejs-bullet>${i + 1}. </ejs-bullet>${prepareText(block.data.items[i])}</li>`);
 				}
 				nodes.push(`<ol ejs-id="${block.id}">${innerNodes.join('\n')}</ol>`);
 			} else if (block.data.style === 'unordered') {
 				const innerNodes: string[] = [];
 				for (let i = 0; i < block.data.items.length; i++) {
-					innerNodes.push(`<li><ejs-bullet>• </ejs-bullet>${block.data.items[i]}</li>`);
+					innerNodes.push(`<li><ejs-bullet>• </ejs-bullet>${prepareText(block.data.items[i])}</li>`);
 				}
 				nodes.push(`<ul ejs-id="${block.id}">${innerNodes.join('\n')}</ul>`);
 			}
@@ -484,6 +495,9 @@ export function editorJsToYMF(json: any) {
 			// nothing
 		}
 	}
+
+	console.log('editorJsToYMF nodes', nodes);
+
 	return YMF.fromYMFText(`<editorjs>${nodes.join('\n')}</editorjs>`);
 }
 
@@ -581,7 +595,7 @@ export function useOpenMailCompose() {
 		({ mailData }: { mailData?: OutgoingMailData } = {}) => {
 			if (!matchPath(RoutePath.MAIL_COMPOSE, location.pathname)) {
 				if (browserStorage.widgetId === WidgetId.MAILBOX) {
-					globalOutgoingMailData.reset(mailData);
+					getGlobalOutgoingMailData().reset(mailData);
 					navigate(generatePath(RoutePath.MAIL_COMPOSE));
 				} else {
 					showStaticComponent(

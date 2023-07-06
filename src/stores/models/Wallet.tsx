@@ -163,10 +163,6 @@ export class Wallet extends EventEmitter {
 
 		if (!result) {
 			result = await this.domain.ylide.core.getAddressKeys(account.address);
-
-			if (result.freshestKey) {
-				browserStorage.setAccountRemoteKeys(account.address, result);
-			}
 		} else {
 			this.domain.ylide.core.getAddressKeys(account.address).then(actual => {
 				invariant(result);
@@ -175,13 +171,15 @@ export class Wallet extends EventEmitter {
 				const actualFK = actual.freshestKey;
 
 				if (cachedFK?.publicKey.toHex() !== actualFK?.publicKey.toHex()) {
+					browserStorage.setAccountRemoteKeys(account.address, undefined);
+
 					toast(
 						<>
 							<b>
 								<AdaptiveAddress maxLength={12} address={account.address} />
 							</b>
 							<div>
-								Your Ylide public keys for this account have been updated. Please re-connect it ❤️
+								Your Ylide public keys for this account have been updated. Please re-connect it 🙏
 							</div>
 						</>,
 					);

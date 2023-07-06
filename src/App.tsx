@@ -35,6 +35,7 @@ import { analytics } from './stores/Analytics';
 import { browserStorage } from './stores/browserStorage';
 import domain from './stores/Domain';
 import { RoutePath } from './stores/routePath';
+import { VenomProjectId } from './stores/venomProjects/venomProjects';
 import walletConnect from './stores/WalletConnect';
 import { useNav } from './utils/url';
 
@@ -235,8 +236,19 @@ const App = observer(() => {
 						<Route path={RoutePath.FEED_SOURCE} element={<FeedPage />} />
 						<Route path={RoutePath.FEED_SMART} element={<FeedPage />} />
 						<Route path={RoutePath.FEED_SMART_ADDRESS} element={<FeedPage />} />
+						<Route path={RoutePath.FEED_VENOM_PROJECT} element={<FeedPage />} />
 						<Route path={RoutePath.FEED_VENOM_ADMIN} element={<FeedPage />} />
-						<Route path={RoutePath.FEED_VENOM} element={<FeedPage />} />
+						<Route
+							path={RoutePath.FEED_VENOM}
+							element={
+								<Navigate
+									replace
+									to={generatePath(RoutePath.FEED_VENOM_PROJECT, {
+										project: VenomProjectId.VENOM_BLOCKCHAIN,
+									})}
+								/>
+							}
+						/>
 
 						<Route path={RoutePath.MAIL_COMPOSE} element={<ComposePage />} />
 						<Route path={RoutePath.MAIL_CONTACTS} element={<ContactListPage />} />

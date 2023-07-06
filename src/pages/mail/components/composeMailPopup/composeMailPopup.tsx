@@ -8,7 +8,7 @@ import { OverlappingLoader } from '../../../../components/overlappingLoader/over
 import { Popup } from '../../../../components/popup/popup';
 import { ReactComponent as CrossSvg } from '../../../../icons/ic20/cross.svg';
 import { ReactComponent as ExternalSvg } from '../../../../icons/ic20/external.svg';
-import { globalOutgoingMailData, OutgoingMailData } from '../../../../stores/outgoingMailData';
+import { getGlobalOutgoingMailData, OutgoingMailData } from '../../../../stores/outgoingMailData';
 import { RoutePath } from '../../../../stores/routePath';
 import { useNav } from '../../../../utils/url';
 import { useOnMountAnimation } from '../../../../utils/useOnMountAnimation';
@@ -36,7 +36,7 @@ export const ComposeMailPopup = observer(({ onClose, mailData }: ComposeMailPopu
 						onClick={() => {
 							onClose?.();
 
-							globalOutgoingMailData.reset(mailData);
+							getGlobalOutgoingMailData().reset(mailData);
 							navigate(generatePath(RoutePath.MAIL_COMPOSE));
 						}}
 					/>
