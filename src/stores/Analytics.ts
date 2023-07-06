@@ -14,7 +14,6 @@ class Analytics {
 	// +
 	walletConnected(walletName: string, address: string, walletsCount: number) {
 		jitsu.track('wallet_connected', { walletName, address, walletsCount });
-		jitsu.track(`wallet_connected_${walletsCount}`, { walletName, address, walletsCount });
 	}
 
 	// +
