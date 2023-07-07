@@ -1,16 +1,18 @@
 import { useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 
+import { toast } from '../../components/toast/toast';
 import { invariant } from '../../utils/assert';
 import { Button } from './Button';
 import { BASE_URL, DEFAULT_PAGINATOR } from './constants';
 import { DataContext } from './DataContext';
 import { GuessProjectModal } from './GuessProjectModal';
 import { TabDebankProtocols } from './TabDebankProtocols';
+import { TabFeedSources } from './TabFeedSources';
 import { TabNonPinnedTokens } from './TabNonPinnedTokens';
 import { TabProjects } from './TabProjects';
 import { TabTokens } from './TabTokens';
-import { IDebankProtocol, IProjectEntity, ITokenEntity, Paginator } from './types';
+import { IDebankProtocol, IFeedSource, IProjectEntity, ITokenEntity, Paginator } from './types';
 
 export const AdminFeedPage = () => {
 	const [searchParams] = useSearchParams();
@@ -18,7 +20,7 @@ export const AdminFeedPage = () => {
 	invariant(code);
 
 	const [guessData, setGuessData] = useState('');
-	const [tab, setTab] = useState<'non-pinned-tokens' | 'tokens' | 'projects' | 'debank-protocols'>(
+	const [tab, setTab] = useState<'non-pinned-tokens' | 'tokens' | 'projects' | 'debank-protocols' | 'feed-sources'>(
 		'non-pinned-tokens',
 	);
 
@@ -26,13 +28,16 @@ export const AdminFeedPage = () => {
 	const [nonPinnedTokens, setNonPinnedTokens] = useState<Paginator<ITokenEntity>>(DEFAULT_PAGINATOR);
 	const [debankProtocols, setDebankProtocols] = useState<Paginator<IDebankProtocol>>(DEFAULT_PAGINATOR);
 	const [tokens, setTokens] = useState<Paginator<ITokenEntity>>(DEFAULT_PAGINATOR);
+	const [feedSources, setFeedSources] = useState<Paginator<IFeedSource>>(DEFAULT_PAGINATOR);
 
 	const [projectQuery, setProjectQuery] = useState('');
 	const [tokenQuery, setTokenQuery] = useState('');
 	const [nonPinnedTokenQuery, setNonPinnedTokenQuery] = useState('');
 	const [debankQuery, setDebankQuery] = useState('');
+	const [feedSourceQuery, setFeedSourceQuery] = useState('');
 
 	const [selectedProjects, setSelectedProjects] = useState<IProjectEntity[]>([]);
+	const [selectedFeedSources, setSelectedFeedSources] = useState<IFeedSource[]>([]);
 	// const [selectedTokens, setSelectedTokens] = useState<ITokenEntity[]>([]);
 	// const [selectedNonPinnedTokens, setSelectedNonPinnedTokens] = useState<ITokenEntity | IDebankProtocol[]>([]);
 	// const [selectedDebankProtocols, setSelectedDebankProtocols] = useState<IDebankProtocol[]>([]);
@@ -44,6 +49,7 @@ export const AdminFeedPage = () => {
 		fetchNonPinnedTokens();
 		fetchProjects();
 		fetchDebankProtocols();
+		fetchFeedSources();
 	}, []);
 
 	async function deleteProjects() {
@@ -66,6 +72,18 @@ export const AdminFeedPage = () => {
 		const response = await fetch(`${BASE_URL}/projects?${searchParams.toString()}`);
 		const { data } = await response.json();
 		setProjects(data);
+		// setSelectedProjects([]);
+	}
+
+	async function fetchFeedSources(page = 1) {
+		const searchParams = new URLSearchParams();
+		searchParams.append('page', page.toString());
+		searchParams.append('query', encodeURIComponent(feedSourceQuery));
+		searchParams.append('code', code!);
+
+		const response = await fetch(`${BASE_URL}/feed-sources?${searchParams.toString()}`);
+		const { data } = await response.json();
+		setFeedSources(data);
 		// setSelectedProjects([]);
 	}
 
@@ -156,6 +174,34 @@ export const AdminFeedPage = () => {
 			}),
 		});
 		const result = await response.json();
+		setTokenIds([]);
+		setSelectedProjects([]);
+		await fetchProjects();
+		toast('Successfully attached tokens');
+		return result.success;
+	}
+
+	async function attachProjectToSource() {
+		if (selectedFeedSources.length !== 1 && selectedProjects.length !== 1) {
+			return;
+		}
+		const searchParams = new URLSearchParams();
+		searchParams.append('code', code!);
+		const response = await fetch(`${BASE_URL}/pin-project-to-source?${searchParams.toString()}`, {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json',
+			},
+			body: JSON.stringify({
+				projectId: selectedProjects[0].id,
+				sourceId: selectedFeedSources[0].id,
+			}),
+		});
+		const result = await response.json();
+		setSelectedProjects([]);
+		setSelectedFeedSources([]);
+		await fetchFeedSources();
+		toast('Successfully connected Project with Source');
 		return result.success;
 	}
 
@@ -195,6 +241,8 @@ export const AdminFeedPage = () => {
 				return <TabDebankProtocols />;
 			case 'tokens':
 				return <TabTokens />;
+			case 'feed-sources':
+				return <TabFeedSources />;
 			default:
 				<></>;
 		}
@@ -233,6 +281,12 @@ export const AdminFeedPage = () => {
 				// setSelectedNonPinnedTokens,
 				tokenIds,
 				setTokenIds,
+				fetchFeedSources,
+				feedSources,
+				setFeedSourceQuery,
+				feedSourceQuery,
+				selectedFeedSources,
+				setSelectedFeedSources,
 			}}
 		>
 			{guessData ? (
@@ -278,6 +332,11 @@ export const AdminFeedPage = () => {
 						onClick={attachTokensToProject}
 						disabled={selectedProjects.length !== 1 || tokenIds.length === 0}
 						text={'Attach tokens / protocols'}
+					/>
+					<Button
+						onClick={attachProjectToSource}
+						disabled={selectedProjects.length !== 1 || selectedFeedSources.length !== 1}
+						text={'Connect source with project'}
 					/>
 				</div>
 				<div>
@@ -333,9 +392,23 @@ export const AdminFeedPage = () => {
 					>
 						Debank protocols ({showAmount(debankProtocols)})
 					</button>
+					<button
+						style={{
+							background: tab === 'feed-sources' ? 'black' : 'transparent',
+							color: tab === 'feed-sources' ? 'white' : 'black',
+							border: '1px solid black',
+							padding: '5px 10px',
+							margin: 5,
+							borderRadius: 20,
+						}}
+						onClick={() => setTab('feed-sources')}
+					>
+						Feed Sources ({showAmount(feedSources)})
+					</button>
 				</div>
 				<p>
-					Selected our projects ({selectedProjects.length}): {selectedProjects.map(p => p.id).join(', ')}
+					Selected our projects ({selectedProjects.length}):{' '}
+					{selectedProjects.map(p => `${p.name}: ${p.id}`).join(', ')}
 					<p>
 						<button onClick={() => setSelectedProjects([])} style={{ border: '1px solid black' }}>
 							Reset
@@ -344,6 +417,15 @@ export const AdminFeedPage = () => {
 				</p>
 				<p>
 					Selected tokens / protocols ({tokenIds.length}): {tokenIds.join(', ')}
+					<p>
+						<button onClick={() => setTokenIds([])} style={{ border: '1px solid black' }}>
+							Reset
+						</button>
+					</p>
+				</p>
+				<p>
+					Selected sources ({selectedFeedSources.length}):{' '}
+					{selectedFeedSources.map(s => s.id + ': ' + s.link).join(', ')}
 					<p>
 						<button onClick={() => setTokenIds([])} style={{ border: '1px solid black' }}>
 							Reset

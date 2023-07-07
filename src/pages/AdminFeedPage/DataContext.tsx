@@ -1,7 +1,7 @@
 import React from 'react';
 
 import { DEFAULT_PAGINATOR } from './constants';
-import { IDebankProtocol, IProjectEntity, ITokenEntity, Paginator } from './types';
+import { IDebankProtocol, IFeedSource, IProjectEntity, ITokenEntity, Paginator } from './types';
 
 export const DataContext = React.createContext<{
 	tokenQuery: string;
@@ -30,6 +30,12 @@ export const DataContext = React.createContext<{
 	tokenIds: string[];
 	setTokenIds: React.Dispatch<React.SetStateAction<string[]>>;
 	fetchTokens: (page?: number) => void;
+	feedSources: Paginator<IFeedSource>;
+	feedSourceQuery: string;
+	setFeedSourceQuery: React.Dispatch<React.SetStateAction<string>>;
+	fetchFeedSources: (page?: number) => void;
+	selectedFeedSources: IFeedSource[];
+	setSelectedFeedSources: React.Dispatch<React.SetStateAction<IFeedSource[]>>;
 }>({
 	tokenQuery: '',
 	nonPinnedTokenQuery: '',
@@ -57,4 +63,10 @@ export const DataContext = React.createContext<{
 	setTokenIds: () => {},
 	tokens: DEFAULT_PAGINATOR,
 	fetchTokens: () => {},
+	feedSources: DEFAULT_PAGINATOR,
+	selectedFeedSources: [],
+	setSelectedFeedSources: () => {},
+	feedSourceQuery: '',
+	setFeedSourceQuery: () => {},
+	fetchFeedSources: () => {},
 });

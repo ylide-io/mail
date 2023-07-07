@@ -63,3 +63,42 @@ export type Paginator<T> = {
 	currentPage: number;
 	totalPages: number;
 };
+
+export enum SourceType {
+	TELEGRAM = 'telegram',
+	TWITTER = 'twitter',
+	MEDIUM = 'medium',
+	MIRROR = 'mirror',
+	DISCORD = 'discord',
+}
+
+export interface IFeedSource {
+	id: number;
+	accountId: string;
+	twitterListId: string;
+	isInList: boolean;
+	type: SourceType;
+	meta: any;
+	enabled: boolean;
+	guildName: string | null;
+	channelName: string | null;
+	twitterUserId: string | null;
+	link: string;
+	cryptoProjectId: string | null;
+	category: string | null;
+}
+
+export const FeedSourceKey: (keyof IFeedSource)[] = [
+	'id',
+	'accountId',
+	'twitterListId',
+	'isInList',
+	'type',
+	'meta',
+	'enabled',
+	'channelName',
+	'twitterUserId',
+	'link',
+	'cryptoProjectId',
+	'category',
+];
