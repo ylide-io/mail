@@ -6,8 +6,8 @@ import { PaginatorComponent } from './Paginator';
 
 export const TabNonPinnedTokens = () => {
 	const {
-		tokenQuery,
-		setTokenQuery,
+		nonPinnedTokenQuery,
+		setNonPinnedTokenQuery,
 		fetchNonPinnedTokens,
 		nonPinnedTokens,
 		// selectedTokens,
@@ -29,9 +29,9 @@ export const TabNonPinnedTokens = () => {
 					width: 300,
 					appearance: 'auto',
 				}}
-				value={tokenQuery}
+				value={nonPinnedTokenQuery}
 				onChange={e => {
-					setTokenQuery(e.target.value);
+					setNonPinnedTokenQuery(e.target.value);
 				}}
 				onKeyDown={e => {
 					if (e.key === 'Enter') {
