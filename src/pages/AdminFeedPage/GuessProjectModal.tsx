@@ -1,7 +1,7 @@
 import { useState } from 'react';
 
-import { BASE_URL } from './constants';
-import { IProjectEntity } from './types';
+import { BASE_URL, DEFAULT_PAGINATOR } from './constants';
+import { IProjectEntity, Paginator } from './types';
 
 type Props = {
 	token: string;
@@ -14,7 +14,7 @@ export const GuessProjectModal = ({ token, guessData, onClose }: Props) => {
 	const [debankResult, setDebankResult] = useState<any>(null);
 	const [debankId, setDebankId] = useState('');
 	const [projectQuery, setProjectQuery] = useState('');
-	const [projects, setProjects] = useState<IProjectEntity[]>([]);
+	const [projects, setProjects] = useState<Paginator<IProjectEntity>>(DEFAULT_PAGINATOR);
 
 	async function getDebankProject(query: string) {
 		const res = await fetch(`${BASE_URL}/debank-project?id=${query}`);
@@ -31,6 +31,7 @@ export const GuessProjectModal = ({ token, guessData, onClose }: Props) => {
 	async function getProjects(query: string) {
 		const res = await fetch(`${BASE_URL}/projects?query=${query}`);
 		const { data } = await res.json();
+		console.log(data);
 		setProjects(data);
 	}
 
@@ -193,7 +194,7 @@ export const GuessProjectModal = ({ token, guessData, onClose }: Props) => {
 								flexDirection: 'column',
 							}}
 						>
-							{projects.map(p => (
+							{projects.items.map(p => (
 								<div
 									key={p.id}
 									className="sel-prj"
