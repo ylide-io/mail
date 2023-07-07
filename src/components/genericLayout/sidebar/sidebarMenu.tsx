@@ -196,8 +196,9 @@ export const SidebarMenu = observer(() => {
 			<SidebarSection section={Section.FEED} title="Feed">
 				<SidebarButton href={generatePath(RoutePath.FEED_SMART)} icon={sideFeedIcon(14)} name="Smart feed" />
 
-				{domain.accounts.activeAccounts.map(account => (
+				{domain.accounts.activeAccounts.map((account, i) => (
 					<SidebarButton
+						key={i}
 						look={SidebarButtonLook.SUBMENU}
 						href={generatePath(RoutePath.FEED_SMART_ADDRESS, { address: account.account.address })}
 						icon={<ContactSvg />}
@@ -226,6 +227,7 @@ export const SidebarMenu = observer(() => {
 
 					return (
 						<SidebarButton
+							key={id}
 							href={generatePath(RoutePath.FEED_VENOM_PROJECT, { project: meta.id })}
 							name={meta.name}
 							icon={meta.logo}
@@ -250,6 +252,7 @@ export const SidebarMenu = observer(() => {
 					.filter(c => c !== FeedCategory.POLICY && c !== FeedCategory.EDUCATION)
 					.map(category => (
 						<SidebarButton
+							key={category}
 							href={generatePath(RoutePath.FEED_CATEGORY, { category })}
 							icon={getFeedCategoryIcon(category)}
 							name={getFeedCategoryName(category)}

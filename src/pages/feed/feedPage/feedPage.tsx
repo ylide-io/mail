@@ -298,6 +298,7 @@ const VenomFeedContent = observer(() => {
 					<>
 						{messages.map((message, idx) => (
 							<VenomFeedPostItem
+								key={idx}
 								isFirstPost={idx === currentPost}
 								post={message}
 								onNextPost={() => setCurrentPost(idx + 1)}
