@@ -5,6 +5,7 @@ import React, { RefObject } from 'react';
 import { ReactComponent as EditSvg } from '../../../../icons/ic20/edit.svg';
 import { ReactComponent as PlusSvg } from '../../../../icons/ic20/plus.svg';
 import { ReactComponent as LogoutSvg } from '../../../../icons/ic28/logout.svg';
+import { analytics } from '../../../../stores/Analytics';
 import domain from '../../../../stores/Domain';
 import { connectAccount, disconnectAccount } from '../../../../utils/account';
 import { HorizontalAlignment } from '../../../../utils/alignment';
@@ -46,6 +47,12 @@ export const AccountsPopup = observer(({ anchorRef, onClose }: AccountsPopupProp
 									icon={<EditSvg />}
 									title="Rename"
 									onClick={async () => {
+										analytics.renameAccount(
+											'accounts-popup',
+											account.wallet.wallet,
+											account.account.address,
+										);
+
 										const newName = prompt('Enter new account name: ', account.name) || '';
 										await account.rename(newName);
 									}}
@@ -63,7 +70,7 @@ export const AccountsPopup = observer(({ anchorRef, onClose }: AccountsPopupProp
 								icon={<LogoutSvg />}
 								title="Logout"
 								onClick={async () => {
-									await disconnectAccount(account);
+									await disconnectAccount({ account, place: 'accounts-popup' });
 
 									if (!domain.accounts.hasActiveAccounts) {
 										onClose();
@@ -81,7 +88,7 @@ export const AccountsPopup = observer(({ anchorRef, onClose }: AccountsPopupProp
 						icon={<PlusSvg />}
 						onClick={() => {
 							onClose();
-							connectAccount();
+							connectAccount({ place: 'accounts-popup' });
 						}}
 					>
 						Connect account

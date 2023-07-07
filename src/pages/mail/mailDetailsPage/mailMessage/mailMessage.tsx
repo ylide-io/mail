@@ -15,6 +15,7 @@ import { ReactComponent as ForwardSvg } from '../../../../icons/ic20/forward.svg
 import { ReactComponent as ReplySvg } from '../../../../icons/ic20/reply.svg';
 import { ReactComponent as TrashSvg } from '../../../../icons/ic20/trash.svg';
 import { IContact, IMessageDecodedContent } from '../../../../indexedDB/IndexedDB';
+import { analytics } from '../../../../stores/Analytics';
 import contacts from '../../../../stores/Contacts';
 import { FolderId, ILinkedMessage, mailStore } from '../../../../stores/MailList';
 import { invariant } from '../../../../utils/assert';
@@ -76,6 +77,8 @@ export const MailMessage = observer(
 											className={css.recipientsButton}
 											title="Create contact"
 											onClick={() => {
+												analytics.startCreatingContact('mail-details');
+
 												const name = prompt('Enter contact name:')?.trim();
 												if (!name) return;
 
@@ -86,7 +89,10 @@ export const MailMessage = observer(
 													tags: [],
 												};
 
-												contacts.createContact(contact).catch(() => toast("Couldn't save 😒"));
+												contacts
+													.createContact(contact)
+													.then(() => analytics.finishCreatingContact('mail-details'))
+													.catch(() => toast("Couldn't save 😒"));
 											}}
 										>
 											<AddContactSvg />

@@ -44,7 +44,7 @@ export function AccountConnectedModal({ onClose }: AccountConnectedModalProps) {
 					size={ActionButtonSize.XLARGE}
 					onClick={() => {
 						onClose?.();
-						connectAccount();
+						connectAccount({ place: 'account-connected-modal_add-more' });
 					}}
 				>
 					Add one more account

@@ -48,7 +48,7 @@ export const AccountSelect = observer(({ className, activeAccount, onChange, ...
 							onClick={async () => {
 								onSelect();
 
-								const newAccount = await connectAccount();
+								const newAccount = await connectAccount({ place: 'account-select' });
 
 								if (newAccount) {
 									onChange?.(newAccount);

@@ -38,7 +38,7 @@ const Header = observer(() => {
 				<ActionButton
 					className={css.composeButton}
 					look={ActionButtonLook.PRIMARY}
-					onClick={() => openMailCompose()}
+					onClick={() => openMailCompose({ place: 'header' })}
 				>
 					Compose Mail
 				</ActionButton>
@@ -107,7 +107,7 @@ const Header = observer(() => {
 						size={ActionButtonSize.MEDIUM}
 						look={ActionButtonLook.PRIMARY}
 						icon={<PlusSvg />}
-						onClick={() => connectAccount()}
+						onClick={() => connectAccount({ place: 'header' })}
 					>
 						Connect account
 					</ActionButton>

@@ -8,6 +8,7 @@ import { SelectWalletModal } from '../components/selectWalletModal/selectWalletM
 import { showStaticComponent } from '../components/staticComponentManager/staticComponentManager';
 import { SwitchModal } from '../components/switchModal/switchModal';
 import { toast } from '../components/toast/toast';
+import { analytics } from '../stores/Analytics';
 import { browserStorage } from '../stores/browserStorage';
 import domain from '../stores/Domain';
 import { DomainAccount } from '../stores/models/DomainAccount';
@@ -26,7 +27,11 @@ export function formatAccountName(account: DomainAccount) {
 
 //
 
-export async function connectAccount(): Promise<DomainAccount | undefined> {
+export async function connectAccount(params?: { place?: string }): Promise<DomainAccount | undefined> {
+	if (params?.place) {
+		analytics.startConnectingWallet(params.place);
+	}
+
 	const closeLoadingModal = showLoadingModal({ reason: 'Connecting account ...' });
 
 	try {
@@ -154,7 +159,13 @@ export async function connectAccount(): Promise<DomainAccount | undefined> {
 	}
 }
 
-export async function disconnectAccount(account: DomainAccount) {
+export async function disconnectAccount(params: { account: DomainAccount; place?: string }) {
+	const { account, place } = params;
+
+	if (place) {
+		analytics.disconnectWallet(place, account.wallet.wallet, account.account.address);
+	}
+
 	await account.wallet.disconnectAccount(account);
 	await domain.accounts.removeAccount(account);
 	account.mainViewKey = '';

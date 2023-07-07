@@ -36,7 +36,9 @@ export const MainViewOnboarding = observer(() => {
 
 	// Disconnect inactive accounts before begin
 	useEffect(() => {
-		domain.accounts.accounts.filter(a => !domain.accounts.isActiveAccount(a)).forEach(a => disconnectAccount(a));
+		domain.accounts.accounts
+			.filter(a => !domain.accounts.isActiveAccount(a))
+			.forEach(a => disconnectAccount({ account: a }));
 	}, []);
 
 	const reset = useCallback(() => {
@@ -46,7 +48,7 @@ export const MainViewOnboarding = observer(() => {
 
 	const disconnect = useCallback(
 		async (account: DomainAccount) => {
-			await disconnectAccount(account);
+			await disconnectAccount({ account });
 			reset();
 		},
 		[reset],
@@ -121,7 +123,7 @@ export const MainViewOnboarding = observer(() => {
 	const connect = useCallback(async () => {
 		setStep(Step.CONNECT_ACCOUNT);
 
-		connectAccount()
+		connectAccount({ place: 'mv_onboarding' })
 			.then(account => {
 				invariant(account);
 				authorize(account);

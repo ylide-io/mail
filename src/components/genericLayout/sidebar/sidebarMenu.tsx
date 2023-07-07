@@ -29,6 +29,7 @@ import { sideProjectsIcon } from '../../../icons/static/sideProjectsIcon';
 import { sideSecurityIcon } from '../../../icons/static/sideSecurityIcon';
 import { sideTechnologyIcon } from '../../../icons/static/sideTechnologyIcon';
 import { FeedSettingsPopup } from '../../../pages/feed/components/feedSettingsPopup/feedSettingsPopup';
+import { analytics } from '../../../stores/Analytics';
 import { browserStorage } from '../../../stores/browserStorage';
 import domain from '../../../stores/Domain';
 import { getFeedCategoryName } from '../../../stores/Feed';
@@ -275,7 +276,7 @@ export const SidebarMenu = observer(() => {
 					className={css.sectionButton}
 					onClick={() => {
 						isSidebarOpen.set(false);
-						openMailCompose();
+						openMailCompose({ place: 'sidebar' });
 					}}
 				>
 					Compose mail
@@ -311,19 +312,48 @@ export const SidebarMenu = observer(() => {
 			{renderMailSection()}
 
 			<div className={css.socials}>
-				<a href="https://t.me/ylide_chat" target="_blank noreferrer" title="Telegram">
+				<a
+					href="https://t.me/ylide_chat"
+					target="_blank noreferrer"
+					title="Telegram"
+					onClick={() => analytics.openSocial('telegram')}
+				>
 					<TelegramSvg />
 				</a>
-				<a href="https://discord.gg/ylide" target="_blank noreferrer" title="Discord">
+
+				<a
+					href="https://discord.gg/ylide"
+					target="_blank noreferrer"
+					title="Discord"
+					onClick={() => analytics.openSocial('discord')}
+				>
 					<DiscordSvg />
 				</a>
-				<a href="https://twitter.com/ylide_" target="_blank noreferrer" title="Twitter">
+
+				<a
+					href="https://twitter.com/ylide_"
+					target="_blank noreferrer"
+					title="Twitter"
+					onClick={() => analytics.openSocial('twitter')}
+				>
 					<TwitterSvg />
 				</a>
-				<a href="https://www.linkedin.com/company/ylide/" target="_blank noreferrer" title="LinkedIn">
+
+				<a
+					href="https://www.linkedin.com/company/ylide/"
+					target="_blank noreferrer"
+					title="LinkedIn"
+					onClick={() => analytics.openSocial('linkedin')}
+				>
 					<LinkedInSvg />
 				</a>
-				<a href="https://medium.com/@ylide" target="_blank noreferrer" title="Medium">
+
+				<a
+					href="https://medium.com/@ylide"
+					target="_blank noreferrer"
+					title="Medium"
+					onClick={() => analytics.openSocial('medium')}
+				>
 					<MediumSvg />
 				</a>
 			</div>

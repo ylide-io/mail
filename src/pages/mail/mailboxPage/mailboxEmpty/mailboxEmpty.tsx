@@ -1,6 +1,5 @@
 import { observer } from 'mobx-react';
 import React from 'react';
-import { generatePath } from 'react-router-dom';
 
 import { ActionButton, ActionButtonLook, ActionButtonSize } from '../../../../components/ActionButton/ActionButton';
 import { AdaptiveAddress } from '../../../../components/adaptiveAddress/adaptiveAddress';
@@ -8,11 +7,10 @@ import { ReactComponent as ClipboardSvg } from '../../../../icons/ic20/clipboard
 import { ReactComponent as PlusSvg } from '../../../../icons/ic20/plus.svg';
 import domain from '../../../../stores/Domain';
 import { FolderId } from '../../../../stores/MailList';
-import { RoutePath } from '../../../../stores/routePath';
 import { connectAccount } from '../../../../utils/account';
 import { assertUnreachable } from '../../../../utils/assert';
 import { copyToClipboard } from '../../../../utils/clipboard';
-import { useNav } from '../../../../utils/url';
+import { useOpenMailCompose } from '../../../../utils/mail';
 import css from './mailboxEmpty.module.scss';
 
 interface MailboxEmptyProps {
@@ -20,7 +18,7 @@ interface MailboxEmptyProps {
 }
 
 const MailboxEmpty = observer(({ folderId }: MailboxEmptyProps) => {
-	const navigate = useNav();
+	const openMailCompose = useOpenMailCompose();
 
 	return (
 		<div className={css.root}>
@@ -32,7 +30,7 @@ const MailboxEmpty = observer(({ folderId }: MailboxEmptyProps) => {
 						size={ActionButtonSize.MEDIUM}
 						look={ActionButtonLook.PRIMARY}
 						icon={<PlusSvg />}
-						onClick={() => connectAccount()}
+						onClick={() => connectAccount({ place: 'mailbox_no-accounts' })}
 					>
 						Connect account
 					</ActionButton>
@@ -65,7 +63,7 @@ const MailboxEmpty = observer(({ folderId }: MailboxEmptyProps) => {
 					<ActionButton
 						size={ActionButtonSize.MEDIUM}
 						look={ActionButtonLook.PRIMARY}
-						onClick={() => navigate(generatePath(RoutePath.MAIL_COMPOSE))}
+						onClick={() => openMailCompose({ forceComposePage: true, place: 'mailbox_empty' })}
 					>
 						Compose Mail
 					</ActionButton>

@@ -6,6 +6,7 @@ import { DropDownItem, DropDownItemMode } from '../../../components/dropDown/dro
 import { Select } from '../../../components/select/select';
 import { TextField } from '../../../components/textField/textField';
 import { ReactComponent as PlusSvg } from '../../../icons/ic20/plus.svg';
+import { analytics } from '../../../stores/Analytics';
 import contacts from '../../../stores/Contacts';
 import tags from '../../../stores/Tags';
 import { ContactListItem } from './contactListItem/contactListItem';
@@ -65,7 +66,10 @@ export const ContactListPage = observer(() => {
 						size={ActionButtonSize.MEDIUM}
 						look={ActionButtonLook.PRIMARY}
 						icon={<PlusSvg style={{ display: 'inline-block', verticalAlign: 'middle' }} />}
-						onClick={() => contacts.generateNewContact()}
+						onClick={() => {
+							analytics.startCreatingContact('contacts');
+							contacts.generateNewContact();
+						}}
 					>
 						New contact
 					</ActionButton>
