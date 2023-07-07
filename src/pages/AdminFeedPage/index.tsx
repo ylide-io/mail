@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 
+import { invariant } from '../../utils/assert';
 import { Button } from './Button';
 import { BASE_URL, DEFAULT_PAGINATOR } from './constants';
 import { DataContext } from './DataContext';
@@ -11,6 +13,10 @@ import { TabTokens } from './TabTokens';
 import { IDebankProtocol, IProjectEntity, ITokenEntity, Paginator } from './types';
 
 export const AdminFeedPage = () => {
+	const [searchParams] = useSearchParams();
+	const code = searchParams.get('code');
+	invariant(code);
+
 	const [guessData, setGuessData] = useState('');
 	const [tab, setTab] = useState<'non-pinned-tokens' | 'tokens' | 'projects' | 'debank-protocols'>(
 		'non-pinned-tokens',
@@ -41,50 +47,64 @@ export const AdminFeedPage = () => {
 	}, []);
 
 	async function deleteProjects() {
-		let query = '';
+		const searchParams = new URLSearchParams();
 		for (let i = 0; i < selectedProjects.length; i++) {
-			const append = i === 0 ? '?' : '&';
-			query += append + 'id=' + encodeURIComponent(selectedProjects[i].id);
+			searchParams.append('id', encodeURIComponent(selectedProjects[i].id));
 		}
-		await fetch(`${BASE_URL}/projects${query}`, { method: 'delete' });
+		searchParams.append('code', code!);
+		await fetch(`${BASE_URL}/projects?${searchParams.toString()}`, { method: 'delete' });
 		setSelectedProjects([]);
 		await fetchProjects();
 	}
 
 	async function fetchProjects(page = 1) {
-		const response = await fetch(
-			`${BASE_URL}/projects?query=` + encodeURIComponent(projectQuery) + `&page=${page}`,
-		);
+		const searchParams = new URLSearchParams();
+		searchParams.append('page', page.toString());
+		searchParams.append('query', encodeURIComponent(projectQuery));
+		searchParams.append('code', code!);
+
+		const response = await fetch(`${BASE_URL}/projects?${searchParams.toString()}`);
 		const { data } = await response.json();
 		setProjects(data);
 		// setSelectedProjects([]);
 	}
 
 	async function fetchDebankProtocols(page = 1) {
-		const response = await fetch(
-			`${BASE_URL}/debank-protocols?query=` + encodeURIComponent(debankQuery) + `&page=${page}`,
-		);
+		const searchParams = new URLSearchParams();
+		searchParams.append('page', page.toString());
+		searchParams.append('query', encodeURIComponent(debankQuery));
+		searchParams.append('code', code!);
+		const response = await fetch(`${BASE_URL}/debank-protocols?${searchParams.toString()}`);
 		const { data } = await response.json();
 		setDebankProtocols(data);
 		// setSelectedProjects([]);
 	}
 
 	async function fetchNonPinnedTokens(page = 1) {
-		const response = await fetch(
-			`${BASE_URL}/non-pinned-tokens?query=` + encodeURIComponent(tokenQuery) + `&page=${page}`,
-		);
+		const searchParams = new URLSearchParams();
+		searchParams.append('page', page.toString());
+		searchParams.append('query', encodeURIComponent(nonPinnedTokenQuery));
+		searchParams.append('code', code!);
+		const response = await fetch(`${BASE_URL}/non-pinned-tokens?${searchParams.toString()}`);
 		const { data } = await response.json();
 		setNonPinnedTokens(data);
 	}
 
 	async function fetchTokens(page = 1) {
-		const response = await fetch(`${BASE_URL}/tokens?query=` + encodeURIComponent(tokenQuery) + `&page=${page}`);
+		const searchParams = new URLSearchParams();
+		searchParams.append('page', page.toString());
+		searchParams.append('query', encodeURIComponent(tokenQuery));
+		searchParams.append('code', code!);
+		const response = await fetch(`${BASE_URL}/tokens?${searchParams.toString()}`);
 		const { data } = await response.json();
 		setTokens(data);
 	}
 
 	async function smartGuessToken(id: string) {
-		const response = await fetch(`${BASE_URL}/smart-guess-token?token=` + encodeURIComponent(id));
+		const searchParams = new URLSearchParams();
+		searchParams.append('query', encodeURIComponent(tokenQuery));
+		searchParams.append('code', code!);
+		const response = await fetch(`${BASE_URL}/smart-guess-token?${searchParams.toString()}`);
 		const result = await response.json();
 		if (result.result) {
 			// setSelectedTokens([token]);
@@ -97,7 +117,9 @@ export const AdminFeedPage = () => {
 		const firstProject = projects.items.find(p => p.id === projectIds[0]);
 		const newName = prompt('New name: ', firstProject?.name);
 		if (!newName) return;
-		const response = await fetch(`${BASE_URL}/merge-projects`, {
+		const searchParams = new URLSearchParams();
+		searchParams.append('code', code!);
+		const response = await fetch(`${BASE_URL}/merge-projects?${searchParams.toString()}`, {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json',
@@ -121,7 +143,9 @@ export const AdminFeedPage = () => {
 		if (tokenIds.length === 0) {
 			return;
 		}
-		const response = await fetch(`${BASE_URL}/pin-token-to-project`, {
+		const searchParams = new URLSearchParams();
+		searchParams.append('code', code!);
+		const response = await fetch(`${BASE_URL}/pin-token-to-project?${searchParams.toString()}`, {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json',
@@ -136,7 +160,9 @@ export const AdminFeedPage = () => {
 	}
 
 	async function createProject(data: { name: string; logo: string | null; meta: any; slug: string }) {
-		const response = await fetch(`${BASE_URL}/create-project`, {
+		const searchParams = new URLSearchParams();
+		searchParams.append('code', code!);
+		const response = await fetch(`${BASE_URL}/create-project?${searchParams.toString()}`, {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json',
