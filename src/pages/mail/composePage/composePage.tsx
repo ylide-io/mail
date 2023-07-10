@@ -18,9 +18,7 @@ import css from './composePage.module.scss';
 export const ComposePage = observer(() => {
 	const navigate = useNav();
 
-	useEffect(() => {
-		analytics.composeOpened();
-	}, []);
+	useEffect(() => analytics.composeOpened('page'), []);
 
 	useEffect(() => () => getGlobalOutgoingMailData().reset(), []);
 

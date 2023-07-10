@@ -18,6 +18,7 @@ import { ReactComponent as CrossSvg } from '../../../../icons/ic20/cross.svg';
 import { ReactComponent as ExternalSvg } from '../../../../icons/ic20/external.svg';
 import { ReactComponent as MailSvg } from '../../../../icons/ic20/mail.svg';
 import { MessageDecodedTextDataType } from '../../../../indexedDB/IndexedDB';
+import { analytics } from '../../../../stores/Analytics';
 import { browserStorage } from '../../../../stores/browserStorage';
 import { useVenomAccounts } from '../../../../stores/Domain';
 import { OutgoingMailData } from '../../../../stores/outgoingMailData';
@@ -144,6 +145,7 @@ export function VenomFeedPostItemView({
 							target="_blank"
 							rel="noreferrer"
 							title="Details"
+							onClick={() => analytics.venomFeedOpenDetails(post.original.id, post.msg.$$meta.id)}
 						>
 							<ExternalSvg />
 						</a>
@@ -180,11 +182,16 @@ export function VenomFeedPostItemView({
 											copyToClipboard(repliedPostQuery.data!.msg.senderAddress, { toast: true });
 										}}
 										onComposeClick={() => {
+											analytics.venomFeedComposeMail(
+												repliedPostQuery.data!.original.id,
+												repliedPostQuery.data!.msg.senderAddress,
+											);
+
 											const mailData = new OutgoingMailData();
 											mailData.from = venomAccounts[0];
 											mailData.to = new Recipients([repliedPostQuery.data!.msg.senderAddress]);
 
-											openMailCompose({ mailData });
+											openMailCompose({ mailData, place: 'venom-feed_replied-post' });
 										}}
 									/>
 								) : repliedPostQuery.isLoading ? (
@@ -388,11 +395,13 @@ export function VenomFeedPostItem({ post, isFirstPost, onNextPost, onReplyClick 
 					}
 				}}
 				onComposeClick={() => {
+					analytics.venomFeedComposeMail(post.original.id, post.msg.senderAddress);
+
 					const mailData = new OutgoingMailData();
 					mailData.from = venomAccounts[0];
 					mailData.to = new Recipients([post.msg.senderAddress]);
 
-					openMailCompose({ mailData });
+					openMailCompose({ mailData, place: 'venom-feed_post' });
 				}}
 				onReplyClick={onReplyClick}
 				onBanClick={browserStorage.isUserAdmin ? () => banPost() : undefined}

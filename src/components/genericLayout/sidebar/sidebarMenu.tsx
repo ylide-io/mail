@@ -29,6 +29,7 @@ import { sideProjectsIcon } from '../../../icons/static/sideProjectsIcon';
 import { sideSecurityIcon } from '../../../icons/static/sideSecurityIcon';
 import { sideTechnologyIcon } from '../../../icons/static/sideTechnologyIcon';
 import { FeedSettingsPopup } from '../../../pages/feed/components/feedSettingsPopup/feedSettingsPopup';
+import { analytics } from '../../../stores/Analytics';
 import { browserStorage } from '../../../stores/browserStorage';
 import domain from '../../../stores/Domain';
 import { getFeedCategoryName } from '../../../stores/Feed';
@@ -195,8 +196,9 @@ export const SidebarMenu = observer(() => {
 			<SidebarSection section={Section.FEED} title="Feed">
 				<SidebarButton href={generatePath(RoutePath.FEED_SMART)} icon={sideFeedIcon(14)} name="Smart feed" />
 
-				{domain.accounts.activeAccounts.map(account => (
+				{domain.accounts.activeAccounts.map((account, i) => (
 					<SidebarButton
+						key={i}
 						look={SidebarButtonLook.SUBMENU}
 						href={generatePath(RoutePath.FEED_SMART_ADDRESS, { address: account.account.address })}
 						icon={<ContactSvg />}
@@ -214,21 +216,18 @@ export const SidebarMenu = observer(() => {
 			<SidebarSection section={Section.VENOM_PROJECTS} title="Venom Projects">
 				{[
 					VenomProjectId.VENOM_BLOCKCHAIN,
-					// VenomProjectId.VENOM_WALLET,
-					// VenomProjectId.VENOM_SCAN,
 					VenomProjectId.SNIPA,
 					VenomProjectId.WEB3_WORLD,
 					VenomProjectId.VENOM_BRIDGE,
 					VenomProjectId.OASIS_GALLERY,
-					// VenomProjectId.VENOM_PAD,
-					// VenomProjectId.VENOM_STAKE,
-					// VenomProjectId.NUMI,
+					VenomProjectId.VENTORY,
 					VenomProjectId.YLIDE,
 				].map(id => {
 					const meta = venomProjectsMeta[id];
 
 					return (
 						<SidebarButton
+							key={id}
 							href={generatePath(RoutePath.FEED_VENOM_PROJECT, { project: meta.id })}
 							name={meta.name}
 							icon={meta.logo}
@@ -253,6 +252,7 @@ export const SidebarMenu = observer(() => {
 					.filter(c => c !== FeedCategory.POLICY && c !== FeedCategory.EDUCATION)
 					.map(category => (
 						<SidebarButton
+							key={category}
 							href={generatePath(RoutePath.FEED_CATEGORY, { category })}
 							icon={getFeedCategoryIcon(category)}
 							name={getFeedCategoryName(category)}
@@ -279,7 +279,7 @@ export const SidebarMenu = observer(() => {
 					className={css.sectionButton}
 					onClick={() => {
 						isSidebarOpen.set(false);
-						openMailCompose();
+						openMailCompose({ place: 'sidebar' });
 					}}
 				>
 					Compose mail
@@ -315,19 +315,48 @@ export const SidebarMenu = observer(() => {
 			{renderMailSection()}
 
 			<div className={css.socials}>
-				<a href="https://t.me/ylide_chat" target="_blank noreferrer" title="Telegram">
+				<a
+					href="https://t.me/ylide_chat"
+					target="_blank noreferrer"
+					title="Telegram"
+					onClick={() => analytics.openSocial('telegram')}
+				>
 					<TelegramSvg />
 				</a>
-				<a href="https://discord.gg/ylide" target="_blank noreferrer" title="Discord">
+
+				<a
+					href="https://discord.gg/ylide"
+					target="_blank noreferrer"
+					title="Discord"
+					onClick={() => analytics.openSocial('discord')}
+				>
 					<DiscordSvg />
 				</a>
-				<a href="https://twitter.com/ylide_" target="_blank noreferrer" title="Twitter">
+
+				<a
+					href="https://twitter.com/ylide_"
+					target="_blank noreferrer"
+					title="Twitter"
+					onClick={() => analytics.openSocial('twitter')}
+				>
 					<TwitterSvg />
 				</a>
-				<a href="https://www.linkedin.com/company/ylide/" target="_blank noreferrer" title="LinkedIn">
+
+				<a
+					href="https://www.linkedin.com/company/ylide/"
+					target="_blank noreferrer"
+					title="LinkedIn"
+					onClick={() => analytics.openSocial('linkedin')}
+				>
 					<LinkedInSvg />
 				</a>
-				<a href="https://medium.com/@ylide" target="_blank noreferrer" title="Medium">
+
+				<a
+					href="https://medium.com/@ylide"
+					target="_blank noreferrer"
+					title="Medium"
+					onClick={() => analytics.openSocial('medium')}
+				>
 					<MediumSvg />
 				</a>
 			</div>

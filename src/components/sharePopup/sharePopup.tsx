@@ -56,7 +56,7 @@ export function SharePopup({ anchorRef, horizontalAlign, onClose, url, subject }
 								mailData.subject = subject;
 								mailData.editorData = plainTextToEditorJsData(realUrl);
 
-								openMailCompose({ mailData });
+								openMailCompose({ mailData, place: 'share-popup' });
 
 								onClose();
 							}}

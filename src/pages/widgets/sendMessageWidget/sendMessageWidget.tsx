@@ -1,10 +1,11 @@
-import React, { useMemo } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import { useSearchParams } from 'react-router-dom';
 
 import { ActionButton, ActionButtonLook } from '../../../components/ActionButton/ActionButton';
 import { Recipients } from '../../../components/recipientInput/recipientInput';
 import { Toast, toast } from '../../../components/toast/toast';
 import { ReactComponent as CrossSvg } from '../../../icons/ic20/cross.svg';
+import { analytics } from '../../../stores/Analytics';
 import { OutgoingMailData } from '../../../stores/outgoingMailData';
 import { invariant } from '../../../utils/assert';
 import { ComposeMailForm } from '../../mail/components/composeMailForm/composeMailForm';
@@ -16,6 +17,8 @@ export function SendMessageWidget() {
 	const toAddress = searchParams.get('to');
 	const subject = searchParams.get('subject') || '';
 	invariant(toAddress, 'to-address required');
+
+	useEffect(() => analytics.composeOpened('send-message-widget'), []);
 
 	const mailData = useMemo(() => {
 		const data = new OutgoingMailData();

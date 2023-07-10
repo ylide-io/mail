@@ -140,16 +140,19 @@ export const MailboxPage = observer(() => {
 							setSelectedMessageIds(isChecked ? new Set(mailList.messages.map(it => it.id)) : new Set());
 						}}
 						onMarkReadClick={() => {
+							analytics.markMailAsRead(selectedMessageIds.size);
 							mailStore.markMessagesAsReaded(Array.from(selectedMessageIds));
 							setSelectedMessageIds(new Set());
 						}}
 						onDeleteClick={() => {
+							analytics.archiveMail('mailbox', selectedMessageIds.size);
 							mailStore.markMessagesAsDeleted(
 								mailList.messages.filter(it => selectedMessageIds.has(it.id)),
 							);
 							setSelectedMessageIds(new Set());
 						}}
 						onRestoreClick={() => {
+							analytics.restoreMail('mailbox', selectedMessageIds.size);
 							mailStore.markMessagesAsNotDeleted(
 								mailList.messages.filter(it => selectedMessageIds.has(it.id)),
 							);

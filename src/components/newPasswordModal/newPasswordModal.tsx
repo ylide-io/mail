@@ -108,7 +108,7 @@ export function NewPasswordModal({ faucetType, bonus, wallet, account, remoteKey
 		}
 
 		if (domainAccountRef.current) {
-			disconnectAccount(domainAccountRef.current).catch();
+			disconnectAccount({ account: domainAccountRef.current }).catch();
 		}
 
 		onClose?.();
@@ -129,7 +129,7 @@ export function NewPasswordModal({ faucetType, bonus, wallet, account, remoteKey
 			]);
 			await asyncDelay(7000);
 			await account.init();
-			analytics.walletRegistered(wallet.factory.wallet, account.account.address, domain.accounts.accounts.length);
+			analytics.walletRegistered(wallet.wallet, account.account.address);
 			onClose?.(account);
 		} catch (e) {
 			exitUnsuccessfully({ message: 'Transaction was not published. Please, try again', e });
@@ -232,11 +232,7 @@ export function NewPasswordModal({ faucetType, bonus, wallet, account, remoteKey
 					setStep(Step.LOADING);
 
 					domain.isTxPublishing = true;
-					analytics.walletRegistered(
-						wallet.factory.wallet,
-						account.account.address,
-						domain.accounts.accounts.length,
-					);
+					analytics.walletRegistered(wallet.wallet, account.account.address);
 					domain.txChain = faucetType;
 					domain.txPlateVisible = true;
 					domain.txWithBonus = bonus;
@@ -307,7 +303,7 @@ export function NewPasswordModal({ faucetType, bonus, wallet, account, remoteKey
 			}
 		} else if (isBytesEqual(freshestKey.key.publicKey.bytes, tempLocalKey.publicKey)) {
 			const domainAccount = await createDomainAccount(wallet, account, tempLocalKey, keyVersion);
-			analytics.walletConnected(wallet.factory.wallet, account.address, domain.accounts.accounts.length);
+			analytics.walletConnected(wallet.wallet, account.address);
 			onClose?.(domainAccount);
 		} else if (forceNew || withoutPassword) {
 			await createDomainAccount(wallet, account, tempLocalKey, keyVersion);

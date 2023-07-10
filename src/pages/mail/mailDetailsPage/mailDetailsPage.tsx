@@ -14,9 +14,10 @@ import { ReactComponent as ContactSvg } from '../../../icons/ic20/contact.svg';
 import { ReactComponent as ForwardSvg } from '../../../icons/ic20/forward.svg';
 import { ReactComponent as ReplySvg } from '../../../icons/ic20/reply.svg';
 import { IMessageDecodedContent } from '../../../indexedDB/IndexedDB';
+import { analytics } from '../../../stores/Analytics';
 import { useDomainAccounts } from '../../../stores/Domain';
 import { FolderId, ILinkedMessage, MailList, mailStore } from '../../../stores/MailList';
-import { getGlobalOutgoingMailData, OutgoingMailData } from '../../../stores/outgoingMailData';
+import { OutgoingMailData } from '../../../stores/outgoingMailData';
 import { RoutePath } from '../../../stores/routePath';
 import { DateFormatStyle, formatDate } from '../../../utils/date';
 import {
@@ -135,7 +136,7 @@ export const MailDetailsPage = observer(() => {
 		mailData.to = new Recipients([senderAddress]);
 		mailData.subject = formatSubject(subject || '', 'Re: ');
 
-		openMailCompose({ mailData });
+		openMailCompose({ mailData, place: 'mail-details_reply' });
 	};
 
 	const onForwardClick = (message: ILinkedMessage, decodedContent: IMessageDecodedContent) => {
@@ -154,16 +155,15 @@ export const MailDetailsPage = observer(() => {
 			editorData.blocks = [...forwardedData.blocks, ...editorData.blocks];
 		}
 
-		getGlobalOutgoingMailData().editorData = editorData;
-		getGlobalOutgoingMailData().subject = formatSubject(
-			decodedContent.decodedSubject.replace(/^Fwd:\s+/i, ''),
-			'Fwd: ',
-		);
+		const mailData = new OutgoingMailData();
+		mailData.editorData = editorData;
+		mailData.subject = formatSubject(decodedContent.decodedSubject.replace(/^Fwd:\s+/i, ''), 'Fwd: ');
 
-		navigate(RoutePath.MAIL_COMPOSE);
+		openMailCompose({ mailData, place: 'mail-details_forward' });
 	};
 
 	const onDeleteClick = (m: ILinkedMessage) => {
+		analytics.archiveMail('details', 1);
 		mailStore.markMessagesAsDeleted([m]);
 
 		if (isThreadOpen) {
@@ -176,6 +176,7 @@ export const MailDetailsPage = observer(() => {
 	};
 
 	const onRestoreClick = (m: ILinkedMessage) => {
+		analytics.restoreMail('details', 1);
 		mailStore.markMessagesAsNotDeleted([m]);
 
 		setWrappedThreadMessages(

@@ -1,5 +1,4 @@
 import { MessageAttachmentLinkV1, MessageAttachmentType } from '@ylide/sdk';
-import { Uint256 } from '@ylide/sdk';
 import clsx from 'clsx';
 import { observer } from 'mobx-react';
 import { forwardRef, Ref, useEffect, useImperativeHandle, useMemo, useRef, useState } from 'react';
@@ -17,8 +16,10 @@ import { VENOM_FEED_ID } from '../../../../constants';
 import { ReactComponent as TrashSvg } from '../../../../icons/ic20/trash.svg';
 import { ReactComponent as BulbSvg } from '../../../../icons/ic28/bulb.svg';
 import { ReactComponent as StickerSvg } from '../../../../icons/ic28/sticker.svg';
+import { analytics } from '../../../../stores/Analytics';
 import { DomainAccount } from '../../../../stores/models/DomainAccount';
 import { OutgoingMailData, OutgoingMailDataMode } from '../../../../stores/outgoingMailData';
+import { VenomProjectMeta } from '../../../../stores/venomProjects/venomProjects';
 import { HorizontalAlignment } from '../../../../utils/alignment';
 import { hashToIpfsUrl, ipfsToHttpUrl } from '../../../../utils/ipfs';
 import { escapeRegex } from '../../../../utils/regex';
@@ -33,23 +34,25 @@ export interface CreatePostFormApi {
 export interface CreatePostFormProps extends PropsWithClassName {
 	accounts: DomainAccount[];
 	isAnavailable: boolean;
-	feedId: Uint256;
+	projectMeta: VenomProjectMeta;
 	onCreated?: () => void;
 }
 
 export const CreatePostForm = observer(
 	forwardRef(
 		(
-			{ className, feedId, accounts, isAnavailable, onCreated }: CreatePostFormProps,
+			{ className, accounts, isAnavailable, projectMeta, onCreated }: CreatePostFormProps,
 			ref: Ref<CreatePostFormApi>,
 		) => {
 			const textAreaApiRef = useRef<AutoSizeTextAreaApi>(null);
+
+			const [replyTo, setReplyTo] = useState<DecodedVenomFeedPost>();
 
 			const mailData = useMemo(() => {
 				const mailData = new OutgoingMailData();
 
 				mailData.mode = OutgoingMailDataMode.BROADCAST;
-				mailData.feedId = feedId;
+				mailData.feedId = projectMeta.feedId;
 
 				mailData.validator = () => {
 					const text = mailData.plainTextData;
@@ -77,11 +80,13 @@ export const CreatePostForm = observer(
 						return false;
 					}
 
+					analytics.venomFeedSendAttempt(projectMeta.id, !!replyTo, replyTo?.original.id);
+
 					return true;
 				};
 
 				return mailData;
-			}, [feedId]);
+			}, [projectMeta.feedId, projectMeta.id, replyTo]);
 
 			useEffect(() => {
 				mailData.from = mailData.from && accounts.includes(mailData.from) ? mailData.from : accounts[0];
@@ -119,6 +124,8 @@ export const CreatePostForm = observer(
 				: undefined;
 
 			const onSent = () => {
+				analytics.venomFeedSendSuccessful(projectMeta.id, !!replyTo, replyTo?.original.id);
+
 				mailData.reset({
 					mode: OutgoingMailDataMode.BROADCAST,
 					feedId: VENOM_FEED_ID,
@@ -130,8 +137,6 @@ export const CreatePostForm = observer(
 
 				onCreated?.();
 			};
-
-			const [replyTo, setReplyTo] = useState<DecodedVenomFeedPost>();
 
 			useEffect(() => {
 				mailData.processContent = ymf => {

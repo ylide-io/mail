@@ -106,7 +106,10 @@ export const NewWalletsPage = observer(() => {
 									</ActionButton>
 								)}
 
-								<div className="cw-delete" onClick={() => disconnectAccount(acc)}>
+								<div
+									className="cw-delete"
+									onClick={() => disconnectAccount({ account: acc, place: 'wallets' })}
+								>
 									<CrossSvg />
 								</div>
 							</div>
@@ -116,7 +119,7 @@ export const NewWalletsPage = observer(() => {
 					<div
 						className="cw-block emphaized"
 						onClick={async () => {
-							const account = await connectAccount();
+							const account = await connectAccount({ place: 'wallets' });
 
 							if (account) {
 								await showStaticComponent(resolve => <AccountConnectedModal onClose={resolve} />);

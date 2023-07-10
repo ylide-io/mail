@@ -53,8 +53,12 @@ export class FeedStore {
 			this.loaded = true;
 			this.error = false;
 
-			if (params.needOld && this.categories.length === 1) {
-				analytics.feedPageLoaded(this.categories[0], Math.floor(this.posts.length / FEED_PAGE_SIZE) + 1);
+			if (params.needOld) {
+				if (this.posts.length) {
+					analytics.feedLoadMore(this.categories);
+				} else {
+					analytics.feedView(this.categories);
+				}
 			}
 
 			return response;

@@ -592,9 +592,17 @@ export function useOpenMailCompose() {
 	const navigate = useNav();
 
 	return useCallback(
-		({ mailData }: { mailData?: OutgoingMailData } = {}) => {
+		({
+			mailData,
+			forceComposePage,
+			place,
+		}: { mailData?: OutgoingMailData; forceComposePage?: boolean; place?: string } = {}) => {
+			if (place) {
+				analytics.openCompose(place);
+			}
+
 			if (!matchPath(RoutePath.MAIL_COMPOSE, location.pathname)) {
-				if (browserStorage.widgetId === WidgetId.MAILBOX) {
+				if (browserStorage.widgetId === WidgetId.MAILBOX || forceComposePage) {
 					getGlobalOutgoingMailData().reset(mailData);
 					navigate(generatePath(RoutePath.MAIL_COMPOSE));
 				} else {

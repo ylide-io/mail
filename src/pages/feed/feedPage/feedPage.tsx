@@ -15,6 +15,7 @@ import { YlideLoader } from '../../../components/ylideLoader/ylideLoader';
 import { AppMode, REACT_APP__APP_MODE } from '../../../env';
 import { ReactComponent as ArrowUpSvg } from '../../../icons/ic20/arrowUp.svg';
 import { ReactComponent as CrossSvg } from '../../../icons/ic20/cross.svg';
+import { analytics } from '../../../stores/Analytics';
 import { useDomainAccounts, useVenomAccounts } from '../../../stores/Domain';
 import { FeedStore, getFeedCategoryName } from '../../../stores/Feed';
 import { RoutePath } from '../../../stores/routePath';
@@ -141,7 +142,10 @@ const RegularFeedContent = observer(() => {
 									Your crypto account doesn't have any tokens or transactions that we can use to build
 									the Feed for you. You can connect another account anytime.
 								</div>
-								<ActionButton look={ActionButtonLook.PRIMARY} onClick={() => connectAccount()}>
+								<ActionButton
+									look={ActionButtonLook.PRIMARY}
+									onClick={() => connectAccount({ place: 'feed_no-posts-for-account' })}
+								>
 									Connect another account
 								</ActionButton>
 							</>
@@ -159,7 +163,10 @@ const RegularFeedContent = observer(() => {
 							<div>
 								You need to connect a crypto wallet in order to use <b>Smart feed</b> 🔥
 							</div>
-							<ActionButton look={ActionButtonLook.PRIMARY} onClick={() => connectAccount()}>
+							<ActionButton
+								look={ActionButtonLook.PRIMARY}
+								onClick={() => connectAccount({ place: 'feed_no-accounts' })}
+							>
 								Connect account
 							</ActionButton>
 						</ErrorMessage>
@@ -185,6 +192,8 @@ const VenomFeedContent = observer(() => {
 
 	const postsQuery = useInfiniteQuery<DecodedVenomFeedPost[]>(['feed', 'venom', 'posts', project], {
 		queryFn: async ({ pageParam = 0 }) => {
+			analytics.venomFeedView(projectMeta.id);
+
 			const posts = await VenomFilterApi.getPosts({
 				feedId: projectMeta.feedId,
 				beforeTimestamp: pageParam,
@@ -258,7 +267,7 @@ const VenomFeedContent = observer(() => {
 			{venomAccounts.length ? (
 				<CreatePostForm
 					ref={createPostFormRef}
-					feedId={projectMeta.sendFeedId || projectMeta.feedId}
+					projectMeta={projectMeta}
 					className={css.createPostForm}
 					accounts={venomAccounts}
 					isAnavailable={serviceStatus.data !== 'ACTIVE'}
@@ -268,7 +277,10 @@ const VenomFeedContent = observer(() => {
 				<ErrorMessage look={ErrorMessageLook.INFO}>
 					<div>Connect your Venom wallet to post messages to Venom feed.</div>
 
-					<ActionButton look={ActionButtonLook.PRIMARY} onClick={() => connectAccount()}>
+					<ActionButton
+						look={ActionButtonLook.PRIMARY}
+						onClick={() => connectAccount({ place: 'venom-feed_no-accounts' })}
+					>
 						Connect account
 					</ActionButton>
 				</ErrorMessage>
@@ -286,10 +298,19 @@ const VenomFeedContent = observer(() => {
 					<>
 						{messages.map((message, idx) => (
 							<VenomFeedPostItem
+								key={idx}
 								isFirstPost={idx === currentPost}
 								post={message}
 								onNextPost={() => setCurrentPost(idx + 1)}
-								onReplyClick={() => createPostFormRef.current?.replyTo(message)}
+								onReplyClick={() => {
+									analytics.venomFeedReply(projectMeta.id, message.original.id);
+
+									if (venomAccounts.length) {
+										createPostFormRef.current?.replyTo(message);
+									} else {
+										toast('You need to connect a Venom account in order to reply 👍');
+									}
+								}}
 							/>
 						))}
 
@@ -299,7 +320,12 @@ const VenomFeedContent = observer(() => {
 									<InView
 										className={css.loader}
 										rootMargin="100px"
-										onChange={inView => inView && postsQuery.fetchNextPage()}
+										onChange={inView => {
+											if (inView) {
+												analytics.venomFeedLoadMore(projectMeta.id);
+												postsQuery.fetchNextPage();
+											}
+										}}
 									>
 										<YlideLoader reason="Loading more posts ..." />
 									</InView>

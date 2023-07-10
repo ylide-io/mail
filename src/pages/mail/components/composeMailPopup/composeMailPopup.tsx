@@ -1,6 +1,6 @@
 import clsx from 'clsx';
 import { observer } from 'mobx-react';
-import React from 'react';
+import React, { useEffect } from 'react';
 import { generatePath } from 'react-router-dom';
 
 import { ActionButton, ActionButtonLook } from '../../../../components/ActionButton/ActionButton';
@@ -8,6 +8,7 @@ import { OverlappingLoader } from '../../../../components/overlappingLoader/over
 import { Popup } from '../../../../components/popup/popup';
 import { ReactComponent as CrossSvg } from '../../../../icons/ic20/cross.svg';
 import { ReactComponent as ExternalSvg } from '../../../../icons/ic20/external.svg';
+import { analytics } from '../../../../stores/Analytics';
 import { getGlobalOutgoingMailData, OutgoingMailData } from '../../../../stores/outgoingMailData';
 import { RoutePath } from '../../../../stores/routePath';
 import { useNav } from '../../../../utils/url';
@@ -23,6 +24,8 @@ export interface ComposeMailPopupProps {
 export const ComposeMailPopup = observer(({ onClose, mailData }: ComposeMailPopupProps) => {
 	const navigate = useNav();
 	const isMount = useOnMountAnimation();
+
+	useEffect(() => analytics.composeOpened('popup'), []);
 
 	return (
 		<Popup className={clsx(css.root, isMount && css.root_visible)} onClose={onClose}>

@@ -13,12 +13,12 @@ import { ReactComponent as MailSvg } from '../../../../icons/ic20/mail.svg';
 import { ReactComponent as TickSvg } from '../../../../icons/ic20/tick.svg';
 import { ReactComponent as TrashSvg } from '../../../../icons/ic20/trash.svg';
 import { IContact } from '../../../../indexedDB/IndexedDB';
+import { analytics } from '../../../../stores/Analytics';
 import contacts from '../../../../stores/Contacts';
 import domain from '../../../../stores/Domain';
-import { getGlobalOutgoingMailData } from '../../../../stores/outgoingMailData';
-import { RoutePath } from '../../../../stores/routePath';
+import { OutgoingMailData } from '../../../../stores/outgoingMailData';
 import TagsStore from '../../../../stores/Tags';
-import { useNav } from '../../../../utils/url';
+import { useOpenMailCompose } from '../../../../utils/mail';
 import css from './contactListItem.module.scss';
 
 interface ContactListItemProps {
@@ -27,8 +27,6 @@ interface ContactListItemProps {
 }
 
 export const ContactListItem = observer(({ contact, isNew }: ContactListItemProps) => {
-	const navigate = useNav();
-
 	const [isEditing, setEditing] = useState(isNew || false);
 	const [name, setName] = useState(contact.name);
 	const [address, setAddress] = useState(contact.address);
@@ -36,6 +34,8 @@ export const ContactListItem = observer(({ contact, isNew }: ContactListItemProp
 
 	const [nameError, setNameError] = useState(false);
 	const [addressError, setAddressError] = useState(false);
+
+	const openMailCompose = useOpenMailCompose();
 
 	const onNameEdit = (value: string) => {
 		setName(value);
@@ -50,6 +50,7 @@ export const ContactListItem = observer(({ contact, isNew }: ContactListItemProp
 	const [selectedTagIds, setSelectedTagIds] = useState(contact.tags);
 
 	const editClickHandler = () => {
+		analytics.startEditingContact();
 		setEditing(true);
 	};
 
@@ -64,9 +65,11 @@ export const ContactListItem = observer(({ contact, isNew }: ContactListItemProp
 		if (checkNewContactErrors(newContact)) return;
 
 		if (isNew) {
+			analytics.finishCreatingContact('contacts');
 			contacts.resetNewContact();
 			contacts.createContact(newContact);
 		} else {
+			analytics.finishEditingContact();
 			contacts.updateContact(newContact);
 		}
 		setEditing(false);
@@ -101,13 +104,17 @@ export const ContactListItem = observer(({ contact, isNew }: ContactListItemProp
 		if (isNew) {
 			contacts.resetNewContact();
 		} else {
+			analytics.removeContact();
 			await contacts.deleteContact(contact.address);
 		}
 	};
 
 	const mailThisContact = () => {
-		getGlobalOutgoingMailData().to = new Recipients([contact.name]);
-		navigate(RoutePath.MAIL_COMPOSE);
+		analytics.composeMailToContact();
+
+		const mailData = new OutgoingMailData();
+		mailData.to = new Recipients([contact.name]);
+		openMailCompose({ mailData, place: 'contacts' });
 	};
 
 	return (
