@@ -214,7 +214,6 @@ export function NewPasswordModal({ faucetType, bonus, wallet, account, remoteKey
 					bonus: boolean,
 					doWait: boolean,
 				) {
-					browserStorage.canSkipRegistration = true;
 					console.log('public key: ', '0x' + new SmartBuffer(account.key.keypair.publicKey).toHexString());
 					setStep(Step.GENERATE_KEY);
 					const chainId = chainIdByFaucetType(faucetType);

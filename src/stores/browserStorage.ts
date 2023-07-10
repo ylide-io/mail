@@ -11,7 +11,6 @@ enum BrowserStorageKey {
 	USER_ADMIN_PASSWORD = 'ylide_userAdminPassword',
 	IS_MAIN_VIEW_BANNER_HIDDEN = 'ylide_isMainViewBannerHidden',
 	ACCOUNT_REMOTE_KEYS = 'ylide_accountRemoteKeys',
-	CAN_SKIP_REGISTRATION = 'can_skip_registration',
 	SIDEBAR_FOLDED_SECTIONS = 'ylide_sidebarFoldedSections',
 	SAVE_DECODED_MESSAGES = 'ylide_saveDecodedMessages',
 	WIDGET_ID = 'ylide_widgetId',
@@ -170,19 +169,6 @@ class BrowserStorage {
 
 		this._accountRemoteKeys = _accountRemoteKeys;
 		BrowserStorage.setItem(BrowserStorageKey.ACCOUNT_REMOTE_KEYS, JSON.stringify(_accountRemoteKeys));
-	}
-
-	//
-
-	private _canSkipRegistration = BrowserStorage.getItem(BrowserStorageKey.CAN_SKIP_REGISTRATION) === 'true';
-
-	get canSkipRegistration() {
-		return this._canSkipRegistration;
-	}
-
-	set canSkipRegistration(value: boolean) {
-		BrowserStorage.setItem(BrowserStorageKey.CAN_SKIP_REGISTRATION, value);
-		this._canSkipRegistration = value;
 	}
 
 	//
