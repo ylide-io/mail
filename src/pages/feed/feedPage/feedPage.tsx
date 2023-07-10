@@ -304,7 +304,12 @@ const VenomFeedContent = observer(() => {
 								onNextPost={() => setCurrentPost(idx + 1)}
 								onReplyClick={() => {
 									analytics.venomFeedReply(projectMeta.id, message.original.id);
-									createPostFormRef.current?.replyTo(message);
+
+									if (venomAccounts.length) {
+										createPostFormRef.current?.replyTo(message);
+									} else {
+										toast('You need to connect a Venom account in order to reply 👍');
+									}
 								}}
 							/>
 						))}
