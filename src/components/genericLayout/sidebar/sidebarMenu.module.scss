@@ -77,13 +77,15 @@
 }
 
 .sectionLinkTitle {
+	@include truncate-text;
+	flex: 1 1;
 	padding: 0 4px 0 0;
 	min-width: 0;
 	line-height: 20px;
 }
 
 .sectionRightButton {
-	margin: -99px 0 -99px auto;
+	margin: -99px 0;
 	opacity: 0.25;
 
 	&:hover,
@@ -129,5 +131,32 @@
 
 	@include less920px {
 		display: block;
+	}
+}
+
+//
+
+.inboxButton {
+	display: flex;
+	align-items: center;
+}
+
+.inboxNotification {
+	@include expand-click-area;
+	margin: 0 0 0 8px;
+	width: 6px;
+	height: 6px;
+	background: var(--error-color);
+	border-radius: 50%;
+	animation: inboxNotification-keyframes 10s linear infinite;
+}
+
+@keyframes inboxNotification-keyframes {
+	0% {
+		box-shadow: 0 0 0 0 rgba(var(--error-rgb-color), 0.3);
+	}
+
+	20% {
+		box-shadow: 0 0 0 8px rgba(var(--error-rgb-color), 0);
 	}
 }

@@ -206,7 +206,7 @@ export class MailList<M = ILinkedMessage> {
 
 		await this.stream.resume().then(async () => {
 			if (this.isDestroyed) return;
-			this.loadNextPage();
+			return this.loadNextPage();
 		});
 	}
 

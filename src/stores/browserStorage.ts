@@ -15,6 +15,7 @@ enum BrowserStorageKey {
 	SAVE_DECODED_MESSAGES = 'ylide_saveDecodedMessages',
 	WIDGET_ID = 'ylide_widgetId',
 	MAIN_VIEW_KEYS = 'ylide_mainViewKeys',
+	LAST_MAILBOX_INCOMING_DATE = 'ylide_lastMailboxIncomingDate',
 }
 
 interface AccountRemotePublicKey {
@@ -233,6 +234,20 @@ class BrowserStorage {
 	set mainViewKeys(value: Record<string, string | undefined>) {
 		BrowserStorage.setItem(BrowserStorageKey.MAIN_VIEW_KEYS, JSON.stringify(value));
 		this._mainViewKeys = value;
+	}
+
+	//
+
+	private _lastMailboxIncomingDate: Record<string, number> =
+		BrowserStorage.getItemWithTransform(BrowserStorageKey.LAST_MAILBOX_INCOMING_DATE, JSON.parse) || {};
+
+	get lastMailboxIncomingDate() {
+		return this._lastMailboxIncomingDate;
+	}
+
+	set lastMailboxIncomingDate(value: Record<string, number>) {
+		BrowserStorage.setItem(BrowserStorageKey.LAST_MAILBOX_INCOMING_DATE, JSON.stringify(value));
+		this._lastMailboxIncomingDate = value;
 	}
 }
 

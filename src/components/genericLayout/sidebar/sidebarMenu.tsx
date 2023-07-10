@@ -2,6 +2,7 @@ import clsx from 'clsx';
 import { observable } from 'mobx';
 import { observer } from 'mobx-react';
 import React, { PropsWithChildren, ReactNode, useState } from 'react';
+import { useQuery } from 'react-query';
 import { generatePath, useLocation } from 'react-router-dom';
 
 import { FeedCategory } from '../../../api/feedServerApi';
@@ -31,9 +32,9 @@ import { sideTechnologyIcon } from '../../../icons/static/sideTechnologyIcon';
 import { FeedSettingsPopup } from '../../../pages/feed/components/feedSettingsPopup/feedSettingsPopup';
 import { analytics } from '../../../stores/Analytics';
 import { browserStorage } from '../../../stores/browserStorage';
-import domain from '../../../stores/Domain';
+import domain, { useDomainAccounts } from '../../../stores/Domain';
 import { getFeedCategoryName } from '../../../stores/Feed';
-import { FolderId } from '../../../stores/MailList';
+import { FolderId, MailList } from '../../../stores/MailList';
 import { DomainAccount } from '../../../stores/models/DomainAccount';
 import { RoutePath } from '../../../stores/routePath';
 import { VenomProjectId, venomProjectsMeta } from '../../../stores/venomProjects/venomProjects';
@@ -43,6 +44,31 @@ import { ActionButton, ActionButtonLook, ActionButtonSize } from '../../ActionBu
 import { AdaptiveText } from '../../adaptiveText/adaptiveText';
 import { PropsWithClassName } from '../../props';
 import css from './sidebarMenu.module.scss';
+
+export const isSidebarOpen = observable.box(false);
+
+export enum Section {
+	VENOM_PROJECTS = 'venom_projects',
+	FEED = 'feed',
+	FEED_DISCOVERY = 'feed_discovery',
+	MAIL = 'mail',
+	OTC = 'otc',
+}
+
+const getFeedCategoryIcon = (category: FeedCategory) => {
+	return {
+		[FeedCategory.MARKETS]: sideMarketsIcon(15),
+		[FeedCategory.ANALYTICS]: sideAnalyticsIcon(15),
+		[FeedCategory.PROJECTS]: sideProjectsIcon(15),
+		[FeedCategory.POLICY]: sidePolicyIcon(15),
+		[FeedCategory.SECURITY]: sideSecurityIcon(15),
+		[FeedCategory.TECHNOLOGY]: sideTechnologyIcon(15),
+		[FeedCategory.CULTURE]: sideCultureIcon(15),
+		[FeedCategory.EDUCATION]: sideEducationIcon(18),
+	}[category];
+};
+
+//
 
 interface SidebarBurgerProps extends PropsWithClassName, PropsWithChildren<{}> {}
 
@@ -149,32 +175,97 @@ export const SidebarButton = observer(({ look, href, icon, name, rightButton }: 
 
 //
 
-export const isSidebarOpen = observable.box(false);
-
-export enum Section {
-	VENOM_PROJECTS = 'venom_projects',
-	FEED = 'feed',
-	FEED_DISCOVERY = 'feed_discovery',
-	MAIL = 'mail',
-	OTC = 'otc',
-}
-
-const getFeedCategoryIcon = (category: FeedCategory) => {
-	return {
-		[FeedCategory.MARKETS]: sideMarketsIcon(15),
-		[FeedCategory.ANALYTICS]: sideAnalyticsIcon(15),
-		[FeedCategory.PROJECTS]: sideProjectsIcon(15),
-		[FeedCategory.POLICY]: sidePolicyIcon(15),
-		[FeedCategory.SECURITY]: sideSecurityIcon(15),
-		[FeedCategory.TECHNOLOGY]: sideTechnologyIcon(15),
-		[FeedCategory.CULTURE]: sideCultureIcon(15),
-		[FeedCategory.EDUCATION]: sideEducationIcon(18),
-	}[category];
-};
-
-export const SidebarMenu = observer(() => {
+export const SidebarMailSection = observer(() => {
 	const openMailCompose = useOpenMailCompose();
 
+	const accounts = useDomainAccounts();
+
+	const [hasNewMessages, setHasNewMessages] = useState(false);
+
+	useQuery(['mailbox', 'new-inbox-messages'], {
+		queryFn: async () => {
+			if (hasNewMessages) return;
+
+			const data: Array<{ address: string; lastMessageDate?: number }> = await Promise.all(
+				accounts.map(async account => {
+					const mailList = new MailList();
+
+					await mailList.init({
+						mailbox: {
+							accounts: [account],
+							folderId: FolderId.Inbox,
+						},
+					});
+
+					return {
+						address: account.account.address,
+						lastMessageDate: mailList.messages[0]?.msg.createdAt,
+					};
+				}),
+			);
+
+			const hasNew = data.some(d => {
+				const lastCachedDate = browserStorage.lastMailboxIncomingDate[d.address];
+				return lastCachedDate && d.lastMessageDate && lastCachedDate < d.lastMessageDate;
+			});
+
+			setHasNewMessages(hasNew);
+
+			if (!hasNew) {
+				browserStorage.lastMailboxIncomingDate = data.reduce((res, item) => {
+					if (item.lastMessageDate) {
+						res[item.address] = item.lastMessageDate;
+					}
+
+					return res;
+				}, {} as Record<string, number>);
+			}
+		},
+		refetchInterval: 60 * 1000,
+	});
+
+	return (
+		<SidebarSection section={Section.MAIL} title="Mail">
+			<ActionButton
+				look={ActionButtonLook.PRIMARY}
+				className={css.sectionButton}
+				onClick={() => {
+					isSidebarOpen.set(false);
+					openMailCompose({ place: 'sidebar' });
+				}}
+			>
+				Compose mail
+			</ActionButton>
+
+			<SidebarButton
+				href={generatePath(RoutePath.MAIL_FOLDER, { folderId: FolderId.Inbox })}
+				icon={<InboxSvg />}
+				name={
+					<div className={css.inboxButton}>
+						Inbox
+						{hasNewMessages && <div className={css.inboxNotification} title="You have new messages" />}
+					</div>
+				}
+			/>
+
+			<SidebarButton
+				href={generatePath(RoutePath.MAIL_FOLDER, { folderId: FolderId.Sent })}
+				icon={<SentSvg />}
+				name="Sent"
+			/>
+
+			<SidebarButton
+				href={generatePath(RoutePath.MAIL_FOLDER, { folderId: FolderId.Archive })}
+				icon={<ArchiveSvg />}
+				name="Archive"
+			/>
+		</SidebarSection>
+	);
+});
+
+//
+
+export const SidebarMenu = observer(() => {
 	const [isFeedSettingsAccount, setFeedSettingsAccount] = useState<DomainAccount>();
 
 	function renderOtcSection() {
@@ -272,38 +363,7 @@ export const SidebarMenu = observer(() => {
 	function renderMailSection() {
 		if (REACT_APP__APP_MODE !== AppMode.HUB) return;
 
-		return (
-			<SidebarSection section={Section.MAIL} title="Mail">
-				<ActionButton
-					look={ActionButtonLook.PRIMARY}
-					className={css.sectionButton}
-					onClick={() => {
-						isSidebarOpen.set(false);
-						openMailCompose({ place: 'sidebar' });
-					}}
-				>
-					Compose mail
-				</ActionButton>
-
-				<SidebarButton
-					href={generatePath(RoutePath.MAIL_FOLDER, { folderId: FolderId.Inbox })}
-					icon={<InboxSvg />}
-					name="Inbox"
-				/>
-
-				<SidebarButton
-					href={generatePath(RoutePath.MAIL_FOLDER, { folderId: FolderId.Sent })}
-					icon={<SentSvg />}
-					name="Sent"
-				/>
-
-				<SidebarButton
-					href={generatePath(RoutePath.MAIL_FOLDER, { folderId: FolderId.Archive })}
-					icon={<ArchiveSvg />}
-					name="Archive"
-				/>
-			</SidebarSection>
-		);
+		return <SidebarMailSection />;
 	}
 
 	return (
