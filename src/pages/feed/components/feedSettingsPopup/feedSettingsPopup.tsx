@@ -68,6 +68,8 @@ export const FeedSettingsPopup = observer(({ account, onClose }: FeedSettingsPop
 	const [searchTerm, setSearchTerm] = useState('');
 
 	const sourcesByReason = useMemo(() => {
+		const config = feedSettings.getAccountConfig(account);
+
 		const sources = feedSettings.sources
 			.slice()
 			.sort(
@@ -85,7 +87,10 @@ export const FeedSettingsPopup = observer(({ account, onClose }: FeedSettingsPop
 		});
 
 		const grouped = filteredSources.reduce((res, s) => {
-			const reason = s.cryptoProjectReasons[0] || '';
+			const cryptoProjectId = s.cryptoProject?.id;
+			const cryptoProject =
+				(cryptoProjectId && config?.defaultProjects.find(p => p.projectId === cryptoProjectId)) || undefined;
+			const reason = cryptoProject?.reasons[0] || '';
 			const list = (res[reason] = res[reason] || []);
 			list.push(s);
 			return res;
@@ -108,7 +113,7 @@ export const FeedSettingsPopup = observer(({ account, onClose }: FeedSettingsPop
 				(res, reason) => ({ ...res, [reason]: grouped[reason] }),
 				{} as Record<FeedReasonOrEmpty, FeedSource[]>,
 			);
-	}, [searchTerm]);
+	}, [account, searchTerm]);
 
 	const saveConfigMutation = useMutation({
 		mutationFn: () => feedSettings.updateFeedConfig(account, selectedSourceIds),

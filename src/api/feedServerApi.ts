@@ -41,7 +41,6 @@ export interface FeedSource {
 		id: string;
 		name: string;
 	};
-	cryptoProjectReasons: FeedReason[];
 }
 
 //
@@ -152,13 +151,6 @@ export namespace FeedServerApi {
 	export type GetSourcesResponse = { sources: FeedSource[] };
 
 	export async function getSources(): Promise<GetSourcesResponse> {
-		const response = await request<GetSourcesResponse>('/sources');
-
-		// FIXME Temp
-		response.sources.forEach(s => {
-			s.cryptoProjectReasons = s.cryptoProjectReasons || [];
-		});
-
-		return response;
+		return await request<GetSourcesResponse>('/sources');
 	}
 }

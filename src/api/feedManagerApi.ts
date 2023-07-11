@@ -1,5 +1,6 @@
 import { REACT_APP__FEED_MANAGER } from '../env';
 import { createCleanSerachParams } from '../utils/url';
+import { FeedReason } from './feedServerApi';
 
 export namespace FeedManagerApi {
 	export enum ErrorCode {
@@ -113,7 +114,7 @@ export namespace FeedManagerApi {
 	export interface UserProject {
 		projectId: string;
 		projectName: string;
-		reasons: string[];
+		reasons: FeedReason[];
 		reasonsRaw: string[][];
 		reasonsDataRaw: any[];
 	}
