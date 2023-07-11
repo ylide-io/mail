@@ -19,6 +19,7 @@ import { feedSettings } from '../../../../stores/FeedSettings';
 import { DomainAccount } from '../../../../stores/models/DomainAccount';
 import { toggleArrayItem } from '../../../../utils/array';
 import { invariant } from '../../../../utils/assert';
+import { reloadFeed } from '../../feedPage/feedPage';
 import { FeedLinkTypeIcon } from '../feedLinkTypeIcon/feedLinkTypeIcon';
 import css from './feedSettingsPopup.module.scss';
 
@@ -117,7 +118,10 @@ export const FeedSettingsPopup = observer(({ account, onClose }: FeedSettingsPop
 
 	const saveConfigMutation = useMutation({
 		mutationFn: () => feedSettings.updateFeedConfig(account, selectedSourceIds),
-		onSuccess: () => onClose?.(),
+		onSuccess: () => {
+			onClose?.();
+			reloadFeed();
+		},
 		onError: () => toast("Couldn't save your feed settings. Please try again."),
 	});
 

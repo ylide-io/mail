@@ -1,3 +1,4 @@
+import { observable } from 'mobx';
 import { observer } from 'mobx-react';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { InView } from 'react-intersection-observer';
@@ -18,7 +19,6 @@ import { ReactComponent as CrossSvg } from '../../../icons/ic20/cross.svg';
 import { analytics } from '../../../stores/Analytics';
 import { useDomainAccounts, useVenomAccounts } from '../../../stores/Domain';
 import { FeedStore, getFeedCategoryName } from '../../../stores/Feed';
-import { feedSettings } from '../../../stores/FeedSettings';
 import { RoutePath } from '../../../stores/routePath';
 import { VenomProjectId, venomProjectsMeta } from '../../../stores/venomProjects/venomProjects';
 import { connectAccount } from '../../../utils/account';
@@ -30,6 +30,14 @@ import { FeedPostItem } from '../components/feedPostItem/feedPostItem';
 import { VenomFeedPostItem } from '../components/venomFeedPostItem/venomFeedPostItem';
 import css from './feedPage.module.scss';
 import ErrorCode = FeedServerApi.ErrorCode;
+
+const reloadFeedCounter = observable.box(0);
+
+export function reloadFeed() {
+	reloadFeedCounter.set(reloadFeedCounter.get() + 1);
+}
+
+//
 
 const RegularFeedContent = observer(() => {
 	const location = useLocation();
@@ -62,10 +70,10 @@ const RegularFeedContent = observer(() => {
 		isAllPosts ||
 		(!!accounts.length && (REACT_APP__APP_MODE !== AppMode.MAIN_VIEW || accounts.every(a => a.mainViewKey)));
 
-	const feedSettingsUpdateCounter = feedSettings.updateCounter;
+	const reloadCounter = reloadFeedCounter.get();
 
 	const feed = useMemo(() => {
-		hookDependency(feedSettingsUpdateCounter);
+		hookDependency(reloadCounter);
 
 		const feed = new FeedStore({
 			categories: category ? [category] : isAllPosts ? Object.values(FeedCategory) : undefined,
@@ -80,7 +88,7 @@ const RegularFeedContent = observer(() => {
 		}
 
 		return feed;
-	}, [canLoadFeed, category, genericLayoutApi, isAllPosts, selectedAccounts, source, feedSettingsUpdateCounter]);
+	}, [canLoadFeed, category, genericLayoutApi, isAllPosts, selectedAccounts, source, reloadCounter]);
 
 	return (
 		<NarrowContent
