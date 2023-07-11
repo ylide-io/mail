@@ -200,6 +200,7 @@ workflows:
                           only:
                               - hub-release
                               - otc-release
+                              - mainview-release
                               - dev
             - build_hub:
                   requires:
