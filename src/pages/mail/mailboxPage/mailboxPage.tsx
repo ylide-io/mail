@@ -10,6 +10,7 @@ import { FullPageContent } from '../../../components/genericLayout/content/fullP
 import { GenericLayout } from '../../../components/genericLayout/genericLayout';
 import { YlideLoader } from '../../../components/ylideLoader/ylideLoader';
 import { analytics } from '../../../stores/Analytics';
+import { browserStorage } from '../../../stores/browserStorage';
 import domain, { useDomainAccounts } from '../../../stores/Domain';
 import { FolderId, ILinkedMessage, MailList, mailStore } from '../../../stores/MailList';
 import { useNav } from '../../../utils/url';
@@ -125,6 +126,13 @@ export const MailboxPage = observer(() => {
 			}),
 		[itemSize, mailList, scrollParams],
 	);
+
+	useEffect(() => {
+		if (folderId === FolderId.Inbox) {
+			// Reset
+			browserStorage.lastMailboxIncomingDate = {};
+		}
+	}, [folderId]);
 
 	return (
 		<GenericLayout>

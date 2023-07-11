@@ -11,11 +11,11 @@ enum BrowserStorageKey {
 	USER_ADMIN_PASSWORD = 'ylide_userAdminPassword',
 	IS_MAIN_VIEW_BANNER_HIDDEN = 'ylide_isMainViewBannerHidden',
 	ACCOUNT_REMOTE_KEYS = 'ylide_accountRemoteKeys',
-	CAN_SKIP_REGISTRATION = 'can_skip_registration',
 	SIDEBAR_FOLDED_SECTIONS = 'ylide_sidebarFoldedSections',
 	SAVE_DECODED_MESSAGES = 'ylide_saveDecodedMessages',
 	WIDGET_ID = 'ylide_widgetId',
 	MAIN_VIEW_KEYS = 'ylide_mainViewKeys',
+	LAST_MAILBOX_INCOMING_DATE = 'ylide_lastMailboxIncomingDate',
 }
 
 interface AccountRemotePublicKey {
@@ -174,19 +174,6 @@ class BrowserStorage {
 
 	//
 
-	private _canSkipRegistration = BrowserStorage.getItem(BrowserStorageKey.CAN_SKIP_REGISTRATION) === 'true';
-
-	get canSkipRegistration() {
-		return this._canSkipRegistration;
-	}
-
-	set canSkipRegistration(value: boolean) {
-		BrowserStorage.setItem(BrowserStorageKey.CAN_SKIP_REGISTRATION, value);
-		this._canSkipRegistration = value;
-	}
-
-	//
-
 	private _sidebarFoldedSections =
 		BrowserStorage.getItemWithTransform(
 			BrowserStorageKey.SIDEBAR_FOLDED_SECTIONS,
@@ -247,6 +234,20 @@ class BrowserStorage {
 	set mainViewKeys(value: Record<string, string | undefined>) {
 		BrowserStorage.setItem(BrowserStorageKey.MAIN_VIEW_KEYS, JSON.stringify(value));
 		this._mainViewKeys = value;
+	}
+
+	//
+
+	private _lastMailboxIncomingDate: Record<string, number> =
+		BrowserStorage.getItemWithTransform(BrowserStorageKey.LAST_MAILBOX_INCOMING_DATE, JSON.parse) || {};
+
+	get lastMailboxIncomingDate() {
+		return this._lastMailboxIncomingDate;
+	}
+
+	set lastMailboxIncomingDate(value: Record<string, number>) {
+		BrowserStorage.setItem(BrowserStorageKey.LAST_MAILBOX_INCOMING_DATE, JSON.stringify(value));
+		this._lastMailboxIncomingDate = value;
 	}
 }
 
