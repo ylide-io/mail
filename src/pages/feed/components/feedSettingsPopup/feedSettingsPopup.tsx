@@ -124,7 +124,7 @@ export const FeedSettingsPopup = observer(({ account, onClose }: FeedSettingsPop
 	return (
 		<Modal className={css.root} onClose={onClose}>
 			<div className={css.header}>
-				<div className={css.title}>My Feed Settings</div>
+				<div className={css.title}>Feed Settings</div>
 				<div className={css.description}>Select sources you want to see in your Feed</div>
 			</div>
 

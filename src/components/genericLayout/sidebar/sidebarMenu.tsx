@@ -129,6 +129,7 @@ interface SidebarButtonProps {
 	name: ReactNode;
 	rightButton?: {
 		icon: ReactNode;
+		title?: string;
 		onClick: () => void;
 	};
 }
@@ -164,6 +165,7 @@ export const SidebarButton = observer(({ look, href, icon, name, rightButton }: 
 					className={css.sectionRightButton}
 					look={ActionButtonLook.LITE}
 					icon={rightButton.icon}
+					title={rightButton.title}
 					onClick={e => {
 						e.preventDefault();
 						e.stopPropagation();
@@ -300,6 +302,7 @@ export const SidebarMenu = observer(() => {
 							REACT_APP__APP_MODE === AppMode.MAIN_VIEW
 								? {
 										icon: <SettingsSvg />,
+										title: 'Feed Settings',
 										onClick: () => {
 											if (!account.mainViewKey) {
 												return toast('Please complete the onboarding first ❤');
