@@ -29,6 +29,7 @@ const txPrices: Record<EVMNetwork, number> = {
 	[EVMNetwork.MOONRIVER]: 0.001,
 	[EVMNetwork.METIS]: 0.001,
 	[EVMNetwork.ASTAR]: 0.001,
+	[EVMNetwork.SHARDEUM]: 0.001,
 };
 
 //

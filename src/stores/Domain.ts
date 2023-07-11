@@ -96,6 +96,7 @@ if (REACT_APP__APP_MODE === AppMode.OTC) {
 	Ylide.registerBlockchainFactory(evmBlockchainFactories[EVMNetwork.MOONBEAM]);
 	Ylide.registerBlockchainFactory(evmBlockchainFactories[EVMNetwork.MOONRIVER]);
 	Ylide.registerBlockchainFactory(evmBlockchainFactories[EVMNetwork.METIS]);
+	Ylide.registerBlockchainFactory(evmBlockchainFactories[EVMNetwork.SHARDEUM]);
 
 	if (REACT_APP__APP_MODE !== AppMode.MAIN_VIEW) {
 		Ylide.registerBlockchainFactory(everscaleBlockchainFactory);

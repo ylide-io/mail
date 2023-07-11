@@ -18,6 +18,7 @@ import { MoonriverLogo } from '../icons/network/MoonriverLogo';
 import { NearLogo } from '../icons/network/NearLogo';
 import { OptimismLogo } from '../icons/network/OptimismLogo';
 import { PolygonLogo } from '../icons/network/PolygonLogo';
+import { ShardeumLogo } from '../icons/network/ShardeumLogo';
 import { SolanaLogo } from '../icons/network/SolanaLogo';
 import { VenomLogo } from '../icons/network/VenomLogo';
 import domain from '../stores/Domain';
@@ -443,6 +444,21 @@ export const blockchainMeta: Record<
 				'https://1rpc.io/astr',
 			],
 			blockExplorerUrls: ['https://astar.subscan.io'],
+		},
+	},
+	[EVM_NAMES[EVMNetwork.SHARDEUM]]: {
+		title: 'Shardeum',
+		logo: (s = 16) => <ShardeumLogo size={s} />,
+		ethNetwork: {
+			chainId: '0x1F91',
+			chainName: 'Shardeum',
+			nativeCurrency: {
+				name: 'Shardeum',
+				symbol: 'SHM',
+				decimals: 18,
+			},
+			rpcUrls: ['https://dapps.shardeum.org'],
+			blockExplorerUrls: ['https://explorer-dapps.shardeum.org'],
 		},
 	},
 	'solana': {
