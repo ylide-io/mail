@@ -61,7 +61,7 @@ export interface FeedSettingsPopupProps {
 export const FeedSettingsPopup = observer(({ account, onClose }: FeedSettingsPopupProps) => {
 	invariant(account.mainViewKey, 'FeedSettings only supports MV accounts');
 
-	const data = feedSettings.getData(account);
+	const config = feedSettings.getAccountConfig(account);
 	const [selectedSourceIds, setSelectedSourceIds] = useState(feedSettings.getSelectedSourceIds(account));
 
 	const [isSearchOpen, setSearchOpen] = useState(false);
@@ -124,7 +124,7 @@ export const FeedSettingsPopup = observer(({ account, onClose }: FeedSettingsPop
 			</div>
 
 			<div className={css.list}>
-				{data ? (
+				{config ? (
 					Object.keys(sourcesByReason).length ? (
 						(Object.entries(sourcesByReason) as [FeedReasonOrEmpty, FeedSource[]][]).map(
 							([reason, sources]) => (
@@ -200,7 +200,7 @@ export const FeedSettingsPopup = observer(({ account, onClose }: FeedSettingsPop
 				</div>
 
 				<div className={css.footerRight}>
-					{data ? (
+					{config ? (
 						isSearchOpen ? (
 							<TextField
 								look={TextFieldLook.LITE}

@@ -48,22 +48,22 @@ export class FeedSettings {
 		});
 	}
 
-	getData(account: DomainAccount): FeedSettingsData | undefined {
+	getAccountConfig(account: DomainAccount): FeedSettingsData | undefined {
 		const data = this.data.get(account);
 		if (data && data !== 'loading') return data;
 	}
 
 	getSelectedSourceIds(account: DomainAccount) {
-		const data = this.getData(account);
-		if (!data) return [];
+		const config = this.getAccountConfig(account);
+		if (!config) return [];
 
-		const defaultProjectIds = data.defaultProjects.map(p => p.projectId);
+		const defaultProjectIds = config.defaultProjects.map(p => p.projectId);
 
 		return this.sources
 			.filter(source =>
 				source.cryptoProject?.id && defaultProjectIds.includes(source.cryptoProject.id)
-					? !data.excludedProjectIds.includes(source.id)
-					: data.includedProjectIds.includes(source.id),
+					? !config.excludedProjectIds.includes(source.id)
+					: config.includedProjectIds.includes(source.id),
 			)
 			.map(s => s.id);
 	}
@@ -73,12 +73,12 @@ export class FeedSettings {
 	}
 
 	async updateFeedConfig(account: DomainAccount, selectedSourceIds: string[]) {
-		const data = this.getData(account);
-		if (!data) return;
+		const config = this.getAccountConfig(account);
+		if (!config) return;
 
-		const defaultProjectIds = data.defaultProjects.map(p => p.projectId);
+		const defaultProjectIds = config.defaultProjects.map(p => p.projectId);
 
-		data.excludedProjectIds = this.sources
+		config.excludedProjectIds = this.sources
 			.filter(
 				source =>
 					!selectedSourceIds.includes(source.id) &&
@@ -86,7 +86,7 @@ export class FeedSettings {
 			)
 			.map(s => s.id);
 
-		data.includedProjectIds = this.sources
+		config.includedProjectIds = this.sources
 			.filter(
 				source =>
 					selectedSourceIds.includes(source.id) &&
@@ -98,9 +98,9 @@ export class FeedSettings {
 		await FeedManagerApi.setConfig({
 			token: account.mainViewKey,
 			config: {
-				mode: data.mode,
-				excludedProjectIds: data.excludedProjectIds,
-				includedProjectIds: data.includedProjectIds,
+				mode: config.mode,
+				excludedProjectIds: config.excludedProjectIds,
+				includedProjectIds: config.includedProjectIds,
 			},
 		});
 	}
