@@ -98,7 +98,7 @@ interface AddtoMyFeedItemProps {
 	account: DomainAccount;
 }
 
-export const AddtoMyFeedItem = observer(({ post, account }: AddtoMyFeedItemProps) => {
+export const AddToMyFeedItem = observer(({ post, account }: AddtoMyFeedItemProps) => {
 	const [isUpdating, setUpdating] = useState(false);
 
 	const isSelected = feedSettings.isSourceSelected(account, post.sourceId);
@@ -165,7 +165,7 @@ export const AddToMyFeedButton = observer(({ post }: AddToMyFeedButtonProps) => 
 					onCloseRequest={() => setListOpen(false)}
 				>
 					{mvAccounts.map(account => (
-						<AddtoMyFeedItem post={post} account={account} />
+						<AddToMyFeedItem post={post} account={account} />
 					))}
 				</DropDown>
 			)}

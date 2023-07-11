@@ -19,6 +19,7 @@ import { feedSettings } from '../../../../stores/FeedSettings';
 import { DomainAccount } from '../../../../stores/models/DomainAccount';
 import { toggleArrayItem } from '../../../../utils/array';
 import { invariant } from '../../../../utils/assert';
+import { reloadFeed } from '../../feedPage/feedPage';
 import { FeedLinkTypeIcon } from '../feedLinkTypeIcon/feedLinkTypeIcon';
 import css from './feedSettingsPopup.module.scss';
 
@@ -61,13 +62,15 @@ export interface FeedSettingsPopupProps {
 export const FeedSettingsPopup = observer(({ account, onClose }: FeedSettingsPopupProps) => {
 	invariant(account.mainViewKey, 'FeedSettings only supports MV accounts');
 
-	const data = feedSettings.getData(account);
+	const config = feedSettings.getAccountConfig(account);
 	const [selectedSourceIds, setSelectedSourceIds] = useState(feedSettings.getSelectedSourceIds(account));
 
 	const [isSearchOpen, setSearchOpen] = useState(false);
 	const [searchTerm, setSearchTerm] = useState('');
 
 	const sourcesByReason = useMemo(() => {
+		const config = feedSettings.getAccountConfig(account);
+
 		const sources = feedSettings.sources
 			.slice()
 			.sort(
@@ -85,7 +88,10 @@ export const FeedSettingsPopup = observer(({ account, onClose }: FeedSettingsPop
 		});
 
 		const grouped = filteredSources.reduce((res, s) => {
-			const reason = s.cryptoProjectReasons[0] || '';
+			const cryptoProjectId = s.cryptoProject?.id;
+			const cryptoProject =
+				(cryptoProjectId && config?.defaultProjects.find(p => p.projectId === cryptoProjectId)) || undefined;
+			const reason = cryptoProject?.reasons[0] || '';
 			const list = (res[reason] = res[reason] || []);
 			list.push(s);
 			return res;
@@ -108,23 +114,26 @@ export const FeedSettingsPopup = observer(({ account, onClose }: FeedSettingsPop
 				(res, reason) => ({ ...res, [reason]: grouped[reason] }),
 				{} as Record<FeedReasonOrEmpty, FeedSource[]>,
 			);
-	}, [searchTerm]);
+	}, [account, searchTerm]);
 
 	const saveConfigMutation = useMutation({
 		mutationFn: () => feedSettings.updateFeedConfig(account, selectedSourceIds),
-		onSuccess: () => onClose?.(),
+		onSuccess: () => {
+			onClose?.();
+			reloadFeed();
+		},
 		onError: () => toast("Couldn't save your feed settings. Please try again."),
 	});
 
 	return (
 		<Modal className={css.root} onClose={onClose}>
 			<div className={css.header}>
-				<div className={css.title}>My Feed Settings</div>
+				<div className={css.title}>Feed Settings</div>
 				<div className={css.description}>Select sources you want to see in your Feed</div>
 			</div>
 
 			<div className={css.list}>
-				{data ? (
+				{config ? (
 					Object.keys(sourcesByReason).length ? (
 						(Object.entries(sourcesByReason) as [FeedReasonOrEmpty, FeedSource[]][]).map(
 							([reason, sources]) => (
@@ -200,7 +209,7 @@ export const FeedSettingsPopup = observer(({ account, onClose }: FeedSettingsPop
 				</div>
 
 				<div className={css.footerRight}>
-					{data ? (
+					{config ? (
 						isSearchOpen ? (
 							<TextField
 								look={TextFieldLook.LITE}
