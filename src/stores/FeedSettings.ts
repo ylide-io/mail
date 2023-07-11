@@ -13,11 +13,14 @@ export interface FeedSettingsData {
 }
 
 export class FeedSettings {
-	@observable isError = false;
+	@observable
+	isError = false;
 
-	@observable.shallow sources: FeedSource[] = [];
+	@observable.shallow
+	sources: FeedSource[] = [];
 
-	@observable private data = new Map<DomainAccount, FeedSettingsData | 'loading'>();
+	@observable
+	private configs = new Map<DomainAccount, FeedSettingsData | 'loading'>();
 
 	constructor() {
 		makeObservable(this);
@@ -28,14 +31,14 @@ export class FeedSettings {
 
 		autorun(() => {
 			domain.accounts.activeAccounts
-				.filter(account => account.mainViewKey && !this.data.has(account))
+				.filter(account => account.mainViewKey && !this.configs.has(account))
 				.forEach(async account => {
 					try {
-						this.data.set(account, 'loading');
+						this.configs.set(account, 'loading');
 
 						const config = await FeedManagerApi.getConfig({ token: account.mainViewKey });
 
-						this.data.set(account, {
+						this.configs.set(account, {
 							mode: config.config.mode,
 							includedSourceIds: config.config.includedSourceIds,
 							excludedSourceIds: config.config.excludedSourceIds,
@@ -49,8 +52,8 @@ export class FeedSettings {
 	}
 
 	getAccountConfig(account: DomainAccount): FeedSettingsData | undefined {
-		const data = this.data.get(account);
-		if (data && data !== 'loading') return data;
+		const config = this.configs.get(account);
+		if (config && config !== 'loading') return config;
 	}
 
 	getSelectedSourceIds(account: DomainAccount) {
