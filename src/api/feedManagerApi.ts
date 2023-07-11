@@ -127,8 +127,8 @@ export namespace FeedManagerApi {
 	export interface ConfigEntity {
 		address: string;
 		mode: ConfigMode;
-		includedProjectIds: string[];
-		excludedProjectIds: string[];
+		includedSourceIds: string[];
+		excludedSourceIds: string[];
 		lastLoginTimestamp: number;
 	}
 
@@ -145,8 +145,8 @@ export namespace FeedManagerApi {
 		token: string;
 		config: {
 			mode: ConfigMode;
-			includedProjectIds: string[];
-			excludedProjectIds: string[];
+			includedSourceIds: string[];
+			excludedSourceIds: string[];
 		};
 	}) {
 		return await request(`/set-config`, {}, data);
