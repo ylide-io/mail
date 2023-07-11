@@ -82,7 +82,8 @@ export class FeedSettings {
 			.filter(
 				source =>
 					!selectedSourceIds.includes(source.id) &&
-					(!source.cryptoProject?.id || defaultProjectIds.includes(source.cryptoProject.id)),
+					source.cryptoProject?.id &&
+					defaultProjectIds.includes(source.cryptoProject.id),
 			)
 			.map(s => s.id);
 
@@ -90,8 +91,7 @@ export class FeedSettings {
 			.filter(
 				source =>
 					selectedSourceIds.includes(source.id) &&
-					source.cryptoProject?.id &&
-					!defaultProjectIds.includes(source.cryptoProject.id),
+					(!source.cryptoProject?.id || !defaultProjectIds.includes(source.cryptoProject.id)),
 			)
 			.map(s => s.id);
 
