@@ -22,6 +22,9 @@ export class FeedSettings {
 	@observable
 	private configs = new Map<DomainAccount, FeedSettingsData | 'loading'>();
 
+	@observable
+	updateCounter = 0;
+
 	constructor() {
 		makeObservable(this);
 
@@ -106,6 +109,8 @@ export class FeedSettings {
 				includedSourceIds: config.includedSourceIds,
 			},
 		});
+
+		this.updateCounter++;
 	}
 }
 

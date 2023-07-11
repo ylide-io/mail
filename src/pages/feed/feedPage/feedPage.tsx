@@ -18,10 +18,12 @@ import { ReactComponent as CrossSvg } from '../../../icons/ic20/cross.svg';
 import { analytics } from '../../../stores/Analytics';
 import { useDomainAccounts, useVenomAccounts } from '../../../stores/Domain';
 import { FeedStore, getFeedCategoryName } from '../../../stores/Feed';
+import { feedSettings } from '../../../stores/FeedSettings';
 import { RoutePath } from '../../../stores/routePath';
 import { VenomProjectId, venomProjectsMeta } from '../../../stores/venomProjects/venomProjects';
 import { connectAccount } from '../../../utils/account';
 import { invariant } from '../../../utils/assert';
+import { hookDependency } from '../../../utils/react';
 import { useNav } from '../../../utils/url';
 import { CreatePostForm, CreatePostFormApi } from '../components/createPostForm/createPostForm';
 import { FeedPostItem } from '../components/feedPostItem/feedPostItem';
@@ -60,7 +62,11 @@ const RegularFeedContent = observer(() => {
 		isAllPosts ||
 		(!!accounts.length && (REACT_APP__APP_MODE !== AppMode.MAIN_VIEW || accounts.every(a => a.mainViewKey)));
 
+	const feedSettingsUpdateCounter = feedSettings.updateCounter;
+
 	const feed = useMemo(() => {
+		hookDependency(feedSettingsUpdateCounter);
+
 		const feed = new FeedStore({
 			categories: category ? [category] : isAllPosts ? Object.values(FeedCategory) : undefined,
 			sourceId: source,
@@ -74,7 +80,7 @@ const RegularFeedContent = observer(() => {
 		}
 
 		return feed;
-	}, [canLoadFeed, category, genericLayoutApi, isAllPosts, selectedAccounts, source]);
+	}, [canLoadFeed, category, genericLayoutApi, isAllPosts, selectedAccounts, source, feedSettingsUpdateCounter]);
 
 	return (
 		<NarrowContent
