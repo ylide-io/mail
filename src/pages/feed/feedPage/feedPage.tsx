@@ -261,7 +261,7 @@ const VenomFeedContent = observer(() => {
 	const createPostFormRef = useRef<CreatePostFormApi>(null);
 
 	return (
-		<NarrowContent contentClassName={css.venomProjecsContent}>
+		<NarrowContent key={project} contentClassName={css.venomProjecsContent}>
 			<div className={css.venomProjectTitle}>
 				<div className={css.venomProjectLogo}>{projectMeta.logo}</div>
 				<div className={css.venomProjectName}>{projectMeta.name}</div>
