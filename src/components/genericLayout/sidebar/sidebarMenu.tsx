@@ -51,6 +51,7 @@ export const isSidebarOpen = observable.box(false);
 
 export enum Section {
 	VENOM_PROJECTS = 'venom_projects',
+	TVM_PROJECTS = 'tvm_projects',
 	FEED = 'feed',
 	FEED_DISCOVERY = 'feed_discovery',
 	MAIL = 'mail',
@@ -355,6 +356,20 @@ export const SidebarMenu = observer(() => {
 		);
 	}
 
+	function renderTvmProjects() {
+		if (REACT_APP__APP_MODE !== AppMode.HUB) return;
+
+		return (
+			<SidebarSection section={Section.TVM_PROJECTS} title="TVM 주요정보">
+				<SidebarButton
+					href={generatePath(RoutePath.FEED_TVM)}
+					name={venomProjectsMeta[VenomProjectId.TVM].name}
+					icon={venomProjectsMeta[VenomProjectId.TVM].logo}
+				/>
+			</SidebarSection>
+		);
+	}
+
 	function renderFeedDiscoverySection() {
 		if (REACT_APP__APP_MODE !== AppMode.MAIN_VIEW) return;
 
@@ -390,6 +405,7 @@ export const SidebarMenu = observer(() => {
 			{renderOtcSection()}
 			{renderSmartFeedSection()}
 			{renderVenomProjectsSection()}
+			{renderTvmProjects()}
 			{renderFeedDiscoverySection()}
 			{renderMailSection()}
 

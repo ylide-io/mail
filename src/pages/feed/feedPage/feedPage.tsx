@@ -194,7 +194,9 @@ const RegularFeedContent = observer(() => {
 const VenomFeedContent = observer(() => {
 	const location = useLocation();
 
-	const { project } = useParams<{ project: VenomProjectId }>();
+	const { project: projectRaw } = useParams<{ project?: VenomProjectId }>();
+	const project =
+		projectRaw || (location.pathname === generatePath(RoutePath.FEED_TVM) ? VenomProjectId.TVM : undefined);
 	invariant(project, 'Venom project must be specified');
 	const projectMeta = venomProjectsMeta[project];
 
@@ -365,7 +367,12 @@ const VenomFeedContent = observer(() => {
 export const FeedPage = () => {
 	const location = useLocation();
 	const isVenomFeed = !!matchRoutes(
-		[{ path: RoutePath.FEED_VENOM }, { path: RoutePath.FEED_VENOM_PROJECT }, { path: RoutePath.FEED_VENOM_ADMIN }],
+		[
+			{ path: RoutePath.FEED_VENOM },
+			{ path: RoutePath.FEED_VENOM_PROJECT },
+			{ path: RoutePath.FEED_VENOM_ADMIN },
+			{ path: RoutePath.FEED_TVM },
+		],
 		location.pathname,
 	)?.length;
 
