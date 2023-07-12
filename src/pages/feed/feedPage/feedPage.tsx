@@ -284,6 +284,7 @@ const VenomFeedContent = observer(() => {
 					projectMeta={projectMeta}
 					className={css.createPostForm}
 					accounts={venomAccounts}
+					displayIdeasButton={projectMeta.id === VenomProjectId.VENOM_BLOCKCHAIN}
 					isAnavailable={serviceStatus.data !== 'ACTIVE'}
 					onCreated={() => toast('Good job! Your post will appear shortly 🔥')}
 				/>
