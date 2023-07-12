@@ -161,7 +161,9 @@ export const FeedSettingsPopup = observer(({ account, onClose }: FeedSettingsPop
 														[FeedReason.PROTOCOL]: 'Projects you have position in',
 														[FeedReason.TRANSACTION]: 'Projects you used',
 												  }[reason]
-												: 'Others'}
+												: Object.keys(sourcesByReason).length === 1
+												? 'Source'
+												: 'Other sources'}
 										</div>
 										<div className={css.categoryProject}>Token / Project</div>
 									</div>
@@ -196,7 +198,7 @@ export const FeedSettingsPopup = observer(({ account, onClose }: FeedSettingsPop
 			<div className={css.footer}>
 				<div className={css.footerLeft}>
 					<ActionButton
-						isDisabled={!selectedSourceIds.length || saveConfigMutation.isLoading}
+						isDisabled={saveConfigMutation.isLoading}
 						look={ActionButtonLook.PRIMARY}
 						onClick={() => saveConfigMutation.mutate()}
 					>
