@@ -66,6 +66,8 @@ export interface FeedPost {
 	embeds: FeedPostEmbed[];
 	thread: FeedPost[];
 	cryptoProjectId: string | null;
+	cryptoProjectName: string | null;
+	cryptoProjectReasons: FeedReason[];
 }
 
 export interface FeedPostEmbed {
