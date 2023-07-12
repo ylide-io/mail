@@ -17,7 +17,7 @@ import { toast } from '../../../../components/toast/toast';
 import { AppMode, REACT_APP__APP_MODE } from '../../../../env';
 import { ReactComponent as ContactSvg } from '../../../../icons/ic20/contact.svg';
 import { ReactComponent as MenuSvg } from '../../../../icons/ic20/menu.svg';
-import { useDomainAccounts } from '../../../../stores/Domain';
+import domain from '../../../../stores/Domain';
 import { feedSettings } from '../../../../stores/FeedSettings';
 import { DomainAccount } from '../../../../stores/models/DomainAccount';
 import { RoutePath } from '../../../../stores/routePath';
@@ -142,7 +142,7 @@ interface AddToMyFeedButtonProps {
 }
 
 export const AddToMyFeedButton = observer(({ post }: AddToMyFeedButtonProps) => {
-	const accounts = useDomainAccounts();
+	const accounts = domain.accounts.activeAccounts;
 	const mvAccounts = useMemo(() => accounts.filter(a => a.mainViewKey), [accounts]);
 
 	const buttonRef = useRef(null);
@@ -195,7 +195,7 @@ export function FeedPostItem({ isInFeed, realtedAccounts, post }: FeedPostItemPr
 
 	const [unfollowedState, setUnfollowState] = useState<'none' | 'unfollowing' | 'unfollowed'>('none');
 
-	const unfollow = async (entireProject: boolean) => {
+	const unfollow = async (projectId?: string) => {
 		try {
 			setUnfollowState('unfollowing');
 
@@ -205,8 +205,8 @@ export function FeedPostItem({ isInFeed, realtedAccounts, post }: FeedPostItemPr
 				'Not all accounts have MV key',
 			);
 
-			const sourceIdsToExclude = entireProject
-				? feedSettings.sources.filter(s => s.cryptoProject?.id === post.cryptoProjectId).map(s => s.id)
+			const sourceIdsToExclude = projectId
+				? feedSettings.sources.filter(s => s.cryptoProject?.id === projectId).map(s => s.id)
 				: [post.sourceId];
 
 			invariant(sourceIdsToExclude.length, 'No source ids to exclude');
@@ -229,7 +229,12 @@ export function FeedPostItem({ isInFeed, realtedAccounts, post }: FeedPostItemPr
 		}
 	};
 
-	const reason = post.cryptoProjectReasons[0];
+	const userCryptoProject = useMemo(() => {
+		if (realtedAccounts?.length === 1 && post.cryptoProjectId) {
+			const config = feedSettings.getAccountConfig(realtedAccounts[0]);
+			return config?.defaultProjects.find(p => p.projectId === post.cryptoProjectId);
+		}
+	}, [post.cryptoProjectId, realtedAccounts]);
 
 	return (
 		<>
@@ -262,17 +267,19 @@ export function FeedPostItem({ isInFeed, realtedAccounts, post }: FeedPostItemPr
 						<div className={css.metaRight}>
 							{!realtedAccounts?.length
 								? REACT_APP__APP_MODE === AppMode.MAIN_VIEW && <AddToMyFeedButton post={post} />
-								: reason && (
+								: userCryptoProject &&
+								  !!userCryptoProject.reasons.length &&
+								  !!userCryptoProject.projectName && (
 										<div className={css.reason} title="The reason why you see this post">
 											{
 												{
 													[FeedReason.BALANCE]: "You're holding ",
 													[FeedReason.PROTOCOL]: "You're in ",
 													[FeedReason.TRANSACTION]: 'You used ',
-												}[reason]
+												}[userCryptoProject.reasons[0]]
 											}
 
-											<b>{post.cryptoProjectName}</b>
+											<b>{userCryptoProject.projectName}</b>
 										</div>
 								  )}
 
@@ -321,16 +328,16 @@ export function FeedPostItem({ isInFeed, realtedAccounts, post }: FeedPostItemPr
 
 									{!!realtedAccounts?.length && (
 										<>
-											<DropDownItem mode={DropDownItemMode.LITE} onSelect={() => unfollow(false)}>
+											<DropDownItem mode={DropDownItemMode.LITE} onSelect={() => unfollow()}>
 												Unfollow <b>{post.authorName}</b>
 											</DropDownItem>
 
-											{!!post.cryptoProjectName && (
+											{userCryptoProject && (
 												<DropDownItem
 													mode={DropDownItemMode.LITE}
-													onSelect={() => unfollow(true)}
+													onSelect={() => unfollow(userCryptoProject.projectId)}
 												>
-													Unfollow <b>{post.cryptoProjectName}</b>
+													Unfollow <b>{userCryptoProject.projectName}</b>
 												</DropDownItem>
 											)}
 										</>
