@@ -202,7 +202,9 @@ const VenomFeedContent = observer(() => {
 
 	const isAdminMode = !!matchPath(RoutePath.FEED_VENOM_ADMIN, location.pathname);
 
+	const allAccounts = useDomainAccounts();
 	const venomAccounts = useVenomAccounts();
+	const accounts = project === VenomProjectId.TVM ? allAccounts : venomAccounts;
 
 	const [currentPost, setCurrentPost] = useState<number>(0);
 
@@ -280,12 +282,12 @@ const VenomFeedContent = observer(() => {
 
 			<div className={css.divider} />
 
-			{venomAccounts.length ? (
+			{accounts.length ? (
 				<CreatePostForm
 					ref={createPostFormRef}
 					projectMeta={projectMeta}
 					className={css.createPostForm}
-					accounts={venomAccounts}
+					accounts={accounts}
 					displayIdeasButton={projectMeta.id === VenomProjectId.VENOM_BLOCKCHAIN}
 					isAnavailable={serviceStatus.data !== 'ACTIVE'}
 					onCreated={() => toast('Good job! Your post will appear shortly 🔥')}
@@ -322,7 +324,7 @@ const VenomFeedContent = observer(() => {
 								onReplyClick={() => {
 									analytics.venomFeedReply(projectMeta.id, message.original.id);
 
-									if (venomAccounts.length) {
+									if (accounts.length) {
 										createPostFormRef.current?.replyTo(message);
 									} else {
 										toast('You need to connect a Venom account in order to reply 👍');
