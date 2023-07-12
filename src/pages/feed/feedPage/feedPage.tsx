@@ -1,3 +1,4 @@
+import { observable } from 'mobx';
 import { observer } from 'mobx-react';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { InView } from 'react-intersection-observer';
@@ -22,12 +23,21 @@ import { RoutePath } from '../../../stores/routePath';
 import { VenomProjectId, venomProjectsMeta } from '../../../stores/venomProjects/venomProjects';
 import { connectAccount } from '../../../utils/account';
 import { invariant } from '../../../utils/assert';
+import { hookDependency } from '../../../utils/react';
 import { useNav } from '../../../utils/url';
 import { CreatePostForm, CreatePostFormApi } from '../components/createPostForm/createPostForm';
 import { FeedPostItem } from '../components/feedPostItem/feedPostItem';
 import { VenomFeedPostItem } from '../components/venomFeedPostItem/venomFeedPostItem';
 import css from './feedPage.module.scss';
 import ErrorCode = FeedServerApi.ErrorCode;
+
+const reloadFeedCounter = observable.box(0);
+
+export function reloadFeed() {
+	reloadFeedCounter.set(reloadFeedCounter.get() + 1);
+}
+
+//
 
 const RegularFeedContent = observer(() => {
 	const location = useLocation();
@@ -60,7 +70,11 @@ const RegularFeedContent = observer(() => {
 		isAllPosts ||
 		(!!accounts.length && (REACT_APP__APP_MODE !== AppMode.MAIN_VIEW || accounts.every(a => a.mainViewKey)));
 
+	const reloadCounter = reloadFeedCounter.get();
+
 	const feed = useMemo(() => {
+		hookDependency(reloadCounter);
+
 		const feed = new FeedStore({
 			categories: category ? [category] : isAllPosts ? Object.values(FeedCategory) : undefined,
 			sourceId: source,
@@ -74,7 +88,7 @@ const RegularFeedContent = observer(() => {
 		}
 
 		return feed;
-	}, [canLoadFeed, category, genericLayoutApi, isAllPosts, selectedAccounts, source]);
+	}, [canLoadFeed, category, genericLayoutApi, isAllPosts, selectedAccounts, source, reloadCounter]);
 
 	return (
 		<NarrowContent

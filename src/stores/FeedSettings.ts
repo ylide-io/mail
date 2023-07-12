@@ -7,17 +7,20 @@ import { DomainAccount } from './models/DomainAccount';
 
 export interface FeedSettingsData {
 	mode: FeedManagerApi.ConfigMode;
-	includedProjectIds: string[];
-	excludedProjectIds: string[];
+	includedSourceIds: string[];
+	excludedSourceIds: string[];
 	defaultProjects: FeedManagerApi.UserProject[];
 }
 
 export class FeedSettings {
-	@observable isError = false;
+	@observable
+	isError = false;
 
-	@observable.shallow sources: FeedSource[] = [];
+	@observable.shallow
+	sources: FeedSource[] = [];
 
-	@observable private data = new Map<DomainAccount, FeedSettingsData | 'loading'>();
+	@observable
+	private configs = new Map<DomainAccount, FeedSettingsData | 'loading'>();
 
 	constructor() {
 		makeObservable(this);
@@ -28,17 +31,17 @@ export class FeedSettings {
 
 		autorun(() => {
 			domain.accounts.activeAccounts
-				.filter(account => account.mainViewKey && !this.data.has(account))
+				.filter(account => account.mainViewKey && !this.configs.has(account))
 				.forEach(async account => {
 					try {
-						this.data.set(account, 'loading');
+						this.configs.set(account, 'loading');
 
 						const config = await FeedManagerApi.getConfig({ token: account.mainViewKey });
 
-						this.data.set(account, {
+						this.configs.set(account, {
 							mode: config.config.mode,
-							includedProjectIds: config.config.includedProjectIds,
-							excludedProjectIds: config.config.excludedProjectIds,
+							includedSourceIds: config.config.includedSourceIds,
+							excludedSourceIds: config.config.excludedSourceIds,
 							defaultProjects: config.defaultProjects,
 						});
 					} catch (e) {
@@ -48,22 +51,22 @@ export class FeedSettings {
 		});
 	}
 
-	getData(account: DomainAccount): FeedSettingsData | undefined {
-		const data = this.data.get(account);
-		if (data && data !== 'loading') return data;
+	getAccountConfig(account: DomainAccount): FeedSettingsData | undefined {
+		const config = this.configs.get(account);
+		if (config && config !== 'loading') return config;
 	}
 
 	getSelectedSourceIds(account: DomainAccount) {
-		const data = this.getData(account);
-		if (!data) return [];
+		const config = this.getAccountConfig(account);
+		if (!config) return [];
 
-		const defaultProjectIds = data.defaultProjects.map(p => p.projectId);
+		const defaultProjectIds = config.defaultProjects.map(p => p.projectId);
 
 		return this.sources
 			.filter(source =>
 				source.cryptoProject?.id && defaultProjectIds.includes(source.cryptoProject.id)
-					? !data.excludedProjectIds.includes(source.id)
-					: data.includedProjectIds.includes(source.id),
+					? !config.excludedSourceIds.includes(source.id)
+					: config.includedSourceIds.includes(source.id),
 			)
 			.map(s => s.id);
 	}
@@ -73,34 +76,34 @@ export class FeedSettings {
 	}
 
 	async updateFeedConfig(account: DomainAccount, selectedSourceIds: string[]) {
-		const data = this.getData(account);
-		if (!data) return;
+		const config = this.getAccountConfig(account);
+		if (!config) return;
 
-		const defaultProjectIds = data.defaultProjects.map(p => p.projectId);
+		const defaultProjectIds = config.defaultProjects.map(p => p.projectId);
 
-		data.excludedProjectIds = this.sources
+		config.excludedSourceIds = this.sources
 			.filter(
 				source =>
 					!selectedSourceIds.includes(source.id) &&
-					(!source.cryptoProject?.id || defaultProjectIds.includes(source.cryptoProject.id)),
+					source.cryptoProject?.id &&
+					defaultProjectIds.includes(source.cryptoProject.id),
 			)
 			.map(s => s.id);
 
-		data.includedProjectIds = this.sources
+		config.includedSourceIds = this.sources
 			.filter(
 				source =>
 					selectedSourceIds.includes(source.id) &&
-					source.cryptoProject?.id &&
-					!defaultProjectIds.includes(source.cryptoProject.id),
+					(!source.cryptoProject?.id || !defaultProjectIds.includes(source.cryptoProject.id)),
 			)
 			.map(s => s.id);
 
 		await FeedManagerApi.setConfig({
 			token: account.mainViewKey,
 			config: {
-				mode: data.mode,
-				excludedProjectIds: data.excludedProjectIds,
-				includedProjectIds: data.includedProjectIds,
+				mode: config.mode,
+				excludedSourceIds: config.excludedSourceIds,
+				includedSourceIds: config.includedSourceIds,
 			},
 		});
 	}
