@@ -2,18 +2,6 @@
 	position: relative;
 	white-space: nowrap;
 	overflow: hidden;
-
-	&.textAlignLeft {
-		.visible {
-			left: 0;
-		}
-	}
-
-	&.textAlignRight {
-		.visible {
-			right: 0;
-		}
-	}
 }
 
 .invisible {
@@ -23,4 +11,12 @@
 .visible {
 	position: absolute;
 	top: 0;
+
+	.root_textAlignLeft & {
+		left: 0;
+	}
+
+	.root_textAlignRight & {
+		right: 0;
+	}
 }
