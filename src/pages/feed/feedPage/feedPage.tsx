@@ -194,13 +194,23 @@ const RegularFeedContent = observer(() => {
 const VenomFeedContent = observer(() => {
 	const location = useLocation();
 
-	const { project } = useParams<{ project: VenomProjectId }>();
+	const { project: projectRaw } = useParams<{ project?: VenomProjectId }>();
+	const project =
+		projectRaw ||
+		(matchPath(RoutePath.FEED_TVM, location.pathname) || matchPath(RoutePath.FEED_TVM_ADMIN, location.pathname)
+			? VenomProjectId.TVM
+			: undefined);
 	invariant(project, 'Venom project must be specified');
 	const projectMeta = venomProjectsMeta[project];
 
-	const isAdminMode = !!matchPath(RoutePath.FEED_VENOM_ADMIN, location.pathname);
+	const isAdminMode = !!(
+		matchPath(RoutePath.FEED_VENOM_ADMIN, location.pathname) ||
+		matchPath(RoutePath.FEED_TVM_ADMIN, location.pathname)
+	);
 
+	const allAccounts = useDomainAccounts();
 	const venomAccounts = useVenomAccounts();
+	const accounts = project === VenomProjectId.TVM ? allAccounts : venomAccounts;
 
 	const [currentPost, setCurrentPost] = useState<number>(0);
 
@@ -257,7 +267,7 @@ const VenomFeedContent = observer(() => {
 	const createPostFormRef = useRef<CreatePostFormApi>(null);
 
 	return (
-		<NarrowContent contentClassName={css.venomProjecsContent}>
+		<NarrowContent key={project} contentClassName={css.venomProjecsContent}>
 			<div className={css.venomProjectTitle}>
 				<div className={css.venomProjectLogo}>{projectMeta.logo}</div>
 				<div className={css.venomProjectName}>{projectMeta.name}</div>
@@ -278,12 +288,13 @@ const VenomFeedContent = observer(() => {
 
 			<div className={css.divider} />
 
-			{venomAccounts.length ? (
+			{accounts.length ? (
 				<CreatePostForm
 					ref={createPostFormRef}
 					projectMeta={projectMeta}
 					className={css.createPostForm}
-					accounts={venomAccounts}
+					accounts={accounts}
+					displayIdeasButton={projectMeta.id === VenomProjectId.VENOM_BLOCKCHAIN}
 					isAnavailable={serviceStatus.data !== 'ACTIVE'}
 					onCreated={() => toast('Good job! Your post will appear shortly 🔥')}
 				/>
@@ -319,7 +330,7 @@ const VenomFeedContent = observer(() => {
 								onReplyClick={() => {
 									analytics.venomFeedReply(projectMeta.id, message.original.id);
 
-									if (venomAccounts.length) {
+									if (accounts.length) {
 										createPostFormRef.current?.replyTo(message);
 									} else {
 										toast('You need to connect a Venom account in order to reply 👍');
@@ -364,7 +375,13 @@ const VenomFeedContent = observer(() => {
 export const FeedPage = () => {
 	const location = useLocation();
 	const isVenomFeed = !!matchRoutes(
-		[{ path: RoutePath.FEED_VENOM }, { path: RoutePath.FEED_VENOM_PROJECT }, { path: RoutePath.FEED_VENOM_ADMIN }],
+		[
+			{ path: RoutePath.FEED_VENOM },
+			{ path: RoutePath.FEED_VENOM_PROJECT },
+			{ path: RoutePath.FEED_VENOM_ADMIN },
+			{ path: RoutePath.FEED_TVM },
+			{ path: RoutePath.FEED_TVM_ADMIN },
+		],
 		location.pathname,
 	)?.length;
 

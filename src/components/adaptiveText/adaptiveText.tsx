@@ -67,7 +67,11 @@ export function AdaptiveText({
 		<div
 			{...props}
 			ref={rootRef}
-			className={clsx(css.root, textAlign === 'left' ? css.textAlignLeft : css.textAlignRight, className)}
+			className={clsx(
+				css.root,
+				textAlign === 'left' ? css.root_textAlignLeft : css.root_textAlignRight,
+				className,
+			)}
 			title={title}
 		>
 			<div className={css.invisible}>{initialText}</div>

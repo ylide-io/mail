@@ -249,6 +249,8 @@ const App = observer(() => {
 								/>
 							}
 						/>
+						<Route path={RoutePath.FEED_TVM} element={<FeedPage />} />
+						<Route path={RoutePath.FEED_TVM_ADMIN} element={<FeedPage />} />
 
 						<Route path={RoutePath.MAIL_COMPOSE} element={<ComposePage />} />
 						<Route path={RoutePath.MAIL_CONTACTS} element={<ContactListPage />} />

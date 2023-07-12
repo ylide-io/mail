@@ -28,6 +28,8 @@ export enum VenomProjectId {
 	WEB3_WORLD = 'web3_world',
 	YLIDE = 'ylide',
 	VENTORY = 'ventory',
+
+	TVM = 'tvm',
 }
 
 export interface VenomProjectMeta {
@@ -125,5 +127,13 @@ export const venomProjectsMeta: Record<VenomProjectId, VenomProjectMeta> = {
 		description:
 			'Multichain NFT Marketplace exclusively for entertaining games & seamless experience, initially built on Venom network.',
 		logo: <VentorySvg />,
+	},
+
+	[VenomProjectId.TVM]: {
+		id: VenomProjectId.TVM,
+		feedId: '2000000000000000000000000000000000000000000000000000000000000001' as Uint256,
+		name: 'TVM 주요 업데이트',
+		description: '베놈과 에버스케일을 포함한 TVM 블록체인의 주요 업데이트 내용을 공유하는 채널',
+		logo: <YlideSvg />,
 	},
 };

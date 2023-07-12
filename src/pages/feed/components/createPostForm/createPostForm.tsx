@@ -34,6 +34,7 @@ export interface CreatePostFormApi {
 export interface CreatePostFormProps extends PropsWithClassName {
 	accounts: DomainAccount[];
 	isAnavailable: boolean;
+	displayIdeasButton: boolean;
 	projectMeta: VenomProjectMeta;
 	onCreated?: () => void;
 }
@@ -41,7 +42,7 @@ export interface CreatePostFormProps extends PropsWithClassName {
 export const CreatePostForm = observer(
 	forwardRef(
 		(
-			{ className, accounts, isAnavailable, projectMeta, onCreated }: CreatePostFormProps,
+			{ className, accounts, isAnavailable, displayIdeasButton, projectMeta, onCreated }: CreatePostFormProps,
 			ref: Ref<CreatePostFormApi>,
 		) => {
 			const textAreaApiRef = useRef<AutoSizeTextAreaApi>(null);
@@ -235,15 +236,17 @@ export const CreatePostForm = observer(
 
 								<div className={css.footerRight}>
 									<GridRowBox gap={4}>
-										<ActionButton
-											className={clsx(isIdeaAnimated && css.ideaButton_animated)}
-											isDisabled={mailData.sending || isIdeaLoading}
-											size={ActionButtonSize.MEDIUM}
-											look={ActionButtonLook.LITE}
-											icon={<BulbSvg />}
-											title="Get idea!"
-											onClick={() => loadIdea()}
-										/>
+										{displayIdeasButton && (
+											<ActionButton
+												className={clsx(isIdeaAnimated && css.ideaButton_animated)}
+												isDisabled={mailData.sending || isIdeaLoading}
+												size={ActionButtonSize.MEDIUM}
+												look={ActionButtonLook.LITE}
+												icon={<BulbSvg />}
+												title="Get idea!"
+												onClick={() => loadIdea()}
+											/>
+										)}
 
 										<ActionButton
 											ref={stickerButtonRef}
