@@ -198,7 +198,7 @@ export const FeedSettingsPopup = observer(({ account, onClose }: FeedSettingsPop
 			<div className={css.footer}>
 				<div className={css.footerLeft}>
 					<ActionButton
-						isDisabled={!selectedSourceIds.length || saveConfigMutation.isLoading}
+						isDisabled={saveConfigMutation.isLoading}
 						look={ActionButtonLook.PRIMARY}
 						onClick={() => saveConfigMutation.mutate()}
 					>
