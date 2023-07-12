@@ -196,11 +196,17 @@ const VenomFeedContent = observer(() => {
 
 	const { project: projectRaw } = useParams<{ project?: VenomProjectId }>();
 	const project =
-		projectRaw || (location.pathname === generatePath(RoutePath.FEED_TVM) ? VenomProjectId.TVM : undefined);
+		projectRaw ||
+		(matchPath(RoutePath.FEED_TVM, location.pathname) || matchPath(RoutePath.FEED_TVM_ADMIN, location.pathname)
+			? VenomProjectId.TVM
+			: undefined);
 	invariant(project, 'Venom project must be specified');
 	const projectMeta = venomProjectsMeta[project];
 
-	const isAdminMode = !!matchPath(RoutePath.FEED_VENOM_ADMIN, location.pathname);
+	const isAdminMode = !!(
+		matchPath(RoutePath.FEED_VENOM_ADMIN, location.pathname) ||
+		matchPath(RoutePath.FEED_TVM_ADMIN, location.pathname)
+	);
 
 	const allAccounts = useDomainAccounts();
 	const venomAccounts = useVenomAccounts();
@@ -374,6 +380,7 @@ export const FeedPage = () => {
 			{ path: RoutePath.FEED_VENOM_PROJECT },
 			{ path: RoutePath.FEED_VENOM_ADMIN },
 			{ path: RoutePath.FEED_TVM },
+			{ path: RoutePath.FEED_TVM_ADMIN },
 		],
 		location.pathname,
 	)?.length;
