@@ -5,11 +5,11 @@ import './styles/index.scss';
 import * as Sentry from '@sentry/react';
 import { BrowserTracing } from '@sentry/tracing';
 import { configure } from 'mobx';
-import ReactDOM from 'react-dom';
+import { createRoot } from 'react-dom/client';
 import { BrowserRouter } from 'react-router-dom';
 
 import packageJson from '../package.json';
-import App from './App';
+import { App } from './App';
 
 if (document.location.hostname !== 'localhost') {
 	Sentry.init({
@@ -29,9 +29,10 @@ configure({
 	enforceActions: 'never',
 });
 
-ReactDOM.render(
+const root = createRoot(document.getElementById('root')!);
+
+root.render(
 	<BrowserRouter>
 		<App />
 	</BrowserRouter>,
-	document.getElementById('root') as HTMLElement,
 );

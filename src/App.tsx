@@ -83,7 +83,7 @@ const RemoveTrailingSlash = () => {
 	return <></>;
 };
 
-const App = observer(() => {
+export const App = observer(() => {
 	const location = useLocation();
 
 	const [queryClient] = useState(
@@ -296,5 +296,3 @@ const App = observer(() => {
 		</>
 	);
 });
-
-export default App;
