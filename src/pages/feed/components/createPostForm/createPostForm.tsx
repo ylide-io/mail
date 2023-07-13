@@ -24,7 +24,7 @@ import { HorizontalAlignment } from '../../../../utils/alignment';
 import { hashToIpfsUrl, ipfsToHttpUrl } from '../../../../utils/ipfs';
 import { escapeRegex } from '../../../../utils/regex';
 import { SendMailButton } from '../../../mail/components/composeMailForm/sendMailButton/sendMailButton';
-import { BlockchainFeedPostItemView } from '../venomFeedPostItem/venomFeedPostItem';
+import { BlockchainProjectPostView } from '../blockchainProjectPost/blockchainProjectPost';
 import css from './createPostForm.module.scss';
 
 export interface CreatePostFormApi {
@@ -182,7 +182,7 @@ export const CreatePostForm = observer(
 								</ActionButton>
 							</div>
 
-							<BlockchainFeedPostItemView post={replyTo} isCompact />
+							<BlockchainProjectPostView post={replyTo} isCompact />
 
 							<div className={css.divider} />
 						</>

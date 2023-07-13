@@ -4,9 +4,9 @@ import React, { MouseEventHandler, useCallback, useEffect, useMemo, useRef, useS
 import { useQuery } from 'react-query';
 
 import {
-	DecodedBlockchainFeedPost,
-	decodeBlockchainFeedPost,
 	BlockchainFeedApi,
+	decodeBlockchainFeedPost,
+	DecodedBlockchainFeedPost,
 } from '../../../../api/blockchainFeedApi';
 import { ActionButton, ActionButtonLook } from '../../../../components/ActionButton/ActionButton';
 import { AdaptiveAddress } from '../../../../components/adaptiveAddress/adaptiveAddress';
@@ -31,9 +31,9 @@ import { ipfsToHttpUrl } from '../../../../utils/ipfs';
 import { useOpenMailCompose } from '../../../../utils/mail';
 import { useShiftPressed } from '../../../../utils/useShiftPressed';
 import { PostItemContainer } from '../postItemContainer/postItemContainer';
-import css from './venomFeedPostItem.module.scss';
+import css from './blockchainProjectPost.module.scss';
 
-interface BlockchainFeedPostItemViewProps {
+interface BlockchainProjectPostViewProps {
 	post: DecodedBlockchainFeedPost;
 
 	isCompact?: boolean;
@@ -50,7 +50,7 @@ interface BlockchainFeedPostItemViewProps {
 	onUnbanClick?: MouseEventHandler<HTMLElement>;
 }
 
-export function BlockchainFeedPostItemView({
+export function BlockchainProjectPostView({
 	post,
 
 	isCompact,
@@ -65,7 +65,7 @@ export function BlockchainFeedPostItemView({
 	onReplyClick,
 	onBanClick,
 	onUnbanClick,
-}: BlockchainFeedPostItemViewProps) {
+}: BlockchainProjectPostViewProps) {
 	const openMailCompose = useOpenMailCompose();
 	const venomAccounts = useVenomAccounts();
 
@@ -179,7 +179,7 @@ export function BlockchainFeedPostItemView({
 						{replyToId && (
 							<>
 								{repliedPostQuery.data ? (
-									<BlockchainFeedPostItemView
+									<BlockchainProjectPostView
 										post={repliedPostQuery.data}
 										isCompact
 										onAddressClick={() => {
@@ -260,14 +260,14 @@ export function BlockchainFeedPostItemView({
 
 //
 
-interface BlockchainFeedPostItemProps {
+interface BlockchainProjectPostProps {
 	post: DecodedBlockchainFeedPost;
 	isFirstPost: boolean;
 	onNextPost: () => void;
 	onReplyClick: () => void;
 }
 
-export function BlockchainFeedPostItem({ post, isFirstPost, onNextPost, onReplyClick }: BlockchainFeedPostItemProps) {
+export function BlockchainProjectPost({ post, isFirstPost, onNextPost, onReplyClick }: BlockchainProjectPostProps) {
 	let [clicks] = useState<number[]>([]);
 
 	const [isBanned, setBanned] = useState(false);
@@ -379,7 +379,7 @@ export function BlockchainFeedPostItem({ post, isFirstPost, onNextPost, onReplyC
 		<div style={{ position: 'relative' }}>
 			<div ref={scrollRef} style={{ position: 'absolute', top: -100 }} />
 
-			<BlockchainFeedPostItemView
+			<BlockchainProjectPostView
 				post={post}
 				isBanned={isBanned}
 				isApproved={isApproved}

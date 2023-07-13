@@ -25,9 +25,9 @@ import { connectAccount } from '../../../utils/account';
 import { invariant } from '../../../utils/assert';
 import { hookDependency } from '../../../utils/react';
 import { useIsMatchingRoute, useNav } from '../../../utils/url';
+import { BlockchainProjectPost } from '../components/blockchainProjectPost/blockchainProjectPost';
 import { CreatePostForm, CreatePostFormApi } from '../components/createPostForm/createPostForm';
 import { FeedPostItem } from '../components/feedPostItem/feedPostItem';
-import { BlockchainFeedPostItem } from '../components/venomFeedPostItem/venomFeedPostItem';
 import css from './feedPage.module.scss';
 import ErrorCode = FeedServerApi.ErrorCode;
 
@@ -311,7 +311,7 @@ const BlockchainProjectFeed = observer(() => {
 				{messages.length ? (
 					<>
 						{messages.map((message, idx) => (
-							<BlockchainFeedPostItem
+							<BlockchainProjectPost
 								key={idx}
 								isFirstPost={idx === currentPost}
 								post={message}
