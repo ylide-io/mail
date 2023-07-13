@@ -5,6 +5,7 @@ import { VENOM_FEED_ID } from '../../constants';
 import { ReactComponent as NumiSvg } from './icons/numi.svg';
 import { ReactComponent as OasisGallerySvg } from './icons/oasisGallery.svg';
 import { ReactComponent as SnipaSvg } from './icons/snipa.svg';
+import { ReactComponent as TvmSvg } from './icons/tvm.svg';
 import { ReactComponent as VenomBlockchainSvg } from './icons/venomBlockchain.svg';
 import { ReactComponent as VenomBridgeSvg } from './icons/venomBridge.svg';
 import { ReactComponent as VenomPadSvg } from './icons/venomPad.svg';
@@ -137,7 +138,7 @@ export const venomProjectsMeta: Record<VenomProjectId, VenomProjectMeta> = {
 		feedId: '2000000000000000000000000000000000000000000000000000000000000001' as Uint256,
 		name: 'TVM 주요 업데이트',
 		description: '베놈과 에버스케일을 포함한 TVM 블록체인의 주요 업데이트 내용을 공유하는 채널',
-		logo: <YlideSvg />,
+		logo: <TvmSvg />,
 	},
 
 	[VenomProjectId.ISME_TEST]: {
