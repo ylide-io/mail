@@ -18,10 +18,10 @@ import { FeedPostItem } from '../components/feedPostItem/feedPostItem';
 import css from './feedPostPage.module.scss';
 
 export function FeedPostPage() {
-	const { id: postId } = useParams<{ id: string }>();
+	const { postId } = useParams<{ postId: string }>();
 	invariant(postId);
 
-	const postPath = generatePath(RoutePath.FEED_POST, { id: postId });
+	const postPath = generatePath(RoutePath.FEED_POST, { postId: postId });
 
 	const { isLoading, data } = useQuery('post', () => FeedServerApi.getPost(postId));
 

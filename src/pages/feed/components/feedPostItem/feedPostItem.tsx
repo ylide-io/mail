@@ -183,7 +183,7 @@ interface FeedPostItemProps {
 
 export function FeedPostItem({ isInFeed, realtedAccounts, post }: FeedPostItemProps) {
 	const navigate = useNav();
-	const postPath = generatePath(RoutePath.FEED_POST, { id: post.id });
+	const postPath = generatePath(RoutePath.FEED_POST, { postId: post.id });
 
 	const menuButtonRef = useRef(null);
 	const [isMenuOpen, setMenuOpen] = useState(false);
