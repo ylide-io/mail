@@ -346,7 +346,7 @@ export const SidebarMenu = observer(() => {
 					return (
 						<SidebarButton
 							key={id}
-							href={generatePath(RoutePath.FEED_VENOM_PROJECT, { projectId: meta.id })}
+							href={generatePath(RoutePath.FEED_PROJECT_POSTS, { projectId: meta.id })}
 							name={meta.name}
 							icon={meta.logo}
 						/>
@@ -362,7 +362,7 @@ export const SidebarMenu = observer(() => {
 		return (
 			<SidebarSection section={Section.TVM_PROJECTS} title="TVM 주요정보">
 				<SidebarButton
-					href={generatePath(RoutePath.FEED_TVM_PROJECT, { projectId: BlockchainProjectId.TVM })}
+					href={generatePath(RoutePath.FEED_PROJECT_POSTS, { projectId: BlockchainProjectId.TVM })}
 					name={blockchainProjectsMeta[BlockchainProjectId.TVM].name}
 					icon={blockchainProjectsMeta[BlockchainProjectId.TVM].logo}
 				/>

@@ -27,7 +27,7 @@ export const BlockchainProjectFeedPage = observer(() => {
 	invariant(projectId, 'Blockchain project must be specified');
 	const projectMeta = blockchainProjectsMeta[projectId];
 
-	const isAdminMode = useIsMatchingRoute(RoutePath.FEED_VENOM_ADMIN) || useIsMatchingRoute(RoutePath.FEED_TVM_ADMIN);
+	const isAdminMode = useIsMatchingRoute(RoutePath.FEED_PROJECT_POSTS_ADMIN);
 
 	const allAccounts = useDomainAccounts();
 	const venomAccounts = useVenomAccounts();

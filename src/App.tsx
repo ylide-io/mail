@@ -241,32 +241,25 @@ export const App = observer(() => {
 						<Route path={RoutePath.FEED_SMART_ADDRESS} element={<FeedPage />} />
 
 						<Route
-							path={RoutePath.FEED_VENOM}
+							path={RoutePath.FEED_PROJECT}
 							element={
 								<Navigate
 									replace
-									to={generatePath(RoutePath.FEED_VENOM_PROJECT, {
+									to={generatePath(RoutePath.FEED_PROJECT_POSTS, {
 										projectId: BlockchainProjectId.VENOM_BLOCKCHAIN,
 									})}
 								/>
 							}
 						/>
-						<Route path={RoutePath.FEED_VENOM_PROJECT} element={<BlockchainProjectFeedPage />} />
-						<Route path={RoutePath.FEED_VENOM_ADMIN} element={<BlockchainProjectFeedPage />} />
+						<Route path={RoutePath.FEED_PROJECT_POSTS} element={<BlockchainProjectFeedPage />} />
+						<Route path={RoutePath.FEED_PROJECT_POSTS_ADMIN} element={<BlockchainProjectFeedPage />} />
 
 						<Route
-							path={RoutePath.FEED_TVM}
+							path="/feed/venom/*"
 							element={
-								<Navigate
-									replace
-									to={generatePath(RoutePath.FEED_TVM_PROJECT, {
-										projectId: BlockchainProjectId.TVM,
-									})}
-								/>
+								<Navigate replace to={location.pathname.replace('/feed/venom/', '/feed/project/')} />
 							}
 						/>
-						<Route path={RoutePath.FEED_TVM_PROJECT} element={<BlockchainProjectFeedPage />} />
-						<Route path={RoutePath.FEED_TVM_ADMIN} element={<BlockchainProjectFeedPage />} />
 
 						<Route path={RoutePath.MAIL_COMPOSE} element={<ComposePage />} />
 						<Route path={RoutePath.MAIL_CONTACTS} element={<ContactListPage />} />
@@ -292,7 +285,7 @@ export const App = observer(() => {
 											? generatePath(RoutePath.OTC_ASSETS)
 											: REACT_APP__APP_MODE === AppMode.MAIN_VIEW
 											? generatePath(RoutePath.FEED)
-											: generatePath(RoutePath.FEED_VENOM)
+											: generatePath(RoutePath.FEED_PROJECT)
 									}
 								/>
 							}
