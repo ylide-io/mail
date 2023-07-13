@@ -1,4 +1,4 @@
-import React, { CSSProperties } from 'react';
+import { CSSProperties } from 'react';
 
 export function VenomLogo({ size = 16, style }: { size?: number; style?: CSSProperties }) {
 	return (

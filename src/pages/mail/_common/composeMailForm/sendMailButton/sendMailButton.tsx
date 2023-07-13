@@ -1,7 +1,7 @@
 import { EVM_NAMES } from '@ylide/ethereum';
 import clsx from 'clsx';
 import { observer } from 'mobx-react';
-import React, { useMemo, useRef, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
 
 import { GridRowBox, TruncateTextBox } from '../../../../../components/boxes/boxes';
 import { DropDown, DropDownItem, DropDownItemMode } from '../../../../../components/dropDown/dropDown';

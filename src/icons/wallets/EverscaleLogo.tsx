@@ -1,5 +1,3 @@
-import React from 'react';
-
 export const EverscaleLogo = ({ size = 16 }: { size?: number }) => {
 	return (
 		<svg

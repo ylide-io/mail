@@ -1,5 +1,5 @@
 import { observer } from 'mobx-react';
-import React, { useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 import { InView } from 'react-intersection-observer';
 import { useInfiniteQuery, useQuery } from 'react-query';
 import { useParams } from 'react-router-dom';

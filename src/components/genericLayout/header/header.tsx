@@ -1,5 +1,5 @@
 import { observer } from 'mobx-react';
-import React, { useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 import { generatePath } from 'react-router-dom';
 
 import { AppMode, REACT_APP__APP_MODE } from '../../../env';

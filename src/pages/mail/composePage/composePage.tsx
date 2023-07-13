@@ -1,5 +1,5 @@
 import { observer } from 'mobx-react';
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
 import { generatePath } from 'react-router-dom';
 
 import { ActionButton, ActionButtonLook } from '../../../components/ActionButton/ActionButton';

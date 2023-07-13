@@ -1,6 +1,6 @@
 import { MessageAttachmentLinkV1 } from '@ylide/sdk';
 import clsx from 'clsx';
-import React, { MouseEventHandler, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { MouseEventHandler, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useQuery } from 'react-query';
 
 import {

@@ -1,6 +1,6 @@
 import clsx from 'clsx';
 import { observer } from 'mobx-react';
-import React, { RefObject } from 'react';
+import { RefObject } from 'react';
 
 import { ReactComponent as EditSvg } from '../../../../icons/ic20/edit.svg';
 import { ReactComponent as PlusSvg } from '../../../../icons/ic20/plus.svg';

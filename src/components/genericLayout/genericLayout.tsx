@@ -1,6 +1,6 @@
 import clsx from 'clsx';
 import { observer } from 'mobx-react';
-import React, { createContext, PropsWithChildren, useContext, useEffect, useMemo } from 'react';
+import { createContext, PropsWithChildren, useContext, useEffect, useMemo } from 'react';
 
 import css from './genericLayout.module.scss';
 import Header from './header/header';

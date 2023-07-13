@@ -1,6 +1,6 @@
 import clsx from 'clsx';
 import { observer } from 'mobx-react';
-import React, { MouseEvent, useMemo, useRef, useState } from 'react';
+import { MouseEvent, useMemo, useRef, useState } from 'react';
 import { generatePath } from 'react-router-dom';
 
 import { FeedPost, FeedReason, LinkType } from '../../../../api/feedServerApi';

@@ -2,7 +2,6 @@ import { OutputData } from '@editorjs/editorjs';
 import { EVMNetwork } from '@ylide/ethereum';
 import { MessageAttachment, Uint256, YMF } from '@ylide/sdk';
 import { autorun, makeAutoObservable, transaction } from 'mobx';
-import React from 'react';
 
 import { ActionButton, ActionButtonLook, ActionButtonSize } from '../components/ActionButton/ActionButton';
 import { ActionModal } from '../components/actionModal/actionModal';

@@ -1,6 +1,6 @@
 import { observable } from 'mobx';
 import { observer } from 'mobx-react';
-import React, { useEffect, useMemo } from 'react';
+import { useEffect, useMemo } from 'react';
 import { InView } from 'react-intersection-observer';
 import { generatePath, useParams } from 'react-router-dom';
 

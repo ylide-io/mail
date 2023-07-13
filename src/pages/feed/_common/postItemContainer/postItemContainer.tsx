@@ -1,5 +1,5 @@
 import clsx from 'clsx';
-import React, { MouseEventHandler, PropsWithChildren, useEffect, useRef, useState } from 'react';
+import { MouseEventHandler, PropsWithChildren, useEffect, useRef, useState } from 'react';
 
 import { PropsWithClassName } from '../../../../components/props';
 import css from './postItemContainer.module.scss';

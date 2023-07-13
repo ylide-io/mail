@@ -1,6 +1,5 @@
 import clsx from 'clsx';
 import { observer } from 'mobx-react';
-import React from 'react';
 import { generatePath } from 'react-router-dom';
 
 import { AccountConnectedModal } from '../../components/accountConnectedModal/accountConnectedModal';

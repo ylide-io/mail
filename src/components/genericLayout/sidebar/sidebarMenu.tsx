@@ -1,7 +1,7 @@
 import clsx from 'clsx';
 import { observable } from 'mobx';
 import { observer } from 'mobx-react';
-import React, { PropsWithChildren, ReactNode, useState } from 'react';
+import { PropsWithChildren, ReactNode, useState } from 'react';
 import { useQuery } from 'react-query';
 import { generatePath, useLocation } from 'react-router-dom';
 

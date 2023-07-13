@@ -1,5 +1,3 @@
-import React from 'react';
-
 import { ActionButton, ActionButtonLook } from '../../../../components/ActionButton/ActionButton';
 import { CheckBox } from '../../../../components/checkBox/checkBox';
 import { ContactName } from '../../../../components/contactName/contactName';

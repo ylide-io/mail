@@ -1,4 +1,4 @@
-import React, { createContext, PropsWithChildren, ReactNode, ReactPortal, useMemo, useRef } from 'react';
+import { createContext, PropsWithChildren, ReactNode, ReactPortal, useMemo, useRef } from 'react';
 import ReactDOM from 'react-dom';
 
 interface PopupManagerApi {

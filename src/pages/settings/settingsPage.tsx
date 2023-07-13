@@ -1,5 +1,3 @@
-import React from 'react';
-
 import { GenericLayout } from '../../components/genericLayout/genericLayout';
 import { browserStorage } from '../../stores/browserStorage';
 

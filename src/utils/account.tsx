@@ -1,5 +1,3 @@
-import React from 'react';
-
 import { ActionButton, ActionButtonLook, ActionButtonSize } from '../components/ActionButton/ActionButton';
 import { ActionModal } from '../components/actionModal/actionModal';
 import { showLoadingModal } from '../components/loadingModal/loadingModal';
