@@ -21,7 +21,7 @@ import { getQueryString } from '../../utils/getQueryString';
 import { useNav } from '../../utils/url';
 import { walletsMeta } from '../../utils/wallet';
 
-export const NewWalletsPage = observer(() => {
+export const WalletsPage = observer(() => {
 	const navigate = useNav();
 
 	return (

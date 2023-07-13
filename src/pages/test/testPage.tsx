@@ -9,7 +9,7 @@ import { RecipientInput, Recipients } from '../../components/recipientInput/reci
 import { TagInput, TagInputItem } from '../../components/tagInput/tagInput';
 import { TextField, TextFieldLook } from '../../components/textField/textField';
 import { ReactComponent as SettingsSvg } from '../../icons/ic20/settings.svg';
-import css from './TestPage.module.scss';
+import css from './testPage.module.scss';
 
 export function Row({ children }: PropsWithChildren<{}>) {
 	return (

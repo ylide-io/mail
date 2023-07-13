@@ -23,13 +23,13 @@ import { ContactListPage } from './pages/mail/contactsPage/contactListPage';
 import { ContactTagsPage } from './pages/mail/contactsPage/contactTagsPage';
 import { MailboxPage } from './pages/mail/mailboxPage/mailboxPage';
 import { MailDetailsPage } from './pages/mail/mailDetailsPage/mailDetailsPage';
-import { NewWalletsPage } from './pages/NewWalletsPage';
 import { OtcAssetsPage } from './pages/otc/OtcAssetsPage/OtcAssetsPage';
 import { OtcChatPage } from './pages/otc/OtcChatPage/OtcChatPage';
 import { OtcChatsPage } from './pages/otc/OtcChatsPage/OtcChatsPage';
 import { OtcWalletsPage } from './pages/otc/OtcWalletsPage/OtcWalletsPage';
-import { SettingsPage } from './pages/SettingsPage/SettingsPage';
-import { TestPage } from './pages/TestPage/TestPage';
+import { SettingsPage } from './pages/settings/settingsPage';
+import { TestPage } from './pages/test/testPage';
+import { WalletsPage } from './pages/wallets/walletsPage';
 import { MailboxWidget } from './pages/widgets/mailboxWidget/mailboxWidget';
 import { SendMessageWidget } from './pages/widgets/sendMessageWidget/sendMessageWidget';
 import { analytics } from './stores/Analytics';
@@ -215,7 +215,7 @@ export const App = observer(() => {
 
 					<Routes>
 						<Route path={RoutePath.TEST} element={<TestPage />} />
-						<Route path={RoutePath.WALLETS} element={<NewWalletsPage />} />
+						<Route path={RoutePath.WALLETS} element={<WalletsPage />} />
 						<Route path={RoutePath.SETTINGS} element={<SettingsPage />} />
 						<Route path={RoutePath.ADMIN} element={<AdminPage />} />
 						<Route path={RoutePath.ADMIN_FEED} element={<AdminFeedPage />} />
