@@ -12,7 +12,7 @@ import { mailStore } from '../../../stores/MailList';
 import { getGlobalOutgoingMailData } from '../../../stores/outgoingMailData';
 import { RoutePath } from '../../../stores/routePath';
 import { useNav } from '../../../utils/url';
-import { ComposeMailForm } from '../components/composeMailForm/composeMailForm';
+import { ComposeMailForm } from '../_common/composeMailForm/composeMailForm';
 import css from './composePage.module.scss';
 
 export const ComposePage = observer(() => {

@@ -23,7 +23,7 @@ import { OutgoingMailData, OutgoingMailDataMode } from '../../../../stores/outgo
 import { HorizontalAlignment } from '../../../../utils/alignment';
 import { hashToIpfsUrl, ipfsToHttpUrl } from '../../../../utils/ipfs';
 import { escapeRegex } from '../../../../utils/regex';
-import { SendMailButton } from '../../../mail/components/composeMailForm/sendMailButton/sendMailButton';
+import { SendMailButton } from '../../../mail/_common/composeMailForm/sendMailButton/sendMailButton';
 import { BlockchainProjectPostView } from '../blockchainProjectPost/blockchainProjectPost';
 import css from './createPostForm.module.scss';
 

@@ -11,10 +11,10 @@ import { formatMoney } from '../../../utils/money';
 import { formatNumber } from '../../../utils/number';
 import { buildUrl, useNav } from '../../../utils/url';
 import { useDebounce } from '../../../utils/useDebounce';
-import { OtcAsideStatistics } from '../components/otcAsideStatistics/otcAsideStatistics';
-import { OtcLayout, OtcSupContentTitle } from '../components/otcLayout/otcLayout';
-import { OtcPagination } from '../components/otcPagination/otcPagination';
-import { OtcTable } from '../components/otcTable/otcTable';
+import { OtcAsideStatistics } from '../_common/otcAsideStatistics/otcAsideStatistics';
+import { OtcLayout, OtcSupContentTitle } from '../_common/otcLayout/otcLayout';
+import { OtcPagination } from '../_common/otcPagination/otcPagination';
+import { OtcTable } from '../_common/otcTable/otcTable';
 import css from './OtcAssetsPage.module.scss';
 
 const PAGE_SIZE = 50;

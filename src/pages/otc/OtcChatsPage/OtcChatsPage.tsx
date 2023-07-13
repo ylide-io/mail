@@ -8,8 +8,8 @@ import { YlideLoader } from '../../../components/ylideLoader/ylideLoader';
 import { RoutePath } from '../../../stores/routePath';
 import { DateFormatStyle, formatDate } from '../../../utils/date';
 import { useNav } from '../../../utils/url';
-import { OtcLayout } from '../components/otcLayout/otcLayout';
-import { OtcTable } from '../components/otcTable/otcTable';
+import { OtcLayout } from '../_common/otcLayout/otcLayout';
+import { OtcTable } from '../_common/otcTable/otcTable';
 import css from './OtcChatsPage.module.scss';
 
 export function OtcChatsPage() {

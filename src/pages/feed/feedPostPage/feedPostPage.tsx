@@ -14,7 +14,7 @@ import { RoutePath } from '../../../stores/routePath';
 import { HorizontalAlignment } from '../../../utils/alignment';
 import { invariant } from '../../../utils/assert';
 import { toAbsoluteUrl } from '../../../utils/url';
-import { FeedPostItem } from '../components/feedPostItem/feedPostItem';
+import { FeedPostItem } from '../_common/feedPostItem/feedPostItem';
 import css from './feedPostPage.module.scss';
 
 export function FeedPostPage() {

@@ -8,7 +8,7 @@ import { ReactComponent as CrossSvg } from '../../../icons/ic20/cross.svg';
 import { analytics } from '../../../stores/Analytics';
 import { OutgoingMailData } from '../../../stores/outgoingMailData';
 import { invariant } from '../../../utils/assert';
-import { ComposeMailForm } from '../../mail/components/composeMailForm/composeMailForm';
+import { ComposeMailForm } from '../../mail/_common/composeMailForm/composeMailForm';
 import { postWidgetMessage, WidgetMessageType } from '../widgets';
 import css from './sendMessageWidget.module.scss';
 

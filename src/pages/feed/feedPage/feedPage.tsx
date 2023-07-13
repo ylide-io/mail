@@ -19,7 +19,7 @@ import { RoutePath } from '../../../stores/routePath';
 import { connectAccount } from '../../../utils/account';
 import { hookDependency } from '../../../utils/react';
 import { useIsMatchingRoute, useNav } from '../../../utils/url';
-import { FeedPostItem } from '../components/feedPostItem/feedPostItem';
+import { FeedPostItem } from '../_common/feedPostItem/feedPostItem';
 import css from './feedPage.module.scss';
 import ErrorCode = FeedServerApi.ErrorCode;
 

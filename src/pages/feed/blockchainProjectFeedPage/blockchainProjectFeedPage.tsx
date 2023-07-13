@@ -5,7 +5,6 @@ import { useInfiniteQuery, useQuery } from 'react-query';
 import { useParams } from 'react-router-dom';
 
 import { BlockchainFeedApi, decodeBlockchainFeedPost, DecodedBlockchainFeedPost } from '../../../api/blockchainFeedApi';
-import { FeedServerApi } from '../../../api/feedServerApi';
 import { ActionButton, ActionButtonLook } from '../../../components/ActionButton/ActionButton';
 import { ErrorMessage, ErrorMessageLook } from '../../../components/errorMessage/errorMessage';
 import { NarrowContent } from '../../../components/genericLayout/content/narrowContent/narrowContent';
@@ -19,8 +18,8 @@ import { RoutePath } from '../../../stores/routePath';
 import { connectAccount } from '../../../utils/account';
 import { invariant } from '../../../utils/assert';
 import { useIsMatchingRoute } from '../../../utils/url';
-import { BlockchainProjectPost } from '../components/blockchainProjectPost/blockchainProjectPost';
-import { CreatePostForm, CreatePostFormApi } from '../components/createPostForm/createPostForm';
+import { BlockchainProjectPost } from '../_common/blockchainProjectPost/blockchainProjectPost';
+import { CreatePostForm, CreatePostFormApi } from '../_common/createPostForm/createPostForm';
 import css from './blockchainProjectFeedPage.module.scss';
 
 export const BlockchainProjectFeedPage = observer(() => {

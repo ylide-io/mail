@@ -35,7 +35,7 @@ import {
 	showStaticComponent,
 	StaticComponentSingletonKey,
 } from '../components/staticComponentManager/staticComponentManager';
-import { ComposeMailPopup } from '../pages/mail/components/composeMailPopup/composeMailPopup';
+import { ComposeMailPopup } from '../pages/mail/_common/composeMailPopup/composeMailPopup';
 import { invariant } from './assert';
 import domain from '../stores/Domain';
 import { DomainAccount } from '../stores/models/DomainAccount';
