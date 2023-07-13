@@ -30,6 +30,9 @@ export enum VenomProjectId {
 	VENTORY = 'ventory',
 
 	TVM = 'tvm',
+
+	// tests:
+	ISME_TEST = 'isme_test',
 }
 
 export interface VenomProjectMeta {
@@ -135,5 +138,13 @@ export const venomProjectsMeta: Record<VenomProjectId, VenomProjectMeta> = {
 		name: 'TVM 주요 업데이트',
 		description: '베놈과 에버스케일을 포함한 TVM 블록체인의 주요 업데이트 내용을 공유하는 채널',
 		logo: <YlideSvg />,
+	},
+
+	[VenomProjectId.ISME_TEST]: {
+		id: VenomProjectId.ISME_TEST,
+		feedId: '11d558ad3a44a6b7476209ccaecdfaf55462d9bb0edcc69c64c0f94f9b2ecc98' as Uint256,
+		name: 'isme',
+		description: 'ISME Test Evm',
+		logo: <VentorySvg />,
 	},
 };

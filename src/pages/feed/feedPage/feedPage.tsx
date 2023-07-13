@@ -6,7 +6,7 @@ import { useInfiniteQuery, useQuery } from 'react-query';
 import { generatePath, matchPath, matchRoutes, useLocation, useParams } from 'react-router-dom';
 
 import { FeedCategory, FeedServerApi } from '../../../api/feedServerApi';
-import { DecodedVenomFeedPost, decodeVenomFeedPost, VenomFilterApi } from '../../../api/venomFilterApi';
+import { DecodedBlockchainFeedPost, decodeBlockchainFeedPost, BlockchainFeedApi } from '../../../api/blockchainFeedApi';
 import { ActionButton, ActionButtonLook, ActionButtonSize } from '../../../components/ActionButton/ActionButton';
 import { ErrorMessage, ErrorMessageLook } from '../../../components/errorMessage/errorMessage';
 import { NarrowContent } from '../../../components/genericLayout/content/narrowContent/narrowContent';
@@ -27,7 +27,7 @@ import { hookDependency } from '../../../utils/react';
 import { useNav } from '../../../utils/url';
 import { CreatePostForm, CreatePostFormApi } from '../components/createPostForm/createPostForm';
 import { FeedPostItem } from '../components/feedPostItem/feedPostItem';
-import { VenomFeedPostItem } from '../components/venomFeedPostItem/venomFeedPostItem';
+import { BlockchainFeedPostItem } from '../components/venomFeedPostItem/venomFeedPostItem';
 import css from './feedPage.module.scss';
 import ErrorCode = FeedServerApi.ErrorCode;
 
@@ -214,16 +214,16 @@ const VenomFeedContent = observer(() => {
 
 	const [currentPost, setCurrentPost] = useState<number>(0);
 
-	const postsQuery = useInfiniteQuery<DecodedVenomFeedPost[]>(['feed', 'venom', 'posts', project], {
+	const postsQuery = useInfiniteQuery<DecodedBlockchainFeedPost[]>(['feed', 'venom', 'posts', project], {
 		queryFn: async ({ pageParam = 0 }) => {
 			analytics.venomFeedView(projectMeta.id);
 
-			const posts = await VenomFilterApi.getPosts({
+			const posts = await BlockchainFeedApi.getPosts({
 				feedId: projectMeta.feedId,
 				beforeTimestamp: pageParam,
 				adminMode: isAdminMode,
 			});
-			return posts.map(decodeVenomFeedPost);
+			return posts.map(decodeBlockchainFeedPost);
 		},
 		getNextPageParam: lastPage =>
 			lastPage.length ? lastPage[lastPage.length - 1].original.createTimestamp : undefined,
@@ -236,7 +236,7 @@ const VenomFeedContent = observer(() => {
 	useQuery(['feed', 'venom', 'new-posts', project], {
 		queryFn: async () => {
 			if (!postsQuery.isLoading) {
-				const posts = await VenomFilterApi.getPosts({
+				const posts = await BlockchainFeedApi.getPosts({
 					feedId: projectMeta.feedId,
 					beforeTimestamp: 0,
 					adminMode: isAdminMode,
@@ -250,7 +250,7 @@ const VenomFeedContent = observer(() => {
 	});
 
 	const serviceStatus = useQuery(['feed', 'venom', 'service-status'], {
-		queryFn: async () => (await VenomFilterApi.getServiceStatus()).status,
+		queryFn: async () => (await BlockchainFeedApi.getServiceStatus()).status,
 		initialData: 'ACTIVE',
 		refetchInterval: 10000,
 	});
@@ -322,7 +322,7 @@ const VenomFeedContent = observer(() => {
 				{messages.length ? (
 					<>
 						{messages.map((message, idx) => (
-							<VenomFeedPostItem
+							<BlockchainFeedPostItem
 								key={idx}
 								isFirstPost={idx === currentPost}
 								post={message}

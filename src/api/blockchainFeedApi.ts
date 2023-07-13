@@ -1,29 +1,30 @@
 import { ITVMMessage } from '@ylide/everscale';
 import { IMessage, IMessageContent, IMessageCorruptedContent } from '@ylide/sdk';
 
-import { REACT_APP__FEED_VENOM } from '../env';
+import { REACT_APP__BLOCKCHAIN_FEED } from '../env';
 import { IMessageDecodedContent } from '../indexedDB/IndexedDB';
 import { invariant } from '../utils/assert';
 import { decodeBroadcastContent } from '../utils/mail';
 import { createCleanSerachParams } from '../utils/url';
 
-export interface VenomFeedPost {
+export interface BlockchainFeedPost {
 	id: string;
 	createTimestamp: number;
 	sender: string;
 	meta: Exclude<ITVMMessage, 'key'> & { key: number[] };
 	content: IMessageCorruptedContent | (Exclude<IMessageContent, 'content'> & { content: number[] }) | null;
 	banned: boolean;
+	blockchain: string;
 	isAdmin?: boolean;
 }
 
-export interface DecodedVenomFeedPost {
-	original: VenomFeedPost;
+export interface DecodedBlockchainFeedPost {
+	original: BlockchainFeedPost;
 	msg: IMessage;
 	decoded: IMessageDecodedContent;
 }
 
-export function decodeVenomFeedPost(p: VenomFeedPost): DecodedVenomFeedPost {
+export function decodeBlockchainFeedPost(p: BlockchainFeedPost): DecodedBlockchainFeedPost {
 	const msg: IMessage = {
 		...p.meta,
 		key: new Uint8Array(p.meta.key),
@@ -64,16 +65,16 @@ export function decodeVenomFeedPost(p: VenomFeedPost): DecodedVenomFeedPost {
 
 //
 
-export namespace VenomFilterApi {
+export namespace BlockchainFeedApi {
 	export function getUrl() {
 		return (
-			REACT_APP__FEED_VENOM ||
+			REACT_APP__BLOCKCHAIN_FEED ||
 			[
-				'https://venom1.ylide.io',
-				'https://venom2.ylide.io',
-				'https://venom3.ylide.io',
-				'https://venom4.ylide.io',
-				'https://venom5.ylide.io',
+				'https://blockchain-feed1.ylide.io',
+				'https://blockchain-feed2.ylide.io',
+				'https://blockchain-feed3.ylide.io',
+				'https://blockchain-feed4.ylide.io',
+				'https://blockchain-feed5.ylide.io',
 			][Math.floor(Math.random() * 5)]
 		);
 	}
@@ -141,13 +142,13 @@ export namespace VenomFilterApi {
 	}
 
 	export async function getPosts(params: { feedId: string; beforeTimestamp: number; adminMode?: boolean }) {
-		return await request<VenomFeedPost[]>('/posts', {
+		return await request<BlockchainFeedPost[]>('/posts', {
 			query: { feedId: params.feedId, beforeTimestamp: params.beforeTimestamp, adminMode: params.adminMode },
 		});
 	}
 
 	export async function getPost(params: { id: string; adminMode?: boolean }) {
-		return await request<VenomFeedPost | null>('/post', {
+		return await request<BlockchainFeedPost | null>('/post', {
 			query: { id: params.id, adminMode: params.adminMode },
 		});
 	}
@@ -171,6 +172,68 @@ export namespace VenomFilterApi {
 		return await request('/stop-service', {
 			query: { secret: params.secret },
 			params: { method: 'GET' },
+		});
+	}
+
+	export async function getFeeds(params: { parentFeedId?: string }) {
+		return await request('/feeds/', {
+			query: { parentFeedId: params.parentFeedId },
+			params: { method: 'GET' },
+		});
+	}
+
+	export async function createFeed(params: {
+		feedId: string;
+		parentFeedId?: string;
+		title: string;
+		description: string;
+		logoUrl: string;
+	}) {
+		return await request('/feeds/', {
+			params: {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json',
+				},
+				body: JSON.stringify({
+					feedId: params.feedId,
+					parentFeedId: params.parentFeedId,
+					title: params.title,
+					description: params.description,
+					logoUrl: params.logoUrl,
+				}),
+			},
+		});
+	}
+
+	export async function updateFeed(params: {
+		feedId: string;
+		title?: string;
+		description?: string;
+		logoUrl?: string;
+		comissions?: Record<string, string>;
+	}) {
+		return await request(`/feeds/${params.feedId}`, {
+			params: {
+				method: 'PUT',
+				headers: {
+					'Content-Type': 'application/json',
+				},
+				body: JSON.stringify({
+					comissions: params.comissions,
+					title: params.title,
+					description: params.description,
+					logoUrl: params.logoUrl,
+				}),
+			},
+		});
+	}
+
+	export async function getComissions(params: { feedId: string }) {
+		return await request(`/feeds/${params.feedId}/comissions`, {
+			params: {
+				method: 'GET',
+			},
 		});
 	}
 }

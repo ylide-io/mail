@@ -4,7 +4,7 @@ import { observer } from 'mobx-react';
 import { forwardRef, Ref, useEffect, useImperativeHandle, useMemo, useRef, useState } from 'react';
 import { useMutation } from 'react-query';
 
-import { DecodedVenomFeedPost, VenomFilterApi } from '../../../../api/venomFilterApi';
+import { DecodedBlockchainFeedPost, BlockchainFeedApi } from '../../../../api/blockchainFeedApi';
 import { AccountSelect } from '../../../../components/accountSelect/accountSelect';
 import { ActionButton, ActionButtonLook, ActionButtonSize } from '../../../../components/ActionButton/ActionButton';
 import { AutoSizeTextArea, AutoSizeTextAreaApi } from '../../../../components/autoSizeTextArea/autoSizeTextArea';
@@ -24,11 +24,11 @@ import { HorizontalAlignment } from '../../../../utils/alignment';
 import { hashToIpfsUrl, ipfsToHttpUrl } from '../../../../utils/ipfs';
 import { escapeRegex } from '../../../../utils/regex';
 import { SendMailButton } from '../../../mail/components/composeMailForm/sendMailButton/sendMailButton';
-import { VenomFeedPostItemView } from '../venomFeedPostItem/venomFeedPostItem';
+import { BlockchainFeedPostItemView } from '../venomFeedPostItem/venomFeedPostItem';
 import css from './createPostForm.module.scss';
 
 export interface CreatePostFormApi {
-	replyTo: (post: DecodedVenomFeedPost) => void;
+	replyTo: (post: DecodedBlockchainFeedPost) => void;
 }
 
 export interface CreatePostFormProps extends PropsWithClassName {
@@ -47,7 +47,7 @@ export const CreatePostForm = observer(
 		) => {
 			const textAreaApiRef = useRef<AutoSizeTextAreaApi>(null);
 
-			const [replyTo, setReplyTo] = useState<DecodedVenomFeedPost>();
+			const [replyTo, setReplyTo] = useState<DecodedBlockchainFeedPost>();
 
 			const mailData = useMemo(() => {
 				const mailData = new OutgoingMailData();
@@ -103,7 +103,7 @@ export const CreatePostForm = observer(
 			const [lastIdea, setLastIdea] = useState('');
 
 			const { mutate: loadIdea, isLoading: isIdeaLoading } = useMutation({
-				mutationFn: () => VenomFilterApi.getTextIdea(),
+				mutationFn: () => BlockchainFeedApi.getTextIdea(),
 				onSuccess: data => {
 					let text = mailData.plainTextData;
 
@@ -182,7 +182,7 @@ export const CreatePostForm = observer(
 								</ActionButton>
 							</div>
 
-							<VenomFeedPostItemView post={replyTo} isCompact />
+							<BlockchainFeedPostItemView post={replyTo} isCompact />
 
 							<div className={css.divider} />
 						</>

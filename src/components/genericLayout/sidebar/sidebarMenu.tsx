@@ -340,6 +340,7 @@ export const SidebarMenu = observer(() => {
 					VenomProjectId.OASIS_GALLERY,
 					VenomProjectId.VENTORY,
 					VenomProjectId.YLIDE,
+					// VenomProjectId.ISME_TEST,
 				].map(id => {
 					const meta = venomProjectsMeta[id];
 
