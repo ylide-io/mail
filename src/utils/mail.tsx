@@ -25,8 +25,8 @@ import {
 	YlideIpfsStorage,
 	YMF,
 } from '@ylide/sdk';
-import { generatePath, matchPath, useLocation } from 'react-router-dom';
-import { useNav } from './url';
+import { generatePath } from 'react-router-dom';
+import { useIsMatchingRoute, useNav } from './url';
 import { getGlobalOutgoingMailData, OutgoingMailData } from '../stores/outgoingMailData';
 import { RoutePath } from '../stores/routePath';
 import { browserStorage } from '../stores/browserStorage';
@@ -588,8 +588,8 @@ export function isEmptyYMF(ymf: YMF) {
 // UI
 
 export function useOpenMailCompose() {
-	const location = useLocation();
 	const navigate = useNav();
+	const isComposePage = useIsMatchingRoute(RoutePath.MAIL_COMPOSE);
 
 	return useCallback(
 		({
@@ -601,7 +601,7 @@ export function useOpenMailCompose() {
 				analytics.openCompose(place);
 			}
 
-			if (!matchPath(RoutePath.MAIL_COMPOSE, location.pathname)) {
+			if (!isComposePage) {
 				if (browserStorage.widgetId === WidgetId.MAILBOX || forceComposePage) {
 					getGlobalOutgoingMailData().reset(mailData);
 					navigate(generatePath(RoutePath.MAIL_COMPOSE));
@@ -613,6 +613,6 @@ export function useOpenMailCompose() {
 				}
 			}
 		},
-		[location.pathname, navigate],
+		[isComposePage, navigate],
 	);
 }

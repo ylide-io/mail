@@ -1,7 +1,7 @@
 import { observer } from 'mobx-react';
 import React, { useEffect, useState } from 'react';
 import { QueryClient, QueryClientProvider } from 'react-query';
-import { generatePath, matchPath, Navigate, Route, Routes, useLocation, useSearchParams } from 'react-router-dom';
+import { generatePath, Navigate, Route, Routes, useLocation, useSearchParams } from 'react-router-dom';
 
 import { ActionButton, ActionButtonLook, ActionButtonSize } from './components/ActionButton/ActionButton';
 import { MainViewOnboarding } from './components/mainViewOnboarding/mainViewOnboarding';
@@ -37,7 +37,7 @@ import { browserStorage } from './stores/browserStorage';
 import domain from './stores/Domain';
 import { RoutePath } from './stores/routePath';
 import walletConnect from './stores/WalletConnect';
-import { useNav } from './utils/url';
+import { useIsMatchingRoute, useNav } from './utils/url';
 
 export enum AppTheme {
 	V1 = 'v1',
@@ -105,8 +105,10 @@ const App = observer(() => {
 
 	const [isInitError, setInitError] = useState(false);
 
+	const isTestPage = useIsMatchingRoute(RoutePath.TEST);
+
 	useEffect(() => {
-		if (!matchPath(RoutePath.TEST, location.pathname)) {
+		if (!isTestPage) {
 			const start = Date.now();
 			domain
 				.init()
@@ -116,7 +118,7 @@ const App = observer(() => {
 				})
 				.finally(() => console.log(`Initialization took ${Date.now() - start}ms`));
 		}
-	}, [location.pathname]);
+	}, [isTestPage]);
 
 	useEffect(() => {
 		if (!domain.accounts.hasActiveAccounts) {
@@ -152,7 +154,7 @@ const App = observer(() => {
 		);
 	}
 
-	if (!matchPath(RoutePath.TEST, location.pathname) && !domain.initialized) {
+	if (!isTestPage && !domain.initialized) {
 		return (
 			<div
 				style={{

@@ -3,7 +3,7 @@ import { observer } from 'mobx-react';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { InView } from 'react-intersection-observer';
 import { useInfiniteQuery, useQuery } from 'react-query';
-import { generatePath, matchPath, matchRoutes, useLocation, useParams } from 'react-router-dom';
+import { generatePath, useParams } from 'react-router-dom';
 
 import { BlockchainFeedApi, decodeBlockchainFeedPost, DecodedBlockchainFeedPost } from '../../../api/blockchainFeedApi';
 import { FeedCategory, FeedServerApi } from '../../../api/feedServerApi';
@@ -24,7 +24,7 @@ import { RoutePath } from '../../../stores/routePath';
 import { connectAccount } from '../../../utils/account';
 import { invariant } from '../../../utils/assert';
 import { hookDependency } from '../../../utils/react';
-import { useNav } from '../../../utils/url';
+import { useIsMatchingRoute, useNav } from '../../../utils/url';
 import { CreatePostForm, CreatePostFormApi } from '../components/createPostForm/createPostForm';
 import { FeedPostItem } from '../components/feedPostItem/feedPostItem';
 import { BlockchainFeedPostItem } from '../components/venomFeedPostItem/venomFeedPostItem';
@@ -40,13 +40,12 @@ export function reloadFeed() {
 //
 
 const RegularFeed = observer(() => {
-	const location = useLocation();
 	const navigate = useNav();
 	const accounts = useDomainAccounts();
 	const genericLayoutApi = useGenericLayoutApi();
 
 	const { category, source, address } = useParams<{ category: FeedCategory; source: string; address: string }>();
-	const isAllPosts = !!matchPath(RoutePath.FEED_ALL, location.pathname);
+	const isAllPosts = useIsMatchingRoute(RoutePath.FEED_ALL);
 
 	const selectedAccounts = useMemo(
 		() =>
@@ -192,21 +191,15 @@ const RegularFeed = observer(() => {
 });
 
 const BlockchainProjectFeed = observer(() => {
-	const location = useLocation();
+	const isVenomAdmin = useIsMatchingRoute(RoutePath.FEED_VENOM_ADMIN);
+	const isTvm = useIsMatchingRoute(RoutePath.FEED_TVM);
+	const isTvmAdmin = useIsMatchingRoute(RoutePath.FEED_TVM_ADMIN);
+	const isAdminMode = isVenomAdmin || isTvmAdmin;
 
 	const { project: projectRaw } = useParams<{ project?: BlockchainProjectId }>();
-	const project =
-		projectRaw ||
-		(matchPath(RoutePath.FEED_TVM, location.pathname) || matchPath(RoutePath.FEED_TVM_ADMIN, location.pathname)
-			? BlockchainProjectId.TVM
-			: undefined);
+	const project = projectRaw || (isTvm || isTvmAdmin ? BlockchainProjectId.TVM : undefined);
 	invariant(project, 'Blockchain project must be specified');
 	const projectMeta = blockchainProjectsMeta[project];
-
-	const isAdminMode = !!(
-		matchPath(RoutePath.FEED_VENOM_ADMIN, location.pathname) ||
-		matchPath(RoutePath.FEED_TVM_ADMIN, location.pathname)
-	);
 
 	const allAccounts = useDomainAccounts();
 	const venomAccounts = useVenomAccounts();
@@ -373,17 +366,13 @@ const BlockchainProjectFeed = observer(() => {
 //
 
 export const FeedPage = () => {
-	const location = useLocation();
-	const isBlockchainProjectFeed = !!matchRoutes(
-		[
-			{ path: RoutePath.FEED_VENOM },
-			{ path: RoutePath.FEED_VENOM_PROJECT },
-			{ path: RoutePath.FEED_VENOM_ADMIN },
-			{ path: RoutePath.FEED_TVM },
-			{ path: RoutePath.FEED_TVM_ADMIN },
-		],
-		location.pathname,
-	)?.length;
+	const isBlockchainProjectFeed = useIsMatchingRoute(
+		RoutePath.FEED_VENOM,
+		RoutePath.FEED_VENOM_PROJECT,
+		RoutePath.FEED_VENOM_ADMIN,
+		RoutePath.FEED_TVM,
+		RoutePath.FEED_TVM_ADMIN,
+	);
 
 	return <GenericLayout>{isBlockchainProjectFeed ? <BlockchainProjectFeed /> : <RegularFeed />}</GenericLayout>;
 };

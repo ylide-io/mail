@@ -1,5 +1,6 @@
-import { createSearchParams, NavigateOptions, URLSearchParamsInit, useNavigate } from 'react-router-dom';
+import { createSearchParams, NavigateOptions, URLSearchParamsInit, useMatch, useNavigate } from 'react-router-dom';
 
+import { RoutePath } from '../stores/routePath';
 import { filterObjectEntries } from './object';
 
 export function toAbsoluteUrl(path: string) {
@@ -35,3 +36,9 @@ export const useNav = () => {
 		navigate(buildUrl(params), options);
 	};
 };
+
+//
+
+export function useIsMatchingRoute(...routes: RoutePath[]) {
+	return routes.map(useMatch).some(Boolean);
+}
