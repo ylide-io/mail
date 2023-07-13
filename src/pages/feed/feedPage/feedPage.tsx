@@ -1,32 +1,24 @@
 import { observable } from 'mobx';
 import { observer } from 'mobx-react';
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import { InView } from 'react-intersection-observer';
-import { useInfiniteQuery, useQuery } from 'react-query';
 import { generatePath, useParams } from 'react-router-dom';
 
-import { BlockchainFeedApi, decodeBlockchainFeedPost, DecodedBlockchainFeedPost } from '../../../api/blockchainFeedApi';
 import { FeedCategory, FeedServerApi } from '../../../api/feedServerApi';
 import { ActionButton, ActionButtonLook, ActionButtonSize } from '../../../components/ActionButton/ActionButton';
 import { ErrorMessage, ErrorMessageLook } from '../../../components/errorMessage/errorMessage';
 import { NarrowContent } from '../../../components/genericLayout/content/narrowContent/narrowContent';
 import { GenericLayout, useGenericLayoutApi } from '../../../components/genericLayout/genericLayout';
-import { toast } from '../../../components/toast/toast';
 import { YlideLoader } from '../../../components/ylideLoader/ylideLoader';
 import { AppMode, REACT_APP__APP_MODE } from '../../../env';
 import { ReactComponent as ArrowUpSvg } from '../../../icons/ic20/arrowUp.svg';
 import { ReactComponent as CrossSvg } from '../../../icons/ic20/cross.svg';
-import { analytics } from '../../../stores/Analytics';
-import { BlockchainProjectId, blockchainProjectsMeta } from '../../../stores/blockchainProjects/blockchainProjects';
-import { useDomainAccounts, useVenomAccounts } from '../../../stores/Domain';
+import { useDomainAccounts } from '../../../stores/Domain';
 import { FeedStore, getFeedCategoryName } from '../../../stores/Feed';
 import { RoutePath } from '../../../stores/routePath';
 import { connectAccount } from '../../../utils/account';
-import { invariant } from '../../../utils/assert';
 import { hookDependency } from '../../../utils/react';
 import { useIsMatchingRoute, useNav } from '../../../utils/url';
-import { BlockchainProjectPost } from '../components/blockchainProjectPost/blockchainProjectPost';
-import { CreatePostForm, CreatePostFormApi } from '../components/createPostForm/createPostForm';
 import { FeedPostItem } from '../components/feedPostItem/feedPostItem';
 import css from './feedPage.module.scss';
 import ErrorCode = FeedServerApi.ErrorCode;
@@ -39,7 +31,7 @@ export function reloadFeed() {
 
 //
 
-const RegularFeed = observer(() => {
+const FeedPageContent = observer(() => {
 	const navigate = useNav();
 	const accounts = useDomainAccounts();
 	const genericLayoutApi = useGenericLayoutApi();
@@ -190,184 +182,10 @@ const RegularFeed = observer(() => {
 	);
 });
 
-const BlockchainProjectFeed = observer(() => {
-	const { project } = useParams<{ project?: BlockchainProjectId }>();
-	invariant(project, 'Blockchain project must be specified');
-	const projectMeta = blockchainProjectsMeta[project];
-
-	const isAdminMode = useIsMatchingRoute(RoutePath.FEED_VENOM_ADMIN) || useIsMatchingRoute(RoutePath.FEED_TVM_ADMIN);
-
-	const allAccounts = useDomainAccounts();
-	const venomAccounts = useVenomAccounts();
-	const accounts = project === BlockchainProjectId.TVM ? allAccounts : venomAccounts;
-
-	const [currentPost, setCurrentPost] = useState<number>(0);
-
-	const postsQuery = useInfiniteQuery<DecodedBlockchainFeedPost[]>(['feed', 'venom', 'posts', project], {
-		queryFn: async ({ pageParam = 0 }) => {
-			analytics.venomFeedView(projectMeta.id);
-
-			const posts = await BlockchainFeedApi.getPosts({
-				feedId: projectMeta.feedId,
-				beforeTimestamp: pageParam,
-				adminMode: isAdminMode,
-			});
-			return posts.map(decodeBlockchainFeedPost);
-		},
-		getNextPageParam: lastPage =>
-			lastPage.length ? lastPage[lastPage.length - 1].original.createTimestamp : undefined,
-	});
-
-	const messages = postsQuery.data?.pages.flat() || [];
-
-	const [hasNewPosts, setHasNewPosts] = useState(false);
-
-	useQuery(['feed', 'venom', 'new-posts', project], {
-		queryFn: async () => {
-			if (!postsQuery.isLoading) {
-				const posts = await BlockchainFeedApi.getPosts({
-					feedId: projectMeta.feedId,
-					beforeTimestamp: 0,
-					adminMode: isAdminMode,
-				});
-				setHasNewPosts(!!(posts.length && messages.length && posts[0].id !== messages[0].original.id));
-			} else {
-				setHasNewPosts(false);
-			}
-		},
-		refetchInterval: 15 * 1000,
-	});
-
-	const serviceStatus = useQuery(['feed', 'venom', 'service-status'], {
-		queryFn: async () => (await BlockchainFeedApi.getServiceStatus()).status,
-		initialData: 'ACTIVE',
-		refetchInterval: 10000,
-	});
-
-	const reloadFeed = () => {
-		setHasNewPosts(false);
-		setCurrentPost(0);
-		postsQuery.remove();
-		postsQuery.refetch();
-	};
-
-	const renderLoadingError = () => <ErrorMessage>Couldn't load posts.</ErrorMessage>;
-
-	const createPostFormRef = useRef<CreatePostFormApi>(null);
-
+export function FeedPage() {
 	return (
-		<NarrowContent key={project} contentClassName={css.blockchainProjecsContent}>
-			<div className={css.blockchainProjectTitle}>
-				<div className={css.blockchainProjectLogo}>{projectMeta.logo}</div>
-				<div className={css.blockchainProjectName}>{projectMeta.name}</div>
-				<div className={css.blockchainProjectDescription}>{projectMeta.description}</div>
-			</div>
-
-			{hasNewPosts && (
-				<div className={css.newPostsButtonWrapper}>
-					<ActionButton
-						className={css.newPostsButton}
-						look={ActionButtonLook.SECONDARY}
-						onClick={() => reloadFeed()}
-					>
-						Load new posts
-					</ActionButton>
-				</div>
-			)}
-
-			<div className={css.divider} />
-
-			{accounts.length ? (
-				<CreatePostForm
-					ref={createPostFormRef}
-					projectMeta={projectMeta}
-					className={css.createPostForm}
-					accounts={accounts}
-					displayIdeasButton={projectMeta.id === BlockchainProjectId.VENOM_BLOCKCHAIN}
-					isAnavailable={serviceStatus.data !== 'ACTIVE'}
-					onCreated={() => toast('Good job! Your post will appear shortly 🔥')}
-				/>
-			) : (
-				<ErrorMessage look={ErrorMessageLook.INFO}>
-					<div>Connect your Venom wallet to post messages to Venom feed.</div>
-
-					<ActionButton
-						look={ActionButtonLook.PRIMARY}
-						onClick={() => connectAccount({ place: 'venom-feed_no-accounts' })}
-					>
-						Connect account
-					</ActionButton>
-				</ErrorMessage>
-			)}
-
-			{/* <ErrorMessage look={ErrorMessageLook.INFO}>
-				Venom Blockchain Is Under Maintenance: To stay informed about the latest developments and announcements,
-				we encourage you to check Venom’s official social media channels.
-			</ErrorMessage> */}
-
-			<div className={css.divider} />
-
-			<div className={css.posts}>
-				{messages.length ? (
-					<>
-						{messages.map((message, idx) => (
-							<BlockchainProjectPost
-								key={idx}
-								isFirstPost={idx === currentPost}
-								post={message}
-								onNextPost={() => setCurrentPost(idx + 1)}
-								onReplyClick={() => {
-									analytics.venomFeedReply(projectMeta.id, message.original.id);
-
-									if (accounts.length) {
-										createPostFormRef.current?.replyTo(message);
-									} else {
-										toast('You need to connect a Venom account in order to reply 👍');
-									}
-								}}
-							/>
-						))}
-
-						{postsQuery.isError
-							? renderLoadingError()
-							: postsQuery.hasNextPage && (
-									<InView
-										className={css.loader}
-										rootMargin="100px"
-										onChange={inView => {
-											if (inView) {
-												analytics.venomFeedLoadMore(projectMeta.id);
-												postsQuery.fetchNextPage();
-											}
-										}}
-									>
-										<YlideLoader reason="Loading more posts ..." />
-									</InView>
-							  )}
-					</>
-				) : postsQuery.isLoading ? (
-					<div className={css.loader}>
-						<YlideLoader reason="Your feed is loading ..." />
-					</div>
-				) : postsQuery.isError ? (
-					renderLoadingError()
-				) : (
-					<ErrorMessage look={ErrorMessageLook.INFO}>No messages yet</ErrorMessage>
-				)}
-			</div>
-		</NarrowContent>
+		<GenericLayout>
+			<FeedPageContent />
+		</GenericLayout>
 	);
-});
-
-//
-
-export const FeedPage = () => {
-	const isBlockchainProjectFeed = useIsMatchingRoute(
-		RoutePath.FEED_VENOM_PROJECT,
-		RoutePath.FEED_VENOM_ADMIN,
-		RoutePath.FEED_TVM_PROJECT,
-		RoutePath.FEED_TVM_ADMIN,
-	);
-
-	return <GenericLayout>{isBlockchainProjectFeed ? <BlockchainProjectFeed /> : <RegularFeed />}</GenericLayout>;
-};
+}

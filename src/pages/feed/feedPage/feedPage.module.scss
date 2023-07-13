@@ -5,12 +5,6 @@
 	padding: 40px 0;
 }
 
-.createPostForm {
-	@include less720px {
-		margin: 0 12px;
-	}
-}
-
 .posts {
 	display: grid;
 	grid-gap: 12px;
@@ -22,67 +16,4 @@
 	right: 20px;
 	bottom: 20px;
 	box-shadow: var(--popup-shadow);
-}
-
-.divider {
-	border-bottom: 1px solid var(--border-color);
-}
-
-//
-
-.newPostsButtonWrapper {
-	display: flex;
-	justify-content: center;
-	position: sticky;
-	z-index: 1;
-	top: 0;
-	height: 0;
-}
-
-.newPostsButton {
-	margin: 24px 0 0;
-	transform: translateY(-50%);
-}
-
-//
-
-.blockchainProjecsContent {
-	position: relative;
-
-	> :not(:first-child) {
-		margin-top: 24px;
-
-		&.newPostsButtonWrapper {
-			margin-top: 0;
-		}
-	}
-}
-
-.blockchainProjectTitle {
-	display: grid;
-	grid-template-columns: auto 1fr;
-	grid-gap: 4px 10px;
-
-	@include less720px {
-		padding: 0 12px;
-	}
-}
-
-.blockchainProjectLogo {
-	grid-row: 1/3;
-	margin: 5px 0 0;
-
-	> svg {
-		width: 44px;
-		height: 44px;
-	}
-}
-
-.blockchainProjectName {
-	font-size: 24px;
-}
-
-.blockchainProjectDescription {
-	font-size: 15px;
-	font-weight: $font-weight_light;
 }

@@ -15,6 +15,7 @@ import { AppMode, REACT_APP__APP_MODE } from './env';
 import { ReactComponent as CrossSvg } from './icons/ic20/cross.svg';
 import { AdminFeedPage } from './pages/AdminFeedPage';
 import { AdminPage } from './pages/AdminPage';
+import { BlockchainProjectFeedPage } from './pages/feed/blockchainProjectFeedPage/blockchainProjectFeedPage';
 import { FeedPage } from './pages/feed/feedPage/feedPage';
 import { FeedPostPage } from './pages/feed/feedPostPage/feedPostPage';
 import { ComposePage } from './pages/mail/composePage/composePage';
@@ -250,8 +251,8 @@ export const App = observer(() => {
 								/>
 							}
 						/>
-						<Route path={RoutePath.FEED_VENOM_PROJECT} element={<FeedPage />} />
-						<Route path={RoutePath.FEED_VENOM_ADMIN} element={<FeedPage />} />
+						<Route path={RoutePath.FEED_VENOM_PROJECT} element={<BlockchainProjectFeedPage />} />
+						<Route path={RoutePath.FEED_VENOM_ADMIN} element={<BlockchainProjectFeedPage />} />
 
 						<Route
 							path={RoutePath.FEED_TVM}
@@ -264,8 +265,8 @@ export const App = observer(() => {
 								/>
 							}
 						/>
-						<Route path={RoutePath.FEED_TVM_PROJECT} element={<FeedPage />} />
-						<Route path={RoutePath.FEED_TVM_ADMIN} element={<FeedPage />} />
+						<Route path={RoutePath.FEED_TVM_PROJECT} element={<BlockchainProjectFeedPage />} />
+						<Route path={RoutePath.FEED_TVM_ADMIN} element={<BlockchainProjectFeedPage />} />
 
 						<Route path={RoutePath.MAIL_COMPOSE} element={<ComposePage />} />
 						<Route path={RoutePath.MAIL_CONTACTS} element={<ContactListPage />} />
