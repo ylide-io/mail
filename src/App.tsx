@@ -238,8 +238,7 @@ export const App = observer(() => {
 						<Route path={RoutePath.FEED_SOURCE} element={<FeedPage />} />
 						<Route path={RoutePath.FEED_SMART} element={<FeedPage />} />
 						<Route path={RoutePath.FEED_SMART_ADDRESS} element={<FeedPage />} />
-						<Route path={RoutePath.FEED_VENOM_PROJECT} element={<FeedPage />} />
-						<Route path={RoutePath.FEED_VENOM_ADMIN} element={<FeedPage />} />
+
 						<Route
 							path={RoutePath.FEED_VENOM}
 							element={
@@ -251,7 +250,21 @@ export const App = observer(() => {
 								/>
 							}
 						/>
-						<Route path={RoutePath.FEED_TVM} element={<FeedPage />} />
+						<Route path={RoutePath.FEED_VENOM_PROJECT} element={<FeedPage />} />
+						<Route path={RoutePath.FEED_VENOM_ADMIN} element={<FeedPage />} />
+
+						<Route
+							path={RoutePath.FEED_TVM}
+							element={
+								<Navigate
+									replace
+									to={generatePath(RoutePath.FEED_TVM_PROJECT, {
+										project: BlockchainProjectId.TVM,
+									})}
+								/>
+							}
+						/>
+						<Route path={RoutePath.FEED_TVM_PROJECT} element={<FeedPage />} />
 						<Route path={RoutePath.FEED_TVM_ADMIN} element={<FeedPage />} />
 
 						<Route path={RoutePath.MAIL_COMPOSE} element={<ComposePage />} />

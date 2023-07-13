@@ -191,15 +191,11 @@ const RegularFeed = observer(() => {
 });
 
 const BlockchainProjectFeed = observer(() => {
-	const isVenomAdmin = useIsMatchingRoute(RoutePath.FEED_VENOM_ADMIN);
-	const isTvm = useIsMatchingRoute(RoutePath.FEED_TVM);
-	const isTvmAdmin = useIsMatchingRoute(RoutePath.FEED_TVM_ADMIN);
-	const isAdminMode = isVenomAdmin || isTvmAdmin;
-
-	const { project: projectRaw } = useParams<{ project?: BlockchainProjectId }>();
-	const project = projectRaw || (isTvm || isTvmAdmin ? BlockchainProjectId.TVM : undefined);
+	const { project } = useParams<{ project?: BlockchainProjectId }>();
 	invariant(project, 'Blockchain project must be specified');
 	const projectMeta = blockchainProjectsMeta[project];
+
+	const isAdminMode = useIsMatchingRoute(RoutePath.FEED_VENOM_ADMIN) || useIsMatchingRoute(RoutePath.FEED_TVM_ADMIN);
 
 	const allAccounts = useDomainAccounts();
 	const venomAccounts = useVenomAccounts();
@@ -367,10 +363,9 @@ const BlockchainProjectFeed = observer(() => {
 
 export const FeedPage = () => {
 	const isBlockchainProjectFeed = useIsMatchingRoute(
-		RoutePath.FEED_VENOM,
 		RoutePath.FEED_VENOM_PROJECT,
 		RoutePath.FEED_VENOM_ADMIN,
-		RoutePath.FEED_TVM,
+		RoutePath.FEED_TVM_PROJECT,
 		RoutePath.FEED_TVM_ADMIN,
 	);
 

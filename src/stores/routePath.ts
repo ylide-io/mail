@@ -27,10 +27,11 @@ export enum RoutePath {
 	FEED_SMART = '/feed/smart',
 	FEED_SMART_ADDRESS = '/feed/smart/:address',
 	FEED_VENOM = '/feed/venom',
-	FEED_VENOM_ADMIN = '/feed/venom/:project/admin',
 	FEED_VENOM_PROJECT = '/feed/venom/:project',
+	FEED_VENOM_ADMIN = '/feed/venom/:project/admin',
 	FEED_TVM = '/feed/tvm',
-	FEED_TVM_ADMIN = '/feed/tvm/admin',
+	FEED_TVM_PROJECT = '/feed/tvm/:project',
+	FEED_TVM_ADMIN = '/feed/tvm/:project/admin',
 
 	OTC_ASSETS = '/otc/assets',
 	OTC_WALLETS = '/otc/wallets',
