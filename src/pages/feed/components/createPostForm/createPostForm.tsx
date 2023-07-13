@@ -4,7 +4,7 @@ import { observer } from 'mobx-react';
 import { forwardRef, Ref, useEffect, useImperativeHandle, useMemo, useRef, useState } from 'react';
 import { useMutation } from 'react-query';
 
-import { DecodedBlockchainFeedPost, BlockchainFeedApi } from '../../../../api/blockchainFeedApi';
+import { BlockchainFeedApi, DecodedBlockchainFeedPost } from '../../../../api/blockchainFeedApi';
 import { AccountSelect } from '../../../../components/accountSelect/accountSelect';
 import { ActionButton, ActionButtonLook, ActionButtonSize } from '../../../../components/ActionButton/ActionButton';
 import { AutoSizeTextArea, AutoSizeTextAreaApi } from '../../../../components/autoSizeTextArea/autoSizeTextArea';
@@ -17,9 +17,9 @@ import { ReactComponent as TrashSvg } from '../../../../icons/ic20/trash.svg';
 import { ReactComponent as BulbSvg } from '../../../../icons/ic28/bulb.svg';
 import { ReactComponent as StickerSvg } from '../../../../icons/ic28/sticker.svg';
 import { analytics } from '../../../../stores/Analytics';
+import { BlockchainProjectMeta } from '../../../../stores/blockchainProjects/blockchainProjects';
 import { DomainAccount } from '../../../../stores/models/DomainAccount';
 import { OutgoingMailData, OutgoingMailDataMode } from '../../../../stores/outgoingMailData';
-import { VenomProjectMeta } from '../../../../stores/venomProjects/venomProjects';
 import { HorizontalAlignment } from '../../../../utils/alignment';
 import { hashToIpfsUrl, ipfsToHttpUrl } from '../../../../utils/ipfs';
 import { escapeRegex } from '../../../../utils/regex';
@@ -35,7 +35,7 @@ export interface CreatePostFormProps extends PropsWithClassName {
 	accounts: DomainAccount[];
 	isAnavailable: boolean;
 	displayIdeasButton: boolean;
-	projectMeta: VenomProjectMeta;
+	projectMeta: BlockchainProjectMeta;
 	onCreated?: () => void;
 }
 

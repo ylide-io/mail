@@ -5,8 +5,8 @@ import { InView } from 'react-intersection-observer';
 import { useInfiniteQuery, useQuery } from 'react-query';
 import { generatePath, matchPath, matchRoutes, useLocation, useParams } from 'react-router-dom';
 
+import { BlockchainFeedApi, decodeBlockchainFeedPost, DecodedBlockchainFeedPost } from '../../../api/blockchainFeedApi';
 import { FeedCategory, FeedServerApi } from '../../../api/feedServerApi';
-import { DecodedBlockchainFeedPost, decodeBlockchainFeedPost, BlockchainFeedApi } from '../../../api/blockchainFeedApi';
 import { ActionButton, ActionButtonLook, ActionButtonSize } from '../../../components/ActionButton/ActionButton';
 import { ErrorMessage, ErrorMessageLook } from '../../../components/errorMessage/errorMessage';
 import { NarrowContent } from '../../../components/genericLayout/content/narrowContent/narrowContent';
@@ -17,10 +17,10 @@ import { AppMode, REACT_APP__APP_MODE } from '../../../env';
 import { ReactComponent as ArrowUpSvg } from '../../../icons/ic20/arrowUp.svg';
 import { ReactComponent as CrossSvg } from '../../../icons/ic20/cross.svg';
 import { analytics } from '../../../stores/Analytics';
+import { BlockchainProjectId, blockchainProjectsMeta } from '../../../stores/blockchainProjects/blockchainProjects';
 import { useDomainAccounts, useVenomAccounts } from '../../../stores/Domain';
 import { FeedStore, getFeedCategoryName } from '../../../stores/Feed';
 import { RoutePath } from '../../../stores/routePath';
-import { VenomProjectId, venomProjectsMeta } from '../../../stores/venomProjects/venomProjects';
 import { connectAccount } from '../../../utils/account';
 import { invariant } from '../../../utils/assert';
 import { hookDependency } from '../../../utils/react';
@@ -39,7 +39,7 @@ export function reloadFeed() {
 
 //
 
-const RegularFeedContent = observer(() => {
+const RegularFeed = observer(() => {
 	const location = useLocation();
 	const navigate = useNav();
 	const accounts = useDomainAccounts();
@@ -191,17 +191,17 @@ const RegularFeedContent = observer(() => {
 	);
 });
 
-const VenomFeedContent = observer(() => {
+const BlockchainProjectFeed = observer(() => {
 	const location = useLocation();
 
-	const { project: projectRaw } = useParams<{ project?: VenomProjectId }>();
+	const { project: projectRaw } = useParams<{ project?: BlockchainProjectId }>();
 	const project =
 		projectRaw ||
 		(matchPath(RoutePath.FEED_TVM, location.pathname) || matchPath(RoutePath.FEED_TVM_ADMIN, location.pathname)
-			? VenomProjectId.TVM
+			? BlockchainProjectId.TVM
 			: undefined);
-	invariant(project, 'Venom project must be specified');
-	const projectMeta = venomProjectsMeta[project];
+	invariant(project, 'Blockchain project must be specified');
+	const projectMeta = blockchainProjectsMeta[project];
 
 	const isAdminMode = !!(
 		matchPath(RoutePath.FEED_VENOM_ADMIN, location.pathname) ||
@@ -210,7 +210,7 @@ const VenomFeedContent = observer(() => {
 
 	const allAccounts = useDomainAccounts();
 	const venomAccounts = useVenomAccounts();
-	const accounts = project === VenomProjectId.TVM ? allAccounts : venomAccounts;
+	const accounts = project === BlockchainProjectId.TVM ? allAccounts : venomAccounts;
 
 	const [currentPost, setCurrentPost] = useState<number>(0);
 
@@ -267,11 +267,11 @@ const VenomFeedContent = observer(() => {
 	const createPostFormRef = useRef<CreatePostFormApi>(null);
 
 	return (
-		<NarrowContent key={project} contentClassName={css.venomProjecsContent}>
-			<div className={css.venomProjectTitle}>
-				<div className={css.venomProjectLogo}>{projectMeta.logo}</div>
-				<div className={css.venomProjectName}>{projectMeta.name}</div>
-				<div className={css.venomProjectDescription}>{projectMeta.description}</div>
+		<NarrowContent key={project} contentClassName={css.blockchainProjecsContent}>
+			<div className={css.blockchainProjectTitle}>
+				<div className={css.blockchainProjectLogo}>{projectMeta.logo}</div>
+				<div className={css.blockchainProjectName}>{projectMeta.name}</div>
+				<div className={css.blockchainProjectDescription}>{projectMeta.description}</div>
 			</div>
 
 			{hasNewPosts && (
@@ -294,7 +294,7 @@ const VenomFeedContent = observer(() => {
 					projectMeta={projectMeta}
 					className={css.createPostForm}
 					accounts={accounts}
-					displayIdeasButton={projectMeta.id === VenomProjectId.VENOM_BLOCKCHAIN}
+					displayIdeasButton={projectMeta.id === BlockchainProjectId.VENOM_BLOCKCHAIN}
 					isAnavailable={serviceStatus.data !== 'ACTIVE'}
 					onCreated={() => toast('Good job! Your post will appear shortly 🔥')}
 				/>
@@ -374,7 +374,7 @@ const VenomFeedContent = observer(() => {
 
 export const FeedPage = () => {
 	const location = useLocation();
-	const isVenomFeed = !!matchRoutes(
+	const isBlockchainProjectFeed = !!matchRoutes(
 		[
 			{ path: RoutePath.FEED_VENOM },
 			{ path: RoutePath.FEED_VENOM_PROJECT },
@@ -385,5 +385,5 @@ export const FeedPage = () => {
 		location.pathname,
 	)?.length;
 
-	return <GenericLayout>{isVenomFeed ? <VenomFeedContent /> : <RegularFeedContent />}</GenericLayout>;
+	return <GenericLayout>{isBlockchainProjectFeed ? <BlockchainProjectFeed /> : <RegularFeed />}</GenericLayout>;
 };

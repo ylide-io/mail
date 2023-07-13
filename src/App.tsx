@@ -32,10 +32,10 @@ import { TestPage } from './pages/TestPage/TestPage';
 import { MailboxWidget } from './pages/widgets/mailboxWidget/mailboxWidget';
 import { SendMessageWidget } from './pages/widgets/sendMessageWidget/sendMessageWidget';
 import { analytics } from './stores/Analytics';
+import { BlockchainProjectId } from './stores/blockchainProjects/blockchainProjects';
 import { browserStorage } from './stores/browserStorage';
 import domain from './stores/Domain';
 import { RoutePath } from './stores/routePath';
-import { VenomProjectId } from './stores/venomProjects/venomProjects';
 import walletConnect from './stores/WalletConnect';
 import { useNav } from './utils/url';
 
@@ -244,7 +244,7 @@ const App = observer(() => {
 								<Navigate
 									replace
 									to={generatePath(RoutePath.FEED_VENOM_PROJECT, {
-										project: VenomProjectId.VENOM_BLOCKCHAIN,
+										project: BlockchainProjectId.VENOM_BLOCKCHAIN,
 									})}
 								/>
 							}

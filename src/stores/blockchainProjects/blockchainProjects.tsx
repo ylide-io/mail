@@ -16,7 +16,7 @@ import { ReactComponent as VentorySvg } from './icons/ventory.svg';
 import { ReactComponent as Web3WorldSvg } from './icons/web3World.svg';
 import { ReactComponent as YlideSvg } from './icons/ylide.svg';
 
-export enum VenomProjectId {
+export enum BlockchainProjectId {
 	NUMI = 'numi',
 	OASIS_GALLERY = 'oasis_gallery',
 	SNIPA = 'snipa',
@@ -36,96 +36,96 @@ export enum VenomProjectId {
 	ISME_TEST = 'isme_test',
 }
 
-export interface VenomProjectMeta {
-	id: VenomProjectId;
+export interface BlockchainProjectMeta {
+	id: BlockchainProjectId;
 	feedId: Uint256;
 	name: string;
 	description: string;
 	logo: ReactNode;
 }
 
-export const venomProjectsMeta: Record<VenomProjectId, VenomProjectMeta> = {
-	[VenomProjectId.NUMI]: {
-		id: VenomProjectId.NUMI,
+export const blockchainProjectsMeta: Record<BlockchainProjectId, BlockchainProjectMeta> = {
+	[BlockchainProjectId.NUMI]: {
+		id: BlockchainProjectId.NUMI,
 		feedId: '1000000000000000000000000000000000000000000000000000000000000005' as Uint256,
 		name: 'Nümi',
 		description:
 			'Nümi is the first anime metaverse on Venom blockchain that provides players with limitless possibilities to create their own gaming experience.',
 		logo: <NumiSvg />,
 	},
-	[VenomProjectId.OASIS_GALLERY]: {
-		id: VenomProjectId.OASIS_GALLERY,
+	[BlockchainProjectId.OASIS_GALLERY]: {
+		id: BlockchainProjectId.OASIS_GALLERY,
 		feedId: '1000000000000000000000000000000000000000000000000000000000000006' as Uint256,
 		name: 'oasis.gallery',
 		description: "Trade unique digital assets on Venom blockchain's NFT marketplace.",
 		logo: <OasisGallerySvg />,
 	},
-	[VenomProjectId.SNIPA]: {
-		id: VenomProjectId.SNIPA,
+	[BlockchainProjectId.SNIPA]: {
+		id: BlockchainProjectId.SNIPA,
 		feedId: '1000000000000000000000000000000000000000000000000000000000000007' as Uint256,
 		name: 'Snipa',
 		description: 'DeFi portfolio tracker designed for users to manage their assets.',
 		logo: <SnipaSvg />,
 	},
-	[VenomProjectId.VENOM_BLOCKCHAIN]: {
-		id: VenomProjectId.VENOM_BLOCKCHAIN,
+	[BlockchainProjectId.VENOM_BLOCKCHAIN]: {
+		id: BlockchainProjectId.VENOM_BLOCKCHAIN,
 		feedId: VENOM_FEED_ID,
 		name: 'Venom Blockchain',
 		description: 'Versatile and innovative blockchain that offers a range of use cases across various industries.',
 		logo: <VenomBlockchainSvg />,
 	},
-	[VenomProjectId.VENOM_BRIDGE]: {
-		id: VenomProjectId.VENOM_BRIDGE,
+	[BlockchainProjectId.VENOM_BRIDGE]: {
+		id: BlockchainProjectId.VENOM_BRIDGE,
 		feedId: '1000000000000000000000000000000000000000000000000000000000000009' as Uint256,
 		name: 'Venom Bridge',
 		description:
 			'Explore the world of interchain transactions by effortlessly transferring tokens from one chain to the other.',
 		logo: <VenomBridgeSvg />,
 	},
-	[VenomProjectId.VENOM_PAD]: {
-		id: VenomProjectId.VENOM_PAD,
+	[BlockchainProjectId.VENOM_PAD]: {
+		id: BlockchainProjectId.VENOM_PAD,
 		feedId: '100000000000000000000000000000000000000000000000000000000000000a' as Uint256,
 		name: 'VenomPad',
 		description: 'First crowdfunding platform on Venom.',
 		logo: <VenomPadSvg />,
 	},
-	[VenomProjectId.VENOM_SCAN]: {
-		id: VenomProjectId.VENOM_SCAN,
+	[BlockchainProjectId.VENOM_SCAN]: {
+		id: BlockchainProjectId.VENOM_SCAN,
 		feedId: '100000000000000000000000000000000000000000000000000000000000000b' as Uint256,
 		name: 'Venom Scan',
 		description: 'Search and explore the immutable records of the Venom blockchain.',
 		logo: <VenomScanSvg />,
 	},
-	[VenomProjectId.VENOM_STAKE]: {
-		id: VenomProjectId.VENOM_STAKE,
+	[BlockchainProjectId.VENOM_STAKE]: {
+		id: BlockchainProjectId.VENOM_STAKE,
 		feedId: '100000000000000000000000000000000000000000000000000000000000000c' as Uint256,
 		name: 'VenomStake',
 		description: 'Secure solution for staking VENOM tokens, enabling users to maximize rewards.',
 		logo: <VenomStakeSvg />,
 	},
-	[VenomProjectId.VENOM_WALLET]: {
-		id: VenomProjectId.VENOM_WALLET,
+	[BlockchainProjectId.VENOM_WALLET]: {
+		id: BlockchainProjectId.VENOM_WALLET,
 		feedId: '100000000000000000000000000000000000000000000000000000000000000d' as Uint256,
 		name: 'Venom Wallet',
 		description: 'Non-custodial wallet with a Multisig accounts option and Ledger support.',
 		logo: <VenomWalletSvg />,
 	},
-	[VenomProjectId.WEB3_WORLD]: {
-		id: VenomProjectId.WEB3_WORLD,
+	[BlockchainProjectId.WEB3_WORLD]: {
+		id: BlockchainProjectId.WEB3_WORLD,
 		feedId: '100000000000000000000000000000000000000000000000000000000000000e' as Uint256,
 		name: 'Web3.World',
 		description: 'First DEX on Venom that enables seamless trading by pooling liquidity from investors.',
 		logo: <Web3WorldSvg />,
 	},
-	[VenomProjectId.YLIDE]: {
-		id: VenomProjectId.YLIDE,
+	[BlockchainProjectId.YLIDE]: {
+		id: BlockchainProjectId.YLIDE,
 		feedId: '100000000000000000000000000000000000000000000000000000000000000f' as Uint256,
 		name: 'Ylide',
 		description: 'Protocol for wallet-to-wallet communication with built-in payments.',
 		logo: <YlideSvg />,
 	},
-	[VenomProjectId.VENTORY]: {
-		id: VenomProjectId.VENTORY,
+	[BlockchainProjectId.VENTORY]: {
+		id: BlockchainProjectId.VENTORY,
 		feedId: '1000000000000000000000000000000000000000000000000000000000000010' as Uint256,
 		name: 'Ventory',
 		description:
@@ -133,16 +133,16 @@ export const venomProjectsMeta: Record<VenomProjectId, VenomProjectMeta> = {
 		logo: <VentorySvg />,
 	},
 
-	[VenomProjectId.TVM]: {
-		id: VenomProjectId.TVM,
+	[BlockchainProjectId.TVM]: {
+		id: BlockchainProjectId.TVM,
 		feedId: '2000000000000000000000000000000000000000000000000000000000000001' as Uint256,
 		name: 'TVM 주요 업데이트',
 		description: '베놈과 에버스케일을 포함한 TVM 블록체인의 주요 업데이트 내용을 공유하는 채널',
 		logo: <TvmSvg />,
 	},
 
-	[VenomProjectId.ISME_TEST]: {
-		id: VenomProjectId.ISME_TEST,
+	[BlockchainProjectId.ISME_TEST]: {
+		id: BlockchainProjectId.ISME_TEST,
 		feedId: '11d558ad3a44a6b7476209ccaecdfaf55462d9bb0edcc69c64c0f94f9b2ecc98' as Uint256,
 		name: 'isme',
 		description: 'ISME Test Evm',

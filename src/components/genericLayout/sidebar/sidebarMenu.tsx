@@ -32,13 +32,13 @@ import { sideSecurityIcon } from '../../../icons/static/sideSecurityIcon';
 import { sideTechnologyIcon } from '../../../icons/static/sideTechnologyIcon';
 import { FeedSettingsPopup } from '../../../pages/feed/components/feedSettingsPopup/feedSettingsPopup';
 import { analytics } from '../../../stores/Analytics';
+import { BlockchainProjectId, blockchainProjectsMeta } from '../../../stores/blockchainProjects/blockchainProjects';
 import { browserStorage } from '../../../stores/browserStorage';
 import domain, { useDomainAccounts } from '../../../stores/Domain';
 import { getFeedCategoryName } from '../../../stores/Feed';
 import { FolderId, MailList } from '../../../stores/MailList';
 import { DomainAccount } from '../../../stores/models/DomainAccount';
 import { RoutePath } from '../../../stores/routePath';
-import { VenomProjectId, venomProjectsMeta } from '../../../stores/venomProjects/venomProjects';
 import { useOpenMailCompose } from '../../../utils/mail';
 import { useNav } from '../../../utils/url';
 import { ActionButton, ActionButtonLook, ActionButtonSize } from '../../ActionButton/ActionButton';
@@ -333,16 +333,15 @@ export const SidebarMenu = observer(() => {
 		return (
 			<SidebarSection section={Section.VENOM_PROJECTS} title="Venom Projects">
 				{[
-					VenomProjectId.VENOM_BLOCKCHAIN,
-					VenomProjectId.SNIPA,
-					VenomProjectId.WEB3_WORLD,
-					VenomProjectId.VENOM_BRIDGE,
-					VenomProjectId.OASIS_GALLERY,
-					VenomProjectId.VENTORY,
-					VenomProjectId.YLIDE,
-					// VenomProjectId.ISME_TEST,
+					BlockchainProjectId.VENOM_BLOCKCHAIN,
+					BlockchainProjectId.SNIPA,
+					BlockchainProjectId.WEB3_WORLD,
+					BlockchainProjectId.VENOM_BRIDGE,
+					BlockchainProjectId.OASIS_GALLERY,
+					BlockchainProjectId.VENTORY,
+					BlockchainProjectId.YLIDE,
 				].map(id => {
-					const meta = venomProjectsMeta[id];
+					const meta = blockchainProjectsMeta[id];
 
 					return (
 						<SidebarButton
@@ -364,8 +363,8 @@ export const SidebarMenu = observer(() => {
 			<SidebarSection section={Section.TVM_PROJECTS} title="TVM 주요정보">
 				<SidebarButton
 					href={generatePath(RoutePath.FEED_TVM)}
-					name={venomProjectsMeta[VenomProjectId.TVM].name}
-					icon={venomProjectsMeta[VenomProjectId.TVM].logo}
+					name={blockchainProjectsMeta[BlockchainProjectId.TVM].name}
+					icon={blockchainProjectsMeta[BlockchainProjectId.TVM].logo}
 				/>
 			</SidebarSection>
 		);
