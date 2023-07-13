@@ -23,19 +23,19 @@ import { CreatePostForm, CreatePostFormApi } from '../_common/createPostForm/cre
 import css from './blockchainProjectFeedPage.module.scss';
 
 export const BlockchainProjectFeedPage = observer(() => {
-	const { project } = useParams<{ project?: BlockchainProjectId }>();
-	invariant(project, 'Blockchain project must be specified');
-	const projectMeta = blockchainProjectsMeta[project];
+	const { projectId } = useParams<{ projectId?: BlockchainProjectId }>();
+	invariant(projectId, 'Blockchain project must be specified');
+	const projectMeta = blockchainProjectsMeta[projectId];
 
 	const isAdminMode = useIsMatchingRoute(RoutePath.FEED_VENOM_ADMIN) || useIsMatchingRoute(RoutePath.FEED_TVM_ADMIN);
 
 	const allAccounts = useDomainAccounts();
 	const venomAccounts = useVenomAccounts();
-	const accounts = project === BlockchainProjectId.TVM ? allAccounts : venomAccounts;
+	const accounts = projectId === BlockchainProjectId.TVM ? allAccounts : venomAccounts;
 
 	const [currentPost, setCurrentPost] = useState<number>(0);
 
-	const postsQuery = useInfiniteQuery<DecodedBlockchainFeedPost[]>(['feed', 'venom', 'posts', project], {
+	const postsQuery = useInfiniteQuery<DecodedBlockchainFeedPost[]>(['feed', 'venom', 'posts', projectId], {
 		queryFn: async ({ pageParam = 0 }) => {
 			analytics.venomFeedView(projectMeta.id);
 
@@ -54,7 +54,7 @@ export const BlockchainProjectFeedPage = observer(() => {
 
 	const [hasNewPosts, setHasNewPosts] = useState(false);
 
-	useQuery(['feed', 'venom', 'new-posts', project], {
+	useQuery(['feed', 'venom', 'new-posts', projectId], {
 		queryFn: async () => {
 			if (!postsQuery.isLoading) {
 				const posts = await BlockchainFeedApi.getPosts({
@@ -89,7 +89,7 @@ export const BlockchainProjectFeedPage = observer(() => {
 
 	return (
 		<GenericLayout>
-			<NarrowContent key={project} contentClassName={css.main}>
+			<NarrowContent key={projectId} contentClassName={css.main}>
 				<div className={css.projectTitle}>
 					<div className={css.projectLogo}>{projectMeta.logo}</div>
 					<div className={css.projectName}>{projectMeta.name}</div>

@@ -246,7 +246,7 @@ export const App = observer(() => {
 								<Navigate
 									replace
 									to={generatePath(RoutePath.FEED_VENOM_PROJECT, {
-										project: BlockchainProjectId.VENOM_BLOCKCHAIN,
+										projectId: BlockchainProjectId.VENOM_BLOCKCHAIN,
 									})}
 								/>
 							}
@@ -260,7 +260,7 @@ export const App = observer(() => {
 								<Navigate
 									replace
 									to={generatePath(RoutePath.FEED_TVM_PROJECT, {
-										project: BlockchainProjectId.TVM,
+										projectId: BlockchainProjectId.TVM,
 									})}
 								/>
 							}
