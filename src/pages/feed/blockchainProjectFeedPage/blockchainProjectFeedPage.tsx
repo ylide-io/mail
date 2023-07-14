@@ -13,6 +13,7 @@ import { toast } from '../../../components/toast/toast';
 import { YlideLoader } from '../../../components/ylideLoader/ylideLoader';
 import { analytics } from '../../../stores/Analytics';
 import { BlockchainProjectId, blockchainProjectsMeta } from '../../../stores/blockchainProjects/blockchainProjects';
+import { browserStorage } from '../../../stores/browserStorage';
 import { useDomainAccounts, useVenomAccounts } from '../../../stores/Domain';
 import { RoutePath } from '../../../stores/routePath';
 import { connectAccount } from '../../../utils/account';
@@ -31,7 +32,10 @@ export const BlockchainProjectFeedPage = observer(() => {
 
 	const allAccounts = useDomainAccounts();
 	const venomAccounts = useVenomAccounts();
-	const accounts = projectId === BlockchainProjectId.TVM ? allAccounts : venomAccounts;
+	const accounts =
+		projectId === BlockchainProjectId.TVM || projectId === BlockchainProjectId.TVM_DISCUSSION
+			? allAccounts
+			: venomAccounts;
 
 	const [currentPost, setCurrentPost] = useState<number>(0);
 
@@ -110,7 +114,7 @@ export const BlockchainProjectFeedPage = observer(() => {
 
 				<div className={css.divider} />
 
-				{accounts.length ? (
+				{projectId === BlockchainProjectId.TVM && !browserStorage.isUserAdmin ? null : accounts.length ? (
 					<CreatePostForm
 						ref={createPostFormRef}
 						projectMeta={projectMeta}
@@ -132,13 +136,6 @@ export const BlockchainProjectFeedPage = observer(() => {
 						</ActionButton>
 					</ErrorMessage>
 				)}
-
-				{/* <ErrorMessage look={ErrorMessageLook.INFO}>
-				Venom Blockchain Is Under Maintenance: To stay informed about the latest developments and announcements,
-				we encourage you to check Venom’s official social media channels.
-			</ErrorMessage> */}
-
-				<div className={css.divider} />
 
 				<div className={css.posts}>
 					{messages.length ? (
