@@ -16,6 +16,7 @@ import { ReactComponent as CrossSvg } from './icons/ic20/cross.svg';
 import { AdminFeedPage } from './pages/AdminFeedPage';
 import { AdminPage } from './pages/AdminPage';
 import { BlockchainProjectFeedPage } from './pages/feed/blockchainProjectFeedPage/blockchainProjectFeedPage';
+import { BlockchainProjectFeedPostPage } from './pages/feed/blockchainProjectFeedPostPage/blockchainProjectFeedPostPage';
 import { FeedPage } from './pages/feed/feedPage/feedPage';
 import { FeedPostPage } from './pages/feed/feedPostPage/feedPostPage';
 import { ComposePage } from './pages/mail/composePage/composePage';
@@ -253,6 +254,7 @@ export const App = observer(() => {
 						/>
 						<Route path={RoutePath.FEED_PROJECT_POSTS} element={<BlockchainProjectFeedPage />} />
 						<Route path={RoutePath.FEED_PROJECT_POSTS_ADMIN} element={<BlockchainProjectFeedPage />} />
+						<Route path={RoutePath.FEED_PROJECT_POST} element={<BlockchainProjectFeedPostPage />} />
 
 						<Route
 							path="/feed/venom/*"

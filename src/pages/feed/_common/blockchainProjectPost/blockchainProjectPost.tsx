@@ -2,6 +2,7 @@ import { MessageAttachmentLinkV1 } from '@ylide/sdk';
 import clsx from 'clsx';
 import { MouseEventHandler, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useQuery } from 'react-query';
+import { generatePath } from 'react-router-dom';
 
 import {
 	BlockchainFeedApi,
@@ -23,18 +24,26 @@ import { ReactComponent as ExternalSvg } from '../../../../icons/ic20/external.s
 import { ReactComponent as MailSvg } from '../../../../icons/ic20/mail.svg';
 import { MessageDecodedTextDataType } from '../../../../indexedDB/IndexedDB';
 import { analytics } from '../../../../stores/Analytics';
+import { BlockchainProjectId } from '../../../../stores/blockchainProjects/blockchainProjects';
 import { browserStorage } from '../../../../stores/browserStorage';
 import { useVenomAccounts } from '../../../../stores/Domain';
 import { OutgoingMailData } from '../../../../stores/outgoingMailData';
+import { RoutePath } from '../../../../stores/routePath';
 import { copyToClipboard } from '../../../../utils/clipboard';
 import { ipfsToHttpUrl } from '../../../../utils/ipfs';
 import { useOpenMailCompose } from '../../../../utils/mail';
+import { useNav } from '../../../../utils/url';
 import { useShiftPressed } from '../../../../utils/useShiftPressed';
 import { PostItemContainer } from '../postItemContainer/postItemContainer';
 import css from './blockchainProjectPost.module.scss';
 
+export function generateBlockchainProjectPostPath(projectId: BlockchainProjectId, postId: string) {
+	return generatePath(RoutePath.FEED_PROJECT_POST, { projectId, postId: encodeURIComponent(postId) });
+}
+
 interface BlockchainProjectPostViewProps {
 	post: DecodedBlockchainFeedPost;
+	postUrl?: string;
 
 	isCompact?: boolean;
 	isBanned?: boolean;
@@ -52,6 +61,7 @@ interface BlockchainProjectPostViewProps {
 
 export function BlockchainProjectPostView({
 	post,
+	postUrl,
 
 	isCompact,
 	isBanned,
@@ -66,6 +76,7 @@ export function BlockchainProjectPostView({
 	onBanClick,
 	onUnbanClick,
 }: BlockchainProjectPostViewProps) {
+	const navigate = useNav();
 	const openMailCompose = useOpenMailCompose();
 	const venomAccounts = useVenomAccounts();
 
@@ -101,6 +112,10 @@ export function BlockchainProjectPostView({
 
 	const isAdmin = !!post.original.isAdmin;
 
+	function renderPostDate() {
+		return <ReadableDate value={post.msg.createdAt * 1000} />;
+	}
+
 	return (
 		<PostItemContainer
 			isCollapsable
@@ -134,7 +149,20 @@ export function BlockchainProjectPostView({
 				</GridRowBox>
 
 				<div className={css.metaRight}>
-					<ReadableDate className={css.metaAction} value={post.msg.createdAt * 1000} />
+					{postUrl ? (
+						<a
+							className={clsx(css.metaAction, css.metaAction_interactive)}
+							href={postUrl}
+							onClick={e => {
+								e.preventDefault();
+								navigate(postUrl);
+							}}
+						>
+							{renderPostDate()}
+						</a>
+					) : (
+						<div className={css.metaAction}>{renderPostDate()}</div>
+					)}
 
 					{onReplyClick && (
 						<button className={clsx(css.metaAction, css.metaAction_interactive)} onClick={onReplyClick}>
@@ -262,12 +290,19 @@ export function BlockchainProjectPostView({
 
 interface BlockchainProjectPostProps {
 	post: DecodedBlockchainFeedPost;
+	projectId: BlockchainProjectId;
 	isFirstPost: boolean;
 	onNextPost: () => void;
-	onReplyClick: () => void;
+	onReplyClick?: () => void;
 }
 
-export function BlockchainProjectPost({ post, isFirstPost, onNextPost, onReplyClick }: BlockchainProjectPostProps) {
+export function BlockchainProjectPost({
+	post,
+	projectId,
+	isFirstPost,
+	onNextPost,
+	onReplyClick,
+}: BlockchainProjectPostProps) {
 	let [clicks] = useState<number[]>([]);
 
 	const [isBanned, setBanned] = useState(false);
@@ -381,6 +416,7 @@ export function BlockchainProjectPost({ post, isFirstPost, onNextPost, onReplyCl
 
 			<BlockchainProjectPostView
 				post={post}
+				postUrl={generateBlockchainProjectPostPath(projectId, post.original.id)}
 				isBanned={isBanned}
 				isApproved={isApproved}
 				isAdminHelpVisible={browserStorage.isUserAdmin && isFirstPost && isShiftPressed}

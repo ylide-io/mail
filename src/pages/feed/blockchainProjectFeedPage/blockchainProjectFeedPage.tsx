@@ -148,6 +148,7 @@ export const BlockchainProjectFeedPage = observer(() => {
 									key={idx}
 									isFirstPost={idx === currentPost}
 									post={message}
+									projectId={projectId}
 									onNextPost={() => setCurrentPost(idx + 1)}
 									onReplyClick={() => {
 										analytics.venomFeedReply(projectMeta.id, message.original.id);

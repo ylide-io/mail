@@ -2,28 +2,44 @@ import { useRef, useState } from 'react';
 import { useQuery } from 'react-query';
 import { generatePath, useParams } from 'react-router-dom';
 
-import { FeedServerApi } from '../../../api/feedServerApi';
+import { BlockchainFeedApi, decodeBlockchainFeedPost } from '../../../api/blockchainFeedApi';
 import { ActionButton, ActionButtonLook } from '../../../components/ActionButton/ActionButton';
+import { GridRowBox } from '../../../components/boxes/boxes';
 import { ErrorMessage } from '../../../components/errorMessage/errorMessage';
 import { NarrowContent } from '../../../components/genericLayout/content/narrowContent/narrowContent';
 import { GenericLayout } from '../../../components/genericLayout/genericLayout';
 import { SharePopup } from '../../../components/sharePopup/sharePopup';
 import { YlideLoader } from '../../../components/ylideLoader/ylideLoader';
+import { ReactComponent as ArrowLeftSvg } from '../../../icons/ic20/arrowLeft.svg';
 import { ReactComponent as ShareSvg } from '../../../icons/ic20/share.svg';
+import { BlockchainProjectId, blockchainProjectsMeta } from '../../../stores/blockchainProjects/blockchainProjects';
 import { RoutePath } from '../../../stores/routePath';
 import { HorizontalAlignment } from '../../../utils/alignment';
 import { invariant } from '../../../utils/assert';
-import { toAbsoluteUrl } from '../../../utils/url';
-import { FeedPostItem } from '../_common/feedPostItem/feedPostItem';
-import css from './feedPostPage.module.scss';
+import { toAbsoluteUrl, useNav } from '../../../utils/url';
+import {
+	BlockchainProjectPostView,
+	generateBlockchainProjectPostPath,
+} from '../_common/blockchainProjectPost/blockchainProjectPost';
+import css from './blockchainProjectFeedPostPage.module.scss';
 
-export function FeedPostPage() {
-	const { postId } = useParams<{ postId: string }>();
+export function BlockchainProjectFeedPostPage() {
+	const { projectId, postId } = useParams<{ projectId: BlockchainProjectId; postId: string }>();
+	invariant(projectId);
 	invariant(postId);
 
-	const postPath = generatePath(RoutePath.FEED_POST, { postId: postId });
+	const navigate = useNav();
 
-	const { isLoading, data } = useQuery(['feed', 'post', postId], () => FeedServerApi.getPost(postId));
+	const projectMeta = blockchainProjectsMeta[projectId];
+
+	const postPath = generateBlockchainProjectPostPath(projectId, postId);
+
+	const { isLoading, data } = useQuery(['feed', 'blockchain-project', 'post', postId], {
+		queryFn: async () => {
+			const post = await BlockchainFeedApi.getPost({ id: postId });
+			return decodeBlockchainFeedPost(post!);
+		},
+	});
 
 	const shareButtonRef = useRef(null);
 	const [isSharePopupOpen, setSharePopupOpen] = useState(false);
@@ -31,7 +47,15 @@ export function FeedPostPage() {
 	return (
 		<GenericLayout>
 			<NarrowContent
-				title="Post"
+				title={
+					<GridRowBox>
+						<ActionButton
+							onClick={() => navigate(generatePath(RoutePath.FEED_PROJECT_POSTS, { projectId }))}
+							icon={<ArrowLeftSvg />}
+						/>
+						Post in {projectMeta.name} feed
+					</GridRowBox>
+				}
 				titleRight={
 					data && (
 						<>
@@ -58,7 +82,7 @@ export function FeedPostPage() {
 				}
 			>
 				{data ? (
-					<FeedPostItem post={data.post} />
+					<BlockchainProjectPostView post={data} />
 				) : isLoading ? (
 					<YlideLoader className={css.loader} reason="Loading post ..." />
 				) : (
