@@ -53,7 +53,7 @@ export function BlockchainProjectFeedPostPage() {
 							onClick={() => navigate(generatePath(RoutePath.FEED_PROJECT_POSTS, { projectId }))}
 							icon={<ArrowLeftSvg />}
 						/>
-						Post in {projectMeta.name} feed
+						{projectMeta.name} feed
 					</GridRowBox>
 				}
 				titleRight={
