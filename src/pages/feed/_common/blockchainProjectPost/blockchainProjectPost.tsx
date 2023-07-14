@@ -315,7 +315,7 @@ export function BlockchainProjectPost({
 	const banAddress = useCallback(() => {
 		BlockchainFeedApi.banAddresses({
 			addresses: [post.msg.senderAddress],
-			secret: browserStorage.userAdminPassword || '',
+			secret: browserStorage.adminPassword || '',
 		})
 			.then(() => {
 				toast('Banned 🔥');
@@ -332,7 +332,7 @@ export function BlockchainProjectPost({
 	}, [post.msg.senderAddress]);
 
 	const banPost = useCallback(() => {
-		BlockchainFeedApi.banPost({ ids: [post.msg.msgId], secret: browserStorage.userAdminPassword || '' })
+		BlockchainFeedApi.banPost({ ids: [post.msg.msgId], secret: browserStorage.adminPassword || '' })
 			.then(() => {
 				toast('Banned 🔥');
 				setBanned(true);
@@ -348,7 +348,7 @@ export function BlockchainProjectPost({
 	}, [post.msg.msgId]);
 
 	const approvePost = useCallback(() => {
-		BlockchainFeedApi.approvePost({ ids: [post.msg.msgId], secret: browserStorage.userAdminPassword || '' })
+		BlockchainFeedApi.approvePost({ ids: [post.msg.msgId], secret: browserStorage.adminPassword || '' })
 			.then(() => {
 				toast('Approved 🔥');
 				setApproved(true);
@@ -364,7 +364,7 @@ export function BlockchainProjectPost({
 	}, [post.msg.msgId]);
 
 	const unbanPost = useCallback(() => {
-		BlockchainFeedApi.unbanPost({ ids: [post.msg.msgId], secret: browserStorage.userAdminPassword || '' })
+		BlockchainFeedApi.unbanPost({ ids: [post.msg.msgId], secret: browserStorage.adminPassword || '' })
 			.then(() => {
 				toast('Un-banned 🔥');
 				setBanned(false);

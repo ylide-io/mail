@@ -7,8 +7,7 @@ import { WidgetId } from '../pages/widgets/widgets';
 import { toggleArrayItem } from '../utils/array';
 
 enum BrowserStorageKey {
-	IS_USER_ADMIN = 'ylide_isUserAdmin',
-	USER_ADMIN_PASSWORD = 'ylide_userAdminPassword',
+	ADMIN_PASSWORD = 'ylide_adminPassword',
 	IS_MAIN_VIEW_BANNER_HIDDEN = 'ylide_isMainViewBannerHidden',
 	ACCOUNT_REMOTE_KEYS = 'ylide_accountRemoteKeys',
 	SIDEBAR_FOLDED_SECTIONS = 'ylide_sidebarFoldedSections',
@@ -61,15 +60,19 @@ class BrowserStorage {
 
 	//
 
-	private _isUserAdmin = BrowserStorage.getItem(BrowserStorageKey.IS_USER_ADMIN, sessionStorage) === 'true';
+	private _adminPassword = BrowserStorage.getItem(BrowserStorageKey.ADMIN_PASSWORD, sessionStorage);
 
-	get isUserAdmin() {
-		return this._isUserAdmin;
+	get adminPassword() {
+		return this._adminPassword;
 	}
 
-	set isUserAdmin(value: boolean) {
-		BrowserStorage.setItem(BrowserStorageKey.IS_USER_ADMIN, value || undefined, sessionStorage);
-		this._isUserAdmin = value;
+	set adminPassword(value: string | undefined) {
+		BrowserStorage.setItem(BrowserStorageKey.ADMIN_PASSWORD, value, sessionStorage);
+		this._adminPassword = value;
+	}
+
+	get isUserAdmin() {
+		return !!this.adminPassword;
 	}
 
 	//
@@ -86,17 +89,6 @@ class BrowserStorage {
 	}
 
 	//
-
-	private _userAdminPassword = BrowserStorage.getItem(BrowserStorageKey.USER_ADMIN_PASSWORD, sessionStorage);
-
-	get userAdminPassword() {
-		return this._userAdminPassword;
-	}
-
-	set userAdminPassword(value: string | undefined) {
-		BrowserStorage.setItem(BrowserStorageKey.USER_ADMIN_PASSWORD, value, sessionStorage);
-		this._userAdminPassword = value;
-	}
 
 	private _accountRemoteKeys =
 		BrowserStorage.getItemWithTransform<Record<string, AccountRemoteKeys>>(

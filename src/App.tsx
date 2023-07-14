@@ -66,8 +66,7 @@ const RemoveTrailingSlash = () => {
 				},
 			);
 		} else if (adminParam) {
-			browserStorage.isUserAdmin = adminParam.startsWith('yldpwd');
-			browserStorage.userAdminPassword = adminParam;
+			browserStorage.adminPassword = adminParam.startsWith('yldpwd') ? adminParam : undefined;
 			searchParams.delete('admin');
 			navigate(
 				{
