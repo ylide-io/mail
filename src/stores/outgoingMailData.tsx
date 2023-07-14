@@ -31,6 +31,7 @@ export enum OutgoingMailDataMode {
 export class OutgoingMailData {
 	mode = OutgoingMailDataMode.MESSAGE;
 	feedId = DEFAULT_FEED_ID;
+	isGenericFeed = false;
 
 	from?: DomainAccount;
 	to = new Recipients();
@@ -75,6 +76,7 @@ export class OutgoingMailData {
 	reset(data?: {
 		mode?: OutgoingMailDataMode;
 		feedId?: Uint256;
+		isGenericFeed?: boolean;
 
 		from?: DomainAccount;
 		to?: Recipients;
@@ -90,6 +92,7 @@ export class OutgoingMailData {
 		transaction(() => {
 			this.mode = data?.mode || OutgoingMailDataMode.MESSAGE;
 			this.feedId = data?.feedId || DEFAULT_FEED_ID;
+			this.isGenericFeed = data?.isGenericFeed || false;
 
 			this.from = data?.from || domain.accounts.activeAccounts[0];
 			this.to = data?.to || new Recipients();
@@ -234,6 +237,7 @@ export class OutgoingMailData {
 					attachments: this.attachments,
 					attachmentFiles: this.attachmentFiles,
 					feedId: this.feedId,
+					isGenericFeed: this.isGenericFeed,
 					network: this.network,
 				});
 

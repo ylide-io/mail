@@ -54,6 +54,7 @@ export const CreatePostForm = observer(
 
 				mailData.mode = OutgoingMailDataMode.BROADCAST;
 				mailData.feedId = projectMeta.feedId;
+				mailData.isGenericFeed = true;
 
 				mailData.validator = () => {
 					const text = mailData.plainTextData;

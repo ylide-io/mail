@@ -44,6 +44,10 @@ export const EVMDeployContractModal: FC<EVMDeployContractModalProps> = ({ contra
 			address = await (account.wallet.controller as EthereumWalletController).deployMailerV8(account.account, {
 				network,
 			});
+		} else if (contract.title === 'MailerV9') {
+			address = await (account.wallet.controller as EthereumWalletController).deployMailerV9(account.account, {
+				network,
+			});
 		} else if (contract.title === 'RegistryV3') {
 			address = await (account.wallet.controller as EthereumWalletController).deployRegistryV3(
 				account.account,

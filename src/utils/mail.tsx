@@ -141,6 +141,7 @@ export async function broadcastMessage({
 	attachments,
 	attachmentFiles,
 	feedId,
+	isGenericFeed = false,
 	network,
 }: {
 	sender: DomainAccount;
@@ -149,6 +150,7 @@ export async function broadcastMessage({
 	attachments: MessageAttachment[];
 	attachmentFiles: File[];
 	feedId: Uint256;
+	isGenericFeed?: boolean;
 	network?: EVMNetwork;
 }): Promise<SendBroadcastResult> {
 	analytics.mailSentAttempt();
@@ -200,6 +202,7 @@ export async function broadcastMessage({
 		},
 		{
 			network,
+			isGenericFeed,
 		},
 	);
 
