@@ -366,6 +366,12 @@ export const SidebarMenu = observer(() => {
 					name={blockchainProjectsMeta[BlockchainProjectId.TVM].name}
 					icon={blockchainProjectsMeta[BlockchainProjectId.TVM].logo}
 				/>
+
+				<SidebarButton
+					href={generatePath(RoutePath.FEED_PROJECT_POSTS, { projectId: BlockchainProjectId.TVM_DISCUSSION })}
+					name={blockchainProjectsMeta[BlockchainProjectId.TVM_DISCUSSION].name}
+					icon={blockchainProjectsMeta[BlockchainProjectId.TVM_DISCUSSION].logo}
+				/>
 			</SidebarSection>
 		);
 	}

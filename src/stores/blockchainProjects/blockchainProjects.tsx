@@ -6,6 +6,7 @@ import { ReactComponent as NumiSvg } from './icons/numi.svg';
 import { ReactComponent as OasisGallerySvg } from './icons/oasisGallery.svg';
 import { ReactComponent as SnipaSvg } from './icons/snipa.svg';
 import { ReactComponent as TvmSvg } from './icons/tvm.svg';
+import { ReactComponent as TvmDiscussionSvg } from './icons/tvmDiscussion.svg';
 import { ReactComponent as VenomBlockchainSvg } from './icons/venomBlockchain.svg';
 import { ReactComponent as VenomBridgeSvg } from './icons/venomBridge.svg';
 import { ReactComponent as VenomPadSvg } from './icons/venomPad.svg';
@@ -31,6 +32,7 @@ export enum BlockchainProjectId {
 	VENTORY = 'ventory',
 
 	TVM = 'tvm',
+	TVM_DISCUSSION = 'tvm_discussion',
 
 	// tests:
 	ISME_TEST = 'isme_test',
@@ -139,6 +141,13 @@ export const blockchainProjectsMeta: Record<BlockchainProjectId, BlockchainProje
 		name: 'TVM 주요 업데이트',
 		description: '베놈과 에버스케일을 포함한 TVM 블록체인의 주요 업데이트 내용을 공유하는 채널',
 		logo: <TvmSvg />,
+	},
+	[BlockchainProjectId.TVM_DISCUSSION]: {
+		id: BlockchainProjectId.TVM_DISCUSSION,
+		feedId: '2000000000000000000000000000000000000000000000000000000000000002' as Uint256,
+		name: '한마디',
+		description: '누구나 자유로이 한마디',
+		logo: <TvmDiscussionSvg />,
 	},
 
 	[BlockchainProjectId.ISME_TEST]: {
