@@ -259,7 +259,14 @@ export const App = observer(() => {
 						<Route
 							path="/feed/venom/*"
 							element={
-								<Navigate replace to={location.pathname.replace('/feed/venom/', '/feed/project/')} />
+								<Navigate replace to={location.pathname.replace('/feed/venom', '/feed/project')} />
+							}
+						/>
+
+						<Route
+							path="/feed/tvm/*"
+							element={
+								<Navigate replace to={location.pathname.replace('/feed/tvm', '/feed/project/tvm')} />
 							}
 						/>
 
