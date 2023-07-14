@@ -44,6 +44,7 @@ export interface BlockchainProjectMeta {
 	name: string;
 	description: string;
 	logo: ReactNode;
+	website?: string;
 }
 
 export const blockchainProjectsMeta: Record<BlockchainProjectId, BlockchainProjectMeta> = {
@@ -54,6 +55,7 @@ export const blockchainProjectsMeta: Record<BlockchainProjectId, BlockchainProje
 		description:
 			'Nümi is the first anime metaverse on Venom blockchain that provides players with limitless possibilities to create their own gaming experience.',
 		logo: <NumiSvg />,
+		website: 'https://www.numi.net/',
 	},
 	[BlockchainProjectId.OASIS_GALLERY]: {
 		id: BlockchainProjectId.OASIS_GALLERY,
@@ -61,6 +63,7 @@ export const blockchainProjectsMeta: Record<BlockchainProjectId, BlockchainProje
 		name: 'oasis.gallery',
 		description: "Trade unique digital assets on Venom blockchain's NFT marketplace.",
 		logo: <OasisGallerySvg />,
+		website: 'https://oasis.gallery/',
 	},
 	[BlockchainProjectId.SNIPA]: {
 		id: BlockchainProjectId.SNIPA,
@@ -68,6 +71,7 @@ export const blockchainProjectsMeta: Record<BlockchainProjectId, BlockchainProje
 		name: 'Snipa',
 		description: 'DeFi portfolio tracker designed for users to manage their assets.',
 		logo: <SnipaSvg />,
+		website: 'https://snipa.finance/',
 	},
 	[BlockchainProjectId.VENOM_BLOCKCHAIN]: {
 		id: BlockchainProjectId.VENOM_BLOCKCHAIN,
@@ -75,6 +79,7 @@ export const blockchainProjectsMeta: Record<BlockchainProjectId, BlockchainProje
 		name: 'Venom Blockchain',
 		description: 'Versatile and innovative blockchain that offers a range of use cases across various industries.',
 		logo: <VenomBlockchainSvg />,
+		website: 'https://venom.foundation/',
 	},
 	[BlockchainProjectId.VENOM_BRIDGE]: {
 		id: BlockchainProjectId.VENOM_BRIDGE,
@@ -83,6 +88,7 @@ export const blockchainProjectsMeta: Record<BlockchainProjectId, BlockchainProje
 		description:
 			'Explore the world of interchain transactions by effortlessly transferring tokens from one chain to the other.',
 		logo: <VenomBridgeSvg />,
+		website: 'https://venombridge.com/',
 	},
 	[BlockchainProjectId.VENOM_PAD]: {
 		id: BlockchainProjectId.VENOM_PAD,
@@ -90,6 +96,7 @@ export const blockchainProjectsMeta: Record<BlockchainProjectId, BlockchainProje
 		name: 'VenomPad',
 		description: 'First crowdfunding platform on Venom.',
 		logo: <VenomPadSvg />,
+		website: 'https://venompad.com/',
 	},
 	[BlockchainProjectId.VENOM_SCAN]: {
 		id: BlockchainProjectId.VENOM_SCAN,
@@ -97,6 +104,7 @@ export const blockchainProjectsMeta: Record<BlockchainProjectId, BlockchainProje
 		name: 'Venom Scan',
 		description: 'Search and explore the immutable records of the Venom blockchain.',
 		logo: <VenomScanSvg />,
+		website: 'https://venomscan.com/',
 	},
 	[BlockchainProjectId.VENOM_STAKE]: {
 		id: BlockchainProjectId.VENOM_STAKE,
@@ -104,6 +112,7 @@ export const blockchainProjectsMeta: Record<BlockchainProjectId, BlockchainProje
 		name: 'VenomStake',
 		description: 'Secure solution for staking VENOM tokens, enabling users to maximize rewards.',
 		logo: <VenomStakeSvg />,
+		website: 'https://venomstake.com/',
 	},
 	[BlockchainProjectId.VENOM_WALLET]: {
 		id: BlockchainProjectId.VENOM_WALLET,
@@ -111,6 +120,7 @@ export const blockchainProjectsMeta: Record<BlockchainProjectId, BlockchainProje
 		name: 'Venom Wallet',
 		description: 'Non-custodial wallet with a Multisig accounts option and Ledger support.',
 		logo: <VenomWalletSvg />,
+		website: 'https://venomwallet.com/',
 	},
 	[BlockchainProjectId.WEB3_WORLD]: {
 		id: BlockchainProjectId.WEB3_WORLD,
@@ -118,6 +128,7 @@ export const blockchainProjectsMeta: Record<BlockchainProjectId, BlockchainProje
 		name: 'Web3.World',
 		description: 'First DEX on Venom that enables seamless trading by pooling liquidity from investors.',
 		logo: <Web3WorldSvg />,
+		website: 'https://web3.world/',
 	},
 	[BlockchainProjectId.YLIDE]: {
 		id: BlockchainProjectId.YLIDE,
@@ -125,6 +136,7 @@ export const blockchainProjectsMeta: Record<BlockchainProjectId, BlockchainProje
 		name: 'Ylide',
 		description: 'Protocol for wallet-to-wallet communication with built-in payments.',
 		logo: <YlideSvg />,
+		website: 'https://ylide.io/',
 	},
 	[BlockchainProjectId.VENTORY]: {
 		id: BlockchainProjectId.VENTORY,
@@ -133,6 +145,7 @@ export const blockchainProjectsMeta: Record<BlockchainProjectId, BlockchainProje
 		description:
 			'Multichain NFT Marketplace exclusively for entertaining games & seamless experience, initially built on Venom network.',
 		logo: <VentorySvg />,
+		website: 'https://testnet.ventory.gg/',
 	},
 
 	[BlockchainProjectId.TVM]: {
@@ -156,5 +169,6 @@ export const blockchainProjectsMeta: Record<BlockchainProjectId, BlockchainProje
 		name: 'isme',
 		description: 'ISME Test Evm',
 		logo: <VentorySvg />,
+		website: 'https://isme.is/',
 	},
 };

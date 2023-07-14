@@ -78,3 +78,12 @@
 	font-size: 15px;
 	font-weight: $font-weight_light;
 }
+
+.projectWebsite {
+	display: inline-block;
+	margin: 4px 0 0;
+
+	&:hover {
+		text-decoration: underline;
+	}
+}

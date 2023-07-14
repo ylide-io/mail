@@ -97,7 +97,23 @@ export const BlockchainProjectFeedPage = observer(() => {
 				<div className={css.projectTitle}>
 					<div className={css.projectLogo}>{projectMeta.logo}</div>
 					<div className={css.projectName}>{projectMeta.name}</div>
-					<div className={css.projectDescription}>{projectMeta.description}</div>
+					<div className={css.projectDescription}>
+						{projectMeta.description}
+
+						{projectMeta.website && (
+							<>
+								<br />
+								<a
+									className={css.projectWebsite}
+									href={projectMeta.website}
+									target="_blank"
+									rel="noreferrer"
+								>
+									{projectMeta.website}
+								</a>
+							</>
+						)}
+					</div>
 				</div>
 
 				{hasNewPosts && (
