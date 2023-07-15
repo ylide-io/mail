@@ -21,6 +21,7 @@ import { BlockchainProjectMeta } from '../../../../stores/blockchainProjects/blo
 import { DomainAccount } from '../../../../stores/models/DomainAccount';
 import { OutgoingMailData, OutgoingMailDataMode } from '../../../../stores/outgoingMailData';
 import { HorizontalAlignment } from '../../../../utils/alignment';
+import { calcComissions } from '../../../../utils/calcComissions';
 import { hashToIpfsUrl, ipfsToHttpUrl } from '../../../../utils/ipfs';
 import { escapeRegex } from '../../../../utils/regex';
 import { SendMailButton } from '../../../mail/_common/composeMailForm/sendMailButton/sendMailButton';
@@ -33,7 +34,7 @@ export interface CreatePostFormApi {
 
 export interface CreatePostFormProps extends PropsWithClassName {
 	accounts: DomainAccount[];
-	isAnavailable: boolean;
+	isUnavailable: boolean;
 	displayIdeasButton: boolean;
 	projectMeta: BlockchainProjectMeta;
 	onCreated?: () => void;
@@ -42,7 +43,7 @@ export interface CreatePostFormProps extends PropsWithClassName {
 export const CreatePostForm = observer(
 	forwardRef(
 		(
-			{ className, accounts, isAnavailable, displayIdeasButton, projectMeta, onCreated }: CreatePostFormProps,
+			{ className, accounts, isUnavailable, displayIdeasButton, projectMeta, onCreated }: CreatePostFormProps,
 			ref: Ref<CreatePostFormApi>,
 		) => {
 			const textAreaApiRef = useRef<AutoSizeTextAreaApi>(null);
@@ -55,6 +56,7 @@ export const CreatePostForm = observer(
 				mailData.mode = OutgoingMailDataMode.BROADCAST;
 				mailData.feedId = projectMeta.feedId;
 				mailData.isGenericFeed = true;
+				mailData.extraPayment = '0';
 
 				mailData.validator = () => {
 					const text = mailData.plainTextData;
@@ -93,6 +95,25 @@ export const CreatePostForm = observer(
 			useEffect(() => {
 				mailData.from = mailData.from && accounts.includes(mailData.from) ? mailData.from : accounts[0];
 			}, [mailData, accounts]);
+
+			useEffect(() => {
+				let cancelled = false;
+				BlockchainFeedApi.getComissions({ feedId: mailData.feedId })
+					.then(comissions => {
+						if (cancelled || !mailData.from) {
+							return;
+						}
+						const blockchain = mailData.from.getBlockchainName(mailData.network);
+						const comission = calcComissions(blockchain, comissions);
+						mailData.extraPayment = comission || '0';
+					})
+					.catch(err => {
+						console.error(err);
+					});
+				return () => {
+					cancelled = true;
+				};
+			}, [mailData, mailData.from, mailData.network]);
 
 			const [expanded, setExpanded] = useState(false);
 
@@ -295,7 +316,7 @@ export const CreatePostForm = observer(
 										)}
 									</GridRowBox>
 
-									{isAnavailable ? (
+									{isUnavailable ? (
 										<div>Can't post now. Wait a minute.</div>
 									) : (
 										<SendMailButton disabled={isIdeaLoading} mailData={mailData} onSent={onSent} />

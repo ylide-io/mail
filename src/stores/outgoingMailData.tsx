@@ -3,6 +3,7 @@ import { EVMNetwork } from '@ylide/ethereum';
 import { MessageAttachment, Uint256, YMF } from '@ylide/sdk';
 import { autorun, makeAutoObservable, transaction } from 'mobx';
 
+import { BlockchainFeedApi } from '../api/blockchainFeedApi';
 import { ActionButton, ActionButtonLook, ActionButtonSize } from '../components/ActionButton/ActionButton';
 import { ActionModal } from '../components/actionModal/actionModal';
 import { AdaptiveText } from '../components/adaptiveText/adaptiveText';
@@ -14,6 +15,8 @@ import { HUB_FEED_ID, OTC_FEED_ID } from '../constants';
 import { AppMode, REACT_APP__APP_MODE } from '../env';
 import { connectAccount } from '../utils/account';
 import { invariant } from '../utils/assert';
+import { blockchainMeta } from '../utils/blockchain';
+import { calcComissionDecimals, calcComissions } from '../utils/calcComissions';
 import { broadcastMessage, editorJsToYMF, isEmptyEditorJsData, sendMessage } from '../utils/mail';
 import { truncateInMiddle } from '../utils/string';
 import { getEvmWalletNetwork } from '../utils/wallet';
@@ -31,6 +34,7 @@ export class OutgoingMailData {
 	mode = OutgoingMailDataMode.MESSAGE;
 	feedId = DEFAULT_FEED_ID;
 	isGenericFeed = false;
+	extraPayment: string = '0';
 
 	from?: DomainAccount;
 	to = new Recipients();
@@ -76,6 +80,7 @@ export class OutgoingMailData {
 		mode?: OutgoingMailDataMode;
 		feedId?: Uint256;
 		isGenericFeed?: boolean;
+		extraPayment?: string;
 
 		from?: DomainAccount;
 		to?: Recipients;
@@ -92,6 +97,7 @@ export class OutgoingMailData {
 			this.mode = data?.mode || OutgoingMailDataMode.MESSAGE;
 			this.feedId = data?.feedId || DEFAULT_FEED_ID;
 			this.isGenericFeed = data?.isGenericFeed || false;
+			this.extraPayment = data?.extraPayment || '0';
 
 			this.from = data?.from || domain.accounts.activeAccounts[0];
 			this.to = data?.to || new Recipients();
@@ -229,6 +235,14 @@ export class OutgoingMailData {
 
 				console.log('Sending result: ', result);
 			} else {
+				const blockchain = this.from.getBlockchainName(this.network);
+				if (this.isGenericFeed) {
+					const comissions = await BlockchainFeedApi.getComissions({ feedId: this.feedId });
+					const comission = calcComissions(blockchain, comissions);
+					if (comission !== this.extraPayment) {
+						throw new Error('Comissions mismatch');
+					}
+				}
 				const result = await broadcastMessage({
 					sender: this.from,
 					subject: this.subject,
@@ -237,6 +251,18 @@ export class OutgoingMailData {
 					attachmentFiles: this.attachmentFiles,
 					feedId: this.feedId,
 					isGenericFeed: this.isGenericFeed,
+					extraPayment: this.isGenericFeed
+						? calcComissionDecimals(
+								this.extraPayment,
+								blockchainMeta[blockchain].ethNetwork?.nativeCurrency.decimals || 4,
+						  )
+						: '0',
+					value: this.isGenericFeed
+						? calcComissionDecimals(
+								this.extraPayment,
+								blockchainMeta[blockchain].ethNetwork?.nativeCurrency.decimals || 4,
+						  )
+						: '0',
 					network: this.network,
 				});
 

@@ -30,6 +30,17 @@ export const SendMailButton = observer(({ className, mailData, disabled, onSent 
 
 	const menuAnchorRef = useRef(null);
 	const [menuVisible, setMenuVisible] = useState(false);
+	const currency = useMemo(() => {
+		if (mailData.from) {
+			try {
+				return mailData.from.getBlockchainNativeCurrency(mailData.network);
+			} catch (err) {
+				return '';
+			}
+		} else {
+			return '';
+		}
+	}, [mailData.from, mailData.network]);
 
 	const evmBalances = useMemo(() => {
 		const balances = new EvmBalances();
@@ -53,11 +64,19 @@ export const SendMailButton = observer(({ className, mailData, disabled, onSent 
 	};
 
 	const renderSendText = () => {
+		const payment =
+			mailData.extraPayment === '0' ? null : (
+				<span className={css.extraPayment}>
+					({mailData.extraPayment}
+					{currency ? ` ${currency}` : ''})
+				</span>
+			);
 		if (blockchainGroup === 'everscale') {
 			const bData = blockchainMeta.everscale;
 			return (
 				<>
 					Send via {bData.logo(14)} {bData.title}
+					{payment}
 				</>
 			);
 		} else if (blockchainGroup === 'venom-testnet') {
@@ -65,6 +84,7 @@ export const SendMailButton = observer(({ className, mailData, disabled, onSent 
 			return (
 				<>
 					Send via {bData.logo(14)} {bData.title}
+					{payment}
 				</>
 			);
 		} else if (blockchainGroup === 'evm' && mailData.network !== undefined) {
@@ -73,6 +93,7 @@ export const SendMailButton = observer(({ className, mailData, disabled, onSent 
 				return (
 					<>
 						Send via {bData.logo(16)} {bData.title}
+						{payment}
 					</>
 				);
 			} else {

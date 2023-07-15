@@ -48,6 +48,7 @@
 		"@editorjs/header": "2.7.0",
 		"@editorjs/list": "1.8.0",
 		"@editorjs/paragraph": "2.9.0",
+		"@ethersproject/bignumber": "5.7.0",
 		"@jitsu/sdk-js": "3.1.5",
 		"@nft3sdk/client": "0.2.4",
 		"@react-hook/resize-observer": "1.2.6",

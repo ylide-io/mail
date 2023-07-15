@@ -51,6 +51,7 @@ import { ILinkedMessage } from '../stores/MailList';
 import { formatAddress, isEvmBlockchain } from './blockchain';
 import { htmlSelfClosingTagsToXHtml } from './string';
 import { toJS } from 'mobx';
+import { BigNumber } from '@ethersproject/bignumber';
 
 // SENDING
 
@@ -142,7 +143,9 @@ export async function broadcastMessage({
 	attachmentFiles,
 	feedId,
 	isGenericFeed = false,
+	extraPayment = '0',
 	network,
+	value = '0',
 }: {
 	sender: DomainAccount;
 	subject: string;
@@ -151,7 +154,9 @@ export async function broadcastMessage({
 	attachmentFiles: File[];
 	feedId: Uint256;
 	isGenericFeed?: boolean;
+	extraPayment?: string;
 	network?: EVMNetwork;
+	value?: string;
 }): Promise<SendBroadcastResult> {
 	analytics.mailSentAttempt();
 
@@ -203,6 +208,8 @@ export async function broadcastMessage({
 		{
 			network,
 			isGenericFeed,
+			extraPayment: BigNumber.from(extraPayment),
+			value: BigNumber.from(value),
 		},
 	);
 

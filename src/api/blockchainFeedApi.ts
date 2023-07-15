@@ -230,7 +230,7 @@ export namespace BlockchainFeedApi {
 	}
 
 	export async function getComissions(params: { feedId: string }) {
-		return await request(`/feeds/${params.feedId}/comissions`, {
+		return await request<Record<string, string>[]>(`/feeds/${params.feedId}/comissions`, {
 			params: {
 				method: 'GET',
 			},
