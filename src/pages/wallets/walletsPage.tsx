@@ -54,7 +54,7 @@ export const WalletsPage = observer(() => {
 
 				<div className="connected-wallets">
 					{domain.accounts.accounts.map(acc => {
-						const isActive = domain.accounts.isActiveAccount(acc);
+						const isActive = acc.isLocalKeyRegistered;
 						return (
 							<div className={clsx('cw-block', { notActive: !isActive })} key={acc.account.address}>
 								<div className="cw-logo">{walletsMeta[acc.wallet.wallet].logo(isActive ? 32 : 24)}</div>
