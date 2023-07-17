@@ -2,10 +2,9 @@ import { IGenericAccount } from '@ylide/sdk';
 import { useEffect, useState } from 'react';
 
 import { Wallet } from '../../stores/models/Wallet';
-import { requestSwitchAccount } from '../../utils/account';
+import { requestWalletAuthentication } from '../../utils/account';
 import { ActionButton, ActionButtonLook, ActionButtonSize } from '../ActionButton/ActionButton';
 import { ActionModal } from '../actionModal/actionModal';
-import { BlockChainLabel } from '../BlockChainLabel/BlockChainLabel';
 import { GridRowBox } from '../boxes/boxes';
 import { ErrorMessage } from '../errorMessage/errorMessage';
 import { Spinner } from '../spinner/spinner';
@@ -13,14 +12,12 @@ import { showStaticComponent } from '../staticComponentManager/staticComponentMa
 import { WalletTag } from '../walletTag/walletTag';
 
 interface SwitchModalProps {
-	type: 'account' | 'network';
 	wallet: Wallet;
 	needAccount?: IGenericAccount;
-	needNetwork?: string;
 	onConfirm: (result: boolean) => void;
 }
 
-export function SwitchModal({ type, wallet, needAccount, needNetwork, onConfirm }: SwitchModalProps) {
+export function SwitchModal({ wallet, needAccount, onConfirm }: SwitchModalProps) {
 	const [error, setError] = useState('');
 
 	useEffect(() => {
@@ -34,43 +31,20 @@ export function SwitchModal({ type, wallet, needAccount, needNetwork, onConfirm 
 			}
 		}
 
-		function handleNetworkUpdate(network: string) {
-			if (!needNetwork || network === needNetwork) {
-				onConfirm(true);
-			} else {
-				setError('Wrong network 😒 Please try again.');
-			}
-		}
+		wallet.on('accountUpdate', handleAccountUpdate);
 
-		if (type === 'account') {
-			wallet.on('accountUpdate', handleAccountUpdate);
-		} else {
-			wallet.on('chainUpdate', handleNetworkUpdate);
-		}
-
-		requestSwitchAccount(wallet);
+		requestWalletAuthentication(wallet);
 
 		return () => {
-			if (type === 'account') {
-				wallet.off('accountUpdate', handleAccountUpdate);
-			} else {
-				wallet.off('chainUpdate', handleNetworkUpdate);
-			}
+			wallet.off('accountUpdate', handleAccountUpdate);
 		};
-	}, [needAccount, needNetwork, onConfirm, type, wallet]);
+	}, [needAccount, onConfirm, wallet]);
 
 	return (
 		<>
 			{wallet.wallet !== 'everwallet' && (
 				<ActionModal title="Activate account" onClose={() => onConfirm(false)}>
 					{needAccount && <WalletTag wallet={wallet.wallet} address={needAccount.address} />}
-
-					{needNetwork && (
-						<GridRowBox>
-							Network
-							<BlockChainLabel blockchain={needNetwork} />
-						</GridRowBox>
-					)}
 
 					<div>
 						Please unlock you wallet and make sure that both account and network are selected correctly.
@@ -85,7 +59,7 @@ export function SwitchModal({ type, wallet, needAccount, needNetwork, onConfirm 
 								look={ActionButtonLook.PRIMARY}
 								onClick={() => {
 									setError('');
-									requestSwitchAccount(wallet);
+									requestWalletAuthentication(wallet);
 								}}
 							>
 								Try again
@@ -103,20 +77,9 @@ export function SwitchModal({ type, wallet, needAccount, needNetwork, onConfirm 
 }
 
 export namespace SwitchModal {
-	export function show(
-		type: 'account' | 'network',
-		wallet: Wallet,
-		needAccount?: IGenericAccount,
-		needNetwork?: string,
-	) {
+	export function show(wallet: Wallet, needAccount?: IGenericAccount) {
 		return showStaticComponent<boolean>(resolve => (
-			<SwitchModal
-				type={type}
-				wallet={wallet}
-				needAccount={needAccount}
-				needNetwork={needNetwork}
-				onConfirm={resolve}
-			/>
+			<SwitchModal wallet={wallet} needAccount={needAccount} onConfirm={resolve} />
 		));
 	}
 }

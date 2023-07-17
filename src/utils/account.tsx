@@ -98,10 +98,10 @@ export async function connectAccount(params?: { place?: string }): Promise<Domai
 
 				if (currentAccount && wallet.isAccountRegistered(currentAccount)) {
 					if (wallet.factory.blockchainGroup === 'evm') {
-						const result = await SwitchModal.show('account', wallet);
+						const result = await SwitchModal.show(wallet);
 						if (!result) return;
 					} else {
-						await requestSwitchAccount(wallet);
+						await requestWalletAuthentication(wallet);
 					}
 
 					currentAccount = await wallet.getCurrentAccount();
@@ -174,7 +174,7 @@ export async function disconnectAccount(params: { account: DomainAccount; place?
 	}
 }
 
-export async function requestSwitchAccount(wallet: Wallet) {
+export async function requestWalletAuthentication(wallet: Wallet) {
 	try {
 		if (!wallet.controller.isMultipleAccountsSupported()) {
 			const account = await wallet.getCurrentAccount();

@@ -305,7 +305,7 @@ export class Domain {
 		if (!wallet) {
 			return;
 		}
-		await SwitchModal.show('account', wallet, needAccount);
+		await SwitchModal.show(wallet, needAccount);
 	}
 
 	async handleDeriveRequest(
