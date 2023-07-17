@@ -4,7 +4,7 @@ import { showLoadingModal } from '../components/loadingModal/loadingModal';
 import { NewPasswordModal } from '../components/newPasswordModal/newPasswordModal';
 import { SelectWalletModal } from '../components/selectWalletModal/selectWalletModal';
 import { showStaticComponent } from '../components/staticComponentManager/staticComponentManager';
-import { SwitchModal } from '../components/switchModal/switchModal';
+import { SwitchModal, SwitchModalMode } from '../components/switchModal/switchModal';
 import { toast } from '../components/toast/toast';
 import { analytics } from '../stores/Analytics';
 import { browserStorage } from '../stores/browserStorage';
@@ -98,7 +98,9 @@ export async function connectAccount(params?: { place?: string }): Promise<Domai
 
 				if (currentAccount && wallet.isAccountRegistered(currentAccount)) {
 					if (wallet.factory.blockchainGroup === 'evm') {
-						const result = await SwitchModal.show(wallet);
+						const result = await SwitchModal.show(wallet, {
+							mode: SwitchModalMode.CURRENT_ACCOUNT_ALREADY_CONNECTED,
+						});
 						if (!result) return;
 					} else {
 						await requestWalletAuthentication(wallet);
@@ -110,7 +112,7 @@ export async function connectAccount(params?: { place?: string }): Promise<Domai
 				if (currentAccount && wallet.isAccountRegistered(currentAccount)) {
 					const domainAccount = wallet.accounts.find(a => a.account.address === currentAccount!.address)!;
 					if (domainAccount.isLocalKeyRegistered) {
-						return toast('This account is already connected. Please choose a different one.');
+						return toast('This account is already connected. Please choose another one.');
 					} else {
 						await domain.accounts.removeAccount(domainAccount);
 					}

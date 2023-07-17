@@ -34,7 +34,7 @@ import { useEffect, useMemo, useState } from 'react';
 
 import { NFT3NameService } from '../api/nft3DID';
 import { PasswordRequestModal } from '../components/passwordRequestModal/passwordRequestModal';
-import { SwitchModal } from '../components/switchModal/switchModal';
+import { SwitchModal, SwitchModalMode } from '../components/switchModal/switchModal';
 import { AppMode, REACT_APP__APP_MODE } from '../env';
 import { blockchainMeta } from '../utils/blockchain';
 import { walletsMeta } from '../utils/wallet';
@@ -305,7 +305,7 @@ export class Domain {
 		if (!wallet) {
 			return;
 		}
-		await SwitchModal.show(wallet, needAccount);
+		await SwitchModal.show(wallet, { mode: SwitchModalMode.SPECIFIC_ACCOUNT_REQUIRED, needAccount });
 	}
 
 	async handleDeriveRequest(
