@@ -182,47 +182,47 @@ export const SidebarMailSection = observer(() => {
 
 	const [hasNewMessages, setHasNewMessages] = useState(false);
 
-	useQuery(['mailbox', 'new-inbox-messages'], {
-		queryFn: async () => {
-			if (hasNewMessages) return;
+	// useQuery(['mailbox', 'new-inbox-messages'], {
+	// 	queryFn: async () => {
+	// 		if (hasNewMessages) return;
 
-			const data: Array<{ address: string; lastMessageDate?: number }> = await Promise.all(
-				accounts.map(async account => {
-					const mailList = new MailList();
+	// 		const data: Array<{ address: string; lastMessageDate?: number }> = await Promise.all(
+	// 			accounts.map(async account => {
+	// 				const mailList = new MailList();
 
-					await mailList.init({
-						mailbox: {
-							accounts: [account],
-							folderId: FolderId.Inbox,
-						},
-					});
+	// 				await mailList.init({
+	// 					mailbox: {
+	// 						accounts: [account],
+	// 						folderId: FolderId.Inbox,
+	// 					},
+	// 				});
 
-					return {
-						address: account.account.address,
-						lastMessageDate: mailList.messages[0]?.msg.createdAt,
-					};
-				}),
-			);
+	// 				return {
+	// 					address: account.account.address,
+	// 					lastMessageDate: mailList.messages[0]?.msg.createdAt,
+	// 				};
+	// 			}),
+	// 		);
 
-			const hasNew = data.some(d => {
-				const lastCachedDate = browserStorage.lastMailboxIncomingDate[d.address];
-				return lastCachedDate && d.lastMessageDate && lastCachedDate < d.lastMessageDate;
-			});
+	// 		const hasNew = data.some(d => {
+	// 			const lastCachedDate = browserStorage.lastMailboxIncomingDate[d.address];
+	// 			return lastCachedDate && d.lastMessageDate && lastCachedDate < d.lastMessageDate;
+	// 		});
 
-			setHasNewMessages(hasNew);
+	// 		setHasNewMessages(hasNew);
 
-			if (!hasNew) {
-				browserStorage.lastMailboxIncomingDate = data.reduce((res, item) => {
-					if (item.lastMessageDate) {
-						res[item.address] = item.lastMessageDate;
-					}
+	// 		if (!hasNew) {
+	// 			browserStorage.lastMailboxIncomingDate = data.reduce((res, item) => {
+	// 				if (item.lastMessageDate) {
+	// 					res[item.address] = item.lastMessageDate;
+	// 				}
 
-					return res;
-				}, {} as Record<string, number>);
-			}
-		},
-		refetchInterval: 60 * 1000,
-	});
+	// 				return res;
+	// 			}, {} as Record<string, number>);
+	// 		}
+	// 	},
+	// 	refetchInterval: 60 * 1000,
+	// });
 
 	return (
 		<SidebarSection section={Section.MAIL} title="Mail">
