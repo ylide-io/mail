@@ -36,7 +36,8 @@ export const AccountsPopup = observer(({ anchorRef, onClose }: AccountsPopupProp
 			<div className={css.content}>
 				{accounts.map(account => (
 					<div key={account.account.address} className={css.item}>
-						<Avatar className={css.itemIcon} blockie={account.account.address} />
+						<Avatar className={css.itemAvatar} blockie={account.account.address} />
+
 						<div className={css.itemBody}>
 							<div className={css.itemName}>
 								<AdaptiveText
@@ -65,21 +66,20 @@ export const AccountsPopup = observer(({ anchorRef, onClose }: AccountsPopupProp
 							</div>
 							<AdaptiveAddress className={css.itemAddress} address={account.account.address} />
 						</div>
-						<div className={css.itemActions}>
-							<ActionButton
-								size={ActionButtonSize.MEDIUM}
-								look={ActionButtonLook.DANGEROUS}
-								icon={<LogoutSvg />}
-								title="Logout"
-								onClick={async () => {
-									await disconnectAccount({ account, place: 'accounts-popup' });
 
-									if (!accounts.length) {
-										onClose();
-									}
-								}}
-							/>
-						</div>
+						<ActionButton
+							size={ActionButtonSize.MEDIUM}
+							look={ActionButtonLook.DANGEROUS}
+							icon={<LogoutSvg />}
+							title="Logout"
+							onClick={async () => {
+								await disconnectAccount({ account, place: 'accounts-popup' });
+
+								if (!accounts.length) {
+									onClose();
+								}
+							}}
+						/>
 					</div>
 				))}
 
