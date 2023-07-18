@@ -129,10 +129,16 @@ export const MailboxPage = observer(() => {
 
 	useEffect(() => {
 		if (folderId === FolderId.Inbox) {
-			// Reset
-			browserStorage.lastMailboxIncomingDate = {};
+			const key = accounts
+				.map(a => a.account.address)
+				.sort()
+				.join(',');
+			browserStorage.lastMailboxCheckDate = {
+				...browserStorage.lastMailboxCheckDate,
+				[key]: Math.floor(Date.now() / 1000),
+			};
 		}
-	}, [folderId]);
+	}, [folderId, accounts]);
 
 	return (
 		<GenericLayout>

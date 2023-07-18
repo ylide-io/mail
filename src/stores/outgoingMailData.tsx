@@ -252,16 +252,20 @@ export class OutgoingMailData {
 					feedId: this.feedId,
 					isGenericFeed: this.isGenericFeed,
 					extraPayment: this.isGenericFeed
-						? calcComissionDecimals(
-								this.extraPayment,
-								blockchainMeta[blockchain].ethNetwork?.nativeCurrency.decimals || 4,
-						  )
+						? blockchain === 'everscale' || blockchain === 'venom-testnet'
+							? this.extraPayment
+							: calcComissionDecimals(
+									this.extraPayment,
+									blockchainMeta[blockchain].ethNetwork?.nativeCurrency.decimals || 9,
+							  )
 						: '0',
 					value: this.isGenericFeed
-						? calcComissionDecimals(
-								this.extraPayment,
-								blockchainMeta[blockchain].ethNetwork?.nativeCurrency.decimals || 4,
-						  )
+						? blockchain === 'everscale' || blockchain === 'venom-testnet'
+							? this.extraPayment
+							: calcComissionDecimals(
+									this.extraPayment,
+									blockchainMeta[blockchain].ethNetwork?.nativeCurrency.decimals || 9,
+							  )
 						: '0',
 					network: this.network,
 				});

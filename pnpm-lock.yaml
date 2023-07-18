@@ -51,14 +51,14 @@ dependencies:
     specifier: 2.8.6
     version: 2.8.6
   '@ylide/ethereum':
-    specifier: 0.8.0-beta.45
-    version: 0.8.0-beta.45(@ethersproject/abstract-signer@5.7.0)(@ethersproject/address@5.7.0)(@ethersproject/bignumber@5.7.0)(@ethersproject/bytes@5.7.0)(@ethersproject/contracts@5.7.0)(@ethersproject/keccak256@5.7.0)(@ethersproject/solidity@5.7.0)(@ethersproject/strings@5.7.0)(@ethersproject/transactions@5.7.0)(@ethersproject/web@5.7.1)
+    specifier: 0.8.0-beta.51
+    version: 0.8.0-beta.51(@ethersproject/abstract-signer@5.7.0)(@ethersproject/address@5.7.0)(@ethersproject/bignumber@5.7.0)(@ethersproject/bytes@5.7.0)(@ethersproject/contracts@5.7.0)(@ethersproject/keccak256@5.7.0)(@ethersproject/solidity@5.7.0)(@ethersproject/strings@5.7.0)(@ethersproject/transactions@5.7.0)(@ethersproject/web@5.7.1)
   '@ylide/everscale':
-    specifier: 0.8.0-beta.32
-    version: 0.8.0-beta.32
+    specifier: 0.8.0-beta.40
+    version: 0.8.0-beta.40
   '@ylide/sdk':
-    specifier: 0.8.0-beta.16
-    version: 0.8.0-beta.16
+    specifier: 0.8.0-beta.17
+    version: 0.8.0-beta.17
   '@ylide/smart-buffer':
     specifier: 0.0.11
     version: 0.0.11
@@ -4398,8 +4398,8 @@ packages:
       - utf-8-validate
     dev: false
 
-  /@ylide/ethereum@0.8.0-beta.45(@ethersproject/abstract-signer@5.7.0)(@ethersproject/address@5.7.0)(@ethersproject/bignumber@5.7.0)(@ethersproject/bytes@5.7.0)(@ethersproject/contracts@5.7.0)(@ethersproject/keccak256@5.7.0)(@ethersproject/solidity@5.7.0)(@ethersproject/strings@5.7.0)(@ethersproject/transactions@5.7.0)(@ethersproject/web@5.7.1):
-    resolution: {integrity: sha512-+srIwk2z26d5dw05m2rn5S780K9wx4im518VTg2/lvuvNd9sfcerfRgHxUgD27pmBER3wfbuq/MPHOdmZJI+DA==}
+  /@ylide/ethereum@0.8.0-beta.51(@ethersproject/abstract-signer@5.7.0)(@ethersproject/address@5.7.0)(@ethersproject/bignumber@5.7.0)(@ethersproject/bytes@5.7.0)(@ethersproject/contracts@5.7.0)(@ethersproject/keccak256@5.7.0)(@ethersproject/solidity@5.7.0)(@ethersproject/strings@5.7.0)(@ethersproject/transactions@5.7.0)(@ethersproject/web@5.7.1):
+    resolution: {integrity: sha512-wMXjnFl6zFDxmcu/qYovVbW1y+Ss2QBUZZIsBVCfB+Apwh/INUTwqipaFUIKk8SQlCCXw7eLjYxMA+wbJfYTDA==}
     dependencies:
       '@ensdomains/ensjs': 3.0.0-alpha.64(@ethersproject/abi@5.7.0)(@ethersproject/abstract-provider@5.7.0)(@ethersproject/abstract-signer@5.7.0)(@ethersproject/address@5.7.0)(@ethersproject/bignumber@5.7.0)(@ethersproject/bytes@5.7.0)(@ethersproject/contracts@5.7.0)(@ethersproject/keccak256@5.7.0)(@ethersproject/providers@5.7.2)(@ethersproject/solidity@5.7.0)(@ethersproject/strings@5.7.0)(@ethersproject/transactions@5.7.0)(@ethersproject/web@5.7.1)
       '@ethersproject/abi': 5.7.0
@@ -4408,7 +4408,7 @@ packages:
       '@ethersproject/properties': 5.7.0
       '@ethersproject/providers': 5.7.2
       '@ylide/ethereum-contracts': 0.8.0-beta.20
-      '@ylide/sdk': 0.8.0-beta.16
+      '@ylide/sdk': 0.8.0-beta.17
       '@ylide/smart-buffer': 0.0.11
       ethers: 5.7.2
       eventemitter3: 5.0.1
@@ -4429,10 +4429,10 @@ packages:
       - utf-8-validate
     dev: false
 
-  /@ylide/everscale@0.8.0-beta.32:
-    resolution: {integrity: sha512-s/N5KS7Ct0dbAiwQ30x2fgeR6fpw9G2Jb7OS5lS2p6t0Ywju3Xoy311DTAxAPwEGfL6/HHvVfhD1E6kY78b3cg==}
+  /@ylide/everscale@0.8.0-beta.40:
+    resolution: {integrity: sha512-mrKqwXgZJSb5wZMG3rvG13qLxduJ5SqBzWSjSKS+F24Qw7u2C9YVX4dsviNTWk6tAfXR51TdS5e8yxFODv7QdQ==}
     dependencies:
-      '@ylide/sdk': 0.8.0-beta.16
+      '@ylide/sdk': 0.8.0-beta.17
       '@ylide/smart-buffer': 0.0.11
       everscale-inpage-provider: 0.3.61
       everscale-standalone-client: 2.1.19
@@ -4441,8 +4441,8 @@ packages:
       - encoding
     dev: false
 
-  /@ylide/sdk@0.8.0-beta.16:
-    resolution: {integrity: sha512-u3em67faVZ+PJVWWDvbpjH1UCzKrEKtq95O3LSNi8pxiQ6/QEyt7pV+AGXOx5tFb9sPR243TIRg5PlYZHW6wfg==}
+  /@ylide/sdk@0.8.0-beta.17:
+    resolution: {integrity: sha512-/CNQVz10bbO4TVL9aC8IMBLbfwo8IAB1q2Ul5T5KGaaouPzPLaGP8BubBQXP6rqzBuWd77X6WUL+/adV3KeGWg==}
     dependencies:
       '@datastructures-js/binary-search-tree': 5.3.1
       '@datastructures-js/linked-list': 5.2.5
@@ -6898,7 +6898,7 @@ packages:
       events: 3.3.0
       everscale-inpage-provider: 0.3.61
       fast-safe-stringify: 2.1.1
-      nekoton-wasm: 1.1.7
+      nekoton-wasm: 1.1.8
       node-fetch: 2.6.12
     transitivePeerDependencies:
       - encoding
@@ -9640,6 +9640,10 @@ packages:
 
   /nekoton-wasm@1.1.7:
     resolution: {integrity: sha512-9xoKoTzqKGowauP06Lph2GPO7WnPrNIhPWRpu29FDRp/wm+3psEW5tAQJNCdjAcF6KBVaZwK91iGxV7d84FrlA==}
+    dev: false
+
+  /nekoton-wasm@1.1.8:
+    resolution: {integrity: sha512-wFuxsPAB4Tj31glTKQKcgWmgCvS7R+FhjIlRkR4DU64GnlAsoJW1F/YMhBZiO7P22Q7ymETi0jUMLgwqP5NVhA==}
     dev: false
 
   /neo-async@2.6.2:

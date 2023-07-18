@@ -1,8 +1,7 @@
 import clsx from 'clsx';
-import { observable } from 'mobx';
+import { observable, reaction } from 'mobx';
 import { observer } from 'mobx-react';
-import { PropsWithChildren, ReactNode, useState } from 'react';
-import { useQuery } from 'react-query';
+import { PropsWithChildren, ReactNode, useEffect, useState } from 'react';
 import { generatePath, useLocation } from 'react-router-dom';
 
 import { FeedCategory } from '../../../api/feedServerApi';
@@ -183,51 +182,49 @@ export const SidebarButton = observer(({ look, href, icon, name, rightButton }: 
 export const SidebarMailSection = observer(() => {
 	const openMailCompose = useOpenMailCompose();
 
-	const accounts = useDomainAccounts();
+	// const accounts = useDomainAccounts();
 
 	const [hasNewMessages, setHasNewMessages] = useState(false);
 
-	useQuery(['mailbox', 'new-inbox-messages'], {
-		queryFn: async () => {
-			if (hasNewMessages) return;
+	// useEffect(() => {
+	// 	console.log('sidebar mail section mounted');
+	// 	return () => {
+	// 		console.log('sidebar mail section unmounted');
+	// 	};
+	// }, []);
 
-			const data: Array<{ address: string; lastMessageDate?: number }> = await Promise.all(
-				accounts.map(async account => {
-					const mailList = new MailList();
+	// useEffect(() => {
+	// 	const mailList = new MailList();
 
-					await mailList.init({
-						mailbox: {
-							accounts: [account],
-							folderId: FolderId.Inbox,
-						},
-					});
+	// 	mailList.init({
+	// 		mailbox: {
+	// 			accounts,
+	// 			folderId: FolderId.Inbox,
+	// 		},
+	// 	});
 
-					return {
-						address: account.account.address,
-						lastMessageDate: mailList.messages[0]?.msg.createdAt,
-					};
-				}),
-			);
+	// 	console.log('inited maillist: ', mailList.id);
 
-			const hasNew = data.some(d => {
-				const lastCachedDate = browserStorage.lastMailboxIncomingDate[d.address];
-				return lastCachedDate && d.lastMessageDate && lastCachedDate < d.lastMessageDate;
-			});
+	// 	const key = accounts
+	// 		.map(a => a.account.address)
+	// 		.sort()
+	// 		.join(',');
 
-			setHasNewMessages(hasNew);
-
-			if (!hasNew) {
-				browserStorage.lastMailboxIncomingDate = data.reduce((res, item) => {
-					if (item.lastMessageDate) {
-						res[item.address] = item.lastMessageDate;
-					}
-
-					return res;
-				}, {} as Record<string, number>);
-			}
-		},
-		refetchInterval: 60 * 1000,
-	});
+	// 	const dispose = reaction(
+	// 		() => ({ messagesData: mailList.messagesData, lastMailboxCheckDate: browserStorage.lastMailboxCheckDate }),
+	// 		({ messagesData, lastMailboxCheckDate }) => {
+	// 			console.log('reaction triggered for ' + mailList.id);
+	// 			const lastCheckedDate = lastMailboxCheckDate[key];
+	// 			const isNew =
+	// 				messagesData[0] && (!lastCheckedDate || messagesData[0].raw.msg.createdAt > lastCheckedDate);
+	// 			setHasNewMessages(isNew);
+	// 		},
+	// 	);
+	// 	return () => {
+	// 		dispose();
+	// 		mailList.destroy();
+	// 	};
+	// }, [accounts]);
 
 	return (
 		<SidebarSection section={Section.MAIL} title="Mail">
