@@ -23,6 +23,8 @@ interface AccountsPopupProps {
 }
 
 export const AccountsPopup = observer(({ anchorRef, onClose }: AccountsPopupProps) => {
+	const accounts = domain.accounts.accounts;
+
 	return (
 		<AnchoredPopup
 			anchorRef={anchorRef}
@@ -32,7 +34,7 @@ export const AccountsPopup = observer(({ anchorRef, onClose }: AccountsPopupProp
 			onCloseRequest={onClose}
 		>
 			<div className={css.content}>
-				{domain.accounts.activeAccounts.map(account => (
+				{accounts.map(account => (
 					<div key={account.account.address} className={css.item}>
 						<Avatar className={css.itemIcon} blockie={account.account.address} />
 						<div className={css.itemBody}>
@@ -72,7 +74,7 @@ export const AccountsPopup = observer(({ anchorRef, onClose }: AccountsPopupProp
 								onClick={async () => {
 									await disconnectAccount({ account, place: 'accounts-popup' });
 
-									if (!domain.accounts.hasActiveAccounts) {
+									if (!accounts.length) {
 										onClose();
 									}
 								}}
