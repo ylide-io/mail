@@ -1,7 +1,7 @@
 import clsx from 'clsx';
-import { observable, reaction } from 'mobx';
+import { observable } from 'mobx';
 import { observer } from 'mobx-react';
-import { PropsWithChildren, ReactNode, useEffect, useState } from 'react';
+import { PropsWithChildren, ReactNode, useState } from 'react';
 import { generatePath, useLocation } from 'react-router-dom';
 
 import { FeedCategory } from '../../../api/feedServerApi';
@@ -31,11 +31,16 @@ import { sideSecurityIcon } from '../../../icons/static/sideSecurityIcon';
 import { sideTechnologyIcon } from '../../../icons/static/sideTechnologyIcon';
 import { FeedSettingsPopup } from '../../../pages/feed/_common/feedSettingsPopup/feedSettingsPopup';
 import { analytics } from '../../../stores/Analytics';
-import { BlockchainProjectId, blockchainProjectsMeta } from '../../../stores/blockchainProjects/blockchainProjects';
+import {
+	activeTvmProjects,
+	activeVenomProjects,
+	BlockchainProjectId,
+	blockchainProjectsMeta,
+} from '../../../stores/blockchainProjects/blockchainProjects';
 import { browserStorage } from '../../../stores/browserStorage';
-import domain, { useDomainAccounts } from '../../../stores/Domain';
+import domain from '../../../stores/Domain';
 import { getFeedCategoryName } from '../../../stores/Feed';
-import { FolderId, MailList } from '../../../stores/MailList';
+import { FolderId } from '../../../stores/MailList';
 import { DomainAccount } from '../../../stores/models/DomainAccount';
 import { RoutePath } from '../../../stores/routePath';
 import { useOpenMailCompose } from '../../../utils/mail';
@@ -324,52 +329,34 @@ export const SidebarMenu = observer(() => {
 		);
 	}
 
-	function renderVenomProjectsSection() {
+	function renderBlockchainProjectsSection() {
 		if (REACT_APP__APP_MODE !== AppMode.HUB) return;
 
-		return (
-			<SidebarSection section={Section.VENOM_PROJECTS} title="Venom Projects">
-				{[
-					BlockchainProjectId.VENOM_BLOCKCHAIN,
-					BlockchainProjectId.SNIPA,
-					BlockchainProjectId.WEB3_WORLD,
-					BlockchainProjectId.VENOM_BRIDGE,
-					BlockchainProjectId.OASIS_GALLERY,
-					BlockchainProjectId.VENTORY,
-					BlockchainProjectId.YLIDE,
-				].map(id => {
-					const meta = blockchainProjectsMeta[id];
+		function renderProjects(projects: BlockchainProjectId[]) {
+			return projects.map(id => {
+				const meta = blockchainProjectsMeta[id];
 
-					return (
-						<SidebarButton
-							key={id}
-							href={generatePath(RoutePath.FEED_PROJECT_POSTS, { projectId: meta.id })}
-							name={meta.name}
-							icon={meta.logo}
-						/>
-					);
-				})}
-			</SidebarSection>
-		);
-	}
-
-	function renderTvmProjects() {
-		if (REACT_APP__APP_MODE !== AppMode.HUB) return;
+				return (
+					<SidebarButton
+						key={id}
+						href={generatePath(RoutePath.FEED_PROJECT_POSTS, { projectId: meta.id })}
+						name={meta.name}
+						icon={meta.logo}
+					/>
+				);
+			});
+		}
 
 		return (
-			<SidebarSection section={Section.TVM_PROJECTS} title="TVM 주요정보">
-				<SidebarButton
-					href={generatePath(RoutePath.FEED_PROJECT_POSTS, { projectId: BlockchainProjectId.TVM })}
-					name={blockchainProjectsMeta[BlockchainProjectId.TVM].name}
-					icon={blockchainProjectsMeta[BlockchainProjectId.TVM].logo}
-				/>
+			<>
+				<SidebarSection section={Section.VENOM_PROJECTS} title="Venom Projects">
+					{renderProjects(activeVenomProjects)}
+				</SidebarSection>
 
-				<SidebarButton
-					href={generatePath(RoutePath.FEED_PROJECT_POSTS, { projectId: BlockchainProjectId.TVM_DISCUSSION })}
-					name={blockchainProjectsMeta[BlockchainProjectId.TVM_DISCUSSION].name}
-					icon={blockchainProjectsMeta[BlockchainProjectId.TVM_DISCUSSION].logo}
-				/>
-			</SidebarSection>
+				<SidebarSection section={Section.TVM_PROJECTS} title="TVM 주요정보">
+					{renderProjects(activeTvmProjects)}
+				</SidebarSection>
+			</>
 		);
 	}
 
@@ -407,8 +394,7 @@ export const SidebarMenu = observer(() => {
 		<div className={css.root}>
 			{renderOtcSection()}
 			{renderSmartFeedSection()}
-			{renderVenomProjectsSection()}
-			{renderTvmProjects()}
+			{renderBlockchainProjectsSection()}
 			{renderFeedDiscoverySection()}
 			{renderMailSection()}
 

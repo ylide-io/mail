@@ -12,7 +12,12 @@ import { GenericLayout } from '../../../components/genericLayout/genericLayout';
 import { toast } from '../../../components/toast/toast';
 import { YlideLoader } from '../../../components/ylideLoader/ylideLoader';
 import { analytics } from '../../../stores/Analytics';
-import { BlockchainProjectId, blockchainProjectsMeta } from '../../../stores/blockchainProjects/blockchainProjects';
+import {
+	activeTvmProjects,
+	activeVenomProjects,
+	BlockchainProjectId,
+	blockchainProjectsMeta,
+} from '../../../stores/blockchainProjects/blockchainProjects';
 import { browserStorage } from '../../../stores/browserStorage';
 import { useDomainAccounts, useVenomAccounts } from '../../../stores/Domain';
 import { RoutePath } from '../../../stores/routePath';
@@ -32,10 +37,7 @@ export const BlockchainProjectFeedPage = observer(() => {
 
 	const allAccounts = useDomainAccounts();
 	const venomAccounts = useVenomAccounts();
-	const accounts =
-		projectId === BlockchainProjectId.TVM || projectId === BlockchainProjectId.TVM_DISCUSSION
-			? allAccounts
-			: venomAccounts;
+	const accounts = activeTvmProjects.includes(projectId) ? allAccounts : venomAccounts;
 
 	const [currentPost, setCurrentPost] = useState<number>(0);
 
@@ -142,11 +144,15 @@ export const BlockchainProjectFeedPage = observer(() => {
 					/>
 				) : (
 					<ErrorMessage look={ErrorMessageLook.INFO}>
-						<div>Connect your Venom wallet to post messages to Venom feed.</div>
+						<div>
+							{activeVenomProjects.includes(projectId)
+								? 'Connect your Venom wallet to post messages to Venom feed.'
+								: 'Connect your wallet to post messages 👌'}
+						</div>
 
 						<ActionButton
 							look={ActionButtonLook.PRIMARY}
-							onClick={() => connectAccount({ place: 'venom-feed_no-accounts' })}
+							onClick={() => connectAccount({ place: 'blockchain-project-feed_no-accounts' })}
 						>
 							Connect account
 						</ActionButton>

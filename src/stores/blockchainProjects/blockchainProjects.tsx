@@ -172,3 +172,15 @@ export const blockchainProjectsMeta: Record<BlockchainProjectId, BlockchainProje
 		website: 'https://isme.is/',
 	},
 };
+
+export const activeVenomProjects = [
+	BlockchainProjectId.VENOM_BLOCKCHAIN,
+	BlockchainProjectId.SNIPA,
+	BlockchainProjectId.WEB3_WORLD,
+	BlockchainProjectId.VENOM_BRIDGE,
+	BlockchainProjectId.OASIS_GALLERY,
+	BlockchainProjectId.VENTORY,
+	BlockchainProjectId.YLIDE,
+];
+
+export const activeTvmProjects = [BlockchainProjectId.TVM, BlockchainProjectId.TVM_DISCUSSION];
