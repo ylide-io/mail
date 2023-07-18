@@ -3,7 +3,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 
 import { FeedManagerApi } from '../../api/feedManagerApi';
 import { APP_NAME } from '../../constants';
-import domain, { useDomainAccounts } from '../../stores/Domain';
+import domain from '../../stores/Domain';
 import { DomainAccount } from '../../stores/models/DomainAccount';
 import { connectAccount, disconnectAccount } from '../../utils/account';
 import { invariant } from '../../utils/assert';
@@ -25,7 +25,7 @@ enum Step {
 }
 
 export const MainViewOnboarding = observer(() => {
-	const accounts = useDomainAccounts();
+	const accounts = domain.accounts.accounts;
 	const unathorizedAccount = accounts.find(a => !a.mainViewKey);
 
 	const [step, setStep] = useState<Step>();
