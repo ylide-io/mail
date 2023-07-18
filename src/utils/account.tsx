@@ -6,6 +6,7 @@ import { SelectWalletModal } from '../components/selectWalletModal/selectWalletM
 import { showStaticComponent } from '../components/staticComponentManager/staticComponentManager';
 import { SwitchModal, SwitchModalMode } from '../components/switchModal/switchModal';
 import { toast } from '../components/toast/toast';
+import { AppMode, REACT_APP__APP_MODE } from '../env';
 import { analytics } from '../stores/Analytics';
 import { browserStorage } from '../stores/browserStorage';
 import domain from '../stores/Domain';
@@ -135,6 +136,7 @@ export async function connectAccount(params?: { place?: string }): Promise<Domai
 					wallet={wallet!}
 					account={account}
 					remoteKeys={remoteKeys.remoteKeys}
+					waitTxPublishing={REACT_APP__APP_MODE === AppMode.OTC}
 					onClose={resolve}
 				/>
 			));
