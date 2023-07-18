@@ -7,7 +7,7 @@ import { ReactComponent as PlusSvg } from '../../../../icons/ic20/plus.svg';
 import { ReactComponent as LogoutSvg } from '../../../../icons/ic28/logout.svg';
 import { analytics } from '../../../../stores/Analytics';
 import domain from '../../../../stores/Domain';
-import { connectAccount, disconnectAccount } from '../../../../utils/account';
+import { activateAccount, connectAccount, disconnectAccount } from '../../../../utils/account';
 import { HorizontalAlignment } from '../../../../utils/alignment';
 import { walletsMeta } from '../../../../utils/wallet';
 import { ActionButton, ActionButtonLook, ActionButtonSize } from '../../../ActionButton/ActionButton';
@@ -36,7 +36,15 @@ export const AccountsPopup = observer(({ anchorRef, onClose }: AccountsPopupProp
 			<div className={css.content}>
 				{accounts.map(account => (
 					<div key={account.account.address} className={css.item}>
-						<Avatar className={css.itemAvatar} blockie={account.account.address} />
+						<div className={css.itemAvatar}>
+							<Avatar blockie={account.account.address} />
+
+							{account.isLocalKeyRegistered || (
+								<div className={css.inactiveAccountBadge} onClick={() => activateAccount({ account })}>
+									INACTIVE
+								</div>
+							)}
+						</div>
 
 						<div className={css.itemBody}>
 							<div className={css.itemName}>

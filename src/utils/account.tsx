@@ -162,6 +162,24 @@ export async function connectAccount(params?: { place?: string }): Promise<Domai
 	}
 }
 
+export async function activateAccount(params: { account: DomainAccount }) {
+	const account = params.account;
+	const wallet = account.wallet;
+	const remoteKeys = await wallet.readRemoteKeys(account.account);
+	const qqs = getQueryString();
+
+	await showStaticComponent<DomainAccount>(resolve => (
+		<NewPasswordModal
+			faucetType={['polygon', 'fantom', 'gnosis'].includes(qqs.faucet) ? (qqs.faucet as any) : 'gnosis'}
+			bonus={qqs.bonus === 'true'}
+			wallet={wallet}
+			account={account.account}
+			remoteKeys={remoteKeys.remoteKeys}
+			onClose={resolve}
+		/>
+	));
+}
+
 export async function disconnectAccount(params: { account: DomainAccount; place?: string }) {
 	const { account, place } = params;
 
