@@ -100,6 +100,7 @@ export async function connectAccount(params?: { place?: string }): Promise<Domai
 					if (wallet.factory.blockchainGroup === 'evm') {
 						const result = await SwitchModal.show(wallet, {
 							mode: SwitchModalMode.CURRENT_ACCOUNT_ALREADY_CONNECTED,
+							account: currentAccount,
 						});
 						if (!result) return;
 					} else {

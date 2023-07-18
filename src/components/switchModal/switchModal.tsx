@@ -14,7 +14,7 @@ export enum SwitchModalMode {
 }
 
 type SwitchModalPayload =
-	| { mode: SwitchModalMode.CURRENT_ACCOUNT_ALREADY_CONNECTED }
+	| { mode: SwitchModalMode.CURRENT_ACCOUNT_ALREADY_CONNECTED; account: IGenericAccount }
 	| {
 			mode: SwitchModalMode.SPECIFIC_ACCOUNT_REQUIRED;
 			needAccount: IGenericAccount;
@@ -56,7 +56,7 @@ export function SwitchModal({ wallet, payload, needAccount, onConfirm }: SwitchM
 				<ActionModal title="Switch account" onClose={() => onConfirm(false)}>
 					{payload.mode === SwitchModalMode.CURRENT_ACCOUNT_ALREADY_CONNECTED && (
 						<>
-							<WalletTag wallet={wallet.wallet} />
+							<WalletTag wallet={wallet.wallet} address={payload.account.address} />
 
 							<div>
 								Please open your wallet and switch to another account. Your currently active account is
