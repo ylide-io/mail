@@ -12,6 +12,7 @@ import {
 import { ActionButton, ActionButtonLook } from '../../../../components/ActionButton/ActionButton';
 import { AdaptiveAddress } from '../../../../components/adaptiveAddress/adaptiveAddress';
 import { Avatar } from '../../../../components/avatar/avatar';
+import { BlockChainLabel } from '../../../../components/BlockChainLabel/BlockChainLabel';
 import { GridRowBox } from '../../../../components/boxes/boxes';
 import { ErrorMessage, ErrorMessageLook } from '../../../../components/errorMessage/errorMessage';
 import { NlToBr } from '../../../../components/nlToBr/nlToBr';
@@ -149,6 +150,8 @@ export function BlockchainProjectPostView({
 				</GridRowBox>
 
 				<div className={css.metaRight}>
+					<BlockChainLabel blockchain={post.original.blockchain} />
+
 					{postUrl ? (
 						<a
 							className={clsx(css.metaAction, css.metaAction_interactive)}
