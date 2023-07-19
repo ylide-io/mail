@@ -25,7 +25,7 @@ import { ReactComponent as ExternalSvg } from '../../../../icons/ic20/external.s
 import { ReactComponent as MailSvg } from '../../../../icons/ic20/mail.svg';
 import { MessageDecodedTextDataType } from '../../../../indexedDB/IndexedDB';
 import { analytics } from '../../../../stores/Analytics';
-import { BlockchainProjectId } from '../../../../stores/blockchainProjects/blockchainProjects';
+import { activeVenomProjects, BlockchainProjectId } from '../../../../stores/blockchainProjects/blockchainProjects';
 import { browserStorage } from '../../../../stores/browserStorage';
 import { useVenomAccounts } from '../../../../stores/Domain';
 import { OutgoingMailData } from '../../../../stores/outgoingMailData';
@@ -52,6 +52,7 @@ interface BlockchainProjectPostViewProps {
 	isApproved?: boolean;
 	isAdminHelpVisible?: boolean;
 	loadReplyIfNeeded?: boolean;
+	displayBlockchainTag?: boolean;
 
 	onClick?: MouseEventHandler<HTMLElement>;
 	onAddressClick?: MouseEventHandler<HTMLElement>;
@@ -70,6 +71,7 @@ export function BlockchainProjectPostView({
 	isApproved,
 	isAdminHelpVisible,
 	loadReplyIfNeeded,
+	displayBlockchainTag,
 
 	onClick,
 	onAddressClick,
@@ -155,7 +157,7 @@ export function BlockchainProjectPostView({
 				</GridRowBox>
 
 				<div className={css.metaRight}>
-					<BlockChainLabel blockchain={blockchain} />
+					{displayBlockchainTag && <BlockChainLabel blockchain={blockchain} />}
 
 					{postUrl ? (
 						<a
@@ -311,6 +313,8 @@ export function BlockchainProjectPost({
 	onNextPost,
 	onReplyClick,
 }: BlockchainProjectPostProps) {
+	const isVenomFeed = activeVenomProjects.includes(projectId);
+
 	let [clicks] = useState<number[]>([]);
 
 	const [isBanned, setBanned] = useState(false);
@@ -429,6 +433,7 @@ export function BlockchainProjectPost({
 				isApproved={isApproved}
 				isAdminHelpVisible={browserStorage.isUserAdmin && isFirstPost && isShiftPressed}
 				loadReplyIfNeeded
+				displayBlockchainTag={!isVenomFeed}
 				onClick={() => {
 					clicks = [Date.now(), ...clicks].slice(0, 3);
 					if (browserStorage.isUserAdmin && clicks.length === 3 && clicks[0] - clicks[2] < 600) {

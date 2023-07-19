@@ -13,7 +13,6 @@ import { toast } from '../../../components/toast/toast';
 import { YlideLoader } from '../../../components/ylideLoader/ylideLoader';
 import { analytics } from '../../../stores/Analytics';
 import {
-	activeTvmProjects,
 	activeVenomProjects,
 	BlockchainProjectId,
 	blockchainProjectsMeta,
@@ -32,12 +31,13 @@ export const BlockchainProjectFeedPage = observer(() => {
 	const { projectId } = useParams<{ projectId?: BlockchainProjectId }>();
 	invariant(projectId, 'Blockchain project must be specified');
 	const projectMeta = blockchainProjectsMeta[projectId];
+	const isVenomFeed = activeVenomProjects.includes(projectId);
 
 	const isAdminMode = useIsMatchingRoute(RoutePath.FEED_PROJECT_POSTS_ADMIN);
 
 	const allAccounts = useDomainAccounts();
 	const venomAccounts = useVenomAccounts();
-	const accounts = activeTvmProjects.includes(projectId) ? allAccounts : venomAccounts;
+	const accounts = isVenomFeed ? venomAccounts : allAccounts;
 
 	const [currentPost, setCurrentPost] = useState<number>(0);
 

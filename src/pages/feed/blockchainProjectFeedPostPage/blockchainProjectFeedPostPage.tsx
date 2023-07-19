@@ -12,7 +12,11 @@ import { SharePopup } from '../../../components/sharePopup/sharePopup';
 import { YlideLoader } from '../../../components/ylideLoader/ylideLoader';
 import { ReactComponent as ArrowLeftSvg } from '../../../icons/ic20/arrowLeft.svg';
 import { ReactComponent as ShareSvg } from '../../../icons/ic20/share.svg';
-import { BlockchainProjectId, blockchainProjectsMeta } from '../../../stores/blockchainProjects/blockchainProjects';
+import {
+	activeVenomProjects,
+	BlockchainProjectId,
+	blockchainProjectsMeta,
+} from '../../../stores/blockchainProjects/blockchainProjects';
 import { RoutePath } from '../../../stores/routePath';
 import { HorizontalAlignment } from '../../../utils/alignment';
 import { invariant } from '../../../utils/assert';
@@ -31,7 +35,7 @@ export function BlockchainProjectFeedPostPage() {
 	const navigate = useNav();
 
 	const projectMeta = blockchainProjectsMeta[projectId];
-
+	const isVenomFeed = activeVenomProjects.includes(projectId);
 	const postPath = generateBlockchainProjectPostPath(projectId, postId);
 
 	const { isLoading, data } = useQuery(['feed', 'blockchain-project', 'post', postId], {
@@ -82,7 +86,7 @@ export function BlockchainProjectFeedPostPage() {
 				}
 			>
 				{data ? (
-					<BlockchainProjectPostView post={data} />
+					<BlockchainProjectPostView post={data} displayBlockchainTag={!isVenomFeed} />
 				) : isLoading ? (
 					<YlideLoader className={css.loader} reason="Loading post ..." />
 				) : (
