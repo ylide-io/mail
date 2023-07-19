@@ -187,7 +187,7 @@ export function BlockchainProjectPostView({
 							target="_blank"
 							rel="noreferrer"
 							title="Details"
-							onClick={() => analytics.venomFeedOpenDetails(post.original.id, post.msg.$$meta.id)}
+							onClick={() => analytics.blockchainFeedOpenDetails(post.original.id, post.msg.$$meta.id)}
 						>
 							<ExternalSvg />
 						</a>
@@ -224,7 +224,7 @@ export function BlockchainProjectPostView({
 											copyToClipboard(repliedPostQuery.data!.msg.senderAddress, { toast: true });
 										}}
 										onComposeClick={() => {
-											analytics.venomFeedComposeMail(
+											analytics.blockchainFeedComposeMail(
 												repliedPostQuery.data!.original.id,
 												repliedPostQuery.data!.msg.senderAddress,
 											);
@@ -448,7 +448,7 @@ export function BlockchainProjectPost({
 					}
 				}}
 				onComposeClick={() => {
-					analytics.venomFeedComposeMail(post.original.id, post.msg.senderAddress);
+					analytics.blockchainFeedComposeMail(post.original.id, post.msg.senderAddress);
 
 					const mailData = new OutgoingMailData();
 					mailData.from = venomAccounts[0];

@@ -1,5 +1,6 @@
 import { observer } from 'mobx-react';
 import { useRef, useState } from 'react';
+import { Helmet } from 'react-helmet';
 import { InView } from 'react-intersection-observer';
 import { useInfiniteQuery, useQuery } from 'react-query';
 import { useParams } from 'react-router-dom';
@@ -43,7 +44,7 @@ export const BlockchainProjectFeedPage = observer(() => {
 
 	const postsQuery = useInfiniteQuery<DecodedBlockchainFeedPost[]>(['feed', 'venom', 'posts', projectId], {
 		queryFn: async ({ pageParam = 0 }) => {
-			analytics.venomFeedView(projectMeta.id);
+			analytics.blockchainFeedView(projectMeta.id);
 
 			const posts = await BlockchainFeedApi.getPosts({
 				feedId: projectMeta.feedId,
@@ -95,6 +96,11 @@ export const BlockchainProjectFeedPage = observer(() => {
 
 	return (
 		<GenericLayout>
+			<Helmet>
+				<title>{projectMeta.name} on Ylide Social Hub</title>
+				<meta name="description" content={projectMeta.description} />
+			</Helmet>
+
 			<NarrowContent key={projectId} contentClassName={css.main}>
 				<div className={css.projectTitle}>
 					<div className={css.projectLogo}>{projectMeta.logo}</div>
@@ -170,7 +176,7 @@ export const BlockchainProjectFeedPage = observer(() => {
 									projectId={projectId}
 									onNextPost={() => setCurrentPost(idx + 1)}
 									onReplyClick={() => {
-										analytics.venomFeedReply(projectMeta.id, message.original.id);
+										analytics.blockchainFeedReply(projectMeta.id, message.original.id);
 
 										if (accounts.length) {
 											createPostFormRef.current?.replyTo(message);
@@ -189,7 +195,7 @@ export const BlockchainProjectFeedPage = observer(() => {
 											rootMargin="100px"
 											onChange={inView => {
 												if (inView) {
-													analytics.venomFeedLoadMore(projectMeta.id);
+													analytics.blockchainFeedLoadMore(projectMeta.id);
 													postsQuery.fetchNextPage();
 												}
 											}}

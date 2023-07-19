@@ -1,6 +1,7 @@
 import { autorun } from 'mobx';
 import { observer } from 'mobx-react';
 import { useEffect, useMemo, useState } from 'react';
+import { Helmet } from 'react-helmet';
 import { useParams, useSearchParams } from 'react-router-dom';
 import AutoSizer from 'react-virtualized-auto-sizer';
 import { FixedSizeList, ListChildComponentProps } from 'react-window';
@@ -142,6 +143,14 @@ export const MailboxPage = observer(() => {
 
 	return (
 		<GenericLayout>
+			<Helmet>
+				<title>Decentralized Web3 Mailbox by Ylide for secure and private communication</title>
+				<meta
+					name="description"
+					content="Experience the power of decentralized communication with Ylide's Web3 Mailbox. Supporting multiple chains including Ethereum, Polygon, BNB, Venom Blockchain, Gnosis chain, Celo, Moonriver, Klaytn, Moonbeam, Avalanche, Aurora, Fantom, Metis, Arbitrum, Optimism, and Everscale. Secure, private, and built for the future of the web."
+				/>
+			</Helmet>
+
 			<FullPageContent>
 				<div className="mailbox-page">
 					<MailboxHeader

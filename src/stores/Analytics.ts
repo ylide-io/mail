@@ -54,11 +54,11 @@ class Analytics {
 	// FEED
 
 	feedView(categories: string[]) {
-		track('feed_view', { categories });
+		track('feed___view', { categories });
 	}
 
 	feedLoadMore(categories: string[]) {
-		track('feed_load_more', { categories });
+		track('feed___load_more', { categories });
 	}
 
 	// MAIL
@@ -125,34 +125,34 @@ class Analytics {
 		track('compose_mail_to_contact');
 	}
 
-	// VENOM FEED
+	// BLOCKCHAIN FEED
 
-	venomFeedView(project: string) {
-		track('venom_feed_view', { project });
+	blockchainFeedView(project: string) {
+		track('blockchain_feed___view', { project });
 	}
 
-	venomFeedLoadMore(project: string) {
-		track('venom_feed_load_more', { project });
+	blockchainFeedLoadMore(project: string) {
+		track('blockchain_feed___load_more', { project });
 	}
 
-	venomFeedReply(project: string, postId: string) {
-		track('venom_feed_reply', { project, postId });
+	blockchainFeedReply(project: string, postId: string) {
+		track('blockchain_feed___reply', { project, postId });
 	}
 
-	venomFeedSendAttempt(project: string, isReply: boolean, replyToId?: string) {
-		track('venom_feed_send_attempt', { project, isReply, replyToId });
+	blockchainFeedSendAttempt(project: string, isReply: boolean, replyToId?: string) {
+		track('blockchain_feed___send_attempt', { project, isReply, replyToId });
 	}
 
-	venomFeedSendSuccessful(project: string, isReply: boolean, replyToId?: string) {
-		track('venom_feed_send_successful', { project, isReply, replyToId });
+	blockchainFeedSendSuccessful(project: string, isReply: boolean, replyToId?: string) {
+		track('blockchain_feed___send_successful', { project, isReply, replyToId });
 	}
 
-	venomFeedOpenDetails(postId: string, msgId: string) {
-		track('venom_feed_open_details', { postId, msgId });
+	blockchainFeedOpenDetails(postId: string, msgId: string) {
+		track('blockchain_feed___open_details', { postId, msgId });
 	}
 
-	venomFeedComposeMail(postId: string, address: string) {
-		track('venom_feed_compose_mail', { postId, address });
+	blockchainFeedComposeMail(postId: string, address: string) {
+		track('blockchain_feed___compose_mail', { postId, address });
 	}
 }
 

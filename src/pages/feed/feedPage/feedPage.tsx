@@ -22,6 +22,9 @@ import { useIsMatchingRoute, useNav } from '../../../utils/url';
 import { FeedPostItem } from '../_common/feedPostItem/feedPostItem';
 import css from './feedPage.module.scss';
 import ErrorCode = FeedServerApi.ErrorCode;
+import { Helmet } from 'react-helmet';
+
+import { APP_NAME } from '../../../constants';
 
 const reloadFeedCounter = observable.box(0);
 

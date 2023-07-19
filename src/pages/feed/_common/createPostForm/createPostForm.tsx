@@ -84,7 +84,7 @@ export const CreatePostForm = observer(
 						return false;
 					}
 
-					analytics.venomFeedSendAttempt(projectMeta.id, !!replyTo, replyTo?.original.id);
+					analytics.blockchainFeedSendAttempt(projectMeta.id, !!replyTo, replyTo?.original.id);
 
 					return true;
 				};
@@ -147,7 +147,7 @@ export const CreatePostForm = observer(
 				: undefined;
 
 			const onSent = () => {
-				analytics.venomFeedSendSuccessful(projectMeta.id, !!replyTo, replyTo?.original.id);
+				analytics.blockchainFeedSendSuccessful(projectMeta.id, !!replyTo, replyTo?.original.id);
 
 				mailData.reset({
 					mode: OutgoingMailDataMode.BROADCAST,

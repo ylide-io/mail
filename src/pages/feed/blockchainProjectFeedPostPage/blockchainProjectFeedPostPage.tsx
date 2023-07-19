@@ -1,4 +1,5 @@
 import { useRef, useState } from 'react';
+import { Helmet } from 'react-helmet';
 import { useQuery } from 'react-query';
 import { generatePath, useParams } from 'react-router-dom';
 
@@ -12,6 +13,7 @@ import { SharePopup } from '../../../components/sharePopup/sharePopup';
 import { YlideLoader } from '../../../components/ylideLoader/ylideLoader';
 import { ReactComponent as ArrowLeftSvg } from '../../../icons/ic20/arrowLeft.svg';
 import { ReactComponent as ShareSvg } from '../../../icons/ic20/share.svg';
+import { MessageDecodedTextDataType } from '../../../indexedDB/IndexedDB';
 import {
 	activeVenomProjects,
 	BlockchainProjectId,
@@ -86,7 +88,17 @@ export function BlockchainProjectFeedPostPage() {
 				}
 			>
 				{data ? (
-					<BlockchainProjectPostView post={data} displayBlockchainTag={!isVenomFeed} />
+					<>
+						<Helmet>
+							<title>
+								{data.decoded.decodedTextData.type === MessageDecodedTextDataType.YMF
+									? data.decoded.decodedTextData.value.toPlainText()
+									: data.decoded.decodedTextData.value}
+							</title>
+						</Helmet>
+
+						<BlockchainProjectPostView post={data} displayBlockchainTag={!isVenomFeed} />
+					</>
 				) : isLoading ? (
 					<YlideLoader className={css.loader} reason="Loading post ..." />
 				) : (
