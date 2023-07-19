@@ -155,13 +155,8 @@ export const SendMailButton = observer(({ className, mailData, disabled, onSent 
 											onSelect={async () => {
 												invariant(from);
 
-												const currentBlockchainName =
-													await from.wallet.controller.getCurrentBlockchain();
-
-												if (currentBlockchainName !== bc.blockchain) {
-													await domain.switchEVMChain(from.wallet!, network);
-													mailData.network = network;
-												}
+												await domain.switchEVMChain(from.wallet, network);
+												mailData.network = network;
 
 												setMenuVisible(false);
 											}}
