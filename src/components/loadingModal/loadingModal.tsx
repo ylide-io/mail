@@ -1,4 +1,4 @@
-import React, { ReactNode } from 'react';
+import { ReactNode } from 'react';
 
 import { Modal } from '../modal/modal';
 import { showStaticComponent } from '../staticComponentManager/staticComponentManager';

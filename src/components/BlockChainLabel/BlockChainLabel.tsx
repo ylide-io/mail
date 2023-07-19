@@ -1,5 +1,3 @@
-import React from 'react';
-
 import { blockchainMeta } from '../../utils/blockchain';
 import css from './BlockChainLabel.module.scss';
 

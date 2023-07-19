@@ -1,5 +1,5 @@
 import clsx from 'clsx';
-import React, { PropsWithChildren, ReactNode } from 'react';
+import { PropsWithChildren, ReactNode } from 'react';
 import { generatePath } from 'react-router-dom';
 
 import { FullPageContent } from '../../../../components/genericLayout/content/fullPageContent/fullPageContent';

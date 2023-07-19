@@ -43,10 +43,19 @@ interface NewPasswordModalProps {
 	wallet: Wallet;
 	account: IGenericAccount;
 	remoteKeys: Record<string, ExternalYlidePublicKey | null>;
+	waitTxPublishing?: boolean;
 	onClose?: (account?: DomainAccount) => void;
 }
 
-export function NewPasswordModal({ faucetType, bonus, wallet, account, remoteKeys, onClose }: NewPasswordModalProps) {
+export function NewPasswordModal({
+	faucetType,
+	bonus,
+	wallet,
+	account,
+	remoteKeys,
+	waitTxPublishing,
+	onClose,
+}: NewPasswordModalProps) {
 	const freshestKey: { key: ExternalYlidePublicKey; blockchain: string } | undefined = useMemo(
 		() =>
 			Object.keys(remoteKeys)
@@ -212,7 +221,6 @@ export function NewPasswordModal({ faucetType, bonus, wallet, account, remoteKey
 					keyVersion: number,
 					faucetType: 'polygon' | 'gnosis' | 'fantom',
 					bonus: boolean,
-					doWait: boolean,
 				) {
 					console.log('public key: ', '0x' + new SmartBuffer(account.key.keypair.publicKey).toHexString());
 					setStep(Step.GENERATE_KEY);
@@ -247,7 +255,7 @@ export function NewPasswordModal({ faucetType, bonus, wallet, account, remoteKey
 					)
 						.then(async result => {
 							if (result.result) {
-								if (doWait) {
+								if (waitTxPublishing) {
 									await asyncDelay(20000);
 								} else {
 									await asyncDelay(7000);
@@ -278,7 +286,7 @@ export function NewPasswordModal({ faucetType, bonus, wallet, account, remoteKey
 							domain.txPlateVisible = false;
 						});
 
-					if (doWait) {
+					if (waitTxPublishing) {
 						await promise;
 					}
 
@@ -291,7 +299,6 @@ export function NewPasswordModal({ faucetType, bonus, wallet, account, remoteKey
 					// we will publish v3 keys for users having v1 and v2 to polygon
 					needToRepublishKey ? 'polygon' : faucetType,
 					bonus,
-					REACT_APP__APP_MODE === AppMode.OTC,
 				);
 			} else {
 				if (wallet.factory.blockchainGroup === 'evm') {

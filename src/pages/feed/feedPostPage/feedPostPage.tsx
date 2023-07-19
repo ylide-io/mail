@@ -14,16 +14,16 @@ import { RoutePath } from '../../../stores/routePath';
 import { HorizontalAlignment } from '../../../utils/alignment';
 import { invariant } from '../../../utils/assert';
 import { toAbsoluteUrl } from '../../../utils/url';
-import { FeedPostItem } from '../components/feedPostItem/feedPostItem';
+import { FeedPostItem } from '../_common/feedPostItem/feedPostItem';
 import css from './feedPostPage.module.scss';
 
 export function FeedPostPage() {
-	const { id: postId } = useParams<{ id: string }>();
+	const { postId } = useParams<{ postId: string }>();
 	invariant(postId);
 
-	const postPath = generatePath(RoutePath.FEED_POST, { id: postId });
+	const postPath = generatePath(RoutePath.FEED_POST, { postId: postId });
 
-	const { isLoading, data } = useQuery('post', () => FeedServerApi.getPost(postId));
+	const { isLoading, data } = useQuery(['feed', 'post', postId], () => FeedServerApi.getPost(postId));
 
 	const shareButtonRef = useRef(null);
 	const [isSharePopupOpen, setSharePopupOpen] = useState(false);

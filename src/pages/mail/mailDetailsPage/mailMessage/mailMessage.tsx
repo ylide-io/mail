@@ -1,6 +1,6 @@
 import { MessageAttachment, MessageAttachmentLinkV1, YlideIpfsStorage } from '@ylide/sdk';
 import { observer } from 'mobx-react';
-import React, { ReactNode, useEffect, useMemo, useState } from 'react';
+import { ReactNode, useEffect, useMemo, useState } from 'react';
 import { createReactEditorJS } from 'react-editor-js';
 
 import { ActionButton, ActionButtonLook } from '../../../../components/ActionButton/ActionButton';

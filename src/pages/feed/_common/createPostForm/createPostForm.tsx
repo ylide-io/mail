@@ -4,7 +4,7 @@ import { observer } from 'mobx-react';
 import { forwardRef, Ref, useEffect, useImperativeHandle, useMemo, useRef, useState } from 'react';
 import { useMutation } from 'react-query';
 
-import { DecodedVenomFeedPost, VenomFilterApi } from '../../../../api/venomFilterApi';
+import { BlockchainFeedApi, DecodedBlockchainFeedPost } from '../../../../api/blockchainFeedApi';
 import { AccountSelect } from '../../../../components/accountSelect/accountSelect';
 import { ActionButton, ActionButtonLook, ActionButtonSize } from '../../../../components/ActionButton/ActionButton';
 import { AutoSizeTextArea, AutoSizeTextAreaApi } from '../../../../components/autoSizeTextArea/autoSizeTextArea';
@@ -17,43 +17,46 @@ import { ReactComponent as TrashSvg } from '../../../../icons/ic20/trash.svg';
 import { ReactComponent as BulbSvg } from '../../../../icons/ic28/bulb.svg';
 import { ReactComponent as StickerSvg } from '../../../../icons/ic28/sticker.svg';
 import { analytics } from '../../../../stores/Analytics';
+import { BlockchainProjectMeta } from '../../../../stores/blockchainProjects/blockchainProjects';
 import { DomainAccount } from '../../../../stores/models/DomainAccount';
 import { OutgoingMailData, OutgoingMailDataMode } from '../../../../stores/outgoingMailData';
-import { VenomProjectMeta } from '../../../../stores/venomProjects/venomProjects';
 import { HorizontalAlignment } from '../../../../utils/alignment';
+import { calcComissions } from '../../../../utils/calcComissions';
 import { hashToIpfsUrl, ipfsToHttpUrl } from '../../../../utils/ipfs';
 import { escapeRegex } from '../../../../utils/regex';
-import { SendMailButton } from '../../../mail/components/composeMailForm/sendMailButton/sendMailButton';
-import { VenomFeedPostItemView } from '../venomFeedPostItem/venomFeedPostItem';
+import { SendMailButton } from '../../../mail/_common/composeMailForm/sendMailButton/sendMailButton';
+import { BlockchainProjectPostView } from '../blockchainProjectPost/blockchainProjectPost';
 import css from './createPostForm.module.scss';
 
 export interface CreatePostFormApi {
-	replyTo: (post: DecodedVenomFeedPost) => void;
+	replyTo: (post: DecodedBlockchainFeedPost) => void;
 }
 
 export interface CreatePostFormProps extends PropsWithClassName {
 	accounts: DomainAccount[];
-	isAnavailable: boolean;
+	isUnavailable: boolean;
 	displayIdeasButton: boolean;
-	projectMeta: VenomProjectMeta;
+	projectMeta: BlockchainProjectMeta;
 	onCreated?: () => void;
 }
 
 export const CreatePostForm = observer(
 	forwardRef(
 		(
-			{ className, accounts, isAnavailable, displayIdeasButton, projectMeta, onCreated }: CreatePostFormProps,
+			{ className, accounts, isUnavailable, displayIdeasButton, projectMeta, onCreated }: CreatePostFormProps,
 			ref: Ref<CreatePostFormApi>,
 		) => {
 			const textAreaApiRef = useRef<AutoSizeTextAreaApi>(null);
 
-			const [replyTo, setReplyTo] = useState<DecodedVenomFeedPost>();
+			const [replyTo, setReplyTo] = useState<DecodedBlockchainFeedPost>();
 
 			const mailData = useMemo(() => {
 				const mailData = new OutgoingMailData();
 
 				mailData.mode = OutgoingMailDataMode.BROADCAST;
 				mailData.feedId = projectMeta.feedId;
+				mailData.isGenericFeed = true;
+				mailData.extraPayment = '0';
 
 				mailData.validator = () => {
 					const text = mailData.plainTextData;
@@ -93,6 +96,25 @@ export const CreatePostForm = observer(
 				mailData.from = mailData.from && accounts.includes(mailData.from) ? mailData.from : accounts[0];
 			}, [mailData, accounts]);
 
+			useEffect(() => {
+				let cancelled = false;
+				BlockchainFeedApi.getComissions({ feedId: mailData.feedId })
+					.then(comissions => {
+						if (cancelled || !mailData.from) {
+							return;
+						}
+						const blockchain = mailData.from.getBlockchainName(mailData.network);
+						const comission = calcComissions(blockchain, comissions);
+						mailData.extraPayment = comission || '0';
+					})
+					.catch(err => {
+						console.error(err);
+					});
+				return () => {
+					cancelled = true;
+				};
+			}, [mailData, mailData.from, mailData.network]);
+
 			const [expanded, setExpanded] = useState(false);
 
 			const [isIdeaAnimated, setIdeaAnimated] = useState(false);
@@ -103,7 +125,7 @@ export const CreatePostForm = observer(
 			const [lastIdea, setLastIdea] = useState('');
 
 			const { mutate: loadIdea, isLoading: isIdeaLoading } = useMutation({
-				mutationFn: () => VenomFilterApi.getTextIdea(),
+				mutationFn: () => BlockchainFeedApi.getTextIdea(),
 				onSuccess: data => {
 					let text = mailData.plainTextData;
 
@@ -182,7 +204,7 @@ export const CreatePostForm = observer(
 								</ActionButton>
 							</div>
 
-							<VenomFeedPostItemView post={replyTo} isCompact />
+							<BlockchainProjectPostView post={replyTo} isCompact />
 
 							<div className={css.divider} />
 						</>
@@ -294,7 +316,7 @@ export const CreatePostForm = observer(
 										)}
 									</GridRowBox>
 
-									{isAnavailable ? (
+									{isUnavailable ? (
 										<div>Can't post now. Wait a minute.</div>
 									) : (
 										<SendMailButton disabled={isIdeaLoading} mailData={mailData} onSent={onSent} />

@@ -1,12 +1,18 @@
 import { MessageAttachmentLinkV1 } from '@ylide/sdk';
 import clsx from 'clsx';
-import React, { MouseEventHandler, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { MouseEventHandler, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useQuery } from 'react-query';
+import { generatePath } from 'react-router-dom';
 
-import { DecodedVenomFeedPost, decodeVenomFeedPost, VenomFilterApi } from '../../../../api/venomFilterApi';
+import {
+	BlockchainFeedApi,
+	decodeBlockchainFeedPost,
+	DecodedBlockchainFeedPost,
+} from '../../../../api/blockchainFeedApi';
 import { ActionButton, ActionButtonLook } from '../../../../components/ActionButton/ActionButton';
 import { AdaptiveAddress } from '../../../../components/adaptiveAddress/adaptiveAddress';
 import { Avatar } from '../../../../components/avatar/avatar';
+import { BlockChainLabel } from '../../../../components/BlockChainLabel/BlockChainLabel';
 import { GridRowBox } from '../../../../components/boxes/boxes';
 import { ErrorMessage, ErrorMessageLook } from '../../../../components/errorMessage/errorMessage';
 import { NlToBr } from '../../../../components/nlToBr/nlToBr';
@@ -19,24 +25,34 @@ import { ReactComponent as ExternalSvg } from '../../../../icons/ic20/external.s
 import { ReactComponent as MailSvg } from '../../../../icons/ic20/mail.svg';
 import { MessageDecodedTextDataType } from '../../../../indexedDB/IndexedDB';
 import { analytics } from '../../../../stores/Analytics';
+import { activeVenomProjects, BlockchainProjectId } from '../../../../stores/blockchainProjects/blockchainProjects';
 import { browserStorage } from '../../../../stores/browserStorage';
 import { useVenomAccounts } from '../../../../stores/Domain';
 import { OutgoingMailData } from '../../../../stores/outgoingMailData';
+import { RoutePath } from '../../../../stores/routePath';
+import { generateBlockchainExplorerUrl } from '../../../../utils/blockchain';
 import { copyToClipboard } from '../../../../utils/clipboard';
 import { ipfsToHttpUrl } from '../../../../utils/ipfs';
 import { useOpenMailCompose } from '../../../../utils/mail';
+import { useNav } from '../../../../utils/url';
 import { useShiftPressed } from '../../../../utils/useShiftPressed';
 import { PostItemContainer } from '../postItemContainer/postItemContainer';
-import css from './venomFeedPostItem.module.scss';
+import css from './blockchainProjectPost.module.scss';
 
-interface VenomFeedPostItemViewProps {
-	post: DecodedVenomFeedPost;
+export function generateBlockchainProjectPostPath(projectId: BlockchainProjectId, postId: string) {
+	return generatePath(RoutePath.FEED_PROJECT_POST, { projectId, postId: encodeURIComponent(postId) });
+}
+
+interface BlockchainProjectPostViewProps {
+	post: DecodedBlockchainFeedPost;
+	postUrl?: string;
 
 	isCompact?: boolean;
 	isBanned?: boolean;
 	isApproved?: boolean;
 	isAdminHelpVisible?: boolean;
 	loadReplyIfNeeded?: boolean;
+	displayBlockchainTag?: boolean;
 
 	onClick?: MouseEventHandler<HTMLElement>;
 	onAddressClick?: MouseEventHandler<HTMLElement>;
@@ -46,14 +62,16 @@ interface VenomFeedPostItemViewProps {
 	onUnbanClick?: MouseEventHandler<HTMLElement>;
 }
 
-export function VenomFeedPostItemView({
+export function BlockchainProjectPostView({
 	post,
+	postUrl,
 
 	isCompact,
 	isBanned,
 	isApproved,
 	isAdminHelpVisible,
 	loadReplyIfNeeded,
+	displayBlockchainTag,
 
 	onClick,
 	onAddressClick,
@@ -61,7 +79,8 @@ export function VenomFeedPostItemView({
 	onReplyClick,
 	onBanClick,
 	onUnbanClick,
-}: VenomFeedPostItemViewProps) {
+}: BlockchainProjectPostViewProps) {
+	const navigate = useNav();
 	const openMailCompose = useOpenMailCompose();
 	const venomAccounts = useVenomAccounts();
 
@@ -87,15 +106,23 @@ export function VenomFeedPostItemView({
 	const repliedPostQuery = useQuery(['feed', 'venom', 'reply-to', replyToId], {
 		enabled: !!replyToId,
 		queryFn: async () => {
-			const post = await VenomFilterApi.getPost({ id: replyToId! });
-			return post ? decodeVenomFeedPost(post) : undefined;
+			const post = await BlockchainFeedApi.getPost({ id: replyToId! });
+			return post ? decodeBlockchainFeedPost(post) : undefined;
 		},
 	});
 
 	const attachment = post.decoded.attachments[0] as MessageAttachmentLinkV1 | undefined;
 	const attachmentHttpUrl = attachment && ipfsToHttpUrl(attachment.link);
 
+	const blockchain = post.original.blockchain;
+	const txId = post.msg.$$meta.tx?.hash || post.msg.$$meta.id;
+	const explorerUrl = generateBlockchainExplorerUrl(blockchain, txId);
+
 	const isAdmin = !!post.original.isAdmin;
+
+	function renderPostDate() {
+		return <ReadableDate value={post.msg.createdAt * 1000} />;
+	}
 
 	return (
 		<PostItemContainer
@@ -130,7 +157,22 @@ export function VenomFeedPostItemView({
 				</GridRowBox>
 
 				<div className={css.metaRight}>
-					<ReadableDate className={css.metaAction} value={post.msg.createdAt * 1000} />
+					{displayBlockchainTag && <BlockChainLabel blockchain={blockchain} />}
+
+					{postUrl ? (
+						<a
+							className={clsx(css.metaAction, css.metaAction_interactive)}
+							href={postUrl}
+							onClick={e => {
+								e.preventDefault();
+								navigate(postUrl);
+							}}
+						>
+							{renderPostDate()}
+						</a>
+					) : (
+						<div className={css.metaAction}>{renderPostDate()}</div>
+					)}
 
 					{onReplyClick && (
 						<button className={clsx(css.metaAction, css.metaAction_interactive)} onClick={onReplyClick}>
@@ -138,10 +180,10 @@ export function VenomFeedPostItemView({
 						</button>
 					)}
 
-					{!!post.msg.$$meta.id && (
+					{!!explorerUrl && (
 						<a
 							className={clsx(css.metaAction, css.metaAction_icon, css.metaAction_interactive)}
-							href={`https://testnet.venomscan.com/messages/${post.msg.$$meta.id}`}
+							href={explorerUrl}
 							target="_blank"
 							rel="noreferrer"
 							title="Details"
@@ -175,7 +217,7 @@ export function VenomFeedPostItemView({
 						{replyToId && (
 							<>
 								{repliedPostQuery.data ? (
-									<VenomFeedPostItemView
+									<BlockchainProjectPostView
 										post={repliedPostQuery.data}
 										isCompact
 										onAddressClick={() => {
@@ -256,14 +298,23 @@ export function VenomFeedPostItemView({
 
 //
 
-interface VenomFeedPostItemProps {
-	post: DecodedVenomFeedPost;
+interface BlockchainProjectPostProps {
+	post: DecodedBlockchainFeedPost;
+	projectId: BlockchainProjectId;
 	isFirstPost: boolean;
 	onNextPost: () => void;
-	onReplyClick: () => void;
+	onReplyClick?: () => void;
 }
 
-export function VenomFeedPostItem({ post, isFirstPost, onNextPost, onReplyClick }: VenomFeedPostItemProps) {
+export function BlockchainProjectPost({
+	post,
+	projectId,
+	isFirstPost,
+	onNextPost,
+	onReplyClick,
+}: BlockchainProjectPostProps) {
+	const isVenomFeed = activeVenomProjects.includes(projectId);
+
 	let [clicks] = useState<number[]>([]);
 
 	const [isBanned, setBanned] = useState(false);
@@ -274,9 +325,9 @@ export function VenomFeedPostItem({ post, isFirstPost, onNextPost, onReplyClick 
 	const venomAccounts = useVenomAccounts();
 
 	const banAddress = useCallback(() => {
-		VenomFilterApi.banAddresses({
+		BlockchainFeedApi.banAddresses({
 			addresses: [post.msg.senderAddress],
-			secret: browserStorage.userAdminPassword || '',
+			secret: browserStorage.adminPassword || '',
 		})
 			.then(() => {
 				toast('Banned 🔥');
@@ -293,7 +344,7 @@ export function VenomFeedPostItem({ post, isFirstPost, onNextPost, onReplyClick 
 	}, [post.msg.senderAddress]);
 
 	const banPost = useCallback(() => {
-		VenomFilterApi.banPost({ ids: [post.msg.msgId], secret: browserStorage.userAdminPassword || '' })
+		BlockchainFeedApi.banPost({ ids: [post.msg.msgId], secret: browserStorage.adminPassword || '' })
 			.then(() => {
 				toast('Banned 🔥');
 				setBanned(true);
@@ -309,7 +360,7 @@ export function VenomFeedPostItem({ post, isFirstPost, onNextPost, onReplyClick 
 	}, [post.msg.msgId]);
 
 	const approvePost = useCallback(() => {
-		VenomFilterApi.approvePost({ ids: [post.msg.msgId], secret: browserStorage.userAdminPassword || '' })
+		BlockchainFeedApi.approvePost({ ids: [post.msg.msgId], secret: browserStorage.adminPassword || '' })
 			.then(() => {
 				toast('Approved 🔥');
 				setApproved(true);
@@ -325,7 +376,7 @@ export function VenomFeedPostItem({ post, isFirstPost, onNextPost, onReplyClick 
 	}, [post.msg.msgId]);
 
 	const unbanPost = useCallback(() => {
-		VenomFilterApi.unbanPost({ ids: [post.msg.msgId], secret: browserStorage.userAdminPassword || '' })
+		BlockchainFeedApi.unbanPost({ ids: [post.msg.msgId], secret: browserStorage.adminPassword || '' })
 			.then(() => {
 				toast('Un-banned 🔥');
 				setBanned(false);
@@ -375,12 +426,14 @@ export function VenomFeedPostItem({ post, isFirstPost, onNextPost, onReplyClick 
 		<div style={{ position: 'relative' }}>
 			<div ref={scrollRef} style={{ position: 'absolute', top: -100 }} />
 
-			<VenomFeedPostItemView
+			<BlockchainProjectPostView
 				post={post}
+				postUrl={generateBlockchainProjectPostPath(projectId, post.original.id)}
 				isBanned={isBanned}
 				isApproved={isApproved}
 				isAdminHelpVisible={browserStorage.isUserAdmin && isFirstPost && isShiftPressed}
 				loadReplyIfNeeded
+				displayBlockchainTag={!isVenomFeed}
 				onClick={() => {
 					clicks = [Date.now(), ...clicks].slice(0, 3);
 					if (browserStorage.isUserAdmin && clicks.length === 3 && clicks[0] - clicks[2] < 600) {

@@ -1,5 +1,4 @@
 import { observer } from 'mobx-react';
-import React from 'react';
 
 import { ReactComponent as PlusSvg } from '../../icons/ic20/plus.svg';
 import domain from '../../stores/Domain';

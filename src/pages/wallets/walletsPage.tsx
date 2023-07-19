@@ -1,27 +1,23 @@
 import clsx from 'clsx';
 import { observer } from 'mobx-react';
-import React from 'react';
 import { generatePath } from 'react-router-dom';
 
 import { AccountConnectedModal } from '../../components/accountConnectedModal/accountConnectedModal';
 import { ActionButton, ActionButtonLook, ActionButtonSize } from '../../components/ActionButton/ActionButton';
 import { AdaptiveAddress } from '../../components/adaptiveAddress/adaptiveAddress';
 import { AppLogo } from '../../components/appLogo/appLogo';
-import { NewPasswordModal } from '../../components/newPasswordModal/newPasswordModal';
 import { showStaticComponent } from '../../components/staticComponentManager/staticComponentManager';
 import { APP_NAME } from '../../constants';
 import { ReactComponent as CrossSvg } from '../../icons/ic20/cross.svg';
 import { ReactComponent as NextSvg } from '../../icons/ic28/next.svg';
 import domain from '../../stores/Domain';
-import { DomainAccount } from '../../stores/models/DomainAccount';
 import { RoutePath } from '../../stores/routePath';
-import { connectAccount, disconnectAccount } from '../../utils/account';
+import { activateAccount, connectAccount, disconnectAccount } from '../../utils/account';
 import { blockchainMeta } from '../../utils/blockchain';
-import { getQueryString } from '../../utils/getQueryString';
 import { useNav } from '../../utils/url';
 import { walletsMeta } from '../../utils/wallet';
 
-export const NewWalletsPage = observer(() => {
+export const WalletsPage = observer(() => {
 	const navigate = useNav();
 
 	return (
@@ -55,7 +51,7 @@ export const NewWalletsPage = observer(() => {
 
 				<div className="connected-wallets">
 					{domain.accounts.accounts.map(acc => {
-						const isActive = domain.accounts.isActiveAccount(acc);
+						const isActive = acc.isLocalKeyRegistered;
 						return (
 							<div className={clsx('cw-block', { notActive: !isActive })} key={acc.account.address}>
 								<div className="cw-logo">{walletsMeta[acc.wallet.wallet].logo(isActive ? 32 : 24)}</div>
@@ -81,26 +77,7 @@ export const NewWalletsPage = observer(() => {
 								{!isActive && (
 									<ActionButton
 										look={ActionButtonLook.SECONDARY}
-										onClick={async () => {
-											const wallet = acc.wallet;
-											const remoteKeys = await wallet.readRemoteKeys(acc.account);
-											const qqs = getQueryString();
-
-											await showStaticComponent<DomainAccount>(resolve => (
-												<NewPasswordModal
-													faucetType={
-														['polygon', 'fantom', 'gnosis'].includes(qqs.faucet)
-															? (qqs.faucet as any)
-															: 'gnosis'
-													}
-													bonus={qqs.bonus === 'true'}
-													wallet={wallet}
-													account={acc.account}
-													remoteKeys={remoteKeys.remoteKeys}
-													onClose={resolve}
-												/>
-											));
-										}}
+										onClick={() => activateAccount({ account: acc })}
 									>
 										Activate
 									</ActionButton>

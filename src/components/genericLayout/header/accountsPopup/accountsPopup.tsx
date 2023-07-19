@@ -1,13 +1,13 @@
 import clsx from 'clsx';
 import { observer } from 'mobx-react';
-import React, { RefObject } from 'react';
+import { RefObject } from 'react';
 
 import { ReactComponent as EditSvg } from '../../../../icons/ic20/edit.svg';
 import { ReactComponent as PlusSvg } from '../../../../icons/ic20/plus.svg';
 import { ReactComponent as LogoutSvg } from '../../../../icons/ic28/logout.svg';
 import { analytics } from '../../../../stores/Analytics';
 import domain from '../../../../stores/Domain';
-import { connectAccount, disconnectAccount } from '../../../../utils/account';
+import { activateAccount, connectAccount, disconnectAccount } from '../../../../utils/account';
 import { HorizontalAlignment } from '../../../../utils/alignment';
 import { walletsMeta } from '../../../../utils/wallet';
 import { ActionButton, ActionButtonLook, ActionButtonSize } from '../../../ActionButton/ActionButton';
@@ -23,6 +23,8 @@ interface AccountsPopupProps {
 }
 
 export const AccountsPopup = observer(({ anchorRef, onClose }: AccountsPopupProps) => {
+	const accounts = domain.accounts.accounts;
+
 	return (
 		<AnchoredPopup
 			anchorRef={anchorRef}
@@ -32,52 +34,60 @@ export const AccountsPopup = observer(({ anchorRef, onClose }: AccountsPopupProp
 			onCloseRequest={onClose}
 		>
 			<div className={css.content}>
-				{domain.accounts.activeAccounts.map(account => (
+				{accounts.map(account => (
 					<div key={account.account.address} className={css.item}>
-						<Avatar className={css.itemIcon} blockie={account.account.address} />
+						<Avatar className={css.itemAvatar} blockie={account.account.address} />
+
 						<div className={css.itemBody}>
-							<div className={css.itemName}>
-								<AdaptiveText
-									className={clsx(css.itemNameInner, !account.name && css.itemNameInner_empty)}
-									text={account.name || 'No name'}
-								/>
+							{account.isLocalKeyRegistered ? (
+								<div className={css.itemName}>
+									<AdaptiveText
+										className={clsx(css.itemNameInner, !account.name && css.itemNameInner_empty)}
+										text={account.name || 'No name'}
+									/>
 
-								<ActionButton
-									look={ActionButtonLook.LITE}
-									icon={<EditSvg />}
-									title="Rename"
-									onClick={async () => {
-										analytics.renameAccount(
-											'accounts-popup',
-											account.wallet.wallet,
-											account.account.address,
-										);
+									<ActionButton
+										look={ActionButtonLook.LITE}
+										icon={<EditSvg />}
+										title="Rename"
+										onClick={async () => {
+											analytics.renameAccount(
+												'accounts-popup',
+												account.wallet.wallet,
+												account.account.address,
+											);
 
-										const newName = prompt('Enter new account name: ', account.name) || '';
-										await account.rename(newName);
-									}}
-								/>
-							</div>
+											const newName = prompt('Enter new account name: ', account.name) || '';
+											await account.rename(newName);
+										}}
+									/>
+								</div>
+							) : (
+								<div className={css.itemInactiveBadge} onClick={() => activateAccount({ account })}>
+									INACTIVE
+								</div>
+							)}
+
 							<div className={css.itemWallet}>
 								{walletsMeta[account.wallet.wallet].logo(12)} {walletsMeta[account.wallet.wallet].title}
 							</div>
+
 							<AdaptiveAddress className={css.itemAddress} address={account.account.address} />
 						</div>
-						<div className={css.itemActions}>
-							<ActionButton
-								size={ActionButtonSize.MEDIUM}
-								look={ActionButtonLook.DANGEROUS}
-								icon={<LogoutSvg />}
-								title="Logout"
-								onClick={async () => {
-									await disconnectAccount({ account, place: 'accounts-popup' });
 
-									if (!domain.accounts.hasActiveAccounts) {
-										onClose();
-									}
-								}}
-							/>
-						</div>
+						<ActionButton
+							size={ActionButtonSize.MEDIUM}
+							look={ActionButtonLook.DANGEROUS}
+							icon={<LogoutSvg />}
+							title="Logout"
+							onClick={async () => {
+								await disconnectAccount({ account, place: 'accounts-popup' });
+
+								if (!accounts.length) {
+									onClose();
+								}
+							}}
+						/>
 					</div>
 				))}
 

@@ -2,7 +2,7 @@ import * as browserUtils from '@walletconnect/browser-utils';
 import clsx from 'clsx';
 import { reaction } from 'mobx';
 import { observer } from 'mobx-react';
-import React, { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import QRCode from 'react-qr-code';
 
 import domain from '../../stores/Domain';

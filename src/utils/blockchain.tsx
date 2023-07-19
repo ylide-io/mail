@@ -56,16 +56,19 @@ export const blockchainMeta: Record<
 	{
 		title: string;
 		logo: (s?: number) => JSX.Element;
+		symbol?: string;
 		ethNetwork?: IEthereumNetworkDescriptor;
 	}
 > = {
 	'everscale': {
 		title: 'Everscale',
 		logo: (s = 16) => <EverscaleLogo size={s} />,
+		symbol: 'EVER',
 	},
 	'venom-testnet': {
 		title: 'Venom Testnet',
 		logo: (s = 16) => <VenomLogo size={s} />,
+		symbol: 'VENOM',
 	},
 	[EVM_NAMES[EVMNetwork.LOCAL_HARDHAT]]: {
 		title: 'LocalNet',
@@ -454,6 +457,21 @@ export const blockchainMeta: Record<
 		logo: (s = 16) => <NearLogo size={30} />,
 	},
 };
+
+export function generateBlockchainExplorerUrl(blockchain: string, txId: string | undefined) {
+	if (!txId) return;
+
+	if (blockchain === 'venom-testnet') {
+		return `https://testnet.venomscan.com/messages/${txId}`;
+	}
+
+	if (blockchain === 'everscale') {
+		return `https://everscan.io/transactions/${txId}`;
+	}
+
+	const explorerUrl = blockchainMeta[blockchain].ethNetwork?.blockExplorerUrls[0];
+	return explorerUrl ? `${explorerUrl}/tx/${txId}` : undefined;
+}
 
 //
 

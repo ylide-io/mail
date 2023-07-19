@@ -98,11 +98,13 @@ export interface ILinkedMessage {
 export class MailList<M = ILinkedMessage> {
 	private isDestroyed = false;
 
+	public id: string;
+
 	@observable isNextPageAvailable = true;
 	@observable isLoading = true;
 	@observable isError = false;
 
-	@observable.shallow private messagesData: { raw: IMessageWithSource; handled: M | typeof FILTERED_OUT }[] = [];
+	@observable.shallow public messagesData: { raw: IMessageWithSource; handled: M | typeof FILTERED_OUT }[] = [];
 
 	private stream: ListSourceDrainer | undefined;
 
@@ -111,6 +113,8 @@ export class MailList<M = ILinkedMessage> {
 
 	constructor() {
 		makeObservable(this);
+		this.id = String(Math.floor(Math.random() * 1000000000));
+		console.log('MailList created', this.id);
 	}
 
 	async init(props: {
@@ -248,6 +252,7 @@ export class MailList<M = ILinkedMessage> {
 
 	@autobind
 	private async onNewMessages({ messages }: { messages: IMessageWithSource[] }) {
+		console.log('New messages', this.id, messages[0]?.msg.createdAt);
 		this.messagesData = await this.handleMessages(messages);
 	}
 

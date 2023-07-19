@@ -1,5 +1,3 @@
-import React from 'react';
-
 import { IContact } from '../../indexedDB/IndexedDB';
 import { Avatar } from '../avatar/avatar';
 import { PropsWithClassName } from '../props';

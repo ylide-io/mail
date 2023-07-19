@@ -1,6 +1,6 @@
 import clsx from 'clsx';
 import { observer } from 'mobx-react';
-import React, { MouseEvent, useMemo, useRef, useState } from 'react';
+import { MouseEvent, useMemo, useRef, useState } from 'react';
 import { generatePath } from 'react-router-dom';
 
 import { FeedPost, FeedReason, LinkType } from '../../../../api/feedServerApi';
@@ -183,7 +183,7 @@ interface FeedPostItemProps {
 
 export function FeedPostItem({ isInFeed, realtedAccounts, post }: FeedPostItemProps) {
 	const navigate = useNav();
-	const postPath = generatePath(RoutePath.FEED_POST, { id: post.id });
+	const postPath = generatePath(RoutePath.FEED_POST, { postId: post.id });
 
 	const menuButtonRef = useRef(null);
 	const [isMenuOpen, setMenuOpen] = useState(false);

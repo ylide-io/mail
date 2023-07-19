@@ -1,8 +1,7 @@
 import clsx from 'clsx';
 import { observable } from 'mobx';
 import { observer } from 'mobx-react';
-import React, { PropsWithChildren, ReactNode, useState } from 'react';
-import { useQuery } from 'react-query';
+import { PropsWithChildren, ReactNode, useState } from 'react';
 import { generatePath, useLocation } from 'react-router-dom';
 
 import { FeedCategory } from '../../../api/feedServerApi';
@@ -30,15 +29,20 @@ import { sidePolicyIcon } from '../../../icons/static/sidePolicyIcon';
 import { sideProjectsIcon } from '../../../icons/static/sideProjectsIcon';
 import { sideSecurityIcon } from '../../../icons/static/sideSecurityIcon';
 import { sideTechnologyIcon } from '../../../icons/static/sideTechnologyIcon';
-import { FeedSettingsPopup } from '../../../pages/feed/components/feedSettingsPopup/feedSettingsPopup';
+import { FeedSettingsPopup } from '../../../pages/feed/_common/feedSettingsPopup/feedSettingsPopup';
 import { analytics } from '../../../stores/Analytics';
+import {
+	activeTvmProjects,
+	activeVenomProjects,
+	BlockchainProjectId,
+	blockchainProjectsMeta,
+} from '../../../stores/blockchainProjects/blockchainProjects';
 import { browserStorage } from '../../../stores/browserStorage';
-import domain, { useDomainAccounts } from '../../../stores/Domain';
+import domain from '../../../stores/Domain';
 import { getFeedCategoryName } from '../../../stores/Feed';
-import { FolderId, MailList } from '../../../stores/MailList';
+import { FolderId } from '../../../stores/MailList';
 import { DomainAccount } from '../../../stores/models/DomainAccount';
 import { RoutePath } from '../../../stores/routePath';
-import { VenomProjectId, venomProjectsMeta } from '../../../stores/venomProjects/venomProjects';
 import { useOpenMailCompose } from '../../../utils/mail';
 import { useNav } from '../../../utils/url';
 import { ActionButton, ActionButtonLook, ActionButtonSize } from '../../ActionButton/ActionButton';
@@ -183,51 +187,49 @@ export const SidebarButton = observer(({ look, href, icon, name, rightButton }: 
 export const SidebarMailSection = observer(() => {
 	const openMailCompose = useOpenMailCompose();
 
-	const accounts = useDomainAccounts();
+	// const accounts = useDomainAccounts();
 
 	const [hasNewMessages, setHasNewMessages] = useState(false);
 
-	useQuery(['mailbox', 'new-inbox-messages'], {
-		queryFn: async () => {
-			if (hasNewMessages) return;
+	// useEffect(() => {
+	// 	console.log('sidebar mail section mounted');
+	// 	return () => {
+	// 		console.log('sidebar mail section unmounted');
+	// 	};
+	// }, []);
 
-			const data: Array<{ address: string; lastMessageDate?: number }> = await Promise.all(
-				accounts.map(async account => {
-					const mailList = new MailList();
+	// useEffect(() => {
+	// 	const mailList = new MailList();
 
-					await mailList.init({
-						mailbox: {
-							accounts: [account],
-							folderId: FolderId.Inbox,
-						},
-					});
+	// 	mailList.init({
+	// 		mailbox: {
+	// 			accounts,
+	// 			folderId: FolderId.Inbox,
+	// 		},
+	// 	});
 
-					return {
-						address: account.account.address,
-						lastMessageDate: mailList.messages[0]?.msg.createdAt,
-					};
-				}),
-			);
+	// 	console.log('inited maillist: ', mailList.id);
 
-			const hasNew = data.some(d => {
-				const lastCachedDate = browserStorage.lastMailboxIncomingDate[d.address];
-				return lastCachedDate && d.lastMessageDate && lastCachedDate < d.lastMessageDate;
-			});
+	// 	const key = accounts
+	// 		.map(a => a.account.address)
+	// 		.sort()
+	// 		.join(',');
 
-			setHasNewMessages(hasNew);
-
-			if (!hasNew) {
-				browserStorage.lastMailboxIncomingDate = data.reduce((res, item) => {
-					if (item.lastMessageDate) {
-						res[item.address] = item.lastMessageDate;
-					}
-
-					return res;
-				}, {} as Record<string, number>);
-			}
-		},
-		refetchInterval: 60 * 1000,
-	});
+	// 	const dispose = reaction(
+	// 		() => ({ messagesData: mailList.messagesData, lastMailboxCheckDate: browserStorage.lastMailboxCheckDate }),
+	// 		({ messagesData, lastMailboxCheckDate }) => {
+	// 			console.log('reaction triggered for ' + mailList.id);
+	// 			const lastCheckedDate = lastMailboxCheckDate[key];
+	// 			const isNew =
+	// 				messagesData[0] && (!lastCheckedDate || messagesData[0].raw.msg.createdAt > lastCheckedDate);
+	// 			setHasNewMessages(isNew);
+	// 		},
+	// 	);
+	// 	return () => {
+	// 		dispose();
+	// 		mailList.destroy();
+	// 	};
+	// }, [accounts]);
 
 	return (
 		<SidebarSection section={Section.MAIL} title="Mail">
@@ -327,46 +329,34 @@ export const SidebarMenu = observer(() => {
 		);
 	}
 
-	function renderVenomProjectsSection() {
+	function renderBlockchainProjectsSection() {
 		if (REACT_APP__APP_MODE !== AppMode.HUB) return;
 
-		return (
-			<SidebarSection section={Section.VENOM_PROJECTS} title="Venom Projects">
-				{[
-					VenomProjectId.VENOM_BLOCKCHAIN,
-					VenomProjectId.SNIPA,
-					VenomProjectId.WEB3_WORLD,
-					VenomProjectId.VENOM_BRIDGE,
-					VenomProjectId.OASIS_GALLERY,
-					VenomProjectId.VENTORY,
-					VenomProjectId.YLIDE,
-				].map(id => {
-					const meta = venomProjectsMeta[id];
+		function renderProjects(projects: BlockchainProjectId[]) {
+			return projects.map(id => {
+				const meta = blockchainProjectsMeta[id];
 
-					return (
-						<SidebarButton
-							key={id}
-							href={generatePath(RoutePath.FEED_VENOM_PROJECT, { project: meta.id })}
-							name={meta.name}
-							icon={meta.logo}
-						/>
-					);
-				})}
-			</SidebarSection>
-		);
-	}
-
-	function renderTvmProjects() {
-		if (REACT_APP__APP_MODE !== AppMode.HUB) return;
+				return (
+					<SidebarButton
+						key={id}
+						href={generatePath(RoutePath.FEED_PROJECT_POSTS, { projectId: meta.id })}
+						name={meta.name}
+						icon={meta.logo}
+					/>
+				);
+			});
+		}
 
 		return (
-			<SidebarSection section={Section.TVM_PROJECTS} title="TVM 주요정보">
-				<SidebarButton
-					href={generatePath(RoutePath.FEED_TVM)}
-					name={venomProjectsMeta[VenomProjectId.TVM].name}
-					icon={venomProjectsMeta[VenomProjectId.TVM].logo}
-				/>
-			</SidebarSection>
+			<>
+				<SidebarSection section={Section.VENOM_PROJECTS} title="Venom Projects">
+					{renderProjects(activeVenomProjects)}
+				</SidebarSection>
+
+				<SidebarSection section={Section.TVM_PROJECTS} title="TVM 주요정보">
+					{renderProjects(activeTvmProjects)}
+				</SidebarSection>
+			</>
 		);
 	}
 
@@ -404,8 +394,7 @@ export const SidebarMenu = observer(() => {
 		<div className={css.root}>
 			{renderOtcSection()}
 			{renderSmartFeedSection()}
-			{renderVenomProjectsSection()}
-			{renderTvmProjects()}
+			{renderBlockchainProjectsSection()}
 			{renderFeedDiscoverySection()}
 			{renderMailSection()}
 

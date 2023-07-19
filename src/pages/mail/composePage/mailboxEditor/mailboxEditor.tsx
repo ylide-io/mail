@@ -1,6 +1,6 @@
 import './mailboxEditor.scss';
 
-import React, { useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 import { createReactEditorJS } from 'react-editor-js';
 
 import { OutgoingMailData } from '../../../../stores/outgoingMailData';

@@ -1,5 +1,5 @@
 import { observer } from 'mobx-react';
-import React, { useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 import { generatePath } from 'react-router-dom';
 
 import { AppMode, REACT_APP__APP_MODE } from '../../../env';
@@ -29,6 +29,8 @@ const Header = observer(() => {
 
 	const accountsPopupButtonRef = useRef(null);
 	const [isAccountsPopupOpen, setAccountsPopupOpen] = useState(false);
+
+	const accounts = domain.accounts.accounts;
 
 	return (
 		<div className={css.root}>
@@ -69,7 +71,7 @@ const Header = observer(() => {
 					/>
 				)}
 
-				{domain.accounts.hasActiveAccounts ? (
+				{accounts.length ? (
 					<>
 						<button
 							ref={accountsPopupButtonRef}
@@ -77,7 +79,7 @@ const Header = observer(() => {
 							onClick={() => setAccountsPopupOpen(!isAccountsPopupOpen)}
 						>
 							<div>
-								{domain.accounts.activeAccounts.map(acc => (
+								{accounts.map(acc => (
 									<Avatar
 										key={acc.account.address}
 										className={css.usersAvatar}
@@ -87,8 +89,8 @@ const Header = observer(() => {
 							</div>
 
 							<div className={css.usersText}>
-								{domain.accounts.activeAccounts.length} account
-								{domain.accounts.activeAccounts.length > 1 ? 's' : ''}
+								{accounts.length} account
+								{accounts.length > 1 ? 's' : ''}
 								<span>&nbsp;connected</span>
 							</div>
 
