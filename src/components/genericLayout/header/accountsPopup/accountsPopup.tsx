@@ -36,42 +36,42 @@ export const AccountsPopup = observer(({ anchorRef, onClose }: AccountsPopupProp
 			<div className={css.content}>
 				{accounts.map(account => (
 					<div key={account.account.address} className={css.item}>
-						<div className={css.itemAvatar}>
-							<Avatar blockie={account.account.address} />
+						<Avatar className={css.itemAvatar} blockie={account.account.address} />
 
-							{account.isLocalKeyRegistered || (
-								<div className={css.inactiveAccountBadge} onClick={() => activateAccount({ account })}>
+						<div className={css.itemBody}>
+							{account.isLocalKeyRegistered ? (
+								<div className={css.itemName}>
+									<AdaptiveText
+										className={clsx(css.itemNameInner, !account.name && css.itemNameInner_empty)}
+										text={account.name || 'No name'}
+									/>
+
+									<ActionButton
+										look={ActionButtonLook.LITE}
+										icon={<EditSvg />}
+										title="Rename"
+										onClick={async () => {
+											analytics.renameAccount(
+												'accounts-popup',
+												account.wallet.wallet,
+												account.account.address,
+											);
+
+											const newName = prompt('Enter new account name: ', account.name) || '';
+											await account.rename(newName);
+										}}
+									/>
+								</div>
+							) : (
+								<div className={css.itemInactiveBadge} onClick={() => activateAccount({ account })}>
 									INACTIVE
 								</div>
 							)}
-						</div>
 
-						<div className={css.itemBody}>
-							<div className={css.itemName}>
-								<AdaptiveText
-									className={clsx(css.itemNameInner, !account.name && css.itemNameInner_empty)}
-									text={account.name || 'No name'}
-								/>
-
-								<ActionButton
-									look={ActionButtonLook.LITE}
-									icon={<EditSvg />}
-									title="Rename"
-									onClick={async () => {
-										analytics.renameAccount(
-											'accounts-popup',
-											account.wallet.wallet,
-											account.account.address,
-										);
-
-										const newName = prompt('Enter new account name: ', account.name) || '';
-										await account.rename(newName);
-									}}
-								/>
-							</div>
 							<div className={css.itemWallet}>
 								{walletsMeta[account.wallet.wallet].logo(12)} {walletsMeta[account.wallet.wallet].title}
 							</div>
+
 							<AdaptiveAddress className={css.itemAddress} address={account.account.address} />
 						</div>
 

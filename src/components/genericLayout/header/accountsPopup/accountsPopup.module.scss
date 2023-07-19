@@ -28,6 +28,13 @@
 	}
 }
 
+.itemBody {
+	display: grid;
+	grid-template-columns: 1fr auto;
+	align-items: center;
+	grid-gap: 8px;
+}
+
 .itemAvatar {
 	position: relative;
 	width: 48px;
@@ -35,27 +42,6 @@
 	@include less480px {
 		width: 32px;
 	}
-}
-
-.inactiveAccountBadge {
-	position: absolute;
-	bottom: 0;
-	left: 50%;
-	padding: 0 3px;
-	font-size: 8px;
-	font-weight: $font-weight_light;
-	color: var(--surface-color);
-	background: var(--error-color);
-	border: 1px solid var(--surface-color);
-	border-radius: 5px;
-	transform: translate(-50%);
-	cursor: pointer;
-}
-
-.itemBody {
-	display: grid;
-	grid-template-columns: 1fr auto;
-	grid-gap: 8px;
 }
 
 .itemName {
@@ -71,6 +57,17 @@
 
 .itemNameInner_empty {
 	color: var(--secondary-text-color);
+}
+
+.itemInactiveBadge {
+	justify-self: start;
+	padding: 3px 8px;
+	font-size: 10px;
+	font-weight: $font-weight_light;
+	color: var(--surface-color);
+	background: var(--error-color);
+	border-radius: 99px;
+	cursor: pointer;
 }
 
 .itemWallet {
