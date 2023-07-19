@@ -458,6 +458,21 @@ export const blockchainMeta: Record<
 	},
 };
 
+export function generateBlockchainExplorerUrl(blockchain: string, txId: string | undefined) {
+	if (!txId) return;
+
+	if (blockchain === 'venom-testnet') {
+		return `https://testnet.venomscan.com/messages/${txId}`;
+	}
+
+	if (blockchain === 'everscale') {
+		return `https://everscan.io/transactions/${txId}`;
+	}
+
+	const explorerUrl = blockchainMeta[blockchain].ethNetwork?.blockExplorerUrls[0];
+	return explorerUrl ? `${explorerUrl}/tx/${txId}` : undefined;
+}
+
 //
 
 export const evmNetworks = (Object.keys(EVM_NAMES) as unknown as EVMNetwork[]).map((network: EVMNetwork) => ({

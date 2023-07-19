@@ -30,6 +30,7 @@ import { browserStorage } from '../../../../stores/browserStorage';
 import { useVenomAccounts } from '../../../../stores/Domain';
 import { OutgoingMailData } from '../../../../stores/outgoingMailData';
 import { RoutePath } from '../../../../stores/routePath';
+import { generateBlockchainExplorerUrl } from '../../../../utils/blockchain';
 import { copyToClipboard } from '../../../../utils/clipboard';
 import { ipfsToHttpUrl } from '../../../../utils/ipfs';
 import { useOpenMailCompose } from '../../../../utils/mail';
@@ -111,6 +112,10 @@ export function BlockchainProjectPostView({
 	const attachment = post.decoded.attachments[0] as MessageAttachmentLinkV1 | undefined;
 	const attachmentHttpUrl = attachment && ipfsToHttpUrl(attachment.link);
 
+	const blockchain = post.original.blockchain;
+	const txId = post.msg.$$meta.tx?.hash || post.msg.$$meta.id;
+	const explorerUrl = generateBlockchainExplorerUrl(blockchain, txId);
+
 	const isAdmin = !!post.original.isAdmin;
 
 	function renderPostDate() {
@@ -150,7 +155,7 @@ export function BlockchainProjectPostView({
 				</GridRowBox>
 
 				<div className={css.metaRight}>
-					<BlockChainLabel blockchain={post.original.blockchain} />
+					<BlockChainLabel blockchain={blockchain} />
 
 					{postUrl ? (
 						<a
@@ -173,10 +178,10 @@ export function BlockchainProjectPostView({
 						</button>
 					)}
 
-					{!!post.msg.$$meta.id && (
+					{!!explorerUrl && (
 						<a
 							className={clsx(css.metaAction, css.metaAction_icon, css.metaAction_interactive)}
-							href={`https://testnet.venomscan.com/messages/${post.msg.$$meta.id}`}
+							href={explorerUrl}
 							target="_blank"
 							rel="noreferrer"
 							title="Details"
