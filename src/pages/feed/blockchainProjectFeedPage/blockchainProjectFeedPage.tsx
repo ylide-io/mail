@@ -1,5 +1,6 @@
 import { observer } from 'mobx-react';
 import { useRef, useState } from 'react';
+import { Helmet } from 'react-helmet';
 import { InView } from 'react-intersection-observer';
 import { useInfiniteQuery, useQuery } from 'react-query';
 import { useParams } from 'react-router-dom';
@@ -95,6 +96,11 @@ export const BlockchainProjectFeedPage = observer(() => {
 
 	return (
 		<GenericLayout>
+			<Helmet>
+				<title>{projectMeta.name} on Ylide Social Hub</title>
+				<meta name="description" content={projectMeta.description} />
+			</Helmet>
+
 			<NarrowContent key={projectId} contentClassName={css.main}>
 				<div className={css.projectTitle}>
 					<div className={css.projectLogo}>{projectMeta.logo}</div>

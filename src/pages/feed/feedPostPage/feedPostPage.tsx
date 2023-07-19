@@ -1,4 +1,5 @@
 import { useRef, useState } from 'react';
+import { Helmet } from 'react-helmet';
 import { useQuery } from 'react-query';
 import { generatePath, useParams } from 'react-router-dom';
 
@@ -9,6 +10,7 @@ import { NarrowContent } from '../../../components/genericLayout/content/narrowC
 import { GenericLayout } from '../../../components/genericLayout/genericLayout';
 import { SharePopup } from '../../../components/sharePopup/sharePopup';
 import { YlideLoader } from '../../../components/ylideLoader/ylideLoader';
+import { APP_NAME } from '../../../constants';
 import { ReactComponent as ShareSvg } from '../../../icons/ic20/share.svg';
 import { RoutePath } from '../../../stores/routePath';
 import { HorizontalAlignment } from '../../../utils/alignment';
@@ -30,6 +32,18 @@ export function FeedPostPage() {
 
 	return (
 		<GenericLayout>
+			{data && (
+				<Helmet>
+					<title>
+						Post by{' '}
+						{[data.post.authorName, data.post.authorNickname].filter(Boolean).join(' @ ') ||
+							data.post.sourceName ||
+							'alien'}{' '}
+						| {APP_NAME}
+					</title>
+				</Helmet>
+			)}
+
 			<NarrowContent
 				title="Post"
 				titleRight={
