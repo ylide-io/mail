@@ -7,11 +7,11 @@ import {
 	IBlockchainSourceSubject,
 	IGenericAccount,
 	IMessage,
-	IMessageWithSource,
-	ISourceWithMeta,
-	ListSource,
-	ListSourceDrainer,
-	ListSourceMultiplexer,
+	INewMessageWithSource,
+	INewSourceWithMeta,
+	NewListSource,
+	NewListSourceDrainer,
+	NewListSourceMultiplexer,
 	SourceReadingSession,
 	Uint256,
 	YLIDE_MAIN_FEED_ID,
@@ -53,9 +53,14 @@ export function getFolderName(folderId: FolderId) {
 
 //
 
-const MailPageSize = 10;
+// const MailPageSize = 10;
 
 const FILTERED_OUT = {};
+
+function wrapMessageId(p: INewMessageWithSource) {
+	const acc = p.meta?.account as DomainAccount | undefined;
+	return `${p.msg.msgId}${acc ? `:${acc.account.address}` : ''}`;
+}
 
 export interface ILinkedMessage {
 	id: string;
@@ -98,15 +103,15 @@ export namespace ILinkedMessage {
 
 	//
 
-	export function idFromIMessageWithSource(p: IMessageWithSource) {
+	export function idFromIMessageWithSource(p: INewMessageWithSource) {
 		return idFromIMessage(p.msg, p.meta.account);
 	}
 
-	export async function fromIMessageWithSource(p: IMessageWithSource): Promise<ILinkedMessage> {
+	export async function fromIMessageWithSource(p: INewMessageWithSource): Promise<ILinkedMessage> {
 		return fromIMessage(p.msg, p.meta.account);
 	}
 
-	export async function fromIMessageWithSourceArray(p: IMessageWithSource[]): Promise<ILinkedMessage[]> {
+	export async function fromIMessageWithSourceArray(p: INewMessageWithSource[]): Promise<ILinkedMessage[]> {
 		return await Promise.all(p.map(fromIMessageWithSource));
 	}
 }
@@ -120,9 +125,11 @@ export class MailList<M = ILinkedMessage> {
 	@observable isLoading = true;
 	@observable isError = false;
 
-	@observable.shallow public messagesData: { raw: IMessageWithSource; handled: M | typeof FILTERED_OUT }[] = [];
+	@observable.shallow public messagesData: { raw: INewMessageWithSource; handled: M | typeof FILTERED_OUT }[] = [];
+	@observable newMessagesCount: number = 0;
 
-	private stream: ListSourceDrainer | undefined;
+	private stream: NewListSourceDrainer | undefined;
+	private streamDisposer: (() => void) | undefined;
 
 	private messagesFilter: ((messages: ILinkedMessage[]) => ILinkedMessage[] | Promise<ILinkedMessage[]>) | undefined;
 	private messageHandler: ((message: ILinkedMessage) => M | Promise<M>) | undefined;
@@ -131,6 +138,8 @@ export class MailList<M = ILinkedMessage> {
 		makeObservable(this);
 		this.id = String(Math.floor(Math.random() * 1000000000));
 		console.log('MailList created', this.id);
+		// @ts-ignore
+		window.activeMailList = this;
 	}
 
 	async init(props: {
@@ -148,14 +157,14 @@ export class MailList<M = ILinkedMessage> {
 		this.messageHandler = messageHandler;
 
 		if (mailbox) {
-			function buildMailboxSources(): ISourceWithMeta[] {
+			function buildMailboxSources(): INewSourceWithMeta[] {
 				invariant(mailbox);
 
 				function getDirectWithMeta(
 					recipient: Uint256,
 					sender: string | null,
 					account: DomainAccount,
-				): ISourceWithMeta[] {
+				): INewSourceWithMeta[] {
 					return domain.ylide.core
 						.getListSources(mailStore.readingSession, [
 							{
@@ -166,6 +175,7 @@ export class MailList<M = ILinkedMessage> {
 							},
 						])
 						.map(source => ({ source, meta: { account } }));
+					// .filter(s => s.source.subject.id === 'evm-GNOSIS-mailer-58');
 				}
 
 				if (mailbox.folderId === FolderId.Inbox || mailbox.folderId === FolderId.Archive) {
@@ -187,13 +197,17 @@ export class MailList<M = ILinkedMessage> {
 				}
 			}
 
-			this.stream = new ListSourceDrainer(new ListSourceMultiplexer(buildMailboxSources()));
-
-			this.stream.resetFilter(m => {
-				return mailbox.filter ? mailbox.filter(ILinkedMessage.idFromIMessageWithSource(m)) : true;
+			this.stream = new NewListSourceDrainer(new NewListSourceMultiplexer(buildMailboxSources()));
+			const start = Date.now();
+			const { dispose } = await this.stream.connect('Mailer', this.onNewMessages);
+			console.log('MailList init', this.id, Date.now() - start);
+			this.streamDisposer = dispose;
+			await this.stream.resetFilter(m => {
+				return mailbox.filter ? mailbox.filter(wrapMessageId(m)) : true;
 			});
+			await this.reloadMessages();
 		} else if (venomFeed) {
-			async function buildVenomFources(): Promise<ISourceWithMeta[]> {
+			async function buildVenomFources(): Promise<INewSourceWithMeta[]> {
 				invariant(venomFeed);
 
 				const blockchainController = domain.blockchains['venom-testnet'] as EverscaleBlockchainController;
@@ -206,7 +220,7 @@ export class MailList<M = ILinkedMessage> {
 					id: 'tvm-venom-testnet-broadcaster-14',
 				};
 				const originalSource = blockchainController.ininiateMessagesSource(blockchainSubject);
-				const listSource = new ListSource(mailStore.readingSession, blockchainSubject, originalSource);
+				const listSource = new NewListSource(mailStore.readingSession, blockchainSubject, originalSource);
 
 				return [
 					{
@@ -215,19 +229,17 @@ export class MailList<M = ILinkedMessage> {
 				];
 			}
 
-			this.stream = new ListSourceDrainer(new ListSourceMultiplexer(await buildVenomFources()));
+			this.stream = new NewListSourceDrainer(new NewListSourceMultiplexer(await buildVenomFources()));
+			const start = Date.now();
+			const { dispose } = await this.stream.connect('Mailer', this.onNewMessages);
+			console.log('MailList init', this.id, Date.now() - start);
+			this.streamDisposer = dispose;
+			await this.reloadMessages();
 		} else {
 			throw new Error('Cannot init list sources');
 		}
 
 		if (this.isDestroyed) return;
-
-		this.stream.on('messages', this.onNewMessages);
-
-		await this.stream.resume().then(async () => {
-			if (this.isDestroyed) return;
-			return this.loadNextPage();
-		});
 	}
 
 	@computed
@@ -235,13 +247,15 @@ export class MailList<M = ILinkedMessage> {
 		return this.messagesData.filter(m => m.handled !== FILTERED_OUT).map(m => m.handled as M);
 	}
 
-	private async handleMessages(messages: IMessageWithSource[]) {
-		const newMessages = messages.filter(m => !this.messagesData.find(old => old.raw.msg.msgId === m.msg.msgId));
+	private async handleMessages() {
+		const newMessages = this.stream!.messages.filter(
+			m => !this.messagesData.find(old => old.raw.msg.msgId === m.msg.msgId),
+		);
 		const newLinked = await ILinkedMessage.fromIMessageWithSourceArray(newMessages);
 		const newFiltered = this.messagesFilter ? await this.messagesFilter(newLinked) : newLinked;
 
 		return await Promise.all(
-			messages.map(async raw => {
+			this.stream!.messages.map(async raw => {
 				// Message is processed already
 				const existing = this.messagesData.find(e => e.raw.msg.msgId === raw.msg.msgId);
 				if (existing) {
@@ -267,43 +281,69 @@ export class MailList<M = ILinkedMessage> {
 	}
 
 	@autobind
-	private async onNewMessages({ messages }: { messages: IMessageWithSource[] }) {
-		console.log('New messages', this.id, messages[0]?.msg.createdAt);
-		this.messagesData = await this.handleMessages(messages);
+	private async onNewMessages() {
+		this.newMessagesCount = this.stream!.newMessagesCount || 0;
 	}
 
-	loadNextPage() {
+	async drainNewMessages() {
+		await this.stream?.drainNewMessages();
+		const data = await this.handleMessages();
+		transaction(() => {
+			this.messagesData = data;
+			this.isNextPageAvailable = !this.stream?.readToBottom;
+			this.newMessagesCount = this.stream!.newMessagesCount || 0;
+		});
+	}
+
+	async reloadMessages() {
 		invariant(this.stream, 'Mail list not ready yet');
 		invariant(!this.isDestroyed, 'Mail list destroyed already');
 
 		this.isLoading = true;
 
-		return this.stream
-			.readMore(MailPageSize)
-			.then(messages =>
-				this.handleMessages(messages).then(data => {
-					transaction(() => {
-						this.messagesData = data;
-						this.isNextPageAvailable = !this.stream?.drained;
-						this.isLoading = false;
-						this.isError = false;
-					});
-				}),
-			)
-			.catch(e => {
-				transaction(() => {
-					this.isLoading = false;
-					this.isError = true;
-				});
-				throw e;
+		try {
+			const data = await this.handleMessages();
+			transaction(() => {
+				this.messagesData = data;
+				this.isNextPageAvailable = !this.stream?.readToBottom;
+				this.isLoading = false;
+				this.isError = false;
 			});
+		} catch (e) {
+			transaction(() => {
+				this.isLoading = false;
+				this.isError = true;
+			});
+			throw e;
+		}
+	}
+
+	async loadNextPage() {
+		invariant(this.stream, 'Mail list not ready yet');
+		invariant(!this.isDestroyed, 'Mail list destroyed already');
+
+		this.isLoading = true;
+
+		console.log('loadNextPage');
+
+		try {
+			const start = Date.now();
+			await this.stream.loadNextPage('MailList');
+			console.log('loadNextPage done', Date.now() - start);
+			await this.reloadMessages();
+		} catch (e) {
+			transaction(() => {
+				this.isLoading = false;
+				this.isError = true;
+			});
+			throw e;
+		}
 	}
 
 	destroy() {
 		this.isDestroyed = true;
 
-		this.stream?.pause();
-		this.stream?.off('messages', this.onNewMessages);
+		this.streamDisposer?.();
 	}
 }
 
@@ -388,3 +428,6 @@ class MailStore {
 }
 
 export const mailStore = new MailStore();
+
+// @ts-ignore
+window.mailStore = mailStore;

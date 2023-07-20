@@ -98,12 +98,11 @@ if (REACT_APP__APP_MODE === AppMode.OTC) {
 	Ylide.registerBlockchainFactory(evmBlockchainFactories[EVMNetwork.METIS]);
 
 	if (REACT_APP__APP_MODE !== AppMode.MAIN_VIEW) {
-		Ylide.registerBlockchainFactory(everscaleBlockchainFactory);
-		Ylide.registerWalletFactory(everscaleWalletFactory);
-		Ylide.registerWalletFactory(everscaleProxyWalletFactory);
-
-		Ylide.registerBlockchainFactory(venomBlockchainFactory);
-		Ylide.registerWalletFactory(venomWalletFactory);
+		// Ylide.registerBlockchainFactory(everscaleBlockchainFactory);
+		// Ylide.registerWalletFactory(everscaleWalletFactory);
+		// Ylide.registerWalletFactory(everscaleProxyWalletFactory);
+		// Ylide.registerBlockchainFactory(venomBlockchainFactory);
+		// Ylide.registerWalletFactory(venomWalletFactory);
 	}
 
 	Ylide.registerWalletFactory(evmWalletFactories.metamask);
