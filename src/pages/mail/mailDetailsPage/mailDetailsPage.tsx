@@ -1,6 +1,5 @@
-import { autorun } from 'mobx';
 import { observer } from 'mobx-react';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { generatePath, useParams } from 'react-router-dom';
 
 import { ActionButton } from '../../../components/ActionButton/ActionButton';
@@ -9,16 +8,18 @@ import { FullPageContent } from '../../../components/genericLayout/content/fullP
 import { GenericLayout } from '../../../components/genericLayout/genericLayout';
 import { Recipients } from '../../../components/recipientInput/recipientInput';
 import { Spinner } from '../../../components/spinner/spinner';
+import { toast } from '../../../components/toast/toast';
 import { ReactComponent as ArrowLeftSvg } from '../../../icons/ic20/arrowLeft.svg';
 import { ReactComponent as ContactSvg } from '../../../icons/ic20/contact.svg';
 import { ReactComponent as ForwardSvg } from '../../../icons/ic20/forward.svg';
 import { ReactComponent as ReplySvg } from '../../../icons/ic20/reply.svg';
 import { IMessageDecodedContent } from '../../../indexedDB/IndexedDB';
 import { analytics } from '../../../stores/Analytics';
-import { useDomainAccounts } from '../../../stores/Domain';
-import { FolderId, ILinkedMessage, MailList, mailStore } from '../../../stores/MailList';
+import domain from '../../../stores/Domain';
+import { FolderId, ILinkedMessage, mailStore, useMailThread } from '../../../stores/MailList';
 import { OutgoingMailData } from '../../../stores/outgoingMailData';
 import { RoutePath } from '../../../stores/routePath';
+import { invariant } from '../../../utils/assert';
 import { DateFormatStyle, formatDate } from '../../../utils/date';
 import {
 	decodedTextDataToEditorJsData,
@@ -59,57 +60,53 @@ export const MailDetailsPage = observer(() => {
 
 	//
 
+	const threadQuery = useMailThread({
+		folderId,
+		message: initialMessage,
+	});
+
 	const primaryThreadItemRef = useRef<HTMLDivElement>(null);
 
 	const [isDecodingThread, setDecodingThread] = useState(false);
 	const [isThreadOpen, setThreadOpen] = useState(false);
 
-	const deletedMessageIds = mailStore.deletedMessageIds;
-
-	const accounts = useDomainAccounts();
-
-	const threadMailList = useMemo(() => {
-		if (folderId !== FolderId.Inbox || !initialMessage?.msg.senderAddress) return;
-
-		const list = new MailList();
-
-		list.init({
-			mailbox: {
-				accounts,
-				folderId: FolderId.Inbox,
-				sender: initialMessage?.msg.senderAddress,
-				filter: (id: string) => !deletedMessageIds.has(id),
-			},
-		});
-
-		return list;
-	}, [accounts, deletedMessageIds, folderId, initialMessage?.msg.senderAddress]);
-
-	useEffect(() => () => threadMailList?.destroy(), [threadMailList]);
-
 	const [wrappedThreadMessages, setWrappedThreadMessages] = useState<WrappedThreadMessage[]>([]);
 
-	useEffect(
-		() =>
-			autorun(() => {
-				if (!threadMailList) return;
+	const onOpenThreadClick = () => {
+		invariant(threadQuery.data);
 
-				if (!threadMailList.isNextPageAvailable) {
-					setWrappedThreadMessages(
-						threadMailList.messages.map(it => ({
-							message: it,
-							isDeleted: false,
-						})),
-					);
-				} else if (!threadMailList.isLoading && !threadMailList.isError) {
-					threadMailList.loadNextPage();
+		setDecodingThread(true);
+
+		// FIXME
+		const myAccount = domain.accounts.activeAccounts[0];
+
+		Promise.all<WrappedThreadMessage | undefined>(
+			threadQuery.data.messages.map(async msg => {
+				try {
+					const message = await ILinkedMessage.fromIMessage(msg.msg, myAccount);
+					const decodedData = await mailStore.decodeMessage(msg.id, msg.msg, myAccount.account);
+
+					return {
+						message,
+						decodedData,
+						isDeleted: false,
+					};
+				} catch (e) {
+					console.error(e);
 				}
 			}),
-		[threadMailList],
-	);
-
-	const onOpenThreadClick = () => {
-		setDecodingThread(true);
+		)
+			.then(result => {
+				setWrappedThreadMessages(result.filter(Boolean) as WrappedThreadMessage[]);
+				setThreadOpen(true);
+			})
+			.catch(e => {
+				console.error(e);
+				toast("Couldn't load thread 😒");
+			})
+			.finally(() => {
+				setDecodingThread(false);
+			});
 
 		(async () => {
 			for (const m of wrappedThreadMessages) {
@@ -194,7 +191,7 @@ export const MailDetailsPage = observer(() => {
 						<div className={css.header}>
 							<ActionButton onClick={onBackClick} icon={<ArrowLeftSvg />} />
 
-							{threadMailList?.isLoading || isDecodingThread ? (
+							{threadQuery.isLoading || isDecodingThread ? (
 								<Spinner className={css.headerSpinner} />
 							) : isThreadOpen ? (
 								<div className={css.messagesFrom}>
@@ -202,9 +199,9 @@ export const MailDetailsPage = observer(() => {
 									<ContactName address={initialMessage.msg.senderAddress} />
 								</div>
 							) : (
-								wrappedThreadMessages.length > 1 && (
+								Number(threadQuery.data?.messages.length) > 1 && (
 									<ActionButton icon={<ContactSvg />} onClick={onOpenThreadClick}>
-										{wrappedThreadMessages.length} messages from this sender
+										{Number(threadQuery.data?.messages.length)} messages from this sender
 									</ActionButton>
 								)
 							)}

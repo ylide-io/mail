@@ -18,6 +18,8 @@ import {
 } from '@ylide/sdk';
 import { autobind } from 'core-decorators';
 import { computed, makeAutoObservable, makeObservable, observable, transaction } from 'mobx';
+import { useMemo } from 'react';
+import { useQuery } from 'react-query';
 
 import { VENOM_FEED_ID } from '../constants';
 import messagesDB, { MessagesDB } from '../indexedDB/impl/MessagesDB';
@@ -388,3 +390,69 @@ class MailStore {
 }
 
 export const mailStore = new MailStore();
+
+//
+
+export interface ThreadMessage {
+	id: string;
+	isIncoming: boolean;
+	msg: IMessage;
+}
+
+export function useMailThread({ folderId, message }: { folderId?: FolderId; message?: ILinkedMessage }) {
+	const queryProps = useMemo(() => {
+		if (!message) return;
+
+		const myAddress =
+			folderId === FolderId.Sent
+				? message.msg.senderAddress
+				: message.recipients.length
+				? domain.accounts.activeAccounts.find(a =>
+						message.recipients.includes(formatAddress(a.account.address)),
+				  )?.account.address
+				: message.msg.recipientAddress;
+
+		const recipientAddress =
+			folderId === FolderId.Sent
+				? message.recipients.length === 1
+					? message.recipients[0]
+					: formatAddress(message.msg.recipientAddress)
+				: message.msg.senderAddress;
+
+		if (myAddress && recipientAddress) {
+			return {
+				myAddress: formatAddress(myAddress),
+				recipientAddress: formatAddress(recipientAddress),
+				offset: 0,
+				limit: 100,
+				feedId: '0000000000000000000000000000000000000000000000000000000000000000',
+			};
+		}
+	}, [folderId, message]);
+
+	return useQuery<{ messages: ThreadMessage[] } | undefined>(
+		'mail-thread',
+		async () => {
+			invariant(queryProps);
+
+			const response = await fetch(`https://idx1.ylide.io/thread`, {
+				method: 'POST',
+				body: JSON.stringify(queryProps),
+				headers: {
+					'Content-Type': 'text/plain',
+				},
+			});
+
+			const json = await response.json();
+
+			if (json.data) {
+				return {
+					messages: json.data.entries,
+				};
+			}
+		},
+		{
+			enabled: !!queryProps,
+		},
+	);
+}
