@@ -113,7 +113,7 @@ export const MailDetailsPage = observer(() => {
 
 		(async () => {
 			for (const m of wrappedThreadMessages) {
-				await mailStore.decodeMessage(m.message);
+				await mailStore.decodeMessage(m.message.msgId, m.message.msg, m.message.recipient?.account);
 			}
 
 			setDecodingThread(false);

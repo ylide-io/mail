@@ -2,6 +2,7 @@ import { Uint256 } from '@ylide/sdk';
 import { ReactNode } from 'react';
 
 import { VENOM_FEED_ID } from '../../constants';
+import { ReactComponent as GeneralSvg } from './icons/general.svg';
 import { ReactComponent as NumiSvg } from './icons/numi.svg';
 import { ReactComponent as OasisGallerySvg } from './icons/oasisGallery.svg';
 import { ReactComponent as SnipaSvg } from './icons/snipa.svg';
@@ -18,6 +19,8 @@ import { ReactComponent as Web3WorldSvg } from './icons/web3World.svg';
 import { ReactComponent as YlideSvg } from './icons/ylide.svg';
 
 export enum BlockchainProjectId {
+	GENERAL = 'general',
+
 	NUMI = 'numi',
 	OASIS_GALLERY = 'oasis_gallery',
 	SNIPA = 'snipa',
@@ -48,6 +51,14 @@ export interface BlockchainProjectMeta {
 }
 
 export const blockchainProjectsMeta: Record<BlockchainProjectId, BlockchainProjectMeta> = {
+	[BlockchainProjectId.GENERAL]: {
+		id: BlockchainProjectId.GENERAL,
+		feedId: '2000000000000000000000000000000000000000000000000000000000000003' as Uint256,
+		name: 'General chat',
+		description: 'General chat to meet your web3 frens.',
+		logo: <GeneralSvg />,
+	},
+
 	[BlockchainProjectId.NUMI]: {
 		id: BlockchainProjectId.NUMI,
 		feedId: '1000000000000000000000000000000000000000000000000000000000000005' as Uint256,

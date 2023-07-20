@@ -49,7 +49,7 @@ export const MailMessage = observer(
 		const editorData = useMemo(() => decoded && decodedTextDataToEditorJsData(decoded.decodedTextData), [decoded]);
 
 		const onDecodeClick = () => {
-			mailStore.decodeMessage(message);
+			mailStore.decodeMessage(message.msgId, message.msg, message.recipient?.account);
 		};
 
 		const [isEditorReady, setEditorReady] = useState(!editorData);

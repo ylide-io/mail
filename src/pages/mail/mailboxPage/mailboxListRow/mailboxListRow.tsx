@@ -51,7 +51,7 @@ const MailboxListRow: React.FC<MailboxListRowProps> = observer(
 			} else {
 				setLoading(true);
 				try {
-					await mailStore.decodeMessage(message);
+					await mailStore.decodeMessage(message.msgId, message.msg, message.recipient?.account);
 				} catch (err) {
 					console.log('decode err: ', err);
 					return setError(`Decoding error. Please, double check your Ylide password`);

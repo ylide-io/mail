@@ -4,7 +4,6 @@ import SmartBuffer from '@ylide/smart-buffer';
 import { useEffect, useMemo, useRef, useState } from 'react';
 
 import { ReactComponent as ProceedToWalletArrowSvg } from '../../assets/proceedTOWalletArrow.svg';
-import { AppMode, REACT_APP__APP_MODE } from '../../env';
 import { analytics } from '../../stores/Analytics';
 import { browserStorage } from '../../stores/browserStorage';
 import domain from '../../stores/Domain';
@@ -18,7 +17,6 @@ import { getEvmWalletNetwork } from '../../utils/wallet';
 import { ActionButton, ActionButtonLook, ActionButtonSize } from '../ActionButton/ActionButton';
 import { ActionModal } from '../actionModal/actionModal';
 import { BlockChainLabel } from '../BlockChainLabel/BlockChainLabel';
-import { ErrorMessage, ErrorMessageLook } from '../errorMessage/errorMessage';
 import { ForgotPasswordModal } from '../forgotPasswordModal/forgotPasswordModal';
 import { LoadingModal } from '../loadingModal/loadingModal';
 import { SelectNetworkModal } from '../selectNetworkModal/selectNetworkModal';
@@ -67,30 +65,12 @@ export function NewPasswordModal({
 				.sort((a, b) => b.key.timestamp - a.key.timestamp)[0],
 		[remoteKeys],
 	);
-
-	const keyParams = useMemo(() => {
-		if (REACT_APP__APP_MODE === AppMode.MAIN_VIEW) {
-			return {
-				keyExists: !!freshestKey && freshestKey.key.keyVersion === 3,
-				keyVersion: freshestKey && freshestKey.key.keyVersion === 3 ? freshestKey.key.keyVersion : 0,
-				isPasswordNeeded: false,
-				registrar: freshestKey && freshestKey.key.keyVersion === 3 ? freshestKey.key.registrar : 0,
-			};
-		}
-		return {
-			keyExists: !!freshestKey,
-			keyVersion: freshestKey ? freshestKey.key.keyVersion : 0,
-			isPasswordNeeded: freshestKey
-				? freshestKey.key.keyVersion === 1 || freshestKey.key.keyVersion === 2
-				: false,
-			registrar: freshestKey ? freshestKey.key.registrar : 0,
-		};
-	}, [freshestKey]);
+	const keyVersion = freshestKey?.key.keyVersion || 0;
+	const isPasswordNeeded = keyVersion === 1 || keyVersion === 2;
 
 	const [step, setStep] = useState(Step.ENTER_PASSWORD);
 
 	const [password, setPassword] = useState('');
-	const [passwordRepeat, setPasswordRepeat] = useState('');
 
 	const [network, setNetwork] = useState<EVMNetwork>();
 	useEffect(() => {
@@ -160,51 +140,41 @@ export function NewPasswordModal({
 		let keyVersion;
 		let needToRepublishKey = false;
 		try {
-			if (REACT_APP__APP_MODE === AppMode.MAIN_VIEW) {
-				// in MainView we support only v3 keys
-				console.log('createLocalKey');
+			if (withoutPassword) {
+				console.log('createLocalKey', 'withoutPassword');
 				tempLocalKey = await wallet.constructLocalKeyV3(account);
 				keyVersion = YlidePublicKeyVersion.KEY_V3;
-				needToRepublishKey =
-					freshestKey?.key.keyVersion === YlidePublicKeyVersion.INSECURE_KEY_V1 ||
-					freshestKey?.key.keyVersion === YlidePublicKeyVersion.KEY_V2;
-			} else {
-				if (withoutPassword) {
-					console.log('createLocalKey', 'withoutPassword');
-					tempLocalKey = await wallet.constructLocalKeyV3(account);
-					keyVersion = YlidePublicKeyVersion.KEY_V3;
-				} else if (forceNew) {
-					console.log('createLocalKey', 'forceNew');
+			} else if (forceNew) {
+				console.log('createLocalKey', 'forceNew');
+				tempLocalKey = await wallet.constructLocalKeyV2(account, password);
+				keyVersion = YlidePublicKeyVersion.KEY_V2;
+			} else if (freshestKey?.key.keyVersion === YlidePublicKeyVersion.INSECURE_KEY_V1) {
+				if (freshestKey.blockchain === 'venom-testnet') {
+					// strange... I'm not sure Qamon keys work here
+					console.log('createLocalKey', 'INSECURE_KEY_V1 venom-testnet');
 					tempLocalKey = await wallet.constructLocalKeyV2(account, password);
 					keyVersion = YlidePublicKeyVersion.KEY_V2;
-				} else if (freshestKey?.key.keyVersion === YlidePublicKeyVersion.INSECURE_KEY_V1) {
-					if (freshestKey.blockchain === 'venom-testnet') {
-						// strange... I'm not sure Qamon keys work here
-						console.log('createLocalKey', 'INSECURE_KEY_V1 venom-testnet');
-						tempLocalKey = await wallet.constructLocalKeyV2(account, password);
-						keyVersion = YlidePublicKeyVersion.KEY_V2;
-					} else {
-						// strange... I'm not sure Qamon keys work here
-						console.log('createLocalKey', 'INSECURE_KEY_V1');
-						tempLocalKey = await wallet.constructLocalKeyV1(account, password);
-						keyVersion = YlidePublicKeyVersion.INSECURE_KEY_V1;
-					}
-				} else if (freshestKey?.key.keyVersion === YlidePublicKeyVersion.KEY_V2) {
-					// if user already using password - we should use it too
-					console.log('createLocalKey', 'KEY_V2');
-					tempLocalKey = await wallet.constructLocalKeyV2(account, password);
-					keyVersion = YlidePublicKeyVersion.KEY_V2;
-				} else if (freshestKey?.key.keyVersion === YlidePublicKeyVersion.KEY_V3) {
-					// if user is not using password - we should not use it too
-					console.log('createLocalKey', 'KEY_V3');
-					tempLocalKey = await wallet.constructLocalKeyV3(account);
-					keyVersion = YlidePublicKeyVersion.KEY_V3;
 				} else {
-					// user have no key at all - use passwordless version
-					console.log('createLocalKey', 'no key');
-					tempLocalKey = await wallet.constructLocalKeyV3(account);
-					keyVersion = YlidePublicKeyVersion.KEY_V3;
+					// strange... I'm not sure Qamon keys work here
+					console.log('createLocalKey', 'INSECURE_KEY_V1');
+					tempLocalKey = await wallet.constructLocalKeyV1(account, password);
+					keyVersion = YlidePublicKeyVersion.INSECURE_KEY_V1;
 				}
+			} else if (freshestKey?.key.keyVersion === YlidePublicKeyVersion.KEY_V2) {
+				// if user already using password - we should use it too
+				console.log('createLocalKey', 'KEY_V2');
+				tempLocalKey = await wallet.constructLocalKeyV2(account, password);
+				keyVersion = YlidePublicKeyVersion.KEY_V2;
+			} else if (freshestKey?.key.keyVersion === YlidePublicKeyVersion.KEY_V3) {
+				// if user is not using password - we should not use it too
+				console.log('createLocalKey', 'KEY_V3');
+				tempLocalKey = await wallet.constructLocalKeyV3(account);
+				keyVersion = YlidePublicKeyVersion.KEY_V3;
+			} else {
+				// user have no key at all - use passwordless version
+				console.log('createLocalKey', 'no key');
+				tempLocalKey = await wallet.constructLocalKeyV3(account);
+				keyVersion = YlidePublicKeyVersion.KEY_V3;
 			}
 		} catch (e) {
 			exitUnsuccessfully({ message: 'Failed to create local key 😒', e });
@@ -332,13 +302,7 @@ export function NewPasswordModal({
 				<LoadingModal reason="Please wait ..." />
 			) : step === Step.ENTER_PASSWORD ? (
 				<ActionModal
-					title={
-						keyParams.isPasswordNeeded
-							? keyParams.keyExists
-								? 'Enter password'
-								: 'Create password'
-							: 'Sign authorization message'
-					}
+					title={isPasswordNeeded ? 'Enter password' : 'Sign authorization message'}
 					buttons={
 						<>
 							<ActionButton
@@ -346,7 +310,7 @@ export function NewPasswordModal({
 								look={ActionButtonLook.PRIMARY}
 								onClick={() => createLocalKey({ password })}
 							>
-								{keyParams.isPasswordNeeded ? 'Continue' : 'Sign'}
+								{isPasswordNeeded ? 'Continue' : 'Sign'}
 							</ActionButton>
 							<ActionButton size={ActionButtonSize.XLARGE} onClick={() => exitUnsuccessfully()}>
 								Cancel
@@ -357,123 +321,73 @@ export function NewPasswordModal({
 				>
 					<WalletTag wallet={wallet.factory.wallet} address={account.address} />
 
-					{keyParams.isPasswordNeeded ? (
-						keyParams.keyExists ? (
+					{freshestKey ? (
+						<>
 							<div>
-								We found your key in <BlockChainLabel blockchain={freshestKey.blockchain} /> blockchain.
-								Please, enter your Ylide Password to access it.
+								We found your key in <BlockChainLabel blockchain={freshestKey.blockchain} /> blockchain.{' '}
+								{isPasswordNeeded
+									? 'Please, enter your Ylide Password to access it.'
+									: 'Please, sign authroization message to access it.'}
 							</div>
-						) : (
-							'This password will be used to encrypt and decrypt your mails.'
-						)
-					) : (
-						keyParams.keyExists && (
-							<div>
-								We found your key in <BlockChainLabel blockchain={freshestKey.blockchain} /> blockchain.
-								Please, sign authroization message to access it.
-							</div>
-						)
-					)}
 
-					{keyParams.isPasswordNeeded ? (
-						keyParams.keyExists ? (
-							<div
-								style={{
-									paddingTop: 40,
-									paddingBottom: 40,
-								}}
-							>
-								<TextField
-									look={TextFieldLook.PROMO}
-									autoFocus
-									value={password}
-									onValueChange={setPassword}
-									type="password"
-									placeholder="Enter your Ylide password"
-								/>
-
+							{isPasswordNeeded && (
 								<div
 									style={{
-										marginTop: 8,
-										textAlign: 'right',
+										paddingTop: 40,
+										paddingBottom: 40,
 									}}
-								>
-									<button
-										onClick={() =>
-											showStaticComponent(resolve => (
-												<ForgotPasswordModal
-													onClose={result => {
-														if (result) {
-															browserStorage.setAccountRemoteKeys(
-																account.address,
-																undefined,
-															);
-														}
-
-														if (result?.withoutPassword) {
-															createLocalKey({
-																password: '',
-																withoutPassword: true,
-															});
-														} else if (result?.password) {
-															createLocalKey({
-																password: result.password,
-																forceNew: true,
-															});
-														}
-
-														resolve();
-													}}
-												/>
-											))
-										}
-									>
-										Forgot Password?
-									</button>
-								</div>
-							</div>
-						) : (
-							<div>
-								<form
-									name="sign-up"
-									style={{
-										display: 'grid',
-										gridGap: 12,
-										paddingBottom: 20,
-									}}
-									action="/"
-									method="POST"
-									noValidate
 								>
 									<TextField
 										look={TextFieldLook.PROMO}
-										type="password"
-										autoComplete="new-password"
-										placeholder="Enter Ylide password"
+										autoFocus
 										value={password}
 										onValueChange={setPassword}
-									/>
-									<TextField
-										look={TextFieldLook.PROMO}
 										type="password"
-										autoComplete="new-password"
-										placeholder="Repeat your password"
-										value={passwordRepeat}
-										onValueChange={setPasswordRepeat}
+										placeholder="Enter your Ylide password"
 									/>
-								</form>
 
-								<ErrorMessage look={ErrorMessageLook.INFO}>
-									<div>
-										Ylide <b>doesn't save</b> your password anywhere.
+									<div
+										style={{
+											marginTop: 8,
+											textAlign: 'right',
+										}}
+									>
+										<button
+											onClick={() =>
+												showStaticComponent(resolve => (
+													<ForgotPasswordModal
+														onClose={result => {
+															if (result) {
+																browserStorage.setAccountRemoteKeys(
+																	account.address,
+																	undefined,
+																);
+															}
+
+															if (result?.withoutPassword) {
+																createLocalKey({
+																	password: '',
+																	withoutPassword: true,
+																});
+															} else if (result?.password) {
+																createLocalKey({
+																	password: result.password,
+																	forceNew: true,
+																});
+															}
+
+															resolve();
+														}}
+													/>
+												))
+											}
+										>
+											Forgot Password?
+										</button>
 									</div>
-									<div>
-										Please, save it securely, because if you lose it, you will not be able to access
-										your mail.
-									</div>
-								</ErrorMessage>
-							</div>
-						)
+								</div>
+							)}
+						</>
 					) : (
 						<div>
 							To get your private Ylide communication key, please, press "Sign" button below and sign the
@@ -486,9 +400,7 @@ export function NewPasswordModal({
 					buttons={
 						<ActionButton
 							size={ActionButtonSize.XLARGE}
-							onClick={() =>
-								keyParams.isPasswordNeeded ? setStep(Step.ENTER_PASSWORD) : exitUnsuccessfully()
-							}
+							onClick={() => (isPasswordNeeded ? setStep(Step.ENTER_PASSWORD) : exitUnsuccessfully())}
 						>
 							Cancel
 						</ActionButton>
@@ -512,7 +424,7 @@ export function NewPasswordModal({
 					<div style={{ textAlign: 'center', fontSize: '180%' }}>Confirm the message</div>
 
 					<div>
-						{keyParams.isPasswordNeeded
+						{isPasswordNeeded
 							? 'We need you to sign your password so we can generate you a unique communication key.'
 							: 'We need you to sign authorization message so we can generate you a unique communication key.'}
 					</div>
@@ -532,7 +444,7 @@ export function NewPasswordModal({
 								setStep(
 									wallet.factory.blockchainGroup === 'evm'
 										? Step.SELECT_NETWORK
-										: keyParams.isPasswordNeeded
+										: isPasswordNeeded
 										? Step.ENTER_PASSWORD
 										: Step.GENERATE_KEY,
 								)

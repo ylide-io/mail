@@ -252,7 +252,7 @@ export const App = observer(() => {
 									to={
 										REACT_APP__APP_MODE === AppMode.MAIN_VIEW
 											? generatePath(RoutePath.FEED_SMART)
-											: generatePath(RoutePath.FEED_ALL)
+											: generatePath(RoutePath.FEED_PROJECT)
 									}
 								/>
 							}
@@ -270,7 +270,7 @@ export const App = observer(() => {
 								<Navigate
 									replace
 									to={generatePath(RoutePath.FEED_PROJECT_POSTS, {
-										projectId: BlockchainProjectId.VENOM_BLOCKCHAIN,
+										projectId: BlockchainProjectId.GENERAL,
 									})}
 								/>
 							}
