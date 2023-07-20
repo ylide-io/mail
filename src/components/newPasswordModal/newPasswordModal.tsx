@@ -66,18 +66,8 @@ export function NewPasswordModal({
 				.sort((a, b) => b.key.timestamp - a.key.timestamp)[0],
 		[remoteKeys],
 	);
-
-	const keyParams = useMemo(
-		() => ({
-			keyExists: !!freshestKey,
-			keyVersion: freshestKey ? freshestKey.key.keyVersion : 0,
-			isPasswordNeeded: freshestKey
-				? freshestKey.key.keyVersion === 1 || freshestKey.key.keyVersion === 2
-				: false,
-			registrar: freshestKey ? freshestKey.key.registrar : 0,
-		}),
-		[freshestKey],
-	);
+	const keyVersion = freshestKey?.key.keyVersion || 0;
+	const isPasswordNeeded = keyVersion === 1 || keyVersion === 2;
 
 	const [step, setStep] = useState(Step.ENTER_PASSWORD);
 
@@ -315,8 +305,8 @@ export function NewPasswordModal({
 			) : step === Step.ENTER_PASSWORD ? (
 				<ActionModal
 					title={
-						keyParams.isPasswordNeeded
-							? keyParams.keyExists
+						isPasswordNeeded
+							? !!freshestKey
 								? 'Enter password'
 								: 'Create password'
 							: 'Sign authorization message'
@@ -328,7 +318,7 @@ export function NewPasswordModal({
 								look={ActionButtonLook.PRIMARY}
 								onClick={() => createLocalKey({ password })}
 							>
-								{keyParams.isPasswordNeeded ? 'Continue' : 'Sign'}
+								{isPasswordNeeded ? 'Continue' : 'Sign'}
 							</ActionButton>
 							<ActionButton size={ActionButtonSize.XLARGE} onClick={() => exitUnsuccessfully()}>
 								Cancel
@@ -339,8 +329,8 @@ export function NewPasswordModal({
 				>
 					<WalletTag wallet={wallet.factory.wallet} address={account.address} />
 
-					{keyParams.isPasswordNeeded ? (
-						keyParams.keyExists ? (
+					{isPasswordNeeded ? (
+						!!freshestKey ? (
 							<div>
 								We found your key in <BlockChainLabel blockchain={freshestKey.blockchain} /> blockchain.
 								Please, enter your Ylide Password to access it.
@@ -349,7 +339,7 @@ export function NewPasswordModal({
 							'This password will be used to encrypt and decrypt your mails.'
 						)
 					) : (
-						keyParams.keyExists && (
+						!!freshestKey && (
 							<div>
 								We found your key in <BlockChainLabel blockchain={freshestKey.blockchain} /> blockchain.
 								Please, sign authroization message to access it.
@@ -357,8 +347,8 @@ export function NewPasswordModal({
 						)
 					)}
 
-					{keyParams.isPasswordNeeded ? (
-						keyParams.keyExists ? (
+					{isPasswordNeeded ? (
+						!!freshestKey ? (
 							<div
 								style={{
 									paddingTop: 40,
@@ -468,9 +458,7 @@ export function NewPasswordModal({
 					buttons={
 						<ActionButton
 							size={ActionButtonSize.XLARGE}
-							onClick={() =>
-								keyParams.isPasswordNeeded ? setStep(Step.ENTER_PASSWORD) : exitUnsuccessfully()
-							}
+							onClick={() => (isPasswordNeeded ? setStep(Step.ENTER_PASSWORD) : exitUnsuccessfully())}
 						>
 							Cancel
 						</ActionButton>
@@ -494,7 +482,7 @@ export function NewPasswordModal({
 					<div style={{ textAlign: 'center', fontSize: '180%' }}>Confirm the message</div>
 
 					<div>
-						{keyParams.isPasswordNeeded
+						{isPasswordNeeded
 							? 'We need you to sign your password so we can generate you a unique communication key.'
 							: 'We need you to sign authorization message so we can generate you a unique communication key.'}
 					</div>
@@ -514,7 +502,7 @@ export function NewPasswordModal({
 								setStep(
 									wallet.factory.blockchainGroup === 'evm'
 										? Step.SELECT_NETWORK
-										: keyParams.isPasswordNeeded
+										: isPasswordNeeded
 										? Step.ENTER_PASSWORD
 										: Step.GENERATE_KEY,
 								)
