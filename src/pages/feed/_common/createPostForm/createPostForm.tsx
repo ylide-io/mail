@@ -2,7 +2,6 @@ import { MessageAttachmentLinkV1, MessageAttachmentType } from '@ylide/sdk';
 import clsx from 'clsx';
 import { observer } from 'mobx-react';
 import { forwardRef, Ref, useEffect, useImperativeHandle, useMemo, useRef, useState } from 'react';
-import { useMutation } from 'react-query';
 
 import { BlockchainFeedApi, DecodedBlockchainFeedPost } from '../../../../api/blockchainFeedApi';
 import { AccountSelect } from '../../../../components/accountSelect/accountSelect';
@@ -14,7 +13,6 @@ import { PropsWithClassName } from '../../../../components/props';
 import { toast } from '../../../../components/toast/toast';
 import { VENOM_FEED_ID } from '../../../../constants';
 import { ReactComponent as TrashSvg } from '../../../../icons/ic20/trash.svg';
-import { ReactComponent as BulbSvg } from '../../../../icons/ic28/bulb.svg';
 import { ReactComponent as StickerSvg } from '../../../../icons/ic28/sticker.svg';
 import { analytics } from '../../../../stores/Analytics';
 import { BlockchainProjectMeta } from '../../../../stores/blockchainProjects/blockchainProjects';
@@ -35,7 +33,6 @@ export interface CreatePostFormApi {
 export interface CreatePostFormProps extends PropsWithClassName {
 	accounts: DomainAccount[];
 	isUnavailable: boolean;
-	displayIdeasButton: boolean;
 	projectMeta: BlockchainProjectMeta;
 	onCreated?: () => void;
 }
@@ -43,7 +40,7 @@ export interface CreatePostFormProps extends PropsWithClassName {
 export const CreatePostForm = observer(
 	forwardRef(
 		(
-			{ className, accounts, isUnavailable, displayIdeasButton, projectMeta, onCreated }: CreatePostFormProps,
+			{ className, accounts, isUnavailable, projectMeta, onCreated }: CreatePostFormProps,
 			ref: Ref<CreatePostFormApi>,
 		) => {
 			const textAreaApiRef = useRef<AutoSizeTextAreaApi>(null);
@@ -116,28 +113,6 @@ export const CreatePostForm = observer(
 			}, [mailData, mailData.from, mailData.network]);
 
 			const [expanded, setExpanded] = useState(false);
-
-			const [isIdeaAnimated, setIdeaAnimated] = useState(false);
-			useEffect(() => {
-				setTimeout(() => setIdeaAnimated(expanded), 1000);
-			}, [expanded]);
-
-			const [lastIdea, setLastIdea] = useState('');
-
-			const { mutate: loadIdea, isLoading: isIdeaLoading } = useMutation({
-				mutationFn: () => BlockchainFeedApi.getTextIdea(),
-				onSuccess: data => {
-					let text = mailData.plainTextData;
-
-					if (lastIdea && text.endsWith(lastIdea)) {
-						text = text.slice(0, text.length - lastIdea.length);
-					}
-
-					mailData.plainTextData = [text.trim(), data].filter(Boolean).join('\n\n');
-					setLastIdea(data);
-				},
-				onError: () => toast('Failed to get idea 🤦‍♀️'),
-			});
 
 			const stickerButtonRef = useRef(null);
 			const [isStickerPopupOpen, setStickerPopupOpen] = useState(false);
@@ -258,18 +233,6 @@ export const CreatePostForm = observer(
 
 								<div className={css.footerRight}>
 									<GridRowBox gap={4}>
-										{displayIdeasButton && (
-											<ActionButton
-												className={clsx(isIdeaAnimated && css.ideaButton_animated)}
-												isDisabled={mailData.sending || isIdeaLoading}
-												size={ActionButtonSize.MEDIUM}
-												look={ActionButtonLook.LITE}
-												icon={<BulbSvg />}
-												title="Get idea!"
-												onClick={() => loadIdea()}
-											/>
-										)}
-
 										<ActionButton
 											ref={stickerButtonRef}
 											isDisabled={mailData.sending}
@@ -319,7 +282,7 @@ export const CreatePostForm = observer(
 									{isUnavailable ? (
 										<div>Can't post now. Wait a minute.</div>
 									) : (
-										<SendMailButton disabled={isIdeaLoading} mailData={mailData} onSent={onSent} />
+										<SendMailButton mailData={mailData} onSent={onSent} />
 									)}
 								</div>
 							</div>

@@ -144,7 +144,6 @@ export const BlockchainProjectFeedPage = observer(() => {
 						projectMeta={projectMeta}
 						className={css.createPostForm}
 						accounts={accounts}
-						displayIdeasButton={projectMeta.id === BlockchainProjectId.VENOM_BLOCKCHAIN}
 						isUnavailable={serviceStatus.data !== 'ACTIVE'}
 						onCreated={() => toast('Good job! Your post will appear shortly 🔥')}
 					/>
