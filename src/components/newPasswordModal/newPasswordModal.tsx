@@ -4,7 +4,6 @@ import SmartBuffer from '@ylide/smart-buffer';
 import { useEffect, useMemo, useRef, useState } from 'react';
 
 import { ReactComponent as ProceedToWalletArrowSvg } from '../../assets/proceedTOWalletArrow.svg';
-import { AppMode, REACT_APP__APP_MODE } from '../../env';
 import { analytics } from '../../stores/Analytics';
 import { browserStorage } from '../../stores/browserStorage';
 import domain from '../../stores/Domain';
@@ -68,24 +67,17 @@ export function NewPasswordModal({
 		[remoteKeys],
 	);
 
-	const keyParams = useMemo(() => {
-		if (REACT_APP__APP_MODE === AppMode.MAIN_VIEW) {
-			return {
-				keyExists: !!freshestKey && freshestKey.key.keyVersion === 3,
-				keyVersion: freshestKey && freshestKey.key.keyVersion === 3 ? freshestKey.key.keyVersion : 0,
-				isPasswordNeeded: false,
-				registrar: freshestKey && freshestKey.key.keyVersion === 3 ? freshestKey.key.registrar : 0,
-			};
-		}
-		return {
+	const keyParams = useMemo(
+		() => ({
 			keyExists: !!freshestKey,
 			keyVersion: freshestKey ? freshestKey.key.keyVersion : 0,
 			isPasswordNeeded: freshestKey
 				? freshestKey.key.keyVersion === 1 || freshestKey.key.keyVersion === 2
 				: false,
 			registrar: freshestKey ? freshestKey.key.registrar : 0,
-		};
-	}, [freshestKey]);
+		}),
+		[freshestKey],
+	);
 
 	const [step, setStep] = useState(Step.ENTER_PASSWORD);
 
@@ -160,51 +152,41 @@ export function NewPasswordModal({
 		let keyVersion;
 		let needToRepublishKey = false;
 		try {
-			if (REACT_APP__APP_MODE === AppMode.MAIN_VIEW) {
-				// in MainView we support only v3 keys
-				console.log('createLocalKey');
+			if (withoutPassword) {
+				console.log('createLocalKey', 'withoutPassword');
 				tempLocalKey = await wallet.constructLocalKeyV3(account);
 				keyVersion = YlidePublicKeyVersion.KEY_V3;
-				needToRepublishKey =
-					freshestKey?.key.keyVersion === YlidePublicKeyVersion.INSECURE_KEY_V1 ||
-					freshestKey?.key.keyVersion === YlidePublicKeyVersion.KEY_V2;
-			} else {
-				if (withoutPassword) {
-					console.log('createLocalKey', 'withoutPassword');
-					tempLocalKey = await wallet.constructLocalKeyV3(account);
-					keyVersion = YlidePublicKeyVersion.KEY_V3;
-				} else if (forceNew) {
-					console.log('createLocalKey', 'forceNew');
+			} else if (forceNew) {
+				console.log('createLocalKey', 'forceNew');
+				tempLocalKey = await wallet.constructLocalKeyV2(account, password);
+				keyVersion = YlidePublicKeyVersion.KEY_V2;
+			} else if (freshestKey?.key.keyVersion === YlidePublicKeyVersion.INSECURE_KEY_V1) {
+				if (freshestKey.blockchain === 'venom-testnet') {
+					// strange... I'm not sure Qamon keys work here
+					console.log('createLocalKey', 'INSECURE_KEY_V1 venom-testnet');
 					tempLocalKey = await wallet.constructLocalKeyV2(account, password);
 					keyVersion = YlidePublicKeyVersion.KEY_V2;
-				} else if (freshestKey?.key.keyVersion === YlidePublicKeyVersion.INSECURE_KEY_V1) {
-					if (freshestKey.blockchain === 'venom-testnet') {
-						// strange... I'm not sure Qamon keys work here
-						console.log('createLocalKey', 'INSECURE_KEY_V1 venom-testnet');
-						tempLocalKey = await wallet.constructLocalKeyV2(account, password);
-						keyVersion = YlidePublicKeyVersion.KEY_V2;
-					} else {
-						// strange... I'm not sure Qamon keys work here
-						console.log('createLocalKey', 'INSECURE_KEY_V1');
-						tempLocalKey = await wallet.constructLocalKeyV1(account, password);
-						keyVersion = YlidePublicKeyVersion.INSECURE_KEY_V1;
-					}
-				} else if (freshestKey?.key.keyVersion === YlidePublicKeyVersion.KEY_V2) {
-					// if user already using password - we should use it too
-					console.log('createLocalKey', 'KEY_V2');
-					tempLocalKey = await wallet.constructLocalKeyV2(account, password);
-					keyVersion = YlidePublicKeyVersion.KEY_V2;
-				} else if (freshestKey?.key.keyVersion === YlidePublicKeyVersion.KEY_V3) {
-					// if user is not using password - we should not use it too
-					console.log('createLocalKey', 'KEY_V3');
-					tempLocalKey = await wallet.constructLocalKeyV3(account);
-					keyVersion = YlidePublicKeyVersion.KEY_V3;
 				} else {
-					// user have no key at all - use passwordless version
-					console.log('createLocalKey', 'no key');
-					tempLocalKey = await wallet.constructLocalKeyV3(account);
-					keyVersion = YlidePublicKeyVersion.KEY_V3;
+					// strange... I'm not sure Qamon keys work here
+					console.log('createLocalKey', 'INSECURE_KEY_V1');
+					tempLocalKey = await wallet.constructLocalKeyV1(account, password);
+					keyVersion = YlidePublicKeyVersion.INSECURE_KEY_V1;
 				}
+			} else if (freshestKey?.key.keyVersion === YlidePublicKeyVersion.KEY_V2) {
+				// if user already using password - we should use it too
+				console.log('createLocalKey', 'KEY_V2');
+				tempLocalKey = await wallet.constructLocalKeyV2(account, password);
+				keyVersion = YlidePublicKeyVersion.KEY_V2;
+			} else if (freshestKey?.key.keyVersion === YlidePublicKeyVersion.KEY_V3) {
+				// if user is not using password - we should not use it too
+				console.log('createLocalKey', 'KEY_V3');
+				tempLocalKey = await wallet.constructLocalKeyV3(account);
+				keyVersion = YlidePublicKeyVersion.KEY_V3;
+			} else {
+				// user have no key at all - use passwordless version
+				console.log('createLocalKey', 'no key');
+				tempLocalKey = await wallet.constructLocalKeyV3(account);
+				keyVersion = YlidePublicKeyVersion.KEY_V3;
 			}
 		} catch (e) {
 			exitUnsuccessfully({ message: 'Failed to create local key 😒', e });
