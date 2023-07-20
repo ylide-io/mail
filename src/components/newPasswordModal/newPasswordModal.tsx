@@ -17,7 +17,6 @@ import { getEvmWalletNetwork } from '../../utils/wallet';
 import { ActionButton, ActionButtonLook, ActionButtonSize } from '../ActionButton/ActionButton';
 import { ActionModal } from '../actionModal/actionModal';
 import { BlockChainLabel } from '../BlockChainLabel/BlockChainLabel';
-import { ErrorMessage, ErrorMessageLook } from '../errorMessage/errorMessage';
 import { ForgotPasswordModal } from '../forgotPasswordModal/forgotPasswordModal';
 import { LoadingModal } from '../loadingModal/loadingModal';
 import { SelectNetworkModal } from '../selectNetworkModal/selectNetworkModal';
@@ -72,7 +71,6 @@ export function NewPasswordModal({
 	const [step, setStep] = useState(Step.ENTER_PASSWORD);
 
 	const [password, setPassword] = useState('');
-	const [passwordRepeat, setPasswordRepeat] = useState('');
 
 	const [network, setNetwork] = useState<EVMNetwork>();
 	useEffect(() => {
@@ -304,13 +302,7 @@ export function NewPasswordModal({
 				<LoadingModal reason="Please wait ..." />
 			) : step === Step.ENTER_PASSWORD ? (
 				<ActionModal
-					title={
-						isPasswordNeeded
-							? !!freshestKey
-								? 'Enter password'
-								: 'Create password'
-							: 'Sign authorization message'
-					}
+					title={isPasswordNeeded ? 'Enter password' : 'Sign authorization message'}
 					buttons={
 						<>
 							<ActionButton
@@ -329,123 +321,73 @@ export function NewPasswordModal({
 				>
 					<WalletTag wallet={wallet.factory.wallet} address={account.address} />
 
-					{isPasswordNeeded ? (
-						!!freshestKey ? (
+					{freshestKey ? (
+						<>
 							<div>
-								We found your key in <BlockChainLabel blockchain={freshestKey.blockchain} /> blockchain.
-								Please, enter your Ylide Password to access it.
+								We found your key in <BlockChainLabel blockchain={freshestKey.blockchain} /> blockchain.{' '}
+								{isPasswordNeeded
+									? 'Please, enter your Ylide Password to access it.'
+									: 'Please, sign authroization message to access it.'}
 							</div>
-						) : (
-							'This password will be used to encrypt and decrypt your mails.'
-						)
-					) : (
-						!!freshestKey && (
-							<div>
-								We found your key in <BlockChainLabel blockchain={freshestKey.blockchain} /> blockchain.
-								Please, sign authroization message to access it.
-							</div>
-						)
-					)}
 
-					{isPasswordNeeded ? (
-						!!freshestKey ? (
-							<div
-								style={{
-									paddingTop: 40,
-									paddingBottom: 40,
-								}}
-							>
-								<TextField
-									look={TextFieldLook.PROMO}
-									autoFocus
-									value={password}
-									onValueChange={setPassword}
-									type="password"
-									placeholder="Enter your Ylide password"
-								/>
-
+							{isPasswordNeeded && (
 								<div
 									style={{
-										marginTop: 8,
-										textAlign: 'right',
+										paddingTop: 40,
+										paddingBottom: 40,
 									}}
-								>
-									<button
-										onClick={() =>
-											showStaticComponent(resolve => (
-												<ForgotPasswordModal
-													onClose={result => {
-														if (result) {
-															browserStorage.setAccountRemoteKeys(
-																account.address,
-																undefined,
-															);
-														}
-
-														if (result?.withoutPassword) {
-															createLocalKey({
-																password: '',
-																withoutPassword: true,
-															});
-														} else if (result?.password) {
-															createLocalKey({
-																password: result.password,
-																forceNew: true,
-															});
-														}
-
-														resolve();
-													}}
-												/>
-											))
-										}
-									>
-										Forgot Password?
-									</button>
-								</div>
-							</div>
-						) : (
-							<div>
-								<form
-									name="sign-up"
-									style={{
-										display: 'grid',
-										gridGap: 12,
-										paddingBottom: 20,
-									}}
-									action="/"
-									method="POST"
-									noValidate
 								>
 									<TextField
 										look={TextFieldLook.PROMO}
-										type="password"
-										autoComplete="new-password"
-										placeholder="Enter Ylide password"
+										autoFocus
 										value={password}
 										onValueChange={setPassword}
-									/>
-									<TextField
-										look={TextFieldLook.PROMO}
 										type="password"
-										autoComplete="new-password"
-										placeholder="Repeat your password"
-										value={passwordRepeat}
-										onValueChange={setPasswordRepeat}
+										placeholder="Enter your Ylide password"
 									/>
-								</form>
 
-								<ErrorMessage look={ErrorMessageLook.INFO}>
-									<div>
-										Ylide <b>doesn't save</b> your password anywhere.
+									<div
+										style={{
+											marginTop: 8,
+											textAlign: 'right',
+										}}
+									>
+										<button
+											onClick={() =>
+												showStaticComponent(resolve => (
+													<ForgotPasswordModal
+														onClose={result => {
+															if (result) {
+																browserStorage.setAccountRemoteKeys(
+																	account.address,
+																	undefined,
+																);
+															}
+
+															if (result?.withoutPassword) {
+																createLocalKey({
+																	password: '',
+																	withoutPassword: true,
+																});
+															} else if (result?.password) {
+																createLocalKey({
+																	password: result.password,
+																	forceNew: true,
+																});
+															}
+
+															resolve();
+														}}
+													/>
+												))
+											}
+										>
+											Forgot Password?
+										</button>
 									</div>
-									<div>
-										Please, save it securely, because if you lose it, you will not be able to access
-										your mail.
-									</div>
-								</ErrorMessage>
-							</div>
-						)
+								</div>
+							)}
+						</>
 					) : (
 						<div>
 							To get your private Ylide communication key, please, press "Sign" button below and sign the
