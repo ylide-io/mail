@@ -1,4 +1,4 @@
-import React, { PropsWithChildren, useContext, useLayoutEffect, useRef } from 'react';
+import { PropsWithChildren, useContext, useLayoutEffect, useRef } from 'react';
 
 import { invariant } from '../../utils/assert';
 import { useEscPress } from '../../utils/useEscPress';

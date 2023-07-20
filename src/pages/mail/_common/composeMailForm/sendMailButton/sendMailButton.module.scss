@@ -1,0 +1,78 @@
+.root {
+	display: flex;
+	flex-direction: row;
+	align-items: stretch;
+
+	height: 30px;
+	color: white;
+}
+
+.root_disabled {
+	pointer-events: none;
+	opacity: 0.6;
+}
+
+.text {
+	@include flex-row(center, flex-start);
+
+	border-top-left-radius: 3px;
+	border-bottom-left-radius: 3px;
+
+	background-color: var(--accent2-color);
+
+	padding-left: 10px;
+	font-size: 0.8rem;
+
+	padding-top: 1px;
+	padding-right: 10px;
+	line-height: 1;
+	cursor: pointer;
+
+	&:hover {
+		background-color: var(--accent2-hover-color);
+	}
+}
+
+.root:not(.root_withDropdown) .text {
+	border-top-right-radius: 3px;
+	border-bottom-right-radius: 3px;
+
+	padding-right: 13px;
+}
+
+.title {
+	@include flex-row(center, flex-start);
+
+	svg {
+		margin-left: 6px;
+		margin-right: 4px;
+	}
+}
+
+.dropdownIcon {
+	border-top-right-radius: 3px;
+	border-bottom-right-radius: 3px;
+
+	background-color: var(--accent2-color);
+
+	display: flex;
+	align-items: center;
+	padding: 0 4px;
+
+	cursor: pointer;
+
+	border-left: 1px solid var(--accent2-hover-color);
+
+	&:hover {
+		background-color: var(--accent2-hover-color);
+	}
+
+	> svg {
+		fill: currentColor;
+	}
+}
+
+.extraPayment {
+	font-size: 10px;
+	margin-left: 4px;
+}

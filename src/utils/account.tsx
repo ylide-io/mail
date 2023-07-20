@@ -1,13 +1,12 @@
-import React from 'react';
-
 import { ActionButton, ActionButtonLook, ActionButtonSize } from '../components/ActionButton/ActionButton';
 import { ActionModal } from '../components/actionModal/actionModal';
 import { showLoadingModal } from '../components/loadingModal/loadingModal';
 import { NewPasswordModal } from '../components/newPasswordModal/newPasswordModal';
 import { SelectWalletModal } from '../components/selectWalletModal/selectWalletModal';
 import { showStaticComponent } from '../components/staticComponentManager/staticComponentManager';
-import { SwitchModal } from '../components/switchModal/switchModal';
+import { SwitchModal, SwitchModalMode } from '../components/switchModal/switchModal';
 import { toast } from '../components/toast/toast';
+import { AppMode, REACT_APP__APP_MODE } from '../env';
 import { analytics } from '../stores/Analytics';
 import { browserStorage } from '../stores/browserStorage';
 import domain from '../stores/Domain';
@@ -100,10 +99,13 @@ export async function connectAccount(params?: { place?: string }): Promise<Domai
 
 				if (currentAccount && wallet.isAccountRegistered(currentAccount)) {
 					if (wallet.factory.blockchainGroup === 'evm') {
-						const result = await SwitchModal.show('account', wallet);
+						const result = await SwitchModal.show(wallet, {
+							mode: SwitchModalMode.CURRENT_ACCOUNT_ALREADY_CONNECTED,
+							account: currentAccount,
+						});
 						if (!result) return;
 					} else {
-						await requestSwitchAccount(wallet);
+						await requestWalletAuthentication(wallet);
 					}
 
 					currentAccount = await wallet.getCurrentAccount();
@@ -112,7 +114,7 @@ export async function connectAccount(params?: { place?: string }): Promise<Domai
 				if (currentAccount && wallet.isAccountRegistered(currentAccount)) {
 					const domainAccount = wallet.accounts.find(a => a.account.address === currentAccount!.address)!;
 					if (domainAccount.isLocalKeyRegistered) {
-						return toast('This account is already connected. Please choose a different one.');
+						return toast('This account is already connected. Please choose another one.');
 					} else {
 						await domain.accounts.removeAccount(domainAccount);
 					}
@@ -134,6 +136,7 @@ export async function connectAccount(params?: { place?: string }): Promise<Domai
 					wallet={wallet!}
 					account={account}
 					remoteKeys={remoteKeys.remoteKeys}
+					waitTxPublishing={REACT_APP__APP_MODE === AppMode.OTC}
 					onClose={resolve}
 				/>
 			));
@@ -159,6 +162,24 @@ export async function connectAccount(params?: { place?: string }): Promise<Domai
 	}
 }
 
+export async function activateAccount(params: { account: DomainAccount }) {
+	const account = params.account;
+	const wallet = account.wallet;
+	const remoteKeys = await wallet.readRemoteKeys(account.account);
+	const qqs = getQueryString();
+
+	await showStaticComponent<DomainAccount>(resolve => (
+		<NewPasswordModal
+			faucetType={['polygon', 'fantom', 'gnosis'].includes(qqs.faucet) ? (qqs.faucet as any) : 'gnosis'}
+			bonus={qqs.bonus === 'true'}
+			wallet={wallet}
+			account={account.account}
+			remoteKeys={remoteKeys.remoteKeys}
+			onClose={resolve}
+		/>
+	));
+}
+
 export async function disconnectAccount(params: { account: DomainAccount; place?: string }) {
 	const { account, place } = params;
 
@@ -176,7 +197,7 @@ export async function disconnectAccount(params: { account: DomainAccount; place?
 	}
 }
 
-export async function requestSwitchAccount(wallet: Wallet) {
+export async function requestWalletAuthentication(wallet: Wallet) {
 	try {
 		if (!wallet.controller.isMultipleAccountsSupported()) {
 			const account = await wallet.getCurrentAccount();

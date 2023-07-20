@@ -1,6 +1,6 @@
 import { MessageAttachment, MessageAttachmentLinkV1, YlideIpfsStorage } from '@ylide/sdk';
 import { observer } from 'mobx-react';
-import React, { ReactNode, useEffect, useMemo, useState } from 'react';
+import { ReactNode, useEffect, useMemo, useState } from 'react';
 import { createReactEditorJS } from 'react-editor-js';
 
 import { ActionButton, ActionButtonLook } from '../../../../components/ActionButton/ActionButton';
@@ -49,7 +49,7 @@ export const MailMessage = observer(
 		const editorData = useMemo(() => decoded && decodedTextDataToEditorJsData(decoded.decodedTextData), [decoded]);
 
 		const onDecodeClick = () => {
-			mailStore.decodeMessage(message);
+			mailStore.decodeMessage(message.msgId, message.msg, message.recipient?.account);
 		};
 
 		const [isEditorReady, setEditorReady] = useState(!editorData);

@@ -1,6 +1,6 @@
 import { autorun } from 'mobx';
 import { observer } from 'mobx-react';
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { generatePath, useParams } from 'react-router-dom';
 
 import { ActionButton } from '../../../components/ActionButton/ActionButton';
@@ -113,7 +113,7 @@ export const MailDetailsPage = observer(() => {
 
 		(async () => {
 			for (const m of wrappedThreadMessages) {
-				await mailStore.decodeMessage(m.message);
+				await mailStore.decodeMessage(m.message.msgId, m.message.msg, m.message.recipient?.account);
 			}
 
 			setDecodingThread(false);

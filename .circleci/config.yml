@@ -170,6 +170,26 @@ jobs:
                   cache_key: paraswap
             - wrangler:
                   project_name: ylide-otc-paraswap
+    build_mainview:
+        docker:
+            - image: node:16
+        steps:
+            - checkout
+            - restore_pnpm_cache
+            - install_pnpm
+            - ylide_build:
+                  build_cmd: build-mainview
+            - save_build_cache:
+                  cache_key: mainview
+            - ylide_store_artifacts
+    deploy_mainview:
+        docker:
+            - image: node:16
+        steps:
+            - restore_build_cache:
+                  cache_key: mainview
+            - wrangler:
+                  project_name: mainview
 
 workflows:
     build_and_test:
@@ -180,6 +200,7 @@ workflows:
                           only:
                               - hub-release
                               - otc-release
+                              - mainview-release
                               - dev
             - build_hub:
                   requires:
@@ -245,3 +266,17 @@ workflows:
                       branches:
                           only:
                               - otc-release
+            - build_mainview:
+                  requires:
+                      - install
+                  filters:
+                      branches:
+                          only:
+                              - mainview-release
+            - deploy_mainview:
+                  requires:
+                      - build_mainview
+                  filters:
+                      branches:
+                          only:
+                              - mainview-release

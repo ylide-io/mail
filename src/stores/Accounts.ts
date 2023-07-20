@@ -99,14 +99,10 @@ export class Accounts {
 	}
 
 	@computed get activeAccounts() {
-		return this.accounts.filter(this.isActiveAccount);
+		return this.accounts.filter(a => a.isLocalKeyRegistered);
 	}
 
 	@computed get hasActiveAccounts() {
 		return !!this.activeAccounts.length;
-	}
-
-	isActiveAccount(account: DomainAccount) {
-		return account.isLocalKeyRegistered;
 	}
 }

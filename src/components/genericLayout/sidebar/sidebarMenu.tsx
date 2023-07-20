@@ -1,8 +1,7 @@
 import clsx from 'clsx';
 import { observable } from 'mobx';
 import { observer } from 'mobx-react';
-import React, { PropsWithChildren, ReactNode, useState } from 'react';
-import { useQuery } from 'react-query';
+import { PropsWithChildren, ReactNode, useState } from 'react';
 import { generatePath, useLocation } from 'react-router-dom';
 
 import { FeedCategory } from '../../../api/feedServerApi';
@@ -11,6 +10,7 @@ import { ReactComponent as ArchiveSvg } from '../../../icons/archive.svg';
 import { ReactComponent as ArrowDownSvg } from '../../../icons/ic20/arrowDown.svg';
 import { ReactComponent as ArrowUpSvg } from '../../../icons/ic20/arrowUp.svg';
 import { ReactComponent as ContactSvg } from '../../../icons/ic20/contact.svg';
+import { ReactComponent as SettingsSvg } from '../../../icons/ic20/settings.svg';
 import { ReactComponent as SidebarMenuSvg } from '../../../icons/ic28/sidebarMenu.svg';
 import { ReactComponent as SidebarMenuCloseSvg } from '../../../icons/ic28/sidebarMenu_close.svg';
 import { ReactComponent as InboxSvg } from '../../../icons/inbox.svg';
@@ -29,26 +29,33 @@ import { sidePolicyIcon } from '../../../icons/static/sidePolicyIcon';
 import { sideProjectsIcon } from '../../../icons/static/sideProjectsIcon';
 import { sideSecurityIcon } from '../../../icons/static/sideSecurityIcon';
 import { sideTechnologyIcon } from '../../../icons/static/sideTechnologyIcon';
-import { FeedSettingsPopup } from '../../../pages/feed/components/feedSettingsPopup/feedSettingsPopup';
+import { FeedSettingsPopup } from '../../../pages/feed/_common/feedSettingsPopup/feedSettingsPopup';
 import { analytics } from '../../../stores/Analytics';
+import {
+	activeTvmProjects,
+	activeVenomProjects,
+	BlockchainProjectId,
+	blockchainProjectsMeta,
+} from '../../../stores/blockchainProjects/blockchainProjects';
 import { browserStorage } from '../../../stores/browserStorage';
-import domain, { useDomainAccounts } from '../../../stores/Domain';
+import domain from '../../../stores/Domain';
 import { getFeedCategoryName } from '../../../stores/Feed';
-import { FolderId, MailList } from '../../../stores/MailList';
+import { FolderId } from '../../../stores/MailList';
 import { DomainAccount } from '../../../stores/models/DomainAccount';
 import { RoutePath } from '../../../stores/routePath';
-import { VenomProjectId, venomProjectsMeta } from '../../../stores/venomProjects/venomProjects';
 import { useOpenMailCompose } from '../../../utils/mail';
 import { useNav } from '../../../utils/url';
 import { ActionButton, ActionButtonLook, ActionButtonSize } from '../../ActionButton/ActionButton';
 import { AdaptiveText } from '../../adaptiveText/adaptiveText';
 import { PropsWithClassName } from '../../props';
+import { toast } from '../../toast/toast';
 import css from './sidebarMenu.module.scss';
 
 export const isSidebarOpen = observable.box(false);
 
 export enum Section {
 	VENOM_PROJECTS = 'venom_projects',
+	TVM_PROJECTS = 'tvm_projects',
 	FEED = 'feed',
 	FEED_DISCOVERY = 'feed_discovery',
 	MAIL = 'mail',
@@ -127,6 +134,7 @@ interface SidebarButtonProps {
 	name: ReactNode;
 	rightButton?: {
 		icon: ReactNode;
+		title?: string;
 		onClick: () => void;
 	};
 }
@@ -162,6 +170,7 @@ export const SidebarButton = observer(({ look, href, icon, name, rightButton }: 
 					className={css.sectionRightButton}
 					look={ActionButtonLook.LITE}
 					icon={rightButton.icon}
+					title={rightButton.title}
 					onClick={e => {
 						e.preventDefault();
 						e.stopPropagation();
@@ -178,51 +187,49 @@ export const SidebarButton = observer(({ look, href, icon, name, rightButton }: 
 export const SidebarMailSection = observer(() => {
 	const openMailCompose = useOpenMailCompose();
 
-	const accounts = useDomainAccounts();
+	// const accounts = useDomainAccounts();
 
 	const [hasNewMessages, setHasNewMessages] = useState(false);
 
-	// useQuery(['mailbox', 'new-inbox-messages'], {
-	// 	queryFn: async () => {
-	// 		if (hasNewMessages) return;
+	// useEffect(() => {
+	// 	console.log('sidebar mail section mounted');
+	// 	return () => {
+	// 		console.log('sidebar mail section unmounted');
+	// 	};
+	// }, []);
 
-	// 		const data: Array<{ address: string; lastMessageDate?: number }> = await Promise.all(
-	// 			accounts.map(async account => {
-	// 				const mailList = new MailList();
+	// useEffect(() => {
+	// 	const mailList = new MailList();
 
-	// 				await mailList.init({
-	// 					mailbox: {
-	// 						accounts: [account],
-	// 						folderId: FolderId.Inbox,
-	// 					},
-	// 				});
+	// 	mailList.init({
+	// 		mailbox: {
+	// 			accounts,
+	// 			folderId: FolderId.Inbox,
+	// 		},
+	// 	});
 
-	// 				return {
-	// 					address: account.account.address,
-	// 					lastMessageDate: mailList.messages[0]?.msg.createdAt,
-	// 				};
-	// 			}),
-	// 		);
+	// 	console.log('inited maillist: ', mailList.id);
 
-	// 		const hasNew = data.some(d => {
-	// 			const lastCachedDate = browserStorage.lastMailboxIncomingDate[d.address];
-	// 			return lastCachedDate && d.lastMessageDate && lastCachedDate < d.lastMessageDate;
-	// 		});
+	// 	const key = accounts
+	// 		.map(a => a.account.address)
+	// 		.sort()
+	// 		.join(',');
 
-	// 		setHasNewMessages(hasNew);
-
-	// 		if (!hasNew) {
-	// 			browserStorage.lastMailboxIncomingDate = data.reduce((res, item) => {
-	// 				if (item.lastMessageDate) {
-	// 					res[item.address] = item.lastMessageDate;
-	// 				}
-
-	// 				return res;
-	// 			}, {} as Record<string, number>);
-	// 		}
-	// 	},
-	// 	refetchInterval: 60 * 1000,
-	// });
+	// 	const dispose = reaction(
+	// 		() => ({ messagesData: mailList.messagesData, lastMailboxCheckDate: browserStorage.lastMailboxCheckDate }),
+	// 		({ messagesData, lastMailboxCheckDate }) => {
+	// 			console.log('reaction triggered for ' + mailList.id);
+	// 			const lastCheckedDate = lastMailboxCheckDate[key];
+	// 			const isNew =
+	// 				messagesData[0] && (!lastCheckedDate || messagesData[0].raw.msg.createdAt > lastCheckedDate);
+	// 			setHasNewMessages(isNew);
+	// 		},
+	// 	);
+	// 	return () => {
+	// 		dispose();
+	// 		mailList.destroy();
+	// 	};
+	// }, [accounts]);
 
 	return (
 		<SidebarSection section={Section.MAIL} title="Mail">
@@ -266,7 +273,7 @@ export const SidebarMailSection = observer(() => {
 //
 
 export const SidebarMenu = observer(() => {
-	const [isFeedSettingsAccount, setFeedSettingsAccount] = useState<DomainAccount>();
+	const [feedSettingsAccount, setFeedSettingsAccount] = useState<DomainAccount>();
 
 	function renderOtcSection() {
 		if (REACT_APP__APP_MODE !== AppMode.OTC) return;
@@ -294,38 +301,69 @@ export const SidebarMenu = observer(() => {
 						href={generatePath(RoutePath.FEED_SMART_ADDRESS, { address: account.account.address })}
 						icon={<ContactSvg />}
 						name={<AdaptiveText text={account.name || account.account.address} />}
+						rightButton={
+							REACT_APP__APP_MODE === AppMode.MAIN_VIEW
+								? {
+										icon: <SettingsSvg />,
+										title: 'Feed Settings',
+										onClick: () => {
+											if (!account.mainViewKey) {
+												return toast('Please complete the onboarding first ❤');
+											}
+
+											setFeedSettingsAccount(account);
+										},
+								  }
+								: undefined
+						}
 					/>
 				))}
+
+				{feedSettingsAccount && (
+					<FeedSettingsPopup
+						account={feedSettingsAccount}
+						onClose={() => setFeedSettingsAccount(undefined)}
+					/>
+				)}
 			</SidebarSection>
 		);
 	}
 
-	function renderVenomProjectsSection() {
+	function renderBlockchainProjectsSection() {
 		if (REACT_APP__APP_MODE !== AppMode.HUB) return;
 
-		return (
-			<SidebarSection section={Section.VENOM_PROJECTS} title="Venom Projects">
-				{[
-					VenomProjectId.VENOM_BLOCKCHAIN,
-					VenomProjectId.SNIPA,
-					VenomProjectId.WEB3_WORLD,
-					VenomProjectId.VENOM_BRIDGE,
-					VenomProjectId.OASIS_GALLERY,
-					VenomProjectId.VENTORY,
-					VenomProjectId.YLIDE,
-				].map(id => {
-					const meta = venomProjectsMeta[id];
+		function renderProjects(projects: BlockchainProjectId[]) {
+			return projects.map(id => {
+				const meta = blockchainProjectsMeta[id];
 
-					return (
-						<SidebarButton
-							key={id}
-							href={generatePath(RoutePath.FEED_VENOM_PROJECT, { project: meta.id })}
-							name={meta.name}
-							icon={meta.logo}
-						/>
-					);
-				})}
-			</SidebarSection>
+				return (
+					<SidebarButton
+						key={id}
+						href={generatePath(RoutePath.FEED_PROJECT_POSTS, { projectId: meta.id })}
+						name={meta.name}
+						icon={meta.logo}
+					/>
+				);
+			});
+		}
+
+		return (
+			<>
+				<SidebarButton
+					look={SidebarButtonLook.SECTION}
+					href={generatePath(RoutePath.FEED_PROJECT_POSTS, { projectId: BlockchainProjectId.GENERAL })}
+					name={blockchainProjectsMeta[BlockchainProjectId.GENERAL].name}
+					icon={blockchainProjectsMeta[BlockchainProjectId.GENERAL].logo}
+				/>
+
+				<SidebarSection section={Section.VENOM_PROJECTS} title="Venom Projects">
+					{renderProjects(activeVenomProjects)}
+				</SidebarSection>
+
+				<SidebarSection section={Section.TVM_PROJECTS} title="TVM 주요정보">
+					{renderProjects(activeTvmProjects)}
+				</SidebarSection>
+			</>
 		);
 	}
 
@@ -349,13 +387,6 @@ export const SidebarMenu = observer(() => {
 							name={getFeedCategoryName(category)}
 						/>
 					))}
-
-				{isFeedSettingsAccount && (
-					<FeedSettingsPopup
-						account={isFeedSettingsAccount}
-						onClose={() => setFeedSettingsAccount(undefined)}
-					/>
-				)}
 			</SidebarSection>
 		);
 	}
@@ -370,7 +401,7 @@ export const SidebarMenu = observer(() => {
 		<div className={css.root}>
 			{renderOtcSection()}
 			{renderSmartFeedSection()}
-			{renderVenomProjectsSection()}
+			{renderBlockchainProjectsSection()}
 			{renderFeedDiscoverySection()}
 			{renderMailSection()}
 

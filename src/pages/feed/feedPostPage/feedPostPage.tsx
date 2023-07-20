@@ -1,4 +1,5 @@
 import { useRef, useState } from 'react';
+import { Helmet } from 'react-helmet';
 import { useQuery } from 'react-query';
 import { generatePath, useParams } from 'react-router-dom';
 
@@ -9,27 +10,40 @@ import { NarrowContent } from '../../../components/genericLayout/content/narrowC
 import { GenericLayout } from '../../../components/genericLayout/genericLayout';
 import { SharePopup } from '../../../components/sharePopup/sharePopup';
 import { YlideLoader } from '../../../components/ylideLoader/ylideLoader';
+import { APP_NAME } from '../../../constants';
 import { ReactComponent as ShareSvg } from '../../../icons/ic20/share.svg';
 import { RoutePath } from '../../../stores/routePath';
 import { HorizontalAlignment } from '../../../utils/alignment';
 import { invariant } from '../../../utils/assert';
 import { toAbsoluteUrl } from '../../../utils/url';
-import { FeedPostItem } from '../components/feedPostItem/feedPostItem';
+import { FeedPostItem } from '../_common/feedPostItem/feedPostItem';
 import css from './feedPostPage.module.scss';
 
 export function FeedPostPage() {
-	const { id: postId } = useParams<{ id: string }>();
+	const { postId } = useParams<{ postId: string }>();
 	invariant(postId);
 
-	const postPath = generatePath(RoutePath.FEED_POST, { id: postId });
+	const postPath = generatePath(RoutePath.FEED_POST, { postId: postId });
 
-	const { isLoading, data } = useQuery('post', () => FeedServerApi.getPost(postId));
+	const { isLoading, data } = useQuery(['feed', 'post', postId], () => FeedServerApi.getPost(postId));
 
 	const shareButtonRef = useRef(null);
 	const [isSharePopupOpen, setSharePopupOpen] = useState(false);
 
 	return (
 		<GenericLayout>
+			{data && (
+				<Helmet>
+					<title>
+						Post by{' '}
+						{[data.post.authorName, data.post.authorNickname].filter(Boolean).join(' @ ') ||
+							data.post.sourceName ||
+							'alien'}{' '}
+						| {APP_NAME}
+					</title>
+				</Helmet>
+			)}
+
 			<NarrowContent
 				title="Post"
 				titleRight={

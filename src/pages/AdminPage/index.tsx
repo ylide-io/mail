@@ -173,7 +173,7 @@ export class EthereumContractsRow extends PureComponent<{ network: EVMNetwork }>
 		const name = EVM_NAMES[network];
 
 		const mostModernRegistry = 'RegistryV6';
-		const mostModernMailer = 'MailerV8';
+		const mostModernMailer = 'MailerV9';
 
 		const registryV3 = {
 			title: 'RegistryV3',
@@ -212,6 +212,10 @@ export class EthereumContractsRow extends PureComponent<{ network: EVMNetwork }>
 			title: 'MailerV8',
 			contract: EVM_CONTRACTS[network].mailerContracts.find(r => r.type === EVMMailerContractType.EVMMailerV8),
 		};
+		const mailerV9 = {
+			title: 'MailerV9',
+			contract: EVM_CONTRACTS[network].mailerContracts.find(r => r.type === EVMMailerContractType.EVMMailerV9),
+		};
 
 		const contractGroups: {
 			title: string;
@@ -221,7 +225,7 @@ export class EthereumContractsRow extends PureComponent<{ network: EVMNetwork }>
 			}[];
 		}[] = [
 			{ title: 'Registry', contracts: [registryV6, registryV5, registryV4, registryV3] },
-			{ title: 'Mailer', contracts: [mailerV8, mailerV7, mailerV6] },
+			{ title: 'Mailer', contracts: [mailerV9, mailerV8, mailerV7, mailerV6] },
 		];
 
 		return (

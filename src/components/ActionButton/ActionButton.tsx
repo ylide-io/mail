@@ -1,5 +1,5 @@
 import clsx from 'clsx';
-import React, { ButtonHTMLAttributes, forwardRef, PropsWithChildren, ReactNode, Ref } from 'react';
+import { ButtonHTMLAttributes, forwardRef, PropsWithChildren, ReactNode, Ref } from 'react';
 
 import { PropsWithClassName } from '../props';
 import { Spinner } from '../spinner/spinner';

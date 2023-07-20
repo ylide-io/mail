@@ -194,7 +194,7 @@ export class Wallet extends EventEmitter {
 	}
 
 	async getCurrentAccount(): Promise<IGenericAccount | null> {
-		return this.controller.getAuthenticatedAccount();
+		return await this.controller.getAuthenticatedAccount();
 	}
 
 	async disconnectAccount(account: DomainAccount) {

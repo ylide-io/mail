@@ -1,6 +1,6 @@
 import clsx from 'clsx';
 import { observer } from 'mobx-react';
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useQuery } from 'react-query';
 import { useParams } from 'react-router-dom';
 
@@ -20,8 +20,8 @@ import domain from '../../../stores/Domain';
 import { OutgoingMailData } from '../../../stores/outgoingMailData';
 import { invariant } from '../../../utils/assert';
 import { decodeMessage, parseEditorJsJson } from '../../../utils/mail';
-import { SendMailButton } from '../../mail/components/composeMailForm/sendMailButton/sendMailButton';
-import { OtcLayout } from '../components/otcLayout/otcLayout';
+import { SendMailButton } from '../../mail/_common/composeMailForm/sendMailButton/sendMailButton';
+import { OtcLayout } from '../_common/otcLayout/otcLayout';
 import { getOtcProviderLogo } from '../otc';
 import { IframePopup } from './iframePopup/iframePopup';
 import css from './OtcChatPage.module.scss';

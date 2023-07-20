@@ -1,5 +1,5 @@
 import { observer } from 'mobx-react';
-import React, { useState } from 'react';
+import { useState } from 'react';
 
 import { ActionButton, ActionButtonLook } from '../../../../components/ActionButton/ActionButton';
 import { AdaptiveAddress } from '../../../../components/adaptiveAddress/adaptiveAddress';

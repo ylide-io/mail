@@ -1,7 +1,8 @@
 import { observer } from 'mobx-react';
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
+import { Helmet } from 'react-helmet';
 import { QueryClient, QueryClientProvider } from 'react-query';
-import { generatePath, matchPath, Navigate, Route, Routes, useLocation, useSearchParams } from 'react-router-dom';
+import { generatePath, Navigate, Route, Routes, useLocation, useSearchParams } from 'react-router-dom';
 
 import { ActionButton, ActionButtonLook, ActionButtonSize } from './components/ActionButton/ActionButton';
 import { MainViewOnboarding } from './components/mainViewOnboarding/mainViewOnboarding';
@@ -10,11 +11,12 @@ import { StaticComponentManager } from './components/staticComponentManager/stat
 import { ToastManager } from './components/toast/toast';
 import { TransactionPopup } from './components/TransactionPopup/TransactionPopup';
 import { YlideLoader } from './components/ylideLoader/ylideLoader';
-import { APP_NAME } from './constants';
 import { AppMode, REACT_APP__APP_MODE } from './env';
 import { ReactComponent as CrossSvg } from './icons/ic20/cross.svg';
 import { AdminFeedPage } from './pages/AdminFeedPage';
 import { AdminPage } from './pages/AdminPage';
+import { BlockchainProjectFeedPage } from './pages/feed/blockchainProjectFeedPage/blockchainProjectFeedPage';
+import { BlockchainProjectFeedPostPage } from './pages/feed/blockchainProjectFeedPostPage/blockchainProjectFeedPostPage';
 import { FeedPage } from './pages/feed/feedPage/feedPage';
 import { FeedPostPage } from './pages/feed/feedPostPage/feedPostPage';
 import { ComposePage } from './pages/mail/composePage/composePage';
@@ -22,22 +24,22 @@ import { ContactListPage } from './pages/mail/contactsPage/contactListPage';
 import { ContactTagsPage } from './pages/mail/contactsPage/contactTagsPage';
 import { MailboxPage } from './pages/mail/mailboxPage/mailboxPage';
 import { MailDetailsPage } from './pages/mail/mailDetailsPage/mailDetailsPage';
-import { NewWalletsPage } from './pages/NewWalletsPage';
 import { OtcAssetsPage } from './pages/otc/OtcAssetsPage/OtcAssetsPage';
 import { OtcChatPage } from './pages/otc/OtcChatPage/OtcChatPage';
 import { OtcChatsPage } from './pages/otc/OtcChatsPage/OtcChatsPage';
 import { OtcWalletsPage } from './pages/otc/OtcWalletsPage/OtcWalletsPage';
-import { SettingsPage } from './pages/SettingsPage/SettingsPage';
-import { TestPage } from './pages/TestPage/TestPage';
+import { SettingsPage } from './pages/settings/settingsPage';
+import { TestPage } from './pages/test/testPage';
+import { WalletsPage } from './pages/wallets/walletsPage';
 import { MailboxWidget } from './pages/widgets/mailboxWidget/mailboxWidget';
 import { SendMessageWidget } from './pages/widgets/sendMessageWidget/sendMessageWidget';
 import { analytics } from './stores/Analytics';
+import { BlockchainProjectId } from './stores/blockchainProjects/blockchainProjects';
 import { browserStorage } from './stores/browserStorage';
 import domain from './stores/Domain';
 import { RoutePath } from './stores/routePath';
-import { VenomProjectId } from './stores/venomProjects/venomProjects';
 import walletConnect from './stores/WalletConnect';
-import { useNav } from './utils/url';
+import { useIsMatchingRoute, useNav } from './utils/url';
 
 export enum AppTheme {
 	V1 = 'v1',
@@ -64,8 +66,7 @@ const RemoveTrailingSlash = () => {
 				},
 			);
 		} else if (adminParam) {
-			browserStorage.isUserAdmin = adminParam.startsWith('yldpwd');
-			browserStorage.userAdminPassword = adminParam;
+			browserStorage.adminPassword = adminParam.startsWith('yldpwd') ? adminParam : undefined;
 			searchParams.delete('admin');
 			navigate(
 				{
@@ -83,7 +84,7 @@ const RemoveTrailingSlash = () => {
 	return <></>;
 };
 
-const App = observer(() => {
+export const App = observer(() => {
 	const location = useLocation();
 
 	const [queryClient] = useState(
@@ -99,14 +100,15 @@ const App = observer(() => {
 	);
 
 	useEffect(() => {
-		document.title = APP_NAME;
 		document.documentElement.dataset.theme = REACT_APP__APP_MODE === AppMode.MAIN_VIEW ? AppTheme.V2 : AppTheme.V1;
 	}, []);
 
 	const [isInitError, setInitError] = useState(false);
 
+	const isTestPage = useIsMatchingRoute(RoutePath.TEST);
+
 	useEffect(() => {
-		if (!matchPath(RoutePath.TEST, location.pathname)) {
+		if (!isTestPage) {
 			const start = Date.now();
 			domain
 				.init()
@@ -116,7 +118,7 @@ const App = observer(() => {
 				})
 				.finally(() => console.log(`Initialization took ${Date.now() - start}ms`));
 		}
-	}, [location.pathname]);
+	}, [isTestPage]);
 
 	useEffect(() => {
 		if (!domain.accounts.hasActiveAccounts) {
@@ -152,7 +154,7 @@ const App = observer(() => {
 		);
 	}
 
-	if (!matchPath(RoutePath.TEST, location.pathname) && !domain.initialized) {
+	if (!isTestPage && !domain.initialized) {
 		return (
 			<div
 				style={{
@@ -171,6 +173,31 @@ const App = observer(() => {
 
 	return (
 		<>
+			<Helmet>
+				<title>
+					{
+						{
+							[AppMode.HUB]: 'Ylide Social Hub: Web3 Community Chats Powered by Ylide Protocol',
+							[AppMode.OTC]: 'OTC Trading Powered by Ylide Protocol',
+							[AppMode.MAIN_VIEW]: 'MainView: Your Smart News Feed',
+						}[REACT_APP__APP_MODE]
+					}
+				</title>
+
+				<meta
+					name="description"
+					content={
+						{
+							[AppMode.HUB]:
+								'Ylide Social Hub is a web3 social app powered by the Ylide protocol. Connect your digital wallet and join community spaces for diverse web3 topics. Engage in public chats, connect with web3 projects, and experience the future of decentralized communication.',
+							[AppMode.OTC]: '',
+							[AppMode.MAIN_VIEW]:
+								'Master your crypto portfolio with our smart news feed. Follow tailored news based on your token holdings and DeFi positions. Stay focused on what matters most.',
+						}[REACT_APP__APP_MODE]
+					}
+				/>
+			</Helmet>
+
 			{browserStorage.isMainViewBannerHidden || REACT_APP__APP_MODE === AppMode.MAIN_VIEW || (
 				<div
 					style={{
@@ -212,7 +239,7 @@ const App = observer(() => {
 
 					<Routes>
 						<Route path={RoutePath.TEST} element={<TestPage />} />
-						<Route path={RoutePath.WALLETS} element={<NewWalletsPage />} />
+						<Route path={RoutePath.WALLETS} element={<WalletsPage />} />
 						<Route path={RoutePath.SETTINGS} element={<SettingsPage />} />
 						<Route path={RoutePath.ADMIN} element={<AdminPage />} />
 						<Route path={RoutePath.ADMIN_FEED} element={<AdminFeedPage />} />
@@ -225,7 +252,7 @@ const App = observer(() => {
 									to={
 										REACT_APP__APP_MODE === AppMode.MAIN_VIEW
 											? generatePath(RoutePath.FEED_SMART)
-											: generatePath(RoutePath.FEED_ALL)
+											: generatePath(RoutePath.FEED_PROJECT)
 									}
 								/>
 							}
@@ -236,17 +263,33 @@ const App = observer(() => {
 						<Route path={RoutePath.FEED_SOURCE} element={<FeedPage />} />
 						<Route path={RoutePath.FEED_SMART} element={<FeedPage />} />
 						<Route path={RoutePath.FEED_SMART_ADDRESS} element={<FeedPage />} />
-						<Route path={RoutePath.FEED_VENOM_PROJECT} element={<FeedPage />} />
-						<Route path={RoutePath.FEED_VENOM_ADMIN} element={<FeedPage />} />
+
 						<Route
-							path={RoutePath.FEED_VENOM}
+							path={RoutePath.FEED_PROJECT}
 							element={
 								<Navigate
 									replace
-									to={generatePath(RoutePath.FEED_VENOM_PROJECT, {
-										project: VenomProjectId.VENOM_BLOCKCHAIN,
+									to={generatePath(RoutePath.FEED_PROJECT_POSTS, {
+										projectId: BlockchainProjectId.GENERAL,
 									})}
 								/>
+							}
+						/>
+						<Route path={RoutePath.FEED_PROJECT_POSTS} element={<BlockchainProjectFeedPage />} />
+						<Route path={RoutePath.FEED_PROJECT_POSTS_ADMIN} element={<BlockchainProjectFeedPage />} />
+						<Route path={RoutePath.FEED_PROJECT_POST} element={<BlockchainProjectFeedPostPage />} />
+
+						<Route
+							path="/feed/venom/*"
+							element={
+								<Navigate replace to={location.pathname.replace('/feed/venom', '/feed/project')} />
+							}
+						/>
+
+						<Route
+							path="/feed/tvm/*"
+							element={
+								<Navigate replace to={location.pathname.replace('/feed/tvm', '/feed/project/tvm')} />
 							}
 						/>
 
@@ -274,7 +317,7 @@ const App = observer(() => {
 											? generatePath(RoutePath.OTC_ASSETS)
 											: REACT_APP__APP_MODE === AppMode.MAIN_VIEW
 											? generatePath(RoutePath.FEED)
-											: generatePath(RoutePath.FEED_VENOM)
+											: generatePath(RoutePath.FEED_PROJECT)
 									}
 								/>
 							}
@@ -292,5 +335,3 @@ const App = observer(() => {
 		</>
 	);
 });
-
-export default App;

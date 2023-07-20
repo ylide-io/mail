@@ -1,5 +1,5 @@
 import { observer } from 'mobx-react';
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
 
 import { ActionButton, ActionButtonLook, ActionButtonSize } from '../../../components/ActionButton/ActionButton';
 import { ReactComponent as PlusSvg } from '../../../icons/ic20/plus.svg';

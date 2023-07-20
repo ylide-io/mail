@@ -5,6 +5,7 @@ import {
 	asyncDelay,
 	BlockchainSourceType,
 	IBlockchainSourceSubject,
+	IGenericAccount,
 	IMessage,
 	IMessageWithSource,
 	ISourceWithMeta,
@@ -56,36 +57,6 @@ const MailPageSize = 10;
 
 const FILTERED_OUT = {};
 
-function wrapMessageId(p: IMessageWithSource) {
-	const acc = p.meta?.account as DomainAccount | undefined;
-	return `${p.msg.msgId}${acc ? `:${acc.account.address}` : ''}`;
-}
-
-async function wrapMessage(p: IMessageWithSource): Promise<ILinkedMessage> {
-	const acc = p.meta?.account as DomainAccount | undefined;
-	const reader = domain.ylide.controllers.blockchainsMap[p.msg.blockchain];
-
-	let recipients: string[] = [];
-	try {
-		recipients = (await (reader as EthereumBlockchainController).getMessageRecipients(p.msg, true))!.recipients.map(
-			formatAddress,
-		);
-	} catch (e) {}
-
-	return {
-		id: wrapMessageId(p),
-		msgId: p.msg.msgId,
-		msg: p.msg,
-		recipient: acc || null,
-		recipients,
-		reader,
-	};
-}
-
-async function wrapMessages(p: IMessageWithSource[]): Promise<ILinkedMessage[]> {
-	return await Promise.all(p.map(wrapMessage));
-}
-
 export interface ILinkedMessage {
 	id: string;
 	msgId: string;
@@ -95,14 +66,61 @@ export interface ILinkedMessage {
 	reader: AbstractBlockchainController;
 }
 
+export namespace ILinkedMessage {
+	export function idFromIMessage(message: IMessage, account: DomainAccount) {
+		return `${message.msgId}:${account.account.address}`;
+	}
+
+	export async function fromIMessage(message: IMessage, account: DomainAccount): Promise<ILinkedMessage> {
+		const reader = domain.ylide.controllers.blockchainsMap[message.blockchain];
+
+		let recipients: string[] = [];
+		try {
+			recipients = (await (reader as EthereumBlockchainController).getMessageRecipients(
+				message,
+				true,
+			))!.recipients.map(formatAddress);
+		} catch (e) {}
+
+		return {
+			id: idFromIMessage(message, account),
+			msgId: message.msgId,
+			msg: message,
+			recipient: account,
+			recipients,
+			reader,
+		};
+	}
+
+	export async function fromIMessageArray(messages: IMessage[], account: DomainAccount): Promise<ILinkedMessage[]> {
+		return await Promise.all(messages.map(m => fromIMessage(m, account)));
+	}
+
+	//
+
+	export function idFromIMessageWithSource(p: IMessageWithSource) {
+		return idFromIMessage(p.msg, p.meta.account);
+	}
+
+	export async function fromIMessageWithSource(p: IMessageWithSource): Promise<ILinkedMessage> {
+		return fromIMessage(p.msg, p.meta.account);
+	}
+
+	export async function fromIMessageWithSourceArray(p: IMessageWithSource[]): Promise<ILinkedMessage[]> {
+		return await Promise.all(p.map(fromIMessageWithSource));
+	}
+}
+
 export class MailList<M = ILinkedMessage> {
 	private isDestroyed = false;
+
+	public id: string;
 
 	@observable isNextPageAvailable = true;
 	@observable isLoading = true;
 	@observable isError = false;
 
-	@observable.shallow private messagesData: { raw: IMessageWithSource; handled: M | typeof FILTERED_OUT }[] = [];
+	@observable.shallow public messagesData: { raw: IMessageWithSource; handled: M | typeof FILTERED_OUT }[] = [];
 
 	private stream: ListSourceDrainer | undefined;
 
@@ -111,6 +129,8 @@ export class MailList<M = ILinkedMessage> {
 
 	constructor() {
 		makeObservable(this);
+		this.id = String(Math.floor(Math.random() * 1000000000));
+		console.log('MailList created', this.id);
 	}
 
 	async init(props: {
@@ -170,7 +190,7 @@ export class MailList<M = ILinkedMessage> {
 			this.stream = new ListSourceDrainer(new ListSourceMultiplexer(buildMailboxSources()));
 
 			this.stream.resetFilter(m => {
-				return mailbox.filter ? mailbox.filter(wrapMessageId(m)) : true;
+				return mailbox.filter ? mailbox.filter(ILinkedMessage.idFromIMessageWithSource(m)) : true;
 			});
 		} else if (venomFeed) {
 			async function buildVenomFources(): Promise<ISourceWithMeta[]> {
@@ -217,7 +237,7 @@ export class MailList<M = ILinkedMessage> {
 
 	private async handleMessages(messages: IMessageWithSource[]) {
 		const newMessages = messages.filter(m => !this.messagesData.find(old => old.raw.msg.msgId === m.msg.msgId));
-		const newLinked = await wrapMessages(newMessages);
+		const newLinked = await ILinkedMessage.fromIMessageWithSourceArray(newMessages);
 		const newFiltered = this.messagesFilter ? await this.messagesFilter(newLinked) : newLinked;
 
 		return await Promise.all(
@@ -248,6 +268,7 @@ export class MailList<M = ILinkedMessage> {
 
 	@autobind
 	private async onNewMessages({ messages }: { messages: IMessageWithSource[] }) {
+		console.log('New messages', this.id, messages[0]?.msg.createdAt);
 		this.messagesData = await this.handleMessages(messages);
 	}
 
@@ -324,12 +345,12 @@ class MailStore {
 		this.deletedMessageIds = new Set(dbDeletedMessages);
 	}
 
-	async decodeMessage(pushMsg: ILinkedMessage) {
+	async decodeMessage(msgId: string, msg: IMessage, recipient?: IGenericAccount) {
 		analytics.mailOpened(this.lastActiveFolderId || 'null');
 
-		const decodedMessage = await decodeMessage(pushMsg.msgId, pushMsg.msg, pushMsg.recipient!.account);
+		const decodedMessage = await decodeMessage(msgId, msg, recipient);
 
-		this.decodedMessagesById[pushMsg.msgId] = decodedMessage;
+		this.decodedMessagesById[msgId] = decodedMessage;
 
 		if (browserStorage.saveDecodedMessages) {
 			await messagesDB.saveDecodedMessage(MessagesDB.serializeMessageDecodedContent(decodedMessage));
