@@ -4,6 +4,7 @@ import { ReactNode } from 'react';
 import { VENOM_FEED_ID } from '../../constants';
 import { ReactComponent as EthWhalesSvg } from './icons/ethWhales.svg';
 import { ReactComponent as GeneralSvg } from './icons/general.svg';
+import { ReactComponent as GravixSvg } from './icons/gravix.svg';
 import { ReactComponent as NumiSvg } from './icons/numi.svg';
 import { ReactComponent as OasisGallerySvg } from './icons/oasisGallery.svg';
 import { ReactComponent as SnipaSvg } from './icons/snipa.svg';
@@ -35,6 +36,7 @@ export enum BlockchainProjectId {
 	WEB3_WORLD = 'web3_world',
 	YLIDE = 'ylide',
 	VENTORY = 'ventory',
+	GRAVIX = 'gravix',
 
 	TVM = 'tvm',
 	TVM_DISCUSSION = 'tvm_discussion',
@@ -167,6 +169,15 @@ export const blockchainProjectsMeta: Record<BlockchainProjectId, BlockchainProje
 		logo: <VentorySvg />,
 		website: 'https://testnet.ventory.gg/',
 	},
+	[BlockchainProjectId.GRAVIX]: {
+		id: BlockchainProjectId.GRAVIX,
+		feedId: '1000000000000000000000000000000000000000000000000000000000000011' as Uint256,
+		name: 'Gravix',
+		description:
+			'Description: Derivatives DEX where you can trade a wide range of assets with up to 200x leverage and near-zero fees directly from your crypto wallet.',
+		logo: <GravixSvg />,
+		website: 'https://gravix.io/',
+	},
 
 	[BlockchainProjectId.TVM]: {
 		id: BlockchainProjectId.TVM,
@@ -200,6 +211,7 @@ export const activeVenomProjects = [
 	BlockchainProjectId.VENOM_BRIDGE,
 	BlockchainProjectId.OASIS_GALLERY,
 	BlockchainProjectId.VENTORY,
+	BlockchainProjectId.GRAVIX,
 	BlockchainProjectId.YLIDE,
 ];
 
