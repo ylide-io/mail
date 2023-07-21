@@ -1,7 +1,7 @@
 import clsx from 'clsx';
 import { PropsWithChildren } from 'react';
 
-import { PropsWithClassName } from '../props';
+import { PropsWithClassName, PropsWithCSSStyle } from '../props';
 import css from './errorMessage.module.scss';
 
 export enum ErrorMessageLook {
@@ -9,15 +9,19 @@ export enum ErrorMessageLook {
 	INFO = 'INFO',
 }
 
-export interface ErrorMessageProps extends PropsWithChildren<{}>, PropsWithClassName {
+export interface ErrorMessageProps extends PropsWithChildren<{}>, PropsWithClassName, PropsWithCSSStyle {
 	look?: ErrorMessageLook;
 }
 
-export function ErrorMessage({ children, className, look }: ErrorMessageProps) {
+export function ErrorMessage({ children, className, style, look }: ErrorMessageProps) {
 	const lookClass = {
 		[ErrorMessageLook.ERROR]: css.root_errorLook,
 		[ErrorMessageLook.INFO]: css.root_infoLook,
 	}[look || ErrorMessageLook.ERROR];
 
-	return <div className={clsx(css.root, lookClass, className)}>{children}</div>;
+	return (
+		<div className={clsx(css.root, lookClass, className)} style={style}>
+			{children}
+		</div>
+	);
 }
