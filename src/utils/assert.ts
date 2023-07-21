@@ -1,12 +1,15 @@
-export function invariant(condition: unknown, info?: string | Error | (() => string | Error)): asserts condition {
+export function invariant(
+	condition: unknown,
+	info?: string | Error | (() => string | Error | unknown),
+): asserts condition {
 	if (condition) return;
 
-	const message = (info instanceof Error ? info : typeof info === 'function' ? info() : info) || 'Invariant failed';
+	const message = typeof info === 'function' ? info() : info;
 
 	if (message instanceof Error) {
 		throw message;
 	} else {
-		throw new Error(message);
+		throw new Error(typeof message === 'string' ? message : 'Invariant failed');
 	}
 }
 
