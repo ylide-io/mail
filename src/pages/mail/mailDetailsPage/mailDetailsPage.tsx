@@ -49,47 +49,46 @@ export const MailDetailsPage = observer(() => {
 
 	const openMailCompose = useOpenMailCompose();
 
-	const messageQuery = useQuery(
-		['mail-details', id, domain.accounts.activeAccounts.map(a => a.account.address).join(',')],
-		{
-			queryFn: async () => {
-				let message = mailStore.lastMessagesList.find(m => m.id === id!);
+	const accounts = domain.accounts.activeAccounts;
 
-				if (!message) {
-					const [msgId, ...rest] = id.split(':');
-					const accountAddress = rest.join(':');
-					invariant(msgId, 'No msgId');
-					invariant(accountAddress, 'No account address');
+	const messageQuery = useQuery(['mail-details', id, accounts.map(a => a.account.address).join(',')], {
+		queryFn: async () => {
+			let message = mailStore.lastMessagesList.find(m => m.id === id!);
 
-					const domainAccount = domain.accounts.accounts.find(a => a.account.address === accountAddress);
-					invariant(domainAccount, () => {
-						toast(`Connect account ${truncateInMiddle(accountAddress, 8, '..')} to read this message 👍`);
-						return 'No account';
-					});
+			if (!message) {
+				const [msgId, ...rest] = id.split(':');
+				const accountAddress = rest.join(':');
+				invariant(msgId, 'No msgId');
+				invariant(accountAddress, 'No account address');
 
-					const msg = await domain.getMessageByMsgId(msgId);
-					invariant(msg);
+				const domainAccount = accounts.find(a => a.account.address === accountAddress);
+				invariant(domainAccount, () => {
+					toast(`Connect account ${truncateInMiddle(accountAddress, 8, '..')} to read this message 👍`);
+					return 'No account';
+				});
 
-					message = await ILinkedMessage.fromIMessage(folderId, msg, domainAccount);
-				}
+				const msg = await domain.getMessageByMsgId(msgId);
+				invariant(msg);
 
-				let decoded = message && mailStore.decodedMessagesById[message.msgId];
+				message = await ILinkedMessage.fromIMessage(folderId, msg, domainAccount);
+			}
 
-				if (!decoded) {
-					await mailStore.decodeMessage(message.msgId, message.msg, message.recipient?.account);
-					decoded = mailStore.decodedMessagesById[message.msgId];
-					invariant(decoded, 'No decoded');
-				}
+			let decoded = message && mailStore.decodedMessagesById[message.msgId];
 
-				mailStore.markMessagesAsReaded([id]);
+			if (!decoded) {
+				await mailStore.decodeMessage(message.msgId, message.msg, message.recipient?.account);
+				decoded = mailStore.decodedMessagesById[message.msgId];
+				invariant(decoded, 'No decoded');
+			}
 
-				return {
-					message,
-					decoded,
-				};
-			},
+			mailStore.markMessagesAsReaded([id]);
+
+			return {
+				message,
+				decoded,
+			};
 		},
-	);
+	});
 
 	const initialMessage = messageQuery.data?.message;
 	const initialDecoded = messageQuery.data?.decoded;
@@ -102,8 +101,6 @@ export const MailDetailsPage = observer(() => {
 	const [isThreadOpen, setThreadOpen] = useState(false);
 
 	const deletedMessageIds = mailStore.deletedMessageIds;
-
-	const accounts = domain.accounts.activeAccounts;
 
 	const threadMailList = useMemo(() => {
 		if (folderId !== FolderId.Inbox || !initialMessage?.msg.senderAddress) return;
