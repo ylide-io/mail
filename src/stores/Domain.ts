@@ -29,8 +29,8 @@ import {
 	Ylide,
 	YlideKeyStore,
 } from '@ylide/sdk';
-import { makeObservable, observable, reaction } from 'mobx';
-import { useEffect, useMemo, useState } from 'react';
+import { makeObservable, observable } from 'mobx';
+import { useMemo } from 'react';
 
 import { NFT3NameService } from '../api/nft3DID';
 import { PasswordRequestModal } from '../components/passwordRequestModal/passwordRequestModal';
@@ -674,28 +674,15 @@ export class Domain {
 	}
 }
 
-export function useDomainAccounts() {
-	const [accounts, setAccounts] = useState(() => domain.accounts.activeAccounts);
-
-	useEffect(
-		() =>
-			reaction(
-				() => [...domain.accounts.activeAccounts],
-				arg => setAccounts(arg),
-			),
-		[],
-	);
-
-	return accounts;
-}
+//
 
 export function useVenomAccounts() {
-	const accounts = useDomainAccounts();
+	const accounts = domain.accounts.activeAccounts;
 	return useMemo(() => accounts.filter(a => a.wallet.wallet === 'venomwallet'), [accounts]);
 }
 
 export function useEvmAccounts() {
-	const accounts = useDomainAccounts();
+	const accounts = domain.accounts.activeAccounts;
 	return useMemo(() => accounts.filter(a => a.wallet.factory.blockchainGroup === 'evm'), [accounts]);
 }
 

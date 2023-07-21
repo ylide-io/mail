@@ -38,7 +38,7 @@ import {
 	blockchainProjectsMeta,
 } from '../../../stores/blockchainProjects/blockchainProjects';
 import { browserStorage } from '../../../stores/browserStorage';
-import domain, { useDomainAccounts } from '../../../stores/Domain';
+import domain from '../../../stores/Domain';
 import { getFeedCategoryName } from '../../../stores/Feed';
 import { FolderId, MailList } from '../../../stores/MailList';
 import { DomainAccount } from '../../../stores/models/DomainAccount';
@@ -187,7 +187,7 @@ export const SidebarButton = observer(({ look, href, icon, name, rightButton }: 
 export const SidebarMailSection = observer(() => {
 	const openMailCompose = useOpenMailCompose();
 
-	const accounts = useDomainAccounts();
+	const accounts = domain.accounts.activeAccounts;
 
 	const [hasNewMessages, setHasNewMessages] = useState(false);
 

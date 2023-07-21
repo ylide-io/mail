@@ -15,7 +15,7 @@ import { ReactComponent as ForwardSvg } from '../../../icons/ic20/forward.svg';
 import { ReactComponent as ReplySvg } from '../../../icons/ic20/reply.svg';
 import { IMessageDecodedContent } from '../../../indexedDB/IndexedDB';
 import { analytics } from '../../../stores/Analytics';
-import { useDomainAccounts } from '../../../stores/Domain';
+import domain from '../../../stores/Domain';
 import { FolderId, ILinkedMessage, MailList, mailStore } from '../../../stores/MailList';
 import { OutgoingMailData } from '../../../stores/outgoingMailData';
 import { RoutePath } from '../../../stores/routePath';
@@ -66,7 +66,7 @@ export const MailDetailsPage = observer(() => {
 
 	const deletedMessageIds = mailStore.deletedMessageIds;
 
-	const accounts = useDomainAccounts();
+	const accounts = domain.accounts.activeAccounts;
 
 	const threadMailList = useMemo(() => {
 		if (folderId !== FolderId.Inbox || !initialMessage?.msg.senderAddress) return;

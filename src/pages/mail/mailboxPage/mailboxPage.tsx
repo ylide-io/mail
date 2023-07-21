@@ -12,7 +12,7 @@ import { GenericLayout } from '../../../components/genericLayout/genericLayout';
 import { YlideLoader } from '../../../components/ylideLoader/ylideLoader';
 import { analytics } from '../../../stores/Analytics';
 import { browserStorage } from '../../../stores/browserStorage';
-import domain, { useDomainAccounts } from '../../../stores/Domain';
+import domain from '../../../stores/Domain';
 import { FolderId, ILinkedMessage, MailList, mailStore } from '../../../stores/MailList';
 import { useNav } from '../../../utils/url';
 import { useWindowSize } from '../../../utils/useWindowSize';
@@ -75,7 +75,7 @@ export const MailboxPage = observer(() => {
 
 	const deletedMessageIds = mailStore.deletedMessageIds;
 
-	const accounts = useDomainAccounts();
+	const accounts = domain.accounts.activeAccounts;
 
 	const mailList = useMemo(() => {
 		const list = new MailList(true);
