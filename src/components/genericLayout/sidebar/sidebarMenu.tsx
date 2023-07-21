@@ -1,7 +1,7 @@
 import clsx from 'clsx';
 import { observable, reaction } from 'mobx';
 import { observer } from 'mobx-react';
-import { PropsWithChildren, ReactNode, useEffect, useState } from 'react';
+import { AnchorHTMLAttributes, PropsWithChildren, ReactNode, useEffect, useState } from 'react';
 import { generatePath, useLocation } from 'react-router-dom';
 
 import { FeedCategory } from '../../../api/feedServerApi';
@@ -145,6 +145,14 @@ export const SidebarButton = observer(({ look, href, icon, name, rightButton }: 
 
 	const isActive = location.pathname === href;
 
+	const isExternal = !href.startsWith('/');
+	const externalProps: AnchorHTMLAttributes<HTMLAnchorElement> = isExternal
+		? {
+				target: '_blank',
+				rel: 'noreferrer',
+		  }
+		: {};
+
 	const lookClass =
 		look &&
 		{
@@ -154,12 +162,15 @@ export const SidebarButton = observer(({ look, href, icon, name, rightButton }: 
 
 	return (
 		<a
+			{...externalProps}
 			className={clsx(css.sectionLink, lookClass, isActive && css.sectionLink_active)}
 			href={href}
 			onClick={e => {
-				e.preventDefault();
-				isSidebarOpen.set(false);
-				navigate(href);
+				if (!isExternal) {
+					e.preventDefault();
+					isSidebarOpen.set(false);
+					navigate(href);
+				}
 			}}
 		>
 			{icon && <div className={css.sectionLinkIconLeft}>{icon}</div>}
@@ -379,6 +390,13 @@ export const SidebarMenu = observer(() => {
 				<SidebarSection section={Section.TVM_PROJECTS} title="TVM 주요정보">
 					{renderProjects(activeTvmProjects)}
 				</SidebarSection>
+
+				<ActionButton
+					className={css.sectionButton}
+					onClick={() => window.open('https://forms.gle/p9141gy5wn7DCjZA8', '_blank')?.focus()}
+				>
+					Create community
+				</ActionButton>
 			</>
 		);
 	}
