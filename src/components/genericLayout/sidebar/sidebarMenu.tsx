@@ -356,12 +356,21 @@ export const SidebarMenu = observer(() => {
 
 		return (
 			<>
-				<SidebarButton
-					look={SidebarButtonLook.SECTION}
-					href={generatePath(RoutePath.FEED_PROJECT_POSTS, { projectId: BlockchainProjectId.GENERAL })}
-					name={blockchainProjectsMeta[BlockchainProjectId.GENERAL].name}
-					icon={blockchainProjectsMeta[BlockchainProjectId.GENERAL].logo}
-				/>
+				<div>
+					<SidebarButton
+						look={SidebarButtonLook.SECTION}
+						href={generatePath(RoutePath.FEED_PROJECT_POSTS, { projectId: BlockchainProjectId.GENERAL })}
+						name={blockchainProjectsMeta[BlockchainProjectId.GENERAL].name}
+						icon={blockchainProjectsMeta[BlockchainProjectId.GENERAL].logo}
+					/>
+
+					<SidebarButton
+						look={SidebarButtonLook.SECTION}
+						href={generatePath(RoutePath.FEED_PROJECT_POSTS, { projectId: BlockchainProjectId.ETH_WHALES })}
+						name={blockchainProjectsMeta[BlockchainProjectId.ETH_WHALES].name}
+						icon={blockchainProjectsMeta[BlockchainProjectId.ETH_WHALES].logo}
+					/>
+				</div>
 
 				<SidebarSection section={Section.VENOM_PROJECTS} title="Venom Projects">
 					{renderProjects(activeVenomProjects)}

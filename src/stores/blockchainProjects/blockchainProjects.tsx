@@ -2,6 +2,7 @@ import { Uint256 } from '@ylide/sdk';
 import { ReactNode } from 'react';
 
 import { VENOM_FEED_ID } from '../../constants';
+import { ReactComponent as EthWhalesSvg } from './icons/ethWhales.svg';
 import { ReactComponent as GeneralSvg } from './icons/general.svg';
 import { ReactComponent as NumiSvg } from './icons/numi.svg';
 import { ReactComponent as OasisGallerySvg } from './icons/oasisGallery.svg';
@@ -20,6 +21,7 @@ import { ReactComponent as YlideSvg } from './icons/ylide.svg';
 
 export enum BlockchainProjectId {
 	GENERAL = 'general',
+	ETH_WHALES = 'eth_whales',
 
 	NUMI = 'numi',
 	OASIS_GALLERY = 'oasis_gallery',
@@ -57,6 +59,13 @@ export const blockchainProjectsMeta: Record<BlockchainProjectId, BlockchainProje
 		name: 'General chat',
 		description: 'General chat to meet your web3 frens.',
 		logo: <GeneralSvg />,
+	},
+	[BlockchainProjectId.ETH_WHALES]: {
+		id: BlockchainProjectId.ETH_WHALES,
+		feedId: '2000000000000000000000000000000000000000000000000000000000000004' as Uint256,
+		name: 'ETH Whales',
+		description: 'Here you can meet the fellow ETH supporters. Btw, messages are sent only via Ethereum chain 😉',
+		logo: <EthWhalesSvg />,
 	},
 
 	[BlockchainProjectId.NUMI]: {

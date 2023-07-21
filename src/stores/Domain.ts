@@ -694,6 +694,11 @@ export function useVenomAccounts() {
 	return useMemo(() => accounts.filter(a => a.wallet.wallet === 'venomwallet'), [accounts]);
 }
 
+export function useEvmAccounts() {
+	const accounts = useDomainAccounts();
+	return useMemo(() => accounts.filter(a => a.wallet.factory.blockchainGroup === 'evm'), [accounts]);
+}
+
 //@ts-ignore
 const domain = (window.domain = new Domain());
 export default domain;
