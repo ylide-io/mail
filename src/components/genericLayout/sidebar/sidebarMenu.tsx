@@ -1,7 +1,7 @@
 import clsx from 'clsx';
-import { observable } from 'mobx';
+import { observable, reaction } from 'mobx';
 import { observer } from 'mobx-react';
-import { PropsWithChildren, ReactNode, useState } from 'react';
+import { PropsWithChildren, ReactNode, useEffect, useState } from 'react';
 import { generatePath, useLocation } from 'react-router-dom';
 
 import { FeedCategory } from '../../../api/feedServerApi';
@@ -38,9 +38,9 @@ import {
 	blockchainProjectsMeta,
 } from '../../../stores/blockchainProjects/blockchainProjects';
 import { browserStorage } from '../../../stores/browserStorage';
-import domain from '../../../stores/Domain';
+import domain, { useDomainAccounts } from '../../../stores/Domain';
 import { getFeedCategoryName } from '../../../stores/Feed';
-import { FolderId } from '../../../stores/MailList';
+import { FolderId, MailList } from '../../../stores/MailList';
 import { DomainAccount } from '../../../stores/models/DomainAccount';
 import { RoutePath } from '../../../stores/routePath';
 import { useOpenMailCompose } from '../../../utils/mail';
@@ -187,49 +187,56 @@ export const SidebarButton = observer(({ look, href, icon, name, rightButton }: 
 export const SidebarMailSection = observer(() => {
 	const openMailCompose = useOpenMailCompose();
 
-	// const accounts = useDomainAccounts();
+	const accounts = useDomainAccounts();
 
 	const [hasNewMessages, setHasNewMessages] = useState(false);
 
-	// useEffect(() => {
-	// 	console.log('sidebar mail section mounted');
-	// 	return () => {
-	// 		console.log('sidebar mail section unmounted');
-	// 	};
-	// }, []);
+	useEffect(() => {
+		console.log('sidebar mail section mounted');
+		return () => {
+			console.log('sidebar mail section unmounted');
+		};
+	}, []);
 
-	// useEffect(() => {
-	// 	const mailList = new MailList();
+	useEffect(() => {
+		const mailList = new MailList();
 
-	// 	mailList.init({
-	// 		mailbox: {
-	// 			accounts,
-	// 			folderId: FolderId.Inbox,
-	// 		},
-	// 	});
+		mailList.init({
+			mailbox: {
+				accounts,
+				folderId: FolderId.Inbox,
+			},
+		});
 
-	// 	console.log('inited maillist: ', mailList.id);
+		console.log('sidebar inited maillist: ', mailList.id);
 
-	// 	const key = accounts
-	// 		.map(a => a.account.address)
-	// 		.sort()
-	// 		.join(',');
+		const key = accounts
+			.map(a => a.account.address)
+			.sort()
+			.join(',');
 
-	// 	const dispose = reaction(
-	// 		() => ({ messagesData: mailList.messagesData, lastMailboxCheckDate: browserStorage.lastMailboxCheckDate }),
-	// 		({ messagesData, lastMailboxCheckDate }) => {
-	// 			console.log('reaction triggered for ' + mailList.id);
-	// 			const lastCheckedDate = lastMailboxCheckDate[key];
-	// 			const isNew =
-	// 				messagesData[0] && (!lastCheckedDate || messagesData[0].raw.msg.createdAt > lastCheckedDate);
-	// 			setHasNewMessages(isNew);
-	// 		},
-	// 	);
-	// 	return () => {
-	// 		dispose();
-	// 		mailList.destroy();
-	// 	};
-	// }, [accounts]);
+		const dispose = reaction(
+			() => ({
+				newMessagesCount: mailList.newMessagesCount,
+				messagesData: mailList.messagesData,
+				lastMailboxCheckDate: browserStorage.lastMailboxCheckDate,
+			}),
+			({ newMessagesCount, messagesData, lastMailboxCheckDate }) => {
+				if (newMessagesCount) {
+					mailList.drainNewMessages();
+				}
+				console.log('reaction triggered for ' + mailList.id);
+				const lastCheckedDate = lastMailboxCheckDate[key];
+				const isNew =
+					messagesData[0] && (!lastCheckedDate || messagesData[0].raw.msg.createdAt > lastCheckedDate);
+				setHasNewMessages(isNew);
+			},
+		);
+		return () => {
+			dispose();
+			mailList.destroy();
+		};
+	}, [accounts]);
 
 	return (
 		<SidebarSection section={Section.MAIL} title="Mail">

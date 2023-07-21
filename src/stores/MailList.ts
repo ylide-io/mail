@@ -7,11 +7,11 @@ import {
 	IBlockchainSourceSubject,
 	IGenericAccount,
 	IMessage,
-	INewMessageWithSource,
-	INewSourceWithMeta,
-	NewListSource,
-	NewListSourceDrainer,
-	NewListSourceMultiplexer,
+	IMessageWithSource,
+	ISourceWithMeta,
+	ListSource,
+	ListSourceDrainer,
+	ListSourceMultiplexer,
 	SourceReadingSession,
 	Uint256,
 	YLIDE_MAIN_FEED_ID,
@@ -57,7 +57,7 @@ export function getFolderName(folderId: FolderId) {
 
 const FILTERED_OUT = {};
 
-function wrapMessageId(p: INewMessageWithSource) {
+function wrapMessageId(p: IMessageWithSource) {
 	const acc = p.meta?.account as DomainAccount | undefined;
 	return `${p.msg.msgId}${acc ? `:${acc.account.address}` : ''}`;
 }
@@ -76,15 +76,22 @@ export namespace ILinkedMessage {
 		return `${message.msgId}:${account.account.address}`;
 	}
 
-	export async function fromIMessage(message: IMessage, account: DomainAccount): Promise<ILinkedMessage> {
+	export async function fromIMessage(
+		folderId: FolderId | null,
+		message: IMessage,
+		account: DomainAccount,
+	): Promise<ILinkedMessage> {
 		const reader = domain.ylide.controllers.blockchainsMap[message.blockchain];
 
 		let recipients: string[] = [];
 		try {
-			recipients = (await (reader as EthereumBlockchainController).getMessageRecipients(
-				message,
-				true,
-			))!.recipients.map(formatAddress);
+			// console.log('folderId: ', folderId);
+			if (folderId === FolderId.Sent) {
+				recipients = (await (reader as EthereumBlockchainController).getMessageRecipients(
+					message,
+					true,
+				))!.recipients.map(formatAddress);
+			}
 		} catch (e) {}
 
 		return {
@@ -97,22 +104,32 @@ export namespace ILinkedMessage {
 		};
 	}
 
-	export async function fromIMessageArray(messages: IMessage[], account: DomainAccount): Promise<ILinkedMessage[]> {
-		return await Promise.all(messages.map(m => fromIMessage(m, account)));
+	export async function fromIMessageArray(
+		folderId: FolderId | null,
+		messages: IMessage[],
+		account: DomainAccount,
+	): Promise<ILinkedMessage[]> {
+		return await Promise.all(messages.map(m => fromIMessage(folderId, m, account)));
 	}
 
 	//
 
-	export function idFromIMessageWithSource(p: INewMessageWithSource) {
+	export function idFromIMessageWithSource(p: IMessageWithSource) {
 		return idFromIMessage(p.msg, p.meta.account);
 	}
 
-	export async function fromIMessageWithSource(p: INewMessageWithSource): Promise<ILinkedMessage> {
-		return fromIMessage(p.msg, p.meta.account);
+	export async function fromIMessageWithSource(
+		folderId: FolderId | null,
+		p: IMessageWithSource,
+	): Promise<ILinkedMessage> {
+		return fromIMessage(folderId, p.msg, p.meta.account);
 	}
 
-	export async function fromIMessageWithSourceArray(p: INewMessageWithSource[]): Promise<ILinkedMessage[]> {
-		return await Promise.all(p.map(fromIMessageWithSource));
+	export async function fromIMessageWithSourceArray(
+		folderId: FolderId | null,
+		p: IMessageWithSource[],
+	): Promise<ILinkedMessage[]> {
+		return await Promise.all(p.map(m => fromIMessageWithSource(folderId, m)));
 	}
 }
 
@@ -120,15 +137,16 @@ export class MailList<M = ILinkedMessage> {
 	private isDestroyed = false;
 
 	public id: string;
+	folderId: FolderId | null = null;
 
 	@observable isNextPageAvailable = true;
 	@observable isLoading = true;
 	@observable isError = false;
 
-	@observable.shallow public messagesData: { raw: INewMessageWithSource; handled: M | typeof FILTERED_OUT }[] = [];
+	@observable.shallow public messagesData: { raw: IMessageWithSource; handled: M | typeof FILTERED_OUT }[] = [];
 	@observable newMessagesCount: number = 0;
 
-	private stream: NewListSourceDrainer | undefined;
+	private stream: ListSourceDrainer | undefined;
 	private streamDisposer: (() => void) | undefined;
 
 	private messagesFilter: ((messages: ILinkedMessage[]) => ILinkedMessage[] | Promise<ILinkedMessage[]>) | undefined;
@@ -156,15 +174,19 @@ export class MailList<M = ILinkedMessage> {
 		this.messagesFilter = messagesFilter;
 		this.messageHandler = messageHandler;
 
+		this.folderId = null;
+
 		if (mailbox) {
-			function buildMailboxSources(): INewSourceWithMeta[] {
+			this.folderId = mailbox.folderId;
+
+			function buildMailboxSources(): ISourceWithMeta[] {
 				invariant(mailbox);
 
 				function getDirectWithMeta(
 					recipient: Uint256,
 					sender: string | null,
 					account: DomainAccount,
-				): INewSourceWithMeta[] {
+				): ISourceWithMeta[] {
 					return domain.ylide.core
 						.getListSources(mailStore.readingSession, [
 							{
@@ -197,8 +219,9 @@ export class MailList<M = ILinkedMessage> {
 				}
 			}
 
-			this.stream = new NewListSourceDrainer(new NewListSourceMultiplexer(buildMailboxSources()));
+			this.stream = new ListSourceDrainer(new ListSourceMultiplexer(buildMailboxSources()));
 			const start = Date.now();
+			// debugger;
 			const { dispose } = await this.stream.connect('Mailer', this.onNewMessages);
 			console.log('MailList init', this.id, Date.now() - start);
 			this.streamDisposer = dispose;
@@ -207,7 +230,7 @@ export class MailList<M = ILinkedMessage> {
 			});
 			await this.reloadMessages();
 		} else if (venomFeed) {
-			async function buildVenomFources(): Promise<INewSourceWithMeta[]> {
+			async function buildVenomFources(): Promise<ISourceWithMeta[]> {
 				invariant(venomFeed);
 
 				const blockchainController = domain.blockchains['venom-testnet'] as EverscaleBlockchainController;
@@ -220,7 +243,7 @@ export class MailList<M = ILinkedMessage> {
 					id: 'tvm-venom-testnet-broadcaster-14',
 				};
 				const originalSource = blockchainController.ininiateMessagesSource(blockchainSubject);
-				const listSource = new NewListSource(mailStore.readingSession, blockchainSubject, originalSource);
+				const listSource = new ListSource(mailStore.readingSession, blockchainSubject, originalSource);
 
 				return [
 					{
@@ -229,7 +252,7 @@ export class MailList<M = ILinkedMessage> {
 				];
 			}
 
-			this.stream = new NewListSourceDrainer(new NewListSourceMultiplexer(await buildVenomFources()));
+			this.stream = new ListSourceDrainer(new ListSourceMultiplexer(await buildVenomFources()));
 			const start = Date.now();
 			const { dispose } = await this.stream.connect('Mailer', this.onNewMessages);
 			console.log('MailList init', this.id, Date.now() - start);
@@ -251,7 +274,7 @@ export class MailList<M = ILinkedMessage> {
 		const newMessages = this.stream!.messages.filter(
 			m => !this.messagesData.find(old => old.raw.msg.msgId === m.msg.msgId),
 		);
-		const newLinked = await ILinkedMessage.fromIMessageWithSourceArray(newMessages);
+		const newLinked = await ILinkedMessage.fromIMessageWithSourceArray(this.folderId, newMessages);
 		const newFiltered = this.messagesFilter ? await this.messagesFilter(newLinked) : newLinked;
 
 		return await Promise.all(
