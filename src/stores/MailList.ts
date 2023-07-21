@@ -152,12 +152,14 @@ export class MailList<M = ILinkedMessage> {
 	private messagesFilter: ((messages: ILinkedMessage[]) => ILinkedMessage[] | Promise<ILinkedMessage[]>) | undefined;
 	private messageHandler: ((message: ILinkedMessage) => M | Promise<M>) | undefined;
 
-	constructor() {
+	constructor(track = false) {
 		makeObservable(this);
 		this.id = String(Math.floor(Math.random() * 1000000000));
 		console.log('MailList created', this.id);
-		// @ts-ignore
-		window.activeMailList = this;
+		if (track) {
+			// @ts-ignore
+			window.activeMailList = this;
+		}
 	}
 
 	async init(props: {
@@ -197,7 +199,7 @@ export class MailList<M = ILinkedMessage> {
 							},
 						])
 						.map(source => ({ source, meta: { account } }));
-					// .filter(s => s.source.subject.id === 'evm-GNOSIS-mailer-58');
+					// .filter(s => s.source.subject.id === 'tvm-venom-testnet-mailer-13');
 				}
 
 				if (mailbox.folderId === FolderId.Inbox || mailbox.folderId === FolderId.Archive) {

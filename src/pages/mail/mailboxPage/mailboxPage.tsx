@@ -78,7 +78,7 @@ export const MailboxPage = observer(() => {
 	const accounts = useDomainAccounts();
 
 	const mailList = useMemo(() => {
-		const list = new MailList();
+		const list = new MailList(true);
 
 		list.init({
 			mailbox: {
