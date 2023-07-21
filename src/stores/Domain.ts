@@ -25,6 +25,7 @@ import {
 	BrowserLocalStorage,
 	DynamicEncryptionRouter,
 	IGenericAccount,
+	IMessage,
 	WalletControllerFactory,
 	Ylide,
 	YlideKeyStore,
@@ -626,6 +627,21 @@ export class Domain {
 			}
 		}
 		this.availableWallets = await Ylide.getAvailableWallets();
+	}
+
+	async getMessageByMsgId(msgId: string): Promise<IMessage | null> {
+		for (const blockchain of Object.keys(this.blockchains)) {
+			const controller = this.blockchains[blockchain];
+			if (controller.isValidMsgId(msgId)) {
+				try {
+					return await controller.getMessageByMsgId(msgId);
+				} catch (err) {
+					console.error('Error getting message by msgId', err);
+					return null;
+				}
+			}
+		}
+		return null;
 	}
 
 	async init() {

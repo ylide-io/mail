@@ -41,9 +41,10 @@ export const MailDetailsPage = observer(() => {
 
 	const openMailCompose = useOpenMailCompose();
 
-	const initialMessage = mailStore.lastMessagesList.find(m => m.id === id!);
-	const initialDecodedContent: IMessageDecodedContent | undefined =
-		initialMessage && mailStore.decodedMessagesById[initialMessage.msgId];
+	const [initialMessage, setInitialMessage] = useState(mailStore.lastMessagesList.find(m => m.id === id!));
+	const [initialDecodedContent, setInitialDecodedContent] = useState<IMessageDecodedContent | undefined>(
+		initialMessage && mailStore.decodedMessagesById[initialMessage.msgId],
+	);
 
 	useEffect(() => {
 		if (id && initialDecodedContent) {
@@ -52,7 +53,38 @@ export const MailDetailsPage = observer(() => {
 	}, [id, initialDecodedContent]);
 
 	useEffect(() => {
-		if (!initialMessage || !initialDecodedContent) {
+		if (!initialMessage) {
+			const [msgId, ...rest] = id!.split(':');
+			const accountAddress = rest.join(':');
+			const domainAccount = domain.accounts.accounts.find(a => a.account.address === accountAddress);
+			domain
+				.getMessageByMsgId(msgId)
+				.then(msg => {
+					if (msg) {
+						mailStore
+							.decodeMessage(msgId, msg, domainAccount?.account)
+							.then(() => {
+								setInitialDecodedContent(mailStore.decodedMessagesById[msg.msgId]);
+								setInitialMessage({
+									id: id!,
+									msgId,
+									msg,
+									recipient: domainAccount ?? null,
+									recipients: [],
+									reader: domain.blockchains[msg.blockchain],
+								});
+							})
+							.catch(err => {
+								navigate(generatePath(RoutePath.MAIL_FOLDER, { folderId: folderId! }));
+							});
+					} else {
+						navigate(generatePath(RoutePath.MAIL_FOLDER, { folderId: folderId! }));
+					}
+				})
+				.catch(err => {
+					navigate(generatePath(RoutePath.MAIL_FOLDER, { folderId: folderId! }));
+				});
+		} else if (!initialMessage || !initialDecodedContent) {
 			navigate(generatePath(RoutePath.MAIL_FOLDER, { folderId: folderId! }));
 		}
 	}, [initialDecodedContent, folderId, initialMessage, navigate]);
