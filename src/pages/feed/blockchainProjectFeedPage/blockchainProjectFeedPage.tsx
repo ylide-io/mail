@@ -143,10 +143,11 @@ export const BlockchainProjectFeedPage = observer(() => {
 				{projectId === BlockchainProjectId.TVM && !browserStorage.isUserAdmin ? null : accounts.length ? (
 					<CreatePostForm
 						ref={createPostFormRef}
-						projectMeta={projectMeta}
 						className={css.createPostForm}
 						accounts={accounts}
 						isUnavailable={serviceStatus.data !== 'ACTIVE'}
+						projectMeta={projectMeta}
+						allowCustomAttachments={isAdminMode}
 						onCreated={() => toast('Good job! Your post will appear shortly 🔥')}
 					/>
 				) : (

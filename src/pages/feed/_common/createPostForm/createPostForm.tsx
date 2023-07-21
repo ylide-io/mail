@@ -7,12 +7,13 @@ import { BlockchainFeedApi, DecodedBlockchainFeedPost } from '../../../../api/bl
 import { AccountSelect } from '../../../../components/accountSelect/accountSelect';
 import { ActionButton, ActionButtonLook, ActionButtonSize } from '../../../../components/ActionButton/ActionButton';
 import { AutoSizeTextArea, AutoSizeTextAreaApi } from '../../../../components/autoSizeTextArea/autoSizeTextArea';
-import { GridRowBox } from '../../../../components/boxes/boxes';
 import { AnchoredPopup } from '../../../../components/popup/anchoredPopup/anchoredPopup';
 import { PropsWithClassName } from '../../../../components/props';
+import { Spinner } from '../../../../components/spinner/spinner';
 import { toast } from '../../../../components/toast/toast';
 import { VENOM_FEED_ID } from '../../../../constants';
 import { ReactComponent as TrashSvg } from '../../../../icons/ic20/trash.svg';
+import { ReactComponent as ImageSvg } from '../../../../icons/ic28/image.svg';
 import { ReactComponent as StickerSvg } from '../../../../icons/ic28/sticker.svg';
 import { analytics } from '../../../../stores/Analytics';
 import { BlockchainProjectMeta } from '../../../../stores/blockchainProjects/blockchainProjects';
@@ -20,6 +21,7 @@ import { DomainAccount } from '../../../../stores/models/DomainAccount';
 import { OutgoingMailData, OutgoingMailDataMode } from '../../../../stores/outgoingMailData';
 import { HorizontalAlignment } from '../../../../utils/alignment';
 import { calcComissions } from '../../../../utils/calcComissions';
+import { openFilePicker, readFileAsDataURL } from '../../../../utils/file';
 import { hashToIpfsUrl, ipfsToHttpUrl } from '../../../../utils/ipfs';
 import { escapeRegex } from '../../../../utils/regex';
 import { SendMailButton } from '../../../mail/_common/composeMailForm/sendMailButton/sendMailButton';
@@ -34,13 +36,14 @@ export interface CreatePostFormProps extends PropsWithClassName {
 	accounts: DomainAccount[];
 	isUnavailable: boolean;
 	projectMeta: BlockchainProjectMeta;
+	allowCustomAttachments: boolean;
 	onCreated?: () => void;
 }
 
 export const CreatePostForm = observer(
 	forwardRef(
 		(
-			{ className, accounts, isUnavailable, projectMeta, onCreated }: CreatePostFormProps,
+			{ className, accounts, isUnavailable, projectMeta, allowCustomAttachments, onCreated }: CreatePostFormProps,
 			ref: Ref<CreatePostFormApi>,
 		) => {
 			const textAreaApiRef = useRef<AutoSizeTextAreaApi>(null);
@@ -117,9 +120,63 @@ export const CreatePostForm = observer(
 			const stickerButtonRef = useRef(null);
 			const [isStickerPopupOpen, setStickerPopupOpen] = useState(false);
 
-			const attachmentUrl = mailData.attachments.length
-				? ipfsToHttpUrl((mailData.attachments[0] as MessageAttachmentLinkV1).link)
-				: undefined;
+			const [previewSrc, setPreviewSrc] = useState('');
+			const [isPreviewLoading, setPreviewLoading] = useState(false);
+
+			const attachFile = async () => {
+				const files = await openFilePicker({ accept: 'image/png, image/jpeg' });
+				const file = files[0];
+				if (file) {
+					setPreviewSrc('');
+					setPreviewLoading(true);
+
+					function success(src: string) {
+						setPreviewSrc(src);
+						setPreviewLoading(false);
+						mailData.attachmentFiles = [file];
+					}
+
+					function error() {
+						setPreviewLoading(false);
+						toast("Couldn't load the image 😒");
+					}
+
+					try {
+						const src = await readFileAsDataURL(file);
+						const img = document.createElement('img');
+						img.onload = () => success(src);
+						img.onerror = error;
+						img.src = src;
+					} catch (e) {
+						error();
+					}
+				}
+			};
+
+			const attachSticker = (id: string) => {
+				const url = hashToIpfsUrl(id);
+
+				mailData.attachments = [
+					new MessageAttachmentLinkV1({
+						type: MessageAttachmentType.LINK_V1,
+						previewLink: '',
+						link: url,
+						fileName: 'Venom sticker',
+						fileSize: 0,
+						isEncrypted: false,
+					}),
+				];
+
+				setStickerPopupOpen(false);
+				setPreviewSrc(ipfsToHttpUrl(url));
+			};
+
+			const removeAttachment = () => {
+				mailData.attachments = [];
+				mailData.attachmentFiles = [];
+
+				setPreviewSrc('');
+			};
 
 			const onSent = () => {
 				analytics.blockchainFeedSendSuccessful(projectMeta.id, !!replyTo, replyTo?.original.id);
@@ -202,22 +259,32 @@ export const CreatePostForm = observer(
 
 					{expanded ? (
 						<>
-							{attachmentUrl && (
+							{(!!previewSrc || isPreviewLoading) && (
 								<>
 									<div className={css.divider} />
 
-									<div className={css.preview}>
-										<img className={css.previewImage} alt="Preview" src={attachmentUrl} />
+									{isPreviewLoading ? (
+										<Spinner className={css.previewLoader} />
+									) : (
+										<div className={css.preview}>
+											<img
+												className={
+													allowCustomAttachments ? css.previewCustomImage : css.previewSticker
+												}
+												alt="Preview"
+												src={previewSrc}
+											/>
 
-										<ActionButton
-											isDisabled={mailData.sending}
-											look={ActionButtonLook.DANGEROUS}
-											icon={<TrashSvg />}
-											onClick={() => (mailData.attachments = [])}
-										>
-											Remove
-										</ActionButton>
-									</div>
+											<ActionButton
+												isDisabled={mailData.sending}
+												look={ActionButtonLook.DANGEROUS}
+												icon={<TrashSvg />}
+												onClick={removeAttachment}
+											>
+												Remove attachment
+											</ActionButton>
+										</div>
+									)}
 								</>
 							)}
 
@@ -232,57 +299,72 @@ export const CreatePostForm = observer(
 								/>
 
 								<div className={css.footerRight}>
-									<GridRowBox gap={4}>
-										<ActionButton
-											ref={stickerButtonRef}
-											isDisabled={mailData.sending}
-											size={ActionButtonSize.MEDIUM}
-											look={ActionButtonLook.LITE}
-											icon={<StickerSvg />}
-											title="Stickers"
-											onClick={() => setStickerPopupOpen(!isStickerPopupOpen)}
-										/>
-
-										{isStickerPopupOpen && (
-											<AnchoredPopup
-												className={css.stickerPopup}
-												anchorRef={stickerButtonRef}
-												horizontalAlign={HorizontalAlignment.END}
-												alignerOptions={{
-													fitLeftToViewport: true,
-												}}
-												onCloseRequest={() => setStickerPopupOpen(false)}
-											>
-												<div className={css.stickerPopupContent}>
-													{stickerIpfsIds.map((id, i) => (
-														<img
-															key={i}
-															alt="Sticker"
-															src={ipfsToHttpUrl(id)}
-															onClick={() => {
-																setStickerPopupOpen(false);
-																mailData.attachments = [
-																	new MessageAttachmentLinkV1({
-																		type: MessageAttachmentType.LINK_V1,
-																		previewLink: '',
-																		link: hashToIpfsUrl(id),
-																		fileName: 'Venom sticker',
-																		fileSize: 0,
-																		isEncrypted: false,
-																	}),
-																];
-															}}
-														/>
-													))}
-												</div>
-											</AnchoredPopup>
-										)}
-									</GridRowBox>
-
 									{isUnavailable ? (
 										<div>Can't post now. Wait a minute.</div>
 									) : (
-										<SendMailButton mailData={mailData} onSent={onSent} />
+										<>
+											{!allowCustomAttachments ? (
+												<>
+													<ActionButton
+														ref={stickerButtonRef}
+														isDisabled={mailData.sending}
+														size={ActionButtonSize.MEDIUM}
+														look={ActionButtonLook.LITE}
+														icon={<StickerSvg />}
+														title="Stickers"
+														onClick={() => setStickerPopupOpen(!isStickerPopupOpen)}
+													/>
+
+													{isStickerPopupOpen && (
+														<AnchoredPopup
+															className={css.stickerPopup}
+															anchorRef={stickerButtonRef}
+															horizontalAlign={HorizontalAlignment.END}
+															alignerOptions={{
+																fitLeftToViewport: true,
+															}}
+															onCloseRequest={() => setStickerPopupOpen(false)}
+														>
+															<div className={css.stickerPopupContent}>
+																{stickerIpfsIds.map((id, i) => (
+																	<img
+																		key={i}
+																		alt="Sticker"
+																		src={ipfsToHttpUrl(id)}
+																		onClick={() => attachSticker(id)}
+																	/>
+																))}
+															</div>
+														</AnchoredPopup>
+													)}
+												</>
+											) : mailData.attachments.length ? (
+												<ActionButton
+													isDisabled={mailData.sending}
+													size={ActionButtonSize.MEDIUM}
+													look={ActionButtonLook.DANGEROUS}
+													icon={<TrashSvg />}
+													title="Remove attachment"
+													onClick={() => {
+														setPreviewSrc('');
+														mailData.attachments = [];
+													}}
+												>
+													Attachment
+												</ActionButton>
+											) : (
+												<ActionButton
+													isDisabled={isPreviewLoading || mailData.sending}
+													size={ActionButtonSize.MEDIUM}
+													look={ActionButtonLook.LITE}
+													icon={<ImageSvg />}
+													title="Attach image"
+													onClick={attachFile}
+												/>
+											)}
+
+											<SendMailButton mailData={mailData} onSent={onSent} />
+										</>
 									)}
 								</div>
 							</div>
