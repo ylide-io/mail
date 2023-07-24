@@ -78,7 +78,7 @@ export const MailboxPage = observer(() => {
 	const accounts = domain.accounts.activeAccounts;
 
 	const mailList = useMemo(() => {
-		const list = new MailList(true);
+		const list = new MailList();
 
 		list.init({
 			mailbox: {
@@ -134,6 +134,7 @@ export const MailboxPage = observer(() => {
 				.map(a => a.account.address)
 				.sort()
 				.join(',');
+
 			browserStorage.lastMailboxCheckDate = {
 				...browserStorage.lastMailboxCheckDate,
 				[key]: Math.floor(Date.now() / 1000),

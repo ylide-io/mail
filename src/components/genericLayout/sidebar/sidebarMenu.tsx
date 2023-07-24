@@ -203,13 +203,6 @@ export const SidebarMailSection = observer(() => {
 	const [hasNewMessages, setHasNewMessages] = useState(false);
 
 	useEffect(() => {
-		console.log('sidebar mail section mounted');
-		return () => {
-			console.log('sidebar mail section unmounted');
-		};
-	}, []);
-
-	useEffect(() => {
 		const mailList = new MailList();
 
 		mailList.init({
@@ -218,8 +211,6 @@ export const SidebarMailSection = observer(() => {
 				folderId: FolderId.Inbox,
 			},
 		});
-
-		console.log('sidebar inited maillist: ', mailList.id);
 
 		const key = accounts
 			.map(a => a.account.address)
@@ -236,13 +227,16 @@ export const SidebarMailSection = observer(() => {
 				if (newMessagesCount) {
 					mailList.drainNewMessages();
 				}
-				console.log('reaction triggered for ' + mailList.id);
+
+				const lastMessage = messagesData[0];
 				const lastCheckedDate = lastMailboxCheckDate[key];
-				const isNew =
-					messagesData[0] && (!lastCheckedDate || messagesData[0].raw.msg.createdAt > lastCheckedDate);
-				setHasNewMessages(isNew);
+
+				setHasNewMessages(
+					!!lastMessage && (!lastCheckedDate || lastMessage.raw.msg.createdAt > lastCheckedDate),
+				);
 			},
 		);
+
 		return () => {
 			dispose();
 			mailList.destroy();

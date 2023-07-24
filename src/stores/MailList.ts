@@ -18,6 +18,7 @@ import {
 } from '@ylide/sdk';
 import { autobind } from 'core-decorators';
 import { computed, makeAutoObservable, makeObservable, observable, transaction } from 'mobx';
+import { nanoid } from 'nanoid';
 
 import { VENOM_FEED_ID } from '../constants';
 import messagesDB, { MessagesDB } from '../indexedDB/impl/MessagesDB';
@@ -77,7 +78,7 @@ export namespace ILinkedMessage {
 	}
 
 	export async function fromIMessage(
-		folderId: FolderId | null,
+		folderId: FolderId | undefined,
 		message: IMessage,
 		account: DomainAccount,
 	): Promise<ILinkedMessage> {
@@ -105,7 +106,7 @@ export namespace ILinkedMessage {
 	}
 
 	export async function fromIMessageArray(
-		folderId: FolderId | null,
+		folderId: FolderId | undefined,
 		messages: IMessage[],
 		account: DomainAccount,
 	): Promise<ILinkedMessage[]> {
@@ -119,14 +120,14 @@ export namespace ILinkedMessage {
 	}
 
 	export async function fromIMessageWithSource(
-		folderId: FolderId | null,
+		folderId: FolderId | undefined,
 		p: IMessageWithSource,
 	): Promise<ILinkedMessage> {
 		return fromIMessage(folderId, p.msg, p.meta.account);
 	}
 
 	export async function fromIMessageWithSourceArray(
-		folderId: FolderId | null,
+		folderId: FolderId | undefined,
 		p: IMessageWithSource[],
 	): Promise<ILinkedMessage[]> {
 		return await Promise.all(p.map(m => fromIMessageWithSource(folderId, m)));
@@ -136,15 +137,15 @@ export namespace ILinkedMessage {
 export class MailList<M = ILinkedMessage> {
 	private isDestroyed = false;
 
-	public id: string;
-	folderId: FolderId | null = null;
+	id = nanoid();
+	folderId: FolderId | undefined;
 
 	@observable isNextPageAvailable = true;
 	@observable isLoading = true;
 	@observable isError = false;
 
 	@observable.shallow public messagesData: { raw: IMessageWithSource; handled: M | typeof FILTERED_OUT }[] = [];
-	@observable newMessagesCount: number = 0;
+	@observable newMessagesCount = 0;
 
 	private stream: ListSourceDrainer | undefined;
 	private streamDisposer: (() => void) | undefined;
@@ -152,14 +153,8 @@ export class MailList<M = ILinkedMessage> {
 	private messagesFilter: ((messages: ILinkedMessage[]) => ILinkedMessage[] | Promise<ILinkedMessage[]>) | undefined;
 	private messageHandler: ((message: ILinkedMessage) => M | Promise<M>) | undefined;
 
-	constructor(track = false) {
+	constructor() {
 		makeObservable(this);
-		this.id = String(Math.floor(Math.random() * 1000000000));
-		console.log('MailList created', this.id);
-		if (track) {
-			// @ts-ignore
-			window.activeMailList = this;
-		}
 	}
 
 	async init(props: {
@@ -175,8 +170,6 @@ export class MailList<M = ILinkedMessage> {
 
 		this.messagesFilter = messagesFilter;
 		this.messageHandler = messageHandler;
-
-		this.folderId = null;
 
 		if (mailbox) {
 			this.folderId = mailbox.folderId;
