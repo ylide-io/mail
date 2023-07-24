@@ -174,7 +174,7 @@ export const blockchainProjectsMeta: Record<BlockchainProjectId, BlockchainProje
 		feedId: '1000000000000000000000000000000000000000000000000000000000000011' as Uint256,
 		name: 'Gravix',
 		description:
-			'Description: Derivatives DEX where you can trade a wide range of assets with up to 200x leverage and near-zero fees directly from your crypto wallet.',
+			'Derivatives DEX where you can trade a wide range of assets with up to 200x leverage and near-zero fees directly from your crypto wallet.',
 		logo: <GravixSvg />,
 		website: 'https://gravix.io/',
 	},
