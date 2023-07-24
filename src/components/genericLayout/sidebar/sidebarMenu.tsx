@@ -393,7 +393,10 @@ export const SidebarMenu = observer(() => {
 
 				<ActionButton
 					className={css.sectionButton}
-					onClick={() => window.open('https://forms.gle/p9141gy5wn7DCjZA8', '_blank')?.focus()}
+					onClick={() => {
+						analytics.openCreateCommunityForm();
+						window.open('https://forms.gle/p9141gy5wn7DCjZA8', '_blank')?.focus();
+					}}
 				>
 					Create community
 				</ActionButton>
