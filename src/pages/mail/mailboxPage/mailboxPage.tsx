@@ -118,6 +118,7 @@ export const MailboxPage = observer(() => {
 				const offsetToEnd = itemsHeight - (scrollParams.height + scrollParams.offset);
 				if (
 					offsetToEnd < itemSize &&
+					mailList.isActive &&
 					mailList.isNextPageAvailable &&
 					!mailList.isLoading &&
 					!mailList.isError

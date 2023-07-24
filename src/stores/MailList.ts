@@ -135,8 +135,6 @@ export namespace ILinkedMessage {
 }
 
 export class MailList<M = ILinkedMessage> {
-	private isDestroyed = false;
-
 	id = nanoid();
 	folderId: FolderId | undefined;
 
@@ -157,6 +155,10 @@ export class MailList<M = ILinkedMessage> {
 		makeObservable(this);
 	}
 
+	get isActive() {
+		return !!this.stream;
+	}
+
 	async init(props: {
 		messagesFilter?: (messages: ILinkedMessage[]) => ILinkedMessage[] | Promise<ILinkedMessage[]>;
 		messageHandler?: (message: ILinkedMessage) => M | Promise<M>;
@@ -170,6 +172,12 @@ export class MailList<M = ILinkedMessage> {
 
 		this.messagesFilter = messagesFilter;
 		this.messageHandler = messageHandler;
+
+		if (this.stream) {
+			throw new Error('Mail list was not destroyed before reinit');
+		}
+
+		this.folderId = undefined;
 
 		if (mailbox) {
 			this.folderId = mailbox.folderId;
@@ -214,15 +222,16 @@ export class MailList<M = ILinkedMessage> {
 				}
 			}
 
-			this.stream = new ListSourceDrainer(new ListSourceMultiplexer(buildMailboxSources()));
+			const newStream = new ListSourceDrainer(new ListSourceMultiplexer(buildMailboxSources()));
 			const start = Date.now();
 			// debugger;
-			const { dispose } = await this.stream.connect('Mailer', this.onNewMessages);
+			const { dispose } = await newStream.connect('Mailer', this.onNewMessages.bind(this, newStream));
 			console.log('MailList init', this.id, Date.now() - start);
 			this.streamDisposer = dispose;
-			await this.stream.resetFilter(m => {
+			await newStream.resetFilter(m => {
 				return mailbox.filter ? mailbox.filter(wrapMessageId(m)) : true;
 			});
+			this.stream = newStream;
 			await this.reloadMessages();
 		} else if (venomFeed) {
 			async function buildVenomFources(): Promise<ISourceWithMeta[]> {
@@ -247,17 +256,16 @@ export class MailList<M = ILinkedMessage> {
 				];
 			}
 
-			this.stream = new ListSourceDrainer(new ListSourceMultiplexer(await buildVenomFources()));
+			const newStream = new ListSourceDrainer(new ListSourceMultiplexer(await buildVenomFources()));
 			const start = Date.now();
-			const { dispose } = await this.stream.connect('Mailer', this.onNewMessages);
+			const { dispose } = await newStream.connect('Mailer', this.onNewMessages.bind(this, newStream));
 			console.log('MailList init', this.id, Date.now() - start);
 			this.streamDisposer = dispose;
+			this.stream = newStream;
 			await this.reloadMessages();
 		} else {
 			throw new Error('Cannot init list sources');
 		}
-
-		if (this.isDestroyed) return;
 	}
 
 	@computed
@@ -299,8 +307,8 @@ export class MailList<M = ILinkedMessage> {
 	}
 
 	@autobind
-	private async onNewMessages() {
-		this.newMessagesCount = this.stream!.newMessagesCount || 0;
+	private async onNewMessages(stream: ListSourceDrainer) {
+		this.newMessagesCount = stream.newMessagesCount || 0;
 	}
 
 	async drainNewMessages() {
@@ -315,7 +323,6 @@ export class MailList<M = ILinkedMessage> {
 
 	async reloadMessages() {
 		invariant(this.stream, 'Mail list not ready yet');
-		invariant(!this.isDestroyed, 'Mail list destroyed already');
 
 		this.isLoading = true;
 
@@ -338,7 +345,6 @@ export class MailList<M = ILinkedMessage> {
 
 	async loadNextPage() {
 		invariant(this.stream, 'Mail list not ready yet');
-		invariant(!this.isDestroyed, 'Mail list destroyed already');
 
 		this.isLoading = true;
 
@@ -359,8 +365,7 @@ export class MailList<M = ILinkedMessage> {
 	}
 
 	destroy() {
-		this.isDestroyed = true;
-
+		this.stream = undefined;
 		this.streamDisposer?.();
 	}
 }

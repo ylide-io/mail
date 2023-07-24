@@ -126,7 +126,7 @@ export const MailDetailsPage = observer(() => {
 	useEffect(
 		() =>
 			autorun(() => {
-				if (!threadMailList) return;
+				if (!threadMailList || !threadMailList.isActive) return;
 
 				if (!threadMailList.isNextPageAvailable) {
 					setWrappedThreadMessages(
