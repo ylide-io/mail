@@ -35,7 +35,7 @@ export const BlockchainProjectFeedPage = observer(() => {
 	const isVenomFeed = activeVenomProjects.includes(projectId);
 	const isEvmFeed = projectId === BlockchainProjectId.ETH_WHALES;
 
-	const isAdminMode = useIsMatchingRoute(RoutePath.FEED_PROJECT_POSTS_ADMIN);
+	const isAdminMode = useIsMatchingRoute(RoutePath.FEED_PROJECT_POSTS_ADMIN) && browserStorage.isUserAdmin;
 
 	const allAccounts = domain.accounts.activeAccounts;
 	const evmAccounts = useEvmAccounts();
