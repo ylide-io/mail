@@ -1,3 +1,4 @@
+import { EVMNetwork } from '@ylide/ethereum';
 import { observer } from 'mobx-react';
 import { useRef, useState } from 'react';
 import { Helmet } from 'react-helmet';
@@ -148,6 +149,7 @@ export const BlockchainProjectFeedPage = observer(() => {
 						isUnavailable={serviceStatus.data !== 'ACTIVE'}
 						projectMeta={projectMeta}
 						allowCustomAttachments={isAdminMode}
+						fixedEvmNetwork={projectId === BlockchainProjectId.ETH_WHALES ? EVMNetwork.ETHEREUM : undefined}
 						onCreated={() => toast('Good job! Your post will appear shortly 🔥')}
 					/>
 				) : (
