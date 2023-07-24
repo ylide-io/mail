@@ -206,12 +206,12 @@ export const blockchainProjectsMeta: Record<BlockchainProjectId, BlockchainProje
 
 export const activeVenomProjects = [
 	BlockchainProjectId.VENOM_BLOCKCHAIN,
+	BlockchainProjectId.GRAVIX,
 	BlockchainProjectId.SNIPA,
 	BlockchainProjectId.WEB3_WORLD,
 	BlockchainProjectId.VENOM_BRIDGE,
 	BlockchainProjectId.OASIS_GALLERY,
 	BlockchainProjectId.VENTORY,
-	BlockchainProjectId.GRAVIX,
 	BlockchainProjectId.YLIDE,
 ];
 
