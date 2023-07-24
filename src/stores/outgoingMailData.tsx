@@ -62,7 +62,7 @@ export class OutgoingMailData {
 		});
 
 		autorun(async () => {
-			if (this.from?.wallet.factory.blockchainGroup === 'evm') {
+			if (this.network == null && this.from?.wallet.factory.blockchainGroup === 'evm') {
 				this.network = await getEvmWalletNetwork(this.from.wallet);
 			}
 		});

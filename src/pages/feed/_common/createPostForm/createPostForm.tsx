@@ -1,3 +1,4 @@
+import { EVMNetwork } from '@ylide/ethereum';
 import { MessageAttachmentLinkV1, MessageAttachmentType } from '@ylide/sdk';
 import clsx from 'clsx';
 import { observer } from 'mobx-react';
@@ -38,13 +39,22 @@ export interface CreatePostFormProps extends PropsWithClassName {
 	isUnavailable: boolean;
 	projectMeta: BlockchainProjectMeta;
 	allowCustomAttachments: boolean;
+	fixedEvmNetwork?: EVMNetwork;
 	onCreated?: () => void;
 }
 
 export const CreatePostForm = observer(
 	forwardRef(
 		(
-			{ className, accounts, isUnavailable, projectMeta, allowCustomAttachments, onCreated }: CreatePostFormProps,
+			{
+				className,
+				accounts,
+				isUnavailable,
+				projectMeta,
+				allowCustomAttachments,
+				fixedEvmNetwork,
+				onCreated,
+			}: CreatePostFormProps,
 			ref: Ref<CreatePostFormApi>,
 		) => {
 			const textAreaApiRef = useRef<AutoSizeTextAreaApi>(null);
@@ -58,6 +68,10 @@ export const CreatePostForm = observer(
 				mailData.feedId = projectMeta.feedId;
 				mailData.isGenericFeed = true;
 				mailData.extraPayment = '0';
+
+				if (fixedEvmNetwork != null) {
+					mailData.network = fixedEvmNetwork;
+				}
 
 				mailData.validator = () => {
 					const text = mailData.plainTextData;
@@ -364,7 +378,11 @@ export const CreatePostForm = observer(
 												/>
 											)}
 
-											<SendMailButton mailData={mailData} onSent={onSent} />
+											<SendMailButton
+												mailData={mailData}
+												disableNetworkSwitch={fixedEvmNetwork != null}
+												onSent={onSent}
+											/>
 										</>
 									)}
 								</div>
