@@ -15,6 +15,7 @@ import { Avatar } from '../../../../components/avatar/avatar';
 import { BlockChainLabel } from '../../../../components/BlockChainLabel/BlockChainLabel';
 import { GridRowBox } from '../../../../components/boxes/boxes';
 import { ErrorMessage, ErrorMessageLook } from '../../../../components/errorMessage/errorMessage';
+import { GalleryModal } from '../../../../components/galleryModal/galleryModal';
 import { NlToBr } from '../../../../components/nlToBr/nlToBr';
 import { ReadableDate } from '../../../../components/readableDate/readableDate';
 import { Recipients } from '../../../../components/recipientInput/recipientInput';
@@ -296,6 +297,11 @@ export function BlockchainProjectPostView({
 								className={isSticker ? css.sticker : css.cover}
 								alt="Attachment"
 								src={attachmentHttpUrl}
+								onClick={() => {
+									if (!isSticker) {
+										GalleryModal.show([attachmentHttpUrl]);
+									}
+								}}
 							/>
 						)}
 					</>
