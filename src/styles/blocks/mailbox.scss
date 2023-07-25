@@ -54,6 +54,9 @@
 
 .mailbox {
 	flex-grow: 1;
+
+	// https://trello.com/c/rsjN1lZZ/262-scrollbars-are-visible-sometimes-in-mailbox
+	overflow-x: hidden;
 }
 
 .mail-top {
