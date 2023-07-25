@@ -59,6 +59,7 @@ if (REACT_APP__APP_MODE === AppMode.OTC) {
 	Ylide.registerBlockchainFactory(evmBlockchainFactories[EVMNetwork.GNOSIS]);
 
 	Ylide.registerWalletFactory(evmWalletFactories.metamask);
+	Ylide.registerWalletFactory(evmWalletFactories.frontier);
 	Ylide.registerWalletFactory(evmWalletFactories.coinbase);
 	Ylide.registerWalletFactory(evmWalletFactories.trustwallet);
 	Ylide.registerWalletFactory(evmWalletFactories.binance);
@@ -108,6 +109,7 @@ if (REACT_APP__APP_MODE === AppMode.OTC) {
 	}
 
 	Ylide.registerWalletFactory(evmWalletFactories.metamask);
+	Ylide.registerWalletFactory(evmWalletFactories.frontier);
 	Ylide.registerWalletFactory(evmWalletFactories.coinbase);
 	Ylide.registerWalletFactory(evmWalletFactories.trustwallet);
 	Ylide.registerWalletFactory(evmWalletFactories.binance);
