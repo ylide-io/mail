@@ -28,6 +28,10 @@ class Analytics {
 		track('open_social', { type });
 	}
 
+	openCreateCommunityForm() {
+		track('open_create_communify_form');
+	}
+
 	// ACCOUNT
 
 	startConnectingWallet(place: string) {

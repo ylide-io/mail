@@ -88,6 +88,10 @@ export async function sendMessage({
 				const encrypted = secureContext.encrypt(uint8Array);
 				const uploaded = await ipfsStorage.uploadToIpfs(encrypted);
 
+				// Temp checks since SDK doesn't throw errors in case it occured
+				invariant(uploaded.hash);
+				invariant(uploaded.size);
+
 				return new MessageAttachmentLinkV1({
 					type: MessageAttachmentType.LINK_V1,
 					previewLink: '',
@@ -169,6 +173,10 @@ export async function broadcastMessage({
 				const buffer = await readFileAsArrayBuffer(file);
 				const uint8Array = new Uint8Array(buffer);
 				const uploaded = await ipfsStorage.uploadToIpfs(uint8Array);
+
+				// Temp checks since SDK doesn't throw errors in case it occured
+				invariant(uploaded.hash);
+				invariant(uploaded.size);
 
 				return new MessageAttachmentLinkV1({
 					type: MessageAttachmentType.LINK_V1,

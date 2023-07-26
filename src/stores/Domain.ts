@@ -25,12 +25,13 @@ import {
 	BrowserLocalStorage,
 	DynamicEncryptionRouter,
 	IGenericAccount,
+	IMessage,
 	WalletControllerFactory,
 	Ylide,
 	YlideKeyStore,
 } from '@ylide/sdk';
-import { makeObservable, observable, reaction } from 'mobx';
-import { useEffect, useMemo, useState } from 'react';
+import { makeObservable, observable } from 'mobx';
+import { useMemo } from 'react';
 
 import { NFT3NameService } from '../api/nft3DID';
 import { PasswordRequestModal } from '../components/passwordRequestModal/passwordRequestModal';
@@ -58,6 +59,7 @@ if (REACT_APP__APP_MODE === AppMode.OTC) {
 	Ylide.registerBlockchainFactory(evmBlockchainFactories[EVMNetwork.GNOSIS]);
 
 	Ylide.registerWalletFactory(evmWalletFactories.metamask);
+	Ylide.registerWalletFactory(evmWalletFactories.frontier);
 	Ylide.registerWalletFactory(evmWalletFactories.coinbase);
 	Ylide.registerWalletFactory(evmWalletFactories.trustwallet);
 	Ylide.registerWalletFactory(evmWalletFactories.binance);
@@ -107,6 +109,7 @@ if (REACT_APP__APP_MODE === AppMode.OTC) {
 	}
 
 	Ylide.registerWalletFactory(evmWalletFactories.metamask);
+	Ylide.registerWalletFactory(evmWalletFactories.frontier);
 	Ylide.registerWalletFactory(evmWalletFactories.coinbase);
 	Ylide.registerWalletFactory(evmWalletFactories.trustwallet);
 	Ylide.registerWalletFactory(evmWalletFactories.binance);
@@ -628,6 +631,21 @@ export class Domain {
 		this.availableWallets = await Ylide.getAvailableWallets();
 	}
 
+	async getMessageByMsgId(msgId: string): Promise<IMessage | null> {
+		for (const blockchain of Object.keys(this.blockchains)) {
+			const controller = this.blockchains[blockchain];
+			if (controller.isValidMsgId(msgId)) {
+				try {
+					return await controller.getMessageByMsgId(msgId);
+				} catch (err) {
+					console.error('Error getting message by msgId', err);
+					return null;
+				}
+			}
+		}
+		return null;
+	}
+
 	async init() {
 		if (this.initialized) {
 			return;
@@ -674,24 +692,16 @@ export class Domain {
 	}
 }
 
-export function useDomainAccounts() {
-	const [accounts, setAccounts] = useState(() => domain.accounts.activeAccounts);
-
-	useEffect(
-		() =>
-			reaction(
-				() => [...domain.accounts.activeAccounts],
-				arg => setAccounts(arg),
-			),
-		[],
-	);
-
-	return accounts;
-}
+//
 
 export function useVenomAccounts() {
-	const accounts = useDomainAccounts();
+	const accounts = domain.accounts.activeAccounts;
 	return useMemo(() => accounts.filter(a => a.wallet.wallet === 'venomwallet'), [accounts]);
+}
+
+export function useEvmAccounts() {
+	const accounts = domain.accounts.activeAccounts;
+	return useMemo(() => accounts.filter(a => a.wallet.factory.blockchainGroup === 'evm'), [accounts]);
 }
 
 //@ts-ignore

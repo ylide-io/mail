@@ -1,24 +1,29 @@
 import { autorun } from 'mobx';
 import { observer } from 'mobx-react';
 import { useEffect, useMemo, useRef, useState } from 'react';
+import { useQuery } from 'react-query';
 import { generatePath, useParams } from 'react-router-dom';
 
 import { ActionButton } from '../../../components/ActionButton/ActionButton';
 import { ContactName } from '../../../components/contactName/contactName';
+import { ErrorMessage } from '../../../components/errorMessage/errorMessage';
 import { FullPageContent } from '../../../components/genericLayout/content/fullPageContent/fullPageContent';
 import { GenericLayout } from '../../../components/genericLayout/genericLayout';
+import { OverlappingLoader } from '../../../components/overlappingLoader/overlappingLoader';
 import { Recipients } from '../../../components/recipientInput/recipientInput';
 import { Spinner } from '../../../components/spinner/spinner';
+import { toast } from '../../../components/toast/toast';
 import { ReactComponent as ArrowLeftSvg } from '../../../icons/ic20/arrowLeft.svg';
 import { ReactComponent as ContactSvg } from '../../../icons/ic20/contact.svg';
 import { ReactComponent as ForwardSvg } from '../../../icons/ic20/forward.svg';
 import { ReactComponent as ReplySvg } from '../../../icons/ic20/reply.svg';
 import { IMessageDecodedContent } from '../../../indexedDB/IndexedDB';
 import { analytics } from '../../../stores/Analytics';
-import { useDomainAccounts } from '../../../stores/Domain';
+import domain from '../../../stores/Domain';
 import { FolderId, ILinkedMessage, MailList, mailStore } from '../../../stores/MailList';
 import { OutgoingMailData } from '../../../stores/outgoingMailData';
 import { RoutePath } from '../../../stores/routePath';
+import { invariant } from '../../../utils/assert';
 import { DateFormatStyle, formatDate } from '../../../utils/date';
 import {
 	decodedTextDataToEditorJsData,
@@ -26,6 +31,7 @@ import {
 	plainTextToEditorJsData,
 	useOpenMailCompose,
 } from '../../../utils/mail';
+import { truncateInMiddle } from '../../../utils/string';
 import { useNav } from '../../../utils/url';
 import css from './mailDetailsPage.module.scss';
 import { MailMessage } from './mailMessage/mailMessage';
@@ -38,24 +44,54 @@ interface WrappedThreadMessage {
 export const MailDetailsPage = observer(() => {
 	const navigate = useNav();
 	const { folderId, id } = useParams<{ folderId: FolderId; id: string }>();
+	invariant(folderId);
+	invariant(id);
 
 	const openMailCompose = useOpenMailCompose();
 
-	const initialMessage = mailStore.lastMessagesList.find(m => m.id === id!);
-	const initialDecodedContent: IMessageDecodedContent | undefined =
-		initialMessage && mailStore.decodedMessagesById[initialMessage.msgId];
+	const accounts = domain.accounts.activeAccounts;
 
-	useEffect(() => {
-		if (id && initialDecodedContent) {
+	const messageQuery = useQuery(['mail-details', id, accounts.map(a => a.account.address).join(',')], {
+		queryFn: async () => {
+			let message = mailStore.lastMessagesList.find(m => m.id === id!);
+
+			if (!message) {
+				const [msgId, ...rest] = id.split(':');
+				const accountAddress = rest.join(':');
+				invariant(msgId, 'No msgId');
+				invariant(accountAddress, 'No account address');
+
+				const domainAccount = accounts.find(a => a.account.address === accountAddress);
+				invariant(domainAccount, () => {
+					toast(`Connect account ${truncateInMiddle(accountAddress, 8, '..')} to read this message 👍`);
+					return 'No account';
+				});
+
+				const msg = await domain.getMessageByMsgId(msgId);
+				invariant(msg);
+
+				message = await ILinkedMessage.fromIMessage(folderId, msg, domainAccount);
+			}
+
+			let decoded = message && mailStore.decodedMessagesById[message.msgId];
+
+			if (!decoded) {
+				await mailStore.decodeMessage(message.msgId, message.msg, message.recipient?.account);
+				decoded = mailStore.decodedMessagesById[message.msgId];
+				invariant(decoded, 'No decoded');
+			}
+
 			mailStore.markMessagesAsReaded([id]);
-		}
-	}, [id, initialDecodedContent]);
 
-	useEffect(() => {
-		if (!initialMessage || !initialDecodedContent) {
-			navigate(generatePath(RoutePath.MAIL_FOLDER, { folderId: folderId! }));
-		}
-	}, [initialDecodedContent, folderId, initialMessage, navigate]);
+			return {
+				message,
+				decoded,
+			};
+		},
+	});
+
+	const initialMessage = messageQuery.data?.message;
+	const initialDecoded = messageQuery.data?.decoded;
 
 	//
 
@@ -65,8 +101,6 @@ export const MailDetailsPage = observer(() => {
 	const [isThreadOpen, setThreadOpen] = useState(false);
 
 	const deletedMessageIds = mailStore.deletedMessageIds;
-
-	const accounts = useDomainAccounts();
 
 	const threadMailList = useMemo(() => {
 		if (folderId !== FolderId.Inbox || !initialMessage?.msg.senderAddress) return;
@@ -92,7 +126,7 @@ export const MailDetailsPage = observer(() => {
 	useEffect(
 		() =>
 			autorun(() => {
-				if (!threadMailList) return;
+				if (!threadMailList || !threadMailList.isActive) return;
 
 				if (!threadMailList.isNextPageAvailable) {
 					setWrappedThreadMessages(
@@ -189,7 +223,7 @@ export const MailDetailsPage = observer(() => {
 	return (
 		<GenericLayout>
 			<FullPageContent className={css.layout}>
-				{initialMessage && initialDecodedContent && (
+				{initialMessage && initialDecoded ? (
 					<div className={css.root}>
 						<div className={css.header}>
 							<ActionButton onClick={onBackClick} icon={<ArrowLeftSvg />} />
@@ -253,15 +287,12 @@ export const MailDetailsPage = observer(() => {
 							) : (
 								<MailMessage
 									message={initialMessage}
-									decoded={initialDecodedContent}
+									decoded={initialDecoded}
 									folderId={folderId}
 									onReplyClick={() =>
-										onReplyClick(
-											initialMessage.msg.senderAddress,
-											initialDecodedContent.decodedSubject,
-										)
+										onReplyClick(initialMessage.msg.senderAddress, initialDecoded.decodedSubject)
 									}
-									onForwardClick={() => onForwardClick(initialMessage, initialDecodedContent)}
+									onForwardClick={() => onForwardClick(initialMessage, initialDecoded)}
 									onDeleteClick={() => onDeleteClick(initialMessage)}
 								/>
 							)}
@@ -271,10 +302,7 @@ export const MailDetailsPage = observer(() => {
 							<div className={css.footer}>
 								<ActionButton
 									onClick={() =>
-										onReplyClick(
-											initialMessage.msg.senderAddress,
-											initialDecodedContent.decodedSubject,
-										)
+										onReplyClick(initialMessage.msg.senderAddress, initialDecoded.decodedSubject)
 									}
 									icon={<ReplySvg />}
 								>
@@ -282,7 +310,7 @@ export const MailDetailsPage = observer(() => {
 								</ActionButton>
 
 								<ActionButton
-									onClick={() => onForwardClick(initialMessage, initialDecodedContent)}
+									onClick={() => onForwardClick(initialMessage, initialDecoded)}
 									icon={<ForwardSvg />}
 								>
 									Forward
@@ -290,6 +318,10 @@ export const MailDetailsPage = observer(() => {
 							</div>
 						)}
 					</div>
+				) : messageQuery.isLoading ? (
+					<OverlappingLoader text="Loading message ..." />
+				) : (
+					<ErrorMessage style={{ margin: 20 }}>Couldn't load this message 😒</ErrorMessage>
 				)}
 			</FullPageContent>
 		</GenericLayout>

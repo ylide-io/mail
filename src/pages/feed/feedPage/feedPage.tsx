@@ -13,7 +13,7 @@ import { YlideLoader } from '../../../components/ylideLoader/ylideLoader';
 import { AppMode, REACT_APP__APP_MODE } from '../../../env';
 import { ReactComponent as ArrowUpSvg } from '../../../icons/ic20/arrowUp.svg';
 import { ReactComponent as CrossSvg } from '../../../icons/ic20/cross.svg';
-import { useDomainAccounts } from '../../../stores/Domain';
+import domain from '../../../stores/Domain';
 import { FeedStore, getFeedCategoryName } from '../../../stores/Feed';
 import { RoutePath } from '../../../stores/routePath';
 import { connectAccount } from '../../../utils/account';
@@ -22,9 +22,6 @@ import { useIsMatchingRoute, useNav } from '../../../utils/url';
 import { FeedPostItem } from '../_common/feedPostItem/feedPostItem';
 import css from './feedPage.module.scss';
 import ErrorCode = FeedServerApi.ErrorCode;
-import { Helmet } from 'react-helmet';
-
-import { APP_NAME } from '../../../constants';
 
 const reloadFeedCounter = observable.box(0);
 
@@ -36,7 +33,7 @@ export function reloadFeed() {
 
 const FeedPageContent = observer(() => {
 	const navigate = useNav();
-	const accounts = useDomainAccounts();
+	const accounts = domain.accounts.activeAccounts;
 	const genericLayoutApi = useGenericLayoutApi();
 
 	const { category, source, address } = useParams<{ category: FeedCategory; source: string; address: string }>();

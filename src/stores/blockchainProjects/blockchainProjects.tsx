@@ -2,7 +2,9 @@ import { Uint256 } from '@ylide/sdk';
 import { ReactNode } from 'react';
 
 import { VENOM_FEED_ID } from '../../constants';
+import { ReactComponent as EthWhalesSvg } from './icons/ethWhales.svg';
 import { ReactComponent as GeneralSvg } from './icons/general.svg';
+import { ReactComponent as GravixSvg } from './icons/gravix.svg';
 import { ReactComponent as NumiSvg } from './icons/numi.svg';
 import { ReactComponent as OasisGallerySvg } from './icons/oasisGallery.svg';
 import { ReactComponent as SnipaSvg } from './icons/snipa.svg';
@@ -20,6 +22,7 @@ import { ReactComponent as YlideSvg } from './icons/ylide.svg';
 
 export enum BlockchainProjectId {
 	GENERAL = 'general',
+	ETH_WHALES = 'eth_whales',
 
 	NUMI = 'numi',
 	OASIS_GALLERY = 'oasis_gallery',
@@ -33,6 +36,7 @@ export enum BlockchainProjectId {
 	WEB3_WORLD = 'web3_world',
 	YLIDE = 'ylide',
 	VENTORY = 'ventory',
+	GRAVIX = 'gravix',
 
 	TVM = 'tvm',
 	TVM_DISCUSSION = 'tvm_discussion',
@@ -57,6 +61,13 @@ export const blockchainProjectsMeta: Record<BlockchainProjectId, BlockchainProje
 		name: 'General chat',
 		description: 'General chat to meet your web3 frens.',
 		logo: <GeneralSvg />,
+	},
+	[BlockchainProjectId.ETH_WHALES]: {
+		id: BlockchainProjectId.ETH_WHALES,
+		feedId: '2000000000000000000000000000000000000000000000000000000000000004' as Uint256,
+		name: 'ETH Whales',
+		description: 'Here you can meet the fellow ETH supporters. Btw, messages are sent only via Ethereum chain 😉',
+		logo: <EthWhalesSvg />,
 	},
 
 	[BlockchainProjectId.NUMI]: {
@@ -158,6 +169,15 @@ export const blockchainProjectsMeta: Record<BlockchainProjectId, BlockchainProje
 		logo: <VentorySvg />,
 		website: 'https://testnet.ventory.gg/',
 	},
+	[BlockchainProjectId.GRAVIX]: {
+		id: BlockchainProjectId.GRAVIX,
+		feedId: '1000000000000000000000000000000000000000000000000000000000000011' as Uint256,
+		name: 'Gravix',
+		description:
+			'Derivatives DEX where you can trade a wide range of assets with up to 200x leverage and near-zero fees directly from your crypto wallet.',
+		logo: <GravixSvg />,
+		website: 'https://gravix.io/',
+	},
 
 	[BlockchainProjectId.TVM]: {
 		id: BlockchainProjectId.TVM,
@@ -186,6 +206,7 @@ export const blockchainProjectsMeta: Record<BlockchainProjectId, BlockchainProje
 
 export const activeVenomProjects = [
 	BlockchainProjectId.VENOM_BLOCKCHAIN,
+	BlockchainProjectId.GRAVIX,
 	BlockchainProjectId.SNIPA,
 	BlockchainProjectId.WEB3_WORLD,
 	BlockchainProjectId.VENOM_BRIDGE,

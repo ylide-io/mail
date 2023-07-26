@@ -15,6 +15,7 @@ import { Avatar } from '../../../../components/avatar/avatar';
 import { BlockChainLabel } from '../../../../components/BlockChainLabel/BlockChainLabel';
 import { GridRowBox } from '../../../../components/boxes/boxes';
 import { ErrorMessage, ErrorMessageLook } from '../../../../components/errorMessage/errorMessage';
+import { GalleryModal } from '../../../../components/galleryModal/galleryModal';
 import { NlToBr } from '../../../../components/nlToBr/nlToBr';
 import { ReadableDate } from '../../../../components/readableDate/readableDate';
 import { Recipients } from '../../../../components/recipientInput/recipientInput';
@@ -32,10 +33,11 @@ import { OutgoingMailData } from '../../../../stores/outgoingMailData';
 import { RoutePath } from '../../../../stores/routePath';
 import { generateBlockchainExplorerUrl } from '../../../../utils/blockchain';
 import { copyToClipboard } from '../../../../utils/clipboard';
-import { ipfsToHttpUrl } from '../../../../utils/ipfs';
+import { getIpfsHashFromUrl, ipfsToHttpUrl } from '../../../../utils/ipfs';
 import { useOpenMailCompose } from '../../../../utils/mail';
 import { useNav } from '../../../../utils/url';
 import { useShiftPressed } from '../../../../utils/useShiftPressed';
+import { stickerIpfsIds } from '../createPostForm/stickerIpfsIds';
 import { PostItemContainer } from '../postItemContainer/postItemContainer';
 import css from './blockchainProjectPost.module.scss';
 
@@ -113,6 +115,8 @@ export function BlockchainProjectPostView({
 
 	const attachment = post.decoded.attachments[0] as MessageAttachmentLinkV1 | undefined;
 	const attachmentHttpUrl = attachment && ipfsToHttpUrl(attachment.link);
+	const attachmentIpfsHash = attachment && getIpfsHashFromUrl(attachment.link);
+	const isSticker = !!attachmentIpfsHash && stickerIpfsIds.includes(attachmentIpfsHash);
 
 	const blockchain = post.original.blockchain;
 	const txId = post.msg.$$meta.tx?.hash || post.msg.$$meta.id;
@@ -288,7 +292,18 @@ export function BlockchainProjectPostView({
 							</div>
 						)}
 
-						{attachmentHttpUrl && <img className={css.cover} alt="Attachment" src={attachmentHttpUrl} />}
+						{attachmentHttpUrl && (
+							<img
+								className={isSticker ? css.sticker : css.cover}
+								alt="Attachment"
+								src={attachmentHttpUrl}
+								onClick={() => {
+									if (!isSticker) {
+										GalleryModal.show([attachmentHttpUrl]);
+									}
+								}}
+							/>
+						)}
 					</>
 				)}
 			</div>

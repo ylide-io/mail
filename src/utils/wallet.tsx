@@ -3,6 +3,7 @@ import { EVM_NAMES, EVMNetwork } from '@ylide/ethereum';
 import { BinanceWalletLogo } from '../icons/wallets/BinanceWalletLogo';
 import { CoinbaseWalletLogo } from '../icons/wallets/CoinbaseWalletLogo';
 import { EverscaleLogo } from '../icons/wallets/EverscaleLogo';
+import { FrontierLogo } from '../icons/wallets/FrontierLogo';
 import { MetaMaskLogo } from '../icons/wallets/MetaMaskLogo';
 import { TrustWalletLogo } from '../icons/wallets/TrustWalletLogo';
 import { VenomLogo } from '../icons/wallets/VenomLogo';
@@ -23,6 +24,28 @@ export const walletsMeta: Record<string, WalletMeta> = {
 		title: 'MetaMask',
 		logo: (s = 30) => <MetaMaskLogo size={s} />,
 		link: 'https://metamask.io/',
+		blockchains: [
+			EVM_NAMES[EVMNetwork.ETHEREUM],
+			EVM_NAMES[EVMNetwork.BNBCHAIN],
+			EVM_NAMES[EVMNetwork.POLYGON],
+			EVM_NAMES[EVMNetwork.AVALANCHE],
+			EVM_NAMES[EVMNetwork.OPTIMISM],
+			EVM_NAMES[EVMNetwork.ARBITRUM],
+			EVM_NAMES[EVMNetwork.FANTOM],
+			EVM_NAMES[EVMNetwork.KLAYTN],
+			EVM_NAMES[EVMNetwork.GNOSIS],
+			EVM_NAMES[EVMNetwork.AURORA],
+			EVM_NAMES[EVMNetwork.CELO],
+			EVM_NAMES[EVMNetwork.MOONBEAM],
+			EVM_NAMES[EVMNetwork.MOONRIVER],
+			EVM_NAMES[EVMNetwork.METIS],
+			EVM_NAMES[EVMNetwork.ASTAR],
+		],
+	},
+	'frontier': {
+		title: 'Frontier',
+		logo: (s = 30) => <FrontierLogo size={s} />,
+		link: 'https://www.frontier.xyz/',
 		blockchains: [
 			EVM_NAMES[EVMNetwork.ETHEREUM],
 			EVM_NAMES[EVMNetwork.BNBCHAIN],
