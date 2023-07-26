@@ -57,8 +57,8 @@ dependencies:
     specifier: 0.8.0-beta.58
     version: 0.8.0-beta.58(@ethersproject/abstract-signer@5.7.0)(@ethersproject/address@5.7.0)(@ethersproject/bignumber@5.7.0)(@ethersproject/bytes@5.7.0)(@ethersproject/contracts@5.7.0)(@ethersproject/keccak256@5.7.0)(@ethersproject/solidity@5.7.0)(@ethersproject/strings@5.7.0)(@ethersproject/transactions@5.7.0)(@ethersproject/web@5.7.1)
   '@ylide/everscale':
-    specifier: 0.8.0-beta.49
-    version: 0.8.0-beta.49
+    specifier: 0.8.0-beta.51
+    version: 0.8.0-beta.51
   '@ylide/sdk':
     specifier: 0.8.0-beta.25
     version: 0.8.0-beta.25
@@ -4393,8 +4393,8 @@ packages:
       - utf-8-validate
     dev: false
 
-  /@ylide/everscale@0.8.0-beta.49:
-    resolution: {integrity: sha512-q2C2u12j2j/Q533ktqC4fe9ElalOScuUjmMMkS8jQB8Wf0cAKhTyx5ohoWeWzi7Nepl3A5+hRnXvFHyDL2nQyQ==}
+  /@ylide/everscale@0.8.0-beta.51:
+    resolution: {integrity: sha512-D/DiPvdTPZa6n3FCCyzwXrY3PekIeQYxPb74jhUIOsPxLq3bAJl3V18+Ma0u8OdvN82viibS2zPczaO+nJFWyQ==}
     dependencies:
       '@ylide/sdk': 0.8.0-beta.25
       '@ylide/smart-buffer': 0.0.11
