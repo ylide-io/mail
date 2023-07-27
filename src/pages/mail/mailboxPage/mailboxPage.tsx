@@ -1,3 +1,4 @@
+import clsx from 'clsx';
 import { autorun } from 'mobx';
 import { observer } from 'mobx-react';
 import { useEffect, useMemo, useRef, useState } from 'react';
@@ -20,6 +21,7 @@ import { useWindowSize } from '../../../utils/useWindowSize';
 import MailboxEmpty from './mailboxEmpty/mailboxEmpty';
 import { MailboxHeader } from './mailboxHeader/mailboxHeader';
 import MailboxListRow from './mailboxListRow/mailboxListRow';
+import css from './mailboxPage.module.scss';
 
 /*
 Rendering lists using FixedSizeList requires that rows doesn't access any variables from the parent component.
@@ -211,54 +213,57 @@ export const MailboxPage = observer(() => {
 						}}
 					/>
 
-					<div className="mailbox">
+					<div className={clsx(css.content, mailList.messages.length && css.content_hasMessages)}>
 						{mailList.messages.length ? (
-							<AutoSizer>
-								{({ width, height }) => {
-									// noinspection JSUnusedGlobalSymbols
-									return (
-										<FixedSizeList<MailboxListItemData>
-											itemSize={itemSize}
-											width={width}
-											height={height}
-											style={{ padding: '0 0 12px' }}
-											itemData={{
-												messages: mailList.messages,
-												itemSize,
-												isSelected: (messageId: string) => selectedMessageIds.has(messageId),
-												onSelectClick: (messageId: string, isSelected: boolean) => {
-													const newSet = new Set(selectedMessageIds.values());
-													isSelected ? newSet.add(messageId) : newSet.delete(messageId);
+							<div className={css.list}>
+								<AutoSizer>
+									{({ width, height }) => {
+										// noinspection JSUnusedGlobalSymbols
+										return (
+											<FixedSizeList<MailboxListItemData>
+												itemSize={itemSize}
+												width={width}
+												height={height}
+												style={{ padding: '0 0 12px' }}
+												itemData={{
+													messages: mailList.messages,
+													itemSize,
+													isSelected: (messageId: string) =>
+														selectedMessageIds.has(messageId),
+													onSelectClick: (messageId: string, isSelected: boolean) => {
+														const newSet = new Set(selectedMessageIds.values());
+														isSelected ? newSet.add(messageId) : newSet.delete(messageId);
 
-													setSelectedMessageIds(newSet);
-												},
-												onFilterBySenderClick:
-													folderId === FolderId.Inbox && !filterBySender
-														? (senderAddress: string) => {
-																navigate({
-																	search: { sender: senderAddress },
-																});
-														  }
-														: undefined,
-											}}
-											initialScrollOffset={preservedState?.scrollOffset}
-											onScroll={props => {
-												listScrollOffset.current = props.scrollOffset;
+														setSelectedMessageIds(newSet);
+													},
+													onFilterBySenderClick:
+														folderId === FolderId.Inbox && !filterBySender
+															? (senderAddress: string) => {
+																	navigate({
+																		search: { sender: senderAddress },
+																	});
+															  }
+															: undefined,
+												}}
+												initialScrollOffset={preservedState?.scrollOffset}
+												onScroll={props => {
+													listScrollOffset.current = props.scrollOffset;
 
-												setScrollParams({
-													offset: props.scrollOffset,
-													height,
-												});
-											}}
-											itemCount={
-												mailList.messages.length + (mailList.isNextPageAvailable ? 1 : 0)
-											}
-										>
-											{MailboxListItem}
-										</FixedSizeList>
-									);
-								}}
-							</AutoSizer>
+													setScrollParams({
+														offset: props.scrollOffset,
+														height,
+													});
+												}}
+												itemCount={
+													mailList.messages.length + (mailList.isNextPageAvailable ? 1 : 0)
+												}
+											>
+												{MailboxListItem}
+											</FixedSizeList>
+										);
+									}}
+								</AutoSizer>
+							</div>
 						) : mailList.isLoading ? (
 							<div style={{ padding: '40px 0' }}>
 								<YlideLoader

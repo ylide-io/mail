@@ -1,0 +1,13 @@
+.content {
+	flex-grow: 1;
+
+	// https://trello.com/c/rsjN1lZZ/262-scrollbars-are-visible-sometimes-in-mailbox
+	overflow-x: hidden;
+}
+.content_hasMessages {
+	border-top: 1px solid var(--border-color);
+}
+
+.list {
+	height: 100%;
+}
