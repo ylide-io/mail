@@ -1,6 +1,6 @@
 import { autorun } from 'mobx';
 import { observer } from 'mobx-react';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { Helmet } from 'react-helmet';
 import { useParams, useSearchParams } from 'react-router-dom';
 import AutoSizer from 'react-virtualized-auto-sizer';
@@ -14,6 +14,7 @@ import { analytics } from '../../../stores/Analytics';
 import { browserStorage } from '../../../stores/browserStorage';
 import domain from '../../../stores/Domain';
 import { FolderId, ILinkedMessage, MailList, mailStore } from '../../../stores/MailList';
+import { usePreservedState } from '../../../utils/preservedState';
 import { useNav } from '../../../utils/url';
 import { useWindowSize } from '../../../utils/useWindowSize';
 import MailboxEmpty from './mailboxEmpty/mailboxEmpty';
@@ -60,6 +61,11 @@ export function MailboxListItem({ index, style, data }: ListChildComponentProps<
 }
 
 export const MailboxPage = observer(() => {
+	const preservedState = usePreservedState(() => ({
+		mailList,
+		scrollOffset: listScrollOffset.current,
+	}));
+
 	const navigate = useNav();
 
 	const params = useParams<{ folderId: FolderId }>();
@@ -77,7 +83,11 @@ export const MailboxPage = observer(() => {
 
 	const accounts = domain.accounts.activeAccounts;
 
-	const mailList = useMemo(() => {
+	const mailList: MailList = useMemo(() => {
+		if (preservedState?.mailList) {
+			return preservedState.mailList;
+		}
+
 		const list = new MailList();
 
 		list.init({
@@ -93,7 +103,7 @@ export const MailboxPage = observer(() => {
 		});
 
 		return list;
-	}, [accounts, deletedMessageIds, filterBySender, folderId]);
+	}, [accounts, deletedMessageIds, filterBySender, folderId, preservedState]);
 
 	useEffect(() => () => mailList.destroy(), [mailList]);
 
@@ -142,6 +152,8 @@ export const MailboxPage = observer(() => {
 			};
 		}
 	}, [folderId, accounts]);
+
+	const listScrollOffset = useRef(0);
 
 	return (
 		<GenericLayout>
@@ -215,7 +227,10 @@ export const MailboxPage = observer(() => {
 														  }
 														: undefined,
 											}}
+											initialScrollOffset={preservedState?.scrollOffset}
 											onScroll={props => {
+												listScrollOffset.current = props.scrollOffset;
+
 												setScrollParams({
 													offset: props.scrollOffset,
 													height,
