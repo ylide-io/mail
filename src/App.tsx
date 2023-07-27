@@ -116,7 +116,7 @@ export const App = observer(() => {
 					setInitError(true);
 					console.log('Initialization error: ', JSON.stringify(err), err);
 				})
-				.finally(() => console.log(`Initialization took ${Date.now() - start}ms`));
+				.finally(() => console.debug(`Initialization took ${Date.now() - start}ms`));
 		}
 	}, [isTestPage]);
 

@@ -559,7 +559,7 @@ export class Domain {
 		let last = Date.now();
 		const tick = (t: string) => {
 			const now = Date.now();
-			console.log(t, now - last + 'ms');
+			console.debug(t, now - last + 'ms');
 			last = now;
 		};
 
@@ -571,7 +571,7 @@ export class Domain {
 				!this.walletControllers[factory.blockchainGroup] ||
 				!this.walletControllers[factory.blockchainGroup][factory.wallet]
 			) {
-				console.log('Initing wallet: ', factory.wallet);
+				console.debug('Initing wallet: ', factory.wallet);
 				await this.initWallet(factory);
 				tick('wallet ' + factory.wallet + ' inited');
 			}
@@ -653,7 +653,7 @@ export class Domain {
 		let last = Date.now();
 		const tick = (t: string) => {
 			const now = Date.now();
-			console.log(t, now - last + 'ms');
+			console.debug(t, now - last + 'ms');
 			last = now;
 		};
 		await this.reloadAvailableWallets();
