@@ -15,9 +15,12 @@ export function useHistoryState() {
 
 	const setState = useCallback(
 		(state: HistoryState) => {
-			navigate('', { state, replace: true });
+			navigate(
+				{ path: location.pathname, search: location.search, hash: location.hash },
+				{ state, replace: true },
+			);
 		},
-		[navigate],
+		[location.hash, location.pathname, location.search, navigate],
 	);
 
 	const patchState = useCallback(

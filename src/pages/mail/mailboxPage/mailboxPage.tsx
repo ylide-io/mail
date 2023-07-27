@@ -72,7 +72,7 @@ export const MailboxPage = observer(() => {
 	const accounts = domain.accounts.activeAccounts;
 
 	const preservedState = usePreservedState({
-		key: ['mailbox', folderId],
+		key: ['mailbox', folderId, filterBySender || ''],
 		factory: () => ({
 			mailList,
 			accounts: accounts.map(a => a.account.address).sort(),
