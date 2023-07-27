@@ -73,13 +73,20 @@ export const MailboxPage = observer(() => {
 
 	const accounts = domain.accounts.activeAccounts;
 
+	const stateKey = ['mailbox', folderId, filterBySender || ''];
 	const preservedState = usePreservedState({
-		key: ['mailbox', folderId, filterBySender || ''],
-		factory: () => ({
-			mailList,
-			accounts: accounts.map(a => a.account.address).sort(),
-			scrollOffset: listScrollOffset.current,
-		}),
+		key: stateKey,
+		factory: () => {
+			if (!filterBySender) {
+				return {
+					mailList,
+					accounts: accounts.map(a => a.account.address).sort(),
+					scrollOffset: listScrollOffset.current,
+				};
+			} else {
+				mailList.destroy();
+			}
+		},
 		validate: state =>
 			state.accounts.join() ===
 			accounts
@@ -167,12 +174,8 @@ export const MailboxPage = observer(() => {
 
 	const listScrollOffset = useRef(0);
 
-	// Key is needed to reset List scroll when the page state restored
-	// noinspection UnnecessaryLocalVariableJS
-	const key = folderId;
-
 	return (
-		<GenericLayout key={key}>
+		<GenericLayout key={stateKey.join()}>
 			<Helmet>
 				<title>Decentralized Web3 Mailbox by Ylide for secure and private communication</title>
 				<meta

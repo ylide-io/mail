@@ -15,7 +15,7 @@ interface UsePreservedStateParams<T> {
 	 * Will be called on page unmounting.
 	 * Should return data that will be restored if user would return to this page again.
 	 */
-	factory: () => T;
+	factory: () => T | undefined;
 
 	/**
 	 * Will be called before restoring state on page mounting.
@@ -47,7 +47,7 @@ export function usePreservedState<T>(params: UsePreservedStateParams<T>): T | un
 		};
 	}, [factoryRef, key]);
 
-	if (params.validate && data.hasOwnProperty(key) && !params.validate(data[key])) {
+	if (params.validate && data[key] !== undefined && !params.validate(data[key])) {
 		delete data[key];
 	}
 
