@@ -17,7 +17,7 @@ import {
 	YLIDE_MAIN_FEED_ID,
 } from '@ylide/sdk';
 import { autobind } from 'core-decorators';
-import { computed, makeAutoObservable, makeObservable, observable, transaction } from 'mobx';
+import { computed, makeAutoObservable, makeObservable, observable, reaction, transaction } from 'mobx';
 import { nanoid } from 'nanoid';
 
 import { VENOM_FEED_ID } from '../constants';
@@ -384,6 +384,14 @@ class MailStore {
 
 	constructor() {
 		makeAutoObservable(this);
+
+		// Reset when account list changes
+		reaction(
+			() => domain.accounts.activeAccounts,
+			() => (this.lastMessagesList = []),
+		);
+
+		this.init();
 	}
 
 	async init() {

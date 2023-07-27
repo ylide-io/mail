@@ -42,7 +42,6 @@ import { walletsMeta } from '../utils/wallet';
 import { Accounts } from './Accounts';
 import contacts from './Contacts';
 import { EverwalletProxy } from './EverwalletProxy';
-import { mailStore } from './MailList';
 import { Wallet } from './models/Wallet';
 import { OTCStore } from './OTC';
 import tags from './Tags';
@@ -670,8 +669,6 @@ export class Domain {
 		tick('contacts.init();');
 		await tags.getTags();
 		tick('tags.getTags();');
-		await mailStore.init();
-		tick('mailStore.init();');
 		this.initialized = true;
 
 		// hacks for VenomWallet again :(

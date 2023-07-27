@@ -73,7 +73,7 @@ export const MailDetailsPage = observer(() => {
 				message = await ILinkedMessage.fromIMessage(folderId, msg, domainAccount);
 			}
 
-			let decoded = message && mailStore.decodedMessagesById[message.msgId];
+			let decoded = mailStore.decodedMessagesById[message.msgId];
 
 			if (!decoded) {
 				await mailStore.decodeMessage(message.msgId, message.msg, message.recipient?.account);
