@@ -6,7 +6,21 @@ import { useLatest } from './useLatest';
 
 const data: Record<string, any> = {};
 
-export function usePreservedState<T>(factory: () => T): T | undefined {
+interface UsePreservedStateParams<T> {
+	/**
+	 * Will be called on page unmounting.
+	 * Should return data that will be restored if user would return to this page again.
+	 */
+	factory: () => T;
+
+	/**
+	 * Will be called before restoring state on page mounting.
+	 * If return 'false', then state won't be restored, and the hook will return 'undefined'.
+	 */
+	validate?: (state: T) => boolean;
+}
+
+export function usePreservedState<T>(params: UsePreservedStateParams<T>): T | undefined {
 	const historyState = useHistoryState();
 
 	const id = useMemo(() => historyState.state.preservedStateId || nanoid(), [historyState]);
@@ -17,7 +31,7 @@ export function usePreservedState<T>(factory: () => T): T | undefined {
 		}
 	}, [historyState, id]);
 
-	const factoryRef = useLatest(factory);
+	const factoryRef = useLatest(params.factory);
 
 	useEffect(() => {
 		return () => {
@@ -25,6 +39,10 @@ export function usePreservedState<T>(factory: () => T): T | undefined {
 			data[id] = factoryRef.current();
 		};
 	}, [factoryRef, id]);
+
+	if (params.validate && data.hasOwnProperty(id) && !params.validate(data[id])) {
+		delete data[id];
+	}
 
 	return data[id];
 }

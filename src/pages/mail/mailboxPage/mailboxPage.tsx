@@ -61,10 +61,21 @@ export function MailboxListItem({ index, style, data }: ListChildComponentProps<
 }
 
 export const MailboxPage = observer(() => {
-	const preservedState = usePreservedState(() => ({
-		mailList,
-		scrollOffset: listScrollOffset.current,
-	}));
+	const accounts = domain.accounts.activeAccounts;
+
+	const preservedState = usePreservedState({
+		factory: () => ({
+			mailList,
+			accounts: accounts.map(a => a.account.address).sort(),
+			scrollOffset: listScrollOffset.current,
+		}),
+		validate: state =>
+			state.accounts.join() ===
+			accounts
+				.map(a => a.account.address)
+				.sort()
+				.join(),
+	});
 
 	const navigate = useNav();
 
@@ -80,8 +91,6 @@ export const MailboxPage = observer(() => {
 	}, [folderId]);
 
 	const deletedMessageIds = mailStore.deletedMessageIds;
-
-	const accounts = domain.accounts.activeAccounts;
 
 	const mailList: MailList = useMemo(() => {
 		if (preservedState?.mailList) {
