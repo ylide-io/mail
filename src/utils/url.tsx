@@ -8,7 +8,7 @@ export function toAbsoluteUrl(path: string) {
 }
 
 export function createCleanSerachParams(search: Record<string, any>) {
-	return createSearchParams(filterObjectEntries(search, (key, value) => value != null));
+	return createSearchParams(filterObjectEntries(search, (_, value) => value != null));
 }
 
 //
@@ -31,9 +31,7 @@ export const useNav = () => {
 	const navigate = useNavigate();
 
 	return (value: string | UseNavParameters, options?: NavigateOptions) => {
-		const params: UseNavParameters = typeof value === 'string' ? { path: value } : value;
-
-		navigate(buildUrl(params), options);
+		navigate(buildUrl(value), options);
 	};
 };
 
