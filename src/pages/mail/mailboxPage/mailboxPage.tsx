@@ -1,6 +1,7 @@
+import clsx from 'clsx';
 import { autorun } from 'mobx';
 import { observer } from 'mobx-react';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { Helmet } from 'react-helmet';
 import { useParams, useSearchParams } from 'react-router-dom';
 import AutoSizer from 'react-virtualized-auto-sizer';
@@ -14,11 +15,13 @@ import { analytics } from '../../../stores/Analytics';
 import { browserStorage } from '../../../stores/browserStorage';
 import domain from '../../../stores/Domain';
 import { FolderId, ILinkedMessage, MailList, mailStore } from '../../../stores/MailList';
+import { usePreservedState } from '../../../utils/preservedState';
 import { useNav } from '../../../utils/url';
 import { useWindowSize } from '../../../utils/useWindowSize';
 import MailboxEmpty from './mailboxEmpty/mailboxEmpty';
 import { MailboxHeader } from './mailboxHeader/mailboxHeader';
 import MailboxListRow from './mailboxListRow/mailboxListRow';
+import css from './mailboxPage.module.scss';
 
 /*
 Rendering lists using FixedSizeList requires that rows doesn't access any variables from the parent component.
@@ -68,6 +71,30 @@ export const MailboxPage = observer(() => {
 	const folderId = params.folderId || FolderId.Inbox;
 	const filterBySender = searchParams.get('sender') || undefined;
 
+	const accounts = domain.accounts.activeAccounts;
+
+	const stateKey = ['mailbox', folderId, filterBySender || ''];
+	const preservedState = usePreservedState({
+		key: stateKey,
+		factory: () => {
+			if (!filterBySender) {
+				return {
+					mailList,
+					accounts: accounts.map(a => a.account.address).sort(),
+					scrollOffset: listScrollOffset.current,
+				};
+			} else {
+				mailList.destroy();
+			}
+		},
+		validate: state =>
+			state.accounts.join() ===
+			accounts
+				.map(a => a.account.address)
+				.sort()
+				.join(),
+	});
+
 	useEffect(() => {
 		mailStore.lastActiveFolderId = folderId;
 		analytics.mailFolderOpened(folderId);
@@ -75,9 +102,11 @@ export const MailboxPage = observer(() => {
 
 	const deletedMessageIds = mailStore.deletedMessageIds;
 
-	const accounts = domain.accounts.activeAccounts;
+	const mailList: MailList = useMemo(() => {
+		if (preservedState?.mailList) {
+			return preservedState.mailList;
+		}
 
-	const mailList = useMemo(() => {
 		const list = new MailList();
 
 		list.init({
@@ -93,7 +122,7 @@ export const MailboxPage = observer(() => {
 		});
 
 		return list;
-	}, [accounts, deletedMessageIds, filterBySender, folderId]);
+	}, [accounts, deletedMessageIds, filterBySender, folderId, preservedState]);
 
 	useEffect(() => () => mailList.destroy(), [mailList]);
 
@@ -143,8 +172,10 @@ export const MailboxPage = observer(() => {
 		}
 	}, [folderId, accounts]);
 
+	const listScrollOffset = useRef(0);
+
 	return (
-		<GenericLayout>
+		<GenericLayout key={stateKey.join()}>
 			<Helmet>
 				<title>Decentralized Web3 Mailbox by Ylide for secure and private communication</title>
 				<meta
@@ -185,51 +216,57 @@ export const MailboxPage = observer(() => {
 						}}
 					/>
 
-					<div className="mailbox">
+					<div className={clsx(css.content, mailList.messages.length && css.content_hasMessages)}>
 						{mailList.messages.length ? (
-							<AutoSizer>
-								{({ width, height }) => {
-									// noinspection JSUnusedGlobalSymbols
-									return (
-										<FixedSizeList<MailboxListItemData>
-											itemSize={itemSize}
-											width={width}
-											height={height}
-											style={{ padding: '0 0 12px' }}
-											itemData={{
-												messages: mailList.messages,
-												itemSize,
-												isSelected: (messageId: string) => selectedMessageIds.has(messageId),
-												onSelectClick: (messageId: string, isSelected: boolean) => {
-													const newSet = new Set(selectedMessageIds.values());
-													isSelected ? newSet.add(messageId) : newSet.delete(messageId);
+							<div className={css.list}>
+								<AutoSizer>
+									{({ width, height }) => {
+										// noinspection JSUnusedGlobalSymbols
+										return (
+											<FixedSizeList<MailboxListItemData>
+												itemSize={itemSize}
+												width={width}
+												height={height}
+												style={{ padding: '0 0 12px' }}
+												itemData={{
+													messages: mailList.messages,
+													itemSize,
+													isSelected: (messageId: string) =>
+														selectedMessageIds.has(messageId),
+													onSelectClick: (messageId: string, isSelected: boolean) => {
+														const newSet = new Set(selectedMessageIds.values());
+														isSelected ? newSet.add(messageId) : newSet.delete(messageId);
 
-													setSelectedMessageIds(newSet);
-												},
-												onFilterBySenderClick:
-													folderId === FolderId.Inbox && !filterBySender
-														? (senderAddress: string) => {
-																navigate({
-																	search: { sender: senderAddress },
-																});
-														  }
-														: undefined,
-											}}
-											onScroll={props => {
-												setScrollParams({
-													offset: props.scrollOffset,
-													height,
-												});
-											}}
-											itemCount={
-												mailList.messages.length + (mailList.isNextPageAvailable ? 1 : 0)
-											}
-										>
-											{MailboxListItem}
-										</FixedSizeList>
-									);
-								}}
-							</AutoSizer>
+														setSelectedMessageIds(newSet);
+													},
+													onFilterBySenderClick:
+														folderId === FolderId.Inbox && !filterBySender
+															? (senderAddress: string) => {
+																	navigate({
+																		search: { sender: senderAddress },
+																	});
+															  }
+															: undefined,
+												}}
+												initialScrollOffset={preservedState?.scrollOffset}
+												onScroll={props => {
+													listScrollOffset.current = props.scrollOffset;
+
+													setScrollParams({
+														offset: props.scrollOffset,
+														height,
+													});
+												}}
+												itemCount={
+													mailList.messages.length + (mailList.isNextPageAvailable ? 1 : 0)
+												}
+											>
+												{MailboxListItem}
+											</FixedSizeList>
+										);
+									}}
+								</AutoSizer>
+							</div>
 						) : mailList.isLoading ? (
 							<div style={{ padding: '40px 0' }}>
 								<YlideLoader

@@ -17,7 +17,7 @@ import {
 	YLIDE_MAIN_FEED_ID,
 } from '@ylide/sdk';
 import { autobind } from 'core-decorators';
-import { computed, makeAutoObservable, makeObservable, observable, transaction } from 'mobx';
+import { computed, makeAutoObservable, makeObservable, observable, reaction, transaction } from 'mobx';
 import { nanoid } from 'nanoid';
 
 import { VENOM_FEED_ID } from '../constants';
@@ -224,9 +224,8 @@ export class MailList<M = ILinkedMessage> {
 
 			const newStream = new ListSourceDrainer(new ListSourceMultiplexer(buildMailboxSources()));
 			const start = Date.now();
-			// debugger;
 			const { dispose } = await newStream.connect('Mailer', this.onNewMessages.bind(this, newStream));
-			console.log('MailList init', this.id, Date.now() - start);
+			console.debug('MailList init', this.id, Date.now() - start);
 			this.streamDisposer = dispose;
 			await newStream.resetFilter(m => {
 				return mailbox.filter ? mailbox.filter(wrapMessageId(m)) : true;
@@ -259,7 +258,7 @@ export class MailList<M = ILinkedMessage> {
 			const newStream = new ListSourceDrainer(new ListSourceMultiplexer(await buildVenomFources()));
 			const start = Date.now();
 			const { dispose } = await newStream.connect('Mailer', this.onNewMessages.bind(this, newStream));
-			console.log('MailList init', this.id, Date.now() - start);
+			console.debug('MailList init', this.id, Date.now() - start);
 			this.streamDisposer = dispose;
 			this.stream = newStream;
 			await this.reloadMessages();
@@ -348,12 +347,12 @@ export class MailList<M = ILinkedMessage> {
 
 		this.isLoading = true;
 
-		console.log('loadNextPage');
+		console.debug('loadNextPage');
 
 		try {
 			const start = Date.now();
 			await this.stream.loadNextPage('MailList');
-			console.log('loadNextPage done', Date.now() - start);
+			console.debug('loadNextPage done', Date.now() - start);
 			await this.reloadMessages();
 		} catch (e) {
 			transaction(() => {
@@ -385,6 +384,14 @@ class MailStore {
 
 	constructor() {
 		makeAutoObservable(this);
+
+		// Reset when account list changes
+		reaction(
+			() => domain.accounts.activeAccounts,
+			() => (this.lastMessagesList = []),
+		);
+
+		this.init();
 	}
 
 	async init() {
