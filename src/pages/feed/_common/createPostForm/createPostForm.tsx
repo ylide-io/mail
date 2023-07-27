@@ -12,7 +12,6 @@ import { AnchoredPopup } from '../../../../components/popup/anchoredPopup/anchor
 import { PropsWithClassName } from '../../../../components/props';
 import { Spinner } from '../../../../components/spinner/spinner';
 import { toast } from '../../../../components/toast/toast';
-import { VENOM_FEED_ID } from '../../../../constants';
 import { ReactComponent as TrashSvg } from '../../../../icons/ic20/trash.svg';
 import { ReactComponent as ImageSvg } from '../../../../icons/ic28/image.svg';
 import { ReactComponent as StickerSvg } from '../../../../icons/ic28/sticker.svg';
@@ -65,13 +64,15 @@ export const CreatePostForm = observer(
 				const mailData = new OutgoingMailData();
 
 				mailData.mode = OutgoingMailDataMode.BROADCAST;
-				mailData.feedId = projectMeta.feedId;
 				mailData.isGenericFeed = true;
 				mailData.extraPayment = '0';
 
-				if (fixedEvmNetwork != null) {
-					mailData.network = fixedEvmNetwork;
-				}
+				return mailData;
+			}, []);
+
+			useEffect(() => {
+				mailData.feedId = projectMeta.feedId;
+				mailData.network = fixedEvmNetwork;
 
 				mailData.validator = () => {
 					const text = mailData.plainTextData;
@@ -103,9 +104,7 @@ export const CreatePostForm = observer(
 
 					return true;
 				};
-
-				return mailData;
-			}, [projectMeta.feedId, projectMeta.id, replyTo]);
+			}, [fixedEvmNetwork, mailData, projectMeta, replyTo]);
 
 			useEffect(() => {
 				mailData.from = mailData.from && accounts.includes(mailData.from) ? mailData.from : accounts[0];
@@ -196,14 +195,13 @@ export const CreatePostForm = observer(
 			const onSent = () => {
 				analytics.blockchainFeedSendSuccessful(projectMeta.id, !!replyTo, replyTo?.original.id);
 
-				mailData.reset({
-					mode: OutgoingMailDataMode.BROADCAST,
-					feedId: VENOM_FEED_ID,
-					from: mailData.from,
-				});
+				mailData.plainTextData = '';
+				mailData.attachments = [];
+				mailData.attachmentFiles = [];
 
 				setReplyTo(undefined);
 				setExpanded(false);
+				setPreviewSrc('');
 
 				onCreated?.();
 			};
@@ -318,7 +316,16 @@ export const CreatePostForm = observer(
 										<div>Can't post now. Wait a minute.</div>
 									) : (
 										<>
-											{!allowCustomAttachments ? (
+											{allowCustomAttachments ? (
+												<ActionButton
+													isDisabled={isPreviewLoading || mailData.sending}
+													size={ActionButtonSize.MEDIUM}
+													look={ActionButtonLook.LITE}
+													icon={<ImageSvg />}
+													title="Attach image"
+													onClick={attachFile}
+												/>
+											) : (
 												<>
 													<ActionButton
 														ref={stickerButtonRef}
@@ -353,29 +360,6 @@ export const CreatePostForm = observer(
 														</AnchoredPopup>
 													)}
 												</>
-											) : mailData.attachments.length ? (
-												<ActionButton
-													isDisabled={mailData.sending}
-													size={ActionButtonSize.MEDIUM}
-													look={ActionButtonLook.DANGEROUS}
-													icon={<TrashSvg />}
-													title="Remove attachment"
-													onClick={() => {
-														setPreviewSrc('');
-														mailData.attachments = [];
-													}}
-												>
-													Attachment
-												</ActionButton>
-											) : (
-												<ActionButton
-													isDisabled={isPreviewLoading || mailData.sending}
-													size={ActionButtonSize.MEDIUM}
-													look={ActionButtonLook.LITE}
-													icon={<ImageSvg />}
-													title="Attach image"
-													onClick={attachFile}
-												/>
 											)}
 
 											<SendMailButton

@@ -239,9 +239,7 @@ export class OutgoingMailData {
 				if (this.isGenericFeed) {
 					const comissions = await BlockchainFeedApi.getComissions({ feedId: this.feedId });
 					const comission = calcComissions(blockchain, comissions);
-					if (comission !== this.extraPayment) {
-						throw new Error('Comissions mismatch');
-					}
+					invariant(comission === this.extraPayment, 'Comissions mismatch');
 				}
 				const result = await broadcastMessage({
 					sender: this.from,
