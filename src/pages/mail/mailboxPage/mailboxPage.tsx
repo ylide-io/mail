@@ -61,9 +61,18 @@ export function MailboxListItem({ index, style, data }: ListChildComponentProps<
 }
 
 export const MailboxPage = observer(() => {
+	const navigate = useNav();
+
+	const params = useParams<{ folderId: FolderId }>();
+	const [searchParams] = useSearchParams();
+
+	const folderId = params.folderId || FolderId.Inbox;
+	const filterBySender = searchParams.get('sender') || undefined;
+
 	const accounts = domain.accounts.activeAccounts;
 
 	const preservedState = usePreservedState({
+		key: ['mailbox', folderId],
 		factory: () => ({
 			mailList,
 			accounts: accounts.map(a => a.account.address).sort(),
@@ -76,14 +85,6 @@ export const MailboxPage = observer(() => {
 				.sort()
 				.join(),
 	});
-
-	const navigate = useNav();
-
-	const params = useParams<{ folderId: FolderId }>();
-	const [searchParams] = useSearchParams();
-
-	const folderId = params.folderId || FolderId.Inbox;
-	const filterBySender = searchParams.get('sender') || undefined;
 
 	useEffect(() => {
 		mailStore.lastActiveFolderId = folderId;
@@ -164,8 +165,12 @@ export const MailboxPage = observer(() => {
 
 	const listScrollOffset = useRef(0);
 
+	// Key is needed to reset List scroll when the page state restored
+	// noinspection UnnecessaryLocalVariableJS
+	const key = folderId;
+
 	return (
-		<GenericLayout>
+		<GenericLayout key={key}>
 			<Helmet>
 				<title>Decentralized Web3 Mailbox by Ylide for secure and private communication</title>
 				<meta

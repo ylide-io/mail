@@ -4,9 +4,13 @@ import { useEffect, useMemo } from 'react';
 import { useHistoryState } from './history';
 import { useLatest } from './useLatest';
 
+const KEY_SEPARATOR = '|@|';
+
 const data: Record<string, any> = {};
 
 interface UsePreservedStateParams<T> {
+	key?: string[];
+
 	/**
 	 * Will be called on page unmounting.
 	 * Should return data that will be restored if user would return to this page again.
@@ -23,26 +27,29 @@ interface UsePreservedStateParams<T> {
 export function usePreservedState<T>(params: UsePreservedStateParams<T>): T | undefined {
 	const historyState = useHistoryState();
 
-	const id = useMemo(() => historyState.state.preservedStateId || nanoid(), [historyState]);
+	const key = useMemo(
+		() => params.key?.join(KEY_SEPARATOR) || historyState.state.preservedStateKey || nanoid(),
+		[historyState.state.preservedStateKey, params.key],
+	);
 
 	useEffect(() => {
-		if (historyState.state.preservedStateId !== id) {
-			historyState.patchState({ preservedStateId: id });
+		if (historyState.state.preservedStateKey !== key) {
+			historyState.patchState({ preservedStateKey: key });
 		}
-	}, [historyState, id]);
+	}, [historyState, key]);
 
 	const factoryRef = useLatest(params.factory);
 
 	useEffect(() => {
 		return () => {
 			// eslint-disable-next-line react-hooks/exhaustive-deps
-			data[id] = factoryRef.current();
+			data[key] = factoryRef.current();
 		};
-	}, [factoryRef, id]);
+	}, [factoryRef, key]);
 
-	if (params.validate && data.hasOwnProperty(id) && !params.validate(data[id])) {
-		delete data[id];
+	if (params.validate && data.hasOwnProperty(key) && !params.validate(data[key])) {
+		delete data[key];
 	}
 
-	return data[id];
+	return data[key];
 }

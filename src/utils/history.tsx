@@ -4,7 +4,7 @@ import { useLocation } from 'react-router-dom';
 import { useNav } from './url';
 
 export type HistoryState = Partial<{
-	preservedStateId: string;
+	preservedStateKey: string;
 }>;
 
 export function useHistoryState() {
