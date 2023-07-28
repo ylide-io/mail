@@ -15,7 +15,8 @@ import { analytics } from '../../../stores/Analytics';
 import { browserStorage } from '../../../stores/browserStorage';
 import domain from '../../../stores/Domain';
 import { FolderId, ILinkedMessage, MailList, mailStore } from '../../../stores/MailList';
-import { useNav } from '../../../utils/url';
+import { RoutePath } from '../../../stores/routePath';
+import { useIsMatchingRoute, useNav } from '../../../utils/url';
 import { useWindowSize } from '../../../utils/useWindowSize';
 import MailboxEmpty from './mailboxEmpty/mailboxEmpty';
 import { MailboxHeader } from './mailboxHeader/mailboxHeader';
@@ -69,6 +70,8 @@ export const MailboxPage = observer(() => {
 
 	const folderId = params.folderId || FolderId.Inbox;
 	const filterBySender = searchParams.get('sender') || undefined;
+
+	const isMailboxRoot = useIsMatchingRoute(RoutePath.MAIL_FOLDER);
 
 	const accounts = domain.accounts.activeAccounts;
 
@@ -156,100 +159,107 @@ export const MailboxPage = observer(() => {
 			</Helmet>
 
 			<FullPageContent>
-				<div className="mailbox-page">
-					<MailboxHeader
-						folderId={folderId!}
-						messages={mailList.messages}
-						selectedMessageIds={selectedMessageIds}
-						filterBySender={filterBySender}
-						isAllSelected={isAllSelected}
-						onSelectAllCheckBoxClick={isChecked => {
-							setSelectedMessageIds(isChecked ? new Set(mailList.messages.map(it => it.id)) : new Set());
-						}}
-						onMarkReadClick={() => {
-							analytics.markMailAsRead(selectedMessageIds.size);
-							mailStore.markMessagesAsReaded(Array.from(selectedMessageIds));
-							setSelectedMessageIds(new Set());
-						}}
-						onDeleteClick={() => {
-							analytics.archiveMail('mailbox', selectedMessageIds.size);
-							mailStore.markMessagesAsDeleted(
-								mailList.messages.filter(it => selectedMessageIds.has(it.id)),
-							);
-							setSelectedMessageIds(new Set());
-						}}
-						onRestoreClick={() => {
-							analytics.restoreMail('mailbox', selectedMessageIds.size);
-							mailStore.markMessagesAsNotDeleted(
-								mailList.messages.filter(it => selectedMessageIds.has(it.id)),
-							);
-							setSelectedMessageIds(new Set());
-						}}
-					/>
+				<div className={css.root}>
+					<div className={clsx(css.main, isMailboxRoot || css.main_hidden)}>
+						<MailboxHeader
+							folderId={folderId!}
+							messages={mailList.messages}
+							selectedMessageIds={selectedMessageIds}
+							filterBySender={filterBySender}
+							isAllSelected={isAllSelected}
+							onSelectAllCheckBoxClick={isChecked => {
+								setSelectedMessageIds(
+									isChecked ? new Set(mailList.messages.map(it => it.id)) : new Set(),
+								);
+							}}
+							onMarkReadClick={() => {
+								analytics.markMailAsRead(selectedMessageIds.size);
+								mailStore.markMessagesAsReaded(Array.from(selectedMessageIds));
+								setSelectedMessageIds(new Set());
+							}}
+							onDeleteClick={() => {
+								analytics.archiveMail('mailbox', selectedMessageIds.size);
+								mailStore.markMessagesAsDeleted(
+									mailList.messages.filter(it => selectedMessageIds.has(it.id)),
+								);
+								setSelectedMessageIds(new Set());
+							}}
+							onRestoreClick={() => {
+								analytics.restoreMail('mailbox', selectedMessageIds.size);
+								mailStore.markMessagesAsNotDeleted(
+									mailList.messages.filter(it => selectedMessageIds.has(it.id)),
+								);
+								setSelectedMessageIds(new Set());
+							}}
+						/>
 
-					<div className={clsx(css.content, mailList.messages.length && css.content_hasMessages)}>
-						{mailList.messages.length ? (
-							<div className={css.list}>
-								<AutoSizer>
-									{({ width, height }) => {
-										// noinspection JSUnusedGlobalSymbols
-										return (
-											<FixedSizeList<MailboxListItemData>
-												itemSize={itemSize}
-												width={width}
-												height={height}
-												style={{ padding: '0 0 12px' }}
-												itemData={{
-													messages: mailList.messages,
-													itemSize,
-													isSelected: (messageId: string) =>
-														selectedMessageIds.has(messageId),
-													onSelectClick: (messageId: string, isSelected: boolean) => {
-														const newSet = new Set(selectedMessageIds.values());
-														isSelected ? newSet.add(messageId) : newSet.delete(messageId);
+						<div className={clsx(css.content, mailList.messages.length && css.content_hasMessages)}>
+							{mailList.messages.length ? (
+								<div className={css.list}>
+									<AutoSizer>
+										{({ width, height }) => {
+											// noinspection JSUnusedGlobalSymbols
+											return (
+												<FixedSizeList<MailboxListItemData>
+													itemSize={itemSize}
+													width={width}
+													height={height}
+													style={{ padding: '0 0 12px' }}
+													itemData={{
+														messages: mailList.messages,
+														itemSize,
+														isSelected: (messageId: string) =>
+															selectedMessageIds.has(messageId),
+														onSelectClick: (messageId: string, isSelected: boolean) => {
+															const newSet = new Set(selectedMessageIds.values());
+															isSelected
+																? newSet.add(messageId)
+																: newSet.delete(messageId);
 
-														setSelectedMessageIds(newSet);
-													},
-													onFilterBySenderClick:
-														folderId === FolderId.Inbox && !filterBySender
-															? (senderAddress: string) => {
-																	navigate({
-																		search: { sender: senderAddress },
-																	});
-															  }
-															: undefined,
-												}}
-												onScroll={props => {
-													setScrollParams({
-														offset: props.scrollOffset,
-														height,
-													});
-												}}
-												itemCount={
-													mailList.messages.length + (mailList.isNextPageAvailable ? 1 : 0)
-												}
-											>
-												{MailboxListItem}
-											</FixedSizeList>
-										);
-									}}
-								</AutoSizer>
-							</div>
-						) : mailList.isLoading ? (
-							<div style={{ padding: '40px 0' }}>
-								<YlideLoader
-									reason={`Retrieving your mails from ${
-										Object.keys(domain.blockchains).length
-									} blockchains`}
-								/>
-							</div>
-						) : mailList.isError ? (
-							<div style={{ padding: '40px' }}>
-								<ErrorMessage>Couldn't load messages.</ErrorMessage>
-							</div>
-						) : (
-							<MailboxEmpty folderId={folderId!} />
-						)}
+															setSelectedMessageIds(newSet);
+														},
+														onFilterBySenderClick:
+															folderId === FolderId.Inbox && !filterBySender
+																? (senderAddress: string) => {
+																		navigate({
+																			search: { sender: senderAddress },
+																		});
+																  }
+																: undefined,
+													}}
+													onScroll={props => {
+														setScrollParams({
+															offset: props.scrollOffset,
+															height,
+														});
+													}}
+													itemCount={
+														mailList.messages.length +
+														(mailList.isNextPageAvailable ? 1 : 0)
+													}
+												>
+													{MailboxListItem}
+												</FixedSizeList>
+											);
+										}}
+									</AutoSizer>
+								</div>
+							) : mailList.isLoading ? (
+								<div style={{ padding: '40px 0' }}>
+									<YlideLoader
+										reason={`Retrieving your mails from ${
+											Object.keys(domain.blockchains).length
+										} blockchains`}
+									/>
+								</div>
+							) : mailList.isError ? (
+								<div style={{ padding: '40px' }}>
+									<ErrorMessage>Couldn't load messages.</ErrorMessage>
+								</div>
+							) : (
+								<MailboxEmpty folderId={folderId!} />
+							)}
+						</div>
 					</div>
 
 					<Outlet />

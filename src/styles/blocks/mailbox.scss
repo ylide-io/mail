@@ -1,9 +1,3 @@
-.mailbox-page {
-	@include flex-column(stretch, flex-start);
-	flex: 1;
-	position: relative;
-}
-
 .mailbox-header {
 	@include flex-column(stretch, flex-start);
 

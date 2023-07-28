@@ -1,3 +1,18 @@
+.root {
+	flex: 1;
+	position: relative;
+}
+
+.main {
+	display: flex;
+	flex-direction: column;
+	height: 100%;
+}
+
+.main_hidden {
+	visibility: hidden;
+}
+
 .content {
 	flex-grow: 1;
 
