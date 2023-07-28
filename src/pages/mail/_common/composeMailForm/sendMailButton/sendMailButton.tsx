@@ -89,7 +89,7 @@ export const SendMailButton = observer(
 						{payment}
 					</>
 				);
-			} else if (blockchainGroup === 'evm' && mailData.network !== undefined) {
+			} else if (blockchainGroup === 'evm' && mailData.network != null) {
 				const bData = blockchainMeta[EVM_NAMES[mailData.network]];
 				if (bData) {
 					return (

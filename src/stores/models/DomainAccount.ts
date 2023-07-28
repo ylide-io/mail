@@ -61,7 +61,7 @@ export class DomainAccount {
 		} else if (blockchains.length === 1) {
 			return blockchains[0].factory.blockchain;
 		} else {
-			if (!network) {
+			if (network == null) {
 				throw new Error('Cant find appropriate blockchain without network');
 			}
 			const blockchain = blockchains.find(bc => bc.factory.blockchain === EVM_NAMES[network]);

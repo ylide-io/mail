@@ -143,7 +143,7 @@ export class OutgoingMailData {
 						<SelectNetworkModal wallet={from.wallet} account={from.account} onClose={resolve} />
 					));
 
-					if (!this.network) return false;
+					if (this.network == null) return false;
 				}
 			} else if (proxyAccount && proxyAccount.account.address !== this.from.account.address) {
 				const proceed = await showStaticComponent<boolean>(resolve => (
