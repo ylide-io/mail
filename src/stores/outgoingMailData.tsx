@@ -60,12 +60,6 @@ export class OutgoingMailData {
 					? this.from
 					: domain.accounts.activeAccounts[0];
 		});
-
-		autorun(async () => {
-			if (this.network == null && this.from?.wallet.factory.blockchainGroup === 'evm') {
-				this.network = await getEvmWalletNetwork(this.from.wallet);
-			}
-		});
 	}
 
 	get hasEditorData() {
