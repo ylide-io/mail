@@ -34,7 +34,7 @@ export class OutgoingMailData {
 	mode = OutgoingMailDataMode.MESSAGE;
 	feedId = DEFAULT_FEED_ID;
 	isGenericFeed = false;
-	extraPayment: string = '0';
+	extraPayment = '0';
 
 	from?: DomainAccount;
 	to = new Recipients();
@@ -54,11 +54,21 @@ export class OutgoingMailData {
 	constructor() {
 		makeAutoObservable(this);
 
-		autorun(() => {
+		autorun(async () => {
 			this.from =
 				this.from && domain.accounts.activeAccounts.includes(this.from)
 					? this.from
 					: domain.accounts.activeAccounts[0];
+
+			if (this.from?.wallet.factory.blockchainGroup === 'evm') {
+				const selectedNetwork = await getEvmWalletNetwork(this.from.wallet);
+
+				if (this.network == null) {
+					this.network = selectedNetwork;
+				}
+			} else {
+				this.network = undefined;
+			}
 		});
 	}
 
