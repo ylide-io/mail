@@ -21,12 +21,13 @@ import { SendMailButton } from './sendMailButton/sendMailButton';
 
 export interface ComposeMailFormProps extends PropsWithClassName {
 	isRecipientInputDisabled?: boolean;
+	displayConnectAccountButton?: boolean;
 	mailData: OutgoingMailData;
 	onSent?: () => void;
 }
 
 export const ComposeMailForm = observer(
-	({ className, isRecipientInputDisabled, mailData, onSent }: ComposeMailFormProps) => {
+	({ className, isRecipientInputDisabled, displayConnectAccountButton, mailData, onSent }: ComposeMailFormProps) => {
 		const attachButtonRef = useRef(null);
 		const [isAttachmentPopupOpen, setAttachmentPopupOpen] = useState(false);
 
@@ -49,6 +50,7 @@ export const ComposeMailForm = observer(
 							<div className={css.metaLabel}>From</div>
 							<AccountSelect
 								activeAccount={mailData.from}
+								displayConnectButton={displayConnectAccountButton}
 								onChange={account => (mailData.from = account)}
 							/>
 						</>
