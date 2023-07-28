@@ -1,9 +1,9 @@
 import clsx from 'clsx';
 import { autorun } from 'mobx';
 import { observer } from 'mobx-react';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Helmet } from 'react-helmet';
-import { useParams, useSearchParams } from 'react-router-dom';
+import { Outlet, useParams, useSearchParams } from 'react-router-dom';
 import AutoSizer from 'react-virtualized-auto-sizer';
 import { FixedSizeList, ListChildComponentProps } from 'react-window';
 
@@ -15,7 +15,6 @@ import { analytics } from '../../../stores/Analytics';
 import { browserStorage } from '../../../stores/browserStorage';
 import domain from '../../../stores/Domain';
 import { FolderId, ILinkedMessage, MailList, mailStore } from '../../../stores/MailList';
-import { usePreservedState } from '../../../utils/preservedState';
 import { useNav } from '../../../utils/url';
 import { useWindowSize } from '../../../utils/useWindowSize';
 import MailboxEmpty from './mailboxEmpty/mailboxEmpty';
@@ -73,28 +72,6 @@ export const MailboxPage = observer(() => {
 
 	const accounts = domain.accounts.activeAccounts;
 
-	const stateKey = ['mailbox', folderId, filterBySender || ''];
-	const preservedState = usePreservedState({
-		key: stateKey,
-		factory: () => {
-			if (!filterBySender) {
-				return {
-					mailList,
-					accounts: accounts.map(a => a.account.address).sort(),
-					scrollOffset: listScrollOffset.current,
-				};
-			} else {
-				mailList.destroy();
-			}
-		},
-		validate: state =>
-			state.accounts.join() ===
-			accounts
-				.map(a => a.account.address)
-				.sort()
-				.join(),
-	});
-
 	useEffect(() => {
 		mailStore.lastActiveFolderId = folderId;
 		analytics.mailFolderOpened(folderId);
@@ -103,10 +80,6 @@ export const MailboxPage = observer(() => {
 	const deletedMessageIds = mailStore.deletedMessageIds;
 
 	const mailList: MailList = useMemo(() => {
-		if (preservedState?.mailList) {
-			return preservedState.mailList;
-		}
-
 		const list = new MailList();
 
 		list.init({
@@ -122,7 +95,7 @@ export const MailboxPage = observer(() => {
 		});
 
 		return list;
-	}, [accounts, deletedMessageIds, filterBySender, folderId, preservedState]);
+	}, [accounts, deletedMessageIds, filterBySender, folderId]);
 
 	useEffect(() => () => mailList.destroy(), [mailList]);
 
@@ -172,10 +145,8 @@ export const MailboxPage = observer(() => {
 		}
 	}, [folderId, accounts]);
 
-	const listScrollOffset = useRef(0);
-
 	return (
-		<GenericLayout key={stateKey.join()}>
+		<GenericLayout>
 			<Helmet>
 				<title>Decentralized Web3 Mailbox by Ylide for secure and private communication</title>
 				<meta
@@ -248,10 +219,7 @@ export const MailboxPage = observer(() => {
 															  }
 															: undefined,
 												}}
-												initialScrollOffset={preservedState?.scrollOffset}
 												onScroll={props => {
-													listScrollOffset.current = props.scrollOffset;
-
 													setScrollParams({
 														offset: props.scrollOffset,
 														height,
@@ -283,6 +251,8 @@ export const MailboxPage = observer(() => {
 							<MailboxEmpty folderId={folderId!} />
 						)}
 					</div>
+
+					<Outlet />
 				</div>
 			</FullPageContent>
 		</GenericLayout>

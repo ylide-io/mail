@@ -7,8 +7,6 @@ import { generatePath, useParams } from 'react-router-dom';
 import { ActionButton } from '../../../components/ActionButton/ActionButton';
 import { ContactName } from '../../../components/contactName/contactName';
 import { ErrorMessage } from '../../../components/errorMessage/errorMessage';
-import { FullPageContent } from '../../../components/genericLayout/content/fullPageContent/fullPageContent';
-import { GenericLayout } from '../../../components/genericLayout/genericLayout';
 import { OverlappingLoader } from '../../../components/overlappingLoader/overlappingLoader';
 import { Recipients } from '../../../components/recipientInput/recipientInput';
 import { Spinner } from '../../../components/spinner/spinner';
@@ -221,111 +219,109 @@ export const MailDetailsPage = observer(() => {
 	//
 
 	return (
-		<GenericLayout>
-			<FullPageContent className={css.layout}>
-				{initialMessage && initialDecoded ? (
-					<div className={css.root}>
-						<div className={css.header}>
-							<ActionButton onClick={onBackClick} icon={<ArrowLeftSvg />}>
-								{getFolderName(folderId)}
-							</ActionButton>
+		<div className={css.root}>
+			{initialMessage && initialDecoded ? (
+				<>
+					<div className={css.header}>
+						<ActionButton onClick={onBackClick} icon={<ArrowLeftSvg />}>
+							{getFolderName(folderId)}
+						</ActionButton>
 
-							{threadMailList?.isLoading || isDecodingThread ? (
-								<Spinner className={css.headerSpinner} />
-							) : isThreadOpen ? (
-								<div className={css.messagesFrom}>
-									<div className={css.messagesFromLebel}>Messages from</div>
-									<ContactName address={initialMessage.msg.senderAddress} />
-								</div>
-							) : (
-								wrappedThreadMessages.length > 1 && (
-									<ActionButton icon={<ContactSvg />} onClick={onOpenThreadClick}>
-										{wrappedThreadMessages.length} messages from this sender
-									</ActionButton>
-								)
-							)}
-						</div>
-
-						<div className={css.messageWrapper}>
-							{isThreadOpen ? (
-								wrappedThreadMessages.map(message => {
-									const decoded = mailStore.decodedMessagesById[message.message.msgId];
-									const isPrimaryItem = message.message.id === initialMessage.id;
-
-									return (
-										<div
-											key={message.message.id}
-											ref={isPrimaryItem ? primaryThreadItemRef : undefined}
-											className={css.messageThreadItem}
-										>
-											{message.isDeleted ? (
-												<div className={css.deletedPlaceholder}>
-													This message was archived
-													<div>
-														<ActionButton onClick={() => onRestoreClick(message.message)}>
-															Restore
-														</ActionButton>
-													</div>
-												</div>
-											) : (
-												<MailMessage
-													message={message.message}
-													decoded={decoded}
-													folderId={folderId}
-													onReady={isPrimaryItem ? onPrimaryThreadMessageReady : undefined}
-													onReplyClick={() =>
-														onReplyClick(
-															message.message.msg.senderAddress,
-															decoded.decodedSubject,
-														)
-													}
-													onForwardClick={() => onForwardClick(message.message, decoded)}
-													onDeleteClick={() => onDeleteClick(message.message)}
-												/>
-											)}
-										</div>
-									);
-								})
-							) : (
-								<MailMessage
-									message={initialMessage}
-									decoded={initialDecoded}
-									folderId={folderId}
-									onReplyClick={() =>
-										onReplyClick(initialMessage.msg.senderAddress, initialDecoded.decodedSubject)
-									}
-									onForwardClick={() => onForwardClick(initialMessage, initialDecoded)}
-									onDeleteClick={() => onDeleteClick(initialMessage)}
-								/>
-							)}
-						</div>
-
-						{isThreadOpen || (
-							<div className={css.footer}>
-								<ActionButton
-									onClick={() =>
-										onReplyClick(initialMessage.msg.senderAddress, initialDecoded.decodedSubject)
-									}
-									icon={<ReplySvg />}
-								>
-									Reply
-								</ActionButton>
-
-								<ActionButton
-									onClick={() => onForwardClick(initialMessage, initialDecoded)}
-									icon={<ForwardSvg />}
-								>
-									Forward
-								</ActionButton>
+						{threadMailList?.isLoading || isDecodingThread ? (
+							<Spinner className={css.headerSpinner} />
+						) : isThreadOpen ? (
+							<div className={css.messagesFrom}>
+								<div className={css.messagesFromLebel}>Messages from</div>
+								<ContactName address={initialMessage.msg.senderAddress} />
 							</div>
+						) : (
+							wrappedThreadMessages.length > 1 && (
+								<ActionButton icon={<ContactSvg />} onClick={onOpenThreadClick}>
+									{wrappedThreadMessages.length} messages from this sender
+								</ActionButton>
+							)
 						)}
 					</div>
-				) : messageQuery.isLoading ? (
-					<OverlappingLoader text="Loading message ..." />
-				) : (
-					<ErrorMessage style={{ margin: 20 }}>Couldn't load this message 😒</ErrorMessage>
-				)}
-			</FullPageContent>
-		</GenericLayout>
+
+					<div className={css.messageWrapper}>
+						{isThreadOpen ? (
+							wrappedThreadMessages.map(message => {
+								const decoded = mailStore.decodedMessagesById[message.message.msgId];
+								const isPrimaryItem = message.message.id === initialMessage.id;
+
+								return (
+									<div
+										key={message.message.id}
+										ref={isPrimaryItem ? primaryThreadItemRef : undefined}
+										className={css.messageThreadItem}
+									>
+										{message.isDeleted ? (
+											<div className={css.deletedPlaceholder}>
+												This message was archived
+												<div>
+													<ActionButton onClick={() => onRestoreClick(message.message)}>
+														Restore
+													</ActionButton>
+												</div>
+											</div>
+										) : (
+											<MailMessage
+												message={message.message}
+												decoded={decoded}
+												folderId={folderId}
+												onReady={isPrimaryItem ? onPrimaryThreadMessageReady : undefined}
+												onReplyClick={() =>
+													onReplyClick(
+														message.message.msg.senderAddress,
+														decoded.decodedSubject,
+													)
+												}
+												onForwardClick={() => onForwardClick(message.message, decoded)}
+												onDeleteClick={() => onDeleteClick(message.message)}
+											/>
+										)}
+									</div>
+								);
+							})
+						) : (
+							<MailMessage
+								message={initialMessage}
+								decoded={initialDecoded}
+								folderId={folderId}
+								onReplyClick={() =>
+									onReplyClick(initialMessage.msg.senderAddress, initialDecoded.decodedSubject)
+								}
+								onForwardClick={() => onForwardClick(initialMessage, initialDecoded)}
+								onDeleteClick={() => onDeleteClick(initialMessage)}
+							/>
+						)}
+					</div>
+
+					{isThreadOpen || (
+						<div className={css.footer}>
+							<ActionButton
+								onClick={() =>
+									onReplyClick(initialMessage.msg.senderAddress, initialDecoded.decodedSubject)
+								}
+								icon={<ReplySvg />}
+							>
+								Reply
+							</ActionButton>
+
+							<ActionButton
+								onClick={() => onForwardClick(initialMessage, initialDecoded)}
+								icon={<ForwardSvg />}
+							>
+								Forward
+							</ActionButton>
+						</div>
+					)}
+				</>
+			) : messageQuery.isLoading ? (
+				<OverlappingLoader text="Loading message ..." />
+			) : (
+				<ErrorMessage style={{ margin: 20 }}>Couldn't load this message 😒</ErrorMessage>
+			)}
+		</div>
 	);
 });
