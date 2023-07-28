@@ -211,6 +211,15 @@ export class Domain {
 			}));
 	}
 
+	getBlockchainsForWallet(wallet: Wallet) {
+		return this.registeredBlockchains
+			.filter(bc => bc.blockchainGroup === wallet.factory.blockchainGroup)
+			.map(factory => ({
+				factory,
+				reader: this.blockchains[factory.blockchain],
+			}));
+	}
+
 	getNSBlockchainsForAddress(
 		name: string,
 	): { blockchain: string; reader: AbstractBlockchainController; service: AbstractNameService }[] {
