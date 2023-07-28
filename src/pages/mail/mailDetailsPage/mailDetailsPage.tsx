@@ -20,7 +20,7 @@ import { ReactComponent as ReplySvg } from '../../../icons/ic20/reply.svg';
 import { IMessageDecodedContent } from '../../../indexedDB/IndexedDB';
 import { analytics } from '../../../stores/Analytics';
 import domain from '../../../stores/Domain';
-import { FolderId, ILinkedMessage, MailList, mailStore } from '../../../stores/MailList';
+import { FolderId, getFolderName, ILinkedMessage, MailList, mailStore } from '../../../stores/MailList';
 import { OutgoingMailData } from '../../../stores/outgoingMailData';
 import { RoutePath } from '../../../stores/routePath';
 import { invariant } from '../../../utils/assert';
@@ -226,7 +226,9 @@ export const MailDetailsPage = observer(() => {
 				{initialMessage && initialDecoded ? (
 					<div className={css.root}>
 						<div className={css.header}>
-							<ActionButton onClick={onBackClick} icon={<ArrowLeftSvg />} />
+							<ActionButton onClick={onBackClick} icon={<ArrowLeftSvg />}>
+								{getFolderName(folderId)}
+							</ActionButton>
 
 							{threadMailList?.isLoading || isDecodingThread ? (
 								<Spinner className={css.headerSpinner} />
