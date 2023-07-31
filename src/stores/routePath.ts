@@ -18,6 +18,7 @@ export enum RoutePath {
 	MAIL_CONTACT_TAGS = '/mail/contacts/tags',
 	MAIL_FOLDER = '/mail/:folderId',
 	MAIL_DETAILS = '/mail/:folderId/:id',
+	MAIL_DETAILS_OUTLET = ':id',
 
 	FEED = '/feed',
 	FEED_ALL = '/feed/all',

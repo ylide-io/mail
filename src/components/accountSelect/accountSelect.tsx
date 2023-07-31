@@ -12,53 +12,58 @@ import { Select } from '../select/select';
 interface AccountSelectProps extends PropsWithClassName {
 	accounts?: DomainAccount[];
 	activeAccount?: DomainAccount;
+	displayConnectButton?: boolean;
 	onChange?: (account: DomainAccount) => void;
 }
 
-export const AccountSelect = observer(({ className, activeAccount, onChange, ...props }: AccountSelectProps) => {
-	const accounts = props.accounts || domain.accounts.activeAccounts;
+export const AccountSelect = observer(
+	({ className, activeAccount, displayConnectButton, onChange, ...props }: AccountSelectProps) => {
+		const accounts = props.accounts || domain.accounts.activeAccounts;
 
-	return (
-		<Select
-			className={className}
-			text={activeAccount && formatAccountName(activeAccount)}
-			placeholder="Select account"
-		>
-			{onSelect => (
-				<>
-					{accounts.map((account, i) => (
-						<DropDownItem
-							key={i}
-							mode={account === activeAccount ? DropDownItemMode.HIGHLIGHTED : undefined}
-							onSelect={() => {
-								onSelect();
-								onChange?.(account);
-							}}
-						>
-							{formatAccountName(account)}
-						</DropDownItem>
-					))}
+		return (
+			<Select
+				className={className}
+				text={activeAccount && formatAccountName(activeAccount)}
+				placeholder="Select account"
+			>
+				{onSelect => (
+					<>
+						{accounts.map((account, i) => (
+							<DropDownItem
+								key={i}
+								mode={account === activeAccount ? DropDownItemMode.HIGHLIGHTED : undefined}
+								onSelect={() => {
+									onSelect();
+									onChange?.(account);
+								}}
+							>
+								{formatAccountName(account)}
+							</DropDownItem>
+						))}
 
-					<DropDownItem mode={DropDownItemMode.WRAPPER}>
-						<ActionButton
-							look={ActionButtonLook.LITE}
-							icon={<PlusSvg />}
-							style={{ margin: 'auto' }}
-							onClick={async () => {
-								onSelect();
+						{displayConnectButton && (
+							<DropDownItem mode={DropDownItemMode.WRAPPER}>
+								<ActionButton
+									look={ActionButtonLook.LITE}
+									icon={<PlusSvg />}
+									style={{ margin: 'auto' }}
+									onClick={async () => {
+										onSelect();
 
-								const newAccount = await connectAccount({ place: 'account-select' });
+										const newAccount = await connectAccount({ place: 'account-select' });
 
-								if (newAccount) {
-									onChange?.(newAccount);
-								}
-							}}
-						>
-							Connect Account
-						</ActionButton>
-					</DropDownItem>
-				</>
-			)}
-		</Select>
-	);
-});
+										if (newAccount) {
+											onChange?.(newAccount);
+										}
+									}}
+								>
+									Connect Account
+								</ActionButton>
+							</DropDownItem>
+						)}
+					</>
+				)}
+			</Select>
+		);
+	},
+);

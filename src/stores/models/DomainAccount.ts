@@ -5,6 +5,7 @@ import { makeAutoObservable } from 'mobx';
 import { blockchainMeta } from '../../utils/blockchain';
 import { isBytesEqual } from '../../utils/isBytesEqual';
 import { browserStorage } from '../browserStorage';
+import domain from '../Domain';
 import { Wallet } from './Wallet';
 
 export class DomainAccount {
@@ -40,28 +41,19 @@ export class DomainAccount {
 		await this.wallet.domain.storage.storeString('yld1_accName_' + this.key.address, this._name);
 	}
 
-	appropriateBlockchains() {
-		return this.wallet.domain.registeredBlockchains
-			.filter(bc => bc.blockchainGroup === this.wallet.factory.blockchainGroup)
-			.map(factory => ({
-				factory,
-				reader: this.wallet.domain.blockchains[factory.blockchain],
-			}));
-	}
-
 	getBlockchainNativeCurrency(network?: EVMNetwork) {
 		const name = this.getBlockchainName(network);
 		return blockchainMeta[name].symbol || blockchainMeta[name].ethNetwork?.nativeCurrency.symbol || '';
 	}
 
 	getBlockchainName(network?: EVMNetwork) {
-		const blockchains = this.appropriateBlockchains();
+		const blockchains = domain.getBlockchainsForWallet(this.wallet);
 		if (blockchains.length === 0) {
 			throw new Error('No appropriate blockchains');
 		} else if (blockchains.length === 1) {
 			return blockchains[0].factory.blockchain;
 		} else {
-			if (!network) {
+			if (network == null) {
 				throw new Error('Cant find appropriate blockchain without network');
 			}
 			const blockchain = blockchains.find(bc => bc.factory.blockchain === EVM_NAMES[network]);

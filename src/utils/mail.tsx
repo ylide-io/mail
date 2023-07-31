@@ -115,7 +115,7 @@ export async function sendMessage({
 		recipientInfos: recipients.map(address => new RecipientInfo({ address, blockchain: '' })),
 	});
 
-	if (!network && sender.wallet.factory.blockchainGroup === 'evm') {
+	if (network == null && sender.wallet.factory.blockchainGroup === 'evm') {
 		network = await getEvmWalletNetwork(sender.wallet);
 	}
 
@@ -201,7 +201,7 @@ export async function broadcastMessage({
 		recipientInfos: [],
 	});
 
-	if (!network && sender.wallet.factory.blockchainGroup === 'evm') {
+	if (network == null && sender.wallet.factory.blockchainGroup === 'evm') {
 		network = await getEvmWalletNetwork(sender.wallet);
 	}
 

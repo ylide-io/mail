@@ -40,7 +40,7 @@ import {
 import { browserStorage } from '../../../stores/browserStorage';
 import domain from '../../../stores/Domain';
 import { getFeedCategoryName } from '../../../stores/Feed';
-import { FolderId, MailList } from '../../../stores/MailList';
+import { FolderId, getFolderName, MailList } from '../../../stores/MailList';
 import { DomainAccount } from '../../../stores/models/DomainAccount';
 import { RoutePath } from '../../../stores/routePath';
 import { useOpenMailCompose } from '../../../utils/mail';
@@ -261,7 +261,7 @@ export const SidebarMailSection = observer(() => {
 				icon={<InboxSvg />}
 				name={
 					<div className={css.inboxButton}>
-						Inbox
+						{getFolderName(FolderId.Inbox)}
 						{hasNewMessages && <div className={css.inboxNotification} title="You have new messages" />}
 					</div>
 				}
@@ -270,13 +270,13 @@ export const SidebarMailSection = observer(() => {
 			<SidebarButton
 				href={generatePath(RoutePath.MAIL_FOLDER, { folderId: FolderId.Sent })}
 				icon={<SentSvg />}
-				name="Sent"
+				name={getFolderName(FolderId.Sent)}
 			/>
 
 			<SidebarButton
 				href={generatePath(RoutePath.MAIL_FOLDER, { folderId: FolderId.Archive })}
 				icon={<ArchiveSvg />}
-				name="Archive"
+				name={getFolderName(FolderId.Archive)}
 			/>
 		</SidebarSection>
 	);

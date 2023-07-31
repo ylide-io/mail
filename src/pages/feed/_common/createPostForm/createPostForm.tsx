@@ -72,7 +72,10 @@ export const CreatePostForm = observer(
 
 			useEffect(() => {
 				mailData.feedId = projectMeta.feedId;
-				mailData.network = fixedEvmNetwork;
+
+				if (fixedEvmNetwork != null) {
+					mailData.network = fixedEvmNetwork;
+				}
 
 				mailData.validator = () => {
 					const text = mailData.plainTextData;

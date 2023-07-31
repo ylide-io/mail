@@ -1,16 +1,10 @@
-.mailbox-page {
-	@include flex-column(stretch, flex-start);
-	flex: 1;
-}
-
 .mailbox-header {
 	@include flex-column(stretch, flex-start);
 
-	margin: 4px 20px 12px;
+	padding: 16px 20px 12px;
 
 	@include less720px {
-		margin-left: 12px;
-		margin-right: 12px;
+		padding: 4px 12px 12px;
 	}
 }
 
@@ -50,13 +44,6 @@
 	.global-checkbox-wrapper {
 		margin-right: 8px;
 	}
-}
-
-.mailbox {
-	flex-grow: 1;
-
-	// https://trello.com/c/rsjN1lZZ/262-scrollbars-are-visible-sometimes-in-mailbox
-	overflow-x: hidden;
 }
 
 .mail-top {

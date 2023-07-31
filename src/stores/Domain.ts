@@ -42,7 +42,6 @@ import { walletsMeta } from '../utils/wallet';
 import { Accounts } from './Accounts';
 import contacts from './Contacts';
 import { EverwalletProxy } from './EverwalletProxy';
-import { mailStore } from './MailList';
 import { Wallet } from './models/Wallet';
 import { OTCStore } from './OTC';
 import tags from './Tags';
@@ -209,6 +208,15 @@ export class Domain {
 			.map(blockchain => ({
 				blockchain,
 				reader: this.blockchains[blockchain],
+			}));
+	}
+
+	getBlockchainsForWallet(wallet: Wallet) {
+		return this.registeredBlockchains
+			.filter(bc => bc.blockchainGroup === wallet.factory.blockchainGroup)
+			.map(factory => ({
+				factory,
+				reader: this.blockchains[factory.blockchain],
 			}));
 	}
 
@@ -559,7 +567,7 @@ export class Domain {
 		let last = Date.now();
 		const tick = (t: string) => {
 			const now = Date.now();
-			console.log(t, now - last + 'ms');
+			console.debug(t, now - last + 'ms');
 			last = now;
 		};
 
@@ -571,7 +579,7 @@ export class Domain {
 				!this.walletControllers[factory.blockchainGroup] ||
 				!this.walletControllers[factory.blockchainGroup][factory.wallet]
 			) {
-				console.log('Initing wallet: ', factory.wallet);
+				console.debug('Initing wallet: ', factory.wallet);
 				await this.initWallet(factory);
 				tick('wallet ' + factory.wallet + ' inited');
 			}
@@ -653,7 +661,7 @@ export class Domain {
 		let last = Date.now();
 		const tick = (t: string) => {
 			const now = Date.now();
-			console.log(t, now - last + 'ms');
+			console.debug(t, now - last + 'ms');
 			last = now;
 		};
 		await this.reloadAvailableWallets();
@@ -670,8 +678,6 @@ export class Domain {
 		tick('contacts.init();');
 		await tags.getTags();
 		tick('tags.getTags();');
-		await mailStore.init();
-		tick('mailStore.init();');
 		this.initialized = true;
 
 		// hacks for VenomWallet again :(
