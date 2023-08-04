@@ -122,6 +122,7 @@ const FeedPageContent = observer(() => {
 			<div className={css.posts}>
 				{feed.loaded ? (
 					<>
+						{feed.posts.length === 0 && <h2>No posts in this category.</h2>}
 						{feed.posts.map(post => (
 							<FeedPostItem key={post.id} isInFeed realtedAccounts={selectedAccounts} post={post} />
 						))}

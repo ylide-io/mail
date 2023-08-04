@@ -403,8 +403,6 @@ export const SidebarMenu = observer(() => {
 				section={Section.FEED_DISCOVERY}
 				title={REACT_APP__APP_MODE === AppMode.MAIN_VIEW ? 'Discovery' : 'Feed'}
 			>
-				<SidebarButton href={generatePath(RoutePath.FEED_ALL)} icon={sideFeedIcon(14)} name="All topics" />
-
 				{Object.values<FeedCategory>(FeedCategory).map(category => (
 					<SidebarButton
 						key={category}
