@@ -36,7 +36,9 @@ export const MainViewOnboarding = observer(() => {
 
 	// Disconnect inactive accounts before begin
 	useEffect(() => {
-		domain.accounts.accounts.filter(a => !a.isLocalKeyRegistered).forEach(a => disconnectAccount({ account: a }));
+		domain.accounts.accounts
+			.filter(a => !a.isAnyLocalPrivateKeyRegistered)
+			.forEach(a => disconnectAccount({ account: a }));
 	}, []);
 
 	const reset = useCallback(() => {

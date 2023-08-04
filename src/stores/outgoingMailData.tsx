@@ -239,7 +239,7 @@ export class OutgoingMailData {
 
 				console.log('Sending result: ', result);
 			} else {
-				const blockchain = this.from.getBlockchainName(this.network);
+				const blockchain = domain.getBlockchainName(this.network);
 				if (this.isGenericFeed) {
 					const comissions = await BlockchainFeedApi.getComissions({ feedId: this.feedId });
 					const comission = calcComissions(blockchain, comissions);

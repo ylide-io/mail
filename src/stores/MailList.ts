@@ -5,7 +5,6 @@ import {
 	asyncDelay,
 	BlockchainSourceType,
 	IBlockchainSourceSubject,
-	IGenericAccount,
 	IMessage,
 	IMessageWithSource,
 	ISourceWithMeta,
@@ -14,6 +13,7 @@ import {
 	ListSourceMultiplexer,
 	SourceReadingSession,
 	Uint256,
+	WalletAccount,
 	YLIDE_MAIN_FEED_ID,
 } from '@ylide/sdk';
 import { autobind } from 'core-decorators';
@@ -415,7 +415,7 @@ class MailStore {
 		this.deletedMessageIds = new Set(dbDeletedMessages);
 	}
 
-	async decodeMessage(msgId: string, msg: IMessage, recipient?: IGenericAccount) {
+	async decodeMessage(msgId: string, msg: IMessage, recipient?: WalletAccount) {
 		analytics.mailOpened(this.lastActiveFolderId || 'null');
 
 		const decodedMessage = await decodeMessage(msgId, msg, recipient);

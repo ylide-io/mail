@@ -1,13 +1,13 @@
-import { constructFaucetMsg, EthereumWalletController } from '@ylide/ethereum';
-import { IGenericAccount } from '@ylide/sdk';
-import SmartBuffer from '@ylide/smart-buffer';
+import { constructFaucetMsg, EthereumWalletController, EVM_CHAINS, EVM_NAMES, EVMNetwork } from '@ylide/ethereum';
+import { PublicKey, WalletAccount } from '@ylide/sdk';
+import { SmartBuffer } from '@ylide/smart-buffer';
 
 import { Wallet } from './models/Wallet';
 
 export const requestFaucetSignature = async (
 	wallet: Wallet,
 	publicKey: Uint8Array,
-	account: IGenericAccount,
+	account: WalletAccount,
 	chainId: number,
 	registrar: number,
 	timestampLock: number,
@@ -22,26 +22,33 @@ export const requestFaucetSignature = async (
 	}
 };
 
-export const chainIdByFaucetType = (faucetType: 'polygon' | 'gnosis' | 'fantom') => {
+export const evmNetworkByFaucetType = (faucetType: 'polygon' | 'gnosis' | 'fantom') => {
 	if (faucetType === 'polygon') {
-		return 137;
+		return EVMNetwork.POLYGON;
 	} else if (faucetType === 'gnosis') {
-		return 100;
+		return EVMNetwork.GNOSIS;
 	} else if (faucetType === 'fantom') {
-		return 250;
+		return EVMNetwork.FANTOM;
 	} else {
 		throw new Error('Invalid faucet type');
 	}
 };
 
+export const chainIdByFaucetType = (faucetType: 'polygon' | 'gnosis' | 'fantom') => {
+	return EVM_CHAINS[evmNetworkByFaucetType(faucetType)];
+};
+
+export const blockchainByFaucetType = (faucetType: 'polygon' | 'gnosis' | 'fantom') => {
+	return EVM_NAMES[evmNetworkByFaucetType(faucetType)];
+};
+
 export const publishKeyThroughFaucet = async (
 	faucetType: 'polygon' | 'gnosis' | 'fantom',
-	publicKey: Uint8Array,
-	account: IGenericAccount,
+	publicKey: PublicKey,
+	account: WalletAccount,
 	signature: Awaited<ReturnType<typeof requestFaucetSignature>>,
 	registrar: number,
 	timestampLock: number,
-	keyVersion: number,
 ): Promise<
 	| { result: true; hash: string }
 	| { result: false; errorCode: 'ALREADY_EXISTS' }
@@ -56,8 +63,8 @@ export const publishKeyThroughFaucet = async (
 			payBonus: '0',
 			registrar,
 			timestampLock,
-			publicKey: '0x' + new SmartBuffer(publicKey).toHexString(),
-			keyVersion,
+			publicKey: '0x' + new SmartBuffer(publicKey.keyBytes).toHexString(),
+			keyVersion: publicKey.keyVersion,
 			_r: signature.r,
 			_s: signature.s,
 			_v: signature.v,

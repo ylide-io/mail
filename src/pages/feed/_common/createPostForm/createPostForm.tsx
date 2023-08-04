@@ -28,6 +28,7 @@ import { SendMailButton } from '../../../mail/_common/composeMailForm/sendMailBu
 import { BlockchainProjectPostView } from '../blockchainProjectPost/blockchainProjectPost';
 import css from './createPostForm.module.scss';
 import { stickerIpfsIds } from './stickerIpfsIds';
+import domain from '../../../../stores/Domain';
 
 export interface CreatePostFormApi {
 	replyTo: (post: DecodedBlockchainFeedPost) => void;
@@ -120,7 +121,7 @@ export const CreatePostForm = observer(
 						if (cancelled || !mailData.from) {
 							return;
 						}
-						const blockchain = mailData.from.getBlockchainName(mailData.network);
+						const blockchain = domain.getBlockchainName(mailData.network);
 						const comission = calcComissions(blockchain, comissions);
 						mailData.extraPayment = comission || '0';
 					})
