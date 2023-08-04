@@ -1,11 +1,7 @@
 import { makeObservable, observable } from 'mobx';
 
-import { FeedCategory, FeedPost, FeedServerApi } from '../api/feedServerApi';
+import { CategoryNameToTag, FeedCategory, FeedPost, FeedServerApi } from '../api/feedServerApi';
 import { analytics } from './Analytics';
-
-export function getFeedCategoryName(category: FeedCategory) {
-	return category;
-}
 
 const FEED_PAGE_SIZE = 10;
 
@@ -19,12 +15,12 @@ export class FeedStore {
 	@observable newPosts = 0;
 	@observable moreAvailable = false;
 
-	readonly categories: FeedCategory[] = [];
+	readonly tags: number[] = [];
 	readonly sourceId: string | undefined;
 	readonly addressTokens: string[] | undefined;
 
 	constructor(params: { categories?: FeedCategory[]; sourceId?: string; addressTokens?: string[] }) {
-		this.categories = params.categories || [];
+		this.tags = params.categories?.map(c => CategoryNameToTag[c]) || [];
 		this.sourceId = params.sourceId;
 		this.addressTokens = params.addressTokens;
 
@@ -41,11 +37,11 @@ export class FeedStore {
 			this.loading = true;
 
 			const sourceId = this.sourceId;
-			const categories = sourceId ? undefined : this.categories;
+			const tags = sourceId ? undefined : this.tags;
 
 			const response = await FeedServerApi.getPosts({
 				...params,
-				categories,
+				tags,
 				sourceId,
 				addressTokens: this.addressTokens,
 			});
@@ -55,9 +51,9 @@ export class FeedStore {
 
 			if (params.needOld) {
 				if (this.posts.length) {
-					analytics.feedLoadMore(this.categories);
+					analytics.feedLoadMore(this.tags);
 				} else {
-					analytics.feedView(this.categories);
+					analytics.feedView(this.tags);
 				}
 			}
 
