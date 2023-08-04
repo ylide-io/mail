@@ -67,6 +67,8 @@ if (REACT_APP__APP_MODE === AppMode.OTC) {
 	INDEXER_BLOCKCHAINS = ['POLYGON', 'FANTOM', 'GNOSIS'];
 } else {
 	INDEXER_BLOCKCHAINS = [
+		'everscale',
+		'venom-testnet',
 		'ETHEREUM',
 		'AVALANCHE',
 		'ARBITRUM',

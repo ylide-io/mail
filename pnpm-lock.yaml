@@ -54,14 +54,14 @@ dependencies:
     specifier: 2.8.6
     version: 2.8.6
   '@ylide/ethereum':
-    specifier: 0.9.0-beta.1
-    version: 0.9.0-beta.1(@ethersproject/abstract-signer@5.7.0)(@ethersproject/address@5.7.0)(@ethersproject/bignumber@5.7.0)(@ethersproject/bytes@5.7.0)(@ethersproject/contracts@5.7.0)(@ethersproject/keccak256@5.7.0)(@ethersproject/solidity@5.7.0)(@ethersproject/strings@5.7.0)(@ethersproject/transactions@5.7.0)(@ethersproject/web@5.7.1)
+    specifier: 0.9.0-beta.2
+    version: 0.9.0-beta.2(@ethersproject/abstract-signer@5.7.0)(@ethersproject/address@5.7.0)(@ethersproject/bignumber@5.7.0)(@ethersproject/bytes@5.7.0)(@ethersproject/contracts@5.7.0)(@ethersproject/keccak256@5.7.0)(@ethersproject/solidity@5.7.0)(@ethersproject/strings@5.7.0)(@ethersproject/transactions@5.7.0)(@ethersproject/web@5.7.1)
   '@ylide/everscale':
-    specifier: 0.9.0-beta.1
-    version: 0.9.0-beta.1
+    specifier: 0.9.0-beta.2
+    version: 0.9.0-beta.2
   '@ylide/sdk':
-    specifier: 0.9.0-beta.1
-    version: 0.9.0-beta.1
+    specifier: 0.9.0-beta.2
+    version: 0.9.0-beta.2
   '@ylide/smart-buffer':
     specifier: 0.0.17
     version: 0.0.17
@@ -4364,8 +4364,8 @@ packages:
       - utf-8-validate
     dev: false
 
-  /@ylide/ethereum@0.9.0-beta.1(@ethersproject/abstract-signer@5.7.0)(@ethersproject/address@5.7.0)(@ethersproject/bignumber@5.7.0)(@ethersproject/bytes@5.7.0)(@ethersproject/contracts@5.7.0)(@ethersproject/keccak256@5.7.0)(@ethersproject/solidity@5.7.0)(@ethersproject/strings@5.7.0)(@ethersproject/transactions@5.7.0)(@ethersproject/web@5.7.1):
-    resolution: {integrity: sha512-NGKaEEiezS3mmiMEqg2izE0hVyLPmbceVvilzlOP0NMOiPQscpTQvAdXqBCwVw8y/PsIH5JteEObkHrLhhE4PQ==}
+  /@ylide/ethereum@0.9.0-beta.2(@ethersproject/abstract-signer@5.7.0)(@ethersproject/address@5.7.0)(@ethersproject/bignumber@5.7.0)(@ethersproject/bytes@5.7.0)(@ethersproject/contracts@5.7.0)(@ethersproject/keccak256@5.7.0)(@ethersproject/solidity@5.7.0)(@ethersproject/strings@5.7.0)(@ethersproject/transactions@5.7.0)(@ethersproject/web@5.7.1):
+    resolution: {integrity: sha512-fFCJdOJEnRb5FB4gCOtT0+zBSr7JOsCcx1mCB7yDse16zpUz4jupDLc++jMKBsrKOZNLCVI6OeRXw3uEUl501Q==}
     dependencies:
       '@ensdomains/ensjs': 3.0.0-alpha.64(@ethersproject/abi@5.7.0)(@ethersproject/abstract-provider@5.7.0)(@ethersproject/abstract-signer@5.7.0)(@ethersproject/address@5.7.0)(@ethersproject/bignumber@5.7.0)(@ethersproject/bytes@5.7.0)(@ethersproject/contracts@5.7.0)(@ethersproject/keccak256@5.7.0)(@ethersproject/providers@5.7.2)(@ethersproject/solidity@5.7.0)(@ethersproject/strings@5.7.0)(@ethersproject/transactions@5.7.0)(@ethersproject/web@5.7.1)
       '@ethersproject/abi': 5.7.0
@@ -4374,7 +4374,7 @@ packages:
       '@ethersproject/properties': 5.7.0
       '@ethersproject/providers': 5.7.2
       '@ylide/ethereum-contracts': 0.8.0-beta.20
-      '@ylide/sdk': 0.9.0-beta.1
+      '@ylide/sdk': 0.9.0-beta.2
       '@ylide/smart-buffer': 0.0.17
       ethers: 5.7.2
       eventemitter3: 5.0.1
@@ -4395,10 +4395,10 @@ packages:
       - utf-8-validate
     dev: false
 
-  /@ylide/everscale@0.9.0-beta.1:
-    resolution: {integrity: sha512-LQSYxUGMsGWjHDZEhjz09onOgx3mF1qTT+1px6Zr6sW+XdN28xOOGFQ7Rz6AH9j3j5SNW21L6GGalNc6N/8Dkw==}
+  /@ylide/everscale@0.9.0-beta.2:
+    resolution: {integrity: sha512-peG6bGBkf/5d3FyrMSTG7+ImbzFeK+QJ7V+swAJJ7I7XChRo6VfU04D8K2iv07B9+g8PdV5gVbFuN+JWLB+jpg==}
     dependencies:
-      '@ylide/sdk': 0.9.0-beta.1
+      '@ylide/sdk': 0.9.0-beta.2
       '@ylide/smart-buffer': 0.0.17
       everscale-inpage-provider: 0.3.61
       everscale-standalone-client: 2.1.19
@@ -4407,8 +4407,8 @@ packages:
       - encoding
     dev: false
 
-  /@ylide/sdk@0.9.0-beta.1:
-    resolution: {integrity: sha512-JVQYko8+UHwooBk7eKMQIwR9Vz6oz3LUJD1fCb0DTv9fvsSIv4moR6OWWymLOKB4L9oP4UbhITrKlNoDW63Bwg==}
+  /@ylide/sdk@0.9.0-beta.2:
+    resolution: {integrity: sha512-iY1nNNjY0o8Vvm+4MKHlx6fEh6NU5DtmphbqA3X27B+A7hBCBOLTHOUpv8DWaNFxS8IlHEWM3G7XIvC3SemHYw==}
     dependencies:
       '@datastructures-js/binary-search-tree': 5.3.1
       '@datastructures-js/linked-list': 5.2.5
