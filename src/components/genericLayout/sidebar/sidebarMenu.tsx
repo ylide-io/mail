@@ -22,10 +22,8 @@ import { ReactComponent as TelegramSvg } from '../../../icons/social/telegram.sv
 import { ReactComponent as TwitterSvg } from '../../../icons/social/twitter.svg';
 import { sideAnalyticsIcon } from '../../../icons/static/sideAnalyticsIcon';
 import { sideCultureIcon } from '../../../icons/static/sideCultureIcon';
-import { sideEducationIcon } from '../../../icons/static/sideEducationIcon';
 import { sideFeedIcon } from '../../../icons/static/sideFeedIcon';
 import { sideMarketsIcon } from '../../../icons/static/sideMarketsIcon';
-import { sidePolicyIcon } from '../../../icons/static/sidePolicyIcon';
 import { sideProjectsIcon } from '../../../icons/static/sideProjectsIcon';
 import { sideSecurityIcon } from '../../../icons/static/sideSecurityIcon';
 import { sideTechnologyIcon } from '../../../icons/static/sideTechnologyIcon';
@@ -39,7 +37,6 @@ import {
 } from '../../../stores/blockchainProjects/blockchainProjects';
 import { browserStorage } from '../../../stores/browserStorage';
 import domain from '../../../stores/Domain';
-import { getFeedCategoryName } from '../../../stores/Feed';
 import { FolderId, getFolderName, MailList } from '../../../stores/MailList';
 import { DomainAccount } from '../../../stores/models/DomainAccount';
 import { RoutePath } from '../../../stores/routePath';
@@ -67,11 +64,11 @@ const getFeedCategoryIcon = (category: FeedCategory) => {
 		[FeedCategory.MARKETS]: sideMarketsIcon(15),
 		[FeedCategory.ANALYTICS]: sideAnalyticsIcon(15),
 		[FeedCategory.PROJECTS]: sideProjectsIcon(15),
-		[FeedCategory.POLICY]: sidePolicyIcon(15),
+		// [FeedCategory.POLICY]: sidePolicyIcon(15),
 		[FeedCategory.SECURITY]: sideSecurityIcon(15),
 		[FeedCategory.TECHNOLOGY]: sideTechnologyIcon(15),
 		[FeedCategory.CULTURE]: sideCultureIcon(15),
-		[FeedCategory.EDUCATION]: sideEducationIcon(18),
+		// [FeedCategory.EDUCATION]: sideEducationIcon(18),
 	}[category];
 };
 
@@ -406,18 +403,14 @@ export const SidebarMenu = observer(() => {
 				section={Section.FEED_DISCOVERY}
 				title={REACT_APP__APP_MODE === AppMode.MAIN_VIEW ? 'Discovery' : 'Feed'}
 			>
-				<SidebarButton href={generatePath(RoutePath.FEED_ALL)} icon={sideFeedIcon(14)} name="All topics" />
-
-				{Object.values<FeedCategory>(FeedCategory)
-					.filter(c => c !== FeedCategory.POLICY && c !== FeedCategory.EDUCATION)
-					.map(category => (
-						<SidebarButton
-							key={category}
-							href={generatePath(RoutePath.FEED_CATEGORY, { category })}
-							icon={getFeedCategoryIcon(category)}
-							name={getFeedCategoryName(category)}
-						/>
-					))}
+				{Object.values<FeedCategory>(FeedCategory).map(category => (
+					<SidebarButton
+						key={category}
+						href={generatePath(RoutePath.FEED_CATEGORY, { category })}
+						icon={getFeedCategoryIcon(category)}
+						name={category}
+					/>
+				))}
 			</SidebarSection>
 		);
 	}

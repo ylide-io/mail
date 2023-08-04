@@ -20,12 +20,30 @@ export enum FeedCategory {
 	MARKETS = 'Markets',
 	ANALYTICS = 'Analytics',
 	PROJECTS = 'Projects',
-	POLICY = 'Policy',
+	// POLICY = 'Policy',
 	SECURITY = 'Security',
 	TECHNOLOGY = 'Technology',
 	CULTURE = 'Culture',
-	EDUCATION = 'Education',
+	// EDUCATION = 'Education',
 }
+
+export const CategoryNameToTag = {
+	Markets: 1,
+	Analytics: 2,
+	Projects: 3,
+	Security: 4,
+	Technology: 5,
+	Culture: 6,
+};
+
+export const TagToCategoryName: Record<number, string> = {
+	1: 'Markets',
+	2: 'Analytics',
+	3: 'Projects',
+	4: 'Security',
+	5: 'Technology',
+	6: 'Culture',
+};
 
 //
 
@@ -57,7 +75,7 @@ export interface FeedPost {
 	serverName: string;
 	channelName: string;
 	sourceType: LinkType;
-	categories: string[];
+	tags: number[];
 	date: string;
 	authorName: string;
 	authorAvatar: string;
@@ -133,7 +151,7 @@ export namespace FeedServerApi {
 		length: number;
 		lastPostId?: string;
 		firstPostId?: string;
-		categories?: FeedCategory[];
+		tags?: number[];
 		sourceId?: string;
 		addressTokens?: string[];
 	}): Promise<GetPostsResponse> {

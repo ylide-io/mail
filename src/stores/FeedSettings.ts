@@ -22,6 +22,9 @@ export class FeedSettings {
 	@observable
 	private configs = new Map<DomainAccount, FeedSettingsData | 'loading'>();
 
+	@observable
+	coverage: FeedManagerApi.GetCoverageResponse | 'loading' | 'error' = 'loading';
+
 	constructor() {
 		makeObservable(this);
 
@@ -36,14 +39,28 @@ export class FeedSettings {
 					try {
 						this.configs.set(account, 'loading');
 
-						const config = await FeedManagerApi.getConfig({ token: account.mainViewKey });
-
-						this.configs.set(account, {
-							mode: config.config.mode,
-							includedSourceIds: config.config.includedSourceIds,
-							excludedSourceIds: config.config.excludedSourceIds,
-							defaultProjects: config.defaultProjects,
-						});
+						const [configResponse, coverageResponse] = await Promise.allSettled([
+							FeedManagerApi.getConfig({ token: account.mainViewKey }),
+							FeedManagerApi.getCoverage(account.mainViewKey),
+						]);
+						if (configResponse.status === 'fulfilled') {
+							const { config, defaultProjects } = configResponse.value;
+							this.configs.set(account, {
+								mode: config.mode,
+								includedSourceIds: config.includedSourceIds,
+								excludedSourceIds: config.excludedSourceIds,
+								defaultProjects: defaultProjects,
+							});
+						} else {
+							this.isError = true;
+							console.log(`Failed to get config - ${configResponse.reason}`);
+						}
+						if (coverageResponse.status === 'fulfilled') {
+							this.coverage = coverageResponse.value;
+						} else {
+							this.coverage = 'error';
+							console.log(`Failed to get coverage - ${coverageResponse.reason}`);
+						}
 					} catch (e) {
 						this.isError = true;
 					}
