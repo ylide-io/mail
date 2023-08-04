@@ -34,7 +34,7 @@ export class OutgoingMailData {
 	mode = OutgoingMailDataMode.MESSAGE;
 	feedId = DEFAULT_FEED_ID;
 	isGenericFeed = false;
-	extraPayment: string = '0';
+	extraPayment = '0';
 
 	from?: DomainAccount;
 	to = new Recipients();
@@ -54,16 +54,20 @@ export class OutgoingMailData {
 	constructor() {
 		makeAutoObservable(this);
 
-		autorun(() => {
+		autorun(async () => {
 			this.from =
 				this.from && domain.accounts.activeAccounts.includes(this.from)
 					? this.from
 					: domain.accounts.activeAccounts[0];
-		});
 
-		autorun(async () => {
 			if (this.from?.wallet.factory.blockchainGroup === 'evm') {
-				this.network = await getEvmWalletNetwork(this.from.wallet);
+				const selectedNetwork = await getEvmWalletNetwork(this.from.wallet);
+
+				if (this.network == null) {
+					this.network = selectedNetwork;
+				}
+			} else {
+				this.network = undefined;
 			}
 		});
 	}
@@ -149,7 +153,7 @@ export class OutgoingMailData {
 						<SelectNetworkModal wallet={from.wallet} account={from.account} onClose={resolve} />
 					));
 
-					if (!this.network) return false;
+					if (this.network == null) return false;
 				}
 			} else if (proxyAccount && proxyAccount.account.address !== this.from.account.address) {
 				const proceed = await showStaticComponent<boolean>(resolve => (
@@ -235,13 +239,11 @@ export class OutgoingMailData {
 
 				console.log('Sending result: ', result);
 			} else {
-				const blockchain = this.from.getBlockchainName(this.network);
+				const blockchain = domain.getBlockchainName(this.network);
 				if (this.isGenericFeed) {
 					const comissions = await BlockchainFeedApi.getComissions({ feedId: this.feedId });
 					const comission = calcComissions(blockchain, comissions);
-					if (comission !== this.extraPayment) {
-						throw new Error('Comissions mismatch');
-					}
+					invariant(comission === this.extraPayment, 'Comissions mismatch');
 				}
 				const result = await broadcastMessage({
 					sender: this.from,

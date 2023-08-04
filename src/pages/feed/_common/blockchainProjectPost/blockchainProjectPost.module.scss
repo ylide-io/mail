@@ -135,7 +135,7 @@
 	}
 }
 
-.cover {
+.sticker {
 	height: 200px;
 	object-fit: contain;
 	border-radius: 8px;
@@ -143,4 +143,8 @@
 	.root_compact & {
 		height: 100px;
 	}
+}
+
+.cover {
+	@include feed-attachment-image;
 }

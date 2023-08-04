@@ -39,7 +39,7 @@ export const AccountsPopup = observer(({ anchorRef, onClose }: AccountsPopupProp
 						<Avatar className={css.itemAvatar} blockie={account.account.address} />
 
 						<div className={css.itemBody}>
-							{account.isLocalKeyRegistered ? (
+							{account.isAnyLocalPrivateKeyRegistered ? (
 								<div className={css.itemName}>
 									<AdaptiveText
 										className={clsx(css.itemNameInner, !account.name && css.itemNameInner_empty)}
@@ -58,7 +58,7 @@ export const AccountsPopup = observer(({ anchorRef, onClose }: AccountsPopupProp
 											);
 
 											const newName = prompt('Enter new account name: ', account.name) || '';
-											await account.rename(newName);
+											account.rename(newName);
 										}}
 									/>
 								</div>

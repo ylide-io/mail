@@ -113,7 +113,7 @@ export async function connectAccount(params?: { place?: string }): Promise<Domai
 
 				if (currentAccount && wallet.isAccountRegistered(currentAccount)) {
 					const domainAccount = wallet.accounts.find(a => a.account.address === currentAccount!.address)!;
-					if (domainAccount.isLocalKeyRegistered) {
+					if (domainAccount.isAnyLocalPrivateKeyRegistered) {
 						return toast('This account is already connected. Please choose another one.');
 					} else {
 						await domain.accounts.removeAccount(domainAccount);
@@ -126,7 +126,7 @@ export async function connectAccount(params?: { place?: string }): Promise<Domai
 			const account = await connectWalletAccount(wallet);
 			if (!account) return;
 
-			const remoteKeys = await wallet.readRemoteKeys(account);
+			const remoteKeys = await domain.ylide.core.getAddressKeys(account.address);
 			const qqs = getQueryString();
 
 			const domainAccount = await showStaticComponent<DomainAccount>(resolve => (
@@ -141,18 +141,6 @@ export async function connectAccount(params?: { place?: string }): Promise<Domai
 				/>
 			));
 
-			if (domainAccount) {
-				browserStorage.setAccountRemoteKeys(
-					domainAccount.account.address,
-					domainAccount.remoteKey
-						? {
-								freshestKey: domainAccount.remoteKey,
-								remoteKeys: domainAccount.remoteKeys,
-						  }
-						: undefined,
-				);
-			}
-
 			return domainAccount;
 		}
 	} catch (e) {
@@ -165,7 +153,7 @@ export async function connectAccount(params?: { place?: string }): Promise<Domai
 export async function activateAccount(params: { account: DomainAccount }) {
 	const account = params.account;
 	const wallet = account.wallet;
-	const remoteKeys = await wallet.readRemoteKeys(account.account);
+	const remoteKeys = await domain.ylide.core.getAddressKeys(account.account.address);
 	const qqs = getQueryString();
 
 	await showStaticComponent<DomainAccount>(resolve => (
@@ -190,7 +178,6 @@ export async function disconnectAccount(params: { account: DomainAccount; place?
 	await account.wallet.disconnectAccount(account);
 	await domain.accounts.removeAccount(account);
 	account.mainViewKey = '';
-	browserStorage.setAccountRemoteKeys(account.account.address, undefined);
 
 	if (account.wallet.factory.wallet === 'walletconnect') {
 		domain.disconnectWalletConnect();

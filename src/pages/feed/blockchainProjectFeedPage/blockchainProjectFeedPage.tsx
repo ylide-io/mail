@@ -1,3 +1,4 @@
+import { EVMNetwork } from '@ylide/ethereum';
 import { observer } from 'mobx-react';
 import { useRef, useState } from 'react';
 import { Helmet } from 'react-helmet';
@@ -19,7 +20,7 @@ import {
 	blockchainProjectsMeta,
 } from '../../../stores/blockchainProjects/blockchainProjects';
 import { browserStorage } from '../../../stores/browserStorage';
-import { useDomainAccounts, useVenomAccounts } from '../../../stores/Domain';
+import domain, { useEvmAccounts, useVenomAccounts } from '../../../stores/Domain';
 import { RoutePath } from '../../../stores/routePath';
 import { connectAccount } from '../../../utils/account';
 import { invariant } from '../../../utils/assert';
@@ -33,12 +34,14 @@ export const BlockchainProjectFeedPage = observer(() => {
 	invariant(projectId, 'Blockchain project must be specified');
 	const projectMeta = blockchainProjectsMeta[projectId];
 	const isVenomFeed = activeVenomProjects.includes(projectId);
+	const isEvmFeed = projectId === BlockchainProjectId.ETH_WHALES;
 
-	const isAdminMode = useIsMatchingRoute(RoutePath.FEED_PROJECT_POSTS_ADMIN);
+	const isAdminMode = useIsMatchingRoute(RoutePath.FEED_PROJECT_POSTS_ADMIN) && browserStorage.isUserAdmin;
 
-	const allAccounts = useDomainAccounts();
+	const allAccounts = domain.accounts.activeAccounts;
+	const evmAccounts = useEvmAccounts();
 	const venomAccounts = useVenomAccounts();
-	const accounts = isVenomFeed ? venomAccounts : allAccounts;
+	const accounts = isEvmFeed ? evmAccounts : isVenomFeed ? venomAccounts : allAccounts;
 
 	const [currentPost, setCurrentPost] = useState<number>(0);
 
@@ -141,11 +144,12 @@ export const BlockchainProjectFeedPage = observer(() => {
 				{projectId === BlockchainProjectId.TVM && !browserStorage.isUserAdmin ? null : accounts.length ? (
 					<CreatePostForm
 						ref={createPostFormRef}
-						projectMeta={projectMeta}
 						className={css.createPostForm}
 						accounts={accounts}
-						displayIdeasButton={projectMeta.id === BlockchainProjectId.VENOM_BLOCKCHAIN}
 						isUnavailable={serviceStatus.data !== 'ACTIVE'}
+						projectMeta={projectMeta}
+						allowCustomAttachments={projectId === BlockchainProjectId.ETH_WHALES || isAdminMode}
+						fixedEvmNetwork={projectId === BlockchainProjectId.ETH_WHALES ? EVMNetwork.ETHEREUM : undefined}
 						onCreated={() => toast('Good job! Your post will appear shortly 🔥')}
 					/>
 				) : (

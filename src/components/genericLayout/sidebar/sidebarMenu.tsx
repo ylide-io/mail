@@ -1,7 +1,7 @@
 import clsx from 'clsx';
-import { observable } from 'mobx';
+import { observable, reaction } from 'mobx';
 import { observer } from 'mobx-react';
-import { PropsWithChildren, ReactNode, useState } from 'react';
+import { AnchorHTMLAttributes, PropsWithChildren, ReactNode, useEffect, useState } from 'react';
 import { generatePath, useLocation } from 'react-router-dom';
 
 import { FeedCategory } from '../../../api/feedServerApi';
@@ -22,10 +22,8 @@ import { ReactComponent as TelegramSvg } from '../../../icons/social/telegram.sv
 import { ReactComponent as TwitterSvg } from '../../../icons/social/twitter.svg';
 import { sideAnalyticsIcon } from '../../../icons/static/sideAnalyticsIcon';
 import { sideCultureIcon } from '../../../icons/static/sideCultureIcon';
-import { sideEducationIcon } from '../../../icons/static/sideEducationIcon';
 import { sideFeedIcon } from '../../../icons/static/sideFeedIcon';
 import { sideMarketsIcon } from '../../../icons/static/sideMarketsIcon';
-import { sidePolicyIcon } from '../../../icons/static/sidePolicyIcon';
 import { sideProjectsIcon } from '../../../icons/static/sideProjectsIcon';
 import { sideSecurityIcon } from '../../../icons/static/sideSecurityIcon';
 import { sideTechnologyIcon } from '../../../icons/static/sideTechnologyIcon';
@@ -39,8 +37,7 @@ import {
 } from '../../../stores/blockchainProjects/blockchainProjects';
 import { browserStorage } from '../../../stores/browserStorage';
 import domain from '../../../stores/Domain';
-import { getFeedCategoryName } from '../../../stores/Feed';
-import { FolderId } from '../../../stores/MailList';
+import { FolderId, getFolderName, MailList } from '../../../stores/MailList';
 import { DomainAccount } from '../../../stores/models/DomainAccount';
 import { RoutePath } from '../../../stores/routePath';
 import { useOpenMailCompose } from '../../../utils/mail';
@@ -67,11 +64,11 @@ const getFeedCategoryIcon = (category: FeedCategory) => {
 		[FeedCategory.MARKETS]: sideMarketsIcon(15),
 		[FeedCategory.ANALYTICS]: sideAnalyticsIcon(15),
 		[FeedCategory.PROJECTS]: sideProjectsIcon(15),
-		[FeedCategory.POLICY]: sidePolicyIcon(15),
+		// [FeedCategory.POLICY]: sidePolicyIcon(15),
 		[FeedCategory.SECURITY]: sideSecurityIcon(15),
 		[FeedCategory.TECHNOLOGY]: sideTechnologyIcon(15),
 		[FeedCategory.CULTURE]: sideCultureIcon(15),
-		[FeedCategory.EDUCATION]: sideEducationIcon(18),
+		// [FeedCategory.EDUCATION]: sideEducationIcon(18),
 	}[category];
 };
 
@@ -145,6 +142,14 @@ export const SidebarButton = observer(({ look, href, icon, name, rightButton }: 
 
 	const isActive = location.pathname === href;
 
+	const isExternal = !href.startsWith('/');
+	const externalProps: AnchorHTMLAttributes<HTMLAnchorElement> = isExternal
+		? {
+				target: '_blank',
+				rel: 'noreferrer',
+		  }
+		: {};
+
 	const lookClass =
 		look &&
 		{
@@ -154,12 +159,15 @@ export const SidebarButton = observer(({ look, href, icon, name, rightButton }: 
 
 	return (
 		<a
+			{...externalProps}
 			className={clsx(css.sectionLink, lookClass, isActive && css.sectionLink_active)}
 			href={href}
 			onClick={e => {
-				e.preventDefault();
-				isSidebarOpen.set(false);
-				navigate(href);
+				if (!isExternal) {
+					e.preventDefault();
+					isSidebarOpen.set(false);
+					navigate(href);
+				}
 			}}
 		>
 			{icon && <div className={css.sectionLinkIconLeft}>{icon}</div>}
@@ -187,49 +195,50 @@ export const SidebarButton = observer(({ look, href, icon, name, rightButton }: 
 export const SidebarMailSection = observer(() => {
 	const openMailCompose = useOpenMailCompose();
 
-	// const accounts = useDomainAccounts();
+	const accounts = domain.accounts.activeAccounts;
 
 	const [hasNewMessages, setHasNewMessages] = useState(false);
 
-	// useEffect(() => {
-	// 	console.log('sidebar mail section mounted');
-	// 	return () => {
-	// 		console.log('sidebar mail section unmounted');
-	// 	};
-	// }, []);
+	useEffect(() => {
+		const mailList = new MailList();
 
-	// useEffect(() => {
-	// 	const mailList = new MailList();
+		mailList.init({
+			mailbox: {
+				accounts,
+				folderId: FolderId.Inbox,
+			},
+		});
 
-	// 	mailList.init({
-	// 		mailbox: {
-	// 			accounts,
-	// 			folderId: FolderId.Inbox,
-	// 		},
-	// 	});
+		const key = accounts
+			.map(a => a.account.address)
+			.sort()
+			.join(',');
 
-	// 	console.log('inited maillist: ', mailList.id);
+		const dispose = reaction(
+			() => ({
+				newMessagesCount: mailList.newMessagesCount,
+				messagesData: mailList.messagesData,
+				lastMailboxCheckDate: browserStorage.lastMailboxCheckDate,
+			}),
+			({ newMessagesCount, messagesData, lastMailboxCheckDate }) => {
+				if (newMessagesCount) {
+					mailList.drainNewMessages();
+				}
 
-	// 	const key = accounts
-	// 		.map(a => a.account.address)
-	// 		.sort()
-	// 		.join(',');
+				const lastMessage = messagesData[0];
+				const lastCheckedDate = lastMailboxCheckDate[key];
 
-	// 	const dispose = reaction(
-	// 		() => ({ messagesData: mailList.messagesData, lastMailboxCheckDate: browserStorage.lastMailboxCheckDate }),
-	// 		({ messagesData, lastMailboxCheckDate }) => {
-	// 			console.log('reaction triggered for ' + mailList.id);
-	// 			const lastCheckedDate = lastMailboxCheckDate[key];
-	// 			const isNew =
-	// 				messagesData[0] && (!lastCheckedDate || messagesData[0].raw.msg.createdAt > lastCheckedDate);
-	// 			setHasNewMessages(isNew);
-	// 		},
-	// 	);
-	// 	return () => {
-	// 		dispose();
-	// 		mailList.destroy();
-	// 	};
-	// }, [accounts]);
+				setHasNewMessages(
+					!!lastMessage && (!lastCheckedDate || lastMessage.raw.msg.createdAt > lastCheckedDate),
+				);
+			},
+		);
+
+		return () => {
+			dispose();
+			mailList.destroy();
+		};
+	}, [accounts]);
 
 	return (
 		<SidebarSection section={Section.MAIL} title="Mail">
@@ -249,7 +258,7 @@ export const SidebarMailSection = observer(() => {
 				icon={<InboxSvg />}
 				name={
 					<div className={css.inboxButton}>
-						Inbox
+						{getFolderName(FolderId.Inbox)}
 						{hasNewMessages && <div className={css.inboxNotification} title="You have new messages" />}
 					</div>
 				}
@@ -258,13 +267,13 @@ export const SidebarMailSection = observer(() => {
 			<SidebarButton
 				href={generatePath(RoutePath.MAIL_FOLDER, { folderId: FolderId.Sent })}
 				icon={<SentSvg />}
-				name="Sent"
+				name={getFolderName(FolderId.Sent)}
 			/>
 
 			<SidebarButton
 				href={generatePath(RoutePath.MAIL_FOLDER, { folderId: FolderId.Archive })}
 				icon={<ArchiveSvg />}
-				name="Archive"
+				name={getFolderName(FolderId.Archive)}
 			/>
 		</SidebarSection>
 	);
@@ -349,12 +358,21 @@ export const SidebarMenu = observer(() => {
 
 		return (
 			<>
-				<SidebarButton
-					look={SidebarButtonLook.SECTION}
-					href={generatePath(RoutePath.FEED_PROJECT_POSTS, { projectId: BlockchainProjectId.GENERAL })}
-					name={blockchainProjectsMeta[BlockchainProjectId.GENERAL].name}
-					icon={blockchainProjectsMeta[BlockchainProjectId.GENERAL].logo}
-				/>
+				<div>
+					<SidebarButton
+						look={SidebarButtonLook.SECTION}
+						href={generatePath(RoutePath.FEED_PROJECT_POSTS, { projectId: BlockchainProjectId.GENERAL })}
+						name={blockchainProjectsMeta[BlockchainProjectId.GENERAL].name}
+						icon={blockchainProjectsMeta[BlockchainProjectId.GENERAL].logo}
+					/>
+
+					<SidebarButton
+						look={SidebarButtonLook.SECTION}
+						href={generatePath(RoutePath.FEED_PROJECT_POSTS, { projectId: BlockchainProjectId.ETH_WHALES })}
+						name={blockchainProjectsMeta[BlockchainProjectId.ETH_WHALES].name}
+						icon={blockchainProjectsMeta[BlockchainProjectId.ETH_WHALES].logo}
+					/>
+				</div>
 
 				<SidebarSection section={Section.VENOM_PROJECTS} title="Venom Projects">
 					{renderProjects(activeVenomProjects)}
@@ -363,6 +381,16 @@ export const SidebarMenu = observer(() => {
 				<SidebarSection section={Section.TVM_PROJECTS} title="TVM 주요정보">
 					{renderProjects(activeTvmProjects)}
 				</SidebarSection>
+
+				<ActionButton
+					className={css.sectionButton}
+					onClick={() => {
+						analytics.openCreateCommunityForm();
+						window.open('https://forms.gle/p9141gy5wn7DCjZA8', '_blank')?.focus();
+					}}
+				>
+					Create community
+				</ActionButton>
 			</>
 		);
 	}
@@ -375,18 +403,14 @@ export const SidebarMenu = observer(() => {
 				section={Section.FEED_DISCOVERY}
 				title={REACT_APP__APP_MODE === AppMode.MAIN_VIEW ? 'Discovery' : 'Feed'}
 			>
-				<SidebarButton href={generatePath(RoutePath.FEED_ALL)} icon={sideFeedIcon(14)} name="All topics" />
-
-				{Object.values<FeedCategory>(FeedCategory)
-					.filter(c => c !== FeedCategory.POLICY && c !== FeedCategory.EDUCATION)
-					.map(category => (
-						<SidebarButton
-							key={category}
-							href={generatePath(RoutePath.FEED_CATEGORY, { category })}
-							icon={getFeedCategoryIcon(category)}
-							name={getFeedCategoryName(category)}
-						/>
-					))}
+				{Object.values<FeedCategory>(FeedCategory).map(category => (
+					<SidebarButton
+						key={category}
+						href={generatePath(RoutePath.FEED_CATEGORY, { category })}
+						icon={getFeedCategoryIcon(category)}
+						name={category}
+					/>
+				))}
 			</SidebarSection>
 		);
 	}

@@ -1,20 +1,19 @@
+import { EVMNetwork } from '@ylide/ethereum';
 import { MessageAttachmentLinkV1, MessageAttachmentType } from '@ylide/sdk';
 import clsx from 'clsx';
 import { observer } from 'mobx-react';
 import { forwardRef, Ref, useEffect, useImperativeHandle, useMemo, useRef, useState } from 'react';
-import { useMutation } from 'react-query';
 
 import { BlockchainFeedApi, DecodedBlockchainFeedPost } from '../../../../api/blockchainFeedApi';
 import { AccountSelect } from '../../../../components/accountSelect/accountSelect';
 import { ActionButton, ActionButtonLook, ActionButtonSize } from '../../../../components/ActionButton/ActionButton';
 import { AutoSizeTextArea, AutoSizeTextAreaApi } from '../../../../components/autoSizeTextArea/autoSizeTextArea';
-import { GridRowBox } from '../../../../components/boxes/boxes';
 import { AnchoredPopup } from '../../../../components/popup/anchoredPopup/anchoredPopup';
 import { PropsWithClassName } from '../../../../components/props';
+import { Spinner } from '../../../../components/spinner/spinner';
 import { toast } from '../../../../components/toast/toast';
-import { VENOM_FEED_ID } from '../../../../constants';
 import { ReactComponent as TrashSvg } from '../../../../icons/ic20/trash.svg';
-import { ReactComponent as BulbSvg } from '../../../../icons/ic28/bulb.svg';
+import { ReactComponent as ImageSvg } from '../../../../icons/ic28/image.svg';
 import { ReactComponent as StickerSvg } from '../../../../icons/ic28/sticker.svg';
 import { analytics } from '../../../../stores/Analytics';
 import { BlockchainProjectMeta } from '../../../../stores/blockchainProjects/blockchainProjects';
@@ -22,11 +21,14 @@ import { DomainAccount } from '../../../../stores/models/DomainAccount';
 import { OutgoingMailData, OutgoingMailDataMode } from '../../../../stores/outgoingMailData';
 import { HorizontalAlignment } from '../../../../utils/alignment';
 import { calcComissions } from '../../../../utils/calcComissions';
+import { openFilePicker, readFileAsDataURL } from '../../../../utils/file';
 import { hashToIpfsUrl, ipfsToHttpUrl } from '../../../../utils/ipfs';
 import { escapeRegex } from '../../../../utils/regex';
 import { SendMailButton } from '../../../mail/_common/composeMailForm/sendMailButton/sendMailButton';
 import { BlockchainProjectPostView } from '../blockchainProjectPost/blockchainProjectPost';
 import css from './createPostForm.module.scss';
+import { stickerIpfsIds } from './stickerIpfsIds';
+import domain from '../../../../stores/Domain';
 
 export interface CreatePostFormApi {
 	replyTo: (post: DecodedBlockchainFeedPost) => void;
@@ -35,15 +37,24 @@ export interface CreatePostFormApi {
 export interface CreatePostFormProps extends PropsWithClassName {
 	accounts: DomainAccount[];
 	isUnavailable: boolean;
-	displayIdeasButton: boolean;
 	projectMeta: BlockchainProjectMeta;
+	allowCustomAttachments: boolean;
+	fixedEvmNetwork?: EVMNetwork;
 	onCreated?: () => void;
 }
 
 export const CreatePostForm = observer(
 	forwardRef(
 		(
-			{ className, accounts, isUnavailable, displayIdeasButton, projectMeta, onCreated }: CreatePostFormProps,
+			{
+				className,
+				accounts,
+				isUnavailable,
+				projectMeta,
+				allowCustomAttachments,
+				fixedEvmNetwork,
+				onCreated,
+			}: CreatePostFormProps,
 			ref: Ref<CreatePostFormApi>,
 		) => {
 			const textAreaApiRef = useRef<AutoSizeTextAreaApi>(null);
@@ -54,9 +65,18 @@ export const CreatePostForm = observer(
 				const mailData = new OutgoingMailData();
 
 				mailData.mode = OutgoingMailDataMode.BROADCAST;
-				mailData.feedId = projectMeta.feedId;
 				mailData.isGenericFeed = true;
 				mailData.extraPayment = '0';
+
+				return mailData;
+			}, []);
+
+			useEffect(() => {
+				mailData.feedId = projectMeta.feedId;
+
+				if (fixedEvmNetwork != null) {
+					mailData.network = fixedEvmNetwork;
+				}
 
 				mailData.validator = () => {
 					const text = mailData.plainTextData;
@@ -88,9 +108,7 @@ export const CreatePostForm = observer(
 
 					return true;
 				};
-
-				return mailData;
-			}, [projectMeta.feedId, projectMeta.id, replyTo]);
+			}, [fixedEvmNetwork, mailData, projectMeta, replyTo]);
 
 			useEffect(() => {
 				mailData.from = mailData.from && accounts.includes(mailData.from) ? mailData.from : accounts[0];
@@ -103,7 +121,7 @@ export const CreatePostForm = observer(
 						if (cancelled || !mailData.from) {
 							return;
 						}
-						const blockchain = mailData.from.getBlockchainName(mailData.network);
+						const blockchain = domain.getBlockchainName(mailData.network);
 						const comission = calcComissions(blockchain, comissions);
 						mailData.extraPayment = comission || '0';
 					})
@@ -117,46 +135,77 @@ export const CreatePostForm = observer(
 
 			const [expanded, setExpanded] = useState(false);
 
-			const [isIdeaAnimated, setIdeaAnimated] = useState(false);
-			useEffect(() => {
-				setTimeout(() => setIdeaAnimated(expanded), 1000);
-			}, [expanded]);
-
-			const [lastIdea, setLastIdea] = useState('');
-
-			const { mutate: loadIdea, isLoading: isIdeaLoading } = useMutation({
-				mutationFn: () => BlockchainFeedApi.getTextIdea(),
-				onSuccess: data => {
-					let text = mailData.plainTextData;
-
-					if (lastIdea && text.endsWith(lastIdea)) {
-						text = text.slice(0, text.length - lastIdea.length);
-					}
-
-					mailData.plainTextData = [text.trim(), data].filter(Boolean).join('\n\n');
-					setLastIdea(data);
-				},
-				onError: () => toast('Failed to get idea 🤦‍♀️'),
-			});
-
 			const stickerButtonRef = useRef(null);
 			const [isStickerPopupOpen, setStickerPopupOpen] = useState(false);
 
-			const attachmentUrl = mailData.attachments.length
-				? ipfsToHttpUrl((mailData.attachments[0] as MessageAttachmentLinkV1).link)
-				: undefined;
+			const [previewSrc, setPreviewSrc] = useState('');
+			const [isPreviewLoading, setPreviewLoading] = useState(false);
+
+			const attachFile = async () => {
+				const files = await openFilePicker({ accept: 'image/png, image/jpeg' });
+				const file = files[0];
+				if (file) {
+					setPreviewSrc('');
+					setPreviewLoading(true);
+
+					function success(src: string) {
+						setPreviewSrc(src);
+						setPreviewLoading(false);
+						mailData.attachmentFiles = [file];
+					}
+
+					function error() {
+						setPreviewLoading(false);
+						toast("Couldn't load the image 😒");
+					}
+
+					try {
+						const src = await readFileAsDataURL(file);
+						const img = document.createElement('img');
+						img.onload = () => success(src);
+						img.onerror = error;
+						img.src = src;
+					} catch (e) {
+						error();
+					}
+				}
+			};
+
+			const attachSticker = (id: string) => {
+				const url = hashToIpfsUrl(id);
+
+				mailData.attachments = [
+					new MessageAttachmentLinkV1({
+						type: MessageAttachmentType.LINK_V1,
+						previewLink: '',
+						link: url,
+						fileName: 'Venom sticker',
+						fileSize: 0,
+						isEncrypted: false,
+					}),
+				];
+
+				setStickerPopupOpen(false);
+				setPreviewSrc(ipfsToHttpUrl(url));
+			};
+
+			const removeAttachment = () => {
+				mailData.attachments = [];
+				mailData.attachmentFiles = [];
+
+				setPreviewSrc('');
+			};
 
 			const onSent = () => {
 				analytics.blockchainFeedSendSuccessful(projectMeta.id, !!replyTo, replyTo?.original.id);
 
-				mailData.reset({
-					mode: OutgoingMailDataMode.BROADCAST,
-					feedId: VENOM_FEED_ID,
-					from: mailData.from,
-				});
+				mailData.plainTextData = '';
+				mailData.attachments = [];
+				mailData.attachmentFiles = [];
 
 				setReplyTo(undefined);
 				setExpanded(false);
+				setPreviewSrc('');
 
 				onCreated?.();
 			};
@@ -227,22 +276,32 @@ export const CreatePostForm = observer(
 
 					{expanded ? (
 						<>
-							{attachmentUrl && (
+							{(!!previewSrc || isPreviewLoading) && (
 								<>
 									<div className={css.divider} />
 
-									<div className={css.preview}>
-										<img className={css.previewImage} alt="Preview" src={attachmentUrl} />
+									{isPreviewLoading ? (
+										<Spinner className={css.previewLoader} />
+									) : (
+										<div className={css.preview}>
+											<img
+												className={
+													allowCustomAttachments ? css.previewCustomImage : css.previewSticker
+												}
+												alt="Preview"
+												src={previewSrc}
+											/>
 
-										<ActionButton
-											isDisabled={mailData.sending}
-											look={ActionButtonLook.DANGEROUS}
-											icon={<TrashSvg />}
-											onClick={() => (mailData.attachments = [])}
-										>
-											Remove
-										</ActionButton>
-									</div>
+											<ActionButton
+												isDisabled={mailData.sending}
+												look={ActionButtonLook.DANGEROUS}
+												icon={<TrashSvg />}
+												onClick={removeAttachment}
+											>
+												Remove attachment
+											</ActionButton>
+										</div>
+									)}
 								</>
 							)}
 
@@ -257,69 +316,62 @@ export const CreatePostForm = observer(
 								/>
 
 								<div className={css.footerRight}>
-									<GridRowBox gap={4}>
-										{displayIdeasButton && (
-											<ActionButton
-												className={clsx(isIdeaAnimated && css.ideaButton_animated)}
-												isDisabled={mailData.sending || isIdeaLoading}
-												size={ActionButtonSize.MEDIUM}
-												look={ActionButtonLook.LITE}
-												icon={<BulbSvg />}
-												title="Get idea!"
-												onClick={() => loadIdea()}
-											/>
-										)}
-
-										<ActionButton
-											ref={stickerButtonRef}
-											isDisabled={mailData.sending}
-											size={ActionButtonSize.MEDIUM}
-											look={ActionButtonLook.LITE}
-											icon={<StickerSvg />}
-											title="Stickers"
-											onClick={() => setStickerPopupOpen(!isStickerPopupOpen)}
-										/>
-
-										{isStickerPopupOpen && (
-											<AnchoredPopup
-												className={css.stickerPopup}
-												anchorRef={stickerButtonRef}
-												horizontalAlign={HorizontalAlignment.END}
-												alignerOptions={{
-													fitLeftToViewport: true,
-												}}
-												onCloseRequest={() => setStickerPopupOpen(false)}
-											>
-												<div className={css.stickerPopupContent}>
-													{stickerIpfsIds.map((id, i) => (
-														<img
-															key={i}
-															alt="Sticker"
-															src={ipfsToHttpUrl(id)}
-															onClick={() => {
-																setStickerPopupOpen(false);
-																mailData.attachments = [
-																	new MessageAttachmentLinkV1({
-																		type: MessageAttachmentType.LINK_V1,
-																		previewLink: '',
-																		link: hashToIpfsUrl(id),
-																		fileName: 'Venom sticker',
-																		fileSize: 0,
-																		isEncrypted: false,
-																	}),
-																];
-															}}
-														/>
-													))}
-												</div>
-											</AnchoredPopup>
-										)}
-									</GridRowBox>
-
 									{isUnavailable ? (
 										<div>Can't post now. Wait a minute.</div>
 									) : (
-										<SendMailButton disabled={isIdeaLoading} mailData={mailData} onSent={onSent} />
+										<>
+											{allowCustomAttachments ? (
+												<ActionButton
+													isDisabled={isPreviewLoading || mailData.sending}
+													size={ActionButtonSize.MEDIUM}
+													look={ActionButtonLook.LITE}
+													icon={<ImageSvg />}
+													title="Attach image"
+													onClick={attachFile}
+												/>
+											) : (
+												<>
+													<ActionButton
+														ref={stickerButtonRef}
+														isDisabled={mailData.sending}
+														size={ActionButtonSize.MEDIUM}
+														look={ActionButtonLook.LITE}
+														icon={<StickerSvg />}
+														title="Stickers"
+														onClick={() => setStickerPopupOpen(!isStickerPopupOpen)}
+													/>
+
+													{isStickerPopupOpen && (
+														<AnchoredPopup
+															className={css.stickerPopup}
+															anchorRef={stickerButtonRef}
+															horizontalAlign={HorizontalAlignment.END}
+															alignerOptions={{
+																fitLeftToViewport: true,
+															}}
+															onCloseRequest={() => setStickerPopupOpen(false)}
+														>
+															<div className={css.stickerPopupContent}>
+																{stickerIpfsIds.map((id, i) => (
+																	<img
+																		key={i}
+																		alt="Sticker"
+																		src={ipfsToHttpUrl(id)}
+																		onClick={() => attachSticker(id)}
+																	/>
+																))}
+															</div>
+														</AnchoredPopup>
+													)}
+												</>
+											)}
+
+											<SendMailButton
+												mailData={mailData}
+												disableNetworkSwitch={fixedEvmNetwork != null}
+												onSent={onSent}
+											/>
+										</>
 									)}
 								</div>
 							</div>
@@ -334,36 +386,6 @@ export const CreatePostForm = observer(
 		},
 	),
 );
-
-//
-
-const stickerIpfsIds = [
-	'QmPNxHsuCpjCoUx8hvanCdzgwQH5CcXcUusvJ2cLyYz8r4',
-	'QmUvZc5jmPa5GK7R5KATH5i4n9uUQPh8vPC9k7oB9oMdER',
-	'QmdyTMTvKZLg33aRy3Y4ELDu5mn7pvcFbLL8KmSxhM96YR',
-	'QmWEBrZzyak2qbDu825q385arxURqKM7GiyffMBTxzidct',
-	'QmTRYuhzMYZ1vF8nFNh41K2KN6pF7VQu25BEmGbPoj6Ny8',
-	'QmVhfBAsFKnoV4dFtaWWqEAtNTnQmAW3TjJogakvj9VwuU',
-	'QmWVkC5on7f6QD4gJTRfjNb6GVYdPa6YJn8JGuU5kDdpZX',
-	'QmXnUQwtiTbmedQwZ74LybbHJWMgePTvoRPTUTgCEVkWvT',
-	'QmQf26iMvegpgNAiuc2SqDVL2vvwL8Q8wHJajVz3ZzWpZ3',
-	'QmQ2cdJmHPtwQEKysejQLfc3JCiwYd7X7CuqLtgHUqNH7U',
-	'QmRQk35pqdBj8xo57RzphdpiK5hmf7kGHZ45V2uLAi34UG',
-	'QmTovX2GyBwJ5uKKudQ6r5zwjbKr8DEibp7Emodqw19Ta2',
-	'QmU9CZfWpAbRNfpU2m515t5mPCiEs3TRH7G1rNdbyK9ZRg',
-	'QmU8E9wHZq4TzCAzg4CL9EC7CGD2gBKdH6PbAMwGo2ZqUo',
-	'QmRC1MLd2PEb3dRTKNE5z57KPgEfTkvAPX5tfvHjAZiScb',
-	'Qme7Cuyk5NezKTXu5gCoNxAXrGv9T6JaUeBGTd1wmPbfpo',
-	'QmetxtnQQP71YEn16YkwbrWhN98hjewgSq5vQKQjPpxeE1',
-	'QmPrTT1x37dDwDsCPzvAppLgxQhsAExLyr8RjwYyRSE2oV',
-	'QmdfDTHJGqFGkds6FaS4NTEqVPUapp33CHChk8Nj5ToCTz',
-	'QmTAGJ7HEEFtmqPaUe3bJZwZ8RUKwBDug94AKG5rJ28puT',
-	'QmdguqNpb2bUKg6znVSyXtKRaNrtrYVxchaof7xryjarhE',
-	'QmW4oWhz6onHJSaWYBTVF68XCgvr8MSrs6m73dJd3tRLTb',
-	'QmZVpzzAyKnFXDLpJze7H22p8igxRfuLHCikPA3YMRhLg7',
-	'QmSwxecFnFjbe44HJ3pQdLrytrZNcM48XGPbvaTbxWZsCk',
-	'QmbYpa9m8QsCuyTG4tPYHtok2Cf7raJrtap9kMsND5Y25x',
-];
 
 //
 

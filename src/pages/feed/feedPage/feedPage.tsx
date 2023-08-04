@@ -4,7 +4,7 @@ import { useEffect, useMemo } from 'react';
 import { InView } from 'react-intersection-observer';
 import { generatePath, useParams } from 'react-router-dom';
 
-import { FeedCategory, FeedServerApi } from '../../../api/feedServerApi';
+import { FeedCategory, FeedServerApi, TagToCategoryName } from '../../../api/feedServerApi';
 import { ActionButton, ActionButtonLook, ActionButtonSize } from '../../../components/ActionButton/ActionButton';
 import { ErrorMessage, ErrorMessageLook } from '../../../components/errorMessage/errorMessage';
 import { NarrowContent } from '../../../components/genericLayout/content/narrowContent/narrowContent';
@@ -13,8 +13,8 @@ import { YlideLoader } from '../../../components/ylideLoader/ylideLoader';
 import { AppMode, REACT_APP__APP_MODE } from '../../../env';
 import { ReactComponent as ArrowUpSvg } from '../../../icons/ic20/arrowUp.svg';
 import { ReactComponent as CrossSvg } from '../../../icons/ic20/cross.svg';
-import { useDomainAccounts } from '../../../stores/Domain';
-import { FeedStore, getFeedCategoryName } from '../../../stores/Feed';
+import domain from '../../../stores/Domain';
+import { FeedStore } from '../../../stores/Feed';
 import { RoutePath } from '../../../stores/routePath';
 import { connectAccount } from '../../../utils/account';
 import { hookDependency } from '../../../utils/react';
@@ -22,9 +22,6 @@ import { useIsMatchingRoute, useNav } from '../../../utils/url';
 import { FeedPostItem } from '../_common/feedPostItem/feedPostItem';
 import css from './feedPage.module.scss';
 import ErrorCode = FeedServerApi.ErrorCode;
-import { Helmet } from 'react-helmet';
-
-import { APP_NAME } from '../../../constants';
 
 const reloadFeedCounter = observable.box(0);
 
@@ -36,7 +33,7 @@ export function reloadFeed() {
 
 const FeedPageContent = observer(() => {
 	const navigate = useNav();
-	const accounts = useDomainAccounts();
+	const accounts = domain.accounts.activeAccounts;
 	const genericLayoutApi = useGenericLayoutApi();
 
 	const { category, source, address } = useParams<{ category: FeedCategory; source: string; address: string }>();
@@ -87,8 +84,8 @@ const FeedPageContent = observer(() => {
 	return (
 		<NarrowContent
 			title={
-				feed.categories.length === 1
-					? getFeedCategoryName(feed.categories[0])
+				feed.tags.length === 1
+					? TagToCategoryName[feed.tags[0]]
 					: feed.sourceId || isAllPosts
 					? 'Feed'
 					: 'Smart feed'
@@ -125,6 +122,7 @@ const FeedPageContent = observer(() => {
 			<div className={css.posts}>
 				{feed.loaded ? (
 					<>
+						{feed.posts.length === 0 && <h2>No posts in this category.</h2>}
 						{feed.posts.map(post => (
 							<FeedPostItem key={post.id} isInFeed realtedAccounts={selectedAccounts} post={post} />
 						))}

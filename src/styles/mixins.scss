@@ -101,3 +101,12 @@ $interactive-elem-size_xlarge: 44px;
 	background-size: 69px 40px;
 	animation: stripes-animation-background-keyframes 1s linear infinite;
 }
+
+//
+
+@mixin feed-attachment-image {
+	width: 100%;
+	max-height: 1000px;
+	object-fit: cover;
+	border-radius: 4px;
+}

@@ -5,7 +5,6 @@ import {
 	asyncDelay,
 	BlockchainSourceType,
 	IBlockchainSourceSubject,
-	IGenericAccount,
 	IMessage,
 	IMessageWithSource,
 	ISourceWithMeta,
@@ -14,10 +13,12 @@ import {
 	ListSourceMultiplexer,
 	SourceReadingSession,
 	Uint256,
+	WalletAccount,
 	YLIDE_MAIN_FEED_ID,
 } from '@ylide/sdk';
 import { autobind } from 'core-decorators';
-import { computed, makeAutoObservable, makeObservable, observable, transaction } from 'mobx';
+import { computed, makeAutoObservable, makeObservable, observable, reaction, transaction } from 'mobx';
+import { nanoid } from 'nanoid';
 
 import { VENOM_FEED_ID } from '../constants';
 import messagesDB, { MessagesDB } from '../indexedDB/impl/MessagesDB';
@@ -53,9 +54,14 @@ export function getFolderName(folderId: FolderId) {
 
 //
 
-const MailPageSize = 10;
+// const MailPageSize = 10;
 
 const FILTERED_OUT = {};
+
+function wrapMessageId(p: IMessageWithSource) {
+	const acc = p.meta?.account as DomainAccount | undefined;
+	return `${p.msg.msgId}${acc ? `:${acc.account.address}` : ''}`;
+}
 
 export interface ILinkedMessage {
 	id: string;
@@ -71,15 +77,22 @@ export namespace ILinkedMessage {
 		return `${message.msgId}:${account.account.address}`;
 	}
 
-	export async function fromIMessage(message: IMessage, account: DomainAccount): Promise<ILinkedMessage> {
+	export async function fromIMessage(
+		folderId: FolderId | undefined,
+		message: IMessage,
+		account: DomainAccount,
+	): Promise<ILinkedMessage> {
 		const reader = domain.ylide.controllers.blockchainsMap[message.blockchain];
 
 		let recipients: string[] = [];
 		try {
-			recipients = (await (reader as EthereumBlockchainController).getMessageRecipients(
-				message,
-				true,
-			))!.recipients.map(formatAddress);
+			// console.log('folderId: ', folderId);
+			if (folderId === FolderId.Sent) {
+				recipients = (await (reader as EthereumBlockchainController).getMessageRecipients(
+					message,
+					true,
+				))!.recipients.map(formatAddress);
+			}
 		} catch (e) {}
 
 		return {
@@ -92,8 +105,12 @@ export namespace ILinkedMessage {
 		};
 	}
 
-	export async function fromIMessageArray(messages: IMessage[], account: DomainAccount): Promise<ILinkedMessage[]> {
-		return await Promise.all(messages.map(m => fromIMessage(m, account)));
+	export async function fromIMessageArray(
+		folderId: FolderId | undefined,
+		messages: IMessage[],
+		account: DomainAccount,
+	): Promise<ILinkedMessage[]> {
+		return await Promise.all(messages.map(m => fromIMessage(folderId, m, account)));
 	}
 
 	//
@@ -102,35 +119,44 @@ export namespace ILinkedMessage {
 		return idFromIMessage(p.msg, p.meta.account);
 	}
 
-	export async function fromIMessageWithSource(p: IMessageWithSource): Promise<ILinkedMessage> {
-		return fromIMessage(p.msg, p.meta.account);
+	export async function fromIMessageWithSource(
+		folderId: FolderId | undefined,
+		p: IMessageWithSource,
+	): Promise<ILinkedMessage> {
+		return fromIMessage(folderId, p.msg, p.meta.account);
 	}
 
-	export async function fromIMessageWithSourceArray(p: IMessageWithSource[]): Promise<ILinkedMessage[]> {
-		return await Promise.all(p.map(fromIMessageWithSource));
+	export async function fromIMessageWithSourceArray(
+		folderId: FolderId | undefined,
+		p: IMessageWithSource[],
+	): Promise<ILinkedMessage[]> {
+		return await Promise.all(p.map(m => fromIMessageWithSource(folderId, m)));
 	}
 }
 
 export class MailList<M = ILinkedMessage> {
-	private isDestroyed = false;
-
-	public id: string;
+	id = nanoid();
+	folderId: FolderId | undefined;
 
 	@observable isNextPageAvailable = true;
 	@observable isLoading = true;
 	@observable isError = false;
 
 	@observable.shallow public messagesData: { raw: IMessageWithSource; handled: M | typeof FILTERED_OUT }[] = [];
+	@observable newMessagesCount = 0;
 
 	private stream: ListSourceDrainer | undefined;
+	private streamDisposer: (() => void) | undefined;
 
 	private messagesFilter: ((messages: ILinkedMessage[]) => ILinkedMessage[] | Promise<ILinkedMessage[]>) | undefined;
 	private messageHandler: ((message: ILinkedMessage) => M | Promise<M>) | undefined;
 
 	constructor() {
 		makeObservable(this);
-		this.id = String(Math.floor(Math.random() * 1000000000));
-		console.log('MailList created', this.id);
+	}
+
+	get isActive() {
+		return !!this.stream;
 	}
 
 	async init(props: {
@@ -147,7 +173,15 @@ export class MailList<M = ILinkedMessage> {
 		this.messagesFilter = messagesFilter;
 		this.messageHandler = messageHandler;
 
+		if (this.stream) {
+			throw new Error('Mail list was not destroyed before reinit');
+		}
+
+		this.folderId = undefined;
+
 		if (mailbox) {
+			this.folderId = mailbox.folderId;
+
 			function buildMailboxSources(): ISourceWithMeta[] {
 				invariant(mailbox);
 
@@ -166,6 +200,7 @@ export class MailList<M = ILinkedMessage> {
 							},
 						])
 						.map(source => ({ source, meta: { account } }));
+					// .filter(s => s.source.subject.id === 'tvm-venom-testnet-mailer-13');
 				}
 
 				if (mailbox.folderId === FolderId.Inbox || mailbox.folderId === FolderId.Archive) {
@@ -187,11 +222,16 @@ export class MailList<M = ILinkedMessage> {
 				}
 			}
 
-			this.stream = new ListSourceDrainer(new ListSourceMultiplexer(buildMailboxSources()));
-
-			this.stream.resetFilter(m => {
-				return mailbox.filter ? mailbox.filter(ILinkedMessage.idFromIMessageWithSource(m)) : true;
+			const newStream = new ListSourceDrainer(new ListSourceMultiplexer(buildMailboxSources()));
+			const start = Date.now();
+			const { dispose } = await newStream.connect('Mailer', this.onNewMessages.bind(this, newStream));
+			console.debug('MailList init', this.id, Date.now() - start);
+			this.streamDisposer = dispose;
+			await newStream.resetFilter(m => {
+				return mailbox.filter ? mailbox.filter(wrapMessageId(m)) : true;
 			});
+			this.stream = newStream;
+			await this.reloadMessages();
 		} else if (venomFeed) {
 			async function buildVenomFources(): Promise<ISourceWithMeta[]> {
 				invariant(venomFeed);
@@ -215,19 +255,16 @@ export class MailList<M = ILinkedMessage> {
 				];
 			}
 
-			this.stream = new ListSourceDrainer(new ListSourceMultiplexer(await buildVenomFources()));
+			const newStream = new ListSourceDrainer(new ListSourceMultiplexer(await buildVenomFources()));
+			const start = Date.now();
+			const { dispose } = await newStream.connect('Mailer', this.onNewMessages.bind(this, newStream));
+			console.debug('MailList init', this.id, Date.now() - start);
+			this.streamDisposer = dispose;
+			this.stream = newStream;
+			await this.reloadMessages();
 		} else {
 			throw new Error('Cannot init list sources');
 		}
-
-		if (this.isDestroyed) return;
-
-		this.stream.on('messages', this.onNewMessages);
-
-		await this.stream.resume().then(async () => {
-			if (this.isDestroyed) return;
-			return this.loadNextPage();
-		});
 	}
 
 	@computed
@@ -235,13 +272,15 @@ export class MailList<M = ILinkedMessage> {
 		return this.messagesData.filter(m => m.handled !== FILTERED_OUT).map(m => m.handled as M);
 	}
 
-	private async handleMessages(messages: IMessageWithSource[]) {
-		const newMessages = messages.filter(m => !this.messagesData.find(old => old.raw.msg.msgId === m.msg.msgId));
-		const newLinked = await ILinkedMessage.fromIMessageWithSourceArray(newMessages);
+	private async handleMessages() {
+		const newMessages = this.stream!.messages.filter(
+			m => !this.messagesData.find(old => old.raw.msg.msgId === m.msg.msgId),
+		);
+		const newLinked = await ILinkedMessage.fromIMessageWithSourceArray(this.folderId, newMessages);
 		const newFiltered = this.messagesFilter ? await this.messagesFilter(newLinked) : newLinked;
 
 		return await Promise.all(
-			messages.map(async raw => {
+			this.stream!.messages.map(async raw => {
 				// Message is processed already
 				const existing = this.messagesData.find(e => e.raw.msg.msgId === raw.msg.msgId);
 				if (existing) {
@@ -267,43 +306,66 @@ export class MailList<M = ILinkedMessage> {
 	}
 
 	@autobind
-	private async onNewMessages({ messages }: { messages: IMessageWithSource[] }) {
-		console.log('New messages', this.id, messages[0]?.msg.createdAt);
-		this.messagesData = await this.handleMessages(messages);
+	private async onNewMessages(stream: ListSourceDrainer) {
+		this.newMessagesCount = stream.newMessagesCount || 0;
 	}
 
-	loadNextPage() {
+	async drainNewMessages() {
+		await this.stream?.drainNewMessages();
+		const data = await this.handleMessages();
+		transaction(() => {
+			this.messagesData = data;
+			this.isNextPageAvailable = !this.stream?.readToBottom;
+			this.newMessagesCount = this.stream!.newMessagesCount || 0;
+		});
+	}
+
+	async reloadMessages() {
 		invariant(this.stream, 'Mail list not ready yet');
-		invariant(!this.isDestroyed, 'Mail list destroyed already');
 
 		this.isLoading = true;
 
-		return this.stream
-			.readMore(MailPageSize)
-			.then(messages =>
-				this.handleMessages(messages).then(data => {
-					transaction(() => {
-						this.messagesData = data;
-						this.isNextPageAvailable = !this.stream?.drained;
-						this.isLoading = false;
-						this.isError = false;
-					});
-				}),
-			)
-			.catch(e => {
-				transaction(() => {
-					this.isLoading = false;
-					this.isError = true;
-				});
-				throw e;
+		try {
+			const data = await this.handleMessages();
+			transaction(() => {
+				this.messagesData = data;
+				this.isNextPageAvailable = !this.stream?.readToBottom;
+				this.isLoading = false;
+				this.isError = false;
 			});
+		} catch (e) {
+			transaction(() => {
+				this.isLoading = false;
+				this.isError = true;
+			});
+			throw e;
+		}
+	}
+
+	async loadNextPage() {
+		invariant(this.stream, 'Mail list not ready yet');
+
+		this.isLoading = true;
+
+		console.debug('loadNextPage');
+
+		try {
+			const start = Date.now();
+			await this.stream.loadNextPage('MailList');
+			console.debug('loadNextPage done', Date.now() - start);
+			await this.reloadMessages();
+		} catch (e) {
+			transaction(() => {
+				this.isLoading = false;
+				this.isError = true;
+			});
+			throw e;
+		}
 	}
 
 	destroy() {
-		this.isDestroyed = true;
-
-		this.stream?.pause();
-		this.stream?.off('messages', this.onNewMessages);
+		this.stream = undefined;
+		this.streamDisposer?.();
 	}
 }
 
@@ -322,6 +384,14 @@ class MailStore {
 
 	constructor() {
 		makeAutoObservable(this);
+
+		// Reset when account list changes
+		reaction(
+			() => domain.accounts.activeAccounts,
+			() => (this.lastMessagesList = []),
+		);
+
+		this.init();
 	}
 
 	async init() {
@@ -345,7 +415,7 @@ class MailStore {
 		this.deletedMessageIds = new Set(dbDeletedMessages);
 	}
 
-	async decodeMessage(msgId: string, msg: IMessage, recipient?: IGenericAccount) {
+	async decodeMessage(msgId: string, msg: IMessage, recipient?: WalletAccount) {
 		analytics.mailOpened(this.lastActiveFolderId || 'null');
 
 		const decodedMessage = await decodeMessage(msgId, msg, recipient);
@@ -388,3 +458,6 @@ class MailStore {
 }
 
 export const mailStore = new MailStore();
+
+// @ts-ignore
+window.mailStore = mailStore;

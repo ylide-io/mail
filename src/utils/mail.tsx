@@ -6,7 +6,6 @@ import { nanoid } from 'nanoid';
 import { OutputData } from '@editorjs/editorjs';
 import { IMessageDecodedContent, IMessageDecodedTextData, MessageDecodedTextDataType } from '../indexedDB/IndexedDB';
 import {
-	IGenericAccount,
 	IMessage,
 	IMessageContent,
 	IMessageCorruptedContent,
@@ -24,6 +23,8 @@ import {
 	Uint256,
 	YlideIpfsStorage,
 	YMF,
+	RecipientInfo,
+	WalletAccount,
 } from '@ylide/sdk';
 import { generatePath } from 'react-router-dom';
 import { useIsMatchingRoute, useNav } from './url';
@@ -46,7 +47,6 @@ import { getEvmWalletNetwork } from './wallet';
 import { VENOM_SERVICE_CODE } from '../constants';
 import { useCallback } from 'react';
 import { hashToIpfsUrl } from './ipfs';
-import { RecipientInfo } from '@ylide/sdk/lib/content/RecipientInfo';
 import { ILinkedMessage } from '../stores/MailList';
 import { formatAddress, isEvmBlockchain } from './blockchain';
 import { htmlSelfClosingTagsToXHtml } from './string';
@@ -88,6 +88,10 @@ export async function sendMessage({
 				const encrypted = secureContext.encrypt(uint8Array);
 				const uploaded = await ipfsStorage.uploadToIpfs(encrypted);
 
+				// Temp checks since SDK doesn't throw errors in case it occured
+				invariant(uploaded.hash);
+				invariant(uploaded.size);
+
 				return new MessageAttachmentLinkV1({
 					type: MessageAttachmentType.LINK_V1,
 					previewLink: '',
@@ -111,7 +115,7 @@ export async function sendMessage({
 		recipientInfos: recipients.map(address => new RecipientInfo({ address, blockchain: '' })),
 	});
 
-	if (!network && sender.wallet.factory.blockchainGroup === 'evm') {
+	if (network == null && sender.wallet.factory.blockchainGroup === 'evm') {
 		network = await getEvmWalletNetwork(sender.wallet);
 	}
 
@@ -170,6 +174,10 @@ export async function broadcastMessage({
 				const uint8Array = new Uint8Array(buffer);
 				const uploaded = await ipfsStorage.uploadToIpfs(uint8Array);
 
+				// Temp checks since SDK doesn't throw errors in case it occured
+				invariant(uploaded.hash);
+				invariant(uploaded.size);
+
 				return new MessageAttachmentLinkV1({
 					type: MessageAttachmentType.LINK_V1,
 					previewLink: '',
@@ -193,7 +201,7 @@ export async function broadcastMessage({
 		recipientInfos: [],
 	});
 
-	if (!network && sender.wallet.factory.blockchainGroup === 'evm') {
+	if (network == null && sender.wallet.factory.blockchainGroup === 'evm') {
 		network = await getEvmWalletNetwork(sender.wallet);
 	}
 
@@ -257,7 +265,7 @@ export function decodeBroadcastContent(
 export async function decodeMessage(
 	msgId: string,
 	msg: IMessage,
-	recipient?: IGenericAccount,
+	recipient?: WalletAccount,
 ): Promise<IMessageDecodedContent> {
 	const content = await getMessageContent(msg);
 
@@ -286,7 +294,7 @@ export async function decodeMessage(
 	};
 }
 
-export async function decodeAttachment(data: Uint8Array, msg: IMessage, recipient: IGenericAccount) {
+export async function decodeAttachment(data: Uint8Array, msg: IMessage, recipient: WalletAccount) {
 	const content = await getMessageContent(msg);
 	const unpackedContainer = MessageContainer.unpackContainter(content.content);
 	const secureContext = await domain.ylide.core.getMessageSecureContext(recipient, msg, unpackedContainer);

@@ -28,6 +28,10 @@ class Analytics {
 		track('open_social', { type });
 	}
 
+	openCreateCommunityForm() {
+		track('open_create_communify_form');
+	}
+
 	// ACCOUNT
 
 	startConnectingWallet(place: string) {
@@ -53,12 +57,12 @@ class Analytics {
 
 	// FEED
 
-	feedView(categories: string[]) {
-		track('feed___view', { categories });
+	feedView(tags: number[]) {
+		track('feed___view', { tags });
 	}
 
-	feedLoadMore(categories: string[]) {
-		track('feed___load_more', { categories });
+	feedLoadMore(tags: number[]) {
+		track('feed___load_more', { tags });
 	}
 
 	// MAIL

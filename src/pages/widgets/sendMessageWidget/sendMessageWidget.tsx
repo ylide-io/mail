@@ -52,6 +52,7 @@ export function SendMessageWidget() {
 			<ComposeMailForm
 				className={css.form}
 				isRecipientInputDisabled
+				displayConnectAccountButton
 				mailData={mailData}
 				onSent={() =>
 					setTimeout(() => {
