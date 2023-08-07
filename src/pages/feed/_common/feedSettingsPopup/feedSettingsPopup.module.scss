@@ -55,6 +55,7 @@ $hPadding: 20px;
 .categoryProject {
 	@include truncate-text;
 	text-align: right;
+	margin-right: 24px;
 
 	@include less480px {
 		display: none;
@@ -100,7 +101,7 @@ $hPadding: 20px;
 }
 
 .sourceName {
-	flex: 1 1;
+	flex: 0.8 1;
 	display: grid;
 	grid-template-columns: 24px 1fr;
 	align-items: center;
@@ -112,7 +113,7 @@ $hPadding: 20px;
 }
 
 .sourceOrigin {
-	flex: 0.66 1;
+	flex: 0.5 1;
 	display: flex;
 }
 
@@ -134,7 +135,7 @@ $hPadding: 20px;
 
 .sourceProject {
 	@include truncate-text;
-	flex: 0.33 1;
+	flex: 0.5 1;
 	text-align: center;
 	font-weight: $font-weight_bold;
 

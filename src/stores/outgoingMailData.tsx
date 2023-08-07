@@ -239,7 +239,11 @@ export class OutgoingMailData {
 
 				console.log('Sending result: ', result);
 			} else {
-				const blockchain = this.from.getBlockchainName(this.network);
+				const blockchain = this.network
+					? domain.getBlockchainName(this.network)
+					: this.from.wallet.factory.wallet === 'everwallet'
+					? 'everscale'
+					: 'venom-testnet';
 				if (this.isGenericFeed) {
 					const comissions = await BlockchainFeedApi.getComissions({ feedId: this.feedId });
 					const comission = calcComissions(blockchain, comissions);

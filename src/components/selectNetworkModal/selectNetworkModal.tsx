@@ -1,5 +1,5 @@
 import { EVMNetwork } from '@ylide/ethereum';
-import { IGenericAccount } from '@ylide/sdk';
+import { WalletAccount } from '@ylide/sdk';
 import clsx from 'clsx';
 import { observer } from 'mobx-react';
 import { useMemo } from 'react';
@@ -36,7 +36,7 @@ const txPrices: Record<EVMNetwork, number> = {
 
 export interface SelectNetworkModalProps {
 	wallet: Wallet;
-	account: IGenericAccount;
+	account: WalletAccount;
 	onClose?: (network?: EVMNetwork) => void;
 }
 

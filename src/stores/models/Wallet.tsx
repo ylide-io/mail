@@ -1,20 +1,16 @@
 import { EthereumWalletController } from '@ylide/ethereum';
 import {
 	AbstractWalletController,
-	IGenericAccount,
+	PrivateKeyAvailabilityState,
+	WalletAccount,
 	WalletControllerFactory,
 	WalletEvent,
-	YlideKeyPair,
-	YlidePublicKeyVersion,
+	YlideKeyVersion,
 } from '@ylide/sdk';
 import { autobind } from 'core-decorators';
 import EventEmitter from 'eventemitter3';
 import { computed, makeObservable, observable } from 'mobx';
 
-import { AdaptiveAddress } from '../../components/adaptiveAddress/adaptiveAddress';
-import { toast } from '../../components/toast/toast';
-import { invariant } from '../../utils/assert';
-import { browserStorage } from '../browserStorage';
 import { Domain } from '../Domain';
 import { DomainAccount } from './DomainAccount';
 
@@ -26,7 +22,7 @@ export class Wallet extends EventEmitter {
 	@observable private _isAvailable: boolean = false;
 	@observable private _accounts: DomainAccount[] = [];
 
-	@observable currentWalletAccount: IGenericAccount | null = null;
+	@observable currentWalletAccount: WalletAccount | null = null;
 	@observable currentBlockchain: string = 'unknown';
 
 	constructor(
@@ -68,13 +64,13 @@ export class Wallet extends EventEmitter {
 	}
 
 	@autobind
-	handleAccountChanged(newAccount: IGenericAccount) {
+	handleAccountChanged(newAccount: WalletAccount) {
 		this.currentWalletAccount = newAccount;
 		this.emit('accountUpdate', this.currentWalletAccount);
 	}
 
 	@autobind
-	handleAccountLogin(newAccount: IGenericAccount) {
+	handleAccountLogin(newAccount: WalletAccount) {
 		this.currentWalletAccount = newAccount;
 		this.emit('accountUpdate', this.currentWalletAccount);
 	}
@@ -110,40 +106,56 @@ export class Wallet extends EventEmitter {
 		return account.account.address === this.currentWalletAccount?.address;
 	}
 
-	isAccountRegistered(account: IGenericAccount): boolean {
+	isAccountRegistered(account: WalletAccount): boolean {
 		return this.accounts.some(a => a.account.address === account.address);
 	}
 
-	async constructLocalKeyV3(account: IGenericAccount) {
-		return await this.domain.keystore.constructKeypairV3(
-			'New account connection',
-			this.factory.blockchainGroup,
-			this.factory.wallet,
+	async createNewDomainAccount(account: WalletAccount) {
+		return await this.domain.accounts.createNewDomainAccount(this, account);
+	}
+
+	async constructLocalKeyV3(account: WalletAccount) {
+		return await this.domain.keyRegistry.instantiateNewPrivateKey(
+			account.blockchainGroup,
 			account.address,
+			YlideKeyVersion.KEY_V3,
+			PrivateKeyAvailabilityState.AVAILABLE,
+			{
+				onPrivateKeyRequest: async (address, magicString) =>
+					await this.controller.signMagicString(account, magicString),
+			},
 		);
 	}
 
-	async constructLocalKeyV2(account: IGenericAccount, password: string) {
-		return await this.domain.keystore.constructKeypairV2(
-			'New account connection',
-			this.factory.blockchainGroup,
-			this.factory.wallet,
+	async constructLocalKeyV2(account: WalletAccount, password: string) {
+		return await this.domain.keyRegistry.instantiateNewPrivateKey(
+			account.blockchainGroup,
 			account.address,
-			password,
+			YlideKeyVersion.KEY_V2,
+			PrivateKeyAvailabilityState.AVAILABLE,
+			{
+				onPrivateKeyRequest: async (address, magicString) =>
+					await this.controller.signMagicString(account, magicString),
+				onYlidePasswordRequest: async address => password,
+			},
 		);
 	}
 
-	async constructLocalKeyV1(account: IGenericAccount, password: string) {
-		return await this.domain.keystore.constructKeypairV1(
-			'New account connection',
-			this.factory.blockchainGroup,
-			this.factory.wallet,
+	async constructLocalKeyV1(account: WalletAccount, password: string) {
+		return await this.domain.keyRegistry.instantiateNewPrivateKey(
+			account.blockchainGroup,
 			account.address,
-			password,
+			YlideKeyVersion.INSECURE_KEY_V1,
+			PrivateKeyAvailabilityState.AVAILABLE,
+			{
+				onPrivateKeyRequest: async (address, magicString) =>
+					await this.controller.signMagicString(account, magicString),
+				onYlidePasswordRequest: async address => password,
+			},
 		);
 	}
 
-	async constructMainViewKey(account: IGenericAccount) {
+	async constructMainViewKey(account: WalletAccount) {
 		if (!(this.controller instanceof EthereumWalletController)) {
 			throw new Error('Not implemented');
 		}
@@ -158,42 +170,7 @@ export class Wallet extends EventEmitter {
 		};
 	}
 
-	async readRemoteKeys(account: IGenericAccount) {
-		let result = browserStorage.getAccountRemoteKeys(account.address);
-
-		if (!result) {
-			result = await this.domain.ylide.core.getAddressKeys(account.address);
-		} else {
-			this.domain.ylide.core.getAddressKeys(account.address).then(actual => {
-				invariant(result);
-
-				const cachedFK = result.freshestKey;
-				const actualFK = actual.freshestKey;
-
-				if (cachedFK?.publicKey.toHex() !== actualFK?.publicKey.toHex()) {
-					browserStorage.setAccountRemoteKeys(account.address, undefined);
-
-					toast(
-						<>
-							<b>
-								<AdaptiveAddress maxLength={12} address={account.address} />
-							</b>
-							<div>
-								Your Ylide public keys for this account have been updated. Please re-connect it 🙏
-							</div>
-						</>,
-					);
-				}
-			});
-		}
-
-		return {
-			remoteKey: result.freshestKey,
-			remoteKeys: result.remoteKeys,
-		};
-	}
-
-	async getCurrentAccount(): Promise<IGenericAccount | null> {
+	async getCurrentAccount(): Promise<WalletAccount | null> {
 		return await this.controller.getAuthenticatedAccount();
 	}
 
@@ -211,20 +188,20 @@ export class Wallet extends EventEmitter {
 		return acc;
 	}
 
-	async instantiateNewAccount(account: IGenericAccount, keypair: YlideKeyPair, keyVersion: YlidePublicKeyVersion) {
-		return new Promise<DomainAccount>(async resolve => {
-			const existingAcc = this.domain.accounts.accounts.find(
-				acc => acc.account.address.toLowerCase() === account.address.toLowerCase(),
-			);
-			if (existingAcc) {
-				return resolve(existingAcc);
-			}
-			this.domain.accounts.onceNewAccount(account, acc => {
-				resolve(acc);
-			});
-			await this.domain.keystore.storeKey(keypair, keyVersion, this.factory.blockchainGroup, this.factory.wallet);
-		});
-	}
+	// async instantiateNewAccount(account: IGenericAccount, keypair: YlideKeyPair, keyVersion: YlidePublicKeyVersion) {
+	// 	return new Promise<DomainAccount>(async resolve => {
+	// 		const existingAcc = this.domain.accounts.accounts.find(
+	// 			acc => acc.account.address.toLowerCase() === account.address.toLowerCase(),
+	// 		);
+	// 		if (existingAcc) {
+	// 			return resolve(existingAcc);
+	// 		}
+	// 		this.domain.accounts.onceNewAccount(account, acc => {
+	// 			resolve(acc);
+	// 		});
+	// 		await this.domain.keystore.storeKey(keypair, keyVersion, this.factory.blockchainGroup, this.factory.wallet);
+	// 	});
+	// }
 
 	async getBalancesOf(address: string): Promise<Record<string, { original: string; numeric: number; e18: string }>> {
 		const chains = this.domain.registeredBlockchains.filter(

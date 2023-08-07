@@ -1,4 +1,4 @@
-import { IGenericAccount } from '@ylide/sdk';
+import { WalletAccount } from '@ylide/sdk';
 import { useEffect, useState } from 'react';
 
 import { Wallet } from '../../stores/models/Wallet';
@@ -14,16 +14,16 @@ export enum SwitchModalMode {
 }
 
 type SwitchModalPayload =
-	| { mode: SwitchModalMode.CURRENT_ACCOUNT_ALREADY_CONNECTED; account: IGenericAccount }
+	| { mode: SwitchModalMode.CURRENT_ACCOUNT_ALREADY_CONNECTED; account: WalletAccount }
 	| {
 			mode: SwitchModalMode.SPECIFIC_ACCOUNT_REQUIRED;
-			needAccount: IGenericAccount;
+			needAccount: WalletAccount;
 	  };
 
 interface SwitchModalProps {
 	wallet: Wallet;
 	payload: SwitchModalPayload;
-	needAccount?: IGenericAccount;
+	needAccount?: WalletAccount;
 	onConfirm: (result: boolean) => void;
 }
 
@@ -31,7 +31,7 @@ export function SwitchModal({ wallet, payload, needAccount, onConfirm }: SwitchM
 	const [error, setError] = useState('');
 
 	useEffect(() => {
-		function handleAccountUpdate(account: IGenericAccount | null) {
+		function handleAccountUpdate(account: WalletAccount | null) {
 			if (!account) return;
 
 			if (!needAccount || account.address === needAccount.address) {

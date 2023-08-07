@@ -19,17 +19,22 @@ import {
 	AbstractBlockchainController,
 	AbstractNameService,
 	AbstractWalletController,
+	asyncDelay,
 	BlockchainControllerFactory,
 	BlockchainMap,
 	BlockchainWalletMap,
 	BrowserLocalStorage,
 	DynamicEncryptionRouter,
-	IGenericAccount,
 	IMessage,
+	PublicKey,
+	PublicKeyType,
+	RemotePublicKey,
+	WalletAccount,
 	WalletControllerFactory,
 	Ylide,
-	YlideKeyStore,
+	YlideKeyRegistry,
 } from '@ylide/sdk';
+import { SmartBuffer } from '@ylide/smart-buffer';
 import { makeObservable, observable } from 'mobx';
 import { useMemo } from 'react';
 
@@ -38,33 +43,32 @@ import { PasswordRequestModal } from '../components/passwordRequestModal/passwor
 import { SwitchModal, SwitchModalMode } from '../components/switchModal/switchModal';
 import { AppMode, REACT_APP__APP_MODE } from '../env';
 import { blockchainMeta } from '../utils/blockchain';
+import { isBytesEqual } from '../utils/isBytesEqual';
 import { walletsMeta } from '../utils/wallet';
 import { Accounts } from './Accounts';
 import contacts from './Contacts';
 import { EverwalletProxy } from './EverwalletProxy';
+import {
+	blockchainByFaucetType,
+	chainIdByFaucetType,
+	publishKeyThroughFaucet,
+	requestFaucetSignature,
+} from './KeyManagement';
+import { DomainAccount } from './models/DomainAccount';
 import { Wallet } from './models/Wallet';
 import { OTCStore } from './OTC';
 import tags from './Tags';
 
-Ylide.verbose();
+// Ylide.verbose();
 
 let INDEXER_BLOCKCHAINS: string[];
 
 if (REACT_APP__APP_MODE === AppMode.OTC) {
 	INDEXER_BLOCKCHAINS = ['POLYGON', 'FANTOM', 'GNOSIS'];
-
-	Ylide.registerBlockchainFactory(evmBlockchainFactories[EVMNetwork.POLYGON]);
-	Ylide.registerBlockchainFactory(evmBlockchainFactories[EVMNetwork.FANTOM]);
-	Ylide.registerBlockchainFactory(evmBlockchainFactories[EVMNetwork.GNOSIS]);
-
-	Ylide.registerWalletFactory(evmWalletFactories.metamask);
-	Ylide.registerWalletFactory(evmWalletFactories.frontier);
-	Ylide.registerWalletFactory(evmWalletFactories.coinbase);
-	Ylide.registerWalletFactory(evmWalletFactories.trustwallet);
-	Ylide.registerWalletFactory(evmWalletFactories.binance);
-	Ylide.registerWalletFactory(evmWalletFactories.walletconnect);
 } else {
 	INDEXER_BLOCKCHAINS = [
+		'everscale',
+		'venom-testnet',
 		'ETHEREUM',
 		'AVALANCHE',
 		'ARBITRUM',
@@ -81,38 +85,6 @@ if (REACT_APP__APP_MODE === AppMode.OTC) {
 		'MOONRIVER',
 		'METIS',
 	];
-
-	Ylide.registerBlockchainFactory(evmBlockchainFactories[EVMNetwork.ETHEREUM]);
-	Ylide.registerBlockchainFactory(evmBlockchainFactories[EVMNetwork.AVALANCHE]);
-	Ylide.registerBlockchainFactory(evmBlockchainFactories[EVMNetwork.ARBITRUM]);
-	Ylide.registerBlockchainFactory(evmBlockchainFactories[EVMNetwork.BNBCHAIN]);
-	Ylide.registerBlockchainFactory(evmBlockchainFactories[EVMNetwork.OPTIMISM]);
-	Ylide.registerBlockchainFactory(evmBlockchainFactories[EVMNetwork.POLYGON]);
-	Ylide.registerBlockchainFactory(evmBlockchainFactories[EVMNetwork.FANTOM]);
-	Ylide.registerBlockchainFactory(evmBlockchainFactories[EVMNetwork.KLAYTN]);
-	Ylide.registerBlockchainFactory(evmBlockchainFactories[EVMNetwork.GNOSIS]);
-	Ylide.registerBlockchainFactory(evmBlockchainFactories[EVMNetwork.AURORA]);
-	Ylide.registerBlockchainFactory(evmBlockchainFactories[EVMNetwork.CELO]);
-	Ylide.registerBlockchainFactory(evmBlockchainFactories[EVMNetwork.CRONOS]);
-	Ylide.registerBlockchainFactory(evmBlockchainFactories[EVMNetwork.MOONBEAM]);
-	Ylide.registerBlockchainFactory(evmBlockchainFactories[EVMNetwork.MOONRIVER]);
-	Ylide.registerBlockchainFactory(evmBlockchainFactories[EVMNetwork.METIS]);
-
-	if (REACT_APP__APP_MODE !== AppMode.MAIN_VIEW) {
-		Ylide.registerBlockchainFactory(everscaleBlockchainFactory);
-		Ylide.registerWalletFactory(everscaleWalletFactory);
-		Ylide.registerWalletFactory(everscaleProxyWalletFactory);
-
-		Ylide.registerBlockchainFactory(venomBlockchainFactory);
-		Ylide.registerWalletFactory(venomWalletFactory);
-	}
-
-	Ylide.registerWalletFactory(evmWalletFactories.metamask);
-	Ylide.registerWalletFactory(evmWalletFactories.frontier);
-	Ylide.registerWalletFactory(evmWalletFactories.coinbase);
-	Ylide.registerWalletFactory(evmWalletFactories.trustwallet);
-	Ylide.registerWalletFactory(evmWalletFactories.binance);
-	Ylide.registerWalletFactory(evmWalletFactories.walletconnect);
 }
 
 //
@@ -121,14 +93,11 @@ export class Domain {
 	savedPassword: string | null = null;
 
 	storage = new BrowserLocalStorage();
-	keystore = new YlideKeyStore(this.storage, {
-		onPasswordRequest: this.handlePasswordRequest.bind(this),
-		onDeriveRequest: this.handleDeriveRequest.bind(this),
-	});
+	keyRegistry = new YlideKeyRegistry(this.storage);
 
 	@observable initialized = false;
 
-	ylide: Ylide = new Ylide(this.keystore, INDEXER_BLOCKCHAINS);
+	ylide: Ylide = new Ylide(this.keyRegistry, INDEXER_BLOCKCHAINS);
 
 	@observable txChain: 'fantom' | 'gnosis' | 'polygon' = 'polygon';
 	@observable txWithBonus: boolean = false;
@@ -146,7 +115,7 @@ export class Domain {
 
 	@observable availableWallets: WalletControllerFactory[] = [];
 
-	@observable availableProxyAccounts: Array<{ wallet: Wallet; account: IGenericAccount }> = [];
+	@observable availableProxyAccounts: Array<{ wallet: Wallet; account: WalletAccount }> = [];
 
 	@observable blockchains: BlockchainMap<AbstractBlockchainController> = {};
 	@observable walletControllers: BlockchainWalletMap<AbstractWalletController | null> = {};
@@ -174,6 +143,51 @@ export class Domain {
 
 	constructor() {
 		makeObservable(this);
+
+		if (REACT_APP__APP_MODE === AppMode.OTC) {
+			this.ylide.registerBlockchainFactory(evmBlockchainFactories[EVMNetwork.POLYGON]);
+			this.ylide.registerBlockchainFactory(evmBlockchainFactories[EVMNetwork.FANTOM]);
+			this.ylide.registerBlockchainFactory(evmBlockchainFactories[EVMNetwork.GNOSIS]);
+
+			this.ylide.registerWalletFactory(evmWalletFactories.metamask);
+			this.ylide.registerWalletFactory(evmWalletFactories.frontier);
+			this.ylide.registerWalletFactory(evmWalletFactories.coinbase);
+			this.ylide.registerWalletFactory(evmWalletFactories.trustwallet);
+			this.ylide.registerWalletFactory(evmWalletFactories.binance);
+			this.ylide.registerWalletFactory(evmWalletFactories.walletconnect);
+		} else {
+			this.ylide.registerBlockchainFactory(evmBlockchainFactories[EVMNetwork.ETHEREUM]);
+			this.ylide.registerBlockchainFactory(evmBlockchainFactories[EVMNetwork.AVALANCHE]);
+			this.ylide.registerBlockchainFactory(evmBlockchainFactories[EVMNetwork.ARBITRUM]);
+			this.ylide.registerBlockchainFactory(evmBlockchainFactories[EVMNetwork.BNBCHAIN]);
+			this.ylide.registerBlockchainFactory(evmBlockchainFactories[EVMNetwork.OPTIMISM]);
+			this.ylide.registerBlockchainFactory(evmBlockchainFactories[EVMNetwork.POLYGON]);
+			this.ylide.registerBlockchainFactory(evmBlockchainFactories[EVMNetwork.FANTOM]);
+			this.ylide.registerBlockchainFactory(evmBlockchainFactories[EVMNetwork.KLAYTN]);
+			this.ylide.registerBlockchainFactory(evmBlockchainFactories[EVMNetwork.GNOSIS]);
+			this.ylide.registerBlockchainFactory(evmBlockchainFactories[EVMNetwork.AURORA]);
+			this.ylide.registerBlockchainFactory(evmBlockchainFactories[EVMNetwork.CELO]);
+			this.ylide.registerBlockchainFactory(evmBlockchainFactories[EVMNetwork.CRONOS]);
+			this.ylide.registerBlockchainFactory(evmBlockchainFactories[EVMNetwork.MOONBEAM]);
+			this.ylide.registerBlockchainFactory(evmBlockchainFactories[EVMNetwork.MOONRIVER]);
+			this.ylide.registerBlockchainFactory(evmBlockchainFactories[EVMNetwork.METIS]);
+
+			if (REACT_APP__APP_MODE !== AppMode.MAIN_VIEW) {
+				this.ylide.registerBlockchainFactory(everscaleBlockchainFactory);
+				this.ylide.registerWalletFactory(everscaleWalletFactory);
+				this.ylide.registerWalletFactory(everscaleProxyWalletFactory);
+
+				this.ylide.registerBlockchainFactory(venomBlockchainFactory);
+				this.ylide.registerWalletFactory(venomWalletFactory);
+			}
+
+			this.ylide.registerWalletFactory(evmWalletFactories.metamask);
+			this.ylide.registerWalletFactory(evmWalletFactories.frontier);
+			this.ylide.registerWalletFactory(evmWalletFactories.coinbase);
+			this.ylide.registerWalletFactory(evmWalletFactories.trustwallet);
+			this.ylide.registerWalletFactory(evmWalletFactories.binance);
+			this.ylide.registerWalletFactory(evmWalletFactories.walletconnect);
+		}
 
 		window.addEventListener('keydown', e => {
 			if (e.ctrlKey && e.key === 'KeyD') {
@@ -211,13 +225,27 @@ export class Domain {
 			}));
 	}
 
-	getBlockchainsForWallet(wallet: Wallet) {
-		return this.registeredBlockchains
-			.filter(bc => bc.blockchainGroup === wallet.factory.blockchainGroup)
-			.map(factory => ({
-				factory,
-				reader: this.blockchains[factory.blockchain],
-			}));
+	getBlockchainNativeCurrency(network?: EVMNetwork) {
+		const name = this.getBlockchainName(network);
+		return blockchainMeta[name].symbol || blockchainMeta[name].ethNetwork?.nativeCurrency.symbol || '';
+	}
+
+	getBlockchainName(network?: EVMNetwork) {
+		const blockchains = this.registeredBlockchains;
+		if (blockchains.length === 0) {
+			throw new Error('No appropriate blockchains');
+		} else if (blockchains.length === 1) {
+			return blockchains[0].blockchain;
+		} else {
+			if (network == null) {
+				throw new Error('Cant find appropriate blockchain without network');
+			}
+			const blockchain = blockchains.find(bc => bc.blockchain === EVM_NAMES[network]);
+			if (!blockchain) {
+				throw new Error('Cant find appropriate blockchain for this network');
+			}
+			return blockchain.blockchain;
+		}
 	}
 
 	getNSBlockchainsForAddress(
@@ -267,6 +295,119 @@ export class Domain {
 		);
 	}
 
+	async getFaucetSignature(
+		account: DomainAccount,
+		publicKey: PublicKey,
+		faucetType: 'polygon' | 'gnosis' | 'fantom',
+	) {
+		console.log('public key: ', '0x' + new SmartBuffer(publicKey.keyBytes).toHexString());
+
+		const chainId = chainIdByFaucetType(faucetType);
+		const timestampLock = Math.floor(Date.now() / 1000) - 90;
+		const registrar = 1;
+
+		const signature = await requestFaucetSignature(
+			account.wallet,
+			publicKey.keyBytes,
+			account.account,
+			chainId,
+			registrar,
+			timestampLock,
+		);
+
+		return {
+			chainId,
+			timestampLock,
+			registrar,
+			signature,
+		};
+	}
+
+	async waitForPublicKey(faucet: boolean, blockchain: string, address: string, key: Uint8Array, timeout = 60000) {
+		const start = Date.now();
+		while (Date.now() - start < timeout) {
+			// faucet only EVM, so indexer usage is fine
+			if (faucet) {
+				const keys = await this.ylide.core.indexer.requestKeys(address);
+				const keyInChain = keys[blockchain];
+				if (keyInChain && isBytesEqual(keyInChain.publicKey, key)) {
+					const bcGroup = this.ylide.core.getBlockchainGroupByBlockchain(blockchain);
+					if (!bcGroup) {
+						throw new Error('Cant find blockchain group');
+					}
+					return new RemotePublicKey(
+						bcGroup,
+						blockchain,
+						address,
+						new PublicKey(PublicKeyType.YLIDE, keyInChain.keyVersion, keyInChain.publicKey),
+						keyInChain.timestamp,
+						keyInChain.registrar,
+					);
+				}
+			} else {
+				const keys = await this.ylide.core.getAddressKeys(address);
+				const keyInChain = keys.remoteKeys[blockchain];
+				if (keyInChain && isBytesEqual(keyInChain.publicKey.keyBytes, key)) {
+					return keyInChain;
+				}
+			}
+			await asyncDelay(2000);
+		}
+		return null;
+	}
+
+	async publishThroughFaucet(
+		account: DomainAccount,
+		publicKey: PublicKey,
+		faucetType: 'polygon' | 'gnosis' | 'fantom',
+		bonus: boolean,
+
+		chainId: number,
+		timestampLock: number,
+		registrar: number,
+		signature: { message: string; r: string; s: string; v: number },
+	) {
+		try {
+			const result = await publishKeyThroughFaucet(
+				faucetType,
+				publicKey,
+				account.account,
+				signature,
+				registrar,
+				timestampLock,
+			);
+
+			if (result.result) {
+				const blockchain = blockchainByFaucetType(faucetType);
+				const key = await this.waitForPublicKey(true, blockchain, account.account.address, publicKey.keyBytes);
+				if (key) {
+					await this.keyRegistry.addRemotePublicKey(key);
+					account.reloadKeys();
+					domain.publishingTxHash = result.hash;
+					domain.isTxPublishing = false;
+				} else {
+					domain.isTxPublishing = false;
+					domain.enforceMainViewOnboarding = true;
+					console.log('Something went wrong with key publishing :(\n\n' + JSON.stringify(result, null, '\t'));
+				}
+			} else {
+				domain.isTxPublishing = false;
+				domain.enforceMainViewOnboarding = true;
+				if (result.errorCode === 'ALREADY_EXISTS') {
+					console.log(
+						`Your address has been already registered or the previous transaction is in progress. Please try connecting another address or wait for transaction to finalize (1-2 minutes).`,
+					);
+				} else {
+					console.log('Something went wrong with key publishing :(\n\n' + JSON.stringify(result, null, '\t'));
+				}
+			}
+		} catch (err) {
+			console.log('faucet publication error: ', err);
+			domain.isTxPublishing = false;
+			domain.txPlateVisible = false;
+		}
+	}
+
 	async identifyAddressAchievability(address: string) {
 		const blockchains = this.getBlockchainsForAddress(address);
 		if (!blockchains.length) {
@@ -307,11 +448,7 @@ export class Domain {
 		});
 	}
 
-	async handleSwitchRequest(
-		walletName: string,
-		currentAccount: IGenericAccount | null,
-		needAccount: IGenericAccount,
-	) {
+	async handleSwitchRequest(walletName: string, currentAccount: WalletAccount | null, needAccount: WalletAccount) {
 		const wallet = this.wallets.find(w => w.factory.wallet === walletName);
 		if (!wallet) {
 			return;
@@ -319,30 +456,30 @@ export class Domain {
 		await SwitchModal.show(wallet, { mode: SwitchModalMode.SPECIFIC_ACCOUNT_REQUIRED, needAccount });
 	}
 
-	async handleDeriveRequest(
-		reason: string,
-		blockchainGroup: string,
-		walletName: string,
-		address: string,
-		magicString: string,
-	) {
-		try {
-			const wallet = this.wallets.find(w => w.factory.wallet === walletName);
-			if (!wallet) {
-				return null;
-			}
-			return wallet.controller.signMagicString(
-				{
-					address,
-					blockchain: blockchainGroup,
-					publicKey: null,
-				},
-				magicString,
-			);
-		} catch (err) {
-			return null;
-		}
-	}
+	// async handleDeriveRequest(
+	// 	reason: string,
+	// 	blockchainGroup: string,
+	// 	walletName: string,
+	// 	address: string,
+	// 	magicString: string,
+	// ) {
+	// 	try {
+	// 		const wallet = this.wallets.find(w => w.factory.wallet === walletName);
+	// 		if (!wallet) {
+	// 			return null;
+	// 		}
+	// 		return wallet.controller.signMagicString(
+	// 			{
+	// 				address,
+	// 				blockchain: blockchainGroup,
+	// 				publicKey: null,
+	// 			},
+	// 			magicString,
+	// 		);
+	// 	} catch (err) {
+	// 		return null;
+	// 	}
+	// }
 
 	async switchEVMChain(wallet: Wallet, needNetwork: EVMNetwork) {
 		try {
@@ -571,8 +708,8 @@ export class Domain {
 			last = now;
 		};
 
-		this.registeredWallets = Ylide.walletsList.map(w => w.factory);
-		this.registeredBlockchains = Ylide.blockchainsList.map(b => b.factory);
+		this.registeredWallets = this.ylide.walletsList.map(w => w.factory);
+		this.registeredBlockchains = this.ylide.blockchainsList.map(b => b.factory);
 
 		for (const factory of this.availableWallets) {
 			if (
@@ -636,7 +773,7 @@ export class Domain {
 				this.everwalletProxy.initializeEverwalletProxy();
 			}
 		}
-		this.availableWallets = await Ylide.getAvailableWallets();
+		this.availableWallets = await this.ylide.getAvailableWallets();
 	}
 
 	async getMessageByMsgId(msgId: string): Promise<IMessage | null> {
@@ -670,10 +807,10 @@ export class Domain {
 		tick('this.initWalletConnect();');
 		await this.extractWalletsData();
 		tick('this.extractWalletsData();');
-		await this.keystore.init();
-		tick('this.keystore.init();');
-		await this.accounts.accountsProcessed;
-		tick('this.accounts.accountsProcessed;');
+		await this.keyRegistry.init();
+		tick('this.keyRegistry.init();');
+		await this.accounts.init();
+		tick('this.accounts.init();');
 		await contacts.init();
 		tick('contacts.init();');
 		await tags.getTags();

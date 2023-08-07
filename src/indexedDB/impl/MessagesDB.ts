@@ -1,5 +1,4 @@
-import { IMessage, YMF } from '@ylide/sdk';
-import { RecipientInfo } from '@ylide/sdk/lib/content/RecipientInfo';
+import { IMessage, RecipientInfo, YMF } from '@ylide/sdk';
 import { toJS } from 'mobx';
 
 import { bytesToAttachment } from '../../utils/mail';

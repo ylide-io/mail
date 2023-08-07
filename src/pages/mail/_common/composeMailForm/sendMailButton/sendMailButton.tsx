@@ -35,7 +35,7 @@ export const SendMailButton = observer(
 		const currency = useMemo(() => {
 			if (mailData.from) {
 				try {
-					return mailData.from.getBlockchainNativeCurrency(mailData.network);
+					return domain.getBlockchainNativeCurrency(mailData.network);
 				} catch (err) {
 					return '';
 				}

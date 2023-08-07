@@ -1,6 +1,5 @@
-import { PublicKey } from '@ylide/sdk';
-import { ExternalYlidePublicKey } from '@ylide/sdk/src';
-import { makeAutoObservable, toJS } from 'mobx';
+import { WalletAccount } from '@ylide/sdk';
+import { makeAutoObservable } from 'mobx';
 
 import { Section } from '../components/genericLayout/sidebar/sidebarMenu';
 import { WidgetId } from '../pages/widgets/widgets';
@@ -15,21 +14,13 @@ enum BrowserStorageKey {
 	WIDGET_ID = 'ylide_widgetId',
 	MAIN_VIEW_KEYS = 'ylide_mainViewKeys',
 	LAST_MAILBOX_INCOMING_DATE = 'ylide_lastMailboxCheckDate',
+	SAVED_ACCOUNTS = 'ylide_savedAccounts',
 }
 
-interface AccountRemotePublicKey {
-	keyVersion: number;
-	publicKey: {
-		type: number;
-		hex: string;
-	};
-	timestamp: number;
-	registrar: number;
-}
-
-interface AccountRemoteKeys {
-	freshestKey: AccountRemotePublicKey | null;
-	remoteKeys: Record<string, AccountRemotePublicKey | null>;
+export interface SavedAccount {
+	name: string;
+	account: WalletAccount;
+	wallet: string;
 }
 
 class BrowserStorage {
@@ -56,6 +47,36 @@ class BrowserStorage {
 		} else {
 			storage.removeItem(key);
 		}
+	}
+
+	private _savedAccounts =
+		BrowserStorage.getItemWithTransform<SavedAccount[]>(BrowserStorageKey.SAVED_ACCOUNTS, val => {
+			const parsed = JSON.parse(val);
+			if (!Array.isArray(parsed)) {
+				return [];
+			} else {
+				return parsed.map((acc: any) => ({
+					...acc,
+					account: WalletAccount.fromBase64(acc.account),
+				}));
+			}
+		}) || [];
+
+	get savedAccounts() {
+		return this._savedAccounts;
+	}
+
+	set savedAccounts(value: SavedAccount[]) {
+		BrowserStorage.setItem(
+			BrowserStorageKey.SAVED_ACCOUNTS,
+			JSON.stringify(
+				value.map(v => ({
+					...v,
+					account: v.account.toBase64(),
+				})),
+			),
+		);
+		this._savedAccounts = value;
 	}
 
 	//
@@ -87,84 +108,6 @@ class BrowserStorage {
 		BrowserStorage.setItem(BrowserStorageKey.IS_MAIN_VIEW_BANNER_HIDDEN, value);
 		this._isMainViewBannerHidden = value;
 	}
-
-	//
-
-	private _accountRemoteKeys =
-		BrowserStorage.getItemWithTransform<Record<string, AccountRemoteKeys>>(
-			BrowserStorageKey.ACCOUNT_REMOTE_KEYS,
-			JSON.parse,
-		) || {};
-
-	getAccountRemoteKeys(address: string):
-		| {
-				freshestKey: ExternalYlidePublicKey | null;
-				remoteKeys: Record<string, ExternalYlidePublicKey | null>;
-		  }
-		| undefined {
-		try {
-			const { freshestKey: freshestKeyRaw, remoteKeys: remoteKeysRaw } =
-				toJS(this._accountRemoteKeys[address]) || {};
-
-			const deserialize = (raw: AccountRemotePublicKey): ExternalYlidePublicKey => ({
-				...raw,
-				publicKey: PublicKey.fromHexString(raw.publicKey.type, raw.publicKey.hex),
-			});
-
-			return freshestKeyRaw
-				? {
-						freshestKey: deserialize(freshestKeyRaw),
-						remoteKeys: remoteKeysRaw
-							? Object.keys(remoteKeysRaw).reduce((res, key) => {
-									const keyRaw = remoteKeysRaw[key];
-									res[key] = keyRaw && deserialize(keyRaw);
-									return res;
-							  }, {} as Record<string, ExternalYlidePublicKey | null>)
-							: {},
-				  }
-				: undefined;
-		} catch (e) {
-			return undefined;
-		}
-	}
-
-	setAccountRemoteKeys(
-		address: string,
-		keys:
-			| {
-					freshestKey: ExternalYlidePublicKey | null;
-					remoteKeys: Record<string, ExternalYlidePublicKey | null>;
-			  }
-			| undefined,
-	) {
-		const serialize = (ylideKey: ExternalYlidePublicKey): AccountRemotePublicKey => ({
-			...ylideKey,
-			publicKey: {
-				type: ylideKey.publicKey.type,
-				hex: ylideKey.publicKey.toHex(),
-			},
-		});
-
-		const _accountRemoteKeys = toJS(this._accountRemoteKeys);
-
-		if (keys?.freshestKey) {
-			_accountRemoteKeys[address] = {
-				freshestKey: serialize(keys.freshestKey),
-				remoteKeys: Object.keys(keys.remoteKeys).reduce((res, key) => {
-					const keyRaw = keys.remoteKeys[key];
-					res[key] = keyRaw && serialize(keyRaw);
-					return res;
-				}, {} as Record<string, AccountRemotePublicKey | null>),
-			};
-		} else {
-			delete _accountRemoteKeys[address];
-		}
-
-		this._accountRemoteKeys = _accountRemoteKeys;
-		BrowserStorage.setItem(BrowserStorageKey.ACCOUNT_REMOTE_KEYS, JSON.stringify(_accountRemoteKeys));
-	}
-
-	//
 
 	private _sidebarFoldedSections =
 		BrowserStorage.getItemWithTransform(

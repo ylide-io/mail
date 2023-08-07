@@ -148,7 +148,11 @@ export const BlockchainProjectFeedPage = observer(() => {
 						accounts={accounts}
 						isUnavailable={serviceStatus.data !== 'ACTIVE'}
 						projectMeta={projectMeta}
-						allowCustomAttachments={projectId === BlockchainProjectId.ETH_WHALES || isAdminMode}
+						allowCustomAttachments={
+							projectId === BlockchainProjectId.ETH_WHALES ||
+							projectId === BlockchainProjectId.TVM_DISCUSSION ||
+							isAdminMode
+						}
 						fixedEvmNetwork={projectId === BlockchainProjectId.ETH_WHALES ? EVMNetwork.ETHEREUM : undefined}
 						onCreated={() => toast('Good job! Your post will appear shortly 🔥')}
 					/>

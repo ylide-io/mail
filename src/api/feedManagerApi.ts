@@ -109,6 +109,36 @@ export namespace FeedManagerApi {
 		});
 	}
 
+	export interface GetCoverageResponse {
+		tokens: {
+			countCovered: number;
+			usdCovered: number;
+			count: number;
+			usd: number;
+			ratio: number;
+			ratioUsd: number;
+		};
+		protocols: {
+			countCovered: number;
+			usdCovered: number;
+			count: number;
+			usd: number;
+			ratio: number;
+			ratioUsd: number;
+		};
+		transactions: {
+			countCovered: number;
+			count: number;
+			ratio: number;
+		};
+	}
+
+	export async function getCoverage(token: string) {
+		return await request<GetCoverageResponse>(`/coverage`, {
+			token,
+		});
+	}
+
 	//
 
 	export interface UserProject {

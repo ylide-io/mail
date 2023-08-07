@@ -1,89 +1,65 @@
-import { IGenericAccount, YlideKey, YlideKeyStoreEvent } from '@ylide/sdk';
-import { autobind } from 'core-decorators';
+import { WalletAccount } from '@ylide/sdk';
 import { computed, makeObservable, observable } from 'mobx';
 
+import { browserStorage } from './browserStorage';
 import { Domain } from './Domain';
 import { DomainAccount } from './models/DomainAccount';
+import { Wallet } from './models/Wallet';
 
 export class Accounts {
 	@observable accounts: DomainAccount[] = [];
 
-	private handlers: Record<string, ((domainAccount: DomainAccount) => void)[]> = {};
-	public accountsProcessed = Promise.resolve();
-
 	constructor(public readonly domain: Domain) {
 		makeObservable(this);
-
-		domain.keystore.on(YlideKeyStoreEvent.KEYS_UPDATED, this.handleKeysUpdate);
 	}
 
-	onceNewAccount(account: IGenericAccount, handler: (domainAccount: DomainAccount) => void) {
-		this.handlers[account.address] = [...(this.handlers[account.address] || []), handler];
+	save() {
+		browserStorage.savedAccounts = this.accounts.map(acc => ({
+			name: acc.name,
+			account: acc.account,
+			blockchainGroup: acc.wallet.factory.blockchainGroup,
+			wallet: acc.wallet.factory.wallet,
+		}));
 	}
 
-	offNewAccount(account: IGenericAccount, handler: (domainAccount: DomainAccount) => void) {
-		if (!this.handlers[account.address]) {
-			return;
-		}
-		const idx = this.handlers[account.address].indexOf(handler);
-		if (idx > -1) {
-			this.handlers[account.address].splice(idx, 1);
-		}
-	}
-
-	@autobind
-	async handleKeysUpdate(keys: YlideKey[]) {
-		this.accountsProcessed = new Promise(async resolve => {
-			try {
-				for (const key of keys) {
-					const foundAccount = this.accounts.find(acc => acc.account.address === key.address);
-					if (!foundAccount) {
-						await this.addAccount(
-							{
-								address: key.address,
-								publicKey: null,
-								blockchain: key.blockchainGroup,
-							},
-							key,
-							key.keyVersion,
-							(await this.domain.storage.readString('yld1_accName_' + key.address)) || '',
-						);
-					}
-				}
-				for (const acc of this.accounts) {
-					const foundKey = keys.find(k => k.address === acc.account.address);
-					if (!foundKey) {
-						await this.removeAccount(acc);
-					}
-				}
-			} finally {
-				resolve();
-			}
-		});
-	}
-
-	async addAccount(account: IGenericAccount, key: YlideKey, keyVersion: number, name: string) {
-		const wallet = this.domain.wallets.find(w => w.factory.wallet === key.wallet);
-		if (!wallet) {
-			return;
-		}
-
-		const domainAccount = new DomainAccount(wallet, account, key, keyVersion, name);
-		await domainAccount.init();
-
-		wallet.accounts.push(domainAccount);
+	async createNewDomainAccount(wallet: Wallet, account: WalletAccount) {
+		const domainAccount = new DomainAccount(this.domain.keyRegistry, wallet, account, 'New Account');
 		this.accounts.push(domainAccount);
-
-		// await this.domain.activateAccountReading(domainAccount);
-
-		if (this.handlers[account.address]) {
-			for (const handler of this.handlers[account.address]) {
-				handler(domainAccount);
-			}
-			this.handlers[account.address] = [];
-		}
-
+		wallet.accounts.push(domainAccount);
+		this.save();
 		return domainAccount;
+	}
+
+	async load() {
+		const savedAccounts = browserStorage.savedAccounts;
+		for (const acc of savedAccounts) {
+			const wallet = this.domain.wallets.find(w => w.factory.wallet === acc.wallet);
+			if (!wallet) {
+				continue;
+			}
+
+			const account = this.accounts.find(a => a.account.address === acc.account.address);
+			if (account) {
+				continue;
+			}
+
+			const domainAccount = new DomainAccount(this.domain.keyRegistry, wallet, acc.account, acc.name);
+
+			if (!domainAccount.freshestRemotePublicKey) {
+				await domainAccount.firstTimeReadRemoteKeys();
+				domainAccount.backgroundReadKeysHistory();
+			} else {
+				domainAccount.backgroundCheckForNewRemoteKeys();
+				domainAccount.backgroundReadKeysHistory();
+			}
+
+			this.accounts.push(domainAccount);
+			wallet.accounts.push(domainAccount);
+		}
+	}
+
+	async init() {
+		await this.load();
 	}
 
 	async removeAccount(account: DomainAccount) {
@@ -95,11 +71,14 @@ export class Accounts {
 		if (widx > -1) {
 			account.wallet.accounts.splice(widx, 1);
 		}
-		await this.domain.keystore.delete(account.key);
+		for (const privateKey of account.localPrivateKeys) {
+			await this.domain.keyRegistry.removeLocalPrivateKey(privateKey);
+		}
+		this.save();
 	}
 
 	@computed get activeAccounts() {
-		return this.accounts.filter(a => a.isLocalKeyRegistered);
+		return this.accounts.filter(a => a.isAnyLocalPrivateKeyRegistered);
 	}
 
 	@computed get hasActiveAccounts() {

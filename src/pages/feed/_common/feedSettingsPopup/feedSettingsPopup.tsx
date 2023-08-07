@@ -91,9 +91,11 @@ export const FeedSettingsPopup = observer(({ account, onClose }: FeedSettingsPop
 			const cryptoProjectId = s.cryptoProject?.id;
 			const cryptoProject =
 				(cryptoProjectId && config?.defaultProjects.find(p => p.projectId === cryptoProjectId)) || undefined;
-			const reason = cryptoProject?.reasons[0] || '';
-			const list = (res[reason] = res[reason] || []);
-			list.push(s);
+			const reasons = cryptoProject?.reasons || [''];
+			for (const reason of reasons) {
+				const list = (res[reason] = res[reason] || []);
+				list.push(s);
+			}
 			return res;
 		}, {} as Record<FeedReasonOrEmpty, FeedSource[]>);
 
