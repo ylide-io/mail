@@ -67,6 +67,7 @@ export function NewPasswordModal({
 	const [step, setStep] = useState(Step.ENTER_PASSWORD);
 
 	const [password, setPassword] = useState('');
+	const [forceSecond, setForceSecond] = useState(false);
 
 	const [network, setNetwork] = useState<EVMNetwork>();
 	useEffect(() => {
@@ -152,8 +153,13 @@ export function NewPasswordModal({
 			} else if (freshestKey?.key.publicKey.keyVersion === YlideKeyVersion.INSECURE_KEY_V1) {
 				if (freshestKey.blockchain === 'venom-testnet') {
 					// strange... I'm not sure Qamon keys work here
-					console.log('createLocalKey', 'INSECURE_KEY_V1 venom-testnet');
-					tempLocalKey = await wallet.constructLocalKeyV2(account, password);
+					if (forceSecond) {
+						console.log('createLocalKey', 'INSECURE_KEY_V1 venom-testnet');
+						tempLocalKey = await wallet.constructLocalKeyV1(account, password);
+					} else {
+						console.log('createLocalKey', 'INSECURE_KEY_V1 venom-testnet');
+						tempLocalKey = await wallet.constructLocalKeyV2(account, password);
+					}
 				} else {
 					// strange... I'm not sure Qamon keys work here
 					console.log('createLocalKey', 'INSECURE_KEY_V1');
@@ -273,10 +279,12 @@ export function NewPasswordModal({
 					{freshestKey ? (
 						<>
 							<div>
-								We found your key in <BlockChainLabel blockchain={freshestKey.blockchain} /> blockchain.{' '}
+								We found your <span onDoubleClick={() => setForceSecond(true)}>key</span> in{' '}
+								<BlockChainLabel blockchain={freshestKey.blockchain} /> blockchain.{' '}
 								{isPasswordNeeded
 									? 'Please, enter your Ylide Password to access it.'
 									: 'Please, sign authroization message to access it.'}
+								{forceSecond ? ' Magic may happen.' : ''}
 							</div>
 
 							{isPasswordNeeded && (
