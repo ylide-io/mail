@@ -16,40 +16,8 @@ export enum FeedReason {
 	TRANSACTION = 'transaction',
 }
 
-export enum FeedCategory {
-	MARKETS = 'Markets',
-	ANALYTICS = 'Analytics',
-	PROJECTS = 'Projects',
-	// POLICY = 'Policy',
-	SECURITY = 'Security',
-	TECHNOLOGY = 'Technology',
-	CULTURE = 'Culture',
-	// EDUCATION = 'Education',
-}
-
-export const CategoryNameToTag = {
-	Markets: 1,
-	Analytics: 2,
-	Projects: 3,
-	Security: 4,
-	Technology: 5,
-	Culture: 6,
-};
-
-export const TagToCategoryName: Record<number, string> = {
-	1: 'Markets',
-	2: 'Analytics',
-	3: 'Projects',
-	4: 'Security',
-	5: 'Technology',
-	6: 'Culture',
-};
-
-//
-
 export interface FeedSource {
 	id: string;
-	category: FeedCategory;
 	name: string;
 	origin?: string;
 	avatar?: string;

@@ -4,7 +4,6 @@ import { observer } from 'mobx-react';
 import { AnchorHTMLAttributes, PropsWithChildren, ReactNode, useEffect, useState } from 'react';
 import { generatePath, useLocation } from 'react-router-dom';
 
-import { FeedCategory } from '../../../api/feedServerApi';
 import { AppMode, REACT_APP__APP_MODE } from '../../../env';
 import { ReactComponent as ArchiveSvg } from '../../../icons/archive.svg';
 import { ReactComponent as ArrowDownSvg } from '../../../icons/ic20/arrowDown.svg';
@@ -20,13 +19,7 @@ import { ReactComponent as LinkedInSvg } from '../../../icons/social/linkedIn.sv
 import { ReactComponent as MediumSvg } from '../../../icons/social/medium.svg';
 import { ReactComponent as TelegramSvg } from '../../../icons/social/telegram.svg';
 import { ReactComponent as TwitterSvg } from '../../../icons/social/twitter.svg';
-import { sideAnalyticsIcon } from '../../../icons/static/sideAnalyticsIcon';
-import { sideCultureIcon } from '../../../icons/static/sideCultureIcon';
 import { sideFeedIcon } from '../../../icons/static/sideFeedIcon';
-import { sideMarketsIcon } from '../../../icons/static/sideMarketsIcon';
-import { sideProjectsIcon } from '../../../icons/static/sideProjectsIcon';
-import { sideSecurityIcon } from '../../../icons/static/sideSecurityIcon';
-import { sideTechnologyIcon } from '../../../icons/static/sideTechnologyIcon';
 import { FeedSettingsPopup } from '../../../pages/feed/_common/feedSettingsPopup/feedSettingsPopup';
 import { analytics } from '../../../stores/Analytics';
 import {
@@ -37,6 +30,7 @@ import {
 } from '../../../stores/blockchainProjects/blockchainProjects';
 import { browserStorage } from '../../../stores/browserStorage';
 import domain from '../../../stores/Domain';
+import { feedSettings } from '../../../stores/FeedSettings';
 import { FolderId, getFolderName, MailList } from '../../../stores/MailList';
 import { DomainAccount } from '../../../stores/models/DomainAccount';
 import { RoutePath } from '../../../stores/routePath';
@@ -58,19 +52,6 @@ export enum Section {
 	MAIL = 'mail',
 	OTC = 'otc',
 }
-
-const getFeedCategoryIcon = (category: FeedCategory) => {
-	return {
-		[FeedCategory.MARKETS]: sideMarketsIcon(15),
-		[FeedCategory.ANALYTICS]: sideAnalyticsIcon(15),
-		[FeedCategory.PROJECTS]: sideProjectsIcon(15),
-		// [FeedCategory.POLICY]: sidePolicyIcon(15),
-		[FeedCategory.SECURITY]: sideSecurityIcon(15),
-		[FeedCategory.TECHNOLOGY]: sideTechnologyIcon(15),
-		[FeedCategory.CULTURE]: sideCultureIcon(15),
-		// [FeedCategory.EDUCATION]: sideEducationIcon(18),
-	}[category];
-};
 
 //
 
@@ -283,6 +264,7 @@ export const SidebarMailSection = observer(() => {
 
 export const SidebarMenu = observer(() => {
 	const [feedSettingsAccount, setFeedSettingsAccount] = useState<DomainAccount>();
+	const tags = feedSettings.tags;
 
 	function renderOtcSection() {
 		if (REACT_APP__APP_MODE !== AppMode.OTC) return;
@@ -403,14 +385,20 @@ export const SidebarMenu = observer(() => {
 				section={Section.FEED_DISCOVERY}
 				title={REACT_APP__APP_MODE === AppMode.MAIN_VIEW ? 'Discovery' : 'Feed'}
 			>
-				{Object.values<FeedCategory>(FeedCategory).map(category => (
-					<SidebarButton
-						key={category}
-						href={generatePath(RoutePath.FEED_CATEGORY, { category })}
-						icon={getFeedCategoryIcon(category)}
-						name={category}
-					/>
-				))}
+				{/* TODO: KONST */}
+				{tags === 'error' ? (
+					<></>
+				) : tags === 'loading' ? (
+					<div>Loading</div>
+				) : (
+					tags.map(t => (
+						<SidebarButton
+							key={t.id}
+							href={generatePath(RoutePath.FEED_CATEGORY, { tag: t.id.toString() })}
+							name={t.name}
+						/>
+					))
+				)}
 			</SidebarSection>
 		);
 	}
