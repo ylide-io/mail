@@ -273,9 +273,9 @@ export function FeedPostItem({ isInFeed, realtedAccounts, post }: FeedPostItemPr
 										<div className={css.reason} title="The reason why you see this post">
 											{
 												{
-													[FeedReason.BALANCE]: "You're holding ",
-													[FeedReason.PROTOCOL]: "You're in ",
-													[FeedReason.TRANSACTION]: 'You used ',
+													[FeedReason.BALANCE]: 'You hold tokens of ',
+													[FeedReason.PROTOCOL]: 'Current position in ',
+													[FeedReason.TRANSACTION]: 'Historical tx in ',
 												}[userCryptoProject.reasons[0]]
 											}
 
@@ -329,7 +329,13 @@ export function FeedPostItem({ isInFeed, realtedAccounts, post }: FeedPostItemPr
 									{!!realtedAccounts?.length && (
 										<>
 											<DropDownItem mode={DropDownItemMode.LITE} onSelect={() => unfollow()}>
-												Unfollow <b>{post.authorName}</b> {post.sourceType}
+												Unfollow{' '}
+												<b>
+													{post.sourceType === LinkType.DISCORD
+														? post.sourceName
+														: post.authorName}
+												</b>{' '}
+												{post.sourceType}
 											</DropDownItem>
 
 											{userCryptoProject && (

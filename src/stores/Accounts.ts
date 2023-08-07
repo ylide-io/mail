@@ -23,7 +23,12 @@ export class Accounts {
 	}
 
 	async createNewDomainAccount(wallet: Wallet, account: WalletAccount) {
-		const domainAccount = new DomainAccount(this.domain.keyRegistry, wallet, account, 'New Account');
+		const domainAccount = new DomainAccount(
+			this.domain.keyRegistry,
+			wallet,
+			account,
+			account.address.toLowerCase(),
+		);
 		this.accounts.push(domainAccount);
 		wallet.accounts.push(domainAccount);
 		this.save();

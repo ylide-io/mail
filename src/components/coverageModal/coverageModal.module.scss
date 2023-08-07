@@ -1,0 +1,53 @@
+$hPadding: 20px;
+
+.list {
+	position: relative;
+}
+
+.section {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	position: sticky;
+	top: 0;
+	z-index: 1;
+	padding: 8px 12px 8px 20px;
+	height: 40px;
+	font-weight: $font-weight_bold;
+	background: var(--tertiary-surface-color);
+}
+
+.row {
+	display: flex;
+	align-items: center;
+	padding: 0 20px;
+
+	&:nth-child(2n) {
+		background: var(--secondary-surface-color);
+	}
+
+	> :not(:first-child) {
+		margin: 0 0 0 12px;
+	}
+
+	@include less480px {
+		display: grid;
+		grid-template-columns: auto 1fr;
+		grid-row-gap: 8px;
+		padding-top: 8px;
+		padding-bottom: 8px;
+	}
+}
+
+.row_data {
+	height: 40px;
+
+	@include less480px {
+		height: auto;
+	}
+}
+
+.nothing {
+	margin-top: 8px;
+	margin-bottom: 8px;
+}
