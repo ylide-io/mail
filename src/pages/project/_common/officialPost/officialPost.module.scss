@@ -1,0 +1,79 @@
+.root {
+	display: grid;
+	grid-gap: 20px;
+}
+
+//
+
+.meta {
+	display: grid;
+	grid-template-columns: auto 1fr auto;
+	grid-gap: 12px;
+	align-items: start;
+}
+
+.metaPrimary {
+	align-self: center;
+	display: grid;
+	grid-gap: 4px;
+}
+
+.metaRight {
+	margin: 4px 2px 0 0;
+
+	&:before {
+		// Needed to make meta-button's negative margin work when it's the only element
+		content: ' ';
+	}
+}
+
+.ava {
+	width: 48px;
+}
+
+.sender {
+	font-size: 16px;
+	font-weight: $font-weight_semi-bold;
+}
+
+.metaAction {
+	color: var(--secondary-text-color);
+	font-size: 12px;
+}
+
+.metaAction_interactive {
+	cursor: pointer;
+
+	&:hover {
+		color: var(--link-color);
+	}
+}
+
+.metaAction_icon {
+	margin: -99px -2px;
+	width: 20px;
+	height: 20px;
+}
+
+//
+
+.body {
+	display: grid;
+	grid-gap: 20px;
+}
+
+.text {
+	font-size: 16px;
+	line-height: $line-height_text;
+	word-break: break-word;
+}
+
+.sticker {
+	height: 200px;
+	object-fit: contain;
+	border-radius: 8px;
+}
+
+.cover {
+	@include feed-attachment-image;
+}

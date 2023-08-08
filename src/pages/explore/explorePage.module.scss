@@ -1,0 +1,61 @@
+.root {
+	display: grid;
+	grid-gap: 48px;
+	padding: 0 0 48px;
+}
+
+.banner {
+	border-radius: 16px;
+}
+
+.heading {
+	font-size: 24px;
+	font-weight: $font-weight_medium;
+	text-align: center;
+
+	span {
+		border-bottom: 2px solid var(--accent-color);
+	}
+}
+
+.bigGrid {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	grid-gap: 32px;
+}
+
+.smallGrid {
+	display: grid;
+	grid-template-columns: 1fr 1fr 1fr;
+	grid-gap: 20px;
+}
+
+.tagTitle {
+	display: flex;
+	align-items: center;
+	margin: 0 0 12px;
+
+	svg {
+		margin: 0 4px 0 0;
+		width: 32px;
+		height: 32px;
+	}
+
+	div {
+		font-size: 24px;
+		font-weight: $font-weight_semi-bold;
+
+		span {
+			color: var(--secondary-text-color);
+			font-weight: $font-weight_light;
+		}
+	}
+}
+
+.footer {
+	font-size: 36px;
+	font-weight: $font-weight_semi-bold;
+	text-align: center;
+	opacity: 0.1;
+	cursor: default;
+}

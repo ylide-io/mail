@@ -16,7 +16,7 @@ import { browserStorage } from '../../../stores/browserStorage';
 import domain from '../../../stores/Domain';
 import { FolderId, ILinkedMessage, MailList, mailStore } from '../../../stores/MailList';
 import { RoutePath } from '../../../stores/routePath';
-import { useIsMatchingRoute, useNav } from '../../../utils/url';
+import { useIsMatchesPattern, useNav } from '../../../utils/url';
 import { useWindowSize } from '../../../utils/useWindowSize';
 import MailboxEmpty from './mailboxEmpty/mailboxEmpty';
 import { MailboxHeader } from './mailboxHeader/mailboxHeader';
@@ -71,7 +71,7 @@ export const MailboxPage = observer(() => {
 	const folderId = params.folderId || FolderId.Inbox;
 	const filterBySender = searchParams.get('sender') || undefined;
 
-	const isMailboxRoot = useIsMatchingRoute(RoutePath.MAIL_FOLDER);
+	const isMailboxRoot = useIsMatchesPattern(RoutePath.MAIL_FOLDER);
 
 	const accounts = domain.accounts.activeAccounts;
 
@@ -204,7 +204,6 @@ export const MailboxPage = observer(() => {
 													itemSize={itemSize}
 													width={width}
 													height={height}
-													style={{ padding: '0 0 12px' }}
 													itemData={{
 														messages: mailList.messages,
 														itemSize,

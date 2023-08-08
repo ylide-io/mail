@@ -15,8 +15,7 @@ import { AppMode, REACT_APP__APP_MODE } from './env';
 import { ReactComponent as CrossSvg } from './icons/ic20/cross.svg';
 import { AdminFeedPage } from './pages/AdminFeedPage';
 import { AdminPage } from './pages/AdminPage';
-import { BlockchainProjectFeedPage } from './pages/feed/blockchainProjectFeedPage/blockchainProjectFeedPage';
-import { BlockchainProjectFeedPostPage } from './pages/feed/blockchainProjectFeedPostPage/blockchainProjectFeedPostPage';
+import { ExplorePage } from './pages/explore/explorePage';
 import { FeedPage } from './pages/feed/feedPage/feedPage';
 import { FeedPostPage } from './pages/feed/feedPostPage/feedPostPage';
 import { ComposePage } from './pages/mail/composePage/composePage';
@@ -28,6 +27,8 @@ import { OtcAssetsPage } from './pages/otc/OtcAssetsPage/OtcAssetsPage';
 import { OtcChatPage } from './pages/otc/OtcChatPage/OtcChatPage';
 import { OtcChatsPage } from './pages/otc/OtcChatsPage/OtcChatsPage';
 import { OtcWalletsPage } from './pages/otc/OtcWalletsPage/OtcWalletsPage';
+import { BlockchainProjectPage } from './pages/project/blockchainProjectPage/blockchainProjectPage';
+import { BlockchainProjectPostPage } from './pages/project/blockchainProjectPostPage/blockchainProjectPostPage';
 import { SettingsPage } from './pages/settings/settingsPage';
 import { TestPage } from './pages/test/testPage';
 import { WalletsPage } from './pages/wallets/walletsPage';
@@ -39,7 +40,7 @@ import { browserStorage } from './stores/browserStorage';
 import domain from './stores/Domain';
 import { RoutePath } from './stores/routePath';
 import walletConnect from './stores/WalletConnect';
-import { useIsMatchingRoute, useNav } from './utils/url';
+import { useIsMatchesPattern, useNav } from './utils/url';
 
 export enum AppTheme {
 	V1 = 'v1',
@@ -105,7 +106,7 @@ export const App = observer(() => {
 
 	const [isInitError, setInitError] = useState(false);
 
-	const isTestPage = useIsMatchingRoute(RoutePath.TEST);
+	const isTestPage = useIsMatchesPattern(RoutePath.TEST);
 
 	useEffect(() => {
 		if (!isTestPage) {
@@ -238,6 +239,8 @@ export const App = observer(() => {
 					<RemoveTrailingSlash />
 
 					<Routes>
+						<Route path={RoutePath.ROOT} element={<ExplorePage />} />
+
 						<Route path={RoutePath.TEST} element={<TestPage />} />
 						<Route path={RoutePath.WALLETS} element={<WalletsPage />} />
 						<Route path={RoutePath.SETTINGS} element={<SettingsPage />} />
@@ -252,7 +255,7 @@ export const App = observer(() => {
 									to={
 										REACT_APP__APP_MODE === AppMode.MAIN_VIEW
 											? generatePath(RoutePath.FEED_SMART)
-											: generatePath(RoutePath.FEED_PROJECT)
+											: generatePath(RoutePath.PROJECT_ROOT)
 									}
 								/>
 							}
@@ -265,19 +268,20 @@ export const App = observer(() => {
 						<Route path={RoutePath.FEED_SMART_ADDRESS} element={<FeedPage />} />
 
 						<Route
-							path={RoutePath.FEED_PROJECT}
+							path={RoutePath.PROJECT_ROOT}
 							element={
 								<Navigate
 									replace
-									to={generatePath(RoutePath.FEED_PROJECT_POSTS, {
+									to={generatePath(RoutePath.PROJECT, {
 										projectId: BlockchainProjectId.GENERAL,
 									})}
 								/>
 							}
 						/>
-						<Route path={RoutePath.FEED_PROJECT_POSTS} element={<BlockchainProjectFeedPage />} />
-						<Route path={RoutePath.FEED_PROJECT_POSTS_ADMIN} element={<BlockchainProjectFeedPage />} />
-						<Route path={RoutePath.FEED_PROJECT_POST} element={<BlockchainProjectFeedPostPage />} />
+						<Route path={RoutePath.PROJECT} element={<BlockchainProjectPage />} />
+						<Route path={RoutePath.PROJECT_ADMIN} element={<BlockchainProjectPage />} />
+						<Route path={RoutePath.PROJECT_POST} element={<BlockchainProjectPostPage />} />
+						<Route path={RoutePath.PROJECT_DISCUSSION} element={<BlockchainProjectPage />} />
 
 						<Route
 							path="/feed/venom/*"
@@ -318,7 +322,7 @@ export const App = observer(() => {
 											? generatePath(RoutePath.OTC_ASSETS)
 											: REACT_APP__APP_MODE === AppMode.MAIN_VIEW
 											? generatePath(RoutePath.FEED)
-											: generatePath(RoutePath.FEED_PROJECT)
+											: generatePath(RoutePath.ROOT)
 									}
 								/>
 							}

@@ -1,23 +1,14 @@
 .root {
 	position: relative;
-	padding: 12px;
+	padding: 20px;
 	background: var(--surface-color);
-	border: 1px solid var(--border-color);
-	border-radius: 12px;
-
-	@include less720px {
-		border-width: 1px 0;
-		border-radius: 0;
-	}
+	border-radius: 16px;
 }
 
 .root_compact {
-	padding: 8px;
-
-	@include less720px {
-		border-width: 1px;
-		border-radius: 8px;
-	}
+	padding: 12px;
+	border: 1px solid var(--border-color);
+	border-radius: 8px;
 }
 
 .root_collapsed {
@@ -43,6 +34,6 @@
 
 	&:hover,
 	&:focus-visible {
-		color: var(--primary-text-color);
+		color: var(--text-color);
 	}
 }

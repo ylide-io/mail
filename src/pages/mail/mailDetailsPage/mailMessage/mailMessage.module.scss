@@ -111,7 +111,7 @@
 }
 .attachmentName {
 	@include truncate-text;
-	font-weight: $font-weight_bold;
+	font-weight: $font-weight_semi-bold;
 }
 .attachmentSize {
 	@include truncate-text;

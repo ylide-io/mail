@@ -6,6 +6,7 @@ import { Spinner } from '../spinner/spinner';
 import css from './ActionButton.module.scss';
 
 export enum ActionButtonSize {
+	XSMALL = 'XSMALL',
 	SMALL = 'SMALL',
 	MEDIUM = 'MEDIUM',
 	LARGE = 'LARGE',
@@ -18,6 +19,8 @@ export enum ActionButtonLook {
 	SECONDARY = 'SECONDARY',
 	DANGEROUS = 'DANGEROUS',
 	LITE = 'LITE',
+	SUBTILE = 'SUBTILE',
+	HEAVY = 'HEAVY',
 }
 
 interface ActionButtonProps extends PropsWithChildren<{}>, PropsWithClassName, ButtonHTMLAttributes<HTMLButtonElement> {
@@ -35,6 +38,7 @@ export const ActionButton = forwardRef(
 		ref: Ref<HTMLButtonElement>,
 	) => {
 		const sizeClass = {
+			[ActionButtonSize.XSMALL]: css.root_xsmallSize,
 			[ActionButtonSize.SMALL]: css.root_smallSize,
 			[ActionButtonSize.MEDIUM]: css.root_mediumSize,
 			[ActionButtonSize.LARGE]: css.root_largeSize,
@@ -47,6 +51,8 @@ export const ActionButton = forwardRef(
 			[ActionButtonLook.SECONDARY]: css.root_secondaryLook,
 			[ActionButtonLook.DANGEROUS]: css.root_dangerousLook,
 			[ActionButtonLook.LITE]: css.root_liteLook,
+			[ActionButtonLook.SUBTILE]: css.root_subtileLook,
+			[ActionButtonLook.HEAVY]: css.root_heavyLook,
 		}[look || ActionButtonLook.DEFAULT];
 
 		return (

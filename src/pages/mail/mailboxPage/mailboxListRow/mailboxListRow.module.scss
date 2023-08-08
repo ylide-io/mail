@@ -7,6 +7,10 @@
 	cursor: pointer;
 	border-bottom: 1px solid var(--border-lite-color);
 
+	&:last-child {
+		border: 0;
+	}
+
 	&:hover:not(.root_loading) {
 		background: var(--surface-hover-color);
 

@@ -1,9 +1,9 @@
 .root {
 	display: inline-block;
 	vertical-align: middle;
-	height: 20px;
-	background: var(--tertiary-surface-color);
-	border-radius: 4px;
+	height: $interactive-elem-size_xsmall;
+	background: var(--secondary-surface-color);
+	border-radius: 6px;
 }
 
 .inner {
@@ -15,4 +15,5 @@
 	padding: 0 6px;
 	height: 100%;
 	font-size: 10px;
+	font-weight: $font-weight_medium;
 }

@@ -1,51 +1,23 @@
 .root {
 	display: flex;
 	align-items: center;
-	height: 140px;
-
-	@media (max-height: 840px) {
-		height: 100px;
-	}
-
-	@include less920px {
-		padding: 0 20px;
-		height: 80px;
-	}
-
-	@include less720px {
-		padding: 0 12px;
-		height: 64px;
-	}
+	padding: 0 40px;
+	height: 80px;
+	background: var(--surface-color);
 }
 
-.burger {
-	margin: 0 12px 0 0;
+.left {
+	display: grid;
+	grid-auto-flow: column;
+	grid-gap: 20px;
+	align-items: center;
 }
 
-.logo {
-	@include expand-click-area;
-
-	@include less920px {
-		width: 130px;
-	}
-
-	@include less720px {
-		display: none;
-	}
-
-	> svg {
-		width: 100%;
-		height: 100%;
-	}
-}
-
-.composeButton {
-	display: none;
-
-	@include less720px {
-		display: block;
-		margin: 0 12px 0 0;
-	}
+.center {
+	display: flex;
+	align-items: center;
+	margin: auto;
+	width: 40%;
 }
 
 .right {
@@ -53,27 +25,62 @@
 	grid-auto-flow: column;
 	grid-gap: 20px;
 	align-items: center;
-	margin: 0 0 0 auto;
+}
+
+//
+
+.composeButton {
+	display: none;
 
 	@include less720px {
-		grid-gap: 8px;
+		display: block;
 	}
+}
+
+.logo {
+	@include expand-click-area;
+}
+
+.navButton {
+	display: flex;
+	align-items: center;
+	padding: 0 20px;
+	margin: 0 8px 0 0;
+	height: 40px;
+	font-size: 12px;
+	font-weight: $font-weight_semi-bold;
+	text-transform: uppercase;
+	color: var(--text-color);
+	border-radius: 99px;
+}
+
+.navButton_active {
+	color: var(--accent-color);
+	background: var(--accent-surface-color);
+}
+
+.navButton:not(.navButton_active):hover {
+	color: var(--accent-color);
+}
+
+.search {
+	flex: 1 1 auto;
+	margin: 0 0 0 12px;
 }
 
 .users {
 	@include expand-click-area;
 	display: flex;
 	align-items: center;
-	padding: 0 0 0 3px;
+	padding: 0 2px 0 3px;
 	height: $interactive-elem-size_xlarge;
 	white-space: nowrap;
-	background-color: var(--secondary-surface-color);
-	border: 1px solid var(--border-color);
+	background: var(--secondary-surface-color);
 	border-radius: $interactive-elem-size_xlarge/2;
 
 	&:hover,
 	&:focus-visible {
-		border-color: var(--border-heavy-color);
+		background: var(--secondary-surface-hover-color);
 	}
 
 	> * {
@@ -94,7 +101,8 @@
 }
 
 .usersText {
-	@include flex-row(center, flex-start);
+	font-size: 12px;
+	font-weight: $font-weight_medium;
 	white-space: nowrap;
 
 	@include less720px {

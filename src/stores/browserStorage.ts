@@ -1,15 +1,11 @@
 import { WalletAccount } from '@ylide/sdk';
 import { makeAutoObservable } from 'mobx';
 
-import { Section } from '../components/genericLayout/sidebar/sidebarMenu';
 import { WidgetId } from '../pages/widgets/widgets';
-import { toggleArrayItem } from '../utils/array';
 
 enum BrowserStorageKey {
 	ADMIN_PASSWORD = 'ylide_adminPassword',
 	IS_MAIN_VIEW_BANNER_HIDDEN = 'ylide_isMainViewBannerHidden',
-	ACCOUNT_REMOTE_KEYS = 'ylide_accountRemoteKeys',
-	SIDEBAR_FOLDED_SECTIONS = 'ylide_sidebarFoldedSections',
 	SAVE_DECODED_MESSAGES = 'ylide_saveDecodedMessages',
 	WIDGET_ID = 'ylide_widgetId',
 	MAIN_VIEW_KEYS = 'ylide_mainViewKeys',
@@ -48,6 +44,8 @@ class BrowserStorage {
 			storage.removeItem(key);
 		}
 	}
+
+	//
 
 	private _savedAccounts =
 		BrowserStorage.getItemWithTransform<SavedAccount[]>(BrowserStorageKey.SAVED_ACCOUNTS, val => {
@@ -107,25 +105,6 @@ class BrowserStorage {
 	set isMainViewBannerHidden(value: boolean) {
 		BrowserStorage.setItem(BrowserStorageKey.IS_MAIN_VIEW_BANNER_HIDDEN, value);
 		this._isMainViewBannerHidden = value;
-	}
-
-	private _sidebarFoldedSections =
-		BrowserStorage.getItemWithTransform(
-			BrowserStorageKey.SIDEBAR_FOLDED_SECTIONS,
-			item => item.split(',') as Section[],
-		) || [];
-
-	isSidebarSectionFolded(section: Section) {
-		return this._sidebarFoldedSections.includes(section);
-	}
-
-	toggleSidebarSectionFolding(section: Section) {
-		const newValue = toggleArrayItem(this._sidebarFoldedSections, section);
-		BrowserStorage.setItem(
-			BrowserStorageKey.SIDEBAR_FOLDED_SECTIONS,
-			newValue.length ? newValue.join(',') : undefined,
-		);
-		this._sidebarFoldedSections = newValue;
 	}
 
 	//

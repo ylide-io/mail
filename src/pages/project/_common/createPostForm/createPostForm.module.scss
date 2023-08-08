@@ -1,15 +1,16 @@
 .form {
 	display: grid;
 	grid-template-columns: 1fr auto;
-	grid-gap: 12px;
+	grid-gap: 16px;
 	padding: 12px;
 	background: var(--surface-color);
-	border: 1px solid var(--border-color);
-	border-radius: 8px;
+	border-radius: 16px;
 }
 
 .form_expanded {
 	grid-template-columns: 1fr;
+	padding: 16px;
+	border: 1px solid var(--accent2-color);
 }
 
 .replyToHeader {
@@ -21,14 +22,17 @@
 }
 
 .replyToTitle {
-	padding: 0 0 0 12px;
 	font-size: 14px;
-	font-weight: $font-weight_bold;
+	font-weight: $font-weight_semi-bold;
 	text-transform: uppercase;
 }
 
 .textarea {
 	padding: 8px;
+
+	.form_expanded & {
+		padding: 4px 2px;
+	}
 }
 
 .divider {

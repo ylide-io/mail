@@ -5,6 +5,10 @@
 	overflow: hidden;
 }
 
+.inner_project {
+	border-radius: 16%;
+}
+
 .inner2 {
 	display: flex;
 	align-items: center;
@@ -17,6 +21,11 @@
 }
 
 .content {
+	display: block;
 	width: 100%;
 	height: 100%;
+}
+
+.content_image {
+	object-fit: cover;
 }

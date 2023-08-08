@@ -1,8 +1,9 @@
 import { EVMNetwork } from '@ylide/ethereum';
-import { MessageAttachmentLinkV1, MessageAttachmentType } from '@ylide/sdk';
+import { MessageAttachmentLinkV1, MessageAttachmentType, Uint256 } from '@ylide/sdk';
 import clsx from 'clsx';
 import { observer } from 'mobx-react';
 import { forwardRef, Ref, useEffect, useImperativeHandle, useMemo, useRef, useState } from 'react';
+import { useQuery } from 'react-query';
 
 import { BlockchainFeedApi, DecodedBlockchainFeedPost } from '../../../../api/blockchainFeedApi';
 import { AccountSelect } from '../../../../components/accountSelect/accountSelect';
@@ -16,7 +17,7 @@ import { ReactComponent as TrashSvg } from '../../../../icons/ic20/trash.svg';
 import { ReactComponent as ImageSvg } from '../../../../icons/ic28/image.svg';
 import { ReactComponent as StickerSvg } from '../../../../icons/ic28/sticker.svg';
 import { analytics } from '../../../../stores/Analytics';
-import { BlockchainProjectMeta } from '../../../../stores/blockchainProjects/blockchainProjects';
+import domain from '../../../../stores/Domain';
 import { DomainAccount } from '../../../../stores/models/DomainAccount';
 import { OutgoingMailData, OutgoingMailDataMode } from '../../../../stores/outgoingMailData';
 import { HorizontalAlignment } from '../../../../utils/alignment';
@@ -25,10 +26,9 @@ import { openFilePicker, readFileAsDataURL } from '../../../../utils/file';
 import { hashToIpfsUrl, ipfsToHttpUrl } from '../../../../utils/ipfs';
 import { escapeRegex } from '../../../../utils/regex';
 import { SendMailButton } from '../../../mail/_common/composeMailForm/sendMailButton/sendMailButton';
-import { BlockchainProjectPostView } from '../blockchainProjectPost/blockchainProjectPost';
+import { RepliedDiscussionPost } from '../repliedDiscussionPost/repliedDiscussionPost';
 import css from './createPostForm.module.scss';
 import { stickerIpfsIds } from './stickerIpfsIds';
-import domain from '../../../../stores/Domain';
 
 export interface CreatePostFormApi {
 	replyTo: (post: DecodedBlockchainFeedPost) => void;
@@ -36,9 +36,9 @@ export interface CreatePostFormApi {
 
 export interface CreatePostFormProps extends PropsWithClassName {
 	accounts: DomainAccount[];
-	isUnavailable: boolean;
-	projectMeta: BlockchainProjectMeta;
+	feedId: Uint256;
 	allowCustomAttachments: boolean;
+	placeholder: string;
 	fixedEvmNetwork?: EVMNetwork;
 	onCreated?: () => void;
 }
@@ -49,9 +49,9 @@ export const CreatePostForm = observer(
 			{
 				className,
 				accounts,
-				isUnavailable,
-				projectMeta,
+				feedId,
 				allowCustomAttachments,
+				placeholder,
 				fixedEvmNetwork,
 				onCreated,
 			}: CreatePostFormProps,
@@ -72,7 +72,7 @@ export const CreatePostForm = observer(
 			}, []);
 
 			useEffect(() => {
-				mailData.feedId = projectMeta.feedId;
+				mailData.feedId = feedId;
 
 				if (fixedEvmNetwork != null) {
 					mailData.network = fixedEvmNetwork;
@@ -104,11 +104,11 @@ export const CreatePostForm = observer(
 						return false;
 					}
 
-					analytics.blockchainFeedSendAttempt(projectMeta.id, !!replyTo, replyTo?.original.id);
+					analytics.blockchainFeedSendAttempt(feedId, !!replyTo, replyTo?.original.id);
 
 					return true;
 				};
-			}, [fixedEvmNetwork, mailData, projectMeta, replyTo]);
+			}, [fixedEvmNetwork, mailData, feedId, replyTo]);
 
 			useEffect(() => {
 				mailData.from = mailData.from && accounts.includes(mailData.from) ? mailData.from : accounts[0];
@@ -197,7 +197,7 @@ export const CreatePostForm = observer(
 			};
 
 			const onSent = () => {
-				analytics.blockchainFeedSendSuccessful(projectMeta.id, !!replyTo, replyTo?.original.id);
+				analytics.blockchainFeedSendSuccessful(feedId, !!replyTo, replyTo?.original.id);
 
 				mailData.plainTextData = '';
 				mailData.attachments = [];
@@ -229,6 +229,14 @@ export const CreatePostForm = observer(
 				};
 			}, [mailData, replyTo]);
 
+			const serviceStatus = useQuery(['project', 'service-status'], {
+				queryFn: async () => (await BlockchainFeedApi.getServiceStatus()).status,
+				initialData: 'ACTIVE',
+				refetchInterval: 10000,
+			});
+
+			const isUnavailable = serviceStatus.data !== 'ACTIVE';
+
 			useImperativeHandle(
 				ref,
 				() => ({
@@ -253,7 +261,7 @@ export const CreatePostForm = observer(
 								</ActionButton>
 							</div>
 
-							<BlockchainProjectPostView post={replyTo} isCompact />
+							<RepliedDiscussionPost post={replyTo} />
 
 							<div className={css.divider} />
 						</>
@@ -264,7 +272,7 @@ export const CreatePostForm = observer(
 						resetKey={expanded}
 						className={css.textarea}
 						disabled={mailData.sending}
-						placeholder="Make a new post"
+						placeholder={placeholder}
 						maxHeight={400}
 						rows={expanded ? 4 : 1}
 						value={mailData.plainTextData}

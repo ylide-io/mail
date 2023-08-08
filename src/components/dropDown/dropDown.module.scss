@@ -26,7 +26,7 @@ $contentPadding: 6px;
 }
 
 .item_regular {
-	color: var(--primary-text-color);
+	color: var(--text-color);
 	cursor: pointer;
 }
 
@@ -43,7 +43,7 @@ $contentPadding: 6px;
 
 .item_lite:hover,
 .item_lite:focus-visible {
-	color: var(--primary-text-color);
+	color: var(--text-color);
 	background: var(--surface-hover-color);
 }
 

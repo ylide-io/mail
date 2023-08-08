@@ -1,3 +1,4 @@
+import { observer } from 'mobx-react';
 import { useRef, useState } from 'react';
 import { Helmet } from 'react-helmet';
 import { useQuery } from 'react-query';
@@ -5,40 +6,28 @@ import { generatePath, useParams } from 'react-router-dom';
 
 import { BlockchainFeedApi, decodeBlockchainFeedPost } from '../../../api/blockchainFeedApi';
 import { ActionButton, ActionButtonLook } from '../../../components/ActionButton/ActionButton';
-import { GridRowBox } from '../../../components/boxes/boxes';
 import { ErrorMessage } from '../../../components/errorMessage/errorMessage';
-import { NarrowContent } from '../../../components/genericLayout/content/narrowContent/narrowContent';
 import { GenericLayout } from '../../../components/genericLayout/genericLayout';
+import { PageContentHeader } from '../../../components/pageContentHeader/pageContentHeader';
 import { SharePopup } from '../../../components/sharePopup/sharePopup';
 import { YlideLoader } from '../../../components/ylideLoader/ylideLoader';
-import { ReactComponent as ArrowLeftSvg } from '../../../icons/ic20/arrowLeft.svg';
 import { ReactComponent as ShareSvg } from '../../../icons/ic20/share.svg';
 import { MessageDecodedTextDataType } from '../../../indexedDB/IndexedDB';
-import {
-	activeVenomProjects,
-	BlockchainProjectId,
-	blockchainProjectsMeta,
-} from '../../../stores/blockchainProjects/blockchainProjects';
+import { BlockchainProjectId, blockchainProjects } from '../../../stores/blockchainProjects/blockchainProjects';
 import { RoutePath } from '../../../stores/routePath';
 import { HorizontalAlignment } from '../../../utils/alignment';
 import { invariant } from '../../../utils/assert';
-import { toAbsoluteUrl, useNav } from '../../../utils/url';
-import {
-	BlockchainProjectPostView,
-	generateBlockchainProjectPostPath,
-} from '../_common/blockchainProjectPost/blockchainProjectPost';
-import css from './blockchainProjectFeedPostPage.module.scss';
+import { toAbsoluteUrl } from '../../../utils/url';
+import { generateOfficialPostPath, OfficialPostView } from '../_common/officialPost/officialPost';
+import css from './blockchainProjectPostPage.module.scss';
 
-export function BlockchainProjectFeedPostPage() {
+export const BlockchainProjectPostPage = observer(() => {
 	const { projectId, postId } = useParams<{ projectId: BlockchainProjectId; postId: string }>();
 	invariant(projectId);
 	invariant(postId);
 
-	const navigate = useNav();
-
-	const projectMeta = blockchainProjectsMeta[projectId];
-	const isVenomFeed = activeVenomProjects.includes(projectId);
-	const postPath = generateBlockchainProjectPostPath(projectId, postId);
+	const project = blockchainProjects[projectId];
+	const postPath = generateOfficialPostPath(projectId, postId);
 
 	const { isLoading, data } = useQuery(['feed', 'blockchain-project', 'post', postId], {
 		queryFn: async () => {
@@ -52,17 +41,10 @@ export function BlockchainProjectFeedPostPage() {
 
 	return (
 		<GenericLayout>
-			<NarrowContent
-				title={
-					<GridRowBox>
-						<ActionButton
-							onClick={() => navigate(generatePath(RoutePath.FEED_PROJECT_POSTS, { projectId }))}
-							icon={<ArrowLeftSvg />}
-						/>
-						{projectMeta.name} feed
-					</GridRowBox>
-				}
-				titleRight={
+			<PageContentHeader
+				backButton={{ href: generatePath(RoutePath.PROJECT, { projectId }) }}
+				title={project.name}
+				right={
 					data && (
 						<>
 							<ActionButton
@@ -86,25 +68,25 @@ export function BlockchainProjectFeedPostPage() {
 						</>
 					)
 				}
-			>
-				{data ? (
-					<>
-						<Helmet>
-							<title>
-								{data.decoded.decodedTextData.type === MessageDecodedTextDataType.YMF
-									? data.decoded.decodedTextData.value.toPlainText()
-									: data.decoded.decodedTextData.value}
-							</title>
-						</Helmet>
+			/>
 
-						<BlockchainProjectPostView post={data} displayBlockchainTag={!isVenomFeed} />
-					</>
-				) : isLoading ? (
-					<YlideLoader className={css.loader} reason="Loading post ..." />
-				) : (
-					<ErrorMessage>Couldn't load this post</ErrorMessage>
-				)}
-			</NarrowContent>
+			{data ? (
+				<>
+					<Helmet>
+						<title>
+							{data.decoded.decodedTextData.type === MessageDecodedTextDataType.YMF
+								? data.decoded.decodedTextData.value.toPlainText()
+								: data.decoded.decodedTextData.value}
+						</title>
+					</Helmet>
+
+					<OfficialPostView project={project} post={data} />
+				</>
+			) : isLoading ? (
+				<YlideLoader className={css.loader} reason="Loading post ..." />
+			) : (
+				<ErrorMessage>Couldn't load this post</ErrorMessage>
+			)}
 		</GenericLayout>
 	);
-}
+});

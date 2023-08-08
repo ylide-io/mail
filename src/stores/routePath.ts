@@ -27,10 +27,12 @@ export enum RoutePath {
 	FEED_SOURCE = '/feed/source/:source',
 	FEED_SMART = '/feed/smart',
 	FEED_SMART_ADDRESS = '/feed/smart/:address',
-	FEED_PROJECT = '/feed/project',
-	FEED_PROJECT_POSTS = '/feed/project/:projectId',
-	FEED_PROJECT_POSTS_ADMIN = '/feed/project/:projectId/admin',
-	FEED_PROJECT_POST = '/feed/project/:projectId/:postId',
+
+	PROJECT_ROOT = '/project',
+	PROJECT = '/project/:projectId',
+	PROJECT_ADMIN = '/project/:projectId/admin',
+	PROJECT_POST = '/project/:projectId/post/:postId',
+	PROJECT_DISCUSSION = '/project/:projectId/discussion',
 
 	OTC_ASSETS = '/otc/assets',
 	OTC_WALLETS = '/otc/wallets',

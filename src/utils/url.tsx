@@ -1,4 +1,11 @@
-import { createSearchParams, NavigateOptions, URLSearchParamsInit, useMatch, useNavigate } from 'react-router-dom';
+import {
+	createSearchParams,
+	matchPath,
+	NavigateOptions,
+	URLSearchParamsInit,
+	useLocation,
+	useNavigate,
+} from 'react-router-dom';
 
 import { RoutePath } from '../stores/routePath';
 import { filterObjectEntries } from './object';
@@ -31,12 +38,22 @@ export const useNav = () => {
 	const navigate = useNavigate();
 
 	return (value: string | UseNavParameters, options?: NavigateOptions) => {
+		if (!options?.preventScrollReset) {
+			window.scrollTo(0, 0);
+		}
+
 		navigate(buildUrl(value), options);
 	};
 };
 
 //
 
-export function useIsMatchingRoute(...routes: RoutePath[]) {
-	return routes.map(useMatch).some(Boolean);
+export function useIsMatchesPattern(...routes: RoutePath[]) {
+	const location = useLocation();
+	return routes.some(route => matchPath(route, location.pathname));
+}
+
+export function useIsMatchesPath(...paths: string[]) {
+	const location = useLocation();
+	return paths.includes(location.pathname);
 }

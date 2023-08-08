@@ -10,6 +10,7 @@ import { CheckBox } from '../../../../components/checkBox/checkBox';
 import { DropDown, DropDownItem, DropDownItemMode } from '../../../../components/dropDown/dropDown';
 import { ErrorMessage, ErrorMessageLook } from '../../../../components/errorMessage/errorMessage';
 import { GalleryModal } from '../../../../components/galleryModal/galleryModal';
+import { PostItemContainer } from '../../../../components/postItemContainer/postItemContainer';
 import { ReadableDate } from '../../../../components/readableDate/readableDate';
 import { SharePopup } from '../../../../components/sharePopup/sharePopup';
 import { Spinner } from '../../../../components/spinner/spinner';
@@ -26,7 +27,6 @@ import { HorizontalAlignment } from '../../../../utils/alignment';
 import { invariant } from '../../../../utils/assert';
 import { toAbsoluteUrl, useNav } from '../../../../utils/url';
 import { FeedLinkTypeIcon } from '../feedLinkTypeIcon/feedLinkTypeIcon';
-import { PostItemContainer } from '../postItemContainer/postItemContainer';
 import css from './feedPostItem.module.scss';
 
 interface FeedPostContentProps {

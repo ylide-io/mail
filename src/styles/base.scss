@@ -1,17 +1,19 @@
 :root {
 	--venom-background: linear-gradient(-45deg, #3f6ccb, #4ebc6a);
+	--on-venom-background: #fff;
 }
 
 [data-theme='v1'] {
 	--background-color: #f7f7ee;
 
-	--primary-text-color: #111;
+	--text-color: #111;
 	--secondary-text-color: #888;
 
-	--surface-color: #fff;
-	--surface-rgb-color: 255, 255, 255;
+	--surface-color: #fffffa;
+	--surface-rgb-color: 255, 255, 250;
 	--surface-hover-color: #f8f8f8;
-	--secondary-surface-color: #fbfbf8;
+	--secondary-surface-color: rgba(0, 0, 0, 0.05);
+	--secondary-surface-hover-color: rgba(0, 0, 0, 0.08);
 	--tertiary-surface-color: #eee;
 	--error-surface-color: rgba(255, 68, 85, 0.2);
 	--success-surface-color: #d1f3dd;
@@ -22,7 +24,7 @@
 	--border-lite-color: rgba(0, 0, 0, 0.1);
 	--border-heavy-color: rgba(0, 0, 0, 0.3);
 
-	--link-color: #19f;
+	--link-color: #0a8;
 
 	--field-border-color: rgba(0, 0, 0, 0.15);
 	--field-focus-border-color: #4bf;
@@ -32,15 +34,21 @@
 	--selected-background-color: #92cffb;
 	--selected-light-background-color: #d1ecff;
 
-	--accent-color: #9747ff;
-	--accent-rgb-color: 151, 71, 255;
-	--accent-hover-color: #7d2ce7;
+	--accent-color: #b4c;
+	--accent-rgb-color: 187, 68, 204;
+	--accent-hover-color: #a2b;
+	--accent-surface-color: rgba(var(--accent-rgb-color), 0.1);
 	--on-accent-color: #fff;
 
-	--accent2-color: #1ab394;
-	--accent2-rgb-color: 26, 179, 148;
+	--accent-lite-color: #f3c9f4;
+
+	--accent2-color: #0a8;
+	--accent2-rgb-color: 0, 170, 136;
 	--accent2-hover-color: #0f947a;
+	--accent2-surface-color: rgba(var(--accent2-rgb-color), 0.1);
 	--on-accent2-color: #fff;
+
+	--accent2-lite-color: #d3f9e5;
 
 	--error-color: #f45;
 	--error-rgb-color: 255, 68, 85;
@@ -56,7 +64,7 @@
 [data-theme='v2'] {
 	--background-color: #e4ebf0;
 
-	--primary-text-color: #111;
+	--text-color: #111;
 	--secondary-text-color: #888;
 
 	--surface-color: #fff;
@@ -86,11 +94,13 @@
 	--accent-color: #0b9;
 	--accent-rgb-color: 0, 187, 153;
 	--accent-hover-color: #097;
+	--accent2-surface-color: rgba(var(--accent-rgb-color), 0.1);
 	--on-accent-color: #fff;
 
 	--accent2-color: #0b9;
 	--accent2-rgb-color: 0, 187, 153;
 	--accent2-hover-color: #097;
+	--accent-surface-color: rgba(var(--accent2-rgb-color), 0.1);
 	--on-accent2-color: #fff;
 
 	--error-color: #f45;
@@ -117,9 +127,9 @@ input,
 textarea,
 select,
 optgroup {
-	// 1.25 - default Figma line-height for Lexend font
-	font: 13px/1.25 $font-family_main;
-	color: var(--primary-text-color);
+	// 1.21 - default Figma line-height for Inter font. We use 1.2 to make it more even
+	font: $font-weight_regular 14px/1.2 $font-family_main;
+	color: var(--text-color);
 	-webkit-font-smoothing: antialiased;
 	-moz-osx-font-smoothing: grayscale;
 }
@@ -134,10 +144,7 @@ select {
 	border: 0;
 }
 
-button:focus,
-input:focus,
-textarea:focus,
-select:focus {
+:focus {
 	outline: none;
 }
 

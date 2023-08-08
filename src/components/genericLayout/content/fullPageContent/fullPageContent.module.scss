@@ -1,27 +1,13 @@
 .root {
+	padding: 0 0 32px;
+	height: 100%;
+}
+
+.inner {
 	display: flex;
 	flex-direction: column;
 	position: relative;
 	height: 100%;
-	min-width: 0;
-	min-height: 0;
-	overflow-y: auto;
-	background-color: var(--surface-color);
-	border-left: 1px solid var(--border-color);
-	border-radius: 0 16px 16px 0;
-
-	@include less920px {
-		border-left: 0;
-		border-radius: 0;
-	}
-}
-
-.linkButton {
-	flex-shrink: 0;
-	display: none;
-	margin: 0 12px 12px;
-
-	@include less920px {
-		display: block;
-	}
+	background: var(--surface-color);
+	border-radius: 16px;
 }

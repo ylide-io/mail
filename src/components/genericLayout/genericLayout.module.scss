@@ -1,50 +1,45 @@
+$mainPadding: 40px;
+$mainGap: 32px;
+$sidebarWidth: 280px;
+
 .root {
 	flex: 1 1 auto;
 	display: grid;
 	grid-template-rows: auto 1fr;
-	margin: auto;
-	padding: 0 20px 20px;
-	width: 100%;
-	max-width: 1140px;
-
-	@include less920px {
-		padding: 0;
-	}
+	grid-gap: 32px;
+	align-items: start;
 }
 
 .main {
-	padding: 0 0 0 226px;
-	position: relative;
-	background: var(--secondary-surface-color);
-	border: 1px solid var(--border-color);
-	border-radius: 16px;
+	display: grid;
+	grid-template-columns: $sidebarWidth 1fr;
+	grid-gap: $mainGap;
+	margin: 0 auto;
+	padding: 0 $mainPadding;
+	width: 100%;
+	max-width: (1200px + $mainPadding * 2);
 
 	@include less920px {
 		grid-template-columns: 1fr;
 		padding: 0;
-		border-width: 1px 0 0;
-		border-radius: 0;
 	}
 }
 
 .sidebar {
 	display: flex;
 	flex-direction: column;
-	position: absolute;
-	top: 0;
-	bottom: 0;
-	left: 0;
-	padding: 24px 0;
-	width: 226px;
-	overflow-y: auto;
 
 	@include less920px {
 		position: fixed;
 		z-index: 2;
 		top: 0;
 		bottom: 0;
-		left: -226px;
-		background-color: var(--surface-color);
+		left: -($sidebarWidth + $mainPadding);
+		padding: 24px 20px;
+		width: 100%;
+		max-width: ($sidebarWidth + 20px * 2);
+		overflow-y: auto;
+		background-color: var(--background-color);
 		box-shadow: 0 0 10px rgba(var(--shade-rgb-color), 0.2);
 		opacity: 0;
 		transition: all 0.2s;
@@ -66,9 +61,10 @@
 	}
 }
 
-.content {
-	display: grid;
-	position: relative;
-	z-index: 1;
-	min-height: 100%;
+.sidebarOverlay {
+	display: none;
+
+	@include less920px {
+		display: block;
+	}
 }

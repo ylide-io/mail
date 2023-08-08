@@ -1,7 +1,7 @@
 import clsx from 'clsx';
 import { MouseEventHandler, PropsWithChildren, useEffect, useRef, useState } from 'react';
 
-import { PropsWithClassName } from '../../../../components/props';
+import { PropsWithClassName } from '../props';
 import css from './postItemContainer.module.scss';
 
 export interface PostItemContainerProps extends PropsWithChildren<{}>, PropsWithClassName {
