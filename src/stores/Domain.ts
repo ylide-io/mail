@@ -368,6 +368,7 @@ export class Domain {
 		signature: { message: string; r: string; s: string; v: number },
 	) {
 		try {
+			domain.enforceMainViewOnboarding = true;
 			const result = await publishKeyThroughFaucet(
 				faucetType,
 				publicKey,
@@ -387,12 +388,10 @@ export class Domain {
 					domain.isTxPublishing = false;
 				} else {
 					domain.isTxPublishing = false;
-					domain.enforceMainViewOnboarding = true;
 					console.log('Something went wrong with key publishing :(\n\n' + JSON.stringify(result, null, '\t'));
 				}
 			} else {
 				domain.isTxPublishing = false;
-				domain.enforceMainViewOnboarding = true;
 				if (result.errorCode === 'ALREADY_EXISTS') {
 					console.log(
 						`Your address has been already registered or the previous transaction is in progress. Please try connecting another address or wait for transaction to finalize (1-2 minutes).`,
