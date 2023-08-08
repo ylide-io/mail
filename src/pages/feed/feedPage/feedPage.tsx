@@ -49,6 +49,14 @@ const FeedPageContent = observer(() => {
 		[accounts, address, tag, source],
 	);
 
+	const coverage = feedSettings.coverages.get(selectedAccounts[0]);
+	const totalCoverage = useMemo(() => {
+		if (!coverage || coverage === 'error' || coverage === 'loading') {
+			return null;
+		}
+		return coverage.totalCoverage;
+	}, [coverage]);
+
 	useEffect(() => {
 		if (address && !selectedAccounts.length) {
 			navigate(generatePath(RoutePath.FEED));
@@ -82,10 +90,13 @@ const FeedPageContent = observer(() => {
 	}, [canLoadFeed, tags, tag, genericLayoutApi, selectedAccounts, source, reloadCounter]);
 
 	const title = useMemo(() => {
+		if (tag) {
+			return feed.tags.find(t => t.id === Number(tag))?.name;
+		}
 		if (feed.tags.length === 1 && feed.tags[0].name) {
 			return feed.sourceId;
 		}
-		if (selectedAccounts.length === 1) {
+		if (selectedAccounts.length === 1 && address) {
 			return `Feed for ${
 				selectedAccounts[0].name
 					? selectedAccounts[0].name
@@ -93,7 +104,7 @@ const FeedPageContent = observer(() => {
 			}`;
 		}
 		return 'Feed';
-	}, [feed, selectedAccounts]);
+	}, [feed, selectedAccounts, address, tag]);
 
 	return (
 		<NarrowContent
@@ -116,13 +127,13 @@ const FeedPageContent = observer(() => {
 							Show {feed.newPosts} new posts
 						</ActionButton>
 					)}
-					{feed.tags.length === 0 && !feed.sourceId && selectedAccounts.length === 1 && (
+					{feed.tags.length === 0 && !feed.sourceId && selectedAccounts.length === 1 && totalCoverage && (
 						<ActionButton
 							look={ActionButtonLook.PRIMARY}
 							onClick={() => setShowCoverageModal(true)}
 							style={{ marginLeft: '8px' }}
 						>
-							Status
+							USD Coverage: {totalCoverage}%
 						</ActionButton>
 					)}
 				</>
