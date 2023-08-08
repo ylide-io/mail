@@ -57,9 +57,11 @@ export const CoverageModal = observer(({ onClose, account }: Props) => {
 	}) => {
 		if (row.projectName) {
 			if (row.name) {
-				return `${row.projectName} (${row.name})`;
+				return `${row.projectName} ($${row.symbol})`;
 			}
 			return row.projectName;
+		} else if (row.symbol) {
+			return `- ($${row.symbol})`;
 		}
 		return row.tokenId;
 	};
@@ -82,40 +84,46 @@ export const CoverageModal = observer(({ onClose, account }: Props) => {
 				</ActionButton>
 			}
 		>
-			<div>We guarantee our users to have a 100% coverage within 3 days from registration.</div>
 			<div>
-				<div className={css.list}>
-					<div className={css.section}>
-						<div>Tokens</div>
-						<div>
-							${coverage.tokens.usdCovered} / ${coverage.tokens.usdTotal} ({coverage.tokens.ratioUsd}%)
-						</div>
-					</div>
-					{uniqTokens.length === 0 && <div className={css.nothing}>You have no tokens</div>}
-					{uniqTokens.map(t => (
-						<div>
-							<div className={clsx(css.row, css.row_data)}>
-								<CheckBox className={css.sourceCheckBox} isChecked={!t.missing} isDisabled />
-								<div>{getRowText(t)}</div>
+				<div className={css.disclaimer}>
+					We guarantee our users to have a 100% coverage within 3 days from registration.
+				</div>
+				<div className={css.total}>Total coverage - {coverage.totalCoverage}%</div>
+				<div>
+					<div className={css.list}>
+						<div className={css.section}>
+							<div>Tokens</div>
+							<div>
+								${coverage.tokens.usdCovered} / ${coverage.tokens.usdTotal} ({coverage.tokens.ratioUsd}
+								%)
 							</div>
 						</div>
-					))}
-					<div className={css.section}>
-						<div>Protocols</div>
-						<div>
-							${coverage.protocols.usdCovered} / ${coverage.protocols.usdTotal} (
-							{coverage.protocols.ratioUsd}%)
+						{uniqTokens.length === 0 && <div className={css.nothing}>You have no tokens</div>}
+						{uniqTokens.map(t => (
+							<div>
+								<div className={clsx(css.row, css.row_data)}>
+									<CheckBox className={css.sourceCheckBox} isChecked={!t.missing} isDisabled />
+									<div>{getRowText(t)}</div>
+								</div>
+							</div>
+						))}
+						<div className={css.section}>
+							<div>Protocols</div>
+							<div>
+								${coverage.protocols.usdCovered} / ${coverage.protocols.usdTotal} (
+								{coverage.protocols.ratioUsd}%)
+							</div>
 						</div>
+						{uniqProtocols.length === 0 && (
+							<div className={css.nothing}>You have no positions in protocols</div>
+						)}
+						{uniqProtocols.map(t => (
+							<div className={clsx(css.row, css.row_data)}>
+								<CheckBox isChecked={!t.missing} isDisabled />
+								<div>{getRowText(t)}</div>
+							</div>
+						))}
 					</div>
-					{uniqProtocols.length === 0 && (
-						<div className={css.nothing}>You have no positions in protocols</div>
-					)}
-					{uniqProtocols.map(t => (
-						<div className={clsx(css.row, css.row_data)}>
-							<CheckBox isChecked={!t.missing} isDisabled />
-							<div>{getRowText(t)}</div>
-						</div>
-					))}
 				</div>
 			</div>
 		</ActionModal>
