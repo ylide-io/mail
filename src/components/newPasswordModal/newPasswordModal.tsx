@@ -114,7 +114,7 @@ export function NewPasswordModal({
 
 			const justPublishedKey = await domain.waitForPublicKey(
 				false,
-				EVM_NAMES[network!],
+				network ? EVM_NAMES[network] : account.wallet.currentBlockchain,
 				account.account.address,
 				key.publicKey.keyBytes,
 			);
