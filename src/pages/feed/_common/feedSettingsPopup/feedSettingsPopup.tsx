@@ -1,7 +1,10 @@
 import clsx from 'clsx';
+import sortBy from 'lodash.sortby';
 import { observer } from 'mobx-react';
-import React, { useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useMutation } from 'react-query';
+import AutoSizer from 'react-virtualized-auto-sizer';
+import { FixedSizeList as List } from 'react-window';
 
 import { FeedReason, FeedSource } from '../../../../api/feedServerApi';
 import { ActionButton, ActionButtonLook } from '../../../../components/ActionButton/ActionButton';
@@ -23,35 +26,6 @@ import { reloadFeed } from '../../feedPage/feedPage';
 import { FeedLinkTypeIcon } from '../feedLinkTypeIcon/feedLinkTypeIcon';
 import css from './feedSettingsPopup.module.scss';
 
-interface RowProps {
-	source: FeedSource;
-	isSelected: boolean;
-	onSelect: (isSelected: boolean) => void;
-}
-
-export const Row = React.memo(({ source, isSelected, onSelect }: RowProps) => (
-	<div key={source.id} className={clsx(css.row, css.row_data)}>
-		<CheckBox className={css.sourceCheckBox} isChecked={isSelected} onChange={isChecked => onSelect(isChecked)} />
-
-		<div className={css.sourceName}>
-			<Avatar image={source.avatar} placeholder={<ContactSvg width="100%" height="100%" />} />
-
-			<div className={css.sourceNameText}>{source.name}</div>
-		</div>
-
-		<div className={css.sourceOrigin}>
-			<a className={css.sourceOriginLink} href={source.link} target="_blank" rel="noreferrer">
-				<FeedLinkTypeIcon size={16} linkType={source.type} />
-				<span className={css.sourceOriginText}>{source.origin || source.link}</span>
-			</a>
-		</div>
-
-		<div className={css.sourceProject}>{source.cryptoProject?.name || DASH}</div>
-	</div>
-));
-
-//
-
 type FeedReasonOrEmpty = FeedReason | '';
 
 export interface FeedSettingsPopupProps {
@@ -68,7 +42,7 @@ export const FeedSettingsPopup = observer(({ account, onClose }: FeedSettingsPop
 	const [isSearchOpen, setSearchOpen] = useState(false);
 	const [searchTerm, setSearchTerm] = useState('');
 
-	const sourcesByReason = useMemo(() => {
+	const [sourcesByReason, rows] = useMemo(() => {
 		const config = feedSettings.getAccountConfig(account);
 
 		const sources = feedSettings.sources
@@ -99,7 +73,7 @@ export const FeedSettingsPopup = observer(({ account, onClose }: FeedSettingsPop
 			return res;
 		}, {} as Record<FeedReasonOrEmpty, FeedSource[]>);
 
-		return (Object.keys(grouped) as FeedReasonOrEmpty[])
+		const aggregated = (Object.keys(grouped) as FeedReasonOrEmpty[])
 			.sort((a: FeedReasonOrEmpty, b: FeedReasonOrEmpty) => {
 				const getOrder = (reason: FeedReasonOrEmpty) =>
 					reason
@@ -116,6 +90,21 @@ export const FeedSettingsPopup = observer(({ account, onClose }: FeedSettingsPop
 				(res, reason) => ({ ...res, [reason]: grouped[reason] }),
 				{} as Record<FeedReasonOrEmpty, FeedSource[]>,
 			);
+
+		return [
+			aggregated,
+			(Object.entries(aggregated) as [FeedReasonOrEmpty, FeedSource[]][])
+				.map(([k, v]) => [
+					k,
+					...sortBy(v, [
+						e => !e.cryptoProject,
+						e => aggregated[k].every((s: FeedSource) => !selectedSourceIds.includes(e.id)),
+					]),
+				])
+				.flat(2),
+		];
+		// do not include selectedSourceIds,
+		// we don't want to sort during checkbox toggle
 	}, [account, searchTerm]);
 
 	const saveConfigMutation = useMutation({
@@ -127,6 +116,78 @@ export const FeedSettingsPopup = observer(({ account, onClose }: FeedSettingsPop
 		onError: () => toast("Couldn't save your feed settings. Please try again."),
 	});
 
+	const Row = ({
+		index,
+		data,
+		style,
+	}: {
+		index: number;
+		data: (FeedSource | FeedReasonOrEmpty)[];
+		style: React.CSSProperties;
+	}) => {
+		const source = data[index];
+		if (typeof source === 'string') {
+			const reason = source;
+			return (
+				<div className={css.category} key={`row-${index}`} style={style}>
+					<CheckBox
+						isChecked={sourcesByReason[reason].every(s => selectedSourceIds.includes(s.id))}
+						onChange={isChecked => {
+							const newSourceIds = selectedSourceIds.filter(
+								id => !sourcesByReason[reason].find(s => typeof s !== 'string' && s.id === id),
+							);
+							console.log(selectedSourceIds);
+							console.log(newSourceIds);
+							setSelectedSourceIds(
+								isChecked ? [...newSourceIds, ...sourcesByReason[reason].map(s => s.id)] : newSourceIds,
+							);
+						}}
+					/>
+					<div className={css.categoryReason}>
+						{reason
+							? {
+									[FeedReason.BALANCE]: 'Tokens you hold',
+									[FeedReason.PROTOCOL]: 'Projects you have position in',
+									[FeedReason.TRANSACTION]: 'Projects you used',
+							  }[reason]
+							: Object.keys(sourcesByReason).length === 1
+							? 'Source'
+							: 'Other sources'}
+					</div>
+					<div className={css.categoryProject}>Token / Project</div>
+				</div>
+			);
+		}
+		return (
+			<div
+				key={`row-${index}-${source.id}`}
+				className={clsx(css.row, css.row_data, index % 2 === 0 ? css.row_2 : '')}
+				style={style}
+			>
+				<CheckBox
+					className={css.sourceCheckBox}
+					isChecked={selectedSourceIds.includes(source.id)}
+					onChange={isSelected => setSelectedSourceIds(prev => toggleArrayItem(prev, source.id, isSelected))}
+				/>
+
+				<div className={css.sourceName}>
+					<Avatar image={source.avatar} placeholder={<ContactSvg width="100%" height="100%" />} />
+
+					<div className={css.sourceNameText}>{source.name}</div>
+				</div>
+
+				<div className={css.sourceOrigin}>
+					<a className={css.sourceOriginLink} href={source.link} target="_blank" rel="noreferrer">
+						<FeedLinkTypeIcon size={16} linkType={source.type} />
+						<span className={css.sourceOriginText}>{source.origin || source.link}</span>
+					</a>
+				</div>
+
+				<div className={css.sourceProject}>{source.cryptoProject?.name || DASH}</div>
+			</div>
+		);
+	};
+
 	return (
 		<Modal className={css.root} onClose={onClose}>
 			<div className={css.header}>
@@ -134,69 +195,21 @@ export const FeedSettingsPopup = observer(({ account, onClose }: FeedSettingsPop
 				<div className={css.description}>Select sources you want to see in your Feed</div>
 			</div>
 
-			<div className={css.list}>
-				{config ? (
-					Object.keys(sourcesByReason).length ? (
-						(Object.entries(sourcesByReason) as [FeedReasonOrEmpty, FeedSource[]][]).map(
-							([reason, sources]) => (
-								<div className={css.listGroup}>
-									<div className={css.category}>
-										<CheckBox
-											isChecked={sourcesByReason[reason].every(s =>
-												selectedSourceIds.includes(s.id),
-											)}
-											onChange={isChecked => {
-												const newSourceIds = selectedSourceIds.filter(
-													id => !sources.find(s => s.id === id),
-												);
-												setSelectedSourceIds(
-													isChecked
-														? [...newSourceIds, ...sources.map(s => s.id)]
-														: newSourceIds,
-												);
-											}}
-										/>
-										<div className={css.categoryReason}>
-											{reason
-												? {
-														[FeedReason.BALANCE]: 'Tokens you hold',
-														[FeedReason.PROTOCOL]: 'Projects you have position in',
-														[FeedReason.TRANSACTION]: 'Projects you used',
-												  }[reason]
-												: Object.keys(sourcesByReason).length === 1
-												? 'Source'
-												: 'Other sources'}
-										</div>
-										<div className={css.categoryProject}>Token / Project</div>
-									</div>
-
-									<div>
-										{sources.map(source => (
-											<Row
-												key={source.id}
-												source={source}
-												isSelected={selectedSourceIds.includes(source.id)}
-												onSelect={isSelected =>
-													setSelectedSourceIds(prev =>
-														toggleArrayItem(prev, source.id, isSelected),
-													)
-												}
-											/>
-										))}
-									</div>
-								</div>
-							),
-						)
-					) : (
-						<div className={css.noData}>- No sources found -</div>
-					)
-				) : feedSettings.isError ? (
-					<ErrorMessage className={css.error}>Couldn't load source list</ErrorMessage>
-				) : (
-					<OverlappingLoader text="Loading sources ..." />
-				)}
-			</div>
-
+			{config ? (
+				<div style={{ flex: '1 1 auto' }}>
+					<AutoSizer>
+						{({ width, height }) => (
+							<List width={width} height={height} itemSize={40} itemCount={rows.length} itemData={rows}>
+								{Row}
+							</List>
+						)}
+					</AutoSizer>
+				</div>
+			) : feedSettings.isError ? (
+				<ErrorMessage className={css.error}>Couldn't load source list</ErrorMessage>
+			) : (
+				<OverlappingLoader text="Loading sources ..." />
+			)}
 			<div className={css.footer}>
 				<div className={css.footerLeft}>
 					<ActionButton
@@ -206,15 +219,11 @@ export const FeedSettingsPopup = observer(({ account, onClose }: FeedSettingsPop
 					>
 						Save Settings
 					</ActionButton>
-
-					<ActionButton isDisabled={saveConfigMutation.isLoading} onClick={() => onClose?.()}>
-						Cancel
-					</ActionButton>
 				</div>
 
 				<div className={css.footerRight}>
-					{config ? (
-						isSearchOpen ? (
+					{config &&
+						(isSearchOpen ? (
 							<TextField
 								look={TextFieldLook.LITE}
 								autoFocus
@@ -229,8 +238,7 @@ export const FeedSettingsPopup = observer(({ account, onClose }: FeedSettingsPop
 								title="Search"
 								onClick={() => setSearchOpen(true)}
 							/>
-						)
-					) : undefined}
+						))}
 				</div>
 			</div>
 		</Modal>
