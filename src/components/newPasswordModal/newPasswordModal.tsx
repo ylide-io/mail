@@ -164,8 +164,13 @@ export function NewPasswordModal({
 					}
 				} else {
 					// strange... I'm not sure Qamon keys work here
-					console.log('createLocalKey', 'INSECURE_KEY_V1');
-					tempLocalKey = await wallet.constructLocalKeyV1(account, password);
+					if (forceSecond) {
+						console.log('createLocalKey', 'INSECURE_KEY_V2 non-venom');
+						tempLocalKey = await wallet.constructLocalKeyV2(account, password);
+					} else {
+						console.log('createLocalKey', 'INSECURE_KEY_V1 non-venom');
+						tempLocalKey = await wallet.constructLocalKeyV1(account, password);
+					}
 				}
 			} else if (freshestKey?.key.publicKey.keyVersion === YlideKeyVersion.KEY_V2) {
 				// if user already using password - we should use it too
