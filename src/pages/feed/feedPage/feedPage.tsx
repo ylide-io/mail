@@ -18,8 +18,9 @@ import domain from '../../../stores/Domain';
 import { FeedStore } from '../../../stores/Feed';
 import { feedSettings } from '../../../stores/FeedSettings';
 import { RoutePath } from '../../../stores/routePath';
-import { connectAccount, formatAccountName } from '../../../utils/account';
+import { connectAccount } from '../../../utils/account';
 import { hookDependency } from '../../../utils/react';
+import { truncateInMiddle } from '../../../utils/string';
 import { useNav } from '../../../utils/url';
 import { FeedPostItem } from '../_common/feedPostItem/feedPostItem';
 import css from './feedPage.module.scss';
@@ -84,8 +85,12 @@ const FeedPageContent = observer(() => {
 		if (feed.tags.length === 1 && feed.tags[0].name) {
 			return feed.sourceId;
 		}
-		if (selectedAccounts.length) {
-			return `Feed for ${formatAccountName(selectedAccounts[0])}`;
+		if (selectedAccounts.length === 1) {
+			return `Feed for ${
+				selectedAccounts[0].name
+					? selectedAccounts[0].name
+					: truncateInMiddle(selectedAccounts[0].account.address, 8, '..')
+			}`;
 		}
 		return 'Feed';
 	}, [feed, selectedAccounts]);
@@ -105,17 +110,22 @@ const FeedPageContent = observer(() => {
 				)
 			}
 			titleRight={
-				feed.tags.length === 0 && !feed.sourceId ? (
-					<ActionButton look={ActionButtonLook.PRIMARY} onClick={() => setShowCoverageModal(true)}>
-						Status
-					</ActionButton>
-				) : (
-					!!feed.newPosts && (
+				<>
+					{!!feed.newPosts && (
 						<ActionButton look={ActionButtonLook.SECONDARY} onClick={() => feed.loadNew()}>
 							Show {feed.newPosts} new posts
 						</ActionButton>
-					)
-				)
+					)}
+					{feed.tags.length === 0 && !feed.sourceId && selectedAccounts.length === 1 && (
+						<ActionButton
+							look={ActionButtonLook.PRIMARY}
+							onClick={() => setShowCoverageModal(true)}
+							style={{ marginLeft: '8px' }}
+						>
+							Status
+						</ActionButton>
+					)}
+				</>
 			}
 		>
 			{showCoverageModal && (
