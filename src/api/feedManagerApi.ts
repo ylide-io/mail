@@ -109,14 +109,16 @@ export namespace FeedManagerApi {
 		});
 	}
 
+	export interface CoverageItem {
+		tokenId: string;
+		missing: boolean;
+		projectName: string | null;
+		name: string | null;
+		symbol: string | null;
+	}
+
 	export type CoverageInfo = {
-		items: {
-			tokenId: string;
-			missing: boolean;
-			projectName: string | null;
-			name: string | null;
-			symbol: string | null;
-		}[];
+		items: CoverageItem[];
 	} & Ratio &
 		RatioUsd;
 
