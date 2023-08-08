@@ -80,15 +80,19 @@ const FeedPageContent = observer(() => {
 		return feed;
 	}, [canLoadFeed, tags, tag, genericLayoutApi, selectedAccounts, source, reloadCounter]);
 
+	const title = useMemo(() => {
+		if (feed.tags.length === 1 && feed.tags[0].name) {
+			return feed.sourceId;
+		}
+		if (selectedAccounts.length) {
+			return `Feed for ${formatAccountName(selectedAccounts[0])}`;
+		}
+		return 'Feed';
+	}, [feed, selectedAccounts]);
+
 	return (
 		<NarrowContent
-			title={
-				feed.tags.length === 1
-					? feed.tags[0].name
-					: feed.sourceId
-					? 'Feed'
-					: `Feed for ${formatAccountName(selectedAccounts[0])}`
-			}
+			title={title}
 			titleSubItem={
 				!!source && (
 					<ActionButton
