@@ -1,6 +1,8 @@
 import clsx from 'clsx';
 import { observer } from 'mobx-react';
+import { useMemo } from 'react';
 
+import { FeedManagerApi } from '../../api/feedManagerApi';
 import { feedSettings } from '../../stores/FeedSettings';
 import { DomainAccount } from '../../stores/models/DomainAccount';
 import { ActionButton, ActionButtonLook, ActionButtonSize } from '../ActionButton/ActionButton';
@@ -20,14 +22,31 @@ export const CoverageModal = observer(({ onClose, account }: Props) => {
 		onClose?.();
 	};
 
-	// TODO: KONST
-	if (!coverage || coverage === 'loading') {
-		return <div>Loading</div>;
-	}
+	const uniq = (items: FeedManagerApi.CoverageItem[]) => {
+		const unique: FeedManagerApi.CoverageItem[] = [];
+		const seenValues = new Set();
+		for (const item of items) {
+			if (!seenValues.has(item.projectName)) {
+				seenValues.add(item.projectName);
+				unique.push(item);
+			}
+		}
+		return unique;
+	};
 
-	if (coverage === 'error') {
-		return <div>Error</div>;
-	}
+	const uniqTokens = useMemo(() => {
+		if (!coverage || coverage === 'error' || coverage === 'loading') {
+			return [];
+		}
+		return uniq(coverage.tokens.items);
+	}, [coverage]);
+
+	const uniqProtocols = useMemo(() => {
+		if (!coverage || coverage === 'error' || coverage === 'loading') {
+			return [];
+		}
+		return uniq(coverage.protocols.items);
+	}, [coverage]);
 
 	const getRowText = (row: {
 		tokenId: string;
@@ -37,19 +56,22 @@ export const CoverageModal = observer(({ onClose, account }: Props) => {
 		symbol: string | null;
 	}) => {
 		if (row.projectName) {
-			if (row.symbol) {
-				return `${row.projectName} (${row.symbol})`;
+			if (row.name) {
+				return `${row.projectName} (${row.name})`;
 			}
 			return row.projectName;
 		}
-		if (row.name) {
-			if (row.symbol) {
-				return `${row.name} (${row.symbol})`;
-			}
-			return row.name;
-		}
 		return row.tokenId;
 	};
+
+	// TODO: KONST
+	if (!coverage || coverage === 'loading') {
+		return <div>Loading</div>;
+	}
+
+	if (coverage === 'error') {
+		return <div>Error</div>;
+	}
 
 	return (
 		<ActionModal
@@ -69,14 +91,12 @@ export const CoverageModal = observer(({ onClose, account }: Props) => {
 							${coverage.tokens.usdCovered} / ${coverage.tokens.usdTotal} ({coverage.tokens.ratioUsd}%)
 						</div>
 					</div>
-					{coverage.tokens.items.length === 0 && <div className={css.nothing}>You have no tokens</div>}
-					{coverage.tokens.items.map(t => (
+					{uniqTokens.length === 0 && <div className={css.nothing}>You have no tokens</div>}
+					{uniqTokens.map(t => (
 						<div>
 							<div className={clsx(css.row, css.row_data)}>
 								<CheckBox className={css.sourceCheckBox} isChecked={!t.missing} isDisabled />
-								<div className={css.sourceName}>
-									<div className={css.sourceNameText}>{getRowText(t)}</div>
-								</div>
+								<div>{getRowText(t)}</div>
 							</div>
 						</div>
 					))}
@@ -87,17 +107,13 @@ export const CoverageModal = observer(({ onClose, account }: Props) => {
 							{coverage.protocols.ratioUsd}%)
 						</div>
 					</div>
-					{coverage.protocols.items.length === 0 && (
+					{uniqProtocols.length === 0 && (
 						<div className={css.nothing}>You have no positions in protocols</div>
 					)}
-					{coverage.protocols.items.map(t => (
-						<div>
-							<div className={clsx(css.row, css.row_data)}>
-								<CheckBox className={css.sourceCheckBox} isChecked={!t.missing} isDisabled />
-								<div className={css.sourceName}>
-									<div className={css.sourceNameText}>{getRowText(t)}</div>
-								</div>
-							</div>
+					{uniqProtocols.map(t => (
+						<div className={clsx(css.row, css.row_data)}>
+							<CheckBox isChecked={!t.missing} isDisabled />
+							<div>{getRowText(t)}</div>
 						</div>
 					))}
 				</div>

@@ -93,9 +93,8 @@ export const MainViewOnboarding = observer(() => {
 					// If account had been authorized already, do it again
 					if (isActive) {
 						await doAuthorize();
-					}
-					// Request invide code
-					else {
+						// Request invide code
+					} else if (account.isAnyLocalPrivateKeyRegistered) {
 						setStep(Step.JOIN_WAITLIST);
 					}
 				}
@@ -104,7 +103,7 @@ export const MainViewOnboarding = observer(() => {
 				disconnect(account);
 			}
 		},
-		[disconnect, reset],
+		[disconnect],
 	);
 
 	useEffect(() => {

@@ -18,7 +18,7 @@ import domain from '../../../stores/Domain';
 import { FeedStore } from '../../../stores/Feed';
 import { feedSettings } from '../../../stores/FeedSettings';
 import { RoutePath } from '../../../stores/routePath';
-import { connectAccount } from '../../../utils/account';
+import { connectAccount, formatAccountName } from '../../../utils/account';
 import { hookDependency } from '../../../utils/react';
 import { useNav } from '../../../utils/url';
 import { FeedPostItem } from '../_common/feedPostItem/feedPostItem';
@@ -87,7 +87,7 @@ const FeedPageContent = observer(() => {
 					? feed.tags[0].name
 					: feed.sourceId
 					? 'Feed'
-					: `Feed for ${selectedAccounts[0].name}`
+					: `Feed for ${formatAccountName(selectedAccounts[0])}`
 			}
 			titleSubItem={
 				!!source && (
