@@ -88,7 +88,7 @@ export const CoverageModal = observer(({ onClose, account }: Props) => {
 				<div className={css.disclaimer}>
 					We guarantee our users to have a 100% coverage within 3 days from registration.
 				</div>
-				<div className={css.total}>Total coverage - {coverage.totalCoverage}%</div>
+				<div className={css.total}>Total coverage - {coverage.totalCoverage}</div>
 				<div>
 					<div className={css.list}>
 						<div className={css.section}>

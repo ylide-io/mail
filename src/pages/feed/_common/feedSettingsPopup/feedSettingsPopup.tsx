@@ -45,23 +45,14 @@ export const FeedSettingsPopup = observer(({ account, onClose }: FeedSettingsPop
 	const [sourcesByReason, rows] = useMemo(() => {
 		const config = feedSettings.getAccountConfig(account);
 
-		const sources = feedSettings.sources
-			.slice()
-			.sort(
-				(a, b) =>
-					b.type.localeCompare(a.type) ||
-					(a.origin || '').localeCompare(b.origin || '') ||
-					a.name.localeCompare(b.name),
-			);
-
-		const filteredSources = sources.filter(source => {
+		const sources = feedSettings.sources.slice().filter(source => {
 			const term = searchTerm.trim().toLowerCase();
 			if (!term) return true;
 
 			return source.name.toLowerCase().includes(term) || source.origin?.toLowerCase().includes(term);
 		});
 
-		const grouped = filteredSources.reduce((res, s) => {
+		const grouped = sources.reduce((res, s) => {
 			const cryptoProjectId = s.cryptoProject?.id;
 			const cryptoProject =
 				(cryptoProjectId && config?.defaultProjects.find(p => p.projectId === cryptoProjectId)) || undefined;
@@ -86,23 +77,28 @@ export const FeedSettingsPopup = observer(({ account, onClose }: FeedSettingsPop
 
 				return getOrder(a) - getOrder(b);
 			})
-			.reduce(
-				(res, reason) => ({ ...res, [reason]: grouped[reason] }),
-				{} as Record<FeedReasonOrEmpty, FeedSource[]>,
-			);
+			.reduce((res, reason) => {
+				const withoutProjects: FeedSource[] = [];
+				const withProjects: FeedSource[] = [];
+				for (const source of grouped[reason]) {
+					if (source.cryptoProject?.name) {
+						withProjects.push(source);
+					} else {
+						withoutProjects.push(source);
+					}
+				}
+				return {
+					...res,
+					[reason]: sortBy(
+						withProjects
+							.sort((b, a) => b.cryptoProject!.name.localeCompare(a.cryptoProject!.name))
+							.concat(withoutProjects),
+						(s: FeedSource) => !selectedSourceIds.includes(s.id),
+					),
+				};
+			}, {} as Record<FeedReasonOrEmpty, FeedSource[]>);
 
-		return [
-			aggregated,
-			(Object.entries(aggregated) as [FeedReasonOrEmpty, FeedSource[]][])
-				.map(([k, v]) => [
-					k,
-					...sortBy(v, [
-						e => !e.cryptoProject,
-						e => aggregated[k].every((s: FeedSource) => !selectedSourceIds.includes(e.id)),
-					]),
-				])
-				.flat(2),
-		];
+		return [aggregated, (Object.entries(aggregated) as [FeedReasonOrEmpty, FeedSource[]][]).flat(2)];
 		// do not include selectedSourceIds,
 		// we don't want to sort during checkbox toggle
 	}, [account, searchTerm]);

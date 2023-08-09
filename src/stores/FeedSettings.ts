@@ -75,7 +75,8 @@ export class FeedSettings {
 							const total = coverage.tokens.usdTotal + coverage.protocols.usdTotal;
 							const covered = coverage.tokens.usdCovered + coverage.protocols.usdCovered;
 							const result = total > 0 ? (covered * 100) / total : 0;
-							const totalCoverage = result === 100 ? '100' : result.toFixed(1);
+							const totalCoverage =
+								total === 0 ? 'N/A' : result === 100 ? '100%' : `${result.toFixed(1)}%`;
 							this.coverages.set(account, { ...coverage, totalCoverage });
 						} else {
 							this.coverages.set(account, 'error');

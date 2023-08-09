@@ -98,24 +98,10 @@
 }
 
 .socials {
-	display: grid;
-	grid-auto-flow: column;
-	justify-content: center;
-	grid-gap: 8px;
-	position: relative;
-	padding: 24px 0 0 0;
-
-	&:before {
-		content: '';
-		position: absolute;
-		top: 0;
-		right: 0;
-		left: 0;
-		height: 1px;
-		background: var(--border-color);
-	}
+	padding: 24px 0 0 8px;
 
 	a {
+		margin-left: 8px;
 		@include expand-click-area(4px);
 		color: var(--primary-text-color);
 
@@ -127,6 +113,11 @@
 			fill: currentColor;
 		}
 	}
+}
+
+.socialItem {
+	display: flex;
+	align-items: center;
 }
 
 .burger {

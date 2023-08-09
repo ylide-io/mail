@@ -97,13 +97,13 @@ const FeedPageContent = observer(() => {
 			return feed.sourceId;
 		}
 		if (selectedAccounts.length === 1 && address) {
-			return `Feed for ${
+			return `Smart feed for ${
 				selectedAccounts[0].name
 					? selectedAccounts[0].name
 					: truncateInMiddle(selectedAccounts[0].account.address, 8, '..')
 			}`;
 		}
-		return 'Feed';
+		return 'Smart feed';
 	}, [feed, selectedAccounts, address, tag]);
 
 	return (
@@ -133,7 +133,7 @@ const FeedPageContent = observer(() => {
 							onClick={() => setShowCoverageModal(true)}
 							style={{ marginLeft: '8px' }}
 						>
-							USD Coverage: {totalCoverage}%
+							USD Coverage: {totalCoverage}
 						</ActionButton>
 					)}
 				</>

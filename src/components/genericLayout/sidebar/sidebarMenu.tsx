@@ -418,14 +418,17 @@ export const SidebarMenu = observer(() => {
 			{renderMailSection()}
 
 			<div className={css.socials}>
-				<a
-					href="https://twitter.com/mainview_io"
-					target="_blank noreferrer"
-					title="Twitter"
-					onClick={() => analytics.openSocial('twitter')}
-				>
-					<TwitterSvg />
-				</a>
+				<div className={css.socialItem}>
+					Follow on
+					<a
+						href="https://twitter.com/mainview_io"
+						target="_blank noreferrer"
+						title="Twitter"
+						onClick={() => analytics.openSocial('twitter')}
+					>
+						<TwitterSvg />
+					</a>
+				</div>
 			</div>
 		</div>
 	);
