@@ -419,48 +419,12 @@ export const SidebarMenu = observer(() => {
 
 			<div className={css.socials}>
 				<a
-					href="https://t.me/ylide_chat"
-					target="_blank noreferrer"
-					title="Telegram"
-					onClick={() => analytics.openSocial('telegram')}
-				>
-					<TelegramSvg />
-				</a>
-
-				<a
-					href="https://discord.gg/ylide"
-					target="_blank noreferrer"
-					title="Discord"
-					onClick={() => analytics.openSocial('discord')}
-				>
-					<DiscordSvg />
-				</a>
-
-				<a
-					href="https://twitter.com/ylide_"
+					href="https://twitter.com/mainview_io"
 					target="_blank noreferrer"
 					title="Twitter"
 					onClick={() => analytics.openSocial('twitter')}
 				>
 					<TwitterSvg />
-				</a>
-
-				<a
-					href="https://www.linkedin.com/company/ylide/"
-					target="_blank noreferrer"
-					title="LinkedIn"
-					onClick={() => analytics.openSocial('linkedin')}
-				>
-					<LinkedInSvg />
-				</a>
-
-				<a
-					href="https://medium.com/@ylide"
-					target="_blank noreferrer"
-					title="Medium"
-					onClick={() => analytics.openSocial('medium')}
-				>
-					<MediumSvg />
 				</a>
 			</div>
 		</div>
