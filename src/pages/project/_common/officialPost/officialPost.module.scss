@@ -2,7 +2,7 @@
 	display: grid;
 	grid-gap: 20px;
 
-	@include lessThan640w {
+	@include lessThan768w {
 		padding: 12px;
 	}
 }

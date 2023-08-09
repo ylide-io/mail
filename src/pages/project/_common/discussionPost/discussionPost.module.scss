@@ -14,7 +14,7 @@
 		background: var(--border-color);
 	}
 
-	@include lessThan640w {
+	@include lessThan768w {
 		grid-gap: 4px 8px;
 	}
 
@@ -115,7 +115,7 @@
 	background: var(--surface-color);
 	border-radius: 16px;
 
-	@include lessThan640w {
+	@include lessThan768w {
 		padding: 12px;
 	}
 }

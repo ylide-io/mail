@@ -12,7 +12,7 @@
 	font-weight: $font-weight_medium;
 	white-space: nowrap;
 
-	@include lessThan640w {
+	@include lessThan768w {
 		font-size: 28px;
 	}
 }

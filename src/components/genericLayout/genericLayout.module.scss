@@ -17,7 +17,7 @@ $sidebarWidth: 280px;
 		--generic-layout_spacing: 20px;
 	}
 
-	@include lessThan640w {
+	@include lessThan768w {
 		--generic-layout_padding: 12px;
 		--generic-layout_spacing: 12px;
 
@@ -30,7 +30,7 @@ $sidebarWidth: 280px;
 	height: 80px;
 	background: var(--surface-color);
 
-	@include lessThan640w {
+	@include lessThan768w {
 		height: 64px;
 	}
 
@@ -53,7 +53,7 @@ $sidebarWidth: 280px;
 		max-width: 960px;
 	}
 
-	@include lessThan640w {
+	@include lessThan768w {
 		padding: 0;
 	}
 }

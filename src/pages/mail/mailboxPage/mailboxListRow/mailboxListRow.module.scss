@@ -19,7 +19,7 @@
 		}
 	}
 
-	@include less720px {
+	@include lessThan768w {
 		grid-template-columns: auto 1fr auto;
 		grid-gap: 4px;
 		align-content: center;
@@ -45,7 +45,7 @@
 .checkbox {
 	margin: 0 8px 0 0;
 
-	@include less720px {
+	@include lessThan768w {
 		grid-row: 1/4;
 		margin: 0 12px 0 0;
 	}
@@ -108,7 +108,7 @@
 .preview {
 	display: none;
 
-	@include less720px {
+	@include lessThan768w {
 		@include truncate-text;
 		grid-column: 2/4;
 		display: block;
@@ -118,7 +118,7 @@
 }
 
 .blockchain {
-	@include less720px {
+	@include lessThan768w {
 		grid-column: 3/4;
 		grid-row: 2/3;
 	}
@@ -127,7 +127,7 @@
 .date {
 	text-align: right;
 
-	@include less720px {
+	@include lessThan768w {
 		grid-column: 3/4;
 		grid-row: 1/2;
 	}
