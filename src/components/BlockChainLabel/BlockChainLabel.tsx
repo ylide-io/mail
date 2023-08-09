@@ -10,7 +10,7 @@ export function BlockChainLabel({ blockchain }: BlockChainLabelProps) {
 		<div className={css.root}>
 			<div className={css.inner}>
 				{blockchainMeta[blockchain].logo(12)}
-				{blockchain.toUpperCase()}
+				<div className={css.label}>{blockchain.toUpperCase()}</div>
 			</div>
 		</div>
 	);

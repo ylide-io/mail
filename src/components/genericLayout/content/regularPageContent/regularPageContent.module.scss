@@ -1,0 +1,5 @@
+.root {
+	@include lessThan640w {
+		padding: var(--generic-layout_spacing) var(--generic-layout_spacing) 0;
+	}
+}

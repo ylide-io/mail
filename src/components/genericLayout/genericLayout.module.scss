@@ -1,26 +1,59 @@
-$mainPadding: 40px;
-$mainGap: 32px;
+$padding: 40px;
+
 $sidebarWidth: 280px;
 
 .root {
+	--generic-layout_padding: 40px;
+	--generic-layout_spacing: 32px;
+
 	flex: 1 1 auto;
 	display: grid;
 	grid-template-rows: auto 1fr;
-	grid-gap: 32px;
+	grid-gap: var(--generic-layout_spacing);
 	align-items: start;
+
+	@include lessThan1366x768 {
+		--generic-layout_padding: 20px;
+		--generic-layout_spacing: 20px;
+	}
+
+	@include lessThan640w {
+		--generic-layout_padding: 12px;
+		--generic-layout_spacing: 12px;
+
+		grid-gap: 0;
+	}
+}
+
+.header {
+	padding: 0 var(--generic-layout_padding);
+	height: 80px;
+	background: var(--surface-color);
+
+	@include lessThan640w {
+		height: 64px;
+	}
+
+	@include lessThan768h {
+		height: 64px;
+	}
 }
 
 .main {
 	display: grid;
 	grid-template-columns: $sidebarWidth 1fr;
-	grid-gap: $mainGap;
+	grid-gap: var(--generic-layout_spacing);
 	margin: 0 auto;
-	padding: 0 $mainPadding;
+	padding: 0 var(--generic-layout_padding);
 	width: 100%;
-	max-width: (1200px + $mainPadding * 2);
+	max-width: 1280px;
 
-	@include less920px {
+	@include lessThan1152w {
 		grid-template-columns: 1fr;
+		max-width: 960px;
+	}
+
+	@include lessThan640w {
 		padding: 0;
 	}
 }
@@ -29,13 +62,13 @@ $sidebarWidth: 280px;
 	display: flex;
 	flex-direction: column;
 
-	@include less920px {
+	@include lessThan1152w {
 		position: fixed;
 		z-index: 2;
 		top: 0;
 		bottom: 0;
-		left: -($sidebarWidth + $mainPadding);
-		padding: 24px 20px;
+		left: -($sidebarWidth + 20px * 2);
+		padding: 20px 20px 0;
 		width: 100%;
 		max-width: ($sidebarWidth + 20px * 2);
 		overflow-y: auto;
@@ -54,7 +87,7 @@ $sidebarWidth: 280px;
 .sidebarMobileHeader {
 	display: none;
 
-	@include less920px {
+	@include lessThan1152w {
 		align-self: center;
 		display: block;
 		margin: 0 0 20px;
@@ -64,7 +97,7 @@ $sidebarWidth: 280px;
 .sidebarOverlay {
 	display: none;
 
-	@include less920px {
+	@include lessThan1152w {
 		display: block;
 	}
 }

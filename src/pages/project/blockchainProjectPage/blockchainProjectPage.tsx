@@ -11,6 +11,7 @@ import { ActionButton, ActionButtonLook, ActionButtonSize } from '../../../compo
 import { ProjectAvatar } from '../../../components/avatar/avatar';
 import { BlockchainProjectBanner } from '../../../components/blockchainProjectBanner/blockchainProjectBanner';
 import { ErrorMessage, ErrorMessageLook } from '../../../components/errorMessage/errorMessage';
+import { RegularPageContent } from '../../../components/genericLayout/content/regularPageContent/regularPageContent';
 import { GenericLayout } from '../../../components/genericLayout/genericLayout';
 import { toast } from '../../../components/toast/toast';
 import { YlideLoader } from '../../../components/ylideLoader/ylideLoader';
@@ -375,75 +376,79 @@ export const BlockchainProjectPage = observer(() => {
 				<meta name="description" content={project.description} />
 			</Helmet>
 
-			<div key={projectId}>
-				<BlockchainProjectBanner
-					className={css.projectCover}
-					image={project.banner || 'https://cdn.pixabay.com/photo/2016/09/29/13/08/planet-1702788_1280.jpg'}
-				/>
+			<RegularPageContent>
+				<div key={projectId}>
+					<BlockchainProjectBanner
+						className={css.projectBanner}
+						image={
+							project.banner || 'https://cdn.pixabay.com/photo/2016/09/29/13/08/planet-1702788_1280.jpg'
+						}
+					/>
 
-				<ProjectAvatar
-					className={css.projectLogo}
-					innerClassName={css.projectLogoInner}
-					image={project.profilePicture || 'https://picsum.photos/id/1067/200'}
-				/>
+					<ProjectAvatar
+						className={css.projectLogo}
+						innerClassName={css.projectLogoInner}
+						image={project.profilePicture || 'https://picsum.photos/id/1067/200'}
+					/>
 
-				<h1 className={css.projectName}>{project.name}</h1>
+					<h1 className={css.projectName}>{project.name}</h1>
 
-				<div className={css.projectDescription}>{project.description}</div>
+					<div className={css.projectDescription}>{project.description}</div>
 
-				{(project.website || !!project.tags.length) && (
-					<div className={css.projectMeta}>
-						{project.website && (
-							<a className={css.projectWebsite} href={project.website}>
-								<LinkSvg />
+					{(project.website || !!project.tags.length) && (
+						<div className={css.projectMeta}>
+							{project.website && (
+								<a className={css.projectWebsite} href={project.website}>
+									<LinkSvg />
 
-								{project.website}
-							</a>
-						)}
+									{project.website}
+								</a>
+							)}
 
-						{!!project.tags.length && (
-							<div className={css.tags}>
-								{project.tags.map(tag => (
-									<div key={tag} className={css.tag}>
-										<TagSvg />
-										{tag}
-									</div>
-								))}
+							{!!project.tags.length && (
+								<div className={css.tags}>
+									{project.tags.map(tag => (
+										<div key={tag} className={css.tag}>
+											<TagSvg />
+											{tag}
+										</div>
+									))}
+								</div>
+							)}
+						</div>
+					)}
+
+					<div className={css.main}>
+						<div className={css.tabsWrapper}>
+							<div className={css.tabs}>
+								{!!project.feedId.official &&
+									renderTab({
+										part: BlockchainProjectPagePart.OFFICIAL,
+										name: 'Official',
+										href: generatePath(RoutePath.PROJECT, { projectId: project.id }),
+									})}
+
+								{!!project.feedId.discussion &&
+									renderTab({
+										part: BlockchainProjectPagePart.DISCUSSION,
+										name: 'Discussion',
+										href: generatePath(RoutePath.PROJECT_DISCUSSION, { projectId: project.id }),
+									})}
 							</div>
-						)}
-					</div>
-				)}
 
-				<div className={css.main}>
-					<div className={css.tabsWrapper}>
-						<div className={css.tabs}>
-							{!!project.feedId.official &&
-								renderTab({
-									part: BlockchainProjectPagePart.OFFICIAL,
-									name: 'Official',
-									href: generatePath(RoutePath.PROJECT, { projectId: project.id }),
-								})}
-
-							{!!project.feedId.discussion &&
-								renderTab({
-									part: BlockchainProjectPagePart.DISCUSSION,
-									name: 'Discussion',
-									href: generatePath(RoutePath.PROJECT_DISCUSSION, { projectId: project.id }),
-								})}
+							{tabsAsideContent && <div className={css.tabsAsideContent}>{tabsAsideContent}</div>}
 						</div>
 
-						{tabsAsideContent && <div className={css.tabsAsideContent}>{tabsAsideContent}</div>}
+						{part === BlockchainProjectPagePart.OFFICIAL ? (
+							<OfficialContent project={project} setTabsAsideContent={setTabsAsideContent} />
+						) : part === BlockchainProjectPagePart.DISCUSSION ? (
+							<DiscussionContent project={project} setTabsAsideContent={setTabsAsideContent} />
+						) : (
+							assertUnreachable(part)
+						)}
 					</div>
-
-					{part === BlockchainProjectPagePart.OFFICIAL ? (
-						<OfficialContent project={project} setTabsAsideContent={setTabsAsideContent} />
-					) : part === BlockchainProjectPagePart.DISCUSSION ? (
-						<DiscussionContent project={project} setTabsAsideContent={setTabsAsideContent} />
-					) : (
-						assertUnreachable(part)
-					)}
 				</div>
-			</div>
+			</RegularPageContent>
 		</GenericLayout>
 	);
 });

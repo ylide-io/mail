@@ -1,5 +1,4 @@
 $font-family_main: 'Inter', Tahoma, Verdana, Geneva, sans-serif;
-$font-family_wide: 'Inter', Tahoma, Verdana, Geneva, sans-serif;
 $font-family_code: source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace;
 
 $font-weight_light: 300;
@@ -15,10 +14,59 @@ $interactive-elem-size: 32px;
 $interactive-elem-size_large: 36px;
 $interactive-elem-size_xlarge: 44px;
 
-// MEDIA RULES
+// RESPONSIVE
 
-@mixin less1280px() {
-	@media (max-width: 1280px) {
+$mediaWidth1366: 1366px;
+$mediaWidth1152: 1152px;
+$mediaWidth768: 768px;
+$mediaWidth640: 640px;
+
+$mediaHeight768: 768px;
+
+@mixin lessThan($width: null, $height: null) {
+	@if $width and $height {
+		@media (max-width: $width), (max-height: $height) {
+			@content;
+		}
+	} @else if $width {
+		@media (max-width: $width) {
+			@content;
+		}
+	} @else if $height {
+		@media (max-height: $height) {
+			@content;
+		}
+	} @else {
+		@error "No WIDTH or HEIGHT";
+	}
+}
+
+@mixin lessThan1366x768() {
+	@include lessThan($mediaWidth1366, $mediaHeight768) {
+		@content;
+	}
+}
+
+@mixin lessThan1152w() {
+	@include lessThan($mediaWidth1152) {
+		@content;
+	}
+}
+
+@mixin lessThan768w() {
+	@include lessThan($mediaWidth768) {
+		@content;
+	}
+}
+
+@mixin lessThan640w() {
+	@include lessThan($mediaWidth640) {
+		@content;
+	}
+}
+
+@mixin lessThan768h() {
+	@include lessThan(null, $mediaHeight768) {
 		@content;
 	}
 }
@@ -31,18 +79,6 @@ $interactive-elem-size_xlarge: 44px;
 
 @mixin less720px() {
 	@media (max-width: 720px) {
-		@content;
-	}
-}
-
-@mixin less670px() {
-	@media (max-width: 670px) {
-		@content;
-	}
-}
-
-@mixin less630px() {
-	@media (max-width: 630px) {
 		@content;
 	}
 }

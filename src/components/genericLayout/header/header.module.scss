@@ -1,9 +1,7 @@
 .root {
 	display: flex;
 	align-items: center;
-	padding: 0 40px;
-	height: 80px;
-	background: var(--surface-color);
+	justify-content: space-between;
 }
 
 .left {
@@ -16,8 +14,11 @@
 .center {
 	display: flex;
 	align-items: center;
-	margin: auto;
 	width: 40%;
+
+	@include lessThan1152w {
+		display: none;
+	}
 }
 
 .right {
@@ -29,16 +30,24 @@
 
 //
 
-.composeButton {
-	display: none;
-
-	@include less720px {
-		display: block;
-	}
-}
-
 .logo {
 	@include expand-click-area;
+
+	@include lessThan(480px) {
+		display: none;
+	}
+
+	svg {
+		@include lessThan768h {
+			width: auto;
+			height: 40px;
+		}
+
+		@include lessThan1152w {
+			width: auto;
+			height: 40px;
+		}
+	}
 }
 
 .navButton {
@@ -70,9 +79,11 @@
 
 .users {
 	@include expand-click-area;
-	display: flex;
+	display: grid;
+	grid-auto-flow: column;
+	grid-gap: 8px;
 	align-items: center;
-	padding: 0 2px 0 3px;
+	padding: 0 10px 0 6px;
 	height: $interactive-elem-size_xlarge;
 	white-space: nowrap;
 	background: var(--secondary-surface-color);
@@ -82,21 +93,18 @@
 	&:focus-visible {
 		background: var(--secondary-surface-hover-color);
 	}
-
-	> * {
-		margin-right: 8px;
-	}
 }
 
 .usersAvatar {
 	display: inline-block;
 	vertical-align: top;
-	width: $interactive-elem-size_xlarge - 8px;
-	border: 2px solid var(--secondary-surface-color);
+	position: relative;
+	width: $interactive-elem-size_xlarge - 12px;
 	border-radius: 50%;
 
 	&:not(:first-child) {
-		margin: 0 0 0 -18px;
+		margin: 0 0 0 -24px;
+		box-shadow: -1px 0 0 1px rgba(var(--surface-rgb-color), 0.3);
 	}
 }
 
@@ -105,13 +113,7 @@
 	font-weight: $font-weight_medium;
 	white-space: nowrap;
 
-	@include less720px {
-		span {
-			display: none;
-		}
-	}
-
-	@include less480px {
+	@include lessThan(640px) {
 		display: none;
 	}
 }

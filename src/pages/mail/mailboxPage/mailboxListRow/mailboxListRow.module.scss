@@ -18,6 +18,13 @@
 			background: rgba(var(--error-rgb-color), 0.15);
 		}
 	}
+
+	@include less720px {
+		grid-template-columns: auto 1fr auto;
+		grid-gap: 4px;
+		align-content: center;
+		padding: 0 12px;
+	}
 }
 
 .root_unread .contactValue,
@@ -37,6 +44,11 @@
 
 .checkbox {
 	margin: 0 8px 0 0;
+
+	@include less720px {
+		grid-row: 1/4;
+		margin: 0 12px 0 0;
+	}
 }
 
 .contact {
@@ -95,40 +107,28 @@
 
 .preview {
 	display: none;
-}
 
-.date {
-	text-align: right;
-}
-
-@include less720px {
-	.root {
-		grid-template-columns: auto 1fr auto;
-		grid-gap: 4px;
-		align-content: center;
-		padding: 0 12px;
-	}
-
-	.checkbox {
-		grid-row: 1/4;
-		margin: 0 12px 0 0;
-	}
-
-	.date {
-		grid-column: 3/4;
-		grid-row: 1/2;
-	}
-
-	.blockchain {
-		grid-column: 3/4;
-		grid-row: 2/3;
-	}
-
-	.preview {
+	@include less720px {
 		@include truncate-text;
 		grid-column: 2/4;
 		display: block;
 		color: var(--secondary-text-color);
 		font-weight: $font-weight_light;
+	}
+}
+
+.blockchain {
+	@include less720px {
+		grid-column: 3/4;
+		grid-row: 2/3;
+	}
+}
+
+.date {
+	text-align: right;
+
+	@include less720px {
+		grid-column: 3/4;
+		grid-row: 1/2;
 	}
 }

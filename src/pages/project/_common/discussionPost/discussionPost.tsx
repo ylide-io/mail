@@ -287,9 +287,11 @@ export const DiscussionPost = observer(({ post, project, onReplyClick }: Discuss
 
 					{isApproved && <ErrorMessage look={ErrorMessageLook.INFO}>Post approved 🔥</ErrorMessage>}
 
-					<div className={css.text}>
-						<NlToBr text={decodedText} />
-					</div>
+					{!!decodedText && (
+						<div className={css.text}>
+							<NlToBr text={decodedText} />
+						</div>
+					)}
 
 					{attachmentHttpUrl && (
 						<img

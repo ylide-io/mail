@@ -38,21 +38,13 @@ export function MailboxHeader({
 	return (
 		<div className="mailbox-header">
 			<div className="mailbox-title">
-				{folderId ? (
-					<>
-						{getFolderName(folderId)}
+				{getFolderName(folderId)}
 
-						<div className="mailbox-title-secondary">
-							{!!filterBySender && (
-								<>
-									{'from '}
-									<ContactName address={filterBySender} />
-								</>
-							)}
-						</div>
-					</>
-				) : (
-					'Loading...'
+				{!!filterBySender && (
+					<div className="mailbox-title-secondary">
+						{'from '}
+						<ContactName address={filterBySender} />
+					</div>
 				)}
 			</div>
 

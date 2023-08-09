@@ -20,6 +20,7 @@ import { useIsMatchesPath, useNav } from '../../../utils/url';
 import { ActionButton, ActionButtonLook, ActionButtonSize } from '../../ActionButton/ActionButton';
 import { AppLogo } from '../../appLogo/appLogo';
 import { Avatar } from '../../avatar/avatar';
+import { PropsWithClassName } from '../../props';
 import { toast } from '../../toast/toast';
 import { SidebarBurger } from '../sidebar/sidebarMenu';
 import { AccountsPopup } from './accountsPopup/accountsPopup';
@@ -50,7 +51,7 @@ const NavButton = ({ children, href }: NavButtonProps) => {
 
 //
 
-const Header = observer(() => {
+export const Header = observer(({ className }: PropsWithClassName) => {
 	const navigate = useNav();
 	const openMailCompose = useOpenMailCompose();
 
@@ -60,19 +61,9 @@ const Header = observer(() => {
 	const accounts = domain.accounts.accounts;
 
 	return (
-		<div className={css.root}>
+		<div className={clsx(css.root, className)}>
 			<div className={css.left}>
 				<SidebarBurger />
-
-				{REACT_APP__APP_MODE === AppMode.HUB && domain.accounts.hasActiveAccounts && (
-					<ActionButton
-						className={css.composeButton}
-						look={ActionButtonLook.PRIMARY}
-						onClick={() => openMailCompose({ place: 'header' })}
-					>
-						Compose Mail
-					</ActionButton>
-				)}
 
 				<a
 					className={css.logo}
@@ -127,8 +118,7 @@ const Header = observer(() => {
 
 							<div className={css.usersText}>
 								{accounts.length} account
-								{accounts.length > 1 ? 's' : ''}
-								<span>&nbsp;connected</span>
+								{accounts.length > 1 ? 's' : ''} connected
 							</div>
 
 							<ArrowDownSvg className={css.usersIcon} />
@@ -171,5 +161,3 @@ const Header = observer(() => {
 		</div>
 	);
 });
-
-export default Header;

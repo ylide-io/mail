@@ -13,6 +13,14 @@
 		width: 1px;
 		background: var(--border-color);
 	}
+
+	@include lessThan640w {
+		grid-gap: 4px 8px;
+	}
+
+	@include less480px {
+		--blockchain-label_display: none;
+	}
 }
 
 //
@@ -106,6 +114,10 @@
 	padding: 20px;
 	background: var(--surface-color);
 	border-radius: 16px;
+
+	@include lessThan640w {
+		padding: 12px;
+	}
 }
 
 .text {

@@ -8,7 +8,7 @@
 
 .block {
 	display: grid;
-	grid-gap: 40px;
+	grid-gap: 32px;
 	padding: 20px;
 	background: var(--surface-color);
 	border-radius: 16px;
@@ -195,7 +195,7 @@
 .burger {
 	display: none;
 
-	@include less920px {
+	@include lessThan1152w {
 		display: block;
 	}
 }

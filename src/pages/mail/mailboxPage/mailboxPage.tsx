@@ -162,7 +162,7 @@ export const MailboxPage = observer(() => {
 				<div className={css.root}>
 					<div className={clsx(css.main, isMailboxRoot || css.main_hidden)}>
 						<MailboxHeader
-							folderId={folderId!}
+							folderId={folderId}
 							messages={mailList.messages}
 							selectedMessageIds={selectedMessageIds}
 							filterBySender={filterBySender}
