@@ -265,6 +265,7 @@ export const SidebarMailSection = observer(() => {
 export const SidebarMenu = observer(() => {
 	const [feedSettingsAccount, setFeedSettingsAccount] = useState<DomainAccount>();
 	const tags = feedSettings.tags;
+	const navigate = useNav();
 
 	function renderOtcSection() {
 		if (REACT_APP__APP_MODE !== AppMode.OTC) return;
@@ -419,14 +420,25 @@ export const SidebarMenu = observer(() => {
 
 			<div className={css.socials}>
 				<div className={css.socialItem}>
-					Follow on
 					<a
 						href="https://twitter.com/mainview_io"
 						target="_blank noreferrer"
 						title="Twitter"
 						onClick={() => analytics.openSocial('twitter')}
 					>
+						<span>Follow on</span>
 						<TwitterSvg />
+					</a>
+				</div>
+				<div className={css.socialItem}>
+					<a
+						href={RoutePath.FAQ}
+						onClick={e => {
+							e.preventDefault();
+							navigate(RoutePath.FAQ);
+						}}
+					>
+						FAQ
 					</a>
 				</div>
 			</div>

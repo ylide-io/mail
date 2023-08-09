@@ -5,6 +5,7 @@ import { QueryClient, QueryClientProvider } from 'react-query';
 import { generatePath, Navigate, Route, Routes, useLocation, useSearchParams } from 'react-router-dom';
 
 import { ActionButton, ActionButtonLook, ActionButtonSize } from './components/ActionButton/ActionButton';
+import { Faq } from './components/faq/faq';
 import { MainViewOnboarding } from './components/mainViewOnboarding/mainViewOnboarding';
 import { PopupManager } from './components/popup/popupManager/popupManager';
 import { StaticComponentManager } from './components/staticComponentManager/staticComponentManager';
@@ -323,6 +324,7 @@ export const App = observer(() => {
 								/>
 							}
 						/>
+						{REACT_APP__APP_MODE === AppMode.MAIN_VIEW && <Route path={RoutePath.FAQ} element={<Faq />} />}
 					</Routes>
 
 					{domain.txPlateVisible && REACT_APP__APP_MODE !== AppMode.MAIN_VIEW && <TransactionPopup />}

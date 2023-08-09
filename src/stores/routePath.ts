@@ -41,4 +41,8 @@ export enum RoutePath {
 
 	SEND_MESSAGE_WIDGET = '/widget/send-message',
 	MAILBOX_WIDGET = '/widget/mailbox',
+
+	// FAQ
+
+	FAQ = '/faq',
 }

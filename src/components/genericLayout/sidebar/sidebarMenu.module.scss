@@ -100,8 +100,25 @@
 .socials {
 	padding: 24px 0 0 8px;
 
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+
+	position: relative;
+
+	&:before {
+		content: '';
+		position: absolute;
+		top: 0;
+		right: 0;
+		left: 0;
+		height: 1px;
+		background: var(--border-color);
+	}
+
 	a {
-		margin-left: 8px;
+		display: flex;
+		align-items: center;
 		@include expand-click-area(4px);
 		color: var(--primary-text-color);
 
@@ -111,6 +128,10 @@
 
 		svg {
 			fill: currentColor;
+		}
+
+		span {
+			margin-right: 8px;
 		}
 	}
 }
