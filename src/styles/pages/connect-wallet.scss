@@ -4,11 +4,9 @@
 	width: 400px;
 
 	.wm-title {
-		font-weight: 400;
 		font-size: 24px;
-		font-family: $font-family_wide;
+		font-family: $font-family_main;
 		text-align: center;
-		letter-spacing: -0.09em;
 		margin-bottom: 24px;
 	}
 }
@@ -39,14 +37,13 @@
 		align-items: flex-start;
 		padding: 3px 12px 5px;
 
-		font-family: $font-family_wide;
+		font-family: $font-family_main;
 		font-style: normal;
 		font-weight: 400;
 		font-size: 12px;
 		line-height: 16px;
 
 		text-align: center;
-		letter-spacing: -0.09em;
 
 		color: var(--secondary-text-color);
 	}
@@ -185,28 +182,26 @@
 
 	.qr-text {
 		margin-top: 10px;
-		font-family: $font-family_wide;
+		font-family: $font-family_main;
 		font-style: normal;
 		font-weight: 300;
 		font-size: 12px;
 		line-height: 16px;
 
 		text-align: center;
-		letter-spacing: -0.09em;
 	}
 
 	.qr-link {
 		margin-top: 8px;
 		margin-bottom: 8px;
 
-		font-family: $font-family_wide;
+		font-family: $font-family_main;
 		font-style: normal;
 		font-weight: 400;
 		font-size: 12px;
 		line-height: 16px;
 
 		text-align: center;
-		letter-spacing: -0.09em;
 
 		color: var(--accent-color);
 	}

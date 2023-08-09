@@ -7,6 +7,7 @@ import { generatePath, useParams } from 'react-router-dom';
 import { BlockchainFeedApi, decodeBlockchainFeedPost } from '../../../api/blockchainFeedApi';
 import { ActionButton, ActionButtonLook } from '../../../components/ActionButton/ActionButton';
 import { ErrorMessage } from '../../../components/errorMessage/errorMessage';
+import { RegularPageContent } from '../../../components/genericLayout/content/regularPageContent/regularPageContent';
 import { GenericLayout } from '../../../components/genericLayout/genericLayout';
 import { PageContentHeader } from '../../../components/pageContentHeader/pageContentHeader';
 import { SharePopup } from '../../../components/sharePopup/sharePopup';
@@ -41,52 +42,54 @@ export const BlockchainProjectPostPage = observer(() => {
 
 	return (
 		<GenericLayout>
-			<PageContentHeader
-				backButton={{ href: generatePath(RoutePath.PROJECT, { projectId }) }}
-				title={project.name}
-				right={
-					data && (
-						<>
-							<ActionButton
-								ref={shareButtonRef}
-								look={ActionButtonLook.PRIMARY}
-								icon={<ShareSvg />}
-								onClick={() => setSharePopupOpen(!isSharePopupOpen)}
-							>
-								Share Post
-							</ActionButton>
+			<RegularPageContent>
+				<PageContentHeader
+					backButton={{ href: generatePath(RoutePath.PROJECT, { projectId }) }}
+					title={project.name}
+					right={
+						data && (
+							<>
+								<ActionButton
+									ref={shareButtonRef}
+									look={ActionButtonLook.PRIMARY}
+									icon={<ShareSvg />}
+									onClick={() => setSharePopupOpen(!isSharePopupOpen)}
+								>
+									Share Post
+								</ActionButton>
 
-							{isSharePopupOpen && (
-								<SharePopup
-									anchorRef={shareButtonRef}
-									horizontalAlign={HorizontalAlignment.END}
-									onClose={() => setSharePopupOpen(false)}
-									subject="Check out this post on Ylide!"
-									url={toAbsoluteUrl(postPath)}
-								/>
-							)}
-						</>
-					)
-				}
-			/>
+								{isSharePopupOpen && (
+									<SharePopup
+										anchorRef={shareButtonRef}
+										horizontalAlign={HorizontalAlignment.END}
+										onClose={() => setSharePopupOpen(false)}
+										subject="Check out this post on Ylide!"
+										url={toAbsoluteUrl(postPath)}
+									/>
+								)}
+							</>
+						)
+					}
+				/>
 
-			{data ? (
-				<>
-					<Helmet>
-						<title>
-							{data.decoded.decodedTextData.type === MessageDecodedTextDataType.YMF
-								? data.decoded.decodedTextData.value.toPlainText()
-								: data.decoded.decodedTextData.value}
-						</title>
-					</Helmet>
+				{data ? (
+					<>
+						<Helmet>
+							<title>
+								{data.decoded.decodedTextData.type === MessageDecodedTextDataType.YMF
+									? data.decoded.decodedTextData.value.toPlainText()
+									: data.decoded.decodedTextData.value}
+							</title>
+						</Helmet>
 
-					<OfficialPostView project={project} post={data} />
-				</>
-			) : isLoading ? (
-				<YlideLoader className={css.loader} reason="Loading post ..." />
-			) : (
-				<ErrorMessage>Couldn't load this post</ErrorMessage>
-			)}
+						<OfficialPostView project={project} post={data} />
+					</>
+				) : isLoading ? (
+					<YlideLoader className={css.loader} reason="Loading post ..." />
+				) : (
+					<ErrorMessage>Couldn't load this post</ErrorMessage>
+				)}
+			</RegularPageContent>
 		</GenericLayout>
 	);
 });

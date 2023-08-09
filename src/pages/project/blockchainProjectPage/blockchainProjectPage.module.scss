@@ -7,14 +7,23 @@
 
 //
 
-.projectCover {
-	margin: 0 0 -66px;
+.projectBanner {
 	border-radius: 16px;
+
+	@include lessThan640w {
+		margin: calc(-1 * var(--generic-layout_spacing)) calc(-1 * var(--generic-layout_padding)) 0;
+		border-radius: 0;
+	}
 }
 
 .projectLogo {
-	margin: auto;
+	margin: -66px auto 0;
 	width: 100px;
+
+	@include lessThan640w {
+		margin: -42px auto 0;
+		width: 64px;
+	}
 }
 
 .projectLogoInner {
@@ -41,6 +50,11 @@
 	align-items: center;
 	justify-content: center;
 	margin: 12px 0 0;
+
+	@include lessThan640w {
+		grid-auto-flow: row;
+		grid-gap: 12px;
+	}
 }
 
 .projectWebsite {

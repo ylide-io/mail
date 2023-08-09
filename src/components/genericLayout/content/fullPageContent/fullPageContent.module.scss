@@ -1,6 +1,11 @@
 .root {
-	padding: 0 0 32px;
+	padding: 0 0 var(--generic-layout_spacing);
 	height: 100%;
+
+	@include lessThan640w {
+		padding: 0;
+		border-top: 1px solid var(--border-color);
+	}
 }
 
 .inner {
@@ -10,4 +15,8 @@
 	height: 100%;
 	background: var(--surface-color);
 	border-radius: 16px;
+
+	@include lessThan640w {
+		border-radius: 0;
+	}
 }

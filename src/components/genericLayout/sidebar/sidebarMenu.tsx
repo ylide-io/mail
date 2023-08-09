@@ -47,7 +47,7 @@ interface SidebarBurgerProps extends PropsWithClassName, PropsWithChildren<{}> {
 export const SidebarBurger = observer(({ className, children }: SidebarBurgerProps) => (
 	<div className={clsx(css.burger, className)}>
 		<ActionButton
-			size={ActionButtonSize.MEDIUM}
+			size={ActionButtonSize.LARGE}
 			icon={isSidebarOpen.get() ? <SidebarMenuCloseSvg /> : <SidebarMenuSvg />}
 			onClick={() => isSidebarOpen.set(!isSidebarOpen.get())}
 		>
@@ -79,7 +79,10 @@ function SidebarSection({ children, title, button }: SidebarSectionProps) {
 							size={ActionButtonSize.XSMALL}
 							look={button.look || ActionButtonLook.SUBTILE}
 							className={css.sectionButton}
-							onClick={() => button?.onClick?.()}
+							onClick={() => {
+								isSidebarOpen.set(false);
+								button?.onClick?.();
+							}}
 						>
 							{button.text}
 						</ActionButton>
@@ -125,9 +128,10 @@ export const SidebarButton = observer(({ href, icon, name, rightButton }: Sideba
 			className={clsx(css.sidebarButton, isActive && css.sidebarButton_active)}
 			href={href}
 			onClick={e => {
+				isSidebarOpen.set(false);
+
 				if (!isExternal) {
 					e.preventDefault();
-					isSidebarOpen.set(false);
 					navigate(href);
 				}
 			}}
@@ -142,8 +146,9 @@ export const SidebarButton = observer(({ href, icon, name, rightButton }: Sideba
 					icon={rightButton.icon}
 					title={rightButton.title}
 					onClick={e => {
-						e.preventDefault();
 						e.stopPropagation();
+						isSidebarOpen.set(false);
+
 						rightButton?.onClick();
 					}}
 				/>
@@ -372,18 +377,18 @@ export const SidebarMenu = observer(() => {
 					])}
 				</SidebarSection>
 
-				<SidebarSection title="Newly Added">
-					{renderProjects([BlockchainProjectId.TVM, BlockchainProjectId.YLIDE, BlockchainProjectId.VENTORY])}
-				</SidebarSection>
-
-				<ActionButton
-					onClick={() => {
-						analytics.openCreateCommunityForm();
-						window.open('https://forms.gle/p9141gy5wn7DCjZA8', '_blank')?.focus();
+				<SidebarSection
+					title="Newly Added"
+					button={{
+						text: 'Create',
+						onClick: () => {
+							analytics.openCreateCommunityForm();
+							window.open('https://forms.gle/p9141gy5wn7DCjZA8', '_blank')?.focus();
+						},
 					}}
 				>
-					Create community
-				</ActionButton>
+					{renderProjects([BlockchainProjectId.TVM, BlockchainProjectId.YLIDE, BlockchainProjectId.VENTORY])}
+				</SidebarSection>
 			</SidebarBlock>
 		);
 	}

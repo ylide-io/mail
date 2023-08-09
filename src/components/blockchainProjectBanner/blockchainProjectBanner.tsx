@@ -9,11 +9,13 @@ export interface BlockchainProjectBannerProps extends PropsWithClassName {
 
 export function BlockchainProjectBanner({ className, image }: BlockchainProjectBannerProps) {
 	return (
-		<div
-			className={clsx(css.root, className)}
-			style={{
-				backgroundImage: `url("${image}")`,
-			}}
-		/>
+		<div className={clsx(css.root, className)}>
+			<div
+				className={css.inner}
+				style={{
+					backgroundImage: `url("${image}")`,
+				}}
+			/>
+		</div>
 	);
 }

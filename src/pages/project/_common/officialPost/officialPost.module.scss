@@ -1,6 +1,10 @@
 .root {
 	display: grid;
 	grid-gap: 20px;
+
+	@include lessThan640w {
+		padding: 12px;
+	}
 }
 
 //
