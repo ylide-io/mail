@@ -365,7 +365,7 @@ export const SidebarMenu = observer(() => {
 		return (
 			<SidebarBlock>
 				<SidebarSection
-					title="Top Communities"
+					title="Trending"
 					button={{ text: 'Explore', onClick: () => navigate(generatePath(RoutePath.ROOT)) }}
 				>
 					{renderProjects([
