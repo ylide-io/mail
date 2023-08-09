@@ -6,6 +6,7 @@ import { generatePath, Navigate, Route, Routes, useLocation, useSearchParams } f
 
 import { ActionButton, ActionButtonLook, ActionButtonSize } from './components/ActionButton/ActionButton';
 import { Faq } from './components/faq/faq';
+import { MainviewLoader } from './components/mainviewLoader/mainviewLoader';
 import { MainViewOnboarding } from './components/mainViewOnboarding/mainViewOnboarding';
 import { PopupManager } from './components/popup/popupManager/popupManager';
 import { StaticComponentManager } from './components/staticComponentManager/staticComponentManager';
@@ -167,7 +168,11 @@ export const App = observer(() => {
 					height: '100vh',
 				}}
 			>
-				<YlideLoader reason="Loading your account data from blockchain ..." />
+				{REACT_APP__APP_MODE === AppMode.MAIN_VIEW ? (
+					<MainviewLoader />
+				) : (
+					<YlideLoader reason="Loading your account data from blockchain ..." />
+				)}
 			</div>
 		);
 	}

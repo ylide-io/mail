@@ -10,7 +10,6 @@ import { CoverageModal } from '../../../components/coverageModal/coverageModal';
 import { ErrorMessage, ErrorMessageLook } from '../../../components/errorMessage/errorMessage';
 import { NarrowContent } from '../../../components/genericLayout/content/narrowContent/narrowContent';
 import { GenericLayout, useGenericLayoutApi } from '../../../components/genericLayout/genericLayout';
-import { YlideLoader } from '../../../components/ylideLoader/ylideLoader';
 import { AppMode, REACT_APP__APP_MODE } from '../../../env';
 import { ReactComponent as ArrowUpSvg } from '../../../icons/ic20/arrowUp.svg';
 import { ReactComponent as CrossSvg } from '../../../icons/ic20/cross.svg';
@@ -25,6 +24,7 @@ import { useNav } from '../../../utils/url';
 import { FeedPostItem } from '../_common/feedPostItem/feedPostItem';
 import css from './feedPage.module.scss';
 import ErrorCode = FeedServerApi.ErrorCode;
+import { SimpleLoader } from '../../../components/simpleLoader/simpleLoader';
 
 const reloadFeedCounter = observable.box(0);
 
@@ -166,7 +166,7 @@ const FeedPageContent = observer(() => {
 								rootMargin="100px"
 								onChange={inView => inView && feed.loadMore()}
 							>
-								<YlideLoader reason="Loading more posts ..." />
+								<SimpleLoader />
 							</InView>
 						)}
 					</>
@@ -194,7 +194,7 @@ const FeedPageContent = observer(() => {
 					</ErrorMessage>
 				) : feed.loading ? (
 					<div className={css.loader}>
-						<YlideLoader reason="Your feed is loading ..." />
+						<SimpleLoader />
 					</div>
 				) : (
 					canLoadFeed || (

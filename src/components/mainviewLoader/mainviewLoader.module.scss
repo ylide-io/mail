@@ -1,0 +1,22 @@
+.root {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+
+	svg {
+		animation: pulse 2s infinite;
+	}
+}
+
+@keyframes pulse {
+	0%,
+	100% {
+		transform: scale(1);
+		fill: currentColor;
+	}
+	50% {
+		transform: scale(1.2);
+		fill: #00ffc2;
+	}
+}
