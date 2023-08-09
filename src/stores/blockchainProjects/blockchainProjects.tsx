@@ -1,23 +1,6 @@
 import { Uint256 } from '@ylide/sdk';
-import { ReactNode } from 'react';
 
 import { VENOM_FEED_ID } from '../../constants';
-import { ReactComponent as EthWhalesSvg } from './icons/ethWhales.svg';
-import { ReactComponent as GeneralSvg } from './icons/general.svg';
-import { ReactComponent as GravixSvg } from './icons/gravix.svg';
-import { ReactComponent as NumiSvg } from './icons/numi.svg';
-import { ReactComponent as OasisGallerySvg } from './icons/oasisGallery.svg';
-import { ReactComponent as SnipaSvg } from './icons/snipa.svg';
-import { ReactComponent as TvmSvg } from './icons/tvm.svg';
-import { ReactComponent as VenomBlockchainSvg } from './icons/venomBlockchain.svg';
-import { ReactComponent as VenomBridgeSvg } from './icons/venomBridge.svg';
-import { ReactComponent as VenomPadSvg } from './icons/venomPad.svg';
-import { ReactComponent as VenomScanSvg } from './icons/venomScan.svg';
-import { ReactComponent as VenomStakeSvg } from './icons/venomStake.svg';
-import { ReactComponent as VenomWalletSvg } from './icons/venomWallet.svg';
-import { ReactComponent as VentorySvg } from './icons/ventory.svg';
-import { ReactComponent as Web3WorldSvg } from './icons/web3World.svg';
-import { ReactComponent as YlideSvg } from './icons/ylide.svg';
 import ethWhalesSrc from './profilePictures/ethWhales.png';
 import generalSrc from './profilePictures/general.png';
 import gravixSrc from './profilePictures/gravix.png';
@@ -65,7 +48,6 @@ export interface BlockchainProject {
 	description: string;
 	profilePicture?: string;
 	banner?: string;
-	logo: ReactNode;
 	website?: string;
 	tags: string[];
 	onlyVenom?: boolean;
@@ -81,7 +63,6 @@ export const blockchainProjects: Record<BlockchainProjectId, BlockchainProject> 
 		name: 'General chat',
 		description: 'General chat to meet your web3 frens.',
 		profilePicture: generalSrc,
-		logo: <GeneralSvg />,
 		tags: [],
 	},
 	[BlockchainProjectId.ETH_WHALES]: {
@@ -93,7 +74,6 @@ export const blockchainProjects: Record<BlockchainProjectId, BlockchainProject> 
 		description: 'Here you can meet the fellow ETH supporters. Btw, messages are sent only via Ethereum chain.',
 		profilePicture: ethWhalesSrc,
 		banner: 'https://picsum.photos/id/723/1500/500',
-		logo: <EthWhalesSvg />,
 		tags: ['Blockchain', 'Ethereum'],
 		onlyEtherium: true,
 	},
@@ -105,7 +85,6 @@ export const blockchainProjects: Record<BlockchainProjectId, BlockchainProject> 
 		name: 'Ylide',
 		description: 'Protocol for wallet-to-wallet communication with built-in payments.',
 		profilePicture: ylideSrc,
-		logo: <YlideSvg />,
 		website: 'https://ylide.io/',
 		tags: ['Blockchain', 'Ylide'],
 	},
@@ -118,7 +97,6 @@ export const blockchainProjects: Record<BlockchainProjectId, BlockchainProject> 
 		name: 'Nümi',
 		description:
 			'Nümi is the first anime metaverse on Venom blockchain that provides players with limitless possibilities to create their own gaming experience.',
-		logo: <NumiSvg />,
 		website: 'https://www.numi.net/',
 		tags: ['Blockchain', 'Venom'],
 		onlyVenom: true,
@@ -131,7 +109,6 @@ export const blockchainProjects: Record<BlockchainProjectId, BlockchainProject> 
 		name: 'oasis.gallery',
 		description: "Trade unique digital assets on Venom blockchain's NFT marketplace.",
 		profilePicture: oasisGallerySrc,
-		logo: <OasisGallerySvg />,
 		website: 'https://oasis.gallery/',
 		tags: ['Blockchain', 'Venom'],
 		onlyVenom: true,
@@ -144,7 +121,6 @@ export const blockchainProjects: Record<BlockchainProjectId, BlockchainProject> 
 		name: 'Snipa',
 		description: 'DeFi portfolio tracker designed for users to manage their assets.',
 		profilePicture: snipaSrc,
-		logo: <SnipaSvg />,
 		website: 'https://snipa.finance/',
 		tags: ['Blockchain', 'Venom'],
 		onlyVenom: true,
@@ -158,7 +134,6 @@ export const blockchainProjects: Record<BlockchainProjectId, BlockchainProject> 
 		description: 'Versatile and innovative blockchain that offers a range of use cases across various industries.',
 		profilePicture: venomBlockchainSrc,
 		banner: 'https://picsum.photos/id/1005/1500/500',
-		logo: <VenomBlockchainSvg />,
 		website: 'https://venom.foundation/',
 		tags: ['Blockchain', 'Venom'],
 		onlyVenom: true,
@@ -172,7 +147,6 @@ export const blockchainProjects: Record<BlockchainProjectId, BlockchainProject> 
 		description:
 			'Explore the world of interchain transactions by effortlessly transferring tokens from one chain to the other.',
 		profilePicture: venomBridgeSrc,
-		logo: <VenomBridgeSvg />,
 		website: 'https://venombridge.com/',
 		tags: ['Blockchain', 'Venom'],
 		onlyVenom: true,
@@ -184,7 +158,6 @@ export const blockchainProjects: Record<BlockchainProjectId, BlockchainProject> 
 		},
 		name: 'VenomPad',
 		description: 'First crowdfunding platform on Venom.',
-		logo: <VenomPadSvg />,
 		website: 'https://venompad.com/',
 		tags: ['Blockchain', 'Venom'],
 		onlyVenom: true,
@@ -196,7 +169,6 @@ export const blockchainProjects: Record<BlockchainProjectId, BlockchainProject> 
 		},
 		name: 'Venom Scan',
 		description: 'Search and explore the immutable records of the Venom blockchain.',
-		logo: <VenomScanSvg />,
 		website: 'https://venomscan.com/',
 		tags: ['Blockchain', 'Venom'],
 		onlyVenom: true,
@@ -208,7 +180,6 @@ export const blockchainProjects: Record<BlockchainProjectId, BlockchainProject> 
 		},
 		name: 'VenomStake',
 		description: 'Secure solution for staking VENOM tokens, enabling users to maximize rewards.',
-		logo: <VenomStakeSvg />,
 		website: 'https://venomstake.com/',
 		tags: ['Blockchain', 'Venom'],
 		onlyVenom: true,
@@ -220,7 +191,6 @@ export const blockchainProjects: Record<BlockchainProjectId, BlockchainProject> 
 		},
 		name: 'Venom Wallet',
 		description: 'Non-custodial wallet with a Multisig accounts option and Ledger support.',
-		logo: <VenomWalletSvg />,
 		website: 'https://venomwallet.com/',
 		tags: ['Blockchain', 'Venom'],
 		onlyVenom: true,
@@ -233,7 +203,6 @@ export const blockchainProjects: Record<BlockchainProjectId, BlockchainProject> 
 		name: 'Web3.World',
 		description: 'First DEX on Venom that enables seamless trading by pooling liquidity from investors.',
 		profilePicture: web3WorldSrc,
-		logo: <Web3WorldSvg />,
 		website: 'https://web3.world/',
 		tags: ['Blockchain', 'Venom'],
 		onlyVenom: true,
@@ -247,7 +216,6 @@ export const blockchainProjects: Record<BlockchainProjectId, BlockchainProject> 
 		description:
 			'Multichain NFT Marketplace exclusively for entertaining games & seamless experience, initially built on Venom network.',
 		profilePicture: ventorySrc,
-		logo: <VentorySvg />,
 		website: 'https://testnet.ventory.gg/',
 		tags: ['Blockchain', 'Venom'],
 		onlyVenom: true,
@@ -262,7 +230,6 @@ export const blockchainProjects: Record<BlockchainProjectId, BlockchainProject> 
 			'Derivatives DEX where you can trade a wide range of assets with up to 200x leverage and near-zero fees directly from your crypto wallet.',
 		profilePicture: gravixSrc,
 		banner: 'https://picsum.photos/id/379/1500/500',
-		logo: <GravixSvg />,
 		website: 'https://gravix.io/',
 		tags: ['Blockchain', 'Venom'],
 		onlyVenom: true,
@@ -278,7 +245,6 @@ export const blockchainProjects: Record<BlockchainProjectId, BlockchainProject> 
 		description: '베놈과 에버스케일을 포함한 TVM 블록체인의 주요 업데이트 내용을 공유하는 채널',
 		profilePicture: tvmSrc,
 		banner: 'https://picsum.photos/id/356/1500/500',
-		logo: <TvmSvg />,
 		tags: ['Blockchain', 'TVM'],
 	},
 
@@ -289,7 +255,6 @@ export const blockchainProjects: Record<BlockchainProjectId, BlockchainProject> 
 		},
 		name: 'isme',
 		description: 'ISME Test Evm',
-		logo: <VentorySvg />,
 		website: 'https://isme.is/',
 		tags: ['Blockchain', 'is.me'],
 	},
