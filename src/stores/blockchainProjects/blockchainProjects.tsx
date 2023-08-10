@@ -17,15 +17,10 @@ export enum BlockchainProjectId {
 	GENERAL = 'general',
 	ETH_WHALES = 'eth_whales',
 
-	NUMI = 'numi',
 	OASIS_GALLERY = 'oasis_gallery',
 	SNIPA = 'snipa',
 	VENOM_BLOCKCHAIN = 'venom_blockchain',
 	VENOM_BRIDGE = 'venom_bridge',
-	VENOM_PAD = 'venom_pad',
-	VENOM_SCAN = 'venom_scan',
-	VENOM_STAKE = 'venom_stake',
-	VENOM_WALLET = 'venom_wallet',
 	WEB3_WORLD = 'web3_world',
 	YLIDE = 'ylide',
 	VENTORY = 'ventory',
@@ -93,18 +88,6 @@ export const blockchainProjects: Record<BlockchainProjectId, BlockchainProject> 
 
 	// VENOM
 
-	[BlockchainProjectId.NUMI]: {
-		id: BlockchainProjectId.NUMI,
-		feedId: {
-			discussion: '1000000000000000000000000000000000000000000000000000000000000005' as Uint256,
-		},
-		name: 'Nümi',
-		description:
-			'Nümi is the first anime metaverse on Venom blockchain that provides players with limitless possibilities to create their own gaming experience.',
-		website: 'https://www.numi.net/',
-		tags: ['Blockchain', 'Venom'],
-		onlyVenom: true,
-	},
 	[BlockchainProjectId.OASIS_GALLERY]: {
 		id: BlockchainProjectId.OASIS_GALLERY,
 		feedId: {
@@ -153,50 +136,6 @@ export const blockchainProjects: Record<BlockchainProjectId, BlockchainProject> 
 		profilePicture: venomBridgeSrc,
 		website: 'https://venombridge.com/',
 		tags: ['DeFi', 'Venom'],
-		onlyVenom: true,
-	},
-	[BlockchainProjectId.VENOM_PAD]: {
-		id: BlockchainProjectId.VENOM_PAD,
-		feedId: {
-			discussion: '100000000000000000000000000000000000000000000000000000000000000a' as Uint256,
-		},
-		name: 'VenomPad',
-		description: 'First crowdfunding platform on Venom.',
-		website: 'https://venompad.com/',
-		tags: ['Blockchain', 'Venom'],
-		onlyVenom: true,
-	},
-	[BlockchainProjectId.VENOM_SCAN]: {
-		id: BlockchainProjectId.VENOM_SCAN,
-		feedId: {
-			discussion: '100000000000000000000000000000000000000000000000000000000000000b' as Uint256,
-		},
-		name: 'Venom Scan',
-		description: 'Search and explore the immutable records of the Venom blockchain.',
-		website: 'https://venomscan.com/',
-		tags: ['Blockchain', 'Venom'],
-		onlyVenom: true,
-	},
-	[BlockchainProjectId.VENOM_STAKE]: {
-		id: BlockchainProjectId.VENOM_STAKE,
-		feedId: {
-			discussion: '100000000000000000000000000000000000000000000000000000000000000c' as Uint256,
-		},
-		name: 'VenomStake',
-		description: 'Secure solution for staking VENOM tokens, enabling users to maximize rewards.',
-		website: 'https://venomstake.com/',
-		tags: ['Blockchain', 'Venom'],
-		onlyVenom: true,
-	},
-	[BlockchainProjectId.VENOM_WALLET]: {
-		id: BlockchainProjectId.VENOM_WALLET,
-		feedId: {
-			discussion: '100000000000000000000000000000000000000000000000000000000000000d' as Uint256,
-		},
-		name: 'Venom Wallet',
-		description: 'Non-custodial wallet with a Multisig accounts option and Ledger support.',
-		website: 'https://venomwallet.com/',
-		tags: ['Blockchain', 'Venom'],
 		onlyVenom: true,
 	},
 	[BlockchainProjectId.WEB3_WORLD]: {
