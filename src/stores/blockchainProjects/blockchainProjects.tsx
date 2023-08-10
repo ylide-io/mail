@@ -1,20 +1,36 @@
 import { Uint256 } from '@ylide/sdk';
 
 import { VENOM_FEED_ID } from '../../constants';
-import ethWhalesSrc from './profilePictures/ethWhales.png';
-import generalSrc from './profilePictures/general.png';
-import gravixSrc from './profilePictures/gravix.png';
-import oasisGallerySrc from './profilePictures/oasisGallery.png';
-import snipaSrc from './profilePictures/snipa.png';
-import tvmSrc from './profilePictures/tvm.png';
-import venomBlockchainSrc from './profilePictures/venomBlockchain.png';
-import venomBridgeSrc from './profilePictures/venomBridge.png';
-import ventorySrc from './profilePictures/ventory.png';
-import web3WorldSrc from './profilePictures/web3World.png';
-import ylideSrc from './profilePictures/ylide.png';
+import _defaultBannerSrc from './bannerImages/_default.png';
+import gravixBannerSrc from './bannerImages/gravix.jpg';
+import oasisGalleryBannerSrc from './bannerImages/oasisGallery.jpg';
+import snipaBannerSrc from './bannerImages/snipa.jpg';
+import venomBlockchainBannerSrc from './bannerImages/venomBlockchain.jpg';
+import venomBridgeBannerSrc from './bannerImages/venomBridge.jpg';
+import ventoryBannerSrc from './bannerImages/ventory.jpg';
+import web3WorldBannerSrc from './bannerImages/web3World.jpg';
+import ethWhalesSrc from './profileImages/ethWhales.png';
+import generalSrc from './profileImages/general.png';
+import gravixSrc from './profileImages/gravix.png';
+import oasisGallerySrc from './profileImages/oasisGallery.png';
+import snipaSrc from './profileImages/snipa.png';
+import tvmSrc from './profileImages/tvm.png';
+import venomBlockchainSrc from './profileImages/venomBlockchain.png';
+import venomBridgeSrc from './profileImages/venomBridge.png';
+import ventorySrc from './profileImages/ventory.png';
+import web3WorldSrc from './profileImages/web3World.png';
+import ylideSrc from './profileImages/ylide.png';
+
+function inputToBlockchainProject(input: BlockchainProject | BlockchainProjectId): BlockchainProject {
+	return typeof input === 'string' ? getBlockchainProjectById(input) : input;
+}
 
 export function getBlockchainProjectById(id: BlockchainProjectId) {
 	return blockchainProjects.find(p => p.id === id)!;
+}
+
+export function getBlockchainProjectBannerImage(input: BlockchainProject | BlockchainProjectId) {
+	return inputToBlockchainProject(input).bannerImage || _defaultBannerSrc;
 }
 
 //
@@ -27,8 +43,8 @@ export interface BlockchainProject {
 	};
 	name: string;
 	description: string;
-	profilePicture?: string;
-	banner?: string;
+	profileImage?: string;
+	bannerImage?: string;
 	website?: string;
 	tags: string[];
 	onlyVenom?: boolean;
@@ -68,7 +84,7 @@ export const blockchainProjects: BlockchainProject[] = [
 		},
 		name: 'General chat',
 		description: 'General chat to meet your web3 frens.',
-		profilePicture: generalSrc,
+		profileImage: generalSrc,
 		tags: [],
 	},
 	{
@@ -78,8 +94,7 @@ export const blockchainProjects: BlockchainProject[] = [
 		},
 		name: 'ETH Whales',
 		description: 'Here you can meet the fellow ETH supporters. Btw, messages are sent only via Ethereum chain.',
-		profilePicture: ethWhalesSrc,
-		banner: 'https://picsum.photos/id/723/1500/500',
+		profileImage: ethWhalesSrc,
 		tags: ['Ecosystems'],
 		onlyEtherium: true,
 	},
@@ -90,7 +105,7 @@ export const blockchainProjects: BlockchainProject[] = [
 		},
 		name: 'Ylide',
 		description: 'Protocol for wallet-to-wallet communication with built-in payments.',
-		profilePicture: ylideSrc,
+		profileImage: ylideSrc,
 		website: 'https://ylide.io/',
 		tags: ['Social', 'Venom'],
 	},
@@ -104,7 +119,8 @@ export const blockchainProjects: BlockchainProject[] = [
 		},
 		name: 'oasis.gallery',
 		description: "Trade unique digital assets on Venom blockchain's NFT marketplace.",
-		profilePicture: oasisGallerySrc,
+		profileImage: oasisGallerySrc,
+		bannerImage: oasisGalleryBannerSrc,
 		website: 'https://oasis.gallery/',
 		tags: ['NFT', 'Venom'],
 		onlyVenom: true,
@@ -116,7 +132,8 @@ export const blockchainProjects: BlockchainProject[] = [
 		},
 		name: 'Snipa',
 		description: 'DeFi portfolio tracker designed for users to manage their assets.',
-		profilePicture: snipaSrc,
+		profileImage: snipaSrc,
+		bannerImage: snipaBannerSrc,
 		website: 'https://snipa.finance/',
 		tags: ['DeFi', 'Venom'],
 		onlyVenom: true,
@@ -128,8 +145,8 @@ export const blockchainProjects: BlockchainProject[] = [
 		},
 		name: 'Venom Blockchain',
 		description: 'Versatile and innovative blockchain that offers a range of use cases across various industries.',
-		profilePicture: venomBlockchainSrc,
-		banner: 'https://picsum.photos/id/1005/1500/500',
+		profileImage: venomBlockchainSrc,
+		bannerImage: venomBlockchainBannerSrc,
 		website: 'https://venom.foundation/',
 		tags: ['Ecosystems', 'Venom'],
 		onlyVenom: true,
@@ -142,7 +159,8 @@ export const blockchainProjects: BlockchainProject[] = [
 		name: 'Venom Bridge',
 		description:
 			'Explore the world of interchain transactions by effortlessly transferring tokens from one chain to the other.',
-		profilePicture: venomBridgeSrc,
+		profileImage: venomBridgeSrc,
+		bannerImage: venomBridgeBannerSrc,
 		website: 'https://venombridge.com/',
 		tags: ['DeFi', 'Venom'],
 		onlyVenom: true,
@@ -154,7 +172,8 @@ export const blockchainProjects: BlockchainProject[] = [
 		},
 		name: 'Web3.World',
 		description: 'First DEX on Venom that enables seamless trading by pooling liquidity from investors.',
-		profilePicture: web3WorldSrc,
+		profileImage: web3WorldSrc,
+		bannerImage: web3WorldBannerSrc,
 		website: 'https://web3.world/',
 		tags: ['DeFi', 'Venom'],
 		onlyVenom: true,
@@ -167,7 +186,8 @@ export const blockchainProjects: BlockchainProject[] = [
 		name: 'Ventory',
 		description:
 			'Multichain NFT Marketplace exclusively for entertaining games & seamless experience, initially built on Venom network.',
-		profilePicture: ventorySrc,
+		profileImage: ventorySrc,
+		bannerImage: ventoryBannerSrc,
 		website: 'https://testnet.ventory.gg/',
 		tags: ['NFT', 'Venom'],
 		onlyVenom: true,
@@ -180,8 +200,8 @@ export const blockchainProjects: BlockchainProject[] = [
 		name: 'Gravix',
 		description:
 			'Derivatives DEX where you can trade a wide range of assets with up to 200x leverage and near-zero fees directly from your crypto wallet.',
-		profilePicture: gravixSrc,
-		banner: 'https://picsum.photos/id/379/1500/500',
+		profileImage: gravixSrc,
+		bannerImage: gravixBannerSrc,
 		website: 'https://gravix.io/',
 		tags: ['DeFi', 'Venom'],
 		onlyVenom: true,
@@ -197,8 +217,7 @@ export const blockchainProjects: BlockchainProject[] = [
 		},
 		name: 'TVM 주요 업데이트',
 		description: '베놈과 에버스케일을 포함한 TVM 블록체인의 주요 업데이트 내용을 공유하는 채널',
-		profilePicture: tvmSrc,
-		banner: 'https://picsum.photos/id/356/1500/500',
+		profileImage: tvmSrc,
 		tags: ['TVM', 'Ecosystems', 'Venom'],
 	},
 	{

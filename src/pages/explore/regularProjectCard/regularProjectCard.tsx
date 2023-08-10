@@ -23,7 +23,7 @@ export function RegularProjectCard({ project }: RegularProjectCardProps) {
 				navigate(href);
 			}}
 		>
-			<ProjectAvatar className={css.ava} image={project.profilePicture || 'https://picsum.photos/id/1067/200'} />
+			<ProjectAvatar className={css.ava} image={project.profileImage || 'https://picsum.photos/id/1067/200'} />
 
 			<div className={css.name}>{project.name}</div>
 

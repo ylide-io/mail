@@ -179,7 +179,7 @@ export function SidebarProject({ project }: SidebarProjectProps) {
 				navigate(href);
 			}}
 		>
-			<ProjectAvatar className={css.sidebarProjectLogo} image={project.profilePicture} blockie={project.name} />
+			<ProjectAvatar className={css.sidebarProjectLogo} image={project.profileImage} blockie={project.name} />
 
 			<div className={css.sidebarProjectTitle}>{project.name}</div>
 		</a>

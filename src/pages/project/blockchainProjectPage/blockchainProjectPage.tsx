@@ -21,6 +21,7 @@ import { analytics } from '../../../stores/Analytics';
 import {
 	BlockchainProject,
 	BlockchainProjectId,
+	getBlockchainProjectBannerImage,
 	getBlockchainProjectById,
 } from '../../../stores/blockchainProjects/blockchainProjects';
 import { browserStorage } from '../../../stores/browserStorage';
@@ -380,15 +381,13 @@ export const BlockchainProjectPage = observer(() => {
 				<div key={projectId}>
 					<BlockchainProjectBanner
 						className={css.projectBanner}
-						image={
-							project.banner || 'https://cdn.pixabay.com/photo/2016/09/29/13/08/planet-1702788_1280.jpg'
-						}
+						image={getBlockchainProjectBannerImage(project)}
 					/>
 
 					<ProjectAvatar
 						className={css.projectLogo}
 						innerClassName={css.projectLogoInner}
-						image={project.profilePicture || 'https://picsum.photos/id/1067/200'}
+						image={project.profileImage || 'https://picsum.photos/id/1067/200'}
 					/>
 
 					<h1 className={css.projectName}>{project.name}</h1>
