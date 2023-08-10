@@ -55,6 +55,8 @@ export interface BlockchainProject {
 }
 
 export const blockchainProjects: Record<BlockchainProjectId, BlockchainProject> = {
+	// GENERAL
+
 	[BlockchainProjectId.GENERAL]: {
 		id: BlockchainProjectId.GENERAL,
 		feedId: {
@@ -74,7 +76,7 @@ export const blockchainProjects: Record<BlockchainProjectId, BlockchainProject> 
 		description: 'Here you can meet the fellow ETH supporters. Btw, messages are sent only via Ethereum chain.',
 		profilePicture: ethWhalesSrc,
 		banner: 'https://picsum.photos/id/723/1500/500',
-		tags: ['Blockchain', 'Ethereum'],
+		tags: ['Ecosystems'],
 		onlyEtherium: true,
 	},
 	[BlockchainProjectId.YLIDE]: {
@@ -86,8 +88,10 @@ export const blockchainProjects: Record<BlockchainProjectId, BlockchainProject> 
 		description: 'Protocol for wallet-to-wallet communication with built-in payments.',
 		profilePicture: ylideSrc,
 		website: 'https://ylide.io/',
-		tags: ['Blockchain', 'Ylide'],
+		tags: ['Social', 'Venom'],
 	},
+
+	// VENOM
 
 	[BlockchainProjectId.NUMI]: {
 		id: BlockchainProjectId.NUMI,
@@ -110,7 +114,7 @@ export const blockchainProjects: Record<BlockchainProjectId, BlockchainProject> 
 		description: "Trade unique digital assets on Venom blockchain's NFT marketplace.",
 		profilePicture: oasisGallerySrc,
 		website: 'https://oasis.gallery/',
-		tags: ['Blockchain', 'Venom'],
+		tags: ['NFT', 'Venom'],
 		onlyVenom: true,
 	},
 	[BlockchainProjectId.SNIPA]: {
@@ -122,7 +126,7 @@ export const blockchainProjects: Record<BlockchainProjectId, BlockchainProject> 
 		description: 'DeFi portfolio tracker designed for users to manage their assets.',
 		profilePicture: snipaSrc,
 		website: 'https://snipa.finance/',
-		tags: ['Blockchain', 'Venom'],
+		tags: ['DeFi', 'Venom'],
 		onlyVenom: true,
 	},
 	[BlockchainProjectId.VENOM_BLOCKCHAIN]: {
@@ -135,7 +139,7 @@ export const blockchainProjects: Record<BlockchainProjectId, BlockchainProject> 
 		profilePicture: venomBlockchainSrc,
 		banner: 'https://picsum.photos/id/1005/1500/500',
 		website: 'https://venom.foundation/',
-		tags: ['Blockchain', 'Venom'],
+		tags: ['Ecosystems', 'Venom'],
 		onlyVenom: true,
 	},
 	[BlockchainProjectId.VENOM_BRIDGE]: {
@@ -148,7 +152,7 @@ export const blockchainProjects: Record<BlockchainProjectId, BlockchainProject> 
 			'Explore the world of interchain transactions by effortlessly transferring tokens from one chain to the other.',
 		profilePicture: venomBridgeSrc,
 		website: 'https://venombridge.com/',
-		tags: ['Blockchain', 'Venom'],
+		tags: ['DeFi', 'Venom'],
 		onlyVenom: true,
 	},
 	[BlockchainProjectId.VENOM_PAD]: {
@@ -204,7 +208,7 @@ export const blockchainProjects: Record<BlockchainProjectId, BlockchainProject> 
 		description: 'First DEX on Venom that enables seamless trading by pooling liquidity from investors.',
 		profilePicture: web3WorldSrc,
 		website: 'https://web3.world/',
-		tags: ['Blockchain', 'Venom'],
+		tags: ['DeFi', 'Venom'],
 		onlyVenom: true,
 	},
 	[BlockchainProjectId.VENTORY]: {
@@ -217,7 +221,7 @@ export const blockchainProjects: Record<BlockchainProjectId, BlockchainProject> 
 			'Multichain NFT Marketplace exclusively for entertaining games & seamless experience, initially built on Venom network.',
 		profilePicture: ventorySrc,
 		website: 'https://testnet.ventory.gg/',
-		tags: ['Blockchain', 'Venom'],
+		tags: ['NFT', 'Venom'],
 		onlyVenom: true,
 	},
 	[BlockchainProjectId.GRAVIX]: {
@@ -231,9 +235,11 @@ export const blockchainProjects: Record<BlockchainProjectId, BlockchainProject> 
 		profilePicture: gravixSrc,
 		banner: 'https://picsum.photos/id/379/1500/500',
 		website: 'https://gravix.io/',
-		tags: ['Blockchain', 'Venom'],
+		tags: ['DeFi', 'Venom'],
 		onlyVenom: true,
 	},
+
+	// OTHERS
 
 	[BlockchainProjectId.TVM]: {
 		id: BlockchainProjectId.TVM,
@@ -245,9 +251,8 @@ export const blockchainProjects: Record<BlockchainProjectId, BlockchainProject> 
 		description: '베놈과 에버스케일을 포함한 TVM 블록체인의 주요 업데이트 내용을 공유하는 채널',
 		profilePicture: tvmSrc,
 		banner: 'https://picsum.photos/id/356/1500/500',
-		tags: ['Blockchain', 'TVM'],
+		tags: ['TVM', 'Ecosystems', 'Venom'],
 	},
-
 	[BlockchainProjectId.ISME_TEST]: {
 		id: BlockchainProjectId.ISME_TEST,
 		feedId: {
