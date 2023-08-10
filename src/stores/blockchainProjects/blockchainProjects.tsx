@@ -2,21 +2,37 @@ import { Uint256 } from '@ylide/sdk';
 
 import { VENOM_FEED_ID } from '../../constants';
 import _defaultBannerSrc from './bannerImages/_default.png';
+import betFuryBannerSrc from './bannerImages/betFury.jpg';
+import cryptoGvrBannerSrc from './bannerImages/cryptoGvr.jpg';
+import gnosisBuildersBannerSrc from './bannerImages/gnosisBuilders.jpg';
 import gravixBannerSrc from './bannerImages/gravix.jpg';
 import oasisGalleryBannerSrc from './bannerImages/oasisGallery.jpg';
+import oneClickCryptoBannerSrc from './bannerImages/oneClickCrypto.jpg';
 import snipaBannerSrc from './bannerImages/snipa.jpg';
+import staxBannerSrc from './bannerImages/stax.jpg';
+import venomApeClubBannerSrc from './bannerImages/venomApeClub.jpg';
 import venomBlockchainBannerSrc from './bannerImages/venomBlockchain.jpg';
 import venomBridgeBannerSrc from './bannerImages/venomBridge.jpg';
+import venomIdBannerSrc from './bannerImages/venomId.jpg';
+import venomRecapBannerSrc from './bannerImages/venomRecap.jpg';
 import ventoryBannerSrc from './bannerImages/ventory.jpg';
 import web3WorldBannerSrc from './bannerImages/web3World.jpg';
+import betFurySrc from './profileImages/betFury.jpg';
+import cryptoGvrSrc from './profileImages/cryptoGvr.jpg';
 import ethWhalesSrc from './profileImages/ethWhales.png';
 import generalSrc from './profileImages/general.png';
+import gnosisBuildersSrc from './profileImages/gnosisBuilders.jpg';
 import gravixSrc from './profileImages/gravix.png';
 import oasisGallerySrc from './profileImages/oasisGallery.png';
+import oneClickCryptoSrc from './profileImages/oneClickCrypto.jpg';
 import snipaSrc from './profileImages/snipa.png';
+import staxSrc from './profileImages/stax.jpg';
 import tvmSrc from './profileImages/tvm.png';
+import venomApeClubSrc from './profileImages/venomApeClub.jpg';
 import venomBlockchainSrc from './profileImages/venomBlockchain.png';
 import venomBridgeSrc from './profileImages/venomBridge.png';
+import venomIdSrc from './profileImages/venomId.jpg';
+import venomRecapSrc from './profileImages/venomRecap.jpg';
 import ventorySrc from './profileImages/ventory.png';
 import web3WorldSrc from './profileImages/web3World.png';
 import ylideSrc from './profileImages/ylide.png';
@@ -34,6 +50,8 @@ export function getBlockchainProjectBannerImage(input: BlockchainProject | Block
 }
 
 //
+
+const NO_FEED_ID = VENOM_FEED_ID;
 
 export interface BlockchainProject {
 	id: BlockchainProjectId;
@@ -67,10 +85,18 @@ export enum BlockchainProjectId {
 	WEB3_WORLD = 'web3_world',
 	VENTORY = 'ventory',
 	GRAVIX = 'gravix',
+	STAX = 'stax',
+	VENOM_ID = 'venom_id',
+	VENOM_RECAP = 'venom_recap',
+	VENOM_APE_CLUB = 'venom_ape_club',
 
 	// OTHERS
 
 	TVM = 'tvm',
+	ONE_CLICK_CRYPTO = 'one_click_crypto',
+	GNOSIS_BUILDERS = 'gnosis_builders',
+	CRYPTO_GVR = 'crypto_gvr',
+	BET_FURY = 'bet_fury',
 	ISME_TEST = 'isme_test',
 }
 
@@ -206,6 +232,63 @@ export const blockchainProjects: BlockchainProject[] = [
 		tags: ['DeFi', 'Venom'],
 		onlyVenom: true,
 	},
+	{
+		id: BlockchainProjectId.STAX,
+		feedId: {
+			official: NO_FEED_ID,
+			discussion: NO_FEED_ID,
+		},
+		name: 'Stax',
+		description:
+			'Stax is a unique digital platform merging art & gaming. It features 7777 unique 3D artworks & interactive games. Your NFT is a stake in Stax, with 90% profits to holders.',
+		profileImage: staxSrc,
+		bannerImage: staxBannerSrc,
+		website: 'https://stax.live',
+		tags: ['NFT', 'Venom'],
+		onlyVenom: true,
+	},
+	{
+		id: BlockchainProjectId.VENOM_ID,
+		feedId: {
+			official: NO_FEED_ID,
+			discussion: NO_FEED_ID,
+		},
+		name: 'Venom ID',
+		description:
+			'Venom IDs are user-friendly solution for organizing your virtual identity in one simple link on the venom blockchain. Claim your Venom ID now!',
+		profileImage: venomIdSrc,
+		bannerImage: venomIdBannerSrc,
+		website: 'https://venomid.network/',
+		tags: ['Social', 'Venom'],
+		onlyVenom: true,
+	},
+	{
+		id: BlockchainProjectId.VENOM_RECAP,
+		feedId: {
+			official: NO_FEED_ID,
+			discussion: NO_FEED_ID,
+		},
+		name: 'Venom Recap',
+		description:
+			'Discover the latest news of Venom ⚡ Supported by @sc_ventures_, and access top-tier news, insights, and knowledge on Venom.',
+		profileImage: venomRecapSrc,
+		bannerImage: venomRecapBannerSrc,
+		website: 'https://twitter.com/VenomRecap',
+		tags: ['Social', 'Venom'],
+	},
+	{
+		id: BlockchainProjectId.VENOM_APE_CLUB,
+		feedId: {
+			official: NO_FEED_ID,
+			discussion: NO_FEED_ID,
+		},
+		name: 'Venom Ape Club',
+		description: '3,333 rare, random & rad Apes living on Venom Network.',
+		profileImage: venomApeClubSrc,
+		bannerImage: venomApeClubBannerSrc,
+		website: 'https://venomape.club/',
+		tags: ['NFT', 'Venom'],
+	},
 
 	// OTHERS
 
@@ -219,6 +302,60 @@ export const blockchainProjects: BlockchainProject[] = [
 		description: '베놈과 에버스케일을 포함한 TVM 블록체인의 주요 업데이트 내용을 공유하는 채널',
 		profileImage: tvmSrc,
 		tags: ['TVM', 'Ecosystems', 'Venom'],
+	},
+	{
+		id: BlockchainProjectId.ONE_CLICK_CRYPTO,
+		feedId: {
+			official: NO_FEED_ID,
+			discussion: NO_FEED_ID,
+		},
+		name: 'One Click Crypto',
+		description: 'Diversify your portfolio, save on gas fees, and generate best risk-reward yield with One Click.',
+		profileImage: oneClickCryptoSrc,
+		bannerImage: oneClickCryptoBannerSrc,
+		website: 'https://www.oneclick.fi/',
+		tags: ['DeFi'],
+	},
+	{
+		id: BlockchainProjectId.GNOSIS_BUILDERS,
+		feedId: {
+			official: NO_FEED_ID,
+			discussion: NO_FEED_ID,
+		},
+		name: 'Gnosis Builders',
+		description: 'Driving the adoption and development of the @gnosischain ecosystem🦉💚',
+		profileImage: gnosisBuildersSrc,
+		bannerImage: gnosisBuildersBannerSrc,
+		website: 'https://www.gnosis.builders/',
+		tags: ['Ecosystems', 'Social'],
+	},
+	{
+		id: BlockchainProjectId.CRYPTO_GVR,
+		feedId: {
+			official: NO_FEED_ID,
+			discussion: NO_FEED_ID,
+		},
+		name: 'Crypto GVR',
+		description:
+			'A little bit about finance, a little bit about geopolitics, not a word about race, gender. Politeness.',
+		profileImage: cryptoGvrSrc,
+		bannerImage: cryptoGvrBannerSrc,
+		website: 'https://twitter.com/GVRCALLS',
+		tags: ['Research'],
+	},
+	{
+		id: BlockchainProjectId.BET_FURY,
+		feedId: {
+			official: NO_FEED_ID,
+			discussion: NO_FEED_ID,
+		},
+		name: 'BetFury',
+		description:
+			'Enjoy 5000+ crypto games, fast payouts and 24/7 live support. Make the best of the superior Bitcoin Casino.',
+		profileImage: betFurySrc,
+		bannerImage: betFuryBannerSrc,
+		website: 'https://betfury.io/',
+		tags: ['Gaming'],
 	},
 	{
 		id: BlockchainProjectId.ISME_TEST,
