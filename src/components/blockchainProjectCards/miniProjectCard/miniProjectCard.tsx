@@ -2,12 +2,12 @@ import clsx from 'clsx';
 import { observer } from 'mobx-react';
 import { generatePath } from 'react-router-dom';
 
-import { ProjectAvatar } from '../../../components/avatar/avatar';
-import { isSidebarOpen } from '../../../components/genericLayout/sidebar/sidebarMenu';
-import { PropsWithClassName } from '../../../components/props';
 import { BlockchainProject } from '../../../stores/blockchainProjects/blockchainProjects';
 import { RoutePath } from '../../../stores/routePath';
 import { useNav } from '../../../utils/url';
+import { ProjectAvatar } from '../../avatar/avatar';
+import { isSidebarOpen } from '../../genericLayout/sidebar/sidebarMenu';
+import { PropsWithClassName } from '../../props';
 import css from './miniProjectCard.module.scss';
 
 export interface MiniProjectCardProps extends PropsWithClassName {

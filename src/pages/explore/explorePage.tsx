@@ -1,3 +1,6 @@
+import { MiniProjectCard } from '../../components/blockchainProjectCards/miniProjectCard/miniProjectCard';
+import { RegularProjectCard } from '../../components/blockchainProjectCards/regularProjectCard/regularProjectCard';
+import { RichProjectCard } from '../../components/blockchainProjectCards/richProjectCard/richProjectCard';
 import { RegularPageContent } from '../../components/genericLayout/content/regularPageContent/regularPageContent';
 import { GenericLayout } from '../../components/genericLayout/genericLayout';
 import { ReactComponent as TagSvg } from '../../icons/ic28/tag.svg';
@@ -8,9 +11,6 @@ import {
 } from '../../stores/blockchainProjects/blockchainProjects';
 import bannerSrc from './banner.png';
 import css from './explorePage.module.scss';
-import { MiniProjectCard } from './miniProjectCard/miniProjectCard';
-import { RegularProjectCard } from './regularProjectCard/regularProjectCard';
-import { RichProjectCard } from './richProjectCard/richProjectCard';
 
 export function ExplorePage() {
 	return (

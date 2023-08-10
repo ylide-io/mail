@@ -1,9 +1,9 @@
 import { generatePath } from 'react-router-dom';
 
-import { ProjectAvatar } from '../../../components/avatar/avatar';
 import { BlockchainProject } from '../../../stores/blockchainProjects/blockchainProjects';
 import { RoutePath } from '../../../stores/routePath';
 import { useNav } from '../../../utils/url';
+import { ProjectAvatar } from '../../avatar/avatar';
 import css from './regularProjectCard.module.scss';
 
 export interface RegularProjectCardProps {

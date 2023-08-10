@@ -1,13 +1,13 @@
 import { generatePath } from 'react-router-dom';
 
-import { ProjectAvatar } from '../../../components/avatar/avatar';
-import { BlockchainProjectBanner } from '../../../components/blockchainProjectBanner/blockchainProjectBanner';
 import {
 	BlockchainProject,
 	getBlockchainProjectBannerImage,
 } from '../../../stores/blockchainProjects/blockchainProjects';
 import { RoutePath } from '../../../stores/routePath';
 import { useNav } from '../../../utils/url';
+import { ProjectAvatar } from '../../avatar/avatar';
+import { BlockchainProjectBanner } from '../../blockchainProjectBanner/blockchainProjectBanner';
 import css from './richProjectCard.module.scss';
 
 export interface RichProjectCardProps {

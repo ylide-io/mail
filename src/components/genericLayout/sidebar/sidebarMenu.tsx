@@ -35,7 +35,7 @@ import { useOpenMailCompose } from '../../../utils/mail';
 import { useIsMatchesPath, useNav } from '../../../utils/url';
 import { ActionButton, ActionButtonLook, ActionButtonSize } from '../../ActionButton/ActionButton';
 import { AdaptiveText } from '../../adaptiveText/adaptiveText';
-import { ProjectAvatar } from '../../avatar/avatar';
+import { MiniProjectCard } from '../../blockchainProjectCards/miniProjectCard/miniProjectCard';
 import { PropsWithClassName } from '../../props';
 import { toast } from '../../toast/toast';
 import css from './sidebarMenu.module.scss';
@@ -164,26 +164,10 @@ interface SidebarProjectProps {
 }
 
 export function SidebarProject({ project }: SidebarProjectProps) {
-	const navigate = useNav();
-
 	const href = generatePath(RoutePath.PROJECT, { projectId: project.id });
 	const isActive = useIsMatchesPath(href);
 
-	return (
-		<a
-			className={clsx(css.sidebarProject, isActive && css.sidebarProject_active)}
-			href={href}
-			onClick={e => {
-				e.preventDefault();
-				isSidebarOpen.set(false);
-				navigate(href);
-			}}
-		>
-			<ProjectAvatar className={css.sidebarProjectLogo} image={project.profileImage} blockie={project.name} />
-
-			<div className={css.sidebarProjectTitle}>{project.name}</div>
-		</a>
-	);
+	return <MiniProjectCard className={clsx(isActive && css.sidebarProject_active)} project={project} />;
 }
 
 //
