@@ -14,7 +14,7 @@ import { SharePopup } from '../../../components/sharePopup/sharePopup';
 import { YlideLoader } from '../../../components/ylideLoader/ylideLoader';
 import { ReactComponent as ShareSvg } from '../../../icons/ic20/share.svg';
 import { MessageDecodedTextDataType } from '../../../indexedDB/IndexedDB';
-import { BlockchainProjectId, blockchainProjects } from '../../../stores/blockchainProjects/blockchainProjects';
+import { BlockchainProjectId, getBlockchainProjectById } from '../../../stores/blockchainProjects/blockchainProjects';
 import { RoutePath } from '../../../stores/routePath';
 import { HorizontalAlignment } from '../../../utils/alignment';
 import { invariant } from '../../../utils/assert';
@@ -27,7 +27,7 @@ export const BlockchainProjectPostPage = observer(() => {
 	invariant(projectId);
 	invariant(postId);
 
-	const project = blockchainProjects[projectId];
+	const project = getBlockchainProjectById(projectId);
 	const postPath = generateOfficialPostPath(projectId, postId);
 
 	const { isLoading, data } = useQuery(['feed', 'blockchain-project', 'post', postId], {

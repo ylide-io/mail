@@ -13,25 +13,11 @@ import ventorySrc from './profilePictures/ventory.png';
 import web3WorldSrc from './profilePictures/web3World.png';
 import ylideSrc from './profilePictures/ylide.png';
 
-export enum BlockchainProjectId {
-	GENERAL = 'general',
-	ETH_WHALES = 'eth_whales',
-
-	OASIS_GALLERY = 'oasis_gallery',
-	SNIPA = 'snipa',
-	VENOM_BLOCKCHAIN = 'venom_blockchain',
-	VENOM_BRIDGE = 'venom_bridge',
-	WEB3_WORLD = 'web3_world',
-	YLIDE = 'ylide',
-	VENTORY = 'ventory',
-	GRAVIX = 'gravix',
-
-	TVM = 'tvm',
-
-	// TESTS
-
-	ISME_TEST = 'isme_test',
+export function getBlockchainProjectById(id: BlockchainProjectId) {
+	return blockchainProjects.find(p => p.id === id)!;
 }
+
+//
 
 export interface BlockchainProject {
 	id: BlockchainProjectId;
@@ -49,10 +35,33 @@ export interface BlockchainProject {
 	onlyEtherium?: boolean;
 }
 
-export const blockchainProjects: Record<BlockchainProjectId, BlockchainProject> = {
+export enum BlockchainProjectId {
 	// GENERAL
 
-	[BlockchainProjectId.GENERAL]: {
+	GENERAL = 'general',
+	ETH_WHALES = 'eth_whales',
+	YLIDE = 'ylide',
+
+	// VENOM
+
+	OASIS_GALLERY = 'oasis_gallery',
+	SNIPA = 'snipa',
+	VENOM_BLOCKCHAIN = 'venom_blockchain',
+	VENOM_BRIDGE = 'venom_bridge',
+	WEB3_WORLD = 'web3_world',
+	VENTORY = 'ventory',
+	GRAVIX = 'gravix',
+
+	// OTHERS
+
+	TVM = 'tvm',
+	ISME_TEST = 'isme_test',
+}
+
+export const blockchainProjects: BlockchainProject[] = [
+	// GENERAL
+
+	{
 		id: BlockchainProjectId.GENERAL,
 		feedId: {
 			discussion: '2000000000000000000000000000000000000000000000000000000000000003' as Uint256,
@@ -62,7 +71,7 @@ export const blockchainProjects: Record<BlockchainProjectId, BlockchainProject> 
 		profilePicture: generalSrc,
 		tags: [],
 	},
-	[BlockchainProjectId.ETH_WHALES]: {
+	{
 		id: BlockchainProjectId.ETH_WHALES,
 		feedId: {
 			discussion: '2000000000000000000000000000000000000000000000000000000000000004' as Uint256,
@@ -74,7 +83,7 @@ export const blockchainProjects: Record<BlockchainProjectId, BlockchainProject> 
 		tags: ['Ecosystems'],
 		onlyEtherium: true,
 	},
-	[BlockchainProjectId.YLIDE]: {
+	{
 		id: BlockchainProjectId.YLIDE,
 		feedId: {
 			discussion: '100000000000000000000000000000000000000000000000000000000000000f' as Uint256,
@@ -88,7 +97,7 @@ export const blockchainProjects: Record<BlockchainProjectId, BlockchainProject> 
 
 	// VENOM
 
-	[BlockchainProjectId.OASIS_GALLERY]: {
+	{
 		id: BlockchainProjectId.OASIS_GALLERY,
 		feedId: {
 			discussion: '1000000000000000000000000000000000000000000000000000000000000006' as Uint256,
@@ -100,7 +109,7 @@ export const blockchainProjects: Record<BlockchainProjectId, BlockchainProject> 
 		tags: ['NFT', 'Venom'],
 		onlyVenom: true,
 	},
-	[BlockchainProjectId.SNIPA]: {
+	{
 		id: BlockchainProjectId.SNIPA,
 		feedId: {
 			discussion: '1000000000000000000000000000000000000000000000000000000000000007' as Uint256,
@@ -112,7 +121,7 @@ export const blockchainProjects: Record<BlockchainProjectId, BlockchainProject> 
 		tags: ['DeFi', 'Venom'],
 		onlyVenom: true,
 	},
-	[BlockchainProjectId.VENOM_BLOCKCHAIN]: {
+	{
 		id: BlockchainProjectId.VENOM_BLOCKCHAIN,
 		feedId: {
 			discussion: VENOM_FEED_ID,
@@ -125,7 +134,7 @@ export const blockchainProjects: Record<BlockchainProjectId, BlockchainProject> 
 		tags: ['Ecosystems', 'Venom'],
 		onlyVenom: true,
 	},
-	[BlockchainProjectId.VENOM_BRIDGE]: {
+	{
 		id: BlockchainProjectId.VENOM_BRIDGE,
 		feedId: {
 			discussion: '1000000000000000000000000000000000000000000000000000000000000009' as Uint256,
@@ -138,7 +147,7 @@ export const blockchainProjects: Record<BlockchainProjectId, BlockchainProject> 
 		tags: ['DeFi', 'Venom'],
 		onlyVenom: true,
 	},
-	[BlockchainProjectId.WEB3_WORLD]: {
+	{
 		id: BlockchainProjectId.WEB3_WORLD,
 		feedId: {
 			discussion: '100000000000000000000000000000000000000000000000000000000000000e' as Uint256,
@@ -150,7 +159,7 @@ export const blockchainProjects: Record<BlockchainProjectId, BlockchainProject> 
 		tags: ['DeFi', 'Venom'],
 		onlyVenom: true,
 	},
-	[BlockchainProjectId.VENTORY]: {
+	{
 		id: BlockchainProjectId.VENTORY,
 		feedId: {
 			discussion: '1000000000000000000000000000000000000000000000000000000000000010' as Uint256,
@@ -163,7 +172,7 @@ export const blockchainProjects: Record<BlockchainProjectId, BlockchainProject> 
 		tags: ['NFT', 'Venom'],
 		onlyVenom: true,
 	},
-	[BlockchainProjectId.GRAVIX]: {
+	{
 		id: BlockchainProjectId.GRAVIX,
 		feedId: {
 			discussion: '1000000000000000000000000000000000000000000000000000000000000011' as Uint256,
@@ -180,7 +189,7 @@ export const blockchainProjects: Record<BlockchainProjectId, BlockchainProject> 
 
 	// OTHERS
 
-	[BlockchainProjectId.TVM]: {
+	{
 		id: BlockchainProjectId.TVM,
 		feedId: {
 			official: '2000000000000000000000000000000000000000000000000000000000000001' as Uint256,
@@ -192,7 +201,7 @@ export const blockchainProjects: Record<BlockchainProjectId, BlockchainProject> 
 		banner: 'https://picsum.photos/id/356/1500/500',
 		tags: ['TVM', 'Ecosystems', 'Venom'],
 	},
-	[BlockchainProjectId.ISME_TEST]: {
+	{
 		id: BlockchainProjectId.ISME_TEST,
 		feedId: {
 			discussion: '11d558ad3a44a6b7476209ccaecdfaf55462d9bb0edcc69c64c0f94f9b2ecc98' as Uint256,
@@ -202,4 +211,4 @@ export const blockchainProjects: Record<BlockchainProjectId, BlockchainProject> 
 		website: 'https://isme.is/',
 		tags: ['Blockchain', 'is.me'],
 	},
-};
+];

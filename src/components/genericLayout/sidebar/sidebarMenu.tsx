@@ -23,7 +23,7 @@ import { analytics } from '../../../stores/Analytics';
 import {
 	BlockchainProject,
 	BlockchainProjectId,
-	blockchainProjects,
+	getBlockchainProjectById,
 } from '../../../stores/blockchainProjects/blockchainProjects';
 import { browserStorage } from '../../../stores/browserStorage';
 import domain from '../../../stores/Domain';
@@ -359,7 +359,7 @@ export const SidebarMenu = observer(() => {
 		if (REACT_APP__APP_MODE !== AppMode.HUB) return;
 
 		function renderProjects(projects: BlockchainProjectId[]) {
-			return projects.map(id => <SidebarProject key={id} project={blockchainProjects[id]} />);
+			return projects.map(id => <SidebarProject key={id} project={getBlockchainProjectById(id)} />);
 		}
 
 		return (

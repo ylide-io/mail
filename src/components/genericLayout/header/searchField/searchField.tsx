@@ -22,9 +22,7 @@ export const SearchField = ({ className }: PropsWithClassName) => {
 	const [results, setResults] = useState<BlockchainProject[]>([]);
 
 	useEffect(() => {
-		setResults(
-			cleanTerm ? Object.values(blockchainProjects).filter(p => p.name.toLowerCase().includes(cleanTerm)) : [],
-		);
+		setResults(cleanTerm ? blockchainProjects.filter(p => p.name.toLowerCase().includes(cleanTerm)) : []);
 
 		setPopupOpen(!!cleanTerm);
 	}, [term]);

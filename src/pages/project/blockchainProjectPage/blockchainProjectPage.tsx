@@ -21,7 +21,7 @@ import { analytics } from '../../../stores/Analytics';
 import {
 	BlockchainProject,
 	BlockchainProjectId,
-	blockchainProjects,
+	getBlockchainProjectById,
 } from '../../../stores/blockchainProjects/blockchainProjects';
 import { browserStorage } from '../../../stores/browserStorage';
 import domain, { useEvmAccounts, useVenomAccounts } from '../../../stores/Domain';
@@ -340,7 +340,7 @@ export const BlockchainProjectPage = observer(() => {
 	const { projectId } = useParams<{ projectId?: BlockchainProjectId }>();
 	invariant(projectId, 'Blockchain project ID must be specified');
 
-	const project = blockchainProjects[projectId];
+	const project = getBlockchainProjectById(projectId);
 	invariant(project, 'Blockchain project not found');
 
 	const part =

@@ -1,7 +1,11 @@
 import { RegularPageContent } from '../../components/genericLayout/content/regularPageContent/regularPageContent';
 import { GenericLayout } from '../../components/genericLayout/genericLayout';
 import { ReactComponent as TagSvg } from '../../icons/ic28/tag.svg';
-import { BlockchainProjectId, blockchainProjects } from '../../stores/blockchainProjects/blockchainProjects';
+import {
+	BlockchainProjectId,
+	blockchainProjects,
+	getBlockchainProjectById,
+} from '../../stores/blockchainProjects/blockchainProjects';
 import bannerSrc from './banner.png';
 import css from './explorePage.module.scss';
 import { RegularProjectCard } from './regularProjectCard/regularProjectCard';
@@ -23,8 +27,8 @@ export function ExplorePage({}: ExplorePageProps) {
 					</h1>
 
 					<div className={css.bigGrid}>
-						<RichProjectCard project={blockchainProjects[BlockchainProjectId.VENOM_BLOCKCHAIN]} />
-						<RichProjectCard project={blockchainProjects[BlockchainProjectId.ETH_WHALES]} />
+						<RichProjectCard project={getBlockchainProjectById(BlockchainProjectId.VENOM_BLOCKCHAIN)} />
+						<RichProjectCard project={getBlockchainProjectById(BlockchainProjectId.ETH_WHALES)} />
 					</div>
 
 					<div>
@@ -37,7 +41,7 @@ export function ExplorePage({}: ExplorePageProps) {
 						</div>
 
 						<div className={css.smallGrid}>
-							{Object.values(blockchainProjects)
+							{blockchainProjects
 								.filter(p => p.tags.includes('Blockchain'))
 								.map(project => (
 									<RegularProjectCard project={project} />
@@ -46,8 +50,8 @@ export function ExplorePage({}: ExplorePageProps) {
 					</div>
 
 					<div className={css.bigGrid}>
-						<RichProjectCard project={blockchainProjects[BlockchainProjectId.TVM]} />
-						<RichProjectCard project={blockchainProjects[BlockchainProjectId.GRAVIX]} />
+						<RichProjectCard project={getBlockchainProjectById(BlockchainProjectId.TVM)} />
+						<RichProjectCard project={getBlockchainProjectById(BlockchainProjectId.GRAVIX)} />
 					</div>
 
 					<div>
@@ -60,7 +64,7 @@ export function ExplorePage({}: ExplorePageProps) {
 						</div>
 
 						<div className={css.smallGrid}>
-							{Object.values(blockchainProjects)
+							{blockchainProjects
 								.filter(p => p.tags.includes('Venom'))
 								.map(project => (
 									<RegularProjectCard project={project} />
