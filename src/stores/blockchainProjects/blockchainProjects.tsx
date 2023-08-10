@@ -121,7 +121,7 @@ export const blockchainProjects: BlockchainProject[] = [
 		name: 'ETH Whales',
 		description: 'Here you can meet the fellow ETH supporters. Btw, messages are sent only via Ethereum chain.',
 		profileImage: ethWhalesSrc,
-		tags: ['Ecosystems'],
+		tags: ['Ecosystem'],
 		onlyEtherium: true,
 	},
 	{
@@ -174,7 +174,7 @@ export const blockchainProjects: BlockchainProject[] = [
 		profileImage: venomBlockchainSrc,
 		bannerImage: venomBlockchainBannerSrc,
 		website: 'https://venom.foundation/',
-		tags: ['Ecosystems', 'Venom'],
+		tags: ['Ecosystem', 'Venom'],
 		onlyVenom: true,
 	},
 	{
@@ -301,7 +301,7 @@ export const blockchainProjects: BlockchainProject[] = [
 		name: 'TVM 주요 업데이트',
 		description: '베놈과 에버스케일을 포함한 TVM 블록체인의 주요 업데이트 내용을 공유하는 채널',
 		profileImage: tvmSrc,
-		tags: ['TVM', 'Ecosystems', 'Venom'],
+		tags: ['TVM', 'Ecosystem', 'Venom'],
 	},
 	{
 		id: BlockchainProjectId.ONE_CLICK_CRYPTO,
@@ -327,7 +327,7 @@ export const blockchainProjects: BlockchainProject[] = [
 		profileImage: gnosisBuildersSrc,
 		bannerImage: gnosisBuildersBannerSrc,
 		website: 'https://www.gnosis.builders/',
-		tags: ['Ecosystems', 'Social'],
+		tags: ['Ecosystem', 'Social'],
 	},
 	{
 		id: BlockchainProjectId.CRYPTO_GVR,
