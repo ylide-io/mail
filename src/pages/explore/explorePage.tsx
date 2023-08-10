@@ -8,12 +8,11 @@ import {
 } from '../../stores/blockchainProjects/blockchainProjects';
 import bannerSrc from './banner.png';
 import css from './explorePage.module.scss';
+import { MiniProjectCard } from './miniProjectCard/miniProjectCard';
 import { RegularProjectCard } from './regularProjectCard/regularProjectCard';
 import { RichProjectCard } from './richProjectCard/richProjectCard';
 
-export interface ExplorePageProps {}
-
-export function ExplorePage({}: ExplorePageProps) {
+export function ExplorePage() {
 	return (
 		<GenericLayout>
 			<RegularPageContent>
@@ -27,6 +26,8 @@ export function ExplorePage({}: ExplorePageProps) {
 					</h1>
 
 					<div className={css.bigGrid}>
+						<RichProjectCard project={getBlockchainProjectById(BlockchainProjectId.GENERAL)} />
+						<RichProjectCard project={getBlockchainProjectById(BlockchainProjectId.YLIDE)} />
 						<RichProjectCard project={getBlockchainProjectById(BlockchainProjectId.VENOM_BLOCKCHAIN)} />
 						<RichProjectCard project={getBlockchainProjectById(BlockchainProjectId.ETH_WHALES)} />
 					</div>
@@ -36,13 +37,13 @@ export function ExplorePage({}: ExplorePageProps) {
 							<TagSvg />
 
 							<div>
-								Blockchain <span>communities</span>
+								Ecosystem <span>communities</span>
 							</div>
 						</div>
 
 						<div className={css.smallGrid}>
 							{blockchainProjects
-								.filter(p => p.tags.includes('Blockchain'))
+								.filter(p => p.tags.includes('Ecosystem'))
 								.map(project => (
 									<RegularProjectCard project={project} />
 								))}
@@ -69,6 +70,27 @@ export function ExplorePage({}: ExplorePageProps) {
 								.map(project => (
 									<RegularProjectCard project={project} />
 								))}
+						</div>
+					</div>
+
+					<div className={css.bigGrid}>
+						<RichProjectCard project={getBlockchainProjectById(BlockchainProjectId.SNIPA)} />
+						<RichProjectCard project={getBlockchainProjectById(BlockchainProjectId.OASIS_GALLERY)} />
+					</div>
+
+					<div>
+						<div className={css.tagTitle}>
+							<TagSvg />
+
+							<div>
+								<span>All communities</span>
+							</div>
+						</div>
+
+						<div className={css.miniGrid}>
+							{blockchainProjects.map(project => (
+								<MiniProjectCard project={project} />
+							))}
 						</div>
 					</div>
 

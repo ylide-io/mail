@@ -1,0 +1,22 @@
+.root {
+	display: flex;
+	align-items: center;
+	color: var(--text-color);
+	font-weight: $font-weight_medium;
+}
+
+.root:hover,
+.root:focus-visible {
+	color: var(--link-color);
+}
+
+.logo {
+	flex: 0 0 32px;
+	margin-right: 12px;
+}
+
+.name {
+	@include truncate-text;
+	flex: 1 1;
+	min-width: 0;
+}
