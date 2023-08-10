@@ -39,6 +39,30 @@ export function formatAddress(address: string) {
 
 //
 
+export const BlockchainName = {
+	EVERSCALE: 'everscale',
+	VENOM_TESTNET: 'venom-testnet',
+	SOLANA: 'solana',
+	NEAR: 'near',
+	LOCAL_HARDHAT: EVM_NAMES[EVMNetwork.LOCAL_HARDHAT],
+	CRONOS: EVM_NAMES[EVMNetwork.CRONOS],
+	ETHEREUM: EVM_NAMES[EVMNetwork.ETHEREUM],
+	BNBCHAIN: EVM_NAMES[EVMNetwork.BNBCHAIN],
+	ARBITRUM: EVM_NAMES[EVMNetwork.ARBITRUM],
+	AVALANCHE: EVM_NAMES[EVMNetwork.AVALANCHE],
+	OPTIMISM: EVM_NAMES[EVMNetwork.OPTIMISM],
+	POLYGON: EVM_NAMES[EVMNetwork.POLYGON],
+	FANTOM: EVM_NAMES[EVMNetwork.FANTOM],
+	KLAYTN: EVM_NAMES[EVMNetwork.KLAYTN],
+	GNOSIS: EVM_NAMES[EVMNetwork.GNOSIS],
+	AURORA: EVM_NAMES[EVMNetwork.AURORA],
+	CELO: EVM_NAMES[EVMNetwork.CELO],
+	MOONBEAM: EVM_NAMES[EVMNetwork.MOONBEAM],
+	MOONRIVER: EVM_NAMES[EVMNetwork.MOONRIVER],
+	METIS: EVM_NAMES[EVMNetwork.METIS],
+	ASTAR: EVM_NAMES[EVMNetwork.ASTAR],
+};
+
 export interface IEthereumNetworkDescriptor {
 	chainId: string;
 	chainName: string;
@@ -60,17 +84,25 @@ export const blockchainMeta: Record<
 		ethNetwork?: IEthereumNetworkDescriptor;
 	}
 > = {
-	'everscale': {
+	[BlockchainName.EVERSCALE]: {
 		title: 'Everscale',
 		logo: (s = 16) => <EverscaleLogo size={s} />,
 		symbol: 'EVER',
 	},
-	'venom-testnet': {
+	[BlockchainName.VENOM_TESTNET]: {
 		title: 'Venom Testnet',
 		logo: (s = 16) => <VenomLogo size={s} />,
 		symbol: 'VENOM',
 	},
-	[EVM_NAMES[EVMNetwork.LOCAL_HARDHAT]]: {
+	[BlockchainName.SOLANA]: {
+		title: 'Solana',
+		logo: (s = 16) => <SolanaLogo size={s} />,
+	},
+	[BlockchainName.NEAR]: {
+		title: 'Near',
+		logo: (s = 16) => <NearLogo size={30} />,
+	},
+	[BlockchainName.LOCAL_HARDHAT]: {
 		title: 'LocalNet',
 		logo: (s = 16) => <EthereumLogo size={s} />,
 		ethNetwork: {
@@ -85,7 +117,7 @@ export const blockchainMeta: Record<
 			blockExplorerUrls: [],
 		},
 	},
-	[EVM_NAMES[EVMNetwork.CRONOS]]: {
+	[BlockchainName.CRONOS]: {
 		title: 'Cronos',
 		logo: (s = 16) => <CronosLogo size={s} />,
 		ethNetwork: {
@@ -105,7 +137,7 @@ export const blockchainMeta: Record<
 			blockExplorerUrls: ['https://cronoscan.com'],
 		},
 	},
-	[EVM_NAMES[EVMNetwork.ETHEREUM]]: {
+	[BlockchainName.ETHEREUM]: {
 		title: 'Ethereum',
 		logo: (s = 16) => <EthereumLogo size={s} />,
 		ethNetwork: {
@@ -142,7 +174,7 @@ export const blockchainMeta: Record<
 			blockExplorerUrls: ['https://etherscan.io'],
 		},
 	},
-	[EVM_NAMES[EVMNetwork.BNBCHAIN]]: {
+	[BlockchainName.BNBCHAIN]: {
 		title: 'BNB Chain',
 		logo: (s = 16) => <BNBChainLogo size={s} />,
 		ethNetwork: {
@@ -182,7 +214,7 @@ export const blockchainMeta: Record<
 			blockExplorerUrls: ['https://bscscan.com'],
 		},
 	},
-	[EVM_NAMES[EVMNetwork.ARBITRUM]]: {
+	[BlockchainName.ARBITRUM]: {
 		title: 'Arbitrum',
 		logo: (s = 16) => <ArbitrumLogo size={s} />,
 		ethNetwork: {
@@ -197,7 +229,7 @@ export const blockchainMeta: Record<
 			blockExplorerUrls: ['https://arbiscan.io'],
 		},
 	},
-	[EVM_NAMES[EVMNetwork.AVALANCHE]]: {
+	[BlockchainName.AVALANCHE]: {
 		title: 'Avalanche',
 		logo: (s = 16) => <AvalancheLogo size={s} />,
 		ethNetwork: {
@@ -218,7 +250,7 @@ export const blockchainMeta: Record<
 			blockExplorerUrls: ['https://snowtrace.io'],
 		},
 	},
-	[EVM_NAMES[EVMNetwork.OPTIMISM]]: {
+	[BlockchainName.OPTIMISM]: {
 		title: 'Optimism',
 		logo: (s = 16) => <OptimismLogo size={s} />,
 		ethNetwork: {
@@ -238,7 +270,7 @@ export const blockchainMeta: Record<
 			blockExplorerUrls: ['https://optimistic.etherscan.io'],
 		},
 	},
-	[EVM_NAMES[EVMNetwork.POLYGON]]: {
+	[BlockchainName.POLYGON]: {
 		title: 'Polygon',
 		logo: (s = 16) => <PolygonLogo size={s} />,
 		ethNetwork: {
@@ -270,7 +302,7 @@ export const blockchainMeta: Record<
 			blockExplorerUrls: ['https://polygonscan.com'],
 		},
 	},
-	[EVM_NAMES[EVMNetwork.FANTOM]]: {
+	[BlockchainName.FANTOM]: {
 		title: 'Fantom',
 		logo: (s = 16) => <FantomLogo size={s} />,
 		ethNetwork: {
@@ -294,7 +326,7 @@ export const blockchainMeta: Record<
 			blockExplorerUrls: ['https://ftmscan.com'],
 		},
 	},
-	[EVM_NAMES[EVMNetwork.KLAYTN]]: {
+	[BlockchainName.KLAYTN]: {
 		title: 'Klaytn',
 		logo: (s = 16) => <KlaytnLogo size={s} />,
 		ethNetwork: {
@@ -317,7 +349,7 @@ export const blockchainMeta: Record<
 			blockExplorerUrls: ['https://scope.klaytn.com'],
 		},
 	},
-	[EVM_NAMES[EVMNetwork.GNOSIS]]: {
+	[BlockchainName.GNOSIS]: {
 		title: 'Gnosis',
 		logo: (s = 16) => <GnosisLogo size={s} />,
 		ethNetwork: {
@@ -341,7 +373,7 @@ export const blockchainMeta: Record<
 			blockExplorerUrls: ['https://gnosisscan.io'],
 		},
 	},
-	[EVM_NAMES[EVMNetwork.AURORA]]: {
+	[BlockchainName.AURORA]: {
 		title: 'Aurora',
 		logo: (s = 16) => <AuroraLogo size={s} />,
 		ethNetwork: {
@@ -356,7 +388,7 @@ export const blockchainMeta: Record<
 			blockExplorerUrls: ['https://aurorascan.dev'],
 		},
 	},
-	[EVM_NAMES[EVMNetwork.CELO]]: {
+	[BlockchainName.CELO]: {
 		title: 'Celo',
 		logo: (s = 16) => <CeloLogo size={s} />,
 		ethNetwork: {
@@ -371,7 +403,7 @@ export const blockchainMeta: Record<
 			blockExplorerUrls: ['https://celoscan.io'],
 		},
 	},
-	[EVM_NAMES[EVMNetwork.MOONBEAM]]: {
+	[BlockchainName.MOONBEAM]: {
 		title: 'Moonbeam',
 		logo: (s = 16) => <MoonbeamLogo size={s} />,
 		ethNetwork: {
@@ -392,7 +424,7 @@ export const blockchainMeta: Record<
 			blockExplorerUrls: ['https://moonbeam.moonscan.io'],
 		},
 	},
-	[EVM_NAMES[EVMNetwork.MOONRIVER]]: {
+	[BlockchainName.MOONRIVER]: {
 		title: 'Moonriver',
 		logo: (s = 16) => <MoonriverLogo size={s} />,
 		ethNetwork: {
@@ -413,7 +445,7 @@ export const blockchainMeta: Record<
 			blockExplorerUrls: ['https://moonriver.moonscan.io'],
 		},
 	},
-	[EVM_NAMES[EVMNetwork.METIS]]: {
+	[BlockchainName.METIS]: {
 		title: 'Metis',
 		logo: (s = 16) => <MetisLogo size={s} />,
 		ethNetwork: {
@@ -428,7 +460,7 @@ export const blockchainMeta: Record<
 			blockExplorerUrls: ['https://andromeda-explorer.metis.io'],
 		},
 	},
-	[EVM_NAMES[EVMNetwork.ASTAR]]: {
+	[BlockchainName.ASTAR]: {
 		title: 'Astar',
 		logo: (s = 16) => <AstarLogo size={s} />,
 		ethNetwork: {
@@ -447,14 +479,6 @@ export const blockchainMeta: Record<
 			],
 			blockExplorerUrls: ['https://astar.subscan.io'],
 		},
-	},
-	'solana': {
-		title: 'Solana',
-		logo: (s = 16) => <SolanaLogo size={s} />,
-	},
-	'near': {
-		title: 'Near',
-		logo: (s = 16) => <NearLogo size={30} />,
 	},
 };
 
