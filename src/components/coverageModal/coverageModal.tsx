@@ -48,7 +48,7 @@ export const CoverageModal = observer(({ onClose, account }: Props) => {
 		return uniq(coverage.protocols.items);
 	}, [coverage]);
 
-	const getRowText = (row: {
+	const getRowTextToken = (row: {
 		tokenId: string;
 		missing: boolean;
 		projectName: string | null;
@@ -56,7 +56,7 @@ export const CoverageModal = observer(({ onClose, account }: Props) => {
 		symbol: string | null;
 	}) => {
 		if (row.projectName) {
-			if (row.name) {
+			if (row.symbol) {
 				return `${row.projectName} ($${row.symbol})`;
 			}
 			return row.projectName;
@@ -64,6 +64,16 @@ export const CoverageModal = observer(({ onClose, account }: Props) => {
 			return `- ($${row.symbol})`;
 		}
 		return row.tokenId;
+	};
+
+	const getRowTextProtocol = (row: {
+		tokenId: string;
+		missing: boolean;
+		projectName: string | null;
+		name: string | null;
+		symbol: string | null;
+	}) => {
+		return row.projectName || row.tokenId;
 	};
 
 	// TODO: KONST
@@ -103,7 +113,7 @@ export const CoverageModal = observer(({ onClose, account }: Props) => {
 							<div>
 								<div className={clsx(css.row, css.row_data)}>
 									<CheckBox className={css.sourceCheckBox} isChecked={!t.missing} isDisabled />
-									<div>{getRowText(t)}</div>
+									<div>{getRowTextToken(t)}</div>
 								</div>
 							</div>
 						))}
@@ -120,7 +130,7 @@ export const CoverageModal = observer(({ onClose, account }: Props) => {
 						{uniqProtocols.map(t => (
 							<div className={clsx(css.row, css.row_data)}>
 								<CheckBox isChecked={!t.missing} isDisabled />
-								<div>{getRowText(t)}</div>
+								<div>{getRowTextProtocol(t)}</div>
 							</div>
 						))}
 					</div>

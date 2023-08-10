@@ -127,15 +127,19 @@ const FeedPageContent = observer(() => {
 							Show {feed.newPosts} new posts
 						</ActionButton>
 					)}
-					{feed.tags.length === 0 && !feed.sourceId && selectedAccounts.length === 1 && totalCoverage && (
-						<ActionButton
-							look={ActionButtonLook.PRIMARY}
-							onClick={() => setShowCoverageModal(true)}
-							style={{ marginLeft: '8px' }}
-						>
-							USD Coverage: {totalCoverage}
-						</ActionButton>
-					)}
+					{feed.tags.length === 0 &&
+						!feed.sourceId &&
+						selectedAccounts.length === 1 &&
+						address &&
+						totalCoverage && (
+							<ActionButton
+								look={ActionButtonLook.PRIMARY}
+								onClick={() => setShowCoverageModal(true)}
+								style={{ marginLeft: '8px' }}
+							>
+								USD Coverage: {totalCoverage}
+							</ActionButton>
+						)}
 				</>
 			}
 		>
