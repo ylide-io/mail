@@ -466,7 +466,7 @@ export function generateBlockchainExplorerUrl(blockchain: string, txId: string |
 	}
 
 	if (blockchain === 'everscale') {
-		return `https://everscan.io/transactions/${txId}`;
+		return `https://everscan.io/messages/${txId}`;
 	}
 
 	const explorerUrl = blockchainMeta[blockchain].ethNetwork?.blockExplorerUrls[0];
