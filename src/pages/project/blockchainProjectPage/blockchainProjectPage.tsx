@@ -20,6 +20,7 @@ import { ReactComponent as TagSvg } from '../../../icons/ic20/tag.svg';
 import { analytics } from '../../../stores/Analytics';
 import {
 	BlockchainProject,
+	BlockchainProjectAttachmentMode,
 	BlockchainProjectId,
 	getBlockchainProjectBannerImage,
 	getBlockchainProjectById,
@@ -116,9 +117,8 @@ const OfficialContent = observer(({ project, setTabsAsideContent }: OfficialCont
 					accounts={accounts}
 					feedId={feedId}
 					allowCustomAttachments={
-						projectId === BlockchainProjectId.ETH_WHALES ||
-						projectId === BlockchainProjectId.TVM ||
-						isAdminMode
+						project.attachmentMode === BlockchainProjectAttachmentMode.EVERYONE ||
+						(isAdminMode && project.attachmentMode === BlockchainProjectAttachmentMode.ADMINS)
 					}
 					placeholder="Make a new post"
 					fixedEvmNetwork={projectId === BlockchainProjectId.ETH_WHALES ? EVMNetwork.ETHEREUM : undefined}

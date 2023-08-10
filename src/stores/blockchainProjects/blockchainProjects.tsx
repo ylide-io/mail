@@ -67,6 +67,7 @@ export interface BlockchainProject {
 	tags: string[];
 	onlyVenom?: boolean;
 	onlyEtherium?: boolean;
+	attachmentMode?: BlockchainProjectAttachmentMode;
 }
 
 export enum BlockchainProjectId {
@@ -100,6 +101,11 @@ export enum BlockchainProjectId {
 	ISME_TEST = 'isme_test',
 }
 
+export enum BlockchainProjectAttachmentMode {
+	ADMINS = 'ADMINS',
+	EVERYONE = 'EVERYONE',
+}
+
 export const blockchainProjects: BlockchainProject[] = [
 	// GENERAL
 
@@ -123,6 +129,7 @@ export const blockchainProjects: BlockchainProject[] = [
 		profileImage: ethWhalesSrc,
 		tags: ['Ecosystem'],
 		onlyEtherium: true,
+		attachmentMode: BlockchainProjectAttachmentMode.EVERYONE,
 	},
 	{
 		id: BlockchainProjectId.YLIDE,
@@ -246,6 +253,7 @@ export const blockchainProjects: BlockchainProject[] = [
 		website: 'https://stax.live',
 		tags: ['NFT', 'Venom'],
 		onlyVenom: true,
+		attachmentMode: BlockchainProjectAttachmentMode.ADMINS,
 	},
 	{
 		id: BlockchainProjectId.VENOM_ID,
@@ -261,6 +269,7 @@ export const blockchainProjects: BlockchainProject[] = [
 		website: 'https://venomid.network/',
 		tags: ['Social', 'Venom'],
 		onlyVenom: true,
+		attachmentMode: BlockchainProjectAttachmentMode.ADMINS,
 	},
 	{
 		id: BlockchainProjectId.VENOM_RECAP,
@@ -275,6 +284,7 @@ export const blockchainProjects: BlockchainProject[] = [
 		bannerImage: venomRecapBannerSrc,
 		website: 'https://twitter.com/VenomRecap',
 		tags: ['Social', 'Venom'],
+		attachmentMode: BlockchainProjectAttachmentMode.ADMINS,
 	},
 	{
 		id: BlockchainProjectId.VENOM_APE_CLUB,
@@ -288,6 +298,7 @@ export const blockchainProjects: BlockchainProject[] = [
 		bannerImage: venomApeClubBannerSrc,
 		website: 'https://venomape.club/',
 		tags: ['NFT', 'Venom'],
+		attachmentMode: BlockchainProjectAttachmentMode.ADMINS,
 	},
 
 	// OTHERS
@@ -302,6 +313,7 @@ export const blockchainProjects: BlockchainProject[] = [
 		description: '베놈과 에버스케일을 포함한 TVM 블록체인의 주요 업데이트 내용을 공유하는 채널',
 		profileImage: tvmSrc,
 		tags: ['TVM', 'Ecosystem', 'Venom'],
+		attachmentMode: BlockchainProjectAttachmentMode.ADMINS,
 	},
 	{
 		id: BlockchainProjectId.ONE_CLICK_CRYPTO,
@@ -315,6 +327,7 @@ export const blockchainProjects: BlockchainProject[] = [
 		bannerImage: oneClickCryptoBannerSrc,
 		website: 'https://www.oneclick.fi/',
 		tags: ['DeFi'],
+		attachmentMode: BlockchainProjectAttachmentMode.ADMINS,
 	},
 	{
 		id: BlockchainProjectId.GNOSIS_BUILDERS,
@@ -328,6 +341,7 @@ export const blockchainProjects: BlockchainProject[] = [
 		bannerImage: gnosisBuildersBannerSrc,
 		website: 'https://www.gnosis.builders/',
 		tags: ['Ecosystem', 'Social'],
+		attachmentMode: BlockchainProjectAttachmentMode.ADMINS,
 	},
 	{
 		id: BlockchainProjectId.CRYPTO_GVR,
@@ -356,6 +370,7 @@ export const blockchainProjects: BlockchainProject[] = [
 		bannerImage: betFuryBannerSrc,
 		website: 'https://betfury.io/',
 		tags: ['Gaming'],
+		attachmentMode: BlockchainProjectAttachmentMode.ADMINS,
 	},
 	{
 		id: BlockchainProjectId.ISME_TEST,
