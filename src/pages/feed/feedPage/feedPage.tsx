@@ -127,7 +127,7 @@ const FeedPageContent = observer(() => {
 				)
 			}
 			titleRight={
-				<>
+				<div className={css.buttons}>
 					{!!feed.newPosts && (
 						<ActionButton look={ActionButtonLook.SECONDARY} onClick={() => feed.loadNew()}>
 							Show {feed.newPosts} new posts
@@ -138,15 +138,11 @@ const FeedPageContent = observer(() => {
 						selectedAccounts.length === 1 &&
 						address &&
 						totalCoverage && (
-							<ActionButton
-								look={ActionButtonLook.PRIMARY}
-								onClick={() => setShowCoverageModal(true)}
-								style={{ marginLeft: '8px' }}
-							>
+							<ActionButton look={ActionButtonLook.PRIMARY} onClick={() => setShowCoverageModal(true)}>
 								USD Coverage: {totalCoverage}
 							</ActionButton>
 						)}
-				</>
+				</div>
 			}
 		>
 			{showCoverageModal && (
