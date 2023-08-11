@@ -21,7 +21,7 @@ export enum RoutePath {
 	MAIL_DETAILS = '/mail/:folderId/:id',
 	MAIL_DETAILS_OUTLET = ':id',
 
-	FEED = '/feed',
+	FEED_ROOT = '/feed',
 	FEED_ALL = '/feed/all',
 	FEED_POST = '/feed/post/:postId',
 	FEED_CATEGORY = '/feed/tag/:tag',
@@ -35,6 +35,7 @@ export enum RoutePath {
 	PROJECT_POST = '/project/:projectId/post/:postId',
 	PROJECT_DISCUSSION = '/project/:projectId/discussion',
 
+	OTC_ROOT = '/otc',
 	OTC_ASSETS = '/otc/assets',
 	OTC_WALLETS = '/otc/wallets',
 	OTC_CHATS = '/otc/chats',

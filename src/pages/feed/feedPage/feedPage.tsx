@@ -59,7 +59,7 @@ const FeedPageContent = observer(() => {
 
 	useEffect(() => {
 		if (address && !selectedAccounts.length) {
-			navigate(generatePath(RoutePath.FEED));
+			navigate(generatePath(RoutePath.FEED_ROOT));
 		}
 	}, [address, navigate, selectedAccounts]);
 
@@ -114,7 +114,7 @@ const FeedPageContent = observer(() => {
 					<ActionButton
 						look={ActionButtonLook.PRIMARY}
 						icon={<CrossSvg />}
-						onClick={() => navigate(generatePath(RoutePath.FEED))}
+						onClick={() => navigate(generatePath(RoutePath.FEED_ROOT))}
 					>
 						Clear filter
 					</ActionButton>

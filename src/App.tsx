@@ -86,6 +86,19 @@ const RemoveTrailingSlash = () => {
 	return <></>;
 };
 
+//
+
+interface RedirectProps {
+	from: string;
+	to: string;
+}
+
+function redirect({ from, to }: RedirectProps) {
+	return <Route path={from} element={<Navigate replace to={to} />} />;
+}
+
+//
+
 export const App = observer(() => {
 	const location = useLocation();
 
@@ -250,19 +263,14 @@ export const App = observer(() => {
 
 						{/* FEED */}
 
-						<Route
-							path={RoutePath.FEED}
-							element={
-								<Navigate
-									replace
-									to={
-										REACT_APP__APP_MODE === AppMode.MAIN_VIEW
-											? generatePath(RoutePath.FEED_SMART)
-											: generatePath(RoutePath.PROJECT_ROOT)
-									}
-								/>
-							}
-						/>
+						{redirect({
+							from: RoutePath.FEED_ROOT,
+							to:
+								REACT_APP__APP_MODE === AppMode.MAIN_VIEW
+									? generatePath(RoutePath.FEED_SMART)
+									: generatePath(RoutePath.PROJECT_ROOT),
+						})}
+
 						<Route path={RoutePath.FEED_ALL} element={<FeedPage />} />
 						<Route path={RoutePath.FEED_POST} element={<FeedPostPage />} />
 						<Route path={RoutePath.FEED_CATEGORY} element={<FeedPage />} />
@@ -272,17 +280,13 @@ export const App = observer(() => {
 
 						{/* PROJECTS */}
 
-						<Route
-							path={RoutePath.PROJECT_ROOT}
-							element={
-								<Navigate
-									replace
-									to={generatePath(RoutePath.PROJECT, {
-										projectId: BlockchainProjectId.GENERAL,
-									})}
-								/>
-							}
-						/>
+						{redirect({
+							from: RoutePath.PROJECT_ROOT,
+							to: generatePath(RoutePath.PROJECT, {
+								projectId: BlockchainProjectId.GENERAL,
+							}),
+						})}
+
 						<Route path={RoutePath.PROJECT} element={<BlockchainProjectPage />} />
 						<Route path={RoutePath.PROJECT_ADMIN} element={<BlockchainProjectPage />} />
 						<Route path={RoutePath.PROJECT_POST} element={<BlockchainProjectPostPage />} />
@@ -290,17 +294,13 @@ export const App = observer(() => {
 
 						{/* MAIL */}
 
-						<Route
-							path={RoutePath.MAIL_ROOT}
-							element={
-								<Navigate
-									replace
-									to={generatePath(RoutePath.MAIL_FOLDER, {
-										folderId: FolderId.Inbox,
-									})}
-								/>
-							}
-						/>
+						{redirect({
+							from: RoutePath.MAIL_ROOT,
+							to: generatePath(RoutePath.MAIL_FOLDER, {
+								folderId: FolderId.Inbox,
+							}),
+						})}
+
 						<Route path={RoutePath.MAIL_COMPOSE} element={<ComposePage />} />
 						<Route path={RoutePath.MAIL_CONTACTS} element={<ContactListPage />} />
 						<Route path={RoutePath.MAIL_CONTACT_TAGS} element={<ContactTagsPage />} />
@@ -309,6 +309,11 @@ export const App = observer(() => {
 						</Route>
 
 						{/* OTC */}
+
+						{redirect({
+							from: RoutePath.OTC_ROOT,
+							to: generatePath(RoutePath.OTC_ASSETS),
+						})}
 
 						<Route path={RoutePath.OTC_ASSETS} element={<OtcAssetsPage />} />
 						<Route path={RoutePath.OTC_WALLETS} element={<OtcWalletsPage />} />
@@ -322,42 +327,32 @@ export const App = observer(() => {
 
 						{/* MIGRATIONS */}
 
-						<Route
-							path="/feed/venom/*"
-							element={
-								<Navigate replace to={location.pathname.replace('/feed/venom', '/feed/project')} />
-							}
-						/>
+						{redirect({
+							from: '/feed/venom/*',
+							to: location.pathname.replace('/feed/venom', '/feed/project'),
+						})}
 
-						<Route
-							path="/feed/tvm/*"
-							element={
-								<Navigate replace to={location.pathname.replace('/feed/tvm', '/feed/project/tvm')} />
-							}
-						/>
+						{redirect({
+							from: '/feed/tvm/*',
+							to: location.pathname.replace('/feed/tvm', '/feed/project/tvm'),
+						})}
 
-						<Route
-							path="/feed/project/*"
-							element={<Navigate replace to={location.pathname.replace('/feed/project', '/project')} />}
-						/>
+						{redirect({
+							from: '/feed/project/*',
+							to: location.pathname.replace('/feed/project', '/project'),
+						})}
 
 						{/* REST */}
 
-						<Route
-							path={RoutePath.ANY}
-							element={
-								<Navigate
-									replace
-									to={
-										REACT_APP__APP_MODE === AppMode.OTC
-											? generatePath(RoutePath.OTC_ASSETS)
-											: REACT_APP__APP_MODE === AppMode.MAIN_VIEW
-											? generatePath(RoutePath.FEED)
-											: generatePath(RoutePath.ROOT)
-									}
-								/>
-							}
-						/>
+						{redirect({
+							from: RoutePath.ANY,
+							to:
+								REACT_APP__APP_MODE === AppMode.OTC
+									? generatePath(RoutePath.OTC_ASSETS)
+									: REACT_APP__APP_MODE === AppMode.MAIN_VIEW
+									? generatePath(RoutePath.FEED_ROOT)
+									: generatePath(RoutePath.ROOT),
+						})}
 					</Routes>
 
 					{domain.txPlateVisible && REACT_APP__APP_MODE !== AppMode.MAIN_VIEW && <TransactionPopup />}
