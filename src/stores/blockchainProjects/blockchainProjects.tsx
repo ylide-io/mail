@@ -11,6 +11,7 @@ import oasisGalleryBannerSrc from './bannerImages/oasisGallery.jpg';
 import oneClickCryptoBannerSrc from './bannerImages/oneClickCrypto.jpg';
 import snipaBannerSrc from './bannerImages/snipa.jpg';
 import staxBannerSrc from './bannerImages/stax.jpg';
+import tvmBannerSrc from './bannerImages/tvm.jpg';
 import venomApeClubBannerSrc from './bannerImages/venomApeClub.jpg';
 import venomBlockchainBannerSrc from './bannerImages/venomBlockchain.jpg';
 import venomBridgeBannerSrc from './bannerImages/venomBridge.jpg';
@@ -96,7 +97,6 @@ export enum BlockchainProjectId {
 	GNOSIS_BUILDERS = 'gnosis_builders',
 	CRYPTO_GVR = 'crypto_gvr',
 	BET_FURY = 'bet_fury',
-	ISME_TEST = 'isme_test',
 }
 
 export enum BlockchainProjectAttachmentMode {
@@ -319,6 +319,7 @@ export const blockchainProjects: BlockchainProject[] = [
 		name: 'TVM 주요 업데이트',
 		description: '베놈과 에버스케일을 포함한 TVM 블록체인의 주요 업데이트 내용을 공유하는 채널',
 		profileImage: tvmSrc,
+		bannerImage: tvmBannerSrc,
 		tags: ['TVM', 'Ecosystem', 'Venom'],
 		attachmentMode: BlockchainProjectAttachmentMode.ADMINS,
 	},
