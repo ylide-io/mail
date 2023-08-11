@@ -375,14 +375,4 @@ export const blockchainProjects: BlockchainProject[] = [
 		tags: ['Gaming'],
 		attachmentMode: BlockchainProjectAttachmentMode.ADMINS,
 	},
-	{
-		id: BlockchainProjectId.ISME_TEST,
-		feedId: {
-			discussion: '11d558ad3a44a6b7476209ccaecdfaf55462d9bb0edcc69c64c0f94f9b2ecc98' as Uint256,
-		},
-		name: 'isme',
-		description: 'ISME Test Evm',
-		website: 'https://isme.is/',
-		tags: ['Blockchain', 'is.me'],
-	},
 ];
