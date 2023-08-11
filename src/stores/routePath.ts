@@ -13,6 +13,7 @@ export enum RoutePath {
 	WALLETS = '/wallets',
 	WALLETS_CONNECT = '/connect-wallets',
 
+	MAIL_ROOT = '/mail',
 	MAIL_COMPOSE = '/mail/compose',
 	MAIL_CONTACTS = '/mail/contacts',
 	MAIL_CONTACT_TAGS = '/mail/contacts/tags',

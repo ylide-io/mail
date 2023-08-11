@@ -38,6 +38,7 @@ import { analytics } from './stores/Analytics';
 import { BlockchainProjectId } from './stores/blockchainProjects/blockchainProjects';
 import { browserStorage } from './stores/browserStorage';
 import domain from './stores/Domain';
+import { FolderId } from './stores/MailList';
 import { RoutePath } from './stores/routePath';
 import walletConnect from './stores/WalletConnect';
 import { useIsMatchesPattern, useNav } from './utils/url';
@@ -247,6 +248,8 @@ export const App = observer(() => {
 						<Route path={RoutePath.ADMIN} element={<AdminPage />} />
 						<Route path={RoutePath.ADMIN_FEED} element={<AdminFeedPage />} />
 
+						{/* FEED */}
+
 						<Route
 							path={RoutePath.FEED}
 							element={
@@ -267,6 +270,8 @@ export const App = observer(() => {
 						<Route path={RoutePath.FEED_SMART} element={<FeedPage />} />
 						<Route path={RoutePath.FEED_SMART_ADDRESS} element={<FeedPage />} />
 
+						{/* PROJECTS */}
+
 						<Route
 							path={RoutePath.PROJECT_ROOT}
 							element={
@@ -283,6 +288,40 @@ export const App = observer(() => {
 						<Route path={RoutePath.PROJECT_POST} element={<BlockchainProjectPostPage />} />
 						<Route path={RoutePath.PROJECT_DISCUSSION} element={<BlockchainProjectPage />} />
 
+						{/* MAIL */}
+
+						<Route
+							path={RoutePath.MAIL_ROOT}
+							element={
+								<Navigate
+									replace
+									to={generatePath(RoutePath.MAIL_FOLDER, {
+										folderId: FolderId.Inbox,
+									})}
+								/>
+							}
+						/>
+						<Route path={RoutePath.MAIL_COMPOSE} element={<ComposePage />} />
+						<Route path={RoutePath.MAIL_CONTACTS} element={<ContactListPage />} />
+						<Route path={RoutePath.MAIL_CONTACT_TAGS} element={<ContactTagsPage />} />
+						<Route path={RoutePath.MAIL_FOLDER} element={<MailboxPage />}>
+							<Route path={RoutePath.MAIL_DETAILS_OUTLET} element={<MailDetailsPage />} />
+						</Route>
+
+						{/* OTC */}
+
+						<Route path={RoutePath.OTC_ASSETS} element={<OtcAssetsPage />} />
+						<Route path={RoutePath.OTC_WALLETS} element={<OtcWalletsPage />} />
+						<Route path={RoutePath.OTC_CHATS} element={<OtcChatsPage />} />
+						<Route path={RoutePath.OTC_CHAT} element={<OtcChatPage />} />
+
+						{/* WIDGETS */}
+
+						<Route path={RoutePath.SEND_MESSAGE_WIDGET} element={<SendMessageWidget />} />
+						<Route path={RoutePath.MAILBOX_WIDGET} element={<MailboxWidget />} />
+
+						{/* MIGRATIONS */}
+
 						<Route
 							path="/feed/venom/*"
 							element={
@@ -297,20 +336,12 @@ export const App = observer(() => {
 							}
 						/>
 
-						<Route path={RoutePath.MAIL_COMPOSE} element={<ComposePage />} />
-						<Route path={RoutePath.MAIL_CONTACTS} element={<ContactListPage />} />
-						<Route path={RoutePath.MAIL_CONTACT_TAGS} element={<ContactTagsPage />} />
-						<Route path={RoutePath.MAIL_FOLDER} element={<MailboxPage />}>
-							<Route path={RoutePath.MAIL_DETAILS_OUTLET} element={<MailDetailsPage />} />
-						</Route>
+						<Route
+							path="/feed/project/*"
+							element={<Navigate replace to={location.pathname.replace('/feed/project', '/project')} />}
+						/>
 
-						<Route path={RoutePath.OTC_ASSETS} element={<OtcAssetsPage />} />
-						<Route path={RoutePath.OTC_WALLETS} element={<OtcWalletsPage />} />
-						<Route path={RoutePath.OTC_CHATS} element={<OtcChatsPage />} />
-						<Route path={RoutePath.OTC_CHAT} element={<OtcChatPage />} />
-
-						<Route path={RoutePath.SEND_MESSAGE_WIDGET} element={<SendMessageWidget />} />
-						<Route path={RoutePath.MAILBOX_WIDGET} element={<MailboxWidget />} />
+						{/* REST */}
 
 						<Route
 							path={RoutePath.ANY}
