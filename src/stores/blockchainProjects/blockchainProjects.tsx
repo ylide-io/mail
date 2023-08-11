@@ -52,8 +52,6 @@ export function getBlockchainProjectBannerImage(input: BlockchainProject | Block
 
 //
 
-const NO_FEED_ID = '2000000000000000000000000000000000000000000000000000000000000004' as Uint256;
-
 export interface BlockchainProject {
 	id: BlockchainProjectId;
 	feedId: {
@@ -134,6 +132,7 @@ export const blockchainProjects: BlockchainProject[] = [
 	{
 		id: BlockchainProjectId.YLIDE,
 		feedId: {
+			official: '200000000000000000000000000000000000000000000000000000000000000f' as Uint256,
 			discussion: '100000000000000000000000000000000000000000000000000000000000000f' as Uint256,
 		},
 		name: 'Ylide',
@@ -148,6 +147,7 @@ export const blockchainProjects: BlockchainProject[] = [
 	{
 		id: BlockchainProjectId.OASIS_GALLERY,
 		feedId: {
+			official: '2000000000000000000000000000000000000000000000000000000000000006' as Uint256,
 			discussion: '1000000000000000000000000000000000000000000000000000000000000006' as Uint256,
 		},
 		name: 'oasis.gallery',
@@ -161,6 +161,7 @@ export const blockchainProjects: BlockchainProject[] = [
 	{
 		id: BlockchainProjectId.SNIPA,
 		feedId: {
+			official: '2000000000000000000000000000000000000000000000000000000000000007' as Uint256,
 			discussion: '1000000000000000000000000000000000000000000000000000000000000007' as Uint256,
 		},
 		name: 'Snipa',
@@ -187,6 +188,7 @@ export const blockchainProjects: BlockchainProject[] = [
 	{
 		id: BlockchainProjectId.VENOM_BRIDGE,
 		feedId: {
+			official: '2000000000000000000000000000000000000000000000000000000000000009' as Uint256,
 			discussion: '1000000000000000000000000000000000000000000000000000000000000009' as Uint256,
 		},
 		name: 'Venom Bridge',
@@ -201,6 +203,7 @@ export const blockchainProjects: BlockchainProject[] = [
 	{
 		id: BlockchainProjectId.WEB3_WORLD,
 		feedId: {
+			official: '200000000000000000000000000000000000000000000000000000000000000e' as Uint256,
 			discussion: '100000000000000000000000000000000000000000000000000000000000000e' as Uint256,
 		},
 		name: 'Web3.World',
@@ -214,6 +217,7 @@ export const blockchainProjects: BlockchainProject[] = [
 	{
 		id: BlockchainProjectId.VENTORY,
 		feedId: {
+			official: '2000000000000000000000000000000000000000000000000000000000000010' as Uint256,
 			discussion: '1000000000000000000000000000000000000000000000000000000000000010' as Uint256,
 		},
 		name: 'Ventory',
@@ -228,6 +232,7 @@ export const blockchainProjects: BlockchainProject[] = [
 	{
 		id: BlockchainProjectId.GRAVIX,
 		feedId: {
+			official: '2000000000000000000000000000000000000000000000000000000000000011' as Uint256,
 			discussion: '1000000000000000000000000000000000000000000000000000000000000011' as Uint256,
 		},
 		name: 'Gravix',
@@ -242,8 +247,8 @@ export const blockchainProjects: BlockchainProject[] = [
 	{
 		id: BlockchainProjectId.STAX,
 		feedId: {
-			official: NO_FEED_ID,
-			discussion: NO_FEED_ID,
+			official: '2000000000000000000000000000000000000000000000000000000000000005' as Uint256,
+			discussion: '1000000000000000000000000000000000000000000000000000000000000005' as Uint256,
 		},
 		name: 'Stax',
 		description:
@@ -258,8 +263,8 @@ export const blockchainProjects: BlockchainProject[] = [
 	{
 		id: BlockchainProjectId.VENOM_ID,
 		feedId: {
-			official: NO_FEED_ID,
-			discussion: NO_FEED_ID,
+			official: '200000000000000000000000000000000000000000000000000000000000000a' as Uint256,
+			discussion: '100000000000000000000000000000000000000000000000000000000000000a' as Uint256,
 		},
 		name: 'Venom ID',
 		description:
@@ -274,8 +279,8 @@ export const blockchainProjects: BlockchainProject[] = [
 	{
 		id: BlockchainProjectId.VENOM_RECAP,
 		feedId: {
-			official: NO_FEED_ID,
-			discussion: NO_FEED_ID,
+			official: '200000000000000000000000000000000000000000000000000000000000000b' as Uint256,
+			discussion: '100000000000000000000000000000000000000000000000000000000000000b' as Uint256,
 		},
 		name: 'Venom Recap',
 		description:
@@ -290,8 +295,8 @@ export const blockchainProjects: BlockchainProject[] = [
 	{
 		id: BlockchainProjectId.VENOM_APE_CLUB,
 		feedId: {
-			official: NO_FEED_ID,
-			discussion: NO_FEED_ID,
+			official: '200000000000000000000000000000000000000000000000000000000000000c' as Uint256,
+			discussion: '100000000000000000000000000000000000000000000000000000000000000c' as Uint256,
 		},
 		name: 'Venom Ape Club',
 		description: '3,333 rare, random & rad Apes living on Venom Network.',
@@ -320,8 +325,8 @@ export const blockchainProjects: BlockchainProject[] = [
 	{
 		id: BlockchainProjectId.ONE_CLICK_CRYPTO,
 		feedId: {
-			official: NO_FEED_ID,
-			discussion: NO_FEED_ID,
+			official: '200000000000000000000000000000000000000000000000000000000000000d' as Uint256,
+			discussion: '100000000000000000000000000000000000000000000000000000000000000d' as Uint256,
 		},
 		name: 'One Click Crypto',
 		description: 'Diversify your portfolio, save on gas fees, and generate best risk-reward yield with One Click.',
@@ -334,8 +339,8 @@ export const blockchainProjects: BlockchainProject[] = [
 	{
 		id: BlockchainProjectId.GNOSIS_BUILDERS,
 		feedId: {
-			official: NO_FEED_ID,
-			discussion: NO_FEED_ID,
+			official: '2000000000000000000000000000000000000000000000000000000000000012' as Uint256,
+			discussion: '2000000000000000000000000000000000000000000000000000000000000013' as Uint256,
 		},
 		name: 'Gnosis Builders',
 		description: 'Driving the adoption and development of the @gnosischain ecosystem🦉💚',
@@ -349,8 +354,8 @@ export const blockchainProjects: BlockchainProject[] = [
 	{
 		id: BlockchainProjectId.CRYPTO_GVR,
 		feedId: {
-			official: NO_FEED_ID,
-			discussion: NO_FEED_ID,
+			official: '2000000000000000000000000000000000000000000000000000000000000014' as Uint256,
+			discussion: '2000000000000000000000000000000000000000000000000000000000000015' as Uint256,
 		},
 		name: 'Crypto GVR',
 		description:
@@ -363,8 +368,8 @@ export const blockchainProjects: BlockchainProject[] = [
 	{
 		id: BlockchainProjectId.BET_FURY,
 		feedId: {
-			official: NO_FEED_ID,
-			discussion: NO_FEED_ID,
+			official: '2000000000000000000000000000000000000000000000000000000000000016' as Uint256,
+			discussion: '2000000000000000000000000000000000000000000000000000000000000017' as Uint256,
 		},
 		name: 'BetFury',
 		description:
