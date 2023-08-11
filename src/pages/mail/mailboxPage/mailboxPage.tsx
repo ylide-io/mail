@@ -2,7 +2,6 @@ import clsx from 'clsx';
 import { autorun } from 'mobx';
 import { observer } from 'mobx-react';
 import { useEffect, useMemo, useState } from 'react';
-import { Helmet } from 'react-helmet';
 import { Outlet, useParams, useSearchParams } from 'react-router-dom';
 import AutoSizer from 'react-virtualized-auto-sizer';
 import { FixedSizeList, ListChildComponentProps } from 'react-window';
@@ -10,6 +9,7 @@ import { FixedSizeList, ListChildComponentProps } from 'react-window';
 import { ErrorMessage } from '../../../components/errorMessage/errorMessage';
 import { FullPageContent } from '../../../components/genericLayout/content/fullPageContent/fullPageContent';
 import { GenericLayout } from '../../../components/genericLayout/genericLayout';
+import { PageMeta } from '../../../components/pageMeta/pageMeta';
 import { YlideLoader } from '../../../components/ylideLoader/ylideLoader';
 import { analytics } from '../../../stores/Analytics';
 import { browserStorage } from '../../../stores/browserStorage';
@@ -150,13 +150,10 @@ export const MailboxPage = observer(() => {
 
 	return (
 		<GenericLayout>
-			<Helmet>
-				<title>Decentralized Web3 Mailbox by Ylide for secure and private communication</title>
-				<meta
-					name="description"
-					content="Experience the power of decentralized communication with Ylide's Web3 Mailbox. Supporting multiple chains including Ethereum, Polygon, BNB, Venom Blockchain, Gnosis chain, Celo, Moonriver, Klaytn, Moonbeam, Avalanche, Aurora, Fantom, Metis, Arbitrum, Optimism, and Everscale. Secure, private, and built for the future of the web."
-				/>
-			</Helmet>
+			<PageMeta
+				title="Decentralized Web3 Mailbox by Ylide for secure and private communication"
+				description="Experience the power of decentralized communication with Ylide's Web3 Mailbox. Supporting multiple chains including Ethereum, Polygon, BNB, Venom Blockchain, Gnosis chain, Celo, Moonriver, Klaytn, Moonbeam, Avalanche, Aurora, Fantom, Metis, Arbitrum, Optimism, and Everscale. Secure, private, and built for the future of the web."
+			/>
 
 			<FullPageContent>
 				<div className={css.root}>

@@ -4,6 +4,7 @@ import { generatePath } from 'react-router-dom';
 
 import { FullPageContent } from '../../../../components/genericLayout/content/fullPageContent/fullPageContent';
 import { GenericLayout } from '../../../../components/genericLayout/genericLayout';
+import { PageMeta } from '../../../../components/pageMeta/pageMeta';
 import { RoutePath } from '../../../../stores/routePath';
 import { useNav } from '../../../../utils/url';
 import css from './contactsLayout.module.scss';
@@ -24,6 +25,8 @@ export function ContactsLayout({ children, activeTab, title, titleRight }: Conta
 
 	return (
 		<GenericLayout>
+			<PageMeta title="Contacts" />
+
 			<FullPageContent className={css.root}>
 				<div className={css.header}>
 					<div className={css.title}>{title}</div>

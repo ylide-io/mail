@@ -1,6 +1,5 @@
 import { observer } from 'mobx-react';
 import { ReactNode, useEffect, useRef, useState } from 'react';
-import { Helmet } from 'react-helmet';
 import { InView } from 'react-intersection-observer';
 import { useInfiniteQuery, useQuery } from 'react-query';
 import { generatePath, useParams } from 'react-router-dom';
@@ -12,6 +11,7 @@ import { BlockchainProjectBanner } from '../../../components/blockchainProjectBa
 import { ErrorMessage, ErrorMessageLook } from '../../../components/errorMessage/errorMessage';
 import { RegularPageContent } from '../../../components/genericLayout/content/regularPageContent/regularPageContent';
 import { GenericLayout } from '../../../components/genericLayout/genericLayout';
+import { PageMeta } from '../../../components/pageMeta/pageMeta';
 import { toast } from '../../../components/toast/toast';
 import { YlideLoader } from '../../../components/ylideLoader/ylideLoader';
 import { ReactComponent as LinkSvg } from '../../../icons/ic20/link.svg';
@@ -113,10 +113,11 @@ const OfficialContent = observer(({ project, setTabsAsideContent }: OfficialCont
 
 	return (
 		<div className={css.content}>
-			<Helmet>
-				<title>{project.name} on Ylide Social Hub</title>
-				<meta name="description" content={project.description} />
-			</Helmet>
+			<PageMeta
+				title={`${project.name} on Ylide Social Hub`}
+				description={project.description}
+				image={project.bannerImage}
+			/>
 
 			{isAdminMode && !!accounts.length && (
 				<CreatePostForm
@@ -239,10 +240,11 @@ const DiscussionContent = observer(({ project, setTabsAsideContent }: Discussion
 
 	return (
 		<div className={css.content}>
-			<Helmet>
-				<title>{project.name} chat on Ylide Social Hub</title>
-				<meta name="description" content={project.description} />
-			</Helmet>
+			<PageMeta
+				title={`${project.name} chat on Ylide Social Hub`}
+				description={project.description}
+				image={project.bannerImage}
+			/>
 
 			{accounts.length ? (
 				<CreatePostForm
@@ -378,11 +380,6 @@ export const BlockchainProjectPage = observer(() => {
 
 	return (
 		<GenericLayout>
-			<Helmet>
-				<title>{project.name} on Ylide Social Hub</title>
-				<meta name="description" content={project.description} />
-			</Helmet>
-
 			<RegularPageContent>
 				<div key={projectId}>
 					<BlockchainProjectBanner

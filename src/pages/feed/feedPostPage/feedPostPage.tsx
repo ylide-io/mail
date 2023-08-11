@@ -1,5 +1,4 @@
 import { useRef, useState } from 'react';
-import { Helmet } from 'react-helmet';
 import { useQuery } from 'react-query';
 import { generatePath, useParams } from 'react-router-dom';
 
@@ -8,6 +7,7 @@ import { ActionButton, ActionButtonLook } from '../../../components/ActionButton
 import { ErrorMessage } from '../../../components/errorMessage/errorMessage';
 import { NarrowContent } from '../../../components/genericLayout/content/narrowContent/narrowContent';
 import { GenericLayout } from '../../../components/genericLayout/genericLayout';
+import { PageMeta } from '../../../components/pageMeta/pageMeta';
 import { SharePopup } from '../../../components/sharePopup/sharePopup';
 import { YlideLoader } from '../../../components/ylideLoader/ylideLoader';
 import { APP_NAME } from '../../../constants';
@@ -33,15 +33,13 @@ export function FeedPostPage() {
 	return (
 		<GenericLayout>
 			{data && (
-				<Helmet>
-					<title>
-						Post by{' '}
-						{[data.post.authorName, data.post.authorNickname].filter(Boolean).join(' @ ') ||
-							data.post.sourceName ||
-							'alien'}{' '}
-						| {APP_NAME}
-					</title>
-				</Helmet>
+				<PageMeta
+					title={`Post by ${
+						[data.post.authorName, data.post.authorNickname].filter(Boolean).join(' @ ') ||
+						data.post.sourceName ||
+						'alien'
+					} | ${APP_NAME}`}
+				/>
 			)}
 
 			<NarrowContent

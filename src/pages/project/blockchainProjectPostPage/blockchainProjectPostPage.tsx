@@ -1,6 +1,6 @@
+import { MessageAttachmentLinkV1 } from '@ylide/sdk';
 import { observer } from 'mobx-react';
 import { useRef, useState } from 'react';
-import { Helmet } from 'react-helmet';
 import { useQuery } from 'react-query';
 import { generatePath, useParams } from 'react-router-dom';
 
@@ -10,6 +10,7 @@ import { ErrorMessage } from '../../../components/errorMessage/errorMessage';
 import { RegularPageContent } from '../../../components/genericLayout/content/regularPageContent/regularPageContent';
 import { GenericLayout } from '../../../components/genericLayout/genericLayout';
 import { PageContentHeader } from '../../../components/pageContentHeader/pageContentHeader';
+import { PageMeta } from '../../../components/pageMeta/pageMeta';
 import { SharePopup } from '../../../components/sharePopup/sharePopup';
 import { YlideLoader } from '../../../components/ylideLoader/ylideLoader';
 import { ReactComponent as ShareSvg } from '../../../icons/ic20/share.svg';
@@ -18,6 +19,7 @@ import { BlockchainProjectId, getBlockchainProjectById } from '../../../stores/b
 import { RoutePath } from '../../../stores/routePath';
 import { HorizontalAlignment } from '../../../utils/alignment';
 import { invariant } from '../../../utils/assert';
+import { ipfsToHttpUrl } from '../../../utils/ipfs';
 import { toAbsoluteUrl } from '../../../utils/url';
 import { generateOfficialPostPath, OfficialPostView } from '../_common/officialPost/officialPost';
 import css from './blockchainProjectPostPage.module.scss';
@@ -36,6 +38,9 @@ export const BlockchainProjectPostPage = observer(() => {
 			return decodeBlockchainFeedPost(post!);
 		},
 	});
+
+	const attachment = data?.decoded.attachments[0] as MessageAttachmentLinkV1 | undefined;
+	const attachmentHttpUrl = attachment && ipfsToHttpUrl(attachment.link);
 
 	const shareButtonRef = useRef(null);
 	const [isSharePopupOpen, setSharePopupOpen] = useState(false);
@@ -74,13 +79,15 @@ export const BlockchainProjectPostPage = observer(() => {
 
 				{data ? (
 					<>
-						<Helmet>
-							<title>
-								{data.decoded.decodedTextData.type === MessageDecodedTextDataType.YMF
+						<PageMeta
+							title={
+								data.decoded.decodedTextData.type === MessageDecodedTextDataType.YMF
 									? data.decoded.decodedTextData.value.toPlainText()
-									: data.decoded.decodedTextData.value}
-							</title>
-						</Helmet>
+									: data.decoded.decodedTextData.value
+							}
+							description={`${project.name} // ${project.description}`}
+							image={attachmentHttpUrl}
+						/>
 
 						<OfficialPostView project={project} post={data} />
 					</>
