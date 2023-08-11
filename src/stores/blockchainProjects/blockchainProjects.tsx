@@ -52,7 +52,7 @@ export function getBlockchainProjectBannerImage(input: BlockchainProject | Block
 
 //
 
-const NO_FEED_ID = VENOM_FEED_ID;
+const NO_FEED_ID = '0000000000000000000000000000000000000000000000000000000000000000' as Uint256;
 
 export interface BlockchainProject {
 	id: BlockchainProjectId;
