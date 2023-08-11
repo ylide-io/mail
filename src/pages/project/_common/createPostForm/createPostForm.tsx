@@ -1,4 +1,3 @@
-import { EVMNetwork } from '@ylide/ethereum';
 import { MessageAttachmentLinkV1, MessageAttachmentType, Uint256 } from '@ylide/sdk';
 import clsx from 'clsx';
 import { observer } from 'mobx-react';
@@ -21,6 +20,7 @@ import domain from '../../../../stores/Domain';
 import { DomainAccount } from '../../../../stores/models/DomainAccount';
 import { OutgoingMailData, OutgoingMailDataMode } from '../../../../stores/outgoingMailData';
 import { HorizontalAlignment } from '../../../../utils/alignment';
+import { evmNameToNetwork } from '../../../../utils/blockchain';
 import { calcComissions } from '../../../../utils/calcComissions';
 import { openFilePicker, readFileAsDataURL } from '../../../../utils/file';
 import { hashToIpfsUrl, ipfsToHttpUrl } from '../../../../utils/ipfs';
@@ -39,7 +39,7 @@ export interface CreatePostFormProps extends PropsWithClassName {
 	feedId: Uint256;
 	allowCustomAttachments: boolean;
 	placeholder: string;
-	fixedEvmNetwork?: EVMNetwork;
+	fixedChain?: string;
 	onCreated?: () => void;
 }
 
@@ -52,7 +52,7 @@ export const CreatePostForm = observer(
 				feedId,
 				allowCustomAttachments,
 				placeholder,
-				fixedEvmNetwork,
+				fixedChain,
 				onCreated,
 			}: CreatePostFormProps,
 			ref: Ref<CreatePostFormApi>,
@@ -74,8 +74,11 @@ export const CreatePostForm = observer(
 			useEffect(() => {
 				mailData.feedId = feedId;
 
-				if (fixedEvmNetwork != null) {
-					mailData.network = fixedEvmNetwork;
+				if (fixedChain) {
+					const evmNetwork = evmNameToNetwork(fixedChain);
+					if (evmNetwork != null) {
+						mailData.network = evmNetwork;
+					}
 				}
 
 				mailData.validator = () => {
@@ -108,7 +111,7 @@ export const CreatePostForm = observer(
 
 					return true;
 				};
-			}, [fixedEvmNetwork, mailData, feedId, replyTo]);
+			}, [fixedChain, mailData, feedId, replyTo]);
 
 			useEffect(() => {
 				mailData.from = mailData.from && accounts.includes(mailData.from) ? mailData.from : accounts[0];
@@ -376,7 +379,7 @@ export const CreatePostForm = observer(
 
 											<SendMailButton
 												mailData={mailData}
-												disableNetworkSwitch={fixedEvmNetwork != null}
+												disableNetworkSwitch={!!fixedChain}
 												onSent={onSent}
 											/>
 										</>

@@ -508,6 +508,6 @@ export function evmNameToNetwork(name: string): EVMNetwork | undefined {
 	return evmNetworks.find(n => n.name === name)?.network;
 }
 
-export function isEvmBlockchain(blockchain: string) {
-	return !!evmNameToNetwork(blockchain);
+export function isEvmBlockchain(blockchain: string | undefined | null) {
+	return !!blockchain && evmNameToNetwork(blockchain) != null;
 }

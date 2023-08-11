@@ -1,4 +1,3 @@
-import { EVMNetwork } from '@ylide/ethereum';
 import { observer } from 'mobx-react';
 import { ReactNode, useEffect, useRef, useState } from 'react';
 import { Helmet } from 'react-helmet';
@@ -26,15 +25,26 @@ import {
 	getBlockchainProjectById,
 } from '../../../stores/blockchainProjects/blockchainProjects';
 import { browserStorage } from '../../../stores/browserStorage';
-import domain, { useEvmAccounts, useVenomAccounts } from '../../../stores/Domain';
+import domain from '../../../stores/Domain';
 import { RoutePath } from '../../../stores/routePath';
 import { connectAccount } from '../../../utils/account';
 import { assertUnreachable, invariant } from '../../../utils/assert';
+import { blockchainMeta, BlockchainName, isEvmBlockchain } from '../../../utils/blockchain';
 import { useIsMatchesPattern, useNav } from '../../../utils/url';
 import { CreatePostForm, CreatePostFormApi } from '../_common/createPostForm/createPostForm';
 import { DiscussionPost } from '../_common/discussionPost/discussionPost';
 import { OfficialPost } from '../_common/officialPost/officialPost';
 import css from './blockchainProjectPage.module.scss';
+
+function getAllowedAccountForProject(project: BlockchainProject) {
+	return project.fixedChain === BlockchainName.VENOM_TESTNET
+		? domain.accounts.activeVenomAccounts
+		: isEvmBlockchain(project.fixedChain)
+		? domain.accounts.activeEvmAccounts
+		: domain.accounts.activeAccounts;
+}
+
+//
 
 interface OfficialContentProps {
 	project: BlockchainProject;
@@ -47,11 +57,7 @@ const OfficialContent = observer(({ project, setTabsAsideContent }: OfficialCont
 	invariant(feedId, 'No official feed id');
 
 	const isAdminMode = useIsMatchesPattern(RoutePath.PROJECT_ADMIN) && browserStorage.isUserAdmin;
-
-	const allAccounts = domain.accounts.activeAccounts;
-	const evmAccounts = useEvmAccounts();
-	const venomAccounts = useVenomAccounts();
-	const accounts = project.onlyEtherium ? evmAccounts : project.onlyVenom ? venomAccounts : allAccounts;
+	const accounts = getAllowedAccountForProject(project);
 
 	const postsQuery = useInfiniteQuery<DecodedBlockchainFeedPost[]>(['project', projectId, 'posts', 'official'], {
 		queryFn: async ({ pageParam = 0 }) => {
@@ -121,7 +127,7 @@ const OfficialContent = observer(({ project, setTabsAsideContent }: OfficialCont
 						(isAdminMode && project.attachmentMode === BlockchainProjectAttachmentMode.ADMINS)
 					}
 					placeholder="Make a new post"
-					fixedEvmNetwork={projectId === BlockchainProjectId.ETH_WHALES ? EVMNetwork.ETHEREUM : undefined}
+					fixedChain={project.fixedChain}
 					onCreated={() => toast('Good job! Your post will appear shortly 🔥')}
 				/>
 			)}
@@ -175,11 +181,7 @@ const DiscussionContent = observer(({ project, setTabsAsideContent }: Discussion
 	invariant(feedId, 'No discussion feed id');
 
 	const isAdminMode = useIsMatchesPattern(RoutePath.PROJECT_ADMIN) && browserStorage.isUserAdmin;
-
-	const allAccounts = domain.accounts.activeAccounts;
-	const evmAccounts = useEvmAccounts();
-	const venomAccounts = useVenomAccounts();
-	const accounts = project.onlyEtherium ? evmAccounts : project.onlyVenom ? venomAccounts : allAccounts;
+	const accounts = getAllowedAccountForProject(project);
 
 	const postsQuery = useInfiniteQuery<DecodedBlockchainFeedPost[]>(['project', projectId, 'posts', 'discussion'], {
 		queryFn: async ({ pageParam = 0 }) => {
@@ -253,17 +255,17 @@ const DiscussionContent = observer(({ project, setTabsAsideContent }: Discussion
 						isAdminMode
 					}
 					placeholder="What’s on your mind?"
-					fixedEvmNetwork={projectId === BlockchainProjectId.ETH_WHALES ? EVMNetwork.ETHEREUM : undefined}
+					fixedChain={project.fixedChain}
 					onCreated={() => toast('Good job! Your post will appear shortly 🔥')}
 				/>
 			) : (
 				<ErrorMessage look={ErrorMessageLook.INFO}>
 					<div>
-						{project.onlyVenom
-							? 'Connect your Venom wallet to post messages to this feed 👌'
-							: project.onlyEtherium
-							? 'Connect your Etherium wallet to post messages to this feed 👌'
-							: 'Connect your wallet to post messages 👌'}
+						<b>Connect your wallet to post messages to this feed 👌</b>
+						{project.fixedChain &&
+							` Posting is allowed using ${
+								(project.fixedChain && blockchainMeta[project.fixedChain].title) || ''
+							} blockchain only.`}
 					</div>
 
 					<ActionButton
@@ -290,7 +292,11 @@ const DiscussionContent = observer(({ project, setTabsAsideContent }: Discussion
 								} else {
 									toast(
 										`You need to connect ${
-											project.onlyVenom ? 'a Venom' : project.onlyEtherium ? 'an Etherium' : 'an'
+											project.fixedChain === BlockchainName.VENOM_TESTNET
+												? 'a Venom'
+												: isEvmBlockchain(project.fixedChain)
+												? 'an EVM'
+												: 'an'
 										} account in order to reply 👍`,
 									);
 								}

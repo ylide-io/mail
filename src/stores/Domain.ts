@@ -36,7 +36,6 @@ import {
 } from '@ylide/sdk';
 import { SmartBuffer } from '@ylide/smart-buffer';
 import { makeObservable, observable } from 'mobx';
-import { useMemo } from 'react';
 
 import { NFT3NameService } from '../api/nft3DID';
 import { PasswordRequestModal } from '../components/passwordRequestModal/passwordRequestModal';
@@ -832,18 +831,6 @@ export class Domain {
 
 		// schedule();
 	}
-}
-
-//
-
-export function useVenomAccounts() {
-	const accounts = domain.accounts.activeAccounts;
-	return useMemo(() => accounts.filter(a => a.wallet.wallet === 'venomwallet'), [accounts]);
-}
-
-export function useEvmAccounts() {
-	const accounts = domain.accounts.activeAccounts;
-	return useMemo(() => accounts.filter(a => a.wallet.factory.blockchainGroup === 'evm'), [accounts]);
 }
 
 //@ts-ignore

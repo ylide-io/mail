@@ -1,6 +1,7 @@
 import { Uint256 } from '@ylide/sdk';
 
 import { VENOM_FEED_ID } from '../../constants';
+import { BlockchainName } from '../../utils/blockchain';
 import _defaultBannerSrc from './bannerImages/_default.png';
 import betFuryBannerSrc from './bannerImages/betFury.jpg';
 import cryptoGvrBannerSrc from './bannerImages/cryptoGvr.jpg';
@@ -65,8 +66,7 @@ export interface BlockchainProject {
 	bannerImage?: string;
 	website?: string;
 	tags: string[];
-	onlyVenom?: boolean;
-	onlyEtherium?: boolean;
+	fixedChain?: string;
 	attachmentMode?: BlockchainProjectAttachmentMode;
 }
 
@@ -128,7 +128,7 @@ export const blockchainProjects: BlockchainProject[] = [
 		description: 'Here you can meet the fellow ETH supporters. Btw, messages are sent only via Ethereum chain.',
 		profileImage: ethWhalesSrc,
 		tags: ['Ecosystem'],
-		onlyEtherium: true,
+		fixedChain: BlockchainName.ETHEREUM,
 		attachmentMode: BlockchainProjectAttachmentMode.EVERYONE,
 	},
 	{
@@ -156,7 +156,7 @@ export const blockchainProjects: BlockchainProject[] = [
 		bannerImage: oasisGalleryBannerSrc,
 		website: 'https://oasis.gallery/',
 		tags: ['NFT', 'Venom'],
-		onlyVenom: true,
+		fixedChain: BlockchainName.VENOM_TESTNET,
 	},
 	{
 		id: BlockchainProjectId.SNIPA,
@@ -169,7 +169,7 @@ export const blockchainProjects: BlockchainProject[] = [
 		bannerImage: snipaBannerSrc,
 		website: 'https://snipa.finance/',
 		tags: ['DeFi', 'Venom'],
-		onlyVenom: true,
+		fixedChain: BlockchainName.VENOM_TESTNET,
 	},
 	{
 		id: BlockchainProjectId.VENOM_BLOCKCHAIN,
@@ -182,7 +182,7 @@ export const blockchainProjects: BlockchainProject[] = [
 		bannerImage: venomBlockchainBannerSrc,
 		website: 'https://venom.foundation/',
 		tags: ['Ecosystem', 'Venom'],
-		onlyVenom: true,
+		fixedChain: BlockchainName.VENOM_TESTNET,
 	},
 	{
 		id: BlockchainProjectId.VENOM_BRIDGE,
@@ -196,7 +196,7 @@ export const blockchainProjects: BlockchainProject[] = [
 		bannerImage: venomBridgeBannerSrc,
 		website: 'https://venombridge.com/',
 		tags: ['DeFi', 'Venom'],
-		onlyVenom: true,
+		fixedChain: BlockchainName.VENOM_TESTNET,
 	},
 	{
 		id: BlockchainProjectId.WEB3_WORLD,
@@ -209,7 +209,7 @@ export const blockchainProjects: BlockchainProject[] = [
 		bannerImage: web3WorldBannerSrc,
 		website: 'https://web3.world/',
 		tags: ['DeFi', 'Venom'],
-		onlyVenom: true,
+		fixedChain: BlockchainName.VENOM_TESTNET,
 	},
 	{
 		id: BlockchainProjectId.VENTORY,
@@ -223,7 +223,7 @@ export const blockchainProjects: BlockchainProject[] = [
 		bannerImage: ventoryBannerSrc,
 		website: 'https://testnet.ventory.gg/',
 		tags: ['NFT', 'Venom'],
-		onlyVenom: true,
+		fixedChain: BlockchainName.VENOM_TESTNET,
 	},
 	{
 		id: BlockchainProjectId.GRAVIX,
@@ -237,7 +237,7 @@ export const blockchainProjects: BlockchainProject[] = [
 		bannerImage: gravixBannerSrc,
 		website: 'https://gravix.io/',
 		tags: ['DeFi', 'Venom'],
-		onlyVenom: true,
+		fixedChain: BlockchainName.VENOM_TESTNET,
 	},
 	{
 		id: BlockchainProjectId.STAX,
@@ -252,7 +252,7 @@ export const blockchainProjects: BlockchainProject[] = [
 		bannerImage: staxBannerSrc,
 		website: 'https://stax.live',
 		tags: ['NFT', 'Venom'],
-		onlyVenom: true,
+		fixedChain: BlockchainName.VENOM_TESTNET,
 		attachmentMode: BlockchainProjectAttachmentMode.ADMINS,
 	},
 	{
@@ -268,7 +268,7 @@ export const blockchainProjects: BlockchainProject[] = [
 		bannerImage: venomIdBannerSrc,
 		website: 'https://venomid.network/',
 		tags: ['Social', 'Venom'],
-		onlyVenom: true,
+		fixedChain: BlockchainName.VENOM_TESTNET,
 		attachmentMode: BlockchainProjectAttachmentMode.ADMINS,
 	},
 	{
@@ -284,6 +284,7 @@ export const blockchainProjects: BlockchainProject[] = [
 		bannerImage: venomRecapBannerSrc,
 		website: 'https://twitter.com/VenomRecap',
 		tags: ['Social', 'Venom'],
+		fixedChain: BlockchainName.VENOM_TESTNET,
 		attachmentMode: BlockchainProjectAttachmentMode.ADMINS,
 	},
 	{
@@ -298,6 +299,7 @@ export const blockchainProjects: BlockchainProject[] = [
 		bannerImage: venomApeClubBannerSrc,
 		website: 'https://venomape.club/',
 		tags: ['NFT', 'Venom'],
+		fixedChain: BlockchainName.VENOM_TESTNET,
 		attachmentMode: BlockchainProjectAttachmentMode.ADMINS,
 	},
 
@@ -341,6 +343,7 @@ export const blockchainProjects: BlockchainProject[] = [
 		bannerImage: gnosisBuildersBannerSrc,
 		website: 'https://www.gnosis.builders/',
 		tags: ['Ecosystem', 'Social'],
+		fixedChain: BlockchainName.GNOSIS,
 		attachmentMode: BlockchainProjectAttachmentMode.ADMINS,
 	},
 	{
