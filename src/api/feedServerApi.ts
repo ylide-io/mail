@@ -122,8 +122,10 @@ export namespace FeedServerApi {
 		tags?: number[];
 		sourceId?: string;
 		addressTokens?: string[];
+		checkNewPosts?: boolean;
+		signal?: AbortSignal;
 	}): Promise<GetPostsResponse> {
-		return await request(`/posts?${createCleanSerachParams(params)}`);
+		return await request(`/posts?${createCleanSerachParams(params)}`, { signal: params.signal });
 	}
 
 	export type GetPostResponse = { post: FeedPost };

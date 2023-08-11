@@ -19,6 +19,9 @@ export class FeedStore {
 	readonly sourceId: string | undefined;
 	readonly addressTokens: string[] | undefined;
 
+	abortController: AbortController | undefined;
+	checkNewPostsProcess: NodeJS.Timer | undefined;
+
 	constructor(params: { tags?: { id: number; name: string }[]; sourceId?: string; addressTokens?: string[] }) {
 		if (params.tags) {
 			this.tags = params.tags;
@@ -34,6 +37,8 @@ export class FeedStore {
 		length: number;
 		lastPostId?: string;
 		firstPostId?: string;
+		checkNewPosts?: boolean;
+		signal?: AbortSignal;
 	}): Promise<FeedServerApi.GetPostsResponse | undefined> {
 		try {
 			this.loading = true;
@@ -72,6 +77,7 @@ export class FeedStore {
 	}
 
 	async load() {
+		this.abortCheckNewPosts();
 		if (this.loading) return;
 
 		const data = await this.genericLoad({
@@ -84,9 +90,15 @@ export class FeedStore {
 			this.moreAvailable = data.moreAvailable;
 			this.newPosts = data.newPosts;
 		}
+		if (!this.checkNewPostsProcess) {
+			this.checkNewPostsProcess = setInterval(() => {
+				this.checkNewPosts();
+			}, 10000);
+		}
 	}
 
 	async loadMore() {
+		this.abortCheckNewPosts();
 		if (this.loading) return;
 
 		const data = await this.genericLoad({
@@ -103,7 +115,47 @@ export class FeedStore {
 		}
 	}
 
+	async checkNewPosts() {
+		if (this.loading) return;
+		const firstPostId = this.posts.at(0)?.id;
+		if (firstPostId) {
+			this.abortController = new AbortController();
+			const data = await this.genericLoad({
+				needOld: false,
+				length: 0,
+				checkNewPosts: true,
+				firstPostId,
+				signal: this.abortController.signal,
+			});
+
+			if (data) {
+				this.newPosts = data.newPosts;
+			}
+		}
+	}
+
+	abortCheckNewPosts() {
+		if (this.abortController) {
+			this.abortController.abort();
+			this.abortController = undefined;
+			this.loading = false;
+		}
+	}
+
+	clearProcess() {
+		if (this.checkNewPostsProcess) {
+			clearInterval(this.checkNewPostsProcess);
+		} else {
+			// FeedPage unmounted before process has been created
+			// wait for it to cancel successfully
+			setTimeout(() => {
+				this.clearProcess();
+			}, 1000);
+		}
+	}
+
 	async loadNew() {
+		this.abortCheckNewPosts();
 		if (this.loading) return;
 
 		const data = await this.genericLoad({

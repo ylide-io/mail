@@ -89,6 +89,12 @@ const FeedPageContent = observer(() => {
 		return feed;
 	}, [canLoadFeed, tags, tag, genericLayoutApi, selectedAccounts, source, reloadCounter]);
 
+	useEffect(() => {
+		return () => {
+			feed.clearProcess();
+		};
+	}, [feed]);
+
 	const title = useMemo(() => {
 		if (tag) {
 			return feed.tags.find(t => t.id === Number(tag))?.name;
