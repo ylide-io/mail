@@ -13,6 +13,28 @@ import bannerSrc from './banner.png';
 import css from './explorePage.module.scss';
 
 export function ExplorePage() {
+	function renderTagBlock(tag: string) {
+		return (
+			<div>
+				<div className={css.tagTitle}>
+					<TagSvg />
+
+					<div>
+						{tag} <span>communities</span>
+					</div>
+				</div>
+
+				<div className={css.smallGrid}>
+					{blockchainProjects
+						.filter(p => p.tags.includes(tag))
+						.map(project => (
+							<RegularProjectCard project={project} />
+						))}
+				</div>
+			</div>
+		);
+	}
+
 	return (
 		<GenericLayout>
 			<RegularPageContent>
@@ -32,46 +54,14 @@ export function ExplorePage() {
 						<RichProjectCard project={getBlockchainProjectById(BlockchainProjectId.ETH_WHALES)} />
 					</div>
 
-					<div>
-						<div className={css.tagTitle}>
-							<TagSvg />
-
-							<div>
-								Ecosystem <span>communities</span>
-							</div>
-						</div>
-
-						<div className={css.smallGrid}>
-							{blockchainProjects
-								.filter(p => p.tags.includes('Ecosystem'))
-								.map(project => (
-									<RegularProjectCard project={project} />
-								))}
-						</div>
-					</div>
+					{renderTagBlock('DeFi')}
 
 					<div className={css.bigGrid}>
 						<RichProjectCard project={getBlockchainProjectById(BlockchainProjectId.TVM)} />
 						<RichProjectCard project={getBlockchainProjectById(BlockchainProjectId.GRAVIX)} />
 					</div>
 
-					<div>
-						<div className={css.tagTitle}>
-							<TagSvg />
-
-							<div>
-								Venom <span>communities</span>
-							</div>
-						</div>
-
-						<div className={css.smallGrid}>
-							{blockchainProjects
-								.filter(p => p.tags.includes('Venom'))
-								.map(project => (
-									<RegularProjectCard project={project} />
-								))}
-						</div>
-					</div>
+					{renderTagBlock('Venom')}
 
 					<div className={css.bigGrid}>
 						<RichProjectCard project={getBlockchainProjectById(BlockchainProjectId.SNIPA)} />
