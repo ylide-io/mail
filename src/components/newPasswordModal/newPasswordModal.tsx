@@ -106,18 +106,54 @@ export function NewPasswordModal({
 			const account = domainAccountRef.current;
 			invariant(account);
 
-			await Promise.all([
-				account.publishPublicKey(key, network),
-				// Display loader after 3 seconds
-				asyncDelay(3000).then(() => setStep(Step.LOADING)),
-			]);
+			const justPublishedKey = await new Promise<RemotePublicKey | null>((resolve, reject) => {
+				let isDone = false;
 
-			const justPublishedKey = await domain.waitForPublicKey(
-				false,
-				network ? EVM_NAMES[network] : account.wallet.currentBlockchain,
-				account.account.address,
-				key.publicKey.keyBytes,
-			);
+				asyncDelay(3000).then(() => (!isDone ? setStep(Step.LOADING) : null));
+
+				account.publishPublicKey(key, network).then(() => {
+					if (isDone) {
+						return;
+					}
+
+					domain
+						.waitForPublicKey(
+							false,
+							network ? EVM_NAMES[network] : account.wallet.currentBlockchain,
+							account.account.address,
+							key.publicKey.keyBytes,
+						)
+						.then(foundKey => {
+							if (isDone) {
+								return;
+							}
+
+							isDone = true;
+
+							resolve(foundKey);
+						});
+				});
+
+				asyncDelay(3000).then(() =>
+					domain
+						.waitForPublicKey(
+							false,
+							network ? EVM_NAMES[network] : account.wallet.currentBlockchain,
+							account.account.address,
+							key.publicKey.keyBytes,
+						)
+						.then(foundKey => {
+							if (isDone) {
+								return;
+							}
+							if (foundKey) {
+								isDone = true;
+								resolve(foundKey);
+							}
+						}),
+				);
+			});
+
 			if (justPublishedKey) {
 				await domain.keyRegistry.addRemotePublicKey(justPublishedKey);
 				account.reloadKeys();
