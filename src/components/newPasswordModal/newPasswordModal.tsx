@@ -106,57 +106,78 @@ export function NewPasswordModal({
 			const account = domainAccountRef.current;
 			invariant(account);
 
-			const justPublishedKey = await new Promise<RemotePublicKey | null>((resolve, reject) => {
-				let isDone = false;
+			const isOldWay = document.location.search.includes('oldWay=true');
 
-				asyncDelay(3000).then(() => (!isDone ? setStep(Step.LOADING) : null));
+			if (isOldWay) {
+				await Promise.all([
+					account.publishPublicKey(key, network),
+					asyncDelay(3000).then(() => setStep(Step.LOADING)),
+				]);
 
-				account.publishPublicKey(key, network).then(() => {
-					if (isDone) {
-						return;
-					}
+				const justPublishedKey = await domain.waitForPublicKey(
+					false,
+					network ? EVM_NAMES[network] : account.wallet.currentBlockchain,
+					account.account.address,
+					key.publicKey.keyBytes,
+				);
 
-					domain
-						.waitForPublicKey(
-							false,
-							network ? EVM_NAMES[network] : account.wallet.currentBlockchain,
-							account.account.address,
-							key.publicKey.keyBytes,
-						)
-						.then(foundKey => {
-							if (isDone) {
-								return;
-							}
+				if (justPublishedKey) {
+					await domain.keyRegistry.addRemotePublicKey(justPublishedKey);
+					account.reloadKeys();
+				}
+			} else {
+				const justPublishedKey = await new Promise<RemotePublicKey | null>((resolve, reject) => {
+					let isDone = false;
 
-							isDone = true;
+					asyncDelay(3000).then(() => (!isDone ? setStep(Step.LOADING) : null));
 
-							resolve(foundKey);
-						});
+					account.publishPublicKey(key, network).then(() => {
+						if (isDone) {
+							return;
+						}
+
+						domain
+							.waitForPublicKey(
+								false,
+								network ? EVM_NAMES[network] : account.wallet.currentBlockchain,
+								account.account.address,
+								key.publicKey.keyBytes,
+							)
+							.then(foundKey => {
+								if (isDone) {
+									return;
+								}
+
+								isDone = true;
+
+								resolve(foundKey);
+							});
+					});
+
+					asyncDelay(3000).then(() =>
+						domain
+							.waitForPublicKey(
+								false,
+								network ? EVM_NAMES[network] : account.wallet.currentBlockchain,
+								account.account.address,
+								key.publicKey.keyBytes,
+							)
+							.then(foundKey => {
+								if (isDone) {
+									return;
+								}
+								if (foundKey) {
+									isDone = true;
+									resolve(foundKey);
+								}
+							}),
+					);
 				});
 
-				asyncDelay(3000).then(() =>
-					domain
-						.waitForPublicKey(
-							false,
-							network ? EVM_NAMES[network] : account.wallet.currentBlockchain,
-							account.account.address,
-							key.publicKey.keyBytes,
-						)
-						.then(foundKey => {
-							if (isDone) {
-								return;
-							}
-							if (foundKey) {
-								isDone = true;
-								resolve(foundKey);
-							}
-						}),
-				);
-			});
-
-			if (justPublishedKey) {
-				await domain.keyRegistry.addRemotePublicKey(justPublishedKey);
-				account.reloadKeys();
+				if (justPublishedKey) {
+					await domain.keyRegistry.addRemotePublicKey(justPublishedKey);
+					account.reloadKeys();
+				}
 			}
 
 			analytics.walletRegistered(wallet.wallet, account.account.address);
