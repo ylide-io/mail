@@ -56,7 +56,7 @@
 }
 
 .previewCustomImage {
-	@include feed-attachment-image;
+	@include feed-attachment-image(480px, false);
 }
 
 .footer {

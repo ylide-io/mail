@@ -22,6 +22,5 @@
 }
 
 .cover {
-	@include feed-attachment-image;
-	max-height: 320px;
+	@include feed-attachment-image(320px);
 }
