@@ -1,4 +1,4 @@
-import { ReactNode } from 'react';
+import { ReactNode, useState } from 'react';
 
 import { Blockie } from '../blockie/blockie';
 import { PropsWithClassName } from '../props';
@@ -11,12 +11,13 @@ interface AvatarProps extends PropsWithClassName {
 }
 
 export function Avatar({ className, image, blockie, placeholder }: AvatarProps) {
+	const [imageLoadFailed, setImageLoadFailed] = useState(false);
 	return (
 		<div className={className}>
 			<div className={css.inner}>
 				<div className={css.inner2}>
-					{image ? (
-						<img className={css.content} src={image} />
+					{image && !imageLoadFailed ? (
+						<img className={css.content} src={image} onError={() => setImageLoadFailed(true)} />
 					) : blockie ? (
 						<Blockie className={css.content} address={blockie} />
 					) : (
