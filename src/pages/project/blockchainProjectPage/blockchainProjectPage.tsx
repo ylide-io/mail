@@ -56,7 +56,7 @@ const OfficialContent = observer(({ project, setTabsAsideContent }: OfficialCont
 	const feedId = project.feedId.official;
 	invariant(feedId, 'No official feed id');
 
-	const isAdminMode = useIsMatchesPattern(RoutePath.PROJECT_ADMIN) && browserStorage.isUserAdmin;
+	const isAdminMode = useIsMatchesPattern(RoutePath.PROJECT_OFFICIAL_ADMIN) && browserStorage.isUserAdmin;
 	const accounts = getAllowedAccountForProject(project);
 
 	const postsQuery = useInfiniteQuery<DecodedBlockchainFeedPost[]>(['project', projectId, 'posts', 'official'], {
@@ -119,13 +119,14 @@ const OfficialContent = observer(({ project, setTabsAsideContent }: OfficialCont
 				image={project.bannerImage}
 			/>
 
-			{isAdminMode && !!accounts.length && (
+			{browserStorage.isUserAdmin && !!accounts.length && (
 				<CreatePostForm
 					accounts={accounts}
 					feedId={feedId}
 					allowCustomAttachments={
 						project.attachmentMode === BlockchainProjectAttachmentMode.EVERYONE ||
-						(isAdminMode && project.attachmentMode === BlockchainProjectAttachmentMode.ADMINS)
+						(browserStorage.isUserAdmin &&
+							project.attachmentMode === BlockchainProjectAttachmentMode.ADMINS)
 					}
 					placeholder="Make a new post"
 					fixedChain={project.fixedChain}
@@ -181,7 +182,7 @@ const DiscussionContent = observer(({ project, setTabsAsideContent }: Discussion
 	const feedId = project.feedId.discussion;
 	invariant(feedId, 'No discussion feed id');
 
-	const isAdminMode = useIsMatchesPattern(RoutePath.PROJECT_ADMIN) && browserStorage.isUserAdmin;
+	const isAdminMode = useIsMatchesPattern(RoutePath.PROJECT_DISCUSSION_ADMIN) && browserStorage.isUserAdmin;
 	const accounts = getAllowedAccountForProject(project);
 
 	const postsQuery = useInfiniteQuery<DecodedBlockchainFeedPost[]>(['project', projectId, 'posts', 'discussion'], {
@@ -254,7 +255,7 @@ const DiscussionContent = observer(({ project, setTabsAsideContent }: Discussion
 					allowCustomAttachments={
 						projectId === BlockchainProjectId.ETH_WHALES ||
 						projectId === BlockchainProjectId.TVM ||
-						isAdminMode
+						browserStorage.isUserAdmin
 					}
 					placeholder="What’s on your mind?"
 					fixedChain={project.fixedChain}
@@ -354,8 +355,8 @@ export const BlockchainProjectPage = observer(() => {
 	invariant(project.feedId.official || project.feedId.discussion, 'Project feed Id must be specified');
 
 	const isProjectRoot = useIsMatchesPattern(RoutePath.PROJECT);
-	const isProjectAnnouncements = useIsMatchesPattern(RoutePath.PROJECT_OFFICIAL);
-	const isProjectDiscussion = useIsMatchesPattern(RoutePath.PROJECT_DISCUSSION);
+	const isProjectAnnouncements = useIsMatchesPattern(RoutePath.PROJECT_OFFICIAL, RoutePath.PROJECT_OFFICIAL_ADMIN);
+	const isProjectDiscussion = useIsMatchesPattern(RoutePath.PROJECT_DISCUSSION, RoutePath.PROJECT_DISCUSSION_ADMIN);
 
 	const part = isProjectAnnouncements ? BlockchainProjectPagePart.OFFICIAL : BlockchainProjectPagePart.DISCUSSION;
 

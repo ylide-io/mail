@@ -280,9 +280,10 @@ export const App = observer(() => {
 
 						<Route path={RoutePath.PROJECT} element={<BlockchainProjectPage />} />
 						<Route path={RoutePath.PROJECT_OFFICIAL} element={<BlockchainProjectPage />} />
-						<Route path={RoutePath.PROJECT_ADMIN} element={<BlockchainProjectPage />} />
+						<Route path={RoutePath.PROJECT_OFFICIAL_ADMIN} element={<BlockchainProjectPage />} />
 						<Route path={RoutePath.PROJECT_POST} element={<BlockchainProjectPostPage />} />
 						<Route path={RoutePath.PROJECT_DISCUSSION} element={<BlockchainProjectPage />} />
+						<Route path={RoutePath.PROJECT_DISCUSSION_ADMIN} element={<BlockchainProjectPage />} />
 
 						{/* MAIL */}
 
