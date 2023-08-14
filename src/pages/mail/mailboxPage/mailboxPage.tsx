@@ -151,8 +151,8 @@ export const MailboxPage = observer(() => {
 	return (
 		<GenericLayout>
 			<PageMeta
-				title="Decentralized Web3 Mailbox by Ylide for secure and private communication"
-				description="Experience the power of decentralized communication with Ylide's Web3 Mailbox. Supporting multiple chains including Ethereum, Polygon, BNB, Venom Blockchain, Gnosis chain, Celo, Moonriver, Klaytn, Moonbeam, Avalanche, Aurora, Fantom, Metis, Arbitrum, Optimism, and Everscale. Secure, private, and built for the future of the web."
+				title="Mailbox by Ylide"
+				description="Decentralized Web3 Mailbox by Ylide for secure and private communication. Experience the power of decentralized communication with Ylide's Web3 Mailbox. Supporting multiple chains including Ethereum, Polygon, BNB, Venom Blockchain, Gnosis chain, Celo, Moonriver, Klaytn, Moonbeam, Avalanche, Aurora, Fantom, Metis, Arbitrum, Optimism, and Everscale. Secure, private, and built for the future of the web."
 			/>
 
 			<FullPageContent>

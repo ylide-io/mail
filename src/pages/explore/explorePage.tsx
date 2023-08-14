@@ -3,6 +3,7 @@ import { RegularProjectCard } from '../../components/blockchainProjectCards/regu
 import { RichProjectCard } from '../../components/blockchainProjectCards/richProjectCard/richProjectCard';
 import { RegularPageContent } from '../../components/genericLayout/content/regularPageContent/regularPageContent';
 import { GenericLayout } from '../../components/genericLayout/genericLayout';
+import { PageMeta } from '../../components/pageMeta/pageMeta';
 import { ReactComponent as TagSvg } from '../../icons/ic28/tag.svg';
 import {
 	BlockchainProjectId,
@@ -39,6 +40,8 @@ export function ExplorePage() {
 
 	return (
 		<GenericLayout>
+			<PageMeta title="Ylide Social Hub – Explore Web3 Communities" />
+
 			<RegularPageContent>
 				<div className={css.root}>
 					<div className={css.banner}>
