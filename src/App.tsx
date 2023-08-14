@@ -246,6 +246,30 @@ export const App = observer(() => {
 					<RemoveTrailingSlash />
 
 					<Routes>
+						{/* MIGRATIONS */}
+
+						{redirect({
+							from: '/feed/venom/*',
+							to: location.pathname.replace('/feed/venom', '/feed/project'),
+						})}
+
+						{redirect({
+							from: '/feed/tvm/*',
+							to: location.pathname.replace('/feed/tvm', '/feed/project/tvm'),
+						})}
+
+						{redirect({
+							from: '/feed/project/*',
+							to: location.pathname.replace('/feed/project', '/project'),
+						})}
+
+						{redirect({
+							from: '/project/tvm_discussion',
+							to: location.pathname.replace('/project/tvm_discussion', '/project/tvm/discussion'),
+						})}
+
+						{/* GENERAL */}
+
 						<Route path={RoutePath.ROOT} element={<ExplorePage />} />
 
 						<Route path={RoutePath.TEST} element={<TestPage />} />
@@ -317,28 +341,6 @@ export const App = observer(() => {
 
 						<Route path={RoutePath.WIDGET_SENDMESSAGE} element={<SendMessageWidget />} />
 						<Route path={RoutePath.WIDGET_MAILBOX} element={<MailboxWidget />} />
-
-						{/* MIGRATIONS */}
-
-						{redirect({
-							from: '/feed/venom/*',
-							to: location.pathname.replace('/feed/venom', '/feed/project'),
-						})}
-
-						{redirect({
-							from: '/feed/tvm/*',
-							to: location.pathname.replace('/feed/tvm', '/feed/project/tvm'),
-						})}
-
-						{redirect({
-							from: '/feed/project/*',
-							to: location.pathname.replace('/feed/project', '/project'),
-						})}
-
-						{redirect({
-							from: '/project/tvm_discussion',
-							to: location.pathname.replace('/project/tvm_discussion', '/project/tvm/discussion'),
-						})}
 
 						{/* REST */}
 
