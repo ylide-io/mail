@@ -390,6 +390,7 @@ export const BlockchainProjectPage = observer(() => {
 	if (isProjectRoot) {
 		return (
 			<Navigate
+				replace
 				to={
 					project.feedId.discussion
 						? generatePath(RoutePath.PROJECT_ID_DISCUSSION, { projectId })
@@ -400,11 +401,11 @@ export const BlockchainProjectPage = observer(() => {
 	}
 
 	if (isProjectAnnouncements && !project.feedId.official) {
-		return <Navigate to={generatePath(RoutePath.PROJECT_ID_DISCUSSION, { projectId })} />;
+		return <Navigate replace to={generatePath(RoutePath.PROJECT_ID_DISCUSSION, { projectId })} />;
 	}
 
 	if (isProjectDiscussion && !project.feedId.discussion) {
-		return <Navigate to={generatePath(RoutePath.PROJECT_ID_OFFICIAL, { projectId })} />;
+		return <Navigate replace to={generatePath(RoutePath.PROJECT_ID_OFFICIAL, { projectId })} />;
 	}
 
 	return (
