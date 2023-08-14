@@ -7,13 +7,14 @@ import { ReactComponent as TagSvg } from '../../icons/ic28/tag.svg';
 import {
 	BlockchainProjectId,
 	blockchainProjects,
+	BlockchainProjectTag,
 	getBlockchainProjectById,
 } from '../../stores/blockchainProjects/blockchainProjects';
 import bannerSrc from './banner.png';
 import css from './explorePage.module.scss';
 
 export function ExplorePage() {
-	function renderTagBlock(tag: string) {
+	function renderTagBlock(tag: BlockchainProjectTag) {
 		return (
 			<div>
 				<div className={css.tagTitle}>
@@ -54,19 +55,26 @@ export function ExplorePage() {
 						<RichProjectCard project={getBlockchainProjectById(BlockchainProjectId.ETH_WHALES)} />
 					</div>
 
-					{renderTagBlock('DeFi')}
+					{renderTagBlock(BlockchainProjectTag.DEFI)}
 
 					<div className={css.bigGrid}>
 						<RichProjectCard project={getBlockchainProjectById(BlockchainProjectId.TVM)} />
 						<RichProjectCard project={getBlockchainProjectById(BlockchainProjectId.GRAVIX)} />
 					</div>
 
-					{renderTagBlock('Venom')}
+					{renderTagBlock(BlockchainProjectTag.VENOM)}
 
 					<div className={css.bigGrid}>
 						<RichProjectCard project={getBlockchainProjectById(BlockchainProjectId.SNIPA)} />
 						<RichProjectCard project={getBlockchainProjectById(BlockchainProjectId.OASIS_GALLERY)} />
 					</div>
+
+					{renderTagBlock(BlockchainProjectTag.NFT)}
+					{renderTagBlock(BlockchainProjectTag.SOCIAL)}
+					{renderTagBlock(BlockchainProjectTag.TVM)}
+					{renderTagBlock(BlockchainProjectTag.ECOSYSTEM)}
+					{renderTagBlock(BlockchainProjectTag.RESEARCH)}
+					{renderTagBlock(BlockchainProjectTag.GAMING)}
 
 					<div>
 						<div className={css.tagTitle}>
