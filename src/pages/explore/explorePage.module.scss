@@ -53,21 +53,6 @@
 	}
 }
 
-.miniGrid {
-	display: grid;
-	grid-template-columns: 1fr 1fr 1fr 1fr;
-	grid-gap: 12px;
-	padding: 4px;
-
-	@include lessThan768w {
-		grid-template-columns: 1fr 1fr 1fr;
-	}
-
-	@include lessThan640w {
-		grid-template-columns: 1fr 1fr;
-	}
-}
-
 .tagTitle {
 	display: flex;
 	align-items: center;

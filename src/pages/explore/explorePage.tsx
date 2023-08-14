@@ -1,4 +1,3 @@
-import { MiniProjectCard } from '../../components/blockchainProjectCards/miniProjectCard/miniProjectCard';
 import { RegularProjectCard } from '../../components/blockchainProjectCards/regularProjectCard/regularProjectCard';
 import { RichProjectCard } from '../../components/blockchainProjectCards/richProjectCard/richProjectCard';
 import { RegularPageContent } from '../../components/genericLayout/content/regularPageContent/regularPageContent';
@@ -75,22 +74,6 @@ export function ExplorePage() {
 					{renderTagBlock(BlockchainProjectTag.ECOSYSTEM)}
 					{renderTagBlock(BlockchainProjectTag.RESEARCH)}
 					{renderTagBlock(BlockchainProjectTag.GAMING)}
-
-					<div>
-						<div className={css.tagTitle}>
-							<TagSvg />
-
-							<div>
-								<span>All communities</span>
-							</div>
-						</div>
-
-						<div className={css.miniGrid}>
-							{blockchainProjects.map(project => (
-								<MiniProjectCard project={project} />
-							))}
-						</div>
-					</div>
 
 					<div className={css.footer}>The End</div>
 				</div>
