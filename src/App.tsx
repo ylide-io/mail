@@ -335,6 +335,11 @@ export const App = observer(() => {
 							to: location.pathname.replace('/feed/project', '/project'),
 						})}
 
+						{redirect({
+							from: '/project/tvm_discussion',
+							to: location.pathname.replace('/project/tvm_discussion', '/project/tvm/discussion'),
+						})}
+
 						{/* REST */}
 
 						{redirect({
