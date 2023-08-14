@@ -57,7 +57,7 @@ export const SearchField = ({ className }: PropsWithClassName) => {
 								<div className={css.heading}>Results</div>
 
 								{results.map(project => {
-									const href = generatePath(RoutePath.PROJECT, { projectId: project.id });
+									const href = generatePath(RoutePath.PROJECT_ID, { projectId: project.id });
 
 									return (
 										<a

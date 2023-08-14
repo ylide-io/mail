@@ -24,7 +24,7 @@ import { stickerIpfsIds } from '../createPostForm/stickerIpfsIds';
 import css from './officialPost.module.scss';
 
 export function generateOfficialPostPath(projectId: BlockchainProjectId, postId: string) {
-	return generatePath(RoutePath.PROJECT_POST, { projectId, postId: encodeURIComponent(postId) });
+	return generatePath(RoutePath.PROJECT_ID_POST_ID, { projectId, postId: encodeURIComponent(postId) });
 }
 
 interface OfficialPostViewProps {

@@ -183,14 +183,14 @@ interface FeedPostItemProps {
 
 export function FeedPostItem({ isInFeed, realtedAccounts, post }: FeedPostItemProps) {
 	const navigate = useNav();
-	const postPath = generatePath(RoutePath.FEED_POST, { postId: post.id });
+	const postPath = generatePath(RoutePath.FEED_POST_ID, { postId: post.id });
 
 	const menuButtonRef = useRef(null);
 	const [isMenuOpen, setMenuOpen] = useState(false);
 	const [isSharePopupOpen, setSharePopupOpen] = useState(false);
 
 	const onSourceIdClick = () => {
-		navigate(generatePath(RoutePath.FEED_SOURCE, { source: post.sourceId }));
+		navigate(generatePath(RoutePath.FEED_SOURCE_ID, { source: post.sourceId }));
 	};
 
 	const [unfollowedState, setUnfollowState] = useState<'none' | 'unfollowing' | 'unfollowed'>('none');

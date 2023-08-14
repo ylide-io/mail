@@ -16,7 +16,7 @@ export interface RichProjectCardProps {
 
 export function RichProjectCard({ project }: RichProjectCardProps) {
 	const navigate = useNav();
-	const href = generatePath(RoutePath.PROJECT, { projectId: project.id });
+	const href = generatePath(RoutePath.PROJECT_ID, { projectId: project.id });
 
 	return (
 		<a

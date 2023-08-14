@@ -43,7 +43,7 @@ import { RepliedDiscussionPost } from '../repliedDiscussionPost/repliedDiscussio
 import css from './discussionPost.module.scss';
 
 export function generateDiscussionPostPath(projectId: BlockchainProjectId, postId: string) {
-	return generatePath(RoutePath.PROJECT_POST, { projectId, postId: encodeURIComponent(postId) });
+	return generatePath(RoutePath.PROJECT_ID_POST_ID, { projectId, postId: encodeURIComponent(postId) });
 }
 
 //

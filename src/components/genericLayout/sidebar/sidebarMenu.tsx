@@ -165,7 +165,7 @@ interface SidebarProjectProps {
 }
 
 export function SidebarProject({ project }: SidebarProjectProps) {
-	const href = generatePath(RoutePath.PROJECT, { projectId: project.id });
+	const href = generatePath(RoutePath.PROJECT_ID, { projectId: project.id });
 	const isActive = useIsMatchesPath(href);
 
 	return <MiniProjectCard className={clsx(isActive && css.sidebarProject_active)} project={project} />;
@@ -389,7 +389,7 @@ export const SidebarMenu = observer(() => {
 					tags.map(t => (
 						<SidebarButton
 							key={t.id}
-							href={generatePath(RoutePath.FEED_CATEGORY, { tag: t.id.toString() })}
+							href={generatePath(RoutePath.FEED_CATEGORY_ID, { tag: t.id.toString() })}
 							name={t.name}
 						/>
 					))

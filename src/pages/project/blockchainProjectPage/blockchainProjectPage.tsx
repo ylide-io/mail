@@ -56,7 +56,7 @@ const OfficialContent = observer(({ project, setTabsAsideContent }: OfficialCont
 	const feedId = project.feedId.official;
 	invariant(feedId, 'No official feed id');
 
-	const isAdminMode = useIsMatchesPattern(RoutePath.PROJECT_OFFICIAL_ADMIN) && browserStorage.isUserAdmin;
+	const isAdminMode = useIsMatchesPattern(RoutePath.PROJECT_ID_OFFICIAL_ADMIN) && browserStorage.isUserAdmin;
 	const accounts = getAllowedAccountForProject(project);
 
 	const postsQuery = useInfiniteQuery<DecodedBlockchainFeedPost[]>(['project', projectId, 'posts', 'official'], {
@@ -182,7 +182,7 @@ const DiscussionContent = observer(({ project, setTabsAsideContent }: Discussion
 	const feedId = project.feedId.discussion;
 	invariant(feedId, 'No discussion feed id');
 
-	const isAdminMode = useIsMatchesPattern(RoutePath.PROJECT_DISCUSSION_ADMIN) && browserStorage.isUserAdmin;
+	const isAdminMode = useIsMatchesPattern(RoutePath.PROJECT_ID_DISCUSSION_ADMIN) && browserStorage.isUserAdmin;
 	const accounts = getAllowedAccountForProject(project);
 
 	const postsQuery = useInfiniteQuery<DecodedBlockchainFeedPost[]>(['project', projectId, 'posts', 'discussion'], {
@@ -354,9 +354,15 @@ export const BlockchainProjectPage = observer(() => {
 	invariant(project, 'Project not found');
 	invariant(project.feedId.official || project.feedId.discussion, 'Project feed Id must be specified');
 
-	const isProjectRoot = useIsMatchesPattern(RoutePath.PROJECT);
-	const isProjectAnnouncements = useIsMatchesPattern(RoutePath.PROJECT_OFFICIAL, RoutePath.PROJECT_OFFICIAL_ADMIN);
-	const isProjectDiscussion = useIsMatchesPattern(RoutePath.PROJECT_DISCUSSION, RoutePath.PROJECT_DISCUSSION_ADMIN);
+	const isProjectRoot = useIsMatchesPattern(RoutePath.PROJECT_ID);
+	const isProjectAnnouncements = useIsMatchesPattern(
+		RoutePath.PROJECT_ID_OFFICIAL,
+		RoutePath.PROJECT_ID_OFFICIAL_ADMIN,
+	);
+	const isProjectDiscussion = useIsMatchesPattern(
+		RoutePath.PROJECT_ID_DISCUSSION,
+		RoutePath.PROJECT_ID_DISCUSSION_ADMIN,
+	);
 
 	const part = isProjectAnnouncements ? BlockchainProjectPagePart.OFFICIAL : BlockchainProjectPagePart.DISCUSSION;
 
@@ -386,19 +392,19 @@ export const BlockchainProjectPage = observer(() => {
 			<Navigate
 				to={
 					project.feedId.discussion
-						? generatePath(RoutePath.PROJECT_DISCUSSION, { projectId })
-						: generatePath(RoutePath.PROJECT_OFFICIAL, { projectId })
+						? generatePath(RoutePath.PROJECT_ID_DISCUSSION, { projectId })
+						: generatePath(RoutePath.PROJECT_ID_OFFICIAL, { projectId })
 				}
 			/>
 		);
 	}
 
 	if (isProjectAnnouncements && !project.feedId.official) {
-		return <Navigate to={generatePath(RoutePath.PROJECT_DISCUSSION, { projectId })} />;
+		return <Navigate to={generatePath(RoutePath.PROJECT_ID_DISCUSSION, { projectId })} />;
 	}
 
 	if (isProjectDiscussion && !project.feedId.discussion) {
-		return <Navigate to={generatePath(RoutePath.PROJECT_OFFICIAL, { projectId })} />;
+		return <Navigate to={generatePath(RoutePath.PROJECT_ID_OFFICIAL, { projectId })} />;
 	}
 
 	return (
@@ -450,14 +456,14 @@ export const BlockchainProjectPage = observer(() => {
 									renderTab({
 										part: BlockchainProjectPagePart.DISCUSSION,
 										name: 'Discussion',
-										href: generatePath(RoutePath.PROJECT_DISCUSSION, { projectId: project.id }),
+										href: generatePath(RoutePath.PROJECT_ID_DISCUSSION, { projectId: project.id }),
 									})}
 
 								{!!project.feedId.official &&
 									renderTab({
 										part: BlockchainProjectPagePart.OFFICIAL,
 										name: 'Announcements',
-										href: generatePath(RoutePath.PROJECT_OFFICIAL, { projectId: project.id }),
+										href: generatePath(RoutePath.PROJECT_ID_OFFICIAL, { projectId: project.id }),
 									})}
 							</div>
 

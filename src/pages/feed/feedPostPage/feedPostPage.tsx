@@ -23,7 +23,7 @@ export function FeedPostPage() {
 	const { postId } = useParams<{ postId: string }>();
 	invariant(postId);
 
-	const postPath = generatePath(RoutePath.FEED_POST, { postId: postId });
+	const postPath = generatePath(RoutePath.FEED_POST_ID, { postId: postId });
 
 	const { isLoading, data } = useQuery(['feed', 'post', postId], () => FeedServerApi.getPost(postId));
 

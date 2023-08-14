@@ -16,7 +16,7 @@ export interface MiniProjectCardProps extends PropsWithClassName {
 
 export const MiniProjectCard = observer(({ className, project }: MiniProjectCardProps) => {
 	const navigate = useNav();
-	const href = generatePath(RoutePath.PROJECT, { projectId: project.id });
+	const href = generatePath(RoutePath.PROJECT_ID, { projectId: project.id });
 
 	return (
 		<a

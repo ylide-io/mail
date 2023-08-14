@@ -12,7 +12,7 @@ export interface RegularProjectCardProps {
 
 export function RegularProjectCard({ project }: RegularProjectCardProps) {
 	const navigate = useNav();
-	const href = generatePath(RoutePath.PROJECT, { projectId: project.id });
+	const href = generatePath(RoutePath.PROJECT_ID, { projectId: project.id });
 
 	return (
 		<a

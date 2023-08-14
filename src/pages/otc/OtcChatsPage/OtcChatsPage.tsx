@@ -39,7 +39,7 @@ export function OtcChatsPage() {
 							],
 							onClick: () =>
 								navigate({
-									path: generatePath(RoutePath.OTC_CHAT, { address: entry.address }),
+									path: generatePath(RoutePath.OTC_CHATS_ID, { address: entry.address }),
 								}),
 						}))}
 					/>

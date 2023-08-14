@@ -49,7 +49,7 @@ export const BlockchainProjectPostPage = observer(() => {
 		<GenericLayout>
 			<RegularPageContent>
 				<PageContentHeader
-					backButton={{ href: generatePath(RoutePath.PROJECT, { projectId }) }}
+					backButton={{ href: generatePath(RoutePath.PROJECT_ID, { projectId }) }}
 					title={project.name}
 					right={
 						data && (

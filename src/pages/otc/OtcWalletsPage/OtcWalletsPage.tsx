@@ -100,7 +100,7 @@ export function OtcWalletsPage() {
 								<button
 									className={css.messageButton}
 									onClick={() =>
-										navigate(generatePath(RoutePath.OTC_CHAT, { address: wallet.address }))
+										navigate(generatePath(RoutePath.OTC_CHATS_ID, { address: wallet.address }))
 									}
 								>
 									Message

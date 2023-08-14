@@ -257,38 +257,38 @@ export const App = observer(() => {
 						{/* FEED */}
 
 						{redirect({
-							from: RoutePath.FEED_ROOT,
+							from: RoutePath.FEED,
 							to:
 								REACT_APP__APP_MODE === AppMode.MAIN_VIEW
 									? generatePath(RoutePath.FEED_SMART)
-									: generatePath(RoutePath.PROJECT_ROOT),
+									: generatePath(RoutePath.PROJECT),
 						})}
 
 						<Route path={RoutePath.FEED_ALL} element={<FeedPage />} />
-						<Route path={RoutePath.FEED_POST} element={<FeedPostPage />} />
-						<Route path={RoutePath.FEED_CATEGORY} element={<FeedPage />} />
-						<Route path={RoutePath.FEED_SOURCE} element={<FeedPage />} />
+						<Route path={RoutePath.FEED_POST_ID} element={<FeedPostPage />} />
+						<Route path={RoutePath.FEED_CATEGORY_ID} element={<FeedPage />} />
+						<Route path={RoutePath.FEED_SOURCE_ID} element={<FeedPage />} />
 						<Route path={RoutePath.FEED_SMART} element={<FeedPage />} />
 						<Route path={RoutePath.FEED_SMART_ADDRESS} element={<FeedPage />} />
 
 						{/* PROJECTS */}
 
 						{redirect({
-							from: RoutePath.PROJECT_ROOT,
+							from: RoutePath.PROJECT,
 							to: generatePath(RoutePath.ROOT),
 						})}
 
-						<Route path={RoutePath.PROJECT} element={<BlockchainProjectPage />} />
-						<Route path={RoutePath.PROJECT_OFFICIAL} element={<BlockchainProjectPage />} />
-						<Route path={RoutePath.PROJECT_OFFICIAL_ADMIN} element={<BlockchainProjectPage />} />
-						<Route path={RoutePath.PROJECT_POST} element={<BlockchainProjectPostPage />} />
-						<Route path={RoutePath.PROJECT_DISCUSSION} element={<BlockchainProjectPage />} />
-						<Route path={RoutePath.PROJECT_DISCUSSION_ADMIN} element={<BlockchainProjectPage />} />
+						<Route path={RoutePath.PROJECT_ID} element={<BlockchainProjectPage />} />
+						<Route path={RoutePath.PROJECT_ID_OFFICIAL} element={<BlockchainProjectPage />} />
+						<Route path={RoutePath.PROJECT_ID_OFFICIAL_ADMIN} element={<BlockchainProjectPage />} />
+						<Route path={RoutePath.PROJECT_ID_POST_ID} element={<BlockchainProjectPostPage />} />
+						<Route path={RoutePath.PROJECT_ID_DISCUSSION} element={<BlockchainProjectPage />} />
+						<Route path={RoutePath.PROJECT_ID_DISCUSSION_ADMIN} element={<BlockchainProjectPage />} />
 
 						{/* MAIL */}
 
 						{redirect({
-							from: RoutePath.MAIL_ROOT,
+							from: RoutePath.MAIL,
 							to: generatePath(RoutePath.MAIL_FOLDER, {
 								folderId: FolderId.Inbox,
 							}),
@@ -304,19 +304,19 @@ export const App = observer(() => {
 						{/* OTC */}
 
 						{redirect({
-							from: RoutePath.OTC_ROOT,
+							from: RoutePath.OTC,
 							to: generatePath(RoutePath.OTC_ASSETS),
 						})}
 
 						<Route path={RoutePath.OTC_ASSETS} element={<OtcAssetsPage />} />
 						<Route path={RoutePath.OTC_WALLETS} element={<OtcWalletsPage />} />
 						<Route path={RoutePath.OTC_CHATS} element={<OtcChatsPage />} />
-						<Route path={RoutePath.OTC_CHAT} element={<OtcChatPage />} />
+						<Route path={RoutePath.OTC_CHATS_ID} element={<OtcChatPage />} />
 
 						{/* WIDGETS */}
 
-						<Route path={RoutePath.SEND_MESSAGE_WIDGET} element={<SendMessageWidget />} />
-						<Route path={RoutePath.MAILBOX_WIDGET} element={<MailboxWidget />} />
+						<Route path={RoutePath.WIDGET_SENDMESSAGE} element={<SendMessageWidget />} />
+						<Route path={RoutePath.WIDGET_MAILBOX} element={<MailboxWidget />} />
 
 						{/* MIGRATIONS */}
 
@@ -343,7 +343,7 @@ export const App = observer(() => {
 								REACT_APP__APP_MODE === AppMode.OTC
 									? generatePath(RoutePath.OTC_ASSETS)
 									: REACT_APP__APP_MODE === AppMode.MAIN_VIEW
-									? generatePath(RoutePath.FEED_ROOT)
+									? generatePath(RoutePath.FEED)
 									: generatePath(RoutePath.ROOT),
 						})}
 					</Routes>
