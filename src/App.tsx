@@ -257,7 +257,7 @@ export const App = observer(() => {
 									replace
 									to={
 										REACT_APP__APP_MODE === AppMode.MAIN_VIEW
-											? generatePath(RoutePath.FEED_SMART)
+											? generatePath(RoutePath.FEED_SMART) + location.search
 											: generatePath(RoutePath.FEED_PROJECT)
 									}
 								/>
@@ -323,7 +323,7 @@ export const App = observer(() => {
 										REACT_APP__APP_MODE === AppMode.OTC
 											? generatePath(RoutePath.OTC_ASSETS)
 											: REACT_APP__APP_MODE === AppMode.MAIN_VIEW
-											? generatePath(RoutePath.FEED)
+											? generatePath(RoutePath.FEED) + location.search
 											: generatePath(RoutePath.FEED_PROJECT)
 									}
 								/>

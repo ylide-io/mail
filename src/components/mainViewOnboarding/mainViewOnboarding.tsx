@@ -1,10 +1,10 @@
 import { observer } from 'mobx-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 
 import { FeedManagerApi } from '../../api/feedManagerApi';
 import { APP_NAME } from '../../constants';
 import domain from '../../stores/Domain';
-import { feedSettings } from '../../stores/FeedSettings';
 import { DomainAccount } from '../../stores/models/DomainAccount';
 import { connectAccount, disconnectAccount } from '../../utils/account';
 import { invariant } from '../../utils/assert';
@@ -15,6 +15,7 @@ import { TextField } from '../textField/textField';
 import { toast } from '../toast/toast';
 import css from './mainViewOnboarding.module.scss';
 import ErrorCode = FeedManagerApi.ErrorCode;
+
 import { CoverageModal } from '../coverageModal/coverageModal';
 
 enum Step {
@@ -27,6 +28,8 @@ enum Step {
 }
 
 export const MainViewOnboarding = observer(() => {
+	const [searchParams] = useSearchParams();
+
 	const accounts = domain.accounts.accounts;
 	const unathorizedAccount = accounts.find(a => !a.mainViewKey);
 
@@ -34,7 +37,7 @@ export const MainViewOnboarding = observer(() => {
 
 	const [step, setStep] = useState<Step>();
 
-	const [inviteCode, setInviteCode] = useState('');
+	const [inviteCode, setInviteCode] = useState(searchParams.get('invite') || '');
 	const [inviteCodeLoading, setInviteCodeLoading] = useState(false);
 	const divForScriptRef = useRef<HTMLDivElement>(null);
 
@@ -95,7 +98,11 @@ export const MainViewOnboarding = observer(() => {
 						await doAuthorize();
 						// Request invide code
 					} else if (account.isAnyLocalPrivateKeyRegistered) {
-						setStep(Step.JOIN_WAITLIST);
+						if (searchParams.get('direct') === 'true' || searchParams.get('invite')) {
+							setStep(Step.ENTER_INVITE_CODE);
+						} else {
+							setStep(Step.JOIN_WAITLIST);
+						}
 					}
 				}
 			} catch (e) {
@@ -103,14 +110,18 @@ export const MainViewOnboarding = observer(() => {
 				disconnect(account);
 			}
 		},
-		[disconnect],
+		[disconnect, searchParams],
 	);
 
 	useEffect(() => {
 		if (domain.enforceMainViewOnboarding) {
-			setStep(Step.JOIN_WAITLIST);
+			if (searchParams.get('direct') === 'true' || searchParams.get('invite')) {
+				setStep(Step.ENTER_INVITE_CODE);
+			} else {
+				setStep(Step.JOIN_WAITLIST);
+			}
 		}
-	}, [domain.enforceMainViewOnboarding]);
+	}, [domain.enforceMainViewOnboarding, searchParams]);
 
 	useEffect(() => {
 		if (step === Step.JOIN_WAITLIST) {
