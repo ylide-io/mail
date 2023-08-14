@@ -8,6 +8,7 @@ import gnosisBuildersBannerSrc from './bannerImages/gnosisBuilders.jpg';
 import gravixBannerSrc from './bannerImages/gravix.jpg';
 import oasisGalleryBannerSrc from './bannerImages/oasisGallery.jpg';
 import oneClickCryptoBannerSrc from './bannerImages/oneClickCrypto.jpg';
+import raveBannerSrc from './bannerImages/rave.jpg';
 import snipaBannerSrc from './bannerImages/snipa.jpg';
 import staxBannerSrc from './bannerImages/stax.jpg';
 import tvmBannerSrc from './bannerImages/tvm.jpg';
@@ -25,6 +26,7 @@ import gnosisBuildersSrc from './profileImages/gnosisBuilders.jpg';
 import gravixSrc from './profileImages/gravix.png';
 import oasisGallerySrc from './profileImages/oasisGallery.png';
 import oneClickCryptoSrc from './profileImages/oneClickCrypto.jpg';
+import raveSrc from './profileImages/rave.jpg';
 import snipaSrc from './profileImages/snipa.png';
 import staxSrc from './profileImages/stax.jpg';
 import tvmSrc from './profileImages/tvm.png';
@@ -87,6 +89,7 @@ export enum BlockchainProjectId {
 	VENOM_ID = 'venom_id',
 	VENOM_RECAP = 'venom_recap',
 	VENOM_APE_CLUB = 'venom_ape_club',
+	RAVE = 'rave',
 
 	// OTHERS
 
@@ -311,6 +314,22 @@ export const blockchainProjects: BlockchainProject[] = [
 		bannerImage: venomApeClubBannerSrc,
 		website: 'https://venomape.club/',
 		tags: [BlockchainProjectTag.NFT, BlockchainProjectTag.VENOM],
+		fixedChain: BlockchainName.VENOM_TESTNET,
+		attachmentMode: BlockchainProjectAttachmentMode.ADMINS,
+	},
+	{
+		id: BlockchainProjectId.RAVE,
+		feedId: {
+			official: '2000000000000000000000000000000000000000000000000000000000000018' as Uint256,
+			discussion: '2000000000000000000000000000000000000000000000000000000000000019' as Uint256,
+		},
+		name: 'Rave',
+		description:
+			'Rave is a NFT car racing metaverse built on Venom. Rave replicates the real-life car racing experience with upgradable and customizable car NFTs, allowing ravers to collect, customize, rave and earn.',
+		profileImage: raveSrc,
+		bannerImage: raveBannerSrc,
+		website: 'https://ravegame.net/',
+		tags: [BlockchainProjectTag.GAMING, BlockchainProjectTag.VENOM],
 		fixedChain: BlockchainName.VENOM_TESTNET,
 		attachmentMode: BlockchainProjectAttachmentMode.ADMINS,
 	},
