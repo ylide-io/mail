@@ -86,7 +86,7 @@ export function ExplorePage() {
 							look={ActionButtonLook.HEAVY}
 							onClick={() => openCreateCommunityForm()}
 						>
-							🔥 Create your own community 🔥
+							Create your own community
 						</ActionButton>
 					</div>
 				</div>
