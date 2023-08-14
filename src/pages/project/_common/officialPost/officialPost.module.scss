@@ -40,12 +40,12 @@
 	font-weight: $font-weight_semi-bold;
 }
 
-.metaAction {
+.actionItem {
 	color: var(--secondary-text-color);
 	font-size: 12px;
 }
 
-.metaAction_interactive {
+.actionItem_interactive {
 	cursor: pointer;
 
 	&:hover {
@@ -53,7 +53,7 @@
 	}
 }
 
-.metaAction_icon {
+.actionItem_icon {
 	margin: -99px -2px;
 	width: 20px;
 	height: 20px;
@@ -70,6 +70,10 @@
 	font-size: 16px;
 	line-height: $line-height_text;
 	word-break: break-word;
+
+	@include lessThan1366x768 {
+		font-size: 14px;
+	}
 }
 
 .sticker {

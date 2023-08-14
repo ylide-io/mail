@@ -173,95 +173,82 @@ export const DiscussionPost = observer(({ post, project, onReplyClick }: Discuss
 		<div className={css.root}>
 			<Avatar blockie={post.msg.senderAddress} />
 
-			<div className={css.meta}>
-				<div className={css.metaLeft}>
-					{isAuthorAdmin && <div className={css.adminTag}>Admin</div>}
-
-					<AdaptiveAddress
-						className={css.sender}
-						contentClassName={isAuthorAdmin ? css.senderContent_admin : undefined}
-						maxLength={12}
-						address={post.msg.senderAddress}
-						onClick={e => {
-							if (e.shiftKey && browserStorage.isUserAdmin) {
-								banAddress();
-							} else {
-								copyToClipboard(post.msg.senderAddress, { toast: true });
-							}
-						}}
-					/>
-
-					<button
-						className={clsx(css.metaAction, css.metaAction_icon, css.metaAction_interactive)}
-						title="Compose mail"
-						onClick={() => {
-							analytics.blockchainFeedComposeMail(post.original.id, post.msg.senderAddress);
-
-							const mailData = new OutgoingMailData();
-							mailData.from = accounts[0];
-							mailData.to = new Recipients([post.msg.senderAddress]);
-
-							openMailCompose({ mailData, place: 'project-discussion' });
-						}}
-					>
-						<MailSvg />
-					</button>
-				</div>
-
-				<div className={css.metaRight}>
-					<BlockChainLabel blockchain={blockchain} />
-
-					<a
-						className={clsx(css.metaAction, css.metaAction_interactive)}
-						href={postUrl}
-						onClick={e => {
-							e.preventDefault();
-							navigate(postUrl);
-						}}
-					>
-						<ReadableDate value={post.msg.createdAt * 1000} />
-					</a>
-
-					<button className={clsx(css.metaAction, css.metaAction_interactive)} onClick={onReplyClick}>
-						Reply
-					</button>
-
-					{explorerUrl && (
-						<a
-							className={clsx(css.metaAction, css.metaAction_icon, css.metaAction_interactive)}
-							href={explorerUrl}
-							target="_blank"
-							rel="noreferrer"
-							title="Details"
-							onClick={() => analytics.blockchainFeedOpenDetails(post.original.id, post.msg.$$meta.id)}
-						>
-							<ExternalSvg />
-						</a>
-					)}
-
-					{isAdminMode && (
-						<button
-							className={clsx(css.metaAction, css.metaAction_icon, css.metaAction_interactive)}
-							title="Approve post"
-							onClick={() => approvePost()}
-						>
-							<TickSvg />
-						</button>
-					)}
-
-					{isAdminMode && (
-						<button
-							className={clsx(css.metaAction, css.metaAction_icon, css.metaAction_interactive)}
-							title="Ban post"
-							onClick={() => banPost()}
-						>
-							<CrossSvg />
-						</button>
-					)}
-				</div>
-			</div>
-
 			<div className={css.body}>
+				<div className={css.meta}>
+					<div className={css.metaLeft}>
+						{isAuthorAdmin && <div className={css.adminTag}>Admin</div>}
+
+						<AdaptiveAddress
+							className={css.sender}
+							contentClassName={isAuthorAdmin ? css.senderContent_admin : undefined}
+							maxLength={12}
+							address={post.msg.senderAddress}
+							onClick={e => {
+								if (e.shiftKey && browserStorage.isUserAdmin) {
+									banAddress();
+								} else {
+									copyToClipboard(post.msg.senderAddress, { toast: true });
+								}
+							}}
+						/>
+
+						<button
+							className={clsx(css.actionItem, css.actionItem_icon, css.actionItem_interactive)}
+							title="Compose mail"
+							onClick={() => {
+								analytics.blockchainFeedComposeMail(post.original.id, post.msg.senderAddress);
+
+								const mailData = new OutgoingMailData();
+								mailData.from = accounts[0];
+								mailData.to = new Recipients([post.msg.senderAddress]);
+
+								openMailCompose({ mailData, place: 'project-discussion' });
+							}}
+						>
+							<MailSvg />
+						</button>
+					</div>
+
+					<div className={css.metaRight}>
+						<BlockChainLabel blockchain={blockchain} />
+
+						{explorerUrl && (
+							<a
+								className={clsx(css.actionItem, css.actionItem_icon, css.actionItem_interactive)}
+								href={explorerUrl}
+								target="_blank"
+								rel="noreferrer"
+								title="Details"
+								onClick={() =>
+									analytics.blockchainFeedOpenDetails(post.original.id, post.msg.$$meta.id)
+								}
+							>
+								<ExternalSvg />
+							</a>
+						)}
+
+						{isAdminMode && (
+							<button
+								className={clsx(css.actionItem, css.actionItem_icon, css.actionItem_interactive)}
+								title="Approve post"
+								onClick={() => approvePost()}
+							>
+								<TickSvg />
+							</button>
+						)}
+
+						{isAdminMode && (
+							<button
+								className={clsx(css.actionItem, css.actionItem_icon, css.actionItem_interactive)}
+								title="Ban post"
+								onClick={() => banPost()}
+							>
+								<CrossSvg />
+							</button>
+						)}
+					</div>
+				</div>
+
 				{replyToId && (
 					<div>
 						{repliedPostQuery.data ? (
@@ -305,6 +292,23 @@ export const DiscussionPost = observer(({ post, project, onReplyClick }: Discuss
 							}}
 						/>
 					)}
+
+					<div className={css.contentFooter}>
+						<a
+							className={clsx(css.actionItem, css.actionItem_interactive)}
+							href={postUrl}
+							onClick={e => {
+								e.preventDefault();
+								navigate(postUrl);
+							}}
+						>
+							<ReadableDate value={post.msg.createdAt * 1000} />
+						</a>
+
+						<button className={clsx(css.actionItem, css.actionItem_interactive)} onClick={onReplyClick}>
+							<b>Reply</b>
+						</button>
+					</div>
 				</div>
 			</div>
 		</div>

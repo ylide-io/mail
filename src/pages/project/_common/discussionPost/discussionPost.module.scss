@@ -1,26 +1,16 @@
 .root {
 	display: grid;
 	grid-template-columns: 32px 1fr;
-	grid-gap: 4px 16px;
-	position: relative;
-
-	&:before {
-		content: '';
-		position: absolute;
-		top: 32px;
-		bottom: -32px;
-		left: 16px;
-		width: 1px;
-		background: var(--border-color);
-	}
-
-	@include lessThan768w {
-		grid-gap: 4px 8px;
-	}
+	grid-gap: 8px;
 
 	@include less480px {
 		--blockchain-label_display: none;
 	}
+}
+
+.body {
+	display: grid;
+	grid-gap: 8px;
 }
 
 //
@@ -40,7 +30,7 @@
 .metaRight {
 	display: grid;
 	grid-auto-flow: column;
-	grid-gap: 12px;
+	grid-gap: 8px;
 	align-items: center;
 	margin: 0 0 0 auto;
 
@@ -79,49 +69,26 @@
 	}
 }
 
-.metaAction {
-	margin: -99px 0;
-	color: var(--secondary-text-color);
-	font-size: 12px;
-}
-
-.metaAction_interactive {
-	@include expand-click-area;
-	cursor: pointer;
-
-	&:hover {
-		color: var(--link-color);
-	}
-}
-
-.metaAction_icon {
-	margin: -99px -2px;
-	width: 20px;
-	height: 20px;
-}
-
 //
-
-.body {
-	grid-column: 2/3;
-	display: grid;
-	grid-gap: 8px;
-}
 
 .content {
 	display: grid;
-	grid-gap: 20px;
-	padding: 20px;
+	grid-gap: 8px;
+	padding: 16px;
 	background: var(--surface-color);
 	border-radius: 16px;
 
-	@include lessThan768w {
+	@include less480px {
+		padding: 12px;
+	}
+
+	@include lessThan768h {
 		padding: 12px;
 	}
 }
 
 .text {
-	font-size: 16px;
+	font-size: 14px;
 	line-height: $line-height_text;
 	word-break: break-word;
 }
@@ -134,4 +101,44 @@
 
 .cover {
 	@include feed-attachment-image;
+}
+
+.contentFooter {
+	display: grid;
+	grid-auto-flow: column;
+	align-items: center;
+	justify-content: start;
+	grid-gap: 12px;
+
+	&:after {
+		// Needed to make meta-button's negative margin work when it's the only element
+		content: ' ';
+	}
+}
+
+//
+
+.actionItem {
+	margin: -99px 0;
+	color: var(--secondary-text-color);
+	font-size: 12px;
+
+	b {
+		font-weight: $font-weight_semi-bold;
+	}
+}
+
+.actionItem_interactive {
+	@include expand-click-area;
+	cursor: pointer;
+
+	&:hover {
+		color: var(--link-color);
+	}
+}
+
+.actionItem_icon {
+	margin: -99px -2px;
+	width: 20px;
+	height: 20px;
 }

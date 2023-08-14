@@ -96,7 +96,7 @@ export function OfficialPostView({ project, post }: OfficialPostViewProps) {
 
 					<div>
 						<a
-							className={clsx(css.metaAction, css.metaAction_interactive)}
+							className={clsx(css.actionItem, css.actionItem_interactive)}
 							href={postUrl}
 							onClick={e => {
 								e.preventDefault();
@@ -111,7 +111,7 @@ export function OfficialPostView({ project, post }: OfficialPostViewProps) {
 				<GridRowBox gap={8} className={css.metaRight}>
 					{isAdminMode && (
 						<button
-							className={clsx(css.metaAction, css.metaAction_icon, css.metaAction_interactive)}
+							className={clsx(css.actionItem, css.actionItem_icon, css.actionItem_interactive)}
 							title="Remove post"
 							onClick={() => confirm('Are you sure you want to remove this post?') && banPost()}
 						>
