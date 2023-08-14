@@ -35,7 +35,6 @@ import { WalletsPage } from './pages/wallets/walletsPage';
 import { MailboxWidget } from './pages/widgets/mailboxWidget/mailboxWidget';
 import { SendMessageWidget } from './pages/widgets/sendMessageWidget/sendMessageWidget';
 import { analytics } from './stores/Analytics';
-import { BlockchainProjectId } from './stores/blockchainProjects/blockchainProjects';
 import { browserStorage } from './stores/browserStorage';
 import domain from './stores/Domain';
 import { FolderId } from './stores/MailList';
@@ -276,12 +275,11 @@ export const App = observer(() => {
 
 						{redirect({
 							from: RoutePath.PROJECT_ROOT,
-							to: generatePath(RoutePath.PROJECT, {
-								projectId: BlockchainProjectId.GENERAL,
-							}),
+							to: generatePath(RoutePath.ROOT),
 						})}
 
 						<Route path={RoutePath.PROJECT} element={<BlockchainProjectPage />} />
+						<Route path={RoutePath.PROJECT_OFFICIAL} element={<BlockchainProjectPage />} />
 						<Route path={RoutePath.PROJECT_ADMIN} element={<BlockchainProjectPage />} />
 						<Route path={RoutePath.PROJECT_POST} element={<BlockchainProjectPostPage />} />
 						<Route path={RoutePath.PROJECT_DISCUSSION} element={<BlockchainProjectPage />} />

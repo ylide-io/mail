@@ -2,7 +2,7 @@ import { observer } from 'mobx-react';
 import { ReactNode, useEffect, useRef, useState } from 'react';
 import { InView } from 'react-intersection-observer';
 import { useInfiniteQuery, useQuery } from 'react-query';
-import { generatePath, useParams } from 'react-router-dom';
+import { generatePath, Navigate, useParams } from 'react-router-dom';
 
 import { BlockchainFeedApi, decodeBlockchainFeedPost, DecodedBlockchainFeedPost } from '../../../api/blockchainFeedApi';
 import { ActionButton, ActionButtonLook, ActionButtonSize } from '../../../components/ActionButton/ActionButton';
@@ -347,15 +347,17 @@ export const BlockchainProjectPage = observer(() => {
 	const navigate = useNav();
 
 	const { projectId } = useParams<{ projectId?: BlockchainProjectId }>();
-	invariant(projectId, 'Blockchain project ID must be specified');
+	invariant(projectId, 'Project ID must be specified');
 
 	const project = getBlockchainProjectById(projectId);
-	invariant(project, 'Blockchain project not found');
+	invariant(project, 'Project not found');
+	invariant(project.feedId.official || project.feedId.discussion, 'Project feed Id must be specified');
 
-	const part =
-		useIsMatchesPattern(RoutePath.PROJECT) && project.feedId.official
-			? BlockchainProjectPagePart.OFFICIAL
-			: BlockchainProjectPagePart.DISCUSSION;
+	const isProjectRoot = useIsMatchesPattern(RoutePath.PROJECT);
+	const isProjectAnnouncements = useIsMatchesPattern(RoutePath.PROJECT_OFFICIAL);
+	const isProjectDiscussion = useIsMatchesPattern(RoutePath.PROJECT_DISCUSSION);
+
+	const part = isProjectAnnouncements ? BlockchainProjectPagePart.OFFICIAL : BlockchainProjectPagePart.DISCUSSION;
 
 	const [tabsAsideContent, setTabsAsideContent] = useState<ReactNode>();
 
@@ -376,6 +378,26 @@ export const BlockchainProjectPage = observer(() => {
 				{params.name}
 			</ActionButton>
 		);
+	}
+
+	if (isProjectRoot) {
+		return (
+			<Navigate
+				to={
+					project.feedId.discussion
+						? generatePath(RoutePath.PROJECT_DISCUSSION, { projectId })
+						: generatePath(RoutePath.PROJECT_OFFICIAL, { projectId })
+				}
+			/>
+		);
+	}
+
+	if (isProjectAnnouncements && !project.feedId.official) {
+		return <Navigate to={generatePath(RoutePath.PROJECT_DISCUSSION, { projectId })} />;
+	}
+
+	if (isProjectDiscussion && !project.feedId.discussion) {
+		return <Navigate to={generatePath(RoutePath.PROJECT_OFFICIAL, { projectId })} />;
 	}
 
 	return (
@@ -423,18 +445,18 @@ export const BlockchainProjectPage = observer(() => {
 					<div className={css.main}>
 						<div className={css.tabsWrapper}>
 							<div className={css.tabs}>
-								{!!project.feedId.official &&
-									renderTab({
-										part: BlockchainProjectPagePart.OFFICIAL,
-										name: 'Official',
-										href: generatePath(RoutePath.PROJECT, { projectId: project.id }),
-									})}
-
 								{!!project.feedId.discussion &&
 									renderTab({
 										part: BlockchainProjectPagePart.DISCUSSION,
 										name: 'Discussion',
 										href: generatePath(RoutePath.PROJECT_DISCUSSION, { projectId: project.id }),
+									})}
+
+								{!!project.feedId.official &&
+									renderTab({
+										part: BlockchainProjectPagePart.OFFICIAL,
+										name: 'Announcements',
+										href: generatePath(RoutePath.PROJECT_OFFICIAL, { projectId: project.id }),
 									})}
 							</div>
 
