@@ -61,23 +61,11 @@ export function ExplorePage() {
 
 					{renderTagBlock(BlockchainProjectTag.DEFI)}
 					{renderTagBlock(BlockchainProjectTag.NFT)}
-
-					<div className={css.bigGrid}>
-						<RichProjectCard project={getBlockchainProjectById(BlockchainProjectId.TVM)} />
-						<RichProjectCard project={getBlockchainProjectById(BlockchainProjectId.GRAVIX)} />
-					</div>
-
 					{renderTagBlock(BlockchainProjectTag.VENOM)}
-
-					<div className={css.bigGrid}>
-						<RichProjectCard project={getBlockchainProjectById(BlockchainProjectId.SNIPA)} />
-						<RichProjectCard project={getBlockchainProjectById(BlockchainProjectId.OASIS_GALLERY)} />
-					</div>
-
-					{renderTagBlock(BlockchainProjectTag.SOCIAL)}
 					{renderTagBlock(BlockchainProjectTag.TVM)}
-					{renderTagBlock(BlockchainProjectTag.ECOSYSTEM)}
+					{renderTagBlock(BlockchainProjectTag.SOCIAL)}
 					{renderTagBlock(BlockchainProjectTag.RESEARCH)}
+					{renderTagBlock(BlockchainProjectTag.ECOSYSTEM)}
 					{renderTagBlock(BlockchainProjectTag.GAMING)}
 
 					<div className={css.footer}>
