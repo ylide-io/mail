@@ -354,11 +354,11 @@ export const SidebarMenu = observer(() => {
 					button={{ text: 'Explore', onClick: () => navigate(generatePath(RoutePath.ROOT)) }}
 				>
 					{renderProjects([
-						BlockchainProjectId.VENOM_BLOCKCHAIN,
-						BlockchainProjectId.ETH_WHALES,
+						BlockchainProjectId.TVM,
+						BlockchainProjectId.OASIS_GALLERY,
 						BlockchainProjectId.GRAVIX,
 						BlockchainProjectId.WEB3_WORLD,
-						BlockchainProjectId.GENERAL,
+						BlockchainProjectId.YLIDE,
 					])}
 				</SidebarSection>
 
@@ -369,7 +369,11 @@ export const SidebarMenu = observer(() => {
 						onClick: () => openCreateCommunityForm(),
 					}}
 				>
-					{renderProjects([BlockchainProjectId.TVM, BlockchainProjectId.YLIDE, BlockchainProjectId.VENTORY])}
+					{renderProjects([
+						BlockchainProjectId.ONE_CLICK_CRYPTO,
+						BlockchainProjectId.GNOSIS_BUILDERS,
+						BlockchainProjectId.BET_FURY,
+					])}
 				</SidebarSection>
 			</SidebarBlock>
 		);
