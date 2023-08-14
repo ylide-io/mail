@@ -4,7 +4,6 @@ import { VENOM_FEED_ID } from '../../constants';
 import { BlockchainName } from '../../utils/blockchain';
 import _defaultBannerSrc from './bannerImages/_default.png';
 import betFuryBannerSrc from './bannerImages/betFury.jpg';
-import cryptoGvrBannerSrc from './bannerImages/cryptoGvr.jpg';
 import gnosisBuildersBannerSrc from './bannerImages/gnosisBuilders.jpg';
 import gravixBannerSrc from './bannerImages/gravix.jpg';
 import oasisGalleryBannerSrc from './bannerImages/oasisGallery.jpg';
@@ -20,7 +19,6 @@ import venomRecapBannerSrc from './bannerImages/venomRecap.jpg';
 import ventoryBannerSrc from './bannerImages/ventory.jpg';
 import web3WorldBannerSrc from './bannerImages/web3World.jpg';
 import betFurySrc from './profileImages/betFury.jpg';
-import cryptoGvrSrc from './profileImages/cryptoGvr.jpg';
 import ethWhalesSrc from './profileImages/ethWhales.png';
 import generalSrc from './profileImages/general.png';
 import gnosisBuildersSrc from './profileImages/gnosisBuilders.jpg';
@@ -95,7 +93,6 @@ export enum BlockchainProjectId {
 	TVM = 'tvm',
 	ONE_CLICK_CRYPTO = 'one_click_crypto',
 	GNOSIS_BUILDERS = 'gnosis_builders',
-	CRYPTO_GVR = 'crypto_gvr',
 	BET_FURY = 'bet_fury',
 }
 
@@ -106,7 +103,6 @@ export enum BlockchainProjectTag {
 	DEFI = 'DeFi',
 	ECOSYSTEM = 'Ecosystem',
 	TVM = 'TVM',
-	RESEARCH = 'Research',
 	GAMING = 'Gaming',
 }
 
@@ -362,20 +358,6 @@ export const blockchainProjects: BlockchainProject[] = [
 		tags: [BlockchainProjectTag.ECOSYSTEM, BlockchainProjectTag.SOCIAL],
 		fixedChain: BlockchainName.GNOSIS,
 		attachmentMode: BlockchainProjectAttachmentMode.ADMINS,
-	},
-	{
-		id: BlockchainProjectId.CRYPTO_GVR,
-		feedId: {
-			official: '2000000000000000000000000000000000000000000000000000000000000014' as Uint256,
-			discussion: '2000000000000000000000000000000000000000000000000000000000000015' as Uint256,
-		},
-		name: 'Crypto GVR',
-		description:
-			'A little bit about finance, a little bit about geopolitics, not a word about race, gender. Politeness.',
-		profileImage: cryptoGvrSrc,
-		bannerImage: cryptoGvrBannerSrc,
-		website: 'https://twitter.com/GVRCALLS',
-		tags: [BlockchainProjectTag.RESEARCH],
 	},
 	{
 		id: BlockchainProjectId.BET_FURY,
