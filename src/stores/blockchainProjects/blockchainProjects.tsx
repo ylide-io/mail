@@ -36,6 +36,7 @@ import venomBridgeSrc from './profileImages/venomBridge.png';
 import venomIdSrc from './profileImages/venomId.jpg';
 import venomRecapSrc from './profileImages/venomRecap.jpg';
 import ventorySrc from './profileImages/ventory.png';
+import weaverSrc from './profileImages/weaver.jpg';
 import web3WorldSrc from './profileImages/web3World.png';
 import ylideSrc from './profileImages/ylide.png';
 
@@ -94,6 +95,7 @@ export enum BlockchainProjectId {
 	// OTHERS
 
 	TVM = 'tvm',
+	WEAVER = 'weaver',
 	ONE_CLICK_CRYPTO = 'one_click_crypto',
 	GNOSIS_BUILDERS = 'gnosis_builders',
 	BET_FURY = 'bet_fury',
@@ -348,6 +350,18 @@ export const blockchainProjects: BlockchainProject[] = [
 		bannerImage: tvmBannerSrc,
 		tags: [BlockchainProjectTag.TVM, BlockchainProjectTag.ECOSYSTEM, BlockchainProjectTag.VENOM],
 		attachmentMode: BlockchainProjectAttachmentMode.ADMINS,
+	},
+	{
+		id: BlockchainProjectId.WEAVER,
+		feedId: {
+			official: '200000000000000000000000000000000000000000000000000000000000001a' as Uint256,
+			discussion: '200000000000000000000000000000000000000000000000000000000000001b' as Uint256,
+		},
+		name: 'Weaver',
+		description: '한국의 크립토 마케팅회사',
+		profileImage: weaverSrc,
+		tags: [BlockchainProjectTag.TVM],
+		attachmentMode: BlockchainProjectAttachmentMode.EVERYONE,
 	},
 	{
 		id: BlockchainProjectId.ONE_CLICK_CRYPTO,
