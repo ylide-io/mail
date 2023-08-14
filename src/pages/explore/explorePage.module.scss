@@ -76,9 +76,7 @@
 }
 
 .footer {
-	font-size: 36px;
-	font-weight: $font-weight_semi-bold;
-	text-align: center;
-	opacity: 0.1;
-	cursor: default;
+	display: flex;
+	justify-content: center;
+	padding: 40px 0;
 }

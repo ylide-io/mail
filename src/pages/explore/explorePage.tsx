@@ -1,3 +1,4 @@
+import { ActionButton, ActionButtonLook, ActionButtonSize } from '../../components/ActionButton/ActionButton';
 import { RegularProjectCard } from '../../components/blockchainProjectCards/regularProjectCard/regularProjectCard';
 import { RichProjectCard } from '../../components/blockchainProjectCards/richProjectCard/richProjectCard';
 import { RegularPageContent } from '../../components/genericLayout/content/regularPageContent/regularPageContent';
@@ -9,6 +10,7 @@ import {
 	BlockchainProjectTag,
 	getBlockchainProjectById,
 } from '../../stores/blockchainProjects/blockchainProjects';
+import { openCreateCommunityForm } from '../../utils/misc';
 import bannerSrc from './banner.png';
 import css from './explorePage.module.scss';
 
@@ -55,6 +57,7 @@ export function ExplorePage() {
 					</div>
 
 					{renderTagBlock(BlockchainProjectTag.DEFI)}
+					{renderTagBlock(BlockchainProjectTag.NFT)}
 
 					<div className={css.bigGrid}>
 						<RichProjectCard project={getBlockchainProjectById(BlockchainProjectId.TVM)} />
@@ -68,14 +71,21 @@ export function ExplorePage() {
 						<RichProjectCard project={getBlockchainProjectById(BlockchainProjectId.OASIS_GALLERY)} />
 					</div>
 
-					{renderTagBlock(BlockchainProjectTag.NFT)}
 					{renderTagBlock(BlockchainProjectTag.SOCIAL)}
 					{renderTagBlock(BlockchainProjectTag.TVM)}
 					{renderTagBlock(BlockchainProjectTag.ECOSYSTEM)}
 					{renderTagBlock(BlockchainProjectTag.RESEARCH)}
 					{renderTagBlock(BlockchainProjectTag.GAMING)}
 
-					<div className={css.footer}>The End</div>
+					<div className={css.footer}>
+						<ActionButton
+							size={ActionButtonSize.LARGE}
+							look={ActionButtonLook.HEAVY}
+							onClick={() => openCreateCommunityForm()}
+						>
+							🔥 Create your own community 🔥
+						</ActionButton>
+					</div>
 				</div>
 			</RegularPageContent>
 		</GenericLayout>

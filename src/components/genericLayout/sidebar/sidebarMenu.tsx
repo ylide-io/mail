@@ -32,6 +32,7 @@ import { FolderId, getFolderName, MailList } from '../../../stores/MailList';
 import { DomainAccount } from '../../../stores/models/DomainAccount';
 import { RoutePath } from '../../../stores/routePath';
 import { useOpenMailCompose } from '../../../utils/mail';
+import { openCreateCommunityForm } from '../../../utils/misc';
 import { useIsMatchesPath, useNav } from '../../../utils/url';
 import { ActionButton, ActionButtonLook, ActionButtonSize } from '../../ActionButton/ActionButton';
 import { AdaptiveText } from '../../adaptiveText/adaptiveText';
@@ -365,10 +366,7 @@ export const SidebarMenu = observer(() => {
 					title="Newly Added"
 					button={{
 						text: 'Create',
-						onClick: () => {
-							analytics.openCreateCommunityForm();
-							window.open('https://forms.gle/p9141gy5wn7DCjZA8', '_blank')?.focus();
-						},
+						onClick: () => openCreateCommunityForm(),
 					}}
 				>
 					{renderProjects([BlockchainProjectId.TVM, BlockchainProjectId.YLIDE, BlockchainProjectId.VENTORY])}
