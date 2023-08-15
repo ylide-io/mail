@@ -5,6 +5,16 @@ declare module '*.module.scss' {
 	export = css;
 }
 
+declare module '*.jpg' {
+	const value: string;
+	export default value;
+}
+
+declare module '*.png' {
+	const value: string;
+	export default value;
+}
+
 declare module '*.svg' {
 	export const ReactComponent: React.FunctionComponent<React.SVGProps<SVGSVGElement>>;
 	const src: string;

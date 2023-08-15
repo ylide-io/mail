@@ -1,11 +1,12 @@
 import { observable } from 'mobx';
 import { observer } from 'mobx-react';
-import { useEffect, useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { InView } from 'react-intersection-observer';
 import { generatePath, useParams } from 'react-router-dom';
 
-import { FeedCategory, FeedServerApi, TagToCategoryName } from '../../../api/feedServerApi';
+import { FeedServerApi } from '../../../api/feedServerApi';
 import { ActionButton, ActionButtonLook, ActionButtonSize } from '../../../components/ActionButton/ActionButton';
+import { CoverageModal } from '../../../components/coverageModal/coverageModal';
 import { ErrorMessage, ErrorMessageLook } from '../../../components/errorMessage/errorMessage';
 import { NarrowContent } from '../../../components/genericLayout/content/narrowContent/narrowContent';
 import { GenericLayout, useGenericLayoutApi } from '../../../components/genericLayout/genericLayout';
@@ -15,10 +16,12 @@ import { ReactComponent as ArrowUpSvg } from '../../../icons/ic20/arrowUp.svg';
 import { ReactComponent as CrossSvg } from '../../../icons/ic20/cross.svg';
 import domain from '../../../stores/Domain';
 import { FeedStore } from '../../../stores/Feed';
+import { feedSettings } from '../../../stores/FeedSettings';
 import { RoutePath } from '../../../stores/routePath';
 import { connectAccount } from '../../../utils/account';
 import { hookDependency } from '../../../utils/react';
-import { useIsMatchingRoute, useNav } from '../../../utils/url';
+import { truncateInMiddle } from '../../../utils/string';
+import { useNav } from '../../../utils/url';
 import { FeedPostItem } from '../_common/feedPostItem/feedPostItem';
 import css from './feedPage.module.scss';
 import ErrorCode = FeedServerApi.ErrorCode;
@@ -35,19 +38,24 @@ const FeedPageContent = observer(() => {
 	const navigate = useNav();
 	const accounts = domain.accounts.activeAccounts;
 	const genericLayoutApi = useGenericLayoutApi();
+	const tags = feedSettings.tags;
 
-	const { category, source, address } = useParams<{ category: FeedCategory; source: string; address: string }>();
-	const isAllPosts = useIsMatchingRoute(RoutePath.FEED_ALL);
+	const [showCoverageModal, setShowCoverageModal] = useState(false);
+
+	const { tag, source, address } = useParams<{ tag: string; source: string; address: string }>();
 
 	const selectedAccounts = useMemo(
-		() =>
-			address
-				? accounts.filter(a => a.account.address === address)
-				: !category && !source && !isAllPosts
-				? accounts
-				: [],
-		[accounts, address, category, isAllPosts, source],
+		() => (address ? accounts.filter(a => a.account.address === address) : !tag && !source ? accounts : []),
+		[accounts, address, tag, source],
 	);
+
+	const coverage = feedSettings.coverages.get(selectedAccounts[0]);
+	const totalCoverage = useMemo(() => {
+		if (!coverage || coverage === 'error' || coverage === 'loading') {
+			return null;
+		}
+		return coverage.totalCoverage;
+	}, [coverage]);
 
 	useEffect(() => {
 		if (address && !selectedAccounts.length) {
@@ -57,8 +65,7 @@ const FeedPageContent = observer(() => {
 
 	// We can NOT load smart feed if no suitable account connected
 	const canLoadFeed =
-		!!category ||
-		isAllPosts ||
+		!!tag ||
 		(!!accounts.length && (REACT_APP__APP_MODE !== AppMode.MAIN_VIEW || accounts.every(a => a.mainViewKey)));
 
 	const reloadCounter = reloadFeedCounter.get();
@@ -67,7 +74,8 @@ const FeedPageContent = observer(() => {
 		hookDependency(reloadCounter);
 
 		const feed = new FeedStore({
-			categories: category ? [category] : isAllPosts ? Object.values(FeedCategory) : undefined,
+			// TODO: KONST
+			tags: tags !== 'error' && tags !== 'loading' ? tags.filter(t => t.id === Number(tag)) : [],
 			sourceId: source,
 			addressTokens: selectedAccounts.map(a => a.mainViewKey),
 		});
@@ -79,17 +87,28 @@ const FeedPageContent = observer(() => {
 		}
 
 		return feed;
-	}, [canLoadFeed, category, genericLayoutApi, isAllPosts, selectedAccounts, source, reloadCounter]);
+	}, [canLoadFeed, tags, tag, genericLayoutApi, selectedAccounts, source, reloadCounter]);
+
+	const title = useMemo(() => {
+		if (tag) {
+			return feed.tags.find(t => t.id === Number(tag))?.name;
+		}
+		if (feed.tags.length === 1 && feed.tags[0].name) {
+			return feed.sourceId;
+		}
+		if (selectedAccounts.length === 1 && address) {
+			return `Feed for ${
+				selectedAccounts[0].name
+					? selectedAccounts[0].name
+					: truncateInMiddle(selectedAccounts[0].account.address, 8, '..')
+			}`;
+		}
+		return 'Feed';
+	}, [feed, selectedAccounts, address, tag]);
 
 	return (
 		<NarrowContent
-			title={
-				feed.tags.length === 1
-					? TagToCategoryName[feed.tags[0]]
-					: feed.sourceId || isAllPosts
-					? 'Feed'
-					: 'Smart feed'
-			}
+			title={title}
 			titleSubItem={
 				!!source && (
 					<ActionButton
@@ -102,13 +121,27 @@ const FeedPageContent = observer(() => {
 				)
 			}
 			titleRight={
-				!!feed.newPosts && (
-					<ActionButton look={ActionButtonLook.SECONDARY} onClick={() => feed.loadNew()}>
-						Show {feed.newPosts} new posts
-					</ActionButton>
-				)
+				<>
+					{!!feed.newPosts && (
+						<ActionButton look={ActionButtonLook.SECONDARY} onClick={() => feed.loadNew()}>
+							Show {feed.newPosts} new posts
+						</ActionButton>
+					)}
+					{feed.tags.length === 0 && !feed.sourceId && selectedAccounts.length === 1 && totalCoverage && (
+						<ActionButton
+							look={ActionButtonLook.PRIMARY}
+							onClick={() => setShowCoverageModal(true)}
+							style={{ marginLeft: '8px' }}
+						>
+							USD Coverage: {totalCoverage}%
+						</ActionButton>
+					)}
+				</>
 			}
 		>
+			{showCoverageModal && (
+				<CoverageModal onClose={() => setShowCoverageModal(false)} account={selectedAccounts[0]} />
+			)}
 			{!!feed.posts.length && (
 				<ActionButton
 					className={css.scrollToTop}

@@ -2,8 +2,10 @@ import clsx from 'clsx';
 import { observer } from 'mobx-react';
 import { createContext, PropsWithChildren, useContext, useEffect, useMemo } from 'react';
 
+import { useBodyHiddenOverflow } from '../../utils/useBodyHiddenOverflow';
+import { Overlay } from '../overlay/overlay';
 import css from './genericLayout.module.scss';
-import Header from './header/header';
+import { Header } from './header/header';
 import { isSidebarOpen, SidebarBurger, SidebarMenu } from './sidebar/sidebarMenu';
 
 interface GenericLayoutApi {
@@ -19,6 +21,8 @@ export const useGenericLayoutApi = () => useContext(GenericLayoutApiContext)!;
 interface GenericLayoutProps extends PropsWithChildren<{}> {}
 
 export const GenericLayout = observer(({ children }: GenericLayoutProps) => {
+	useBodyHiddenOverflow(isSidebarOpen.get());
+
 	useEffect(() => {
 		setTimeout(() => {
 			// @ts-ignore
@@ -45,9 +49,13 @@ export const GenericLayout = observer(({ children }: GenericLayoutProps) => {
 	return (
 		<GenericLayoutApiContext.Provider value={api}>
 			<div className={css.root}>
-				<Header />
+				<Header className={css.header} />
 
 				<div className={css.main}>
+					{isSidebarOpen.get() && (
+						<Overlay className={css.sidebarOverlay} onClick={() => isSidebarOpen.set(false)} />
+					)}
+
 					<div className={clsx(css.sidebar, isSidebarOpen.get() && css.sidebar_open)}>
 						<div className={css.sidebarMobileHeader}>
 							<SidebarBurger>Hide sidebar</SidebarBurger>
@@ -56,7 +64,7 @@ export const GenericLayout = observer(({ children }: GenericLayoutProps) => {
 						<SidebarMenu />
 					</div>
 
-					<div className={css.content}>{children}</div>
+					<div>{children}</div>
 				</div>
 			</div>
 		</GenericLayoutApiContext.Provider>

@@ -17,6 +17,7 @@
 
 .title {
 	font-size: 32px;
+	font-weight: $font-weight_medium;
 }
 
 .titleRight {
@@ -46,5 +47,5 @@
 }
 
 .tag_active {
-	color: var(--primary-text-color);
+	color: var(--text-color);
 }

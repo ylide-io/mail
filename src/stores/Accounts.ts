@@ -23,7 +23,7 @@ export class Accounts {
 	}
 
 	async createNewDomainAccount(wallet: Wallet, account: WalletAccount) {
-		const domainAccount = new DomainAccount(this.domain.keyRegistry, wallet, account, 'New Account');
+		const domainAccount = new DomainAccount(this.domain.keyRegistry, wallet, account, '');
 		this.accounts.push(domainAccount);
 		wallet.accounts.push(domainAccount);
 		this.save();
@@ -83,5 +83,13 @@ export class Accounts {
 
 	@computed get hasActiveAccounts() {
 		return !!this.activeAccounts.length;
+	}
+
+	@computed get activeEvmAccounts() {
+		return this.activeAccounts.filter(a => a.wallet.factory.blockchainGroup === 'evm');
+	}
+
+	@computed get activeVenomAccounts() {
+		return this.activeAccounts.filter(a => a.wallet.wallet === 'venomwallet');
 	}
 }

@@ -2,7 +2,6 @@ import clsx from 'clsx';
 import { autorun } from 'mobx';
 import { observer } from 'mobx-react';
 import { useEffect, useMemo, useState } from 'react';
-import { Helmet } from 'react-helmet';
 import { Outlet, useParams, useSearchParams } from 'react-router-dom';
 import AutoSizer from 'react-virtualized-auto-sizer';
 import { FixedSizeList, ListChildComponentProps } from 'react-window';
@@ -10,13 +9,14 @@ import { FixedSizeList, ListChildComponentProps } from 'react-window';
 import { ErrorMessage } from '../../../components/errorMessage/errorMessage';
 import { FullPageContent } from '../../../components/genericLayout/content/fullPageContent/fullPageContent';
 import { GenericLayout } from '../../../components/genericLayout/genericLayout';
+import { PageMeta } from '../../../components/pageMeta/pageMeta';
 import { YlideLoader } from '../../../components/ylideLoader/ylideLoader';
 import { analytics } from '../../../stores/Analytics';
 import { browserStorage } from '../../../stores/browserStorage';
 import domain from '../../../stores/Domain';
 import { FolderId, ILinkedMessage, MailList, mailStore } from '../../../stores/MailList';
 import { RoutePath } from '../../../stores/routePath';
-import { useIsMatchingRoute, useNav } from '../../../utils/url';
+import { useIsMatchesPattern, useNav } from '../../../utils/url';
 import { useWindowSize } from '../../../utils/useWindowSize';
 import MailboxEmpty from './mailboxEmpty/mailboxEmpty';
 import { MailboxHeader } from './mailboxHeader/mailboxHeader';
@@ -71,7 +71,7 @@ export const MailboxPage = observer(() => {
 	const folderId = params.folderId || FolderId.Inbox;
 	const filterBySender = searchParams.get('sender') || undefined;
 
-	const isMailboxRoot = useIsMatchingRoute(RoutePath.MAIL_FOLDER);
+	const isMailboxRoot = useIsMatchesPattern(RoutePath.MAIL_FOLDER);
 
 	const accounts = domain.accounts.activeAccounts;
 
@@ -108,7 +108,7 @@ export const MailboxPage = observer(() => {
 	const isAllSelected = !!mailList.messages.length && mailList.messages.every(it => selectedMessageIds.has(it.id));
 
 	const { windowWidth } = useWindowSize();
-	const isHighRow = windowWidth <= 720;
+	const isHighRow = windowWidth <= 768;
 	const itemSize = isHighRow ? 80 : 40;
 
 	const [scrollParams, setScrollParams] = useState({
@@ -150,19 +150,16 @@ export const MailboxPage = observer(() => {
 
 	return (
 		<GenericLayout>
-			<Helmet>
-				<title>Decentralized Web3 Mailbox by Ylide for secure and private communication</title>
-				<meta
-					name="description"
-					content="Experience the power of decentralized communication with Ylide's Web3 Mailbox. Supporting multiple chains including Ethereum, Polygon, BNB, Venom Blockchain, Gnosis chain, Celo, Moonriver, Klaytn, Moonbeam, Avalanche, Aurora, Fantom, Metis, Arbitrum, Optimism, and Everscale. Secure, private, and built for the future of the web."
-				/>
-			</Helmet>
+			<PageMeta
+				title="Mailbox by Ylide"
+				description="Decentralized Web3 Mailbox by Ylide for secure and private communication. Experience the power of decentralized communication with Ylide's Web3 Mailbox. Supporting multiple chains including Ethereum, Polygon, BNB, Venom Blockchain, Gnosis chain, Celo, Moonriver, Klaytn, Moonbeam, Avalanche, Aurora, Fantom, Metis, Arbitrum, Optimism, and Everscale. Secure, private, and built for the future of the web."
+			/>
 
 			<FullPageContent>
 				<div className={css.root}>
 					<div className={clsx(css.main, isMailboxRoot || css.main_hidden)}>
 						<MailboxHeader
-							folderId={folderId!}
+							folderId={folderId}
 							messages={mailList.messages}
 							selectedMessageIds={selectedMessageIds}
 							filterBySender={filterBySender}
@@ -204,7 +201,6 @@ export const MailboxPage = observer(() => {
 													itemSize={itemSize}
 													width={width}
 													height={height}
-													style={{ padding: '0 0 12px' }}
 													itemData={{
 														messages: mailList.messages,
 														itemSize,

@@ -2,10 +2,6 @@
 	@include flex-column(stretch, flex-start);
 
 	padding: 16px 20px 12px;
-
-	@include less720px {
-		padding: 4px 12px 12px;
-	}
 }
 
 .mailbox-title {
@@ -13,9 +9,10 @@
 	align-items: baseline;
 	margin: 0;
 	font-size: 32px;
+	font-weight: $font-weight_medium;
 	white-space: nowrap;
 
-	@include less720px {
+	@include lessThan768w {
 		font-size: 28px;
 	}
 }
@@ -28,7 +25,6 @@
 	min-width: 0;
 	color: var(--secondary-text-color);
 	font-size: 75%;
-	font-weight: $font-weight_light;
 	white-space: nowrap;
 }
 

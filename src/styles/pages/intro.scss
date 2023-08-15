@@ -30,7 +30,7 @@
 }
 
 .intro-main-title {
-	font-family: $font-family_wide;
+	font-family: $font-family_main;
 	font-style: normal;
 	font-weight: 400;
 	font-size: 44px;
@@ -38,7 +38,6 @@
 	/* or 57px */
 
 	text-align: center;
-	letter-spacing: -0.09em;
 
 	margin-bottom: 20px;
 }
@@ -178,13 +177,12 @@
 }
 
 .intro-wallets-subtitle {
-	font-family: $font-family_wide;
+	font-family: $font-family_main;
 	font-style: normal;
 	font-weight: 400;
 	font-size: 32px;
 	line-height: 40px;
 	text-align: center;
-	letter-spacing: -0.09em;
 	margin-top: 40px;
 	margin-bottom: 30px;
 }

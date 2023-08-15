@@ -7,6 +7,7 @@
 	bottom: 0;
 	left: 0;
 	background: var(--surface-color);
+	border-radius: 16px;
 }
 
 .header {
@@ -18,7 +19,7 @@
 	padding: 0 12px;
 	height: 52px;
 	background: var(--secondary-surface-color);
-	border-radius: 10px 10px 0 0;
+	border-radius: 16px 16px 0 0;
 }
 
 .headerSpinner {

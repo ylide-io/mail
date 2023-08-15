@@ -15,6 +15,7 @@ import { TextField } from '../textField/textField';
 import { toast } from '../toast/toast';
 import css from './mainViewOnboarding.module.scss';
 import ErrorCode = FeedManagerApi.ErrorCode;
+import { CoverageModal } from '../coverageModal/coverageModal';
 
 enum Step {
 	CONNECT_ACCOUNT = 'CONNECT_ACCOUNT',
@@ -23,13 +24,13 @@ enum Step {
 	JOIN_WAITLIST = 'JOIN_WAITLIST',
 	SIGN_AUTH = 'SIGN_AUTH',
 	BUILDING_FEED = 'BUILDING_FEED',
-	SHOW_COVERAGE = 'SHOW_COVERAGE',
 }
 
 export const MainViewOnboarding = observer(() => {
 	const accounts = domain.accounts.accounts;
 	const unathorizedAccount = accounts.find(a => !a.mainViewKey);
-	const coverage = feedSettings.coverage;
+
+	const [freshAccount, setFreshAccount] = useState<DomainAccount | null>(null);
 
 	const [step, setStep] = useState<Step>();
 
@@ -48,15 +49,6 @@ export const MainViewOnboarding = observer(() => {
 		setInviteCode('');
 		setStep(undefined);
 	}, []);
-
-	useEffect(() => {
-		if (coverage !== 'loading' && coverage !== 'error' && step === Step.BUILDING_FEED) {
-			setStep(Step.SHOW_COVERAGE);
-		} else if (coverage === 'error') {
-			toast(`Welcome to ${APP_NAME} 🔥`);
-			reset();
-		}
-	}, [coverage, reset, step]);
 
 	const disconnect = useCallback(
 		async (account: DomainAccount) => {
@@ -89,8 +81,7 @@ export const MainViewOnboarding = observer(() => {
 					// Update keys after Feed Manager initialized
 					account.mainViewKey = token;
 
-					// toast(`Welcome to ${APP_NAME} 🔥`);
-					// reset();
+					setFreshAccount(account);
 				}
 
 				// If just entered invite code, the try to authorize right away
@@ -102,9 +93,8 @@ export const MainViewOnboarding = observer(() => {
 					// If account had been authorized already, do it again
 					if (isActive) {
 						await doAuthorize();
-					}
-					// Request invide code
-					else {
+						// Request invide code
+					} else if (account.isAnyLocalPrivateKeyRegistered) {
 						setStep(Step.JOIN_WAITLIST);
 					}
 				}
@@ -113,7 +103,7 @@ export const MainViewOnboarding = observer(() => {
 				disconnect(account);
 			}
 		},
-		[disconnect, reset],
+		[disconnect],
 	);
 
 	useEffect(() => {
@@ -304,35 +294,15 @@ export const MainViewOnboarding = observer(() => {
 				</ActionModal>
 			)}
 
-			{step === Step.SHOW_COVERAGE && coverage !== 'error' && coverage !== 'loading' && (
-				<ActionModal
-					title="Current coverage of your blockchain activity"
-					buttons={
-						<ActionButton
-							size={ActionButtonSize.XLARGE}
-							look={ActionButtonLook.PRIMARY}
-							onClick={() => {
-								toast(`Welcome to ${APP_NAME} 🔥`);
-								reset();
-							}}
-						>
-							Close
-						</ActionButton>
-					}
-				>
-					<div>We guarantee our users to have a 100% coverage within 3 days from registration date.</div>
-					<div>Current results:</div>
-					<div>
-						Tokens - {coverage.tokens.countCovered} / {coverage.tokens.count} or {coverage.tokens.ratio}%.{' '}
-						Dollar value ${coverage.tokens.usdCovered} / {coverage.tokens.usd} or $
-						{coverage.tokens.ratioUsd}%.
-					</div>
-					<div>
-						Protocols - {coverage.protocols.countCovered} / {coverage.protocols.count} or{' '}
-						{coverage.protocols.ratio}%. Dollar value ${coverage.protocols.usdCovered} /{' '}
-						{coverage.protocols.usd} or ${coverage.protocols.ratioUsd}%.
-					</div>
-				</ActionModal>
+			{freshAccount && (
+				<CoverageModal
+					onClose={() => {
+						setFreshAccount(null);
+						toast(`Welcome to ${APP_NAME} 🔥`);
+						reset();
+					}}
+					account={freshAccount}
+				/>
 			)}
 		</>
 	);

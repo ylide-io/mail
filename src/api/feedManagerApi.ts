@@ -109,34 +109,49 @@ export namespace FeedManagerApi {
 		});
 	}
 
-	export interface GetCoverageResponse {
-		tokens: {
-			countCovered: number;
-			usdCovered: number;
-			count: number;
-			usd: number;
-			ratio: number;
-			ratioUsd: number;
-		};
-		protocols: {
-			countCovered: number;
-			usdCovered: number;
-			count: number;
-			usd: number;
-			ratio: number;
-			ratioUsd: number;
-		};
-		transactions: {
-			countCovered: number;
-			count: number;
-			ratio: number;
-		};
+	export interface CoverageItem {
+		tokenId: string;
+		missing: boolean;
+		projectName: string | null;
+		name: string | null;
+		symbol: string | null;
 	}
 
+	export type CoverageInfo = {
+		items: CoverageItem[];
+	} & Ratio &
+		RatioUsd;
+
+	export interface Ratio {
+		ratio: number;
+		coveredCount: number;
+		total: number;
+	}
+	export interface RatioUsd {
+		ratioUsd: number;
+		usdTotal: number;
+		usdCovered: number;
+	}
+
+	export type CoverageResponse = {
+		tokens: CoverageInfo;
+		protocols: CoverageInfo;
+		transactions: Ratio;
+	};
+
 	export async function getCoverage(token: string) {
-		return await request<GetCoverageResponse>(`/coverage`, {
+		return await request<CoverageResponse>(`/coverage`, {
 			token,
 		});
+	}
+
+	export type TagsResponse = {
+		id: number;
+		name: string;
+	}[];
+
+	export async function getTags() {
+		return await request<TagsResponse>('/tags');
 	}
 
 	//

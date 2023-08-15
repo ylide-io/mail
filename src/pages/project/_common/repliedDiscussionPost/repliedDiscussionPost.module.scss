@@ -1,0 +1,26 @@
+.root {
+	display: grid;
+	grid-gap: 4px;
+	padding: 8px;
+	border-left: 4px solid var(--border-color);
+	border-radius: 8px;
+}
+
+.sender {
+	font-weight: $font-weight_semi-bold;
+}
+
+.text {
+	line-height: $line-height_text;
+	word-break: break-word;
+}
+
+.sticker {
+	height: 120px;
+	object-fit: contain;
+	border-radius: 8px;
+}
+
+.cover {
+	@include feed-attachment-image(320px);
+}

@@ -1,0 +1,37 @@
+.root {
+	display: flex;
+	align-items: center;
+	position: relative;
+	color: var(--text-color);
+	font-weight: $font-weight_medium;
+
+	&:before {
+		content: '';
+		position: absolute;
+		top: -6px;
+		right: -6px;
+		bottom: -6px;
+		left: -6px;
+		background: var(--secondary-surface-color);
+		border-radius: 8px;
+		opacity: 0;
+	}
+}
+
+.root:hover,
+.root:focus-visible {
+	&:before {
+		opacity: 1;
+	}
+}
+
+.logo {
+	flex: 0 0 32px;
+	margin-right: 12px;
+}
+
+.name {
+	@include truncate-text;
+	flex: 1 1;
+	min-width: 0;
+}

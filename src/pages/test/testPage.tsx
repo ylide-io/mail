@@ -57,6 +57,15 @@ export const TestPage = observer(() => {
 			</Row>
 
 			<Row>
+				xsmall
+				<ActionButton size={ActionButtonSize.XSMALL}>Text Only</ActionButton>
+				<ActionButton size={ActionButtonSize.XSMALL} icon={<SettingsSvg />}>
+					With Icon
+				</ActionButton>
+				<ActionButton size={ActionButtonSize.XSMALL} icon={<SettingsSvg />} />
+			</Row>
+
+			<Row>
 				small
 				<ActionButton size={ActionButtonSize.SMALL}>Text Only</ActionButton>
 				<ActionButton size={ActionButtonSize.SMALL} icon={<SettingsSvg />}>

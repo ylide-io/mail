@@ -4,11 +4,8 @@ import { observer } from 'mobx-react';
 import { AnchorHTMLAttributes, PropsWithChildren, ReactNode, useEffect, useState } from 'react';
 import { generatePath, useLocation } from 'react-router-dom';
 
-import { FeedCategory } from '../../../api/feedServerApi';
 import { AppMode, REACT_APP__APP_MODE } from '../../../env';
 import { ReactComponent as ArchiveSvg } from '../../../icons/archive.svg';
-import { ReactComponent as ArrowDownSvg } from '../../../icons/ic20/arrowDown.svg';
-import { ReactComponent as ArrowUpSvg } from '../../../icons/ic20/arrowUp.svg';
 import { ReactComponent as ContactSvg } from '../../../icons/ic20/contact.svg';
 import { ReactComponent as SettingsSvg } from '../../../icons/ic20/settings.svg';
 import { ReactComponent as SidebarMenuSvg } from '../../../icons/ic28/sidebarMenu.svg';
@@ -20,66 +17,38 @@ import { ReactComponent as LinkedInSvg } from '../../../icons/social/linkedIn.sv
 import { ReactComponent as MediumSvg } from '../../../icons/social/medium.svg';
 import { ReactComponent as TelegramSvg } from '../../../icons/social/telegram.svg';
 import { ReactComponent as TwitterSvg } from '../../../icons/social/twitter.svg';
-import { sideAnalyticsIcon } from '../../../icons/static/sideAnalyticsIcon';
-import { sideCultureIcon } from '../../../icons/static/sideCultureIcon';
 import { sideFeedIcon } from '../../../icons/static/sideFeedIcon';
-import { sideMarketsIcon } from '../../../icons/static/sideMarketsIcon';
-import { sideProjectsIcon } from '../../../icons/static/sideProjectsIcon';
-import { sideSecurityIcon } from '../../../icons/static/sideSecurityIcon';
-import { sideTechnologyIcon } from '../../../icons/static/sideTechnologyIcon';
 import { FeedSettingsPopup } from '../../../pages/feed/_common/feedSettingsPopup/feedSettingsPopup';
 import { analytics } from '../../../stores/Analytics';
 import {
-	activeTvmProjects,
-	activeVenomProjects,
+	BlockchainProject,
 	BlockchainProjectId,
-	blockchainProjectsMeta,
+	getBlockchainProjectById,
 } from '../../../stores/blockchainProjects/blockchainProjects';
 import { browserStorage } from '../../../stores/browserStorage';
 import domain from '../../../stores/Domain';
+import { feedSettings } from '../../../stores/FeedSettings';
 import { FolderId, getFolderName, MailList } from '../../../stores/MailList';
 import { DomainAccount } from '../../../stores/models/DomainAccount';
 import { RoutePath } from '../../../stores/routePath';
 import { useOpenMailCompose } from '../../../utils/mail';
-import { useNav } from '../../../utils/url';
+import { openCreateCommunityForm } from '../../../utils/misc';
+import { useIsMatchesPath, useNav } from '../../../utils/url';
 import { ActionButton, ActionButtonLook, ActionButtonSize } from '../../ActionButton/ActionButton';
 import { AdaptiveText } from '../../adaptiveText/adaptiveText';
+import { MiniProjectCard } from '../../blockchainProjectCards/miniProjectCard/miniProjectCard';
 import { PropsWithClassName } from '../../props';
 import { toast } from '../../toast/toast';
 import css from './sidebarMenu.module.scss';
 
 export const isSidebarOpen = observable.box(false);
 
-export enum Section {
-	VENOM_PROJECTS = 'venom_projects',
-	TVM_PROJECTS = 'tvm_projects',
-	FEED = 'feed',
-	FEED_DISCOVERY = 'feed_discovery',
-	MAIL = 'mail',
-	OTC = 'otc',
-}
-
-const getFeedCategoryIcon = (category: FeedCategory) => {
-	return {
-		[FeedCategory.MARKETS]: sideMarketsIcon(15),
-		[FeedCategory.ANALYTICS]: sideAnalyticsIcon(15),
-		[FeedCategory.PROJECTS]: sideProjectsIcon(15),
-		// [FeedCategory.POLICY]: sidePolicyIcon(15),
-		[FeedCategory.SECURITY]: sideSecurityIcon(15),
-		[FeedCategory.TECHNOLOGY]: sideTechnologyIcon(15),
-		[FeedCategory.CULTURE]: sideCultureIcon(15),
-		// [FeedCategory.EDUCATION]: sideEducationIcon(18),
-	}[category];
-};
-
-//
-
 interface SidebarBurgerProps extends PropsWithClassName, PropsWithChildren<{}> {}
 
 export const SidebarBurger = observer(({ className, children }: SidebarBurgerProps) => (
 	<div className={clsx(css.burger, className)}>
 		<ActionButton
-			size={ActionButtonSize.MEDIUM}
+			size={ActionButtonSize.LARGE}
 			icon={isSidebarOpen.get() ? <SidebarMenuCloseSvg /> : <SidebarMenuSvg />}
 			onClick={() => isSidebarOpen.set(!isSidebarOpen.get())}
 		>
@@ -91,41 +60,45 @@ export const SidebarBurger = observer(({ className, children }: SidebarBurgerPro
 //
 
 interface SidebarSectionProps extends PropsWithChildren<{}> {
-	section: Section;
-	title: ReactNode;
+	title?: ReactNode;
+	button?: {
+		look?: ActionButtonLook;
+		text: ReactNode;
+		onClick?: () => void;
+	};
 }
 
-const SidebarSection = observer(({ children, section, title }: SidebarSectionProps) => (
-	<div className={css.section}>
-		<div className={css.sectionTitle}>
-			{title}
-			<ActionButton
-				look={ActionButtonLook.LITE}
-				icon={browserStorage.isSidebarSectionFolded(section) ? <ArrowDownSvg /> : <ArrowUpSvg />}
-				onClick={() => browserStorage.toggleSidebarSectionFolding(section)}
-			/>
-		</div>
+function SidebarSection({ children, title, button }: SidebarSectionProps) {
+	return (
+		<div className={css.section}>
+			{title != null && (
+				<div className={css.sectionTitle}>
+					<div className={css.sectionTitleText}>{title}</div>
 
-		<div
-			className={clsx(
-				css.sectionContent,
-				browserStorage.isSidebarSectionFolded(section) || css.sectionContent_open,
+					{button && (
+						<ActionButton
+							size={ActionButtonSize.XSMALL}
+							look={button.look || ActionButtonLook.SUBTILE}
+							className={css.sectionButton}
+							onClick={() => {
+								isSidebarOpen.set(false);
+								button?.onClick?.();
+							}}
+						>
+							{button.text}
+						</ActionButton>
+					)}
+				</div>
 			)}
-		>
-			{children}
+
+			<div className={css.sectionContent}>{children}</div>
 		</div>
-	</div>
-));
+	);
+}
 
 //
 
-enum SidebarButtonLook {
-	SUBMENU = 'SUBMENU',
-	SECTION = 'SECTION',
-}
-
 interface SidebarButtonProps {
-	look?: SidebarButtonLook;
 	href: string;
 	icon?: ReactNode;
 	name: ReactNode;
@@ -136,7 +109,7 @@ interface SidebarButtonProps {
 	};
 }
 
-export const SidebarButton = observer(({ look, href, icon, name, rightButton }: SidebarButtonProps) => {
+export const SidebarButton = observer(({ href, icon, name, rightButton }: SidebarButtonProps) => {
 	const location = useLocation();
 	const navigate = useNav();
 
@@ -150,38 +123,33 @@ export const SidebarButton = observer(({ look, href, icon, name, rightButton }: 
 		  }
 		: {};
 
-	const lookClass =
-		look &&
-		{
-			[SidebarButtonLook.SUBMENU]: css.sectionLink_submenu,
-			[SidebarButtonLook.SECTION]: css.sectionLink_section,
-		}[look];
-
 	return (
 		<a
 			{...externalProps}
-			className={clsx(css.sectionLink, lookClass, isActive && css.sectionLink_active)}
+			className={clsx(css.sidebarButton, isActive && css.sidebarButton_active)}
 			href={href}
 			onClick={e => {
+				isSidebarOpen.set(false);
+
 				if (!isExternal) {
 					e.preventDefault();
-					isSidebarOpen.set(false);
 					navigate(href);
 				}
 			}}
 		>
-			{icon && <div className={css.sectionLinkIconLeft}>{icon}</div>}
-			<div className={css.sectionLinkTitle}>{name}</div>
+			{icon && <div className={css.sidebarButtonIcon}>{icon}</div>}
+			<div className={css.sidebarButtonTitle}>{name}</div>
 
 			{rightButton && (
 				<ActionButton
-					className={css.sectionRightButton}
+					className={css.sidebarButtonRight}
 					look={ActionButtonLook.LITE}
 					icon={rightButton.icon}
 					title={rightButton.title}
 					onClick={e => {
-						e.preventDefault();
 						e.stopPropagation();
+						isSidebarOpen.set(false);
+
 						rightButton?.onClick();
 					}}
 				/>
@@ -189,6 +157,39 @@ export const SidebarButton = observer(({ look, href, icon, name, rightButton }: 
 		</a>
 	);
 });
+
+//
+
+interface SidebarProjectProps {
+	project: BlockchainProject;
+}
+
+export function SidebarProject({ project }: SidebarProjectProps) {
+	const href = generatePath(RoutePath.PROJECT_ID, { projectId: project.id });
+	const isActive = useIsMatchesPath(href);
+
+	return <MiniProjectCard className={clsx(isActive && css.sidebarProject_active)} project={project} />;
+}
+
+//
+
+enum SidebarBlockLook {
+	REGULAR = 'REGULAR',
+	PRETTY = 'PRETTY',
+}
+
+interface SidebarBlockProps extends PropsWithChildren {
+	look?: SidebarBlockLook;
+}
+
+export function SidebarBlock({ children, look }: SidebarBlockProps) {
+	const lookClass = {
+		[SidebarBlockLook.REGULAR]: css.block_regularLook,
+		[SidebarBlockLook.PRETTY]: css.block_prettyLook,
+	}[look || SidebarBlockLook.REGULAR];
+
+	return <div className={clsx(css.block, lookClass)}>{children}</div>;
+}
 
 //
 
@@ -241,54 +242,56 @@ export const SidebarMailSection = observer(() => {
 	}, [accounts]);
 
 	return (
-		<SidebarSection section={Section.MAIL} title="Mail">
-			<ActionButton
-				look={ActionButtonLook.PRIMARY}
-				className={css.sectionButton}
-				onClick={() => {
-					isSidebarOpen.set(false);
-					openMailCompose({ place: 'sidebar' });
+		<SidebarBlock look={SidebarBlockLook.PRETTY}>
+			<SidebarSection
+				title="Mailbox"
+				button={{
+					look: ActionButtonLook.PRIMARY,
+					text: 'Compose',
+					onClick: () => {
+						isSidebarOpen.set(false);
+						openMailCompose({ place: 'sidebar' });
+					},
 				}}
 			>
-				Compose mail
-			</ActionButton>
+				<SidebarButton
+					href={generatePath(RoutePath.MAIL_FOLDER, { folderId: FolderId.Inbox })}
+					icon={<InboxSvg />}
+					name={
+						<div className={css.inboxButton}>
+							{getFolderName(FolderId.Inbox)}
+							{hasNewMessages && <div className={css.inboxNotification} title="You have new messages" />}
+						</div>
+					}
+				/>
 
-			<SidebarButton
-				href={generatePath(RoutePath.MAIL_FOLDER, { folderId: FolderId.Inbox })}
-				icon={<InboxSvg />}
-				name={
-					<div className={css.inboxButton}>
-						{getFolderName(FolderId.Inbox)}
-						{hasNewMessages && <div className={css.inboxNotification} title="You have new messages" />}
-					</div>
-				}
-			/>
+				<SidebarButton
+					href={generatePath(RoutePath.MAIL_FOLDER, { folderId: FolderId.Sent })}
+					icon={<SentSvg />}
+					name={getFolderName(FolderId.Sent)}
+				/>
 
-			<SidebarButton
-				href={generatePath(RoutePath.MAIL_FOLDER, { folderId: FolderId.Sent })}
-				icon={<SentSvg />}
-				name={getFolderName(FolderId.Sent)}
-			/>
-
-			<SidebarButton
-				href={generatePath(RoutePath.MAIL_FOLDER, { folderId: FolderId.Archive })}
-				icon={<ArchiveSvg />}
-				name={getFolderName(FolderId.Archive)}
-			/>
-		</SidebarSection>
+				<SidebarButton
+					href={generatePath(RoutePath.MAIL_FOLDER, { folderId: FolderId.Archive })}
+					icon={<ArchiveSvg />}
+					name={getFolderName(FolderId.Archive)}
+				/>
+			</SidebarSection>
+		</SidebarBlock>
 	);
 });
 
-//
-
 export const SidebarMenu = observer(() => {
+	const navigate = useNav();
+
 	const [feedSettingsAccount, setFeedSettingsAccount] = useState<DomainAccount>();
+	const tags = feedSettings.tags;
 
 	function renderOtcSection() {
 		if (REACT_APP__APP_MODE !== AppMode.OTC) return;
 
 		return (
-			<SidebarSection section={Section.OTC} title="OTC Trading">
+			<SidebarSection title="OTC Trading">
 				<SidebarButton href={generatePath(RoutePath.OTC_ASSETS)} icon={<InboxSvg />} name="Asset Explorer" />
 
 				<SidebarButton href={generatePath(RoutePath.OTC_CHATS)} icon={<SentSvg />} name="Chats" />
@@ -300,13 +303,12 @@ export const SidebarMenu = observer(() => {
 		if (REACT_APP__APP_MODE !== AppMode.MAIN_VIEW) return;
 
 		return (
-			<SidebarSection section={Section.FEED} title="Feed">
-				<SidebarButton href={generatePath(RoutePath.FEED_SMART)} icon={sideFeedIcon(14)} name="Smart feed" />
+			<SidebarSection title="Smart Feed">
+				<SidebarButton href={generatePath(RoutePath.FEED_SMART)} icon={sideFeedIcon(14)} name="All Accounts" />
 
 				{domain.accounts.activeAccounts.map((account, i) => (
 					<SidebarButton
 						key={i}
-						look={SidebarButtonLook.SUBMENU}
 						href={generatePath(RoutePath.FEED_SMART_ADDRESS, { address: account.account.address })}
 						icon={<ContactSvg />}
 						name={<AdaptiveText text={account.name || account.account.address} />}
@@ -342,56 +344,38 @@ export const SidebarMenu = observer(() => {
 		if (REACT_APP__APP_MODE !== AppMode.HUB) return;
 
 		function renderProjects(projects: BlockchainProjectId[]) {
-			return projects.map(id => {
-				const meta = blockchainProjectsMeta[id];
-
-				return (
-					<SidebarButton
-						key={id}
-						href={generatePath(RoutePath.FEED_PROJECT_POSTS, { projectId: meta.id })}
-						name={meta.name}
-						icon={meta.logo}
-					/>
-				);
-			});
+			return projects.map(id => <SidebarProject key={id} project={getBlockchainProjectById(id)} />);
 		}
 
 		return (
-			<>
-				<div>
-					<SidebarButton
-						look={SidebarButtonLook.SECTION}
-						href={generatePath(RoutePath.FEED_PROJECT_POSTS, { projectId: BlockchainProjectId.GENERAL })}
-						name={blockchainProjectsMeta[BlockchainProjectId.GENERAL].name}
-						icon={blockchainProjectsMeta[BlockchainProjectId.GENERAL].logo}
-					/>
-
-					<SidebarButton
-						look={SidebarButtonLook.SECTION}
-						href={generatePath(RoutePath.FEED_PROJECT_POSTS, { projectId: BlockchainProjectId.ETH_WHALES })}
-						name={blockchainProjectsMeta[BlockchainProjectId.ETH_WHALES].name}
-						icon={blockchainProjectsMeta[BlockchainProjectId.ETH_WHALES].logo}
-					/>
-				</div>
-
-				<SidebarSection section={Section.VENOM_PROJECTS} title="Venom Projects">
-					{renderProjects(activeVenomProjects)}
+			<SidebarBlock>
+				<SidebarSection
+					title="Trending"
+					button={{ text: 'Explore', onClick: () => navigate(generatePath(RoutePath.ROOT)) }}
+				>
+					{renderProjects([
+						BlockchainProjectId.TVM,
+						BlockchainProjectId.OASIS_GALLERY,
+						BlockchainProjectId.GRAVIX,
+						BlockchainProjectId.WEB3_WORLD,
+						BlockchainProjectId.YLIDE,
+					])}
 				</SidebarSection>
 
-				<SidebarSection section={Section.TVM_PROJECTS} title="TVM 주요정보">
-					{renderProjects(activeTvmProjects)}
-				</SidebarSection>
-
-				<ActionButton
-					className={css.sectionButton}
-					onClick={() => {
-						analytics.openCreateCommunityForm();
-						window.open('https://forms.gle/p9141gy5wn7DCjZA8', '_blank')?.focus();
+				<SidebarSection
+					title="Newly Added"
+					button={{
+						text: 'Create',
+						onClick: () => openCreateCommunityForm(),
 					}}
 				>
-					Create community
-				</ActionButton>
-			</>
+					{renderProjects([
+						BlockchainProjectId.ONE_CLICK_CRYPTO,
+						BlockchainProjectId.GNOSIS_BUILDERS,
+						BlockchainProjectId.BET_FURY,
+					])}
+				</SidebarSection>
+			</SidebarBlock>
 		);
 	}
 
@@ -399,18 +383,21 @@ export const SidebarMenu = observer(() => {
 		if (REACT_APP__APP_MODE !== AppMode.MAIN_VIEW) return;
 
 		return (
-			<SidebarSection
-				section={Section.FEED_DISCOVERY}
-				title={REACT_APP__APP_MODE === AppMode.MAIN_VIEW ? 'Discovery' : 'Feed'}
-			>
-				{Object.values<FeedCategory>(FeedCategory).map(category => (
-					<SidebarButton
-						key={category}
-						href={generatePath(RoutePath.FEED_CATEGORY, { category })}
-						icon={getFeedCategoryIcon(category)}
-						name={category}
-					/>
-				))}
+			<SidebarSection title={REACT_APP__APP_MODE === AppMode.MAIN_VIEW ? 'Discovery' : 'Feed'}>
+				{/* TODO: KONST */}
+				{tags === 'error' ? (
+					<></>
+				) : tags === 'loading' ? (
+					<div>Loading</div>
+				) : (
+					tags.map(t => (
+						<SidebarButton
+							key={t.id}
+							href={generatePath(RoutePath.FEED_CATEGORY_ID, { tag: t.id.toString() })}
+							name={t.name}
+						/>
+					))
+				)}
 			</SidebarSection>
 		);
 	}
@@ -428,6 +415,8 @@ export const SidebarMenu = observer(() => {
 			{renderBlockchainProjectsSection()}
 			{renderFeedDiscoverySection()}
 			{renderMailSection()}
+
+			<div className={css.divider} />
 
 			<div className={css.socials}>
 				<a

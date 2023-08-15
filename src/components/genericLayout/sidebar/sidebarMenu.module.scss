@@ -1,74 +1,95 @@
 .root {
 	display: grid;
-	grid-gap: 16px;
-	padding: 0 16px;
+	grid-gap: 20px;
+	padding: 0 0 20px;
 }
 
+//
+
+.block {
+	display: grid;
+	grid-gap: 32px;
+	padding: 20px;
+	background: var(--surface-color);
+	border-radius: 16px;
+}
+
+.block_prettyLook {
+	background: linear-gradient(90deg, var(--accent2-lite-color) 0%, var(--accent-lite-color) 100%);
+}
+
+//
+
 .section {
-	min-width: 0;
+	display: grid;
+	grid-gap: 16px;
 }
 
 .sectionTitle {
 	display: flex;
 	align-items: center;
-	padding: 0 0 0 8px;
-	height: 40px;
-	font-size: 16px;
-	font-weight: $font-weight_bold;
+}
+
+.sectionTitleText {
+	font-size: 12px;
+	font-weight: $font-weight_medium;
+	text-transform: uppercase;
+	color: var(--secondary-text-color);
+
+	.block_prettyLook & {
+		color: var(--text-color);
+	}
 }
 
 .sectionButton {
-	align-self: center;
-	justify-self: center;
-	margin: 0 0 8px;
-	min-width: 148px;
+	margin: -99px 0 -99px auto;
 }
 
 .sectionContent {
-	display: flex;
-	flex-direction: column;
-	margin: 0 0 0 -16px;
-	padding: 0 0 0 16px;
-	max-height: 0;
-	overflow: hidden;
-	opacity: 0;
-	transition: all 200ms;
+	display: grid;
+	grid-gap: 12px;
 }
 
-.sectionContent_open {
-	max-height: 600px;
-	opacity: 1;
-}
+//
 
-.sectionLink {
+.sidebarButton {
 	display: flex;
 	align-items: center;
-	margin: 0 0 0 -16px;
-	padding: 0 2px 0 32px;
-	height: 32px;
-	color: var(--primary-text-color);
+	position: relative;
+	color: var(--text-color);
+	font-weight: $font-weight_medium;
 	cursor: pointer;
+
+	&:before {
+		content: '';
+		position: absolute;
+		top: -6px;
+		right: -6px;
+		bottom: -6px;
+		left: -6px;
+		background: var(--secondary-surface-color);
+		border-radius: 8px;
+		opacity: 0;
+	}
 }
 
-.sectionLink_active {
-	background: var(--border-color);
-	border-radius: 0 30px 30px 0;
+.sidebarButton_active:before {
+	background: var(--accent2-surface-color);
 }
 
-.sectionLink_submenu {
-	padding-left: 52px;
+.sidebarButton:hover,
+.sidebarButton:focus-visible,
+.sidebarButton_active {
+	&:before {
+		opacity: 1;
+	}
 }
 
-.sectionLink_section {
-	padding-left: 24px;
-	font-size: 16px;
-	font-weight: $font-weight_bold;
-}
-
-.sectionLinkIconLeft {
+.sidebarButtonIcon {
 	flex: 0 0 20px;
 	position: relative;
-	margin-right: 8px;
+	margin-right: 12px;
+	height: 20px;
 
 	> * {
 		position: absolute;
@@ -79,15 +100,14 @@
 	}
 }
 
-.sectionLinkTitle {
+.sidebarButtonTitle {
 	@include truncate-text;
 	flex: 1 1;
 	padding: 0 4px 0 0;
 	min-width: 0;
-	line-height: 20px;
 }
 
-.sectionRightButton {
+.sidebarButtonRight {
 	margin: -99px 0;
 	opacity: 0.25;
 
@@ -97,30 +117,33 @@
 	}
 }
 
+//
+
+.sidebarProject_active:before {
+	background: var(--accent2-surface-color);
+}
+
+//
+
+.divider {
+	justify-self: center;
+	width: 100px;
+	border-top: 1px solid var(--border-color);
+}
+
 .socials {
+	justify-self: center;
 	display: grid;
 	grid-auto-flow: column;
-	justify-content: center;
 	grid-gap: 8px;
-	position: relative;
-	padding: 24px 0 0 0;
-
-	&:before {
-		content: '';
-		position: absolute;
-		top: 0;
-		right: 0;
-		left: 0;
-		height: 1px;
-		background: var(--border-color);
-	}
 
 	a {
 		@include expand-click-area(4px);
-		color: var(--primary-text-color);
+		color: var(--text-color);
+		opacity: 0.2;
 
 		&:hover {
-			color: var(--link-color);
+			opacity: 1;
 		}
 
 		svg {
@@ -132,7 +155,7 @@
 .burger {
 	display: none;
 
-	@include less920px {
+	@include lessThan1152w {
 		display: block;
 	}
 }

@@ -1,5 +1,6 @@
+import clsx from 'clsx';
 import { observer } from 'mobx-react';
-import { useRef, useState } from 'react';
+import { PropsWithChildren, useRef, useState } from 'react';
 import { generatePath } from 'react-router-dom';
 
 import { AppMode, REACT_APP__APP_MODE } from '../../../env';
@@ -10,20 +11,47 @@ import { ReactComponent as ContactsSvg } from '../../../icons/ic28/contacts.svg'
 import { postWidgetMessage, WidgetId, WidgetMessageType } from '../../../pages/widgets/widgets';
 import { browserStorage } from '../../../stores/browserStorage';
 import domain from '../../../stores/Domain';
+import { FolderId } from '../../../stores/MailList';
 import { getGlobalOutgoingMailData } from '../../../stores/outgoingMailData';
 import { RoutePath } from '../../../stores/routePath';
 import { connectAccount } from '../../../utils/account';
 import { useOpenMailCompose } from '../../../utils/mail';
-import { useNav } from '../../../utils/url';
+import { useIsMatchesPath, useNav } from '../../../utils/url';
 import { ActionButton, ActionButtonLook, ActionButtonSize } from '../../ActionButton/ActionButton';
 import { AppLogo } from '../../appLogo/appLogo';
 import { Avatar } from '../../avatar/avatar';
+import { PropsWithClassName } from '../../props';
 import { toast } from '../../toast/toast';
 import { SidebarBurger } from '../sidebar/sidebarMenu';
 import { AccountsPopup } from './accountsPopup/accountsPopup';
 import css from './header.module.scss';
+import { SearchField } from './searchField/searchField';
 
-const Header = observer(() => {
+interface NavButtonProps extends PropsWithChildren {
+	href: string;
+}
+
+const NavButton = ({ children, href }: NavButtonProps) => {
+	const navigate = useNav();
+	const isActive = useIsMatchesPath(href);
+
+	return (
+		<a
+			className={clsx(css.navButton, isActive && css.navButton_active)}
+			href={href}
+			onClick={e => {
+				e.preventDefault();
+				navigate(href);
+			}}
+		>
+			{children}
+		</a>
+	);
+};
+
+//
+
+export const Header = observer(({ className }: PropsWithClassName) => {
 	const navigate = useNav();
 	const openMailCompose = useOpenMailCompose();
 
@@ -33,29 +61,29 @@ const Header = observer(() => {
 	const accounts = domain.accounts.accounts;
 
 	return (
-		<div className={css.root}>
-			<SidebarBurger className={css.burger} />
+		<div className={clsx(css.root, className)}>
+			<div className={css.left}>
+				<SidebarBurger />
 
-			{REACT_APP__APP_MODE === AppMode.HUB && domain.accounts.hasActiveAccounts && (
-				<ActionButton
-					className={css.composeButton}
-					look={ActionButtonLook.PRIMARY}
-					onClick={() => openMailCompose({ place: 'header' })}
+				<a
+					className={css.logo}
+					href={generatePath(RoutePath.ROOT)}
+					onClick={e => {
+						e.preventDefault();
+						navigate(generatePath(RoutePath.ROOT));
+					}}
 				>
-					Compose Mail
-				</ActionButton>
-			)}
+					<AppLogo />
+				</a>
+			</div>
 
-			<a
-				className={css.logo}
-				href={generatePath(RoutePath.ROOT)}
-				onClick={e => {
-					e.preventDefault();
-					navigate(generatePath(RoutePath.ROOT));
-				}}
-			>
-				<AppLogo />
-			</a>
+			<div className={css.center}>
+				<NavButton href={generatePath(RoutePath.ROOT)}>Explore</NavButton>
+
+				<NavButton href={generatePath(RoutePath.MAIL_FOLDER, { folderId: FolderId.Inbox })}>Mailbox</NavButton>
+
+				<SearchField className={css.search} />
+			</div>
 
 			<div className={css.right}>
 				{REACT_APP__APP_MODE === AppMode.HUB && domain.accounts.hasActiveAccounts && (
@@ -90,8 +118,7 @@ const Header = observer(() => {
 
 							<div className={css.usersText}>
 								{accounts.length} account
-								{accounts.length > 1 ? 's' : ''}
-								<span>&nbsp;connected</span>
+								{accounts.length > 1 ? 's' : ''} connected
 							</div>
 
 							<ArrowDownSvg className={css.usersIcon} />
@@ -134,5 +161,3 @@ const Header = observer(() => {
 		</div>
 	);
 });
-
-export default Header;

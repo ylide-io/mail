@@ -23,10 +23,24 @@ export class FeedSettings {
 	private configs = new Map<DomainAccount, FeedSettingsData | 'loading'>();
 
 	@observable
-	coverage: FeedManagerApi.GetCoverageResponse | 'loading' | 'error' = 'loading';
+	coverages = new Map<
+		DomainAccount,
+		(FeedManagerApi.CoverageResponse & { totalCoverage: string }) | 'loading' | 'error'
+	>();
+
+	@observable
+	tags: { id: number; name: string }[] | 'loading' | 'error' = 'loading';
 
 	constructor() {
 		makeObservable(this);
+
+		FeedManagerApi.getTags()
+			.then(r => {
+				this.tags = r;
+			})
+			.catch(e => {
+				console.log(`Error fetching tags - ${e}`);
+			});
 
 		FeedServerApi.getSources()
 			.then(({ sources }) => (this.sources = sources))
@@ -38,6 +52,7 @@ export class FeedSettings {
 				.forEach(async account => {
 					try {
 						this.configs.set(account, 'loading');
+						this.coverages.set(account, 'loading');
 
 						const [configResponse, coverageResponse] = await Promise.allSettled([
 							FeedManagerApi.getConfig({ token: account.mainViewKey }),
@@ -56,9 +71,14 @@ export class FeedSettings {
 							console.log(`Failed to get config - ${configResponse.reason}`);
 						}
 						if (coverageResponse.status === 'fulfilled') {
-							this.coverage = coverageResponse.value;
+							const coverage = coverageResponse.value;
+							const total = coverage.tokens.usdTotal + coverage.protocols.usdTotal;
+							const covered = coverage.tokens.usdCovered + coverage.protocols.usdCovered;
+							const result = total > 0 ? (covered * 100) / total : 0;
+							const totalCoverage = result === 100 ? '100' : result.toFixed(1);
+							this.coverages.set(account, { ...coverage, totalCoverage });
 						} else {
-							this.coverage = 'error';
+							this.coverages.set(account, 'error');
 							console.log(`Failed to get coverage - ${coverageResponse.reason}`);
 						}
 					} catch (e) {

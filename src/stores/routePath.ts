@@ -9,36 +9,40 @@ export enum RoutePath {
 	// APP
 
 	SETTINGS = '/settings',
-
 	WALLETS = '/wallets',
-	WALLETS_CONNECT = '/connect-wallets',
 
+	MAIL = '/mail',
 	MAIL_COMPOSE = '/mail/compose',
 	MAIL_CONTACTS = '/mail/contacts',
 	MAIL_CONTACT_TAGS = '/mail/contacts/tags',
 	MAIL_FOLDER = '/mail/:folderId',
-	MAIL_DETAILS = '/mail/:folderId/:id',
+	MAIL_FOLDER_DETAILS = '/mail/:folderId/:id',
 	MAIL_DETAILS_OUTLET = ':id',
 
 	FEED = '/feed',
 	FEED_ALL = '/feed/all',
-	FEED_POST = '/feed/post/:postId',
-	FEED_CATEGORY = '/feed/category/:category',
-	FEED_SOURCE = '/feed/source/:source',
+	FEED_POST_ID = '/feed/post/:postId',
+	FEED_CATEGORY_ID = '/feed/tag/:tag',
+	FEED_SOURCE_ID = '/feed/source/:source',
 	FEED_SMART = '/feed/smart',
 	FEED_SMART_ADDRESS = '/feed/smart/:address',
-	FEED_PROJECT = '/feed/project',
-	FEED_PROJECT_POSTS = '/feed/project/:projectId',
-	FEED_PROJECT_POSTS_ADMIN = '/feed/project/:projectId/admin',
-	FEED_PROJECT_POST = '/feed/project/:projectId/:postId',
 
+	PROJECT = '/project',
+	PROJECT_ID = '/project/:projectId',
+	PROJECT_ID_OFFICIAL = '/project/:projectId/announcements',
+	PROJECT_ID_OFFICIAL_ADMIN = '/project/:projectId/announcements/admin',
+	PROJECT_ID_POST_ID = '/project/:projectId/post/:postId',
+	PROJECT_ID_DISCUSSION = '/project/:projectId/discussion',
+	PROJECT_ID_DISCUSSION_ADMIN = '/project/:projectId/discussion/admin',
+
+	OTC = '/otc',
 	OTC_ASSETS = '/otc/assets',
 	OTC_WALLETS = '/otc/wallets',
 	OTC_CHATS = '/otc/chats',
-	OTC_CHAT = '/otc/chats/:address',
+	OTC_CHATS_ID = '/otc/chats/:address',
 
 	// WIDGETS
 
-	SEND_MESSAGE_WIDGET = '/widget/send-message',
-	MAILBOX_WIDGET = '/widget/mailbox',
+	WIDGET_SENDMESSAGE = '/widget/send-message',
+	WIDGET_MAILBOX = '/widget/mailbox',
 }

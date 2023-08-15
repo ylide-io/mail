@@ -10,6 +10,7 @@ import { CheckBox } from '../../../../components/checkBox/checkBox';
 import { DropDown, DropDownItem, DropDownItemMode } from '../../../../components/dropDown/dropDown';
 import { ErrorMessage, ErrorMessageLook } from '../../../../components/errorMessage/errorMessage';
 import { GalleryModal } from '../../../../components/galleryModal/galleryModal';
+import { PostItemContainer } from '../../../../components/postItemContainer/postItemContainer';
 import { ReadableDate } from '../../../../components/readableDate/readableDate';
 import { SharePopup } from '../../../../components/sharePopup/sharePopup';
 import { Spinner } from '../../../../components/spinner/spinner';
@@ -26,7 +27,6 @@ import { HorizontalAlignment } from '../../../../utils/alignment';
 import { invariant } from '../../../../utils/assert';
 import { toAbsoluteUrl, useNav } from '../../../../utils/url';
 import { FeedLinkTypeIcon } from '../feedLinkTypeIcon/feedLinkTypeIcon';
-import { PostItemContainer } from '../postItemContainer/postItemContainer';
 import css from './feedPostItem.module.scss';
 
 interface FeedPostContentProps {
@@ -183,14 +183,14 @@ interface FeedPostItemProps {
 
 export function FeedPostItem({ isInFeed, realtedAccounts, post }: FeedPostItemProps) {
 	const navigate = useNav();
-	const postPath = generatePath(RoutePath.FEED_POST, { postId: post.id });
+	const postPath = generatePath(RoutePath.FEED_POST_ID, { postId: post.id });
 
 	const menuButtonRef = useRef(null);
 	const [isMenuOpen, setMenuOpen] = useState(false);
 	const [isSharePopupOpen, setSharePopupOpen] = useState(false);
 
 	const onSourceIdClick = () => {
-		navigate(generatePath(RoutePath.FEED_SOURCE, { source: post.sourceId }));
+		navigate(generatePath(RoutePath.FEED_SOURCE_ID, { source: post.sourceId }));
 	};
 
 	const [unfollowedState, setUnfollowState] = useState<'none' | 'unfollowing' | 'unfollowed'>('none');
@@ -273,9 +273,9 @@ export function FeedPostItem({ isInFeed, realtedAccounts, post }: FeedPostItemPr
 										<div className={css.reason} title="The reason why you see this post">
 											{
 												{
-													[FeedReason.BALANCE]: "You're holding ",
-													[FeedReason.PROTOCOL]: "You're in ",
-													[FeedReason.TRANSACTION]: 'You used ',
+													[FeedReason.BALANCE]: 'You hold tokens of ',
+													[FeedReason.PROTOCOL]: 'Current position in ',
+													[FeedReason.TRANSACTION]: 'Historical tx in ',
 												}[userCryptoProject.reasons[0]]
 											}
 
@@ -329,7 +329,13 @@ export function FeedPostItem({ isInFeed, realtedAccounts, post }: FeedPostItemPr
 									{!!realtedAccounts?.length && (
 										<>
 											<DropDownItem mode={DropDownItemMode.LITE} onSelect={() => unfollow()}>
-												Unfollow <b>{post.authorName}</b> {post.sourceType}
+												Unfollow{' '}
+												<b>
+													{post.sourceType === LinkType.DISCORD
+														? post.sourceName
+														: post.authorName}
+												</b>{' '}
+												{post.sourceType}
 											</DropDownItem>
 
 											{userCryptoProject && (
