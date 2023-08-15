@@ -18,6 +18,17 @@ export function createCleanSerachParams(search: Record<string, any>) {
 	return createSearchParams(filterObjectEntries(search, (_, value) => value != null));
 }
 
+export function beautifyUrl(url: string) {
+	const u = new URL(url);
+
+	const host = u.hostname.replace(/^www\./, '');
+	const search = u.search;
+	const hash = u.hash;
+	const path = u.pathname.length > 1 || (!search && !hash) ? u.pathname.replace(/\/$/, '') : u.pathname;
+
+	return `${host}${path}${search}${hash}`;
+}
+
 //
 
 interface UseNavParameters {

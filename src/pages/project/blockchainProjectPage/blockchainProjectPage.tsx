@@ -30,7 +30,7 @@ import { RoutePath } from '../../../stores/routePath';
 import { connectAccount } from '../../../utils/account';
 import { assertUnreachable, invariant } from '../../../utils/assert';
 import { blockchainMeta, BlockchainName, isEvmBlockchain } from '../../../utils/blockchain';
-import { useIsMatchesPattern, useNav } from '../../../utils/url';
+import { beautifyUrl, useIsMatchesPattern, useNav } from '../../../utils/url';
 import { CreatePostForm, CreatePostFormApi } from '../_common/createPostForm/createPostForm';
 import { DiscussionPost } from '../_common/discussionPost/discussionPost';
 import { OfficialPost } from '../_common/officialPost/officialPost';
@@ -433,7 +433,7 @@ export const BlockchainProjectPage = observer(() => {
 								<a className={css.projectWebsite} href={project.website}>
 									<LinkSvg />
 
-									{project.website}
+									{beautifyUrl(project.website)}
 								</a>
 							)}
 
