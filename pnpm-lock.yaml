@@ -32,9 +32,6 @@ dependencies:
   '@sentry/react':
     specifier: 7.57.0
     version: 7.57.0(react@18.2.0)
-  '@sentry/tracing':
-    specifier: 7.57.0
-    version: 7.57.0
   '@types/lodash.sortby':
     specifier: ^4.7.7
     version: 4.7.7
@@ -3185,13 +3182,6 @@ packages:
       '@sentry/core': 7.57.0
       '@sentry/types': 7.57.0
       '@sentry/utils': 7.57.0
-    dev: false
-
-  /@sentry/tracing@7.57.0:
-    resolution: {integrity: sha512-D8eKJMYN529mDP9lsOLyhe0Rf9Qiexo7Ul4+MQwDlwRr9c9tc0AdGwFlnKGvCMDh7ucITzvZkMZDHBapU3WHNQ==}
-    engines: {node: '>=8'}
-    dependencies:
-      '@sentry-internal/tracing': 7.57.0
     dev: false
 
   /@sentry/types@7.57.0:
