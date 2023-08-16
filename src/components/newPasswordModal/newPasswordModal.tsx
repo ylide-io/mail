@@ -33,7 +33,7 @@ enum Step {
 }
 
 interface NewPasswordModalProps {
-	faucetType: null | 'polygon' | 'gnosis' | 'fantom';
+	faucetType: null | EVMNetwork.POLYGON | EVMNetwork.GNOSIS | EVMNetwork.FANTOM;
 	bonus: boolean;
 	wallet: Wallet;
 	account: WalletAccount;
@@ -118,9 +118,8 @@ export function NewPasswordModal({
 						return;
 					}
 
-					domain
+					domain.ylide.core
 						.waitForPublicKey(
-							false,
 							network ? EVM_NAMES[network] : account.wallet.currentBlockchain,
 							account.account.address,
 							key.publicKey.keyBytes,
@@ -137,9 +136,8 @@ export function NewPasswordModal({
 				});
 
 				asyncDelay(3000).then(() =>
-					domain
-						.waitForPublicKey(
-							false,
+				domain.ylide.core
+				.waitForPublicKey(
 							network ? EVM_NAMES[network] : account.wallet.currentBlockchain,
 							account.account.address,
 							key.publicKey.keyBytes,
@@ -231,11 +229,11 @@ export function NewPasswordModal({
 		if (!freshestKey || needToRepublishKey) {
 			const domainAccount = await createDomainAccount(wallet, account, tempLocalKey);
 			if (faucetType && wallet.factory.blockchainGroup === 'evm') {
-				const actualFaucetType = needToRepublishKey ? 'polygon' : faucetType;
+				const actualFaucetType = needToRepublishKey ? EVMNetwork.POLYGON : faucetType;
 
 				setStep(Step.GENERATE_KEY);
 
-				const { chainId, timestampLock, registrar, signature } = await domain.getFaucetSignature(
+				const faucetData = await domain.getFaucetSignature(
 					domainAccount,
 					tempLocalKey.publicKey,
 					actualFaucetType,
@@ -250,16 +248,7 @@ export function NewPasswordModal({
 				domain.txPlateVisible = true;
 				domain.txWithBonus = bonus;
 
-				const promise = domain.publishThroughFaucet(
-					domainAccount,
-					tempLocalKey.publicKey,
-					actualFaucetType,
-					bonus,
-					chainId,
-					timestampLock,
-					registrar,
-					signature,
-				);
+				const promise = domain.publishThroughFaucet(faucetData);
 
 				if (waitTxPublishing) {
 					await promise;

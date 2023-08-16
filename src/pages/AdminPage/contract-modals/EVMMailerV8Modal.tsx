@@ -1,8 +1,8 @@
 import {
-	EthereumMailerV8Wrapper,
-	EthereumWalletController,
 	EVM_NAMES,
+	EVMMailerV8Wrapper,
 	EVMNetwork,
+	EVMWalletController,
 	IEVMMailerContractLink,
 	IEVMRegistryContractLink,
 } from '@ylide/ethereum';
@@ -36,10 +36,10 @@ export const EVMMailerV8Modal: FC<EVMMailerV8ModalProps> = ({ contract, isModern
 	useEffect(() => {
 		if (contract.contract) {
 			(async () => {
-				const mailer = await (account.wallet.controller as EthereumWalletController).mailers.find(
+				const mailer = await (account.wallet.controller as EVMWalletController).mailers.find(
 					m => m.link.id === contract.contract?.id,
 				)!;
-				const wrapper = mailer.wrapper as EthereumMailerV8Wrapper;
+				const wrapper = mailer.wrapper as EVMMailerV8Wrapper;
 				const owner = await wrapper.globals.getOwner(mailer.link);
 				const beneficiary = await wrapper.globals.getBeneficiary(mailer.link);
 				const fees = await wrapper.globals.getFees(mailer.link);

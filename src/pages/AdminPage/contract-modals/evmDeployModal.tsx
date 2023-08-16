@@ -1,5 +1,5 @@
 import {
-	EthereumWalletController,
+	EVMWalletController,
 	EVM_NAMES,
 	EVMNetwork,
 	IEVMMailerContractLink,
@@ -33,23 +33,23 @@ export const EVMDeployContractModal: FC<EVMDeployContractModalProps> = ({ contra
 		setLoading(true);
 		let address: string = '';
 		if (contract.title === 'MailerV6') {
-			address = await (account.wallet.controller as EthereumWalletController).deployMailerV6(account.account, {
+			address = await (account.wallet.controller as EVMWalletController).deployMailerV6(account.account, {
 				network,
 			});
 		} else if (contract.title === 'MailerV7') {
-			address = await (account.wallet.controller as EthereumWalletController).deployMailerV7(account.account, {
+			address = await (account.wallet.controller as EVMWalletController).deployMailerV7(account.account, {
 				network,
 			});
 		} else if (contract.title === 'MailerV8') {
-			address = await (account.wallet.controller as EthereumWalletController).deployMailerV8(account.account, {
+			address = await (account.wallet.controller as EVMWalletController).deployMailerV8(account.account, {
 				network,
 			});
 		} else if (contract.title === 'MailerV9') {
-			address = await (account.wallet.controller as EthereumWalletController).deployMailerV9(account.account, {
+			address = await (account.wallet.controller as EVMWalletController).deployMailerV9(account.account, {
 				network,
 			});
 		} else if (contract.title === 'RegistryV3') {
-			address = await (account.wallet.controller as EthereumWalletController).deployRegistryV3(
+			address = await (account.wallet.controller as EVMWalletController).deployRegistryV3(
 				account.account,
 				undefined,
 				{
@@ -57,7 +57,7 @@ export const EVMDeployContractModal: FC<EVMDeployContractModalProps> = ({ contra
 				},
 			);
 		} else if (contract.title === 'RegistryV5') {
-			address = await (account.wallet.controller as EthereumWalletController).deployRegistryV5(
+			address = await (account.wallet.controller as EVMWalletController).deployRegistryV5(
 				account.account,
 				undefined,
 				{
@@ -65,7 +65,7 @@ export const EVMDeployContractModal: FC<EVMDeployContractModalProps> = ({ contra
 				},
 			);
 		} else if (contract.title === 'RegistryV6') {
-			address = await (account.wallet.controller as EthereumWalletController).deployRegistryV6(account.account, {
+			address = await (account.wallet.controller as EVMWalletController).deployRegistryV6(account.account, {
 				network,
 			});
 		}
