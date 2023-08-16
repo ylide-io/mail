@@ -1,4 +1,4 @@
-import { EthereumWalletController } from '@ylide/ethereum';
+import { EVMWalletController } from '@ylide/ethereum';
 import {
 	AbstractWalletController,
 	PrivateKeyAvailabilityState,
@@ -156,7 +156,7 @@ export class Wallet extends EventEmitter {
 	}
 
 	async constructMainViewKey(account: WalletAccount) {
-		if (!(this.controller instanceof EthereumWalletController)) {
+		if (!(this.controller instanceof EVMWalletController)) {
 			throw new Error('Not implemented');
 		}
 		const messageTimestamp = Math.floor(Date.now() / 1000);

@@ -1,3 +1,4 @@
+import { EVMNetwork } from '@ylide/ethereum';
 import clsx from 'clsx';
 import { observer } from 'mobx-react';
 import { useEffect, useState } from 'react';
@@ -71,11 +72,11 @@ export const TransactionPopup = observer(() => {
 						<div className={css.central}>
 							{domain.txWithBonus
 								? `Your ${
-										domain.txChain === 'fantom'
+										domain.txChain === EVMNetwork.FANTOM
 											? '$FTM'
-											: domain.txChain === 'gnosis'
+											: domain.txChain === EVMNetwork.GNOSIS
 											? '$xDAI'
-											: domain.txChain === 'polygon'
+											: domain.txChain === EVMNetwork.POLYGON
 											? '$MATIC'
 											: 'tokens'
 								  } has been sent`
@@ -83,11 +84,11 @@ export const TransactionPopup = observer(() => {
 						</div>
 						<ActionButton
 							onClick={() => {
-								if (domain.txChain === 'fantom') {
+								if (domain.txChain === EVMNetwork.FANTOM) {
 									window.open(`https://ftmscan.com/tx/${domain.publishingTxHash}`, '_blank');
-								} else if (domain.txChain === 'gnosis') {
+								} else if (domain.txChain === EVMNetwork.GNOSIS) {
 									window.open(`https://gnosisscan.io/tx/${domain.publishingTxHash}`, '_blank');
-								} else if (domain.txChain === 'polygon') {
+								} else if (domain.txChain === EVMNetwork.POLYGON) {
 									window.open(`https://polygonscan.com/tx/${domain.publishingTxHash}`, '_blank');
 								}
 							}}
@@ -101,11 +102,11 @@ export const TransactionPopup = observer(() => {
 						<h4 className={css.header}>
 							{domain.txWithBonus
 								? `Your ${
-										domain.txChain === 'fantom'
+										domain.txChain === EVMNetwork.FANTOM
 											? '$FTM'
-											: domain.txChain === 'gnosis'
+											: domain.txChain === EVMNetwork.GNOSIS
 											? '$xDAI'
-											: domain.txChain === 'polygon'
+											: domain.txChain === EVMNetwork.POLYGON
 											? '$MATIC'
 											: 'tokens'
 								  } are on the way`
