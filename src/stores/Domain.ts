@@ -1,11 +1,11 @@
 import { EthereumProvider } from '@walletconnect/ethereum-provider';
 import {
-	EthereumWalletController,
 	EVM_CHAINS,
 	EVM_NAMES,
 	EVM_RPCS,
 	evmBlockchainFactories,
 	EVMNetwork,
+	EVMWalletController,
 	evmWalletFactories,
 } from '@ylide/ethereum';
 import {
@@ -19,7 +19,6 @@ import {
 	AbstractBlockchainController,
 	AbstractNameService,
 	AbstractWalletController,
-	asyncDelay,
 	BlockchainControllerFactory,
 	BlockchainMap,
 	BlockchainWalletMap,
@@ -27,32 +26,23 @@ import {
 	DynamicEncryptionRouter,
 	IMessage,
 	PublicKey,
-	PublicKeyType,
-	RemotePublicKey,
 	WalletAccount,
 	WalletControllerFactory,
 	Ylide,
 	YlideKeyRegistry,
 } from '@ylide/sdk';
-import { SmartBuffer } from '@ylide/smart-buffer';
 import { makeObservable, observable } from 'mobx';
 
 import { NFT3NameService } from '../api/nft3DID';
 import { PasswordRequestModal } from '../components/passwordRequestModal/passwordRequestModal';
 import { SwitchModal, SwitchModalMode } from '../components/switchModal/switchModal';
+import { toast } from '../components/toast/toast';
 import { AppMode, REACT_APP__APP_MODE } from '../env';
 import { blockchainMeta } from '../utils/blockchain';
-import { isBytesEqual } from '../utils/isBytesEqual';
 import { walletsMeta } from '../utils/wallet';
 import { Accounts } from './Accounts';
 import contacts from './Contacts';
 import { EverwalletProxy } from './EverwalletProxy';
-import {
-	blockchainByFaucetType,
-	chainIdByFaucetType,
-	publishKeyThroughFaucet,
-	requestFaucetSignature,
-} from './KeyManagement';
 import { DomainAccount } from './models/DomainAccount';
 import { Wallet } from './models/Wallet';
 import { OTCStore } from './OTC';
@@ -98,7 +88,7 @@ export class Domain {
 
 	ylide: Ylide = new Ylide(this.keyRegistry, INDEXER_BLOCKCHAINS);
 
-	@observable txChain: 'fantom' | 'gnosis' | 'polygon' = 'polygon';
+	@observable txChain: EVMNetwork.FANTOM | EVMNetwork.POLYGON | EVMNetwork.GNOSIS = EVMNetwork.POLYGON;
 	@observable txWithBonus: boolean = false;
 	@observable txPlateVisible: boolean = false;
 	@observable isTxPublishing: boolean = false;
@@ -297,107 +287,48 @@ export class Domain {
 	async getFaucetSignature(
 		account: DomainAccount,
 		publicKey: PublicKey,
-		faucetType: 'polygon' | 'gnosis' | 'fantom',
+		faucetType: EVMNetwork.GNOSIS | EVMNetwork.FANTOM | EVMNetwork.POLYGON,
 	) {
-		console.log('public key: ', '0x' + new SmartBuffer(publicKey.keyBytes).toHexString());
-
-		const chainId = chainIdByFaucetType(faucetType);
-		const timestampLock = Math.floor(Date.now() / 1000) - 90;
+		const faucet = await account.wallet.controller.getFaucet({ faucetType });
+		
 		const registrar = 1;
 
-		const signature = await requestFaucetSignature(
-			account.wallet,
-			publicKey.keyBytes,
-			account.account,
-			chainId,
-			registrar,
-			timestampLock,
-		);
+		const data = await faucet.authorizePublishing(account.account, publicKey, registrar);
 
 		return {
-			chainId,
-			timestampLock,
-			registrar,
-			signature,
+			faucet,
+			data,
+			blockchain: EVM_NAMES[faucetType],
+			account,
+			publicKey,
+			faucetType,
 		};
 	}
 
-	async waitForPublicKey(faucet: boolean, blockchain: string, address: string, key: Uint8Array, timeout = 60000) {
-		const start = Date.now();
-		while (Date.now() - start < timeout) {
-			// faucet only EVM, so indexer usage is fine
-			if (faucet) {
-				const keys = await this.ylide.core.indexer.requestKeys(address);
-				const keyInChain = keys[blockchain];
-				if (keyInChain && isBytesEqual(keyInChain.publicKey, key)) {
-					const bcGroup = this.ylide.core.getBlockchainGroupByBlockchain(blockchain);
-					if (!bcGroup) {
-						throw new Error('Cant find blockchain group');
-					}
-					return new RemotePublicKey(
-						bcGroup,
-						blockchain,
-						address,
-						new PublicKey(PublicKeyType.YLIDE, keyInChain.keyVersion, keyInChain.publicKey),
-						keyInChain.timestamp,
-						keyInChain.registrar,
-					);
-				}
-			} else {
-				const keys = await this.ylide.core.getAddressKeys(address);
-				const keyInChain = keys.remoteKeys[blockchain];
-				if (keyInChain && isBytesEqual(keyInChain.publicKey.keyBytes, key)) {
-					return keyInChain;
-				}
-			}
-			await asyncDelay(2000);
-		}
-		return null;
-	}
-
 	async publishThroughFaucet(
-		account: DomainAccount,
-		publicKey: PublicKey,
-		faucetType: 'polygon' | 'gnosis' | 'fantom',
-		bonus: boolean,
-
-		chainId: number,
-		timestampLock: number,
-		registrar: number,
-		signature: { message: string; r: string; s: string; v: number },
+		faucetData: Awaited<ReturnType<Domain['getFaucetSignature']>>,
 	) {
+		
 		try {
 			domain.enforceMainViewOnboarding = true;
-			const result = await publishKeyThroughFaucet(
-				faucetType,
-				publicKey,
-				account.account,
-				signature,
-				registrar,
-				timestampLock,
-			);
-
-			if (result.result) {
-				const blockchain = blockchainByFaucetType(faucetType);
-				const key = await this.waitForPublicKey(true, blockchain, account.account.address, publicKey.keyBytes);
+			try {
+				const result = await faucetData.faucet.attachPublicKey(faucetData.data);
+				
+				const key = await this.ylide.core.waitForPublicKey(faucetData.blockchain, faucetData.account.account.address, faucetData.publicKey.keyBytes);
 				if (key) {
 					await this.keyRegistry.addRemotePublicKey(key);
-					account.reloadKeys();
-					domain.publishingTxHash = result.hash;
+					faucetData.account.reloadKeys();
+					domain.publishingTxHash = result.txHash;
 					domain.isTxPublishing = false;
 				} else {
 					domain.isTxPublishing = false;
 					console.log('Something went wrong with key publishing :(\n\n' + JSON.stringify(result, null, '\t'));
 				}
-			} else {
+			} catch (err: any) {
+				console.log(`Something went wrong with key publishing: ${err.message}`, err.stack);
+				toast('Something went wrong with key publishing :( Please, try again');
 				domain.isTxPublishing = false;
-				if (result.errorCode === 'ALREADY_EXISTS') {
-					console.log(
-						`Your address has been already registered or the previous transaction is in progress. Please try connecting another address or wait for transaction to finalize (1-2 minutes).`,
-					);
-				} else {
-					console.log('Something went wrong with key publishing :(\n\n' + JSON.stringify(result, null, '\t'));
-				}
+				domain.txPlateVisible = false;
 			}
 		} catch (err) {
 			console.log('faucet publication error: ', err);
@@ -483,7 +414,7 @@ export class Domain {
 		try {
 			const bData = blockchainMeta[EVM_NAMES[needNetwork]];
 			if ('provider' in this.walletConnectState === false) {
-				await (wallet.controller as EthereumWalletController).providerObject.request({
+				await (wallet.controller as EVMWalletController).providerObject.request({
 					method: 'wallet_addEthereumChain',
 					params: [bData.ethNetwork!],
 				});
@@ -498,7 +429,7 @@ export class Domain {
 					{ chainId: '0x' + Number(EVM_CHAINS[needNetwork]).toString(16) },
 				]);
 			} else {
-				await (wallet.controller as EthereumWalletController).providerObject.request({
+				await (wallet.controller as EVMWalletController).providerObject.request({
 					method: 'wallet_switchEthereumChain',
 					params: [{ chainId: '0x' + Number(EVM_CHAINS[needNetwork]).toString(16) }], // chainId must be in hexadecimal numbers
 				});
@@ -663,6 +594,11 @@ export class Domain {
 			...(this.walletControllers[factory.blockchainGroup] || {}),
 			[factory.wallet]: await this.ylide.controllers.addWallet(factory.blockchainGroup, factory.wallet, {
 				dev: false, //document.location.hostname === 'localhost',
+				faucet: {
+					registrar: 1,
+					apiKey: { type: 'client', key: 'cl258c68bb0516f33e' },
+					// host: 'http://localhost:8392',
+				},
 				onSwitchAccountRequest: this.handleSwitchRequest.bind(this, factory.wallet),
 				onNetworkSwitchRequest: async (
 					reason: string,

@@ -1,7 +1,7 @@
 import {
-	EthereumBlockchainController,
-	EthereumRegistryV6Wrapper,
-	EthereumWalletController,
+	EVMBlockchainController,
+	EVMRegistryV6Wrapper,
+	EVMWalletController,
 	EVM_CONTRACTS,
 	EVM_NAMES,
 	EVMNetwork,
@@ -46,11 +46,11 @@ export const EVMRegistryV6Modal: FC<EVMRegistryV6ModalProps> = ({ contract, isMo
 
 	const checkBonucer = useCallback(async () => {
 		setBonucerLoading(true);
-		const walletController = account.wallet.controller as EthereumWalletController;
+		const walletController = account.wallet.controller as EVMWalletController;
 		const link = EVM_CONTRACTS[network].registryContracts.find(r => r.id === contract.contract?.id)!;
-		const wrapper = new EthereumBlockchainController.registryWrappers[link.type](
+		const wrapper = new EVMBlockchainController.registryWrappers[link.type](
 			walletController.blockchainReader,
-		) as EthereumRegistryV6Wrapper;
+		) as EVMRegistryV6Wrapper;
 		const _isBonucer = await wrapper.getIsBonucer(link, bonucerAddress);
 		setIsBonucer(_isBonucer);
 		setBonucerLoading(false);
@@ -59,11 +59,11 @@ export const EVMRegistryV6Modal: FC<EVMRegistryV6ModalProps> = ({ contract, isMo
 	useEffect(() => {
 		if (contract.contract) {
 			(async () => {
-				const walletController = account.wallet.controller as EthereumWalletController;
+				const walletController = account.wallet.controller as EVMWalletController;
 				const link = EVM_CONTRACTS[network].registryContracts.find(r => r.id === contract.contract?.id)!;
-				const wrapper = new EthereumBlockchainController.registryWrappers[link.type](
+				const wrapper = new EVMBlockchainController.registryWrappers[link.type](
 					walletController.blockchainReader,
-				) as EthereumRegistryV6Wrapper;
+				) as EVMRegistryV6Wrapper;
 				const owner = await wrapper.getOwner(link);
 				const { newcomer, referrer } = await wrapper.getBonuces(link);
 				setParams({
@@ -180,13 +180,13 @@ export const EVMRegistryV6Modal: FC<EVMRegistryV6ModalProps> = ({ contract, isMo
 											onClick={async () => {
 												setChangeBonucerLoading(true);
 												const walletController = account.wallet
-													.controller as EthereumWalletController;
+													.controller as EVMWalletController;
 												const link = EVM_CONTRACTS[network].registryContracts.find(
 													r => r.id === contract.contract?.id,
 												)!;
-												const wrapper = new EthereumBlockchainController.registryWrappers[
+												const wrapper = new EVMBlockchainController.registryWrappers[
 													link.type
-												](walletController.blockchainReader) as EthereumRegistryV6Wrapper;
+												](walletController.blockchainReader) as EVMRegistryV6Wrapper;
 												await wrapper.removeBonucer(
 													link,
 													walletController.signer,
@@ -210,13 +210,13 @@ export const EVMRegistryV6Modal: FC<EVMRegistryV6ModalProps> = ({ contract, isMo
 											onClick={async () => {
 												setChangeBonucerLoading(true);
 												const walletController = account.wallet
-													.controller as EthereumWalletController;
+													.controller as EVMWalletController;
 												const link = EVM_CONTRACTS[network].registryContracts.find(
 													r => r.id === contract.contract?.id,
 												)!;
-												const wrapper = new EthereumBlockchainController.registryWrappers[
+												const wrapper = new EVMBlockchainController.registryWrappers[
 													link.type
-												](walletController.blockchainReader) as EthereumRegistryV6Wrapper;
+												](walletController.blockchainReader) as EVMRegistryV6Wrapper;
 												await wrapper.addBonucer(
 													link,
 													walletController.signer,
