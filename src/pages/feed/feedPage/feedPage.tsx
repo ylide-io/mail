@@ -25,6 +25,7 @@ import { FeedPostItem } from '../_common/feedPostItem/feedPostItem';
 import css from './feedPage.module.scss';
 import ErrorCode = FeedServerApi.ErrorCode;
 import { SimpleLoader } from '../../../components/simpleLoader/simpleLoader';
+import { analytics } from '../../../stores/Analytics';
 
 const reloadFeedCounter = observable.box(0);
 
@@ -138,7 +139,13 @@ const FeedPageContent = observer(() => {
 						selectedAccounts.length === 1 &&
 						address &&
 						totalCoverage && (
-							<ActionButton look={ActionButtonLook.PRIMARY} onClick={() => setShowCoverageModal(true)}>
+							<ActionButton
+								look={ActionButtonLook.PRIMARY}
+								onClick={() => {
+									setShowCoverageModal(true);
+									analytics.mainviewCoverageClick(address);
+								}}
+							>
 								USD Coverage: {totalCoverage}
 							</ActionButton>
 						)}

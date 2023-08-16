@@ -158,6 +158,44 @@ class Analytics {
 	blockchainFeedComposeMail(postId: string, address: string) {
 		track('blockchain_feed___compose_mail', { postId, address });
 	}
+
+	// MAINVIEW
+
+	mainviewFeedSettingsClick(address: string) {
+		track('mainview___feed_settings_click', { address });
+	}
+
+	mainviewFeedSettingsAddSources(address: string, sourceIds: string[]) {
+		track('mainview___feed_settings_add_source', { address, sourceIds });
+	}
+
+	mainviewFeedSettingsRemoveSources(address: string, sourceIds: string[]) {
+		track('mainview___feed_settings_remove_source', { address, sourceIds });
+	}
+
+	mainviewCoverageClick(address: string) {
+		track('mainview___coverage_click', { address });
+	}
+
+	mainviewSmartFeedClick() {
+		track('mainview___smart_feed_click');
+	}
+
+	mainviewPersonalFeedClick(address: string) {
+		track('mainview___personal_feed_click', { address });
+	}
+
+	mainviewTagFeedClick(tagId: number) {
+		track('mainview___tag_feed_click', { tagId });
+	}
+
+	mainviewTwitterClick() {
+		track('mainview___twitter_click');
+	}
+
+	mainviewFaqClick() {
+		track('mainview___faq_click');
+	}
 }
 
 export const analytics = new Analytics();

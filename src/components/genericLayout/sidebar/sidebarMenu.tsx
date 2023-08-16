@@ -110,6 +110,7 @@ interface SidebarButtonProps {
 	href: string;
 	icon?: ReactNode;
 	name: ReactNode;
+	onClick?: () => void;
 	rightButton?: {
 		icon: ReactNode;
 		title?: string;
@@ -117,7 +118,7 @@ interface SidebarButtonProps {
 	};
 }
 
-export const SidebarButton = observer(({ look, href, icon, name, rightButton }: SidebarButtonProps) => {
+export const SidebarButton = observer(({ look, href, icon, name, rightButton, onClick }: SidebarButtonProps) => {
 	const location = useLocation();
 	const navigate = useNav();
 
@@ -148,6 +149,7 @@ export const SidebarButton = observer(({ look, href, icon, name, rightButton }: 
 					e.preventDefault();
 					isSidebarOpen.set(false);
 					navigate(href);
+					onClick?.();
 				}
 			}}
 		>
@@ -284,7 +286,16 @@ export const SidebarMenu = observer(() => {
 
 		return (
 			<SidebarSection section={Section.FEED} title="Feed">
-				<SidebarButton href={generatePath(RoutePath.FEED_SMART)} icon={sideFeedIcon(14)} name="Smart feed" />
+				<SidebarButton
+					href={generatePath(RoutePath.FEED_SMART)}
+					icon={sideFeedIcon(14)}
+					onClick={() => {
+						if (REACT_APP__APP_MODE === AppMode.MAIN_VIEW) {
+							analytics.mainviewSmartFeedClick();
+						}
+					}}
+					name="Smart feed"
+				/>
 
 				{domain.accounts.activeAccounts.map((account, i) => (
 					<SidebarButton
@@ -293,6 +304,11 @@ export const SidebarMenu = observer(() => {
 						href={generatePath(RoutePath.FEED_SMART_ADDRESS, { address: account.account.address })}
 						icon={<ContactSvg />}
 						name={<AdaptiveText text={account.name || account.account.address} />}
+						onClick={() => {
+							if (REACT_APP__APP_MODE === AppMode.MAIN_VIEW) {
+								analytics.mainviewPersonalFeedClick(account.account.address);
+							}
+						}}
 						rightButton={
 							REACT_APP__APP_MODE === AppMode.MAIN_VIEW
 								? {
@@ -302,6 +318,8 @@ export const SidebarMenu = observer(() => {
 											if (!account.mainViewKey) {
 												return toast('Please complete the onboarding first ❤');
 											}
+
+											analytics.mainviewFeedSettingsClick(account.account.address);
 
 											setFeedSettingsAccount(account);
 										},
@@ -397,6 +415,11 @@ export const SidebarMenu = observer(() => {
 							key={t.id}
 							href={generatePath(RoutePath.FEED_CATEGORY, { tag: t.id.toString() })}
 							name={t.name}
+							onClick={() => {
+								if (REACT_APP__APP_MODE === AppMode.MAIN_VIEW) {
+									analytics.mainviewTagFeedClick(t.id);
+								}
+							}}
 						/>
 					))
 				)}
@@ -424,7 +447,7 @@ export const SidebarMenu = observer(() => {
 						href="https://twitter.com/mainview_io"
 						target="_blank noreferrer"
 						title="Twitter"
-						onClick={() => analytics.openSocial('twitter')}
+						onClick={() => analytics.mainviewTwitterClick()}
 					>
 						<span>Follow on</span>
 						<TwitterSvg />
@@ -434,6 +457,7 @@ export const SidebarMenu = observer(() => {
 					<a
 						href={RoutePath.FAQ}
 						onClick={e => {
+							analytics.mainviewFaqClick();
 							e.preventDefault();
 							navigate(RoutePath.FAQ);
 						}}

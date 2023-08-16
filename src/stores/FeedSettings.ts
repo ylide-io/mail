@@ -1,7 +1,9 @@
+import difference from 'lodash.difference';
 import { autorun, makeObservable, observable } from 'mobx';
 
 import { FeedManagerApi } from '../api/feedManagerApi';
 import { FeedServerApi, FeedSource } from '../api/feedServerApi';
+import { analytics } from './Analytics';
 import domain from './Domain';
 import { DomainAccount } from './models/DomainAccount';
 
@@ -116,6 +118,17 @@ export class FeedSettings {
 	async updateFeedConfig(account: DomainAccount, selectedSourceIds: string[]) {
 		const config = this.getAccountConfig(account);
 		if (!config) return;
+
+		const initiallySelectedSourceIds = this.getSelectedSourceIds(account);
+		const sourceIdsToRemove = difference(initiallySelectedSourceIds, selectedSourceIds);
+		const sourceIdsToAdd = difference(selectedSourceIds, initiallySelectedSourceIds);
+
+		if (sourceIdsToRemove.length) {
+			analytics.mainviewFeedSettingsRemoveSources(account.account.address, sourceIdsToRemove);
+		}
+		if (sourceIdsToAdd.length) {
+			analytics.mainviewFeedSettingsAddSources(account.account.address, sourceIdsToAdd);
+		}
 
 		const defaultProjectIds = config.defaultProjects.map(p => p.projectId);
 
