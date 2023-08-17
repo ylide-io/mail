@@ -10,6 +10,7 @@ import { SwitchModal, SwitchModalMode } from '../components/switchModal/switchMo
 import { toast } from '../components/toast/toast';
 import { AppMode, REACT_APP__APP_MODE } from '../env';
 import { analytics } from '../stores/Analytics';
+import { browserStorage } from '../stores/browserStorage';
 import domain from '../stores/Domain';
 import { DomainAccount } from '../stores/models/DomainAccount';
 import { Wallet } from '../stores/models/Wallet';
@@ -132,11 +133,15 @@ export async function connectAccount(params?: { place?: string }): Promise<Domai
 
 			const domainAccount = await showStaticComponent<DomainAccount>(resolve => (
 				<NewPasswordModal
-					faucetType={['polygon', 'fantom', 'gnosis'].includes(qqs.faucet) ? ({
-						'polygon': EVMNetwork.POLYGON as const,
-						'fantom': EVMNetwork.FANTOM as const,
-						'gnosis': EVMNetwork.GNOSIS as const,
-					}[qqs.faucet as ('polygon' | 'fantom' | 'gnosis')]) : EVMNetwork.GNOSIS}
+					faucetType={
+						['polygon', 'fantom', 'gnosis'].includes(qqs.faucet)
+							? {
+									polygon: EVMNetwork.POLYGON as const,
+									fantom: EVMNetwork.FANTOM as const,
+									gnosis: EVMNetwork.GNOSIS as const,
+							  }[qqs.faucet as 'polygon' | 'fantom' | 'gnosis']
+							: EVMNetwork.GNOSIS
+					}
 					bonus={qqs.bonus === 'true'}
 					wallet={wallet!}
 					account={account}
@@ -145,6 +150,8 @@ export async function connectAccount(params?: { place?: string }): Promise<Domai
 					onClose={resolve}
 				/>
 			));
+
+			browserStorage.isNotificationAlertHappened = false;
 
 			return domainAccount;
 		}
@@ -163,11 +170,15 @@ export async function activateAccount(params: { account: DomainAccount }) {
 
 	await showStaticComponent<DomainAccount>(resolve => (
 		<NewPasswordModal
-			faucetType={['polygon', 'fantom', 'gnosis'].includes(qqs.faucet) ? ({
-				'polygon': EVMNetwork.POLYGON as const,
-				'fantom': EVMNetwork.FANTOM as const,
-				'gnosis': EVMNetwork.GNOSIS as const,
-			}[qqs.faucet as ('polygon' | 'fantom' | 'gnosis')]) : EVMNetwork.GNOSIS}
+			faucetType={
+				['polygon', 'fantom', 'gnosis'].includes(qqs.faucet)
+					? {
+							polygon: EVMNetwork.POLYGON as const,
+							fantom: EVMNetwork.FANTOM as const,
+							gnosis: EVMNetwork.GNOSIS as const,
+					  }[qqs.faucet as 'polygon' | 'fantom' | 'gnosis']
+					: EVMNetwork.GNOSIS
+			}
 			bonus={qqs.bonus === 'true'}
 			wallet={wallet}
 			account={account.account}

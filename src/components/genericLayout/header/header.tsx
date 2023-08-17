@@ -1,6 +1,6 @@
 import clsx from 'clsx';
 import { observer } from 'mobx-react';
-import { PropsWithChildren, useRef, useState } from 'react';
+import { PropsWithChildren, useEffect, useRef, useState } from 'react';
 import { useMutation } from 'react-query';
 import { createSearchParams, generatePath } from 'react-router-dom';
 
@@ -80,13 +80,26 @@ const NotificationsButton = observer(() => {
 		openInNewWidnow(tgUrl);
 	});
 
+	const notificationAlertHappened = browserStorage.isNotificationAlertHappened;
+	const [isAnimationNeeded, setAnimationNeeded] = useState(false);
+	useEffect(() => {
+		if (!notificationAlertHappened) {
+			browserStorage.isNotificationAlertHappened = true;
+			setAnimationNeeded(true);
+		}
+	}, [notificationAlertHappened]);
+
 	return (
 		<>
 			<ActionButton
 				ref={buttonRef}
 				size={ActionButtonSize.LARGE}
 				look={ActionButtonLook.LITE}
-				icon={<NotificationsSvg />}
+				icon={
+					<div>
+						<NotificationsSvg className={clsx(isAnimationNeeded && css.notificationIcon_animated)} />
+					</div>
+				}
 				title="Notifications"
 				onClick={() => setPopupOpen(!isPopupOpen)}
 			/>
