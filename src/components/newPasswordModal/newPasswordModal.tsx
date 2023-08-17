@@ -1,6 +1,7 @@
 import { EVM_NAMES, EVMNetwork } from '@ylide/ethereum';
 import { asyncDelay, RemotePublicKey, WalletAccount, YlideKeyVersion, YlidePrivateKey } from '@ylide/sdk';
 import { useEffect, useMemo, useRef, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 
 import { ReactComponent as ProceedToWalletArrowSvg } from '../../assets/proceedTOWalletArrow.svg';
 import { analytics } from '../../stores/Analytics';
@@ -50,6 +51,7 @@ export function NewPasswordModal({
 	waitTxPublishing,
 	onClose,
 }: NewPasswordModalProps) {
+	const [searchParams] = useSearchParams();
 	const freshestKey: { key: RemotePublicKey; blockchain: string } | undefined = useMemo(
 		() =>
 			Object.keys(remoteKeys)
@@ -196,6 +198,7 @@ export function NewPasswordModal({
 					domainAccount,
 					tempLocalKey.publicKey,
 					actualFaucetType,
+					searchParams.get('registrar') ? Number(searchParams.get('registrar')) : undefined,
 				);
 
 				setStep(Step.LOADING);

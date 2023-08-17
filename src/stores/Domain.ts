@@ -299,12 +299,13 @@ export class Domain {
 		account: DomainAccount,
 		publicKey: PublicKey,
 		faucetType: 'polygon' | 'gnosis' | 'fantom',
+		// 1 is a default - Ylide
+		registrar = 1,
 	) {
 		console.log('public key: ', '0x' + new SmartBuffer(publicKey.keyBytes).toHexString());
 
 		const chainId = chainIdByFaucetType(faucetType);
 		const timestampLock = Math.floor(Date.now() / 1000) - 90;
-		const registrar = 1;
 
 		const signature = await requestFaucetSignature(
 			account.wallet,
