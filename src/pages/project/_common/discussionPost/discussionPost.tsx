@@ -10,12 +10,11 @@ import {
 	decodeBlockchainFeedPost,
 	DecodedBlockchainFeedPost,
 } from '../../../../api/blockchainFeedApi';
-import { ActionButton } from '../../../../components/ActionButton/ActionButton';
+import { ActionButton, ActionButtonLook, ActionButtonSize } from '../../../../components/ActionButton/ActionButton';
 import { AdaptiveAddress } from '../../../../components/adaptiveAddress/adaptiveAddress';
 import { Avatar } from '../../../../components/avatar/avatar';
 import { BlockChainLabel } from '../../../../components/BlockChainLabel/BlockChainLabel';
 import { GridRowBox } from '../../../../components/boxes/boxes';
-import { ErrorMessage, ErrorMessageLook } from '../../../../components/errorMessage/errorMessage';
 import { GalleryModal } from '../../../../components/galleryModal/galleryModal';
 import { NlToBr } from '../../../../components/nlToBr/nlToBr';
 import { ReadableDate } from '../../../../components/readableDate/readableDate';
@@ -101,8 +100,7 @@ export const DiscussionPost = observer(({ post, project, onReplyClick }: Discuss
 
 	//
 
-	const [isBanned, setBanned] = useState(false);
-	const [isApproved, setApproved] = useState(false);
+	const [isReviewed, setReviewed] = useState(false);
 
 	const banAddress = useCallback(() => {
 		BlockchainFeedApi.banAddresses({
@@ -111,7 +109,7 @@ export const DiscussionPost = observer(({ post, project, onReplyClick }: Discuss
 		})
 			.then(() => {
 				toast('Banned 🔥');
-				setBanned(true);
+				setReviewed(true);
 			})
 			.catch(e => {
 				if (e.message === 'Request failed') {
@@ -126,8 +124,19 @@ export const DiscussionPost = observer(({ post, project, onReplyClick }: Discuss
 	const banPost = useCallback(() => {
 		BlockchainFeedApi.banPost({ ids: [post.msg.msgId], secret: browserStorage.adminPassword || '' })
 			.then(() => {
-				toast('Banned 🔥');
-				setBanned(true);
+				toast(
+					<GridRowBox gap={4} spaceBetween>
+						Banned 🔥
+						<ActionButton
+							size={ActionButtonSize.XSMALL}
+							look={ActionButtonLook.SECONDARY}
+							onClick={() => unbanPost()}
+						>
+							Undo
+						</ActionButton>
+					</GridRowBox>,
+				);
+				setReviewed(true);
 			})
 			.catch(e => {
 				if (e.message === 'Request failed') {
@@ -143,7 +152,7 @@ export const DiscussionPost = observer(({ post, project, onReplyClick }: Discuss
 		BlockchainFeedApi.approvePost({ ids: [post.msg.msgId], secret: browserStorage.adminPassword || '' })
 			.then(() => {
 				toast('Approved 🔥');
-				setApproved(true);
+				setReviewed(true);
 			})
 			.catch(e => {
 				if (e.message === 'Request failed') {
@@ -159,7 +168,7 @@ export const DiscussionPost = observer(({ post, project, onReplyClick }: Discuss
 		BlockchainFeedApi.unbanPost({ ids: [post.msg.msgId], secret: browserStorage.adminPassword || '' })
 			.then(() => {
 				toast('Un-banned 🔥');
-				setBanned(false);
+				setReviewed(false);
 			})
 			.catch(e => {
 				toast('Error 🤦‍♀️');
@@ -169,7 +178,9 @@ export const DiscussionPost = observer(({ post, project, onReplyClick }: Discuss
 
 	//
 
-	return (
+	return isReviewed ? (
+		<></>
+	) : (
 		<div className={css.root}>
 			<Avatar blockie={post.msg.senderAddress} />
 
@@ -265,15 +276,6 @@ export const DiscussionPost = observer(({ post, project, onReplyClick }: Discuss
 				)}
 
 				<div className={css.content}>
-					{isBanned && (
-						<ErrorMessage look={ErrorMessageLook.INFO}>
-							Post banned 🔥
-							<ActionButton onClick={() => unbanPost()}>Undo</ActionButton>
-						</ErrorMessage>
-					)}
-
-					{isApproved && <ErrorMessage look={ErrorMessageLook.INFO}>Post approved 🔥</ErrorMessage>}
-
 					{!!decodedText && (
 						<div className={css.text}>
 							<NlToBr text={decodedText} />
