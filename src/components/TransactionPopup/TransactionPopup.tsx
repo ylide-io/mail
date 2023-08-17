@@ -4,6 +4,7 @@ import { observer } from 'mobx-react';
 import { useEffect, useState } from 'react';
 
 import domain from '../../stores/Domain';
+import { openInNewWidnow } from '../../utils/misc';
 import { ActionButton } from '../ActionButton/ActionButton';
 import css from './TransactionPopup.module.scss';
 
@@ -85,11 +86,11 @@ export const TransactionPopup = observer(() => {
 						<ActionButton
 							onClick={() => {
 								if (domain.txChain === EVMNetwork.FANTOM) {
-									window.open(`https://ftmscan.com/tx/${domain.publishingTxHash}`, '_blank');
+									openInNewWidnow(`https://ftmscan.com/tx/${domain.publishingTxHash}`);
 								} else if (domain.txChain === EVMNetwork.GNOSIS) {
-									window.open(`https://gnosisscan.io/tx/${domain.publishingTxHash}`, '_blank');
+									openInNewWidnow(`https://gnosisscan.io/tx/${domain.publishingTxHash}`);
 								} else if (domain.txChain === EVMNetwork.POLYGON) {
-									window.open(`https://polygonscan.com/tx/${domain.publishingTxHash}`, '_blank');
+									openInNewWidnow(`https://polygonscan.com/tx/${domain.publishingTxHash}`);
 								}
 							}}
 						>

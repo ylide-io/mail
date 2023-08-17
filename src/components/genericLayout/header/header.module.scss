@@ -24,12 +24,19 @@
 .right {
 	display: grid;
 	grid-auto-flow: column;
-	grid-gap: 20px;
 	align-items: center;
+	grid-gap: 20px;
 
 	@include lessThan640w {
 		grid-gap: 12px;
 	}
+}
+
+.rightButtons {
+	display: grid;
+	grid-auto-flow: column;
+	align-items: center;
+	grid-gap: 4px;
 }
 
 //
@@ -81,6 +88,8 @@
 	margin: 0 0 0 12px;
 }
 
+//
+
 .users {
 	@include expand-click-area;
 	display: grid;
@@ -127,4 +136,22 @@
 	width: 20px;
 	height: 20px;
 	fill: currentColor;
+}
+
+//
+
+.notificationsPopup {
+	position: fixed;
+	padding: 4px 0;
+	max-width: 320px;
+}
+
+.notificationsPopupInner {
+	display: grid;
+	justify-content: center;
+	grid-gap: 16px;
+	padding: 20px;
+	background: var(--surface-color);
+	border-radius: 16px;
+	box-shadow: var(--popup-shadow);
 }
