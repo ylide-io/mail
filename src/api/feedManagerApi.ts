@@ -1,4 +1,4 @@
-import { REACT_APP__FEED_MANAGER } from '../env';
+import { MainviewKeyPayload } from '../types';
 import { createCleanSerachParams } from '../utils/url';
 import { FeedReason } from './feedServerApi';
 
@@ -34,7 +34,8 @@ export namespace FeedManagerApi {
 
 	async function request<Res = void>(path: string, query?: Record<string, any>, data?: any): Promise<Res> {
 		const response = await fetch(
-			`${REACT_APP__FEED_MANAGER}${path}?${query ? createCleanSerachParams(query) : ''}`,
+			// `${REACT_APP__FEED_MANAGER}${path}?${query ? createCleanSerachParams(query) : ''}`,
+			`${'http://localhost:8271'}${path}?${query ? createCleanSerachParams(query) : ''}`,
 			{
 				method: data ? 'POST' : 'GET',
 				headers: {
@@ -86,12 +87,9 @@ export namespace FeedManagerApi {
 		token: string;
 	}
 
-	export async function authAddress(address: string, signature: string, messageTimestamp: number, invite?: string) {
+	export async function authAddress(payload: MainviewKeyPayload) {
 		return await request<AuthAddressResponse>(`/auth-address`, undefined, {
-			address,
-			signature,
-			messageTimestamp,
-			invite: invite || '',
+			...payload,
 		});
 	}
 
