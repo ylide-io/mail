@@ -162,14 +162,12 @@ export class Domain {
 			this.ylide.registerBlockchainFactory(evmBlockchainFactories[EVMNetwork.MOONRIVER]);
 			this.ylide.registerBlockchainFactory(evmBlockchainFactories[EVMNetwork.METIS]);
 
-			if (REACT_APP__APP_MODE !== AppMode.MAIN_VIEW) {
-				this.ylide.registerBlockchainFactory(everscaleBlockchainFactory);
-				this.ylide.registerWalletFactory(everscaleWalletFactory);
-				this.ylide.registerWalletFactory(everscaleProxyWalletFactory);
+			this.ylide.registerBlockchainFactory(everscaleBlockchainFactory);
+			this.ylide.registerWalletFactory(everscaleWalletFactory);
+			this.ylide.registerWalletFactory(everscaleProxyWalletFactory);
 
-				this.ylide.registerBlockchainFactory(venomBlockchainFactory);
-				this.ylide.registerWalletFactory(venomWalletFactory);
-			}
+			this.ylide.registerBlockchainFactory(venomBlockchainFactory);
+			this.ylide.registerWalletFactory(venomWalletFactory);
 
 			this.ylide.registerWalletFactory(evmWalletFactories.metamask);
 			this.ylide.registerWalletFactory(evmWalletFactories.frontier);

@@ -67,19 +67,16 @@ export const MainViewOnboarding = observer(() => {
 				async function doAuthorize() {
 					setStep(Step.SIGN_AUTH);
 
-					const key = await account.makeMainViewKey();
-					invariant(key);
+					const payload = await account.makeMainViewKey(invite);
+					invariant(payload);
 
-					const { token } = await FeedManagerApi.authAddress(
-						account.account.address,
-						key.signature,
-						key.timestamp,
-						invite,
-					);
+					const { token } = await FeedManagerApi.authAddress(payload);
 
 					setStep(Step.BUILDING_FEED);
 
-					await FeedManagerApi.init(token);
+					if (!payload.tvmType) {
+						await FeedManagerApi.init(token);
+					}
 
 					// Update keys after Feed Manager initialized
 					account.mainViewKey = token;

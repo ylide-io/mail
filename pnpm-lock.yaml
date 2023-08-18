@@ -60,8 +60,8 @@ dependencies:
     specifier: 0.9.0-beta.5
     version: 0.9.0-beta.5(@ethersproject/abstract-signer@5.7.0)(@ethersproject/address@5.7.0)(@ethersproject/bignumber@5.7.0)(@ethersproject/bytes@5.7.0)(@ethersproject/contracts@5.7.0)(@ethersproject/keccak256@5.7.0)(@ethersproject/solidity@5.7.0)(@ethersproject/strings@5.7.0)(@ethersproject/transactions@5.7.0)(@ethersproject/web@5.7.1)
   '@ylide/everscale':
-    specifier: 0.9.0-beta.7
-    version: 0.9.0-beta.7
+    specifier: file:../everscale
+    version: file:../everscale
   '@ylide/sdk':
     specifier: 0.9.0-beta.4
     version: 0.9.0-beta.4
@@ -4411,18 +4411,6 @@ packages:
       - bufferutil
       - encoding
       - utf-8-validate
-    dev: false
-
-  /@ylide/everscale@0.9.0-beta.7:
-    resolution: {integrity: sha512-jUFO3R3mdfDZeE+O3cBkoA05RxiNt7AazWTgXRrMW0NeTavLNB3dQvXdpPx5LT5FNJlFLGgH87N2080cr0/hBA==}
-    dependencies:
-      '@ylide/sdk': 0.9.0-beta.4
-      '@ylide/smart-buffer': 0.0.17
-      everscale-inpage-provider: 0.3.61
-      everscale-standalone-client: 2.1.21
-      nekoton-wasm: 1.2.0
-    transitivePeerDependencies:
-      - encoding
     dev: false
 
   /@ylide/sdk@0.9.0-beta.4:
@@ -13645,3 +13633,16 @@ packages:
   /yocto-queue@0.1.0:
     resolution: {integrity: sha512-rVksvsnNCdJ/ohGc6xgPwyN8eheCxsiLM8mxuE/t/mOVqJewPuO1miLpTHQiRgTKCLexL4MeAFVagts7HmNZ2Q==}
     engines: {node: '>=10'}
+
+  file:../everscale:
+    resolution: {directory: ../everscale, type: directory}
+    name: '@ylide/everscale'
+    dependencies:
+      '@ylide/sdk': 0.9.0-beta.4
+      '@ylide/smart-buffer': 0.0.17
+      everscale-inpage-provider: 0.3.61
+      everscale-standalone-client: 2.1.21
+      nekoton-wasm: 1.2.0
+    transitivePeerDependencies:
+      - encoding
+    dev: false
