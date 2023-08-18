@@ -10,6 +10,7 @@ import { PropsWithClassName } from '../props';
 import { Select } from '../select/select';
 
 interface AccountSelectProps extends PropsWithClassName {
+	disabled?: boolean;
 	accounts?: DomainAccount[];
 	activeAccount?: DomainAccount;
 	displayConnectButton?: boolean;
@@ -17,12 +18,13 @@ interface AccountSelectProps extends PropsWithClassName {
 }
 
 export const AccountSelect = observer(
-	({ className, activeAccount, displayConnectButton, onChange, ...props }: AccountSelectProps) => {
+	({ className, activeAccount, displayConnectButton, disabled, onChange, ...props }: AccountSelectProps) => {
 		const accounts = props.accounts || domain.accounts.activeAccounts;
 
 		return (
 			<Select
 				className={className}
+				disabled={disabled}
 				text={activeAccount && formatAccountName(activeAccount)}
 				placeholder="Select account"
 			>

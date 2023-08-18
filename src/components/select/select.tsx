@@ -1,5 +1,5 @@
 import clsx from 'clsx';
-import { ReactNode, useCallback, useRef, useState } from 'react';
+import { ReactNode, useCallback, useEffect, useRef, useState } from 'react';
 
 import { ReactComponent as ArrowDownSvg } from '../../icons/ic20/arrowDown.svg';
 import { HorizontalAlignment } from '../../utils/alignment';
@@ -9,19 +9,31 @@ import css from './select.module.scss';
 
 export interface SelectProps extends PropsWithClassName {
 	children?: (onSelect: () => void) => ReactNode;
+	disabled?: boolean;
 	placeholder?: ReactNode;
 	text?: ReactNode;
 }
 
-export function Select({ children, className, placeholder, text }: SelectProps) {
+export function Select({ children, className, disabled, placeholder, text }: SelectProps) {
 	const rootRef = useRef(null);
 	const [isOpen, setOpen] = useState(false);
+
+	useEffect(() => {
+		if (disabled) {
+			setOpen(false);
+		}
+	}, [disabled]);
 
 	const onSelect = useCallback(() => setOpen(false), []);
 
 	return (
 		<>
-			<button ref={rootRef} className={clsx(css.button, className)} onClick={() => setOpen(!isOpen)}>
+			<button
+				ref={rootRef}
+				className={clsx(css.button, className)}
+				disabled={disabled}
+				onClick={() => setOpen(!isOpen)}
+			>
 				<div className={css.buttonText}>{text != null ? text : placeholder}</div>
 
 				<ArrowDownSvg className={css.buttonArrow} />
