@@ -1,29 +1,46 @@
-import { createContext, PropsWithChildren, ReactNode, ReactPortal, useMemo, useRef } from 'react';
+import { createContext, PropsWithChildren, ReactNode, useMemo, useRef } from 'react';
 import ReactDOM from 'react-dom';
 
 interface PopupManagerApi {
-	createPortal: (content: ReactNode) => ReactPortal | null;
+	renderPopup: (content: ReactNode, level?: PopupManagerPortalLevel) => ReactNode;
 }
 
 export const PopupManagerContext = createContext<PopupManagerApi | undefined>(undefined);
 
+export enum PopupManagerPortalLevel {
+	NO_PORTAL = 'NO_PORTAL',
+	REGULAR = 'REGULAR',
+	UPPER = 'UPPER',
+}
+
 export function PopupManager({ children }: PropsWithChildren<{}>) {
-	const mainRef = useRef<HTMLDivElement>(null);
+	const regularContainerRef = useRef<HTMLDivElement>(null);
+	const upperContainerRef = useRef<HTMLDivElement>(null);
 
 	const api = useMemo<PopupManagerApi>(
 		() => ({
-			createPortal: (content: ReactNode) => {
-				return mainRef.current && ReactDOM.createPortal(content, mainRef.current);
+			renderPopup: (content: ReactNode, level = PopupManagerPortalLevel.REGULAR) => {
+				if (level === PopupManagerPortalLevel.NO_PORTAL) {
+					return content;
+				}
+
+				const containerRef = {
+					[PopupManagerPortalLevel.REGULAR]: regularContainerRef,
+					[PopupManagerPortalLevel.UPPER]: upperContainerRef,
+				}[level];
+
+				return containerRef.current && ReactDOM.createPortal(content, containerRef.current);
 			},
 		}),
-		[mainRef],
+		[],
 	);
 
 	return (
 		<PopupManagerContext.Provider value={api}>
 			{children}
 
-			<div ref={mainRef} style={{ position: 'relative', zIndex: 1 }} />
+			<div ref={regularContainerRef} style={{ position: 'relative', zIndex: 1 }} />
+			<div ref={upperContainerRef} style={{ position: 'relative', zIndex: 1 }} />
 		</PopupManagerContext.Provider>
 	);
 }

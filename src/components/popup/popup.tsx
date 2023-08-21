@@ -1,16 +1,17 @@
-import { PropsWithChildren, useContext, useLayoutEffect, useRef } from 'react';
+import React, { PropsWithChildren, useContext, useLayoutEffect, useRef } from 'react';
 
 import { invariant } from '../../utils/assert';
 import { useEscPress } from '../../utils/useEscPress';
 import { useOutsideClick } from '../../utils/useOutsideClick';
 import { PropsWithClassName } from '../props';
-import { PopupManagerContext } from './popupManager/popupManager';
+import { PopupManagerContext, PopupManagerPortalLevel } from './popupManager/popupManager';
 
-interface PopupProps extends PropsWithChildren<{}>, PropsWithClassName {
+interface PopupProps extends PropsWithChildren, PropsWithClassName {
 	align?: (popupElem: HTMLElement) => void;
 	onClick?: (e: React.MouseEvent<HTMLElement>) => void;
 	closeOnOutsideClick?: boolean;
 	customOutsideClickChecker?: (elem: HTMLElement) => boolean;
+	portalLevel?: PopupManagerPortalLevel;
 	onClose?: () => void;
 }
 
@@ -21,6 +22,7 @@ export function Popup({
 	onClick,
 	closeOnOutsideClick,
 	customOutsideClickChecker,
+	portalLevel = PopupManagerPortalLevel.REGULAR,
 	onClose,
 }: PopupProps) {
 	const rootRef = useRef<HTMLDivElement>(null);
@@ -54,21 +56,23 @@ export function Popup({
 
 	useEscPress(onClose);
 
-	return popupManagerApi.createPortal(
+	const root = (
 		<div
 			ref={rootRef}
 			className={className}
 			onClick={e => {
 				/*
-				A fix to prevent click-event bubbling:
-				https://github.com/facebook/react/issues/11387
-				 */
+			A fix to prevent click-event bubbling:
+			https://github.com/facebook/react/issues/11387
+			 */
 				e.stopPropagation();
 
 				onClick?.(e);
 			}}
 		>
 			{children}
-		</div>,
+		</div>
 	);
+
+	return popupManagerApi.renderPopup(root, portalLevel);
 }

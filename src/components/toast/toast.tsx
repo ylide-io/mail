@@ -4,6 +4,7 @@ import { observer } from 'mobx-react';
 import { PropsWithChildren, ReactNode } from 'react';
 
 import { Popup } from '../popup/popup';
+import { PopupManagerPortalLevel } from '../popup/popupManager/popupManager';
 import css from './toast.module.scss';
 
 enum ToastState {
@@ -24,6 +25,7 @@ export function Toast({ children, state }: ToastProps) {
 				state === ToastState.SHOWN && css.root_visible,
 				state === ToastState.HIDING && css.root_hidden,
 			)}
+			portalLevel={PopupManagerPortalLevel.UPPER}
 		>
 			{children}
 		</Popup>
