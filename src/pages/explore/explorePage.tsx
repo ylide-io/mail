@@ -66,6 +66,7 @@ export function ExplorePage() {
 					{renderTagBlock(BlockchainProjectTag.SOCIAL)}
 					{renderTagBlock(BlockchainProjectTag.ECOSYSTEM)}
 					{renderTagBlock(BlockchainProjectTag.GAMING)}
+					{renderTagBlock(BlockchainProjectTag.DEVELOPER_TOOLS)}
 
 					<div className={css.footer}>
 						<ActionButton
