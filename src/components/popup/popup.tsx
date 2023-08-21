@@ -4,14 +4,14 @@ import { invariant } from '../../utils/assert';
 import { useEscPress } from '../../utils/useEscPress';
 import { useOutsideClick } from '../../utils/useOutsideClick';
 import { PropsWithClassName } from '../props';
-import { PopupManagerContext } from './popupManager/popupManager';
+import { PopupManagerContext, PopupManagerPortalLevel } from './popupManager/popupManager';
 
 interface PopupProps extends PropsWithChildren, PropsWithClassName {
 	align?: (popupElem: HTMLElement) => void;
 	onClick?: (e: React.MouseEvent<HTMLElement>) => void;
 	closeOnOutsideClick?: boolean;
 	customOutsideClickChecker?: (elem: HTMLElement) => boolean;
-	noPortal?: boolean;
+	portalLevel?: PopupManagerPortalLevel;
 	onClose?: () => void;
 }
 
@@ -22,7 +22,7 @@ export function Popup({
 	onClick,
 	closeOnOutsideClick,
 	customOutsideClickChecker,
-	noPortal,
+	portalLevel = PopupManagerPortalLevel.REGULAR,
 	onClose,
 }: PopupProps) {
 	const rootRef = useRef<HTMLDivElement>(null);
@@ -74,5 +74,5 @@ export function Popup({
 		</div>
 	);
 
-	return noPortal ? root : popupManagerApi.createPortal(root);
+	return popupManagerApi.renderPopup(root, portalLevel);
 }
