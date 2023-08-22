@@ -121,7 +121,7 @@ export const CreatePostForm = observer(
 				let cancelled = false;
 				BlockchainFeedApi.getComissions({ feedId: mailData.feedId })
 					.then(comissions => {
-						if (cancelled || !mailData.from) {
+						if (cancelled || !mailData.from || !mailData.network) {
 							return;
 						}
 						const blockchain = domain.getBlockchainName(mailData.network);
