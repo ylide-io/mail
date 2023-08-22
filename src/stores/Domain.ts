@@ -535,43 +535,47 @@ export class Domain {
 		}, 10000);
 		this.walletControllers[factory.blockchainGroup] = {
 			...(this.walletControllers[factory.blockchainGroup] || {}),
-			[factory.wallet]: await this.ylide.controllers.addWallet(factory.blockchainGroup, factory.wallet, {
-				dev: false, //document.location.hostname === 'localhost',
-				faucet: {
-					registrar: 1,
-					apiKey: { type: 'client', key: 'cl258c68bb0516f33e' },
-					// host: 'http://localhost:8392',
+			[factory.wallet]: await this.ylide.controllers.addWallet(
+				factory.wallet,
+				{
+					dev: false, //document.location.hostname === 'localhost',
+					faucet: {
+						registrar: 1,
+						apiKey: { type: 'client', key: 'cl258c68bb0516f33e' },
+						// host: 'http://localhost:8392',
+					},
+					onSwitchAccountRequest: this.handleSwitchRequest.bind(this, factory.wallet),
+					onNetworkSwitchRequest: async (
+						reason: string,
+						currentNetwork: EVMNetwork | undefined,
+						needNetwork: EVMNetwork,
+						needChainId: number,
+					) => {
+						try {
+							await this.switchEVMChain(
+								this.wallets.find(w => w.factory.wallet === factory.wallet)!,
+								needNetwork,
+							);
+						} catch (err) {
+							alert(
+								'Wrong network (' +
+									(currentNetwork ? EVM_NAMES[currentNetwork] : 'undefined') +
+									'), switch to ' +
+									EVM_NAMES[needNetwork],
+							);
+						}
+					},
+					walletConnectProvider:
+						factory.wallet === 'walletconnect' &&
+						!this.walletConnectState.loading &&
+						this.walletConnectState.connected
+							? this.walletConnectState.provider
+							: null,
+					// TODO Remove after fixing 'everscaleProxyWalletFactory'
+					provider: factory.wallet === 'everwallet-proxy' ? (window as any).__everProxy : undefined,
 				},
-				onSwitchAccountRequest: this.handleSwitchRequest.bind(this, factory.wallet),
-				onNetworkSwitchRequest: async (
-					reason: string,
-					currentNetwork: EVMNetwork | undefined,
-					needNetwork: EVMNetwork,
-					needChainId: number,
-				) => {
-					try {
-						await this.switchEVMChain(
-							this.wallets.find(w => w.factory.wallet === factory.wallet)!,
-							needNetwork,
-						);
-					} catch (err) {
-						alert(
-							'Wrong network (' +
-								(currentNetwork ? EVM_NAMES[currentNetwork] : 'undefined') +
-								'), switch to ' +
-								EVM_NAMES[needNetwork],
-						);
-					}
-				},
-				walletConnectProvider:
-					factory.wallet === 'walletconnect' &&
-					!this.walletConnectState.loading &&
-					this.walletConnectState.connected
-						? this.walletConnectState.provider
-						: null,
-				// TODO Remove after fixing 'everscaleProxyWalletFactory'
-				provider: factory.wallet === 'everwallet-proxy' ? (window as any).__everProxy : undefined,
-			}),
+				factory.blockchainGroup,
+			),
 		};
 		clearTimeout(somethingWentWrongTimer);
 		return true;

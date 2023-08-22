@@ -224,7 +224,7 @@ export class MailList<M = ILinkedMessage> {
 
 			const newStream = new ListSourceDrainer(new ListSourceMultiplexer(buildMailboxSources()));
 			const start = Date.now();
-			const { dispose } = await newStream.connect('Mailer', this.onNewMessages.bind(this, newStream));
+			const { dispose } = await newStream.connect(this.onNewMessages.bind(this, newStream));
 			console.debug('MailList init', this.id, Date.now() - start);
 			this.streamDisposer = dispose;
 			await newStream.resetFilter(m => {
@@ -257,7 +257,7 @@ export class MailList<M = ILinkedMessage> {
 
 			const newStream = new ListSourceDrainer(new ListSourceMultiplexer(await buildVenomFources()));
 			const start = Date.now();
-			const { dispose } = await newStream.connect('Mailer', this.onNewMessages.bind(this, newStream));
+			const { dispose } = await newStream.connect(this.onNewMessages.bind(this, newStream));
 			console.debug('MailList init', this.id, Date.now() - start);
 			this.streamDisposer = dispose;
 			this.stream = newStream;
