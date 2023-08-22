@@ -100,6 +100,7 @@ export enum BlockchainProjectId {
 	VENOM_APE_CLUB = 'venom_ape_club',
 	RAVE = 'rave',
 	VENOMART = 'venomart',
+	REVOLT = 'revolt',
 
 	// OTHERS
 
@@ -110,7 +111,6 @@ export enum BlockchainProjectId {
 	GNOSIS_BUILDERS = 'gnosis_builders',
 	BET_FURY = 'bet_fury',
 	DITTO_NETWORK = 'ditto_network',
-	REVOLT = 'revolt',
 }
 
 export enum BlockchainProjectTag {
@@ -360,8 +360,22 @@ export const blockchainProjects: BlockchainProject[] = [
 		profileImage: venomartSrc,
 		bannerImage: venomartBannerSrc,
 		website: 'https://venomart.io/',
-		tags: [BlockchainProjectTag.NFT],
+		tags: [BlockchainProjectTag.NFT, BlockchainProjectTag.VENOM],
 		fixedChain: BlockchainName.VENOM_TESTNET,
+		attachmentMode: BlockchainProjectAttachmentMode.ADMINS,
+	},
+	{
+		id: BlockchainProjectId.REVOLT,
+		feedId: {
+			official: '2000000000000000000000000000000000000000000000000000000000000023' as Uint256,
+			discussion: '2000000000000000000000000000000000000000000000000000000000000024' as Uint256,
+		},
+		name: 'Revolt',
+		description: 'Revolt is the First Complete 10,000 PFP Collection on #Venom Devnet.',
+		profileImage: revoltSrc,
+		bannerImage: revoltBannerSrc,
+		website: 'https://twitter.com/RevoltNFT?s=20',
+		tags: [BlockchainProjectTag.NFT, BlockchainProjectTag.VENOM],
 		attachmentMode: BlockchainProjectAttachmentMode.ADMINS,
 	},
 
@@ -462,20 +476,6 @@ export const blockchainProjects: BlockchainProject[] = [
 		bannerImage: dittoBannerSrc,
 		website: 'https://dittonetwork.io',
 		tags: [BlockchainProjectTag.DEVELOPER_TOOLS],
-		attachmentMode: BlockchainProjectAttachmentMode.ADMINS,
-	},
-	{
-		id: BlockchainProjectId.REVOLT,
-		feedId: {
-			official: '2000000000000000000000000000000000000000000000000000000000000023' as Uint256,
-			discussion: '2000000000000000000000000000000000000000000000000000000000000024' as Uint256,
-		},
-		name: 'Revolt',
-		description: 'Revolt is the First Complete 10,000 PFP Collection on #Venom Devnet.',
-		profileImage: revoltSrc,
-		bannerImage: revoltBannerSrc,
-		website: 'https://twitter.com/RevoltNFT?s=20',
-		tags: [BlockchainProjectTag.NFT],
 		attachmentMode: BlockchainProjectAttachmentMode.ADMINS,
 	},
 ];
