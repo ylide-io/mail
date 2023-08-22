@@ -1,4 +1,4 @@
-import { PropsWithChildren, ReactNode } from 'react';
+import { forwardRef, PropsWithChildren, ReactNode } from 'react';
 
 import css from './narrowContent.module.scss';
 
@@ -9,7 +9,10 @@ export interface NarrowContentProps extends PropsWithChildren<{}> {
 	contentClassName?: string;
 }
 
-export function NarrowContent({ children, title, titleSubItem, titleRight, contentClassName }: NarrowContentProps) {
+export const NarrowContent = forwardRef(function (
+	{ children, title, titleSubItem, titleRight, contentClassName }: NarrowContentProps,
+	ref: any,
+) {
 	return (
 		<div className={css.root}>
 			{title != null && (
@@ -24,7 +27,9 @@ export function NarrowContent({ children, title, titleSubItem, titleRight, conte
 				</div>
 			)}
 
-			<div className={contentClassName}>{children}</div>
+			<div ref={ref} className={contentClassName}>
+				{children}
+			</div>
 		</div>
 	);
-}
+});
