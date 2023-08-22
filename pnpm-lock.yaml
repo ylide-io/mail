@@ -51,14 +51,14 @@ dependencies:
     specifier: 2.8.6
     version: 2.8.6
   '@ylide/ethereum':
-    specifier: file:../ethereum
-    version: file:../ethereum(@ethersproject/abstract-signer@5.7.0)(@ethersproject/address@5.7.0)(@ethersproject/bignumber@5.7.0)(@ethersproject/bytes@5.7.0)(@ethersproject/contracts@5.7.0)(@ethersproject/keccak256@5.7.0)(@ethersproject/solidity@5.7.0)(@ethersproject/strings@5.7.0)(@ethersproject/transactions@5.7.0)(@ethersproject/web@5.7.1)
+    specifier: 0.9.0-beta.6
+    version: 0.9.0-beta.6(@ethersproject/abstract-signer@5.7.0)(@ethersproject/address@5.7.0)(@ethersproject/bignumber@5.7.0)(@ethersproject/bytes@5.7.0)(@ethersproject/contracts@5.7.0)(@ethersproject/keccak256@5.7.0)(@ethersproject/solidity@5.7.0)(@ethersproject/strings@5.7.0)(@ethersproject/transactions@5.7.0)(@ethersproject/web@5.7.1)
   '@ylide/everscale':
-    specifier: file:../everscale
-    version: file:../everscale
+    specifier: 0.9.0-beta.8
+    version: 0.9.0-beta.8
   '@ylide/sdk':
-    specifier: file:../sdk
-    version: file:../sdk
+    specifier: 0.9.0-beta.6
+    version: 0.9.0-beta.6
   '@ylide/smart-buffer':
     specifier: 0.0.17
     version: 0.0.17
@@ -4348,6 +4348,62 @@ packages:
     transitivePeerDependencies:
       - bufferutil
       - utf-8-validate
+    dev: false
+
+  /@ylide/ethereum@0.9.0-beta.6(@ethersproject/abstract-signer@5.7.0)(@ethersproject/address@5.7.0)(@ethersproject/bignumber@5.7.0)(@ethersproject/bytes@5.7.0)(@ethersproject/contracts@5.7.0)(@ethersproject/keccak256@5.7.0)(@ethersproject/solidity@5.7.0)(@ethersproject/strings@5.7.0)(@ethersproject/transactions@5.7.0)(@ethersproject/web@5.7.1):
+    resolution: {integrity: sha512-zi2nntOxIyS/AMAfmZuxyuDFQ5hGtNeIlAFMdwfgPlAcUGatpK5mckcMIUqSma8XmlErv/zNPMHn8TxjlQdtnQ==}
+    dependencies:
+      '@ensdomains/ensjs': 3.0.0-alpha.64(@ethersproject/abi@5.7.0)(@ethersproject/abstract-provider@5.7.0)(@ethersproject/abstract-signer@5.7.0)(@ethersproject/address@5.7.0)(@ethersproject/bignumber@5.7.0)(@ethersproject/bytes@5.7.0)(@ethersproject/contracts@5.7.0)(@ethersproject/keccak256@5.7.0)(@ethersproject/providers@5.7.2)(@ethersproject/solidity@5.7.0)(@ethersproject/strings@5.7.0)(@ethersproject/transactions@5.7.0)(@ethersproject/web@5.7.1)
+      '@ethersproject/abi': 5.7.0
+      '@ethersproject/abstract-provider': 5.7.0
+      '@ethersproject/logger': 5.7.0
+      '@ethersproject/properties': 5.7.0
+      '@ethersproject/providers': 5.7.2
+      '@ylide/ethereum-contracts': 0.8.0-beta.20
+      '@ylide/sdk': 0.9.0-beta.6
+      '@ylide/smart-buffer': 0.0.17
+      ethers: 5.7.2
+      eventemitter3: 5.0.1
+      semaphore-promise: 1.4.1
+    transitivePeerDependencies:
+      - '@ethersproject/abstract-signer'
+      - '@ethersproject/address'
+      - '@ethersproject/bignumber'
+      - '@ethersproject/bytes'
+      - '@ethersproject/contracts'
+      - '@ethersproject/keccak256'
+      - '@ethersproject/solidity'
+      - '@ethersproject/strings'
+      - '@ethersproject/transactions'
+      - '@ethersproject/web'
+      - bufferutil
+      - encoding
+      - utf-8-validate
+    dev: false
+
+  /@ylide/everscale@0.9.0-beta.8:
+    resolution: {integrity: sha512-zO/h7mUQO1Mni4/HicG06lCsad/wTO1KQC44NkpGbswVkRPSWFzvnKTEbpOSgbwG2kJR/Ip/tAQldvyyH8S5Cg==}
+    dependencies:
+      '@ylide/sdk': 0.9.0-beta.6
+      '@ylide/smart-buffer': 0.0.17
+      everscale-inpage-provider: 0.3.61
+      everscale-standalone-client: 2.1.21
+      nekoton-wasm: 1.2.0
+    transitivePeerDependencies:
+      - encoding
+    dev: false
+
+  /@ylide/sdk@0.9.0-beta.6:
+    resolution: {integrity: sha512-6lGVD3mEoGE6hIH+L9Cg46G6KYDyrTvABybETOF9QThtCha42rn6V4P+DIvZTrFIxd1lTiz2xYi5R40RFdUtVA==}
+    dependencies:
+      '@datastructures-js/binary-search-tree': 5.3.1
+      '@datastructures-js/linked-list': 5.2.5
+      '@ylide/smart-buffer': 0.0.17
+      eventemitter3: 5.0.1
+      idb: 7.1.1
+      js-sha256: 0.9.0
+      pako: 2.1.0
+      tweetnacl: 1.0.3
     dev: false
 
   /@ylide/smart-buffer@0.0.17:
@@ -13548,63 +13604,3 @@ packages:
   /yocto-queue@0.1.0:
     resolution: {integrity: sha512-rVksvsnNCdJ/ohGc6xgPwyN8eheCxsiLM8mxuE/t/mOVqJewPuO1miLpTHQiRgTKCLexL4MeAFVagts7HmNZ2Q==}
     engines: {node: '>=10'}
-
-  file:../ethereum(@ethersproject/abstract-signer@5.7.0)(@ethersproject/address@5.7.0)(@ethersproject/bignumber@5.7.0)(@ethersproject/bytes@5.7.0)(@ethersproject/contracts@5.7.0)(@ethersproject/keccak256@5.7.0)(@ethersproject/solidity@5.7.0)(@ethersproject/strings@5.7.0)(@ethersproject/transactions@5.7.0)(@ethersproject/web@5.7.1):
-    resolution: {directory: ../ethereum, type: directory}
-    id: file:../ethereum
-    name: '@ylide/ethereum'
-    dependencies:
-      '@ensdomains/ensjs': 3.0.0-alpha.64(@ethersproject/abi@5.7.0)(@ethersproject/abstract-provider@5.7.0)(@ethersproject/abstract-signer@5.7.0)(@ethersproject/address@5.7.0)(@ethersproject/bignumber@5.7.0)(@ethersproject/bytes@5.7.0)(@ethersproject/contracts@5.7.0)(@ethersproject/keccak256@5.7.0)(@ethersproject/providers@5.7.2)(@ethersproject/solidity@5.7.0)(@ethersproject/strings@5.7.0)(@ethersproject/transactions@5.7.0)(@ethersproject/web@5.7.1)
-      '@ethersproject/abi': 5.7.0
-      '@ethersproject/abstract-provider': 5.7.0
-      '@ethersproject/logger': 5.7.0
-      '@ethersproject/properties': 5.7.0
-      '@ethersproject/providers': 5.7.2
-      '@ylide/ethereum-contracts': 0.8.0-beta.20
-      '@ylide/sdk': file:../sdk
-      '@ylide/smart-buffer': 0.0.17
-      ethers: 5.7.2
-      eventemitter3: 5.0.1
-      semaphore-promise: 1.4.1
-    transitivePeerDependencies:
-      - '@ethersproject/abstract-signer'
-      - '@ethersproject/address'
-      - '@ethersproject/bignumber'
-      - '@ethersproject/bytes'
-      - '@ethersproject/contracts'
-      - '@ethersproject/keccak256'
-      - '@ethersproject/solidity'
-      - '@ethersproject/strings'
-      - '@ethersproject/transactions'
-      - '@ethersproject/web'
-      - bufferutil
-      - encoding
-      - utf-8-validate
-    dev: false
-
-  file:../everscale:
-    resolution: {directory: ../everscale, type: directory}
-    name: '@ylide/everscale'
-    dependencies:
-      '@ylide/sdk': file:../sdk
-      '@ylide/smart-buffer': 0.0.17
-      everscale-inpage-provider: 0.3.61
-      everscale-standalone-client: 2.1.21
-      nekoton-wasm: 1.2.0
-    transitivePeerDependencies:
-      - encoding
-    dev: false
-
-  file:../sdk:
-    resolution: {directory: ../sdk, type: directory}
-    name: '@ylide/sdk'
-    dependencies:
-      '@datastructures-js/binary-search-tree': 5.3.1
-      '@datastructures-js/linked-list': 5.2.5
-      '@ylide/smart-buffer': 0.0.17
-      eventemitter3: 5.0.1
-      idb: 7.1.1
-      js-sha256: 0.9.0
-      pako: 2.1.0
-      tweetnacl: 1.0.3
-    dev: false
