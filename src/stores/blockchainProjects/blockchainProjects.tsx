@@ -4,15 +4,19 @@ import { VENOM_FEED_ID } from '../../constants';
 import { BlockchainName } from '../../utils/blockchain';
 import _defaultBannerSrc from './bannerImages/_default.png';
 import betFuryBannerSrc from './bannerImages/betFury.jpg';
+import dittoBannerSrc from './bannerImages/ditto.jpg';
 import gnosisBuildersBannerSrc from './bannerImages/gnosisBuilders.jpg';
 import gravixBannerSrc from './bannerImages/gravix.jpg';
+import hanmadiBannerSrc from './bannerImages/hanmadi.jpg';
 import oasisGalleryBannerSrc from './bannerImages/oasisGallery.jpg';
 import oneClickCryptoBannerSrc from './bannerImages/oneClickCrypto.jpg';
 import raveBannerSrc from './bannerImages/rave.jpg';
+import revoltBannerSrc from './bannerImages/revolt.jpg';
 import snipaBannerSrc from './bannerImages/snipa.jpg';
 import staxBannerSrc from './bannerImages/stax.jpg';
 import tvmBannerSrc from './bannerImages/tvm.jpg';
 import venomApeClubBannerSrc from './bannerImages/venomApeClub.jpg';
+import venomartBannerSrc from './bannerImages/venomart.jpg';
 import venomBlockchainBannerSrc from './bannerImages/venomBlockchain.jpg';
 import venomBridgeBannerSrc from './bannerImages/venomBridge.jpg';
 import venomIdBannerSrc from './bannerImages/venomId.jpg';
@@ -20,17 +24,21 @@ import venomRecapBannerSrc from './bannerImages/venomRecap.jpg';
 import ventoryBannerSrc from './bannerImages/ventory.jpg';
 import web3WorldBannerSrc from './bannerImages/web3World.jpg';
 import betFurySrc from './profileImages/betFury.jpg';
+import dittoSrc from './profileImages/ditto.jpg';
 import ethWhalesSrc from './profileImages/ethWhales.png';
 import generalSrc from './profileImages/general.png';
 import gnosisBuildersSrc from './profileImages/gnosisBuilders.jpg';
 import gravixSrc from './profileImages/gravix.png';
+import hanmadiSrc from './profileImages/hanmadi.jpg';
 import oasisGallerySrc from './profileImages/oasisGallery.png';
 import oneClickCryptoSrc from './profileImages/oneClickCrypto.jpg';
 import raveSrc from './profileImages/rave.jpg';
+import revoltSrc from './profileImages/revolt.jpg';
 import snipaSrc from './profileImages/snipa.png';
 import staxSrc from './profileImages/stax.jpg';
 import tvmSrc from './profileImages/tvm.png';
 import venomApeClubSrc from './profileImages/venomApeClub.jpg';
+import venomartSrc from './profileImages/venomart.jpg';
 import venomBlockchainSrc from './profileImages/venomBlockchain.png';
 import venomBridgeSrc from './profileImages/venomBridge.png';
 import venomIdSrc from './profileImages/venomId.jpg';
@@ -91,14 +99,18 @@ export enum BlockchainProjectId {
 	VENOM_RECAP = 'venom_recap',
 	VENOM_APE_CLUB = 'venom_ape_club',
 	RAVE = 'rave',
+	VENOMART = 'venomart',
+	REVOLT = 'revolt',
 
 	// OTHERS
 
 	TVM = 'tvm',
+	HANMADI = 'hanmadi',
 	WEAVER = 'weaver',
 	ONE_CLICK_CRYPTO = 'one_click_crypto',
 	GNOSIS_BUILDERS = 'gnosis_builders',
 	BET_FURY = 'bet_fury',
+	DITTO_NETWORK = 'ditto_network',
 }
 
 export enum BlockchainProjectTag {
@@ -109,6 +121,7 @@ export enum BlockchainProjectTag {
 	ECOSYSTEM = 'Ecosystem',
 	TVM = 'TVM',
 	GAMING = 'Gaming',
+	DEVELOPER_TOOLS = 'Developer Tools',
 }
 
 export enum BlockchainProjectAttachmentMode {
@@ -335,6 +348,36 @@ export const blockchainProjects: BlockchainProject[] = [
 		fixedChain: BlockchainName.VENOM_TESTNET,
 		attachmentMode: BlockchainProjectAttachmentMode.ADMINS,
 	},
+	{
+		id: BlockchainProjectId.VENOMART,
+		feedId: {
+			official: '2000000000000000000000000000000000000000000000000000000000000021' as Uint256,
+			discussion: '2000000000000000000000000000000000000000000000000000000000000022' as Uint256,
+		},
+		name: 'Venomart',
+		description:
+			'Venomart is the first fully-fledged NFT Marketplace on Venom. Get quick and easy access to digital collectibles and explore, buy and sell NFTs.',
+		profileImage: venomartSrc,
+		bannerImage: venomartBannerSrc,
+		website: 'https://venomart.io/',
+		tags: [BlockchainProjectTag.NFT, BlockchainProjectTag.VENOM],
+		fixedChain: BlockchainName.VENOM_TESTNET,
+		attachmentMode: BlockchainProjectAttachmentMode.ADMINS,
+	},
+	{
+		id: BlockchainProjectId.REVOLT,
+		feedId: {
+			official: '2000000000000000000000000000000000000000000000000000000000000023' as Uint256,
+			discussion: '2000000000000000000000000000000000000000000000000000000000000024' as Uint256,
+		},
+		name: 'Revolt',
+		description: 'Revolt is the First Complete 10,000 PFP Collection on #Venom Devnet.',
+		profileImage: revoltSrc,
+		bannerImage: revoltBannerSrc,
+		website: 'https://twitter.com/RevoltNFT?s=20',
+		tags: [BlockchainProjectTag.NFT, BlockchainProjectTag.VENOM],
+		attachmentMode: BlockchainProjectAttachmentMode.ADMINS,
+	},
 
 	// OTHERS
 
@@ -350,6 +393,19 @@ export const blockchainProjects: BlockchainProject[] = [
 		bannerImage: tvmBannerSrc,
 		tags: [BlockchainProjectTag.TVM, BlockchainProjectTag.ECOSYSTEM, BlockchainProjectTag.VENOM],
 		attachmentMode: BlockchainProjectAttachmentMode.ADMINS,
+	},
+	{
+		id: BlockchainProjectId.HANMADI,
+		feedId: {
+			official: '2000000000000000000000000000000000000000000000000000000000000025' as Uint256,
+			discussion: '2000000000000000000000000000000000000000000000000000000000000026' as Uint256,
+		},
+		name: '한마디 (Hanmadi)',
+		description: '누구나 자유로이 한마디!',
+		profileImage: hanmadiSrc,
+		bannerImage: hanmadiBannerSrc,
+		tags: [BlockchainProjectTag.TVM, BlockchainProjectTag.VENOM],
+		attachmentMode: BlockchainProjectAttachmentMode.EVERYONE,
 	},
 	{
 		id: BlockchainProjectId.WEAVER,
@@ -405,6 +461,21 @@ export const blockchainProjects: BlockchainProject[] = [
 		bannerImage: betFuryBannerSrc,
 		website: 'https://betfury.io/',
 		tags: [BlockchainProjectTag.GAMING],
+		attachmentMode: BlockchainProjectAttachmentMode.ADMINS,
+	},
+	{
+		id: BlockchainProjectId.DITTO_NETWORK,
+		feedId: {
+			official: '200000000000000000000000000000000000000000000000000000000000001f' as Uint256,
+			discussion: '2000000000000000000000000000000000000000000000000000000000000020' as Uint256,
+		},
+		name: 'Ditto Network',
+		description:
+			'Robust infrastructure empowering Web3 users to seamlessly connect to any application and automate any workflow both on- and off-chain.',
+		profileImage: dittoSrc,
+		bannerImage: dittoBannerSrc,
+		website: 'https://dittonetwork.io',
+		tags: [BlockchainProjectTag.DEVELOPER_TOOLS],
 		attachmentMode: BlockchainProjectAttachmentMode.ADMINS,
 	},
 ];

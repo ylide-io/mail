@@ -49,6 +49,9 @@ export const SearchField = ({ className }: PropsWithClassName) => {
 					className={css.popup}
 					anchorRef={inputRef}
 					horizontalAlign={HorizontalAlignment.MATCH}
+					alignerOptions={{
+						fitHeightToViewport: true,
+					}}
 					onCloseRequest={() => setPopupOpen(false)}
 				>
 					<div className={css.content}>

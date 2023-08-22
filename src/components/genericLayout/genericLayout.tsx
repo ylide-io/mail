@@ -4,8 +4,10 @@ import { createContext, PropsWithChildren, useContext, useEffect, useMemo } from
 
 import { useBodyHiddenOverflow } from '../../utils/useBodyHiddenOverflow';
 import { Overlay } from '../overlay/overlay';
+import { PopupManagerPortalLevel } from '../popup/popupManager/popupManager';
 import css from './genericLayout.module.scss';
 import { Header } from './header/header';
+import { SearchField } from './header/searchField/searchField';
 import { isSidebarOpen, SidebarBurger, SidebarMenu } from './sidebar/sidebarMenu';
 
 interface GenericLayoutApi {
@@ -53,13 +55,19 @@ export const GenericLayout = observer(({ children }: GenericLayoutProps) => {
 
 				<div className={css.main}>
 					{isSidebarOpen.get() && (
-						<Overlay className={css.sidebarOverlay} onClick={() => isSidebarOpen.set(false)} />
+						<Overlay
+							className={css.sidebarOverlay}
+							portalLevel={PopupManagerPortalLevel.NO_PORTAL}
+							onClick={() => isSidebarOpen.set(false)}
+						/>
 					)}
 
 					<div className={clsx(css.sidebar, isSidebarOpen.get() && css.sidebar_open)}>
 						<div className={css.sidebarMobileHeader}>
 							<SidebarBurger>Hide sidebar</SidebarBurger>
 						</div>
+
+						<SearchField className={css.sidebarSearch} />
 
 						<SidebarMenu />
 					</div>

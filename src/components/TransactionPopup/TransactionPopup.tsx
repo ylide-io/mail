@@ -1,8 +1,10 @@
+import { EVMNetwork } from '@ylide/ethereum';
 import clsx from 'clsx';
 import { observer } from 'mobx-react';
 import { useEffect, useState } from 'react';
 
 import domain from '../../stores/Domain';
+import { openInNewWidnow } from '../../utils/misc';
 import { ActionButton } from '../ActionButton/ActionButton';
 import css from './TransactionPopup.module.scss';
 
@@ -71,11 +73,11 @@ export const TransactionPopup = observer(() => {
 						<div className={css.central}>
 							{domain.txWithBonus
 								? `Your ${
-										domain.txChain === 'fantom'
+										domain.txChain === EVMNetwork.FANTOM
 											? '$FTM'
-											: domain.txChain === 'gnosis'
+											: domain.txChain === EVMNetwork.GNOSIS
 											? '$xDAI'
-											: domain.txChain === 'polygon'
+											: domain.txChain === EVMNetwork.POLYGON
 											? '$MATIC'
 											: 'tokens'
 								  } has been sent`
@@ -83,12 +85,12 @@ export const TransactionPopup = observer(() => {
 						</div>
 						<ActionButton
 							onClick={() => {
-								if (domain.txChain === 'fantom') {
-									window.open(`https://ftmscan.com/tx/${domain.publishingTxHash}`, '_blank');
-								} else if (domain.txChain === 'gnosis') {
-									window.open(`https://gnosisscan.io/tx/${domain.publishingTxHash}`, '_blank');
-								} else if (domain.txChain === 'polygon') {
-									window.open(`https://polygonscan.com/tx/${domain.publishingTxHash}`, '_blank');
+								if (domain.txChain === EVMNetwork.FANTOM) {
+									openInNewWidnow(`https://ftmscan.com/tx/${domain.publishingTxHash}`);
+								} else if (domain.txChain === EVMNetwork.GNOSIS) {
+									openInNewWidnow(`https://gnosisscan.io/tx/${domain.publishingTxHash}`);
+								} else if (domain.txChain === EVMNetwork.POLYGON) {
+									openInNewWidnow(`https://polygonscan.com/tx/${domain.publishingTxHash}`);
 								}
 							}}
 						>
@@ -101,11 +103,11 @@ export const TransactionPopup = observer(() => {
 						<h4 className={css.header}>
 							{domain.txWithBonus
 								? `Your ${
-										domain.txChain === 'fantom'
+										domain.txChain === EVMNetwork.FANTOM
 											? '$FTM'
-											: domain.txChain === 'gnosis'
+											: domain.txChain === EVMNetwork.GNOSIS
 											? '$xDAI'
-											: domain.txChain === 'polygon'
+											: domain.txChain === EVMNetwork.POLYGON
 											? '$MATIC'
 											: 'tokens'
 								  } are on the way`

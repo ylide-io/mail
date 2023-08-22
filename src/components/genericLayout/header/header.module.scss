@@ -24,8 +24,19 @@
 .right {
 	display: grid;
 	grid-auto-flow: column;
-	grid-gap: 20px;
 	align-items: center;
+	grid-gap: 20px;
+
+	@include lessThan640w {
+		grid-gap: 12px;
+	}
+}
+
+.rightButtons {
+	display: grid;
+	grid-auto-flow: column;
+	align-items: center;
+	grid-gap: 4px;
 }
 
 //
@@ -77,6 +88,8 @@
 	margin: 0 0 0 12px;
 }
 
+//
+
 .users {
 	@include expand-click-area;
 	display: grid;
@@ -123,4 +136,108 @@
 	width: 20px;
 	height: 20px;
 	fill: currentColor;
+}
+
+//
+
+.notificationsPopup {
+	position: fixed;
+	padding: 4px 0;
+	max-width: 320px;
+}
+
+.notificationsPopupInner {
+	display: grid;
+	justify-content: center;
+	grid-gap: 16px;
+	padding: 20px;
+	background: var(--surface-color);
+	border-radius: 16px;
+	box-shadow: var(--popup-shadow);
+}
+
+.notificationIcon_animated {
+	transform-origin: 50% 8px;
+	animation-name: notification-icon;
+	animation-duration: 4s;
+	animation-delay: 2s;
+	animation-timing-function: ease-in-out;
+	animation-iteration-count: 3;
+}
+
+@keyframes notification-icon {
+	0% {
+		color: var(--accent-color);
+		transform: rotate(0);
+	}
+	1% {
+		transform: rotate(30deg);
+	}
+	3% {
+		transform: rotate(-28deg);
+	}
+	5% {
+		transform: rotate(34deg);
+	}
+	7% {
+		transform: rotate(-32deg);
+	}
+	9% {
+		transform: rotate(30deg);
+	}
+	11% {
+		transform: rotate(-28deg);
+	}
+	13% {
+		transform: rotate(26deg);
+	}
+	15% {
+		transform: rotate(-24deg);
+	}
+	17% {
+		transform: rotate(22deg);
+	}
+	19% {
+		transform: rotate(-20deg);
+	}
+	21% {
+		transform: rotate(18deg);
+	}
+	23% {
+		transform: rotate(-16deg);
+	}
+	25% {
+		transform: rotate(14deg);
+	}
+	27% {
+		transform: rotate(-12deg);
+	}
+	29% {
+		transform: rotate(10deg);
+	}
+	31% {
+		transform: rotate(-8deg);
+	}
+	33% {
+		transform: rotate(6deg);
+	}
+	35% {
+		transform: rotate(-4deg);
+	}
+	37% {
+		transform: rotate(2deg);
+	}
+	39% {
+		transform: rotate(-1deg);
+	}
+	41% {
+		transform: rotate(1deg);
+	}
+	43% {
+		color: var(--text-color);
+		transform: rotate(0);
+	}
+	100% {
+		transform: rotate(0);
+	}
 }

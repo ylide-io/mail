@@ -11,6 +11,7 @@ enum BrowserStorageKey {
 	MAIN_VIEW_KEYS = 'ylide_mainViewKeys',
 	LAST_MAILBOX_INCOMING_DATE = 'ylide_lastMailboxCheckDate',
 	SAVED_ACCOUNTS = 'ylide_savedAccounts',
+	NOTIFICATIONS_ALERT = 'ylide_notificationsAlert',
 }
 
 export interface SavedAccount {
@@ -162,6 +163,19 @@ class BrowserStorage {
 	set lastMailboxCheckDate(value: Record<string, number>) {
 		BrowserStorage.setItem(BrowserStorageKey.LAST_MAILBOX_INCOMING_DATE, JSON.stringify(value));
 		this._lastMailboxCheckDate = value;
+	}
+
+	//
+
+	private _isNotificationAlertHappened = BrowserStorage.getItem(BrowserStorageKey.NOTIFICATIONS_ALERT) === 'true';
+
+	get isNotificationAlertHappened() {
+		return this._isNotificationAlertHappened;
+	}
+
+	set isNotificationAlertHappened(value: boolean) {
+		BrowserStorage.setItem(BrowserStorageKey.NOTIFICATIONS_ALERT, value);
+		this._isNotificationAlertHappened = value;
 	}
 }
 

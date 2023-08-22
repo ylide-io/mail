@@ -321,6 +321,7 @@ export const CreatePostForm = observer(
 							<div className={css.footer}>
 								<AccountSelect
 									className={css.accontSelect}
+									disabled={mailData.sending}
 									accounts={accounts}
 									activeAccount={mailData.from}
 									onChange={account => (mailData.from = account)}

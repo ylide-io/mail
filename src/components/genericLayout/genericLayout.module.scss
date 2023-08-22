@@ -11,6 +11,7 @@ $sidebarWidth: 280px;
 	grid-template-rows: auto 1fr;
 	grid-gap: var(--generic-layout_spacing);
 	align-items: start;
+	position: relative;
 
 	@include lessThan1366x768 {
 		--generic-layout_padding: 20px;
@@ -64,7 +65,7 @@ $sidebarWidth: 280px;
 
 	@include lessThan1152w {
 		position: fixed;
-		z-index: 2;
+		z-index: 1;
 		top: 0;
 		bottom: 0;
 		left: -($sidebarWidth + 20px * 2);
@@ -88,7 +89,15 @@ $sidebarWidth: 280px;
 	display: none;
 
 	@include lessThan1152w {
-		align-self: center;
+		display: block;
+		margin: 0 0 20px;
+	}
+}
+
+.sidebarSearch {
+	display: none;
+
+	@include lessThan1152w {
 		display: block;
 		margin: 0 0 20px;
 	}
@@ -99,5 +108,6 @@ $sidebarWidth: 280px;
 
 	@include lessThan1152w {
 		display: block;
+		z-index: 1;
 	}
 }

@@ -4,10 +4,9 @@ import { useCallback, useMemo, useRef, useState } from 'react';
 import { generatePath } from 'react-router-dom';
 
 import { BlockchainFeedApi, DecodedBlockchainFeedPost } from '../../../../api/blockchainFeedApi';
-import { ActionButton } from '../../../../components/ActionButton/ActionButton';
+import { ActionButton, ActionButtonLook, ActionButtonSize } from '../../../../components/ActionButton/ActionButton';
 import { ProjectAvatar } from '../../../../components/avatar/avatar';
 import { GridRowBox } from '../../../../components/boxes/boxes';
-import { ErrorMessage, ErrorMessageLook } from '../../../../components/errorMessage/errorMessage';
 import { GalleryModal } from '../../../../components/galleryModal/galleryModal';
 import { NlToBr } from '../../../../components/nlToBr/nlToBr';
 import { PostItemContainer } from '../../../../components/postItemContainer/postItemContainer';
@@ -54,13 +53,24 @@ export function OfficialPostView({ project, post }: OfficialPostViewProps) {
 
 	//
 
-	const [isBanned, setBanned] = useState(false);
+	const [isRemoved, setRemoved] = useState(false);
 
 	const banPost = useCallback(() => {
 		BlockchainFeedApi.banPost({ ids: [post.msg.msgId], secret: browserStorage.adminPassword || '' })
 			.then(() => {
-				toast('Removed 👌');
-				setBanned(true);
+				toast(
+					<GridRowBox gap={4} spaceBetween>
+						Removed 👌
+						<ActionButton
+							size={ActionButtonSize.XSMALL}
+							look={ActionButtonLook.SECONDARY}
+							onClick={() => unbanPost()}
+						>
+							Undo
+						</ActionButton>
+					</GridRowBox>,
+				);
+				setRemoved(true);
 			})
 			.catch(e => {
 				if (e.message === 'Request failed') {
@@ -76,7 +86,7 @@ export function OfficialPostView({ project, post }: OfficialPostViewProps) {
 		BlockchainFeedApi.unbanPost({ ids: [post.msg.msgId], secret: browserStorage.adminPassword || '' })
 			.then(() => {
 				toast('Restored 🔥');
-				setBanned(false);
+				setRemoved(false);
 			})
 			.catch(e => {
 				toast('Error 🤦‍♀️');
@@ -86,7 +96,9 @@ export function OfficialPostView({ project, post }: OfficialPostViewProps) {
 
 	//
 
-	return (
+	return isRemoved ? (
+		<></>
+	) : (
 		<PostItemContainer isCollapsable className={css.root}>
 			<div className={css.meta}>
 				<ProjectAvatar className={css.ava} blockie={post.msg.senderAddress} />
@@ -122,13 +134,6 @@ export function OfficialPostView({ project, post }: OfficialPostViewProps) {
 			</div>
 
 			<div className={css.body}>
-				{isBanned && (
-					<ErrorMessage look={ErrorMessageLook.INFO}>
-						Post removed 👌
-						<ActionButton onClick={() => unbanPost()}>Undo</ActionButton>
-					</ErrorMessage>
-				)}
-
 				<div className={css.text}>
 					<NlToBr text={decodedText} />
 				</div>

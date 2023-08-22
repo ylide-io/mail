@@ -9,6 +9,7 @@ import domain from '../../stores/Domain';
 import { Wallet } from '../../stores/models/Wallet';
 import walletConnect from '../../stores/WalletConnect';
 import { copyToClipboard } from '../../utils/clipboard';
+import { openInNewWidnow } from '../../utils/misc';
 import { walletsMeta } from '../../utils/wallet';
 import { ActionButton, ActionButtonLook, ActionButtonSize } from '../ActionButton/ActionButton';
 import { Modal } from '../modal/modal';
@@ -313,7 +314,7 @@ export const SelectWalletModal = observer(({ onClose }: SelectWalletModalProps) 
 																	name: w.name,
 																	href: href,
 																});
-																window.open(href, '_blank');
+																openInNewWidnow(href);
 															}}
 														>
 															<div className="wallet-icon-block">
@@ -376,7 +377,7 @@ export const SelectWalletModal = observer(({ onClose }: SelectWalletModalProps) 
 																name: w.name,
 																href: href,
 															});
-															window.open(href, '_blank');
+															openInNewWidnow(href);
 														}}
 													>
 														<div className="wallet-icon-block">
@@ -426,7 +427,7 @@ export const SelectWalletModal = observer(({ onClose }: SelectWalletModalProps) 
 											className="wallet-icon"
 											key={w}
 											onClick={() => {
-												window.open(wData.link, '_blank');
+												openInNewWidnow(wData.link);
 											}}
 										>
 											<div className="wallet-icon-block">

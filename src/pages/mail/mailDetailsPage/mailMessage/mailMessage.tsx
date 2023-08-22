@@ -61,48 +61,50 @@ export const MailMessage = observer(
 
 		function renderRecipients(label: ReactNode, addresses: string[]) {
 			return (
-				<>
-					<div className={css.recipientsLabel}>{label}</div>
+				!!addresses.length && (
+					<>
+						<div className={css.recipientsLabel}>{label}</div>
 
-					<div className={css.recipientsList}>
-						{addresses.map(address => {
-							const contact = contacts.find({ address });
+						<div className={css.recipientsList}>
+							{addresses.map(address => {
+								const contact = contacts.find({ address });
 
-							return (
-								<div className={css.recipientsRow}>
-									<ContactName address={address} />
+								return (
+									<div className={css.recipientsRow}>
+										<ContactName address={address} />
 
-									{!contact && (
-										<button
-											className={css.recipientsButton}
-											title="Create contact"
-											onClick={() => {
-												analytics.startCreatingContact('mail-details');
+										{!contact && (
+											<button
+												className={css.recipientsButton}
+												title="Create contact"
+												onClick={() => {
+													analytics.startCreatingContact('mail-details');
 
-												const name = prompt('Enter contact name:')?.trim();
-												if (!name) return;
+													const name = prompt('Enter contact name:')?.trim();
+													if (!name) return;
 
-												const contact: IContact = {
-													name,
-													description: '',
-													address,
-													tags: [],
-												};
+													const contact: IContact = {
+														name,
+														description: '',
+														address,
+														tags: [],
+													};
 
-												contacts
-													.createContact(contact)
-													.then(() => analytics.finishCreatingContact('mail-details'))
-													.catch(() => toast("Couldn't save 😒"));
-											}}
-										>
-											<AddContactSvg />
-										</button>
-									)}
-								</div>
-							);
-						})}
-					</div>
-				</>
+													contacts
+														.createContact(contact)
+														.then(() => analytics.finishCreatingContact('mail-details'))
+														.catch(() => toast("Couldn't save 😒"));
+												}}
+											>
+												<AddContactSvg />
+											</button>
+										)}
+									</div>
+								);
+							})}
+						</div>
+					</>
+				)
 			);
 		}
 

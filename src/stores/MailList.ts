@@ -1,5 +1,5 @@
-import { EthereumBlockchainController } from '@ylide/ethereum';
-import { EverscaleBlockchainController } from '@ylide/everscale';
+import { EVMBlockchainController } from '@ylide/ethereum';
+import { TVMBlockchainController } from '@ylide/everscale';
 import {
 	AbstractBlockchainController,
 	asyncDelay,
@@ -88,7 +88,7 @@ export namespace ILinkedMessage {
 		try {
 			// console.log('folderId: ', folderId);
 			if (folderId === FolderId.Sent) {
-				recipients = (await (reader as EthereumBlockchainController).getMessageRecipients(
+				recipients = (await (reader as EVMBlockchainController).getMessageRecipients(
 					message,
 					true,
 				))!.recipients.map(formatAddress);
@@ -236,7 +236,7 @@ export class MailList<M = ILinkedMessage> {
 			async function buildVenomFources(): Promise<ISourceWithMeta[]> {
 				invariant(venomFeed);
 
-				const blockchainController = domain.blockchains['venom-testnet'] as EverscaleBlockchainController;
+				const blockchainController = domain.blockchains['venom-testnet'] as TVMBlockchainController;
 				const composedFeedId = await blockchainController.getComposedFeedId(VENOM_FEED_ID, 1);
 				const blockchainSubject: IBlockchainSourceSubject = {
 					feedId: composedFeedId,

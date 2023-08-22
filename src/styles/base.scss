@@ -164,6 +164,10 @@ button,
 	cursor: pointer;
 }
 
+*[disabled] {
+	cursor: default;
+}
+
 a {
 	color: var(--link-color);
 	text-decoration: none;
