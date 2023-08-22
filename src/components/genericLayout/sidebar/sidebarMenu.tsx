@@ -370,9 +370,9 @@ export const SidebarMenu = observer(() => {
 					}}
 				>
 					{renderProjects([
-						BlockchainProjectId.ONE_CLICK_CRYPTO,
-						BlockchainProjectId.GNOSIS_BUILDERS,
-						BlockchainProjectId.BET_FURY,
+						BlockchainProjectId.DITTO_NETWORK,
+						BlockchainProjectId.HANMADI,
+						BlockchainProjectId.VENOMART,
 					])}
 				</SidebarSection>
 			</SidebarBlock>
