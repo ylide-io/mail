@@ -136,8 +136,8 @@ export function NewPasswordModal({
 				});
 
 				asyncDelay(3000).then(() =>
-				domain.ylide.core
-				.waitForPublicKey(
+					domain.ylide.core
+						.waitForPublicKey(
 							network ? EVM_NAMES[network] : account.wallet.currentBlockchain,
 							account.account.address,
 							key.publicKey.keyBytes,
@@ -155,7 +155,7 @@ export function NewPasswordModal({
 			});
 
 			if (justPublishedKey) {
-				await domain.keyRegistry.addRemotePublicKey(justPublishedKey);
+				await domain.keysRegistry.addRemotePublicKey(justPublishedKey);
 				account.reloadKeys();
 			}
 
@@ -263,7 +263,7 @@ export function NewPasswordModal({
 				}
 			}
 		} else if (freshestKey.key.publicKey.equals(tempLocalKey.publicKey)) {
-			await domain.keyRegistry.addRemotePublicKeys(
+			await domain.keysRegistry.addRemotePublicKeys(
 				Object.values(remoteKeys).filter(it => !!it) as RemotePublicKey[],
 			);
 			const domainAccount = await createDomainAccount(wallet, account, tempLocalKey);

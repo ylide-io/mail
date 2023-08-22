@@ -117,7 +117,7 @@ export class Wallet extends EventEmitter {
 	}
 
 	async constructLocalKeyV3(account: WalletAccount) {
-		return await this.domain.keyRegistry.instantiateNewPrivateKey(
+		return await this.domain.keysRegistry.instantiateNewPrivateKey(
 			account.blockchainGroup,
 			account.address,
 			YlideKeyVersion.KEY_V3,
@@ -130,7 +130,7 @@ export class Wallet extends EventEmitter {
 	}
 
 	async constructLocalKeyV2(account: WalletAccount, password: string) {
-		return await this.domain.keyRegistry.instantiateNewPrivateKey(
+		return await this.domain.keysRegistry.instantiateNewPrivateKey(
 			account.blockchainGroup,
 			account.address,
 			YlideKeyVersion.KEY_V2,
@@ -144,7 +144,7 @@ export class Wallet extends EventEmitter {
 	}
 
 	async constructLocalKeyV1(account: WalletAccount, password: string) {
-		return await this.domain.keyRegistry.instantiateNewPrivateKey(
+		return await this.domain.keysRegistry.instantiateNewPrivateKey(
 			account.blockchainGroup,
 			account.address,
 			YlideKeyVersion.INSECURE_KEY_V1,
