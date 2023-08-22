@@ -23,7 +23,7 @@ export class Accounts {
 	}
 
 	async createNewDomainAccount(wallet: Wallet, account: WalletAccount) {
-		const domainAccount = new DomainAccount(this.domain.keyRegistry, wallet, account, '');
+		const domainAccount = new DomainAccount(this.domain.keysRegistry, wallet, account, '');
 		this.accounts.push(domainAccount);
 		wallet.accounts.push(domainAccount);
 		this.save();
@@ -43,7 +43,7 @@ export class Accounts {
 				continue;
 			}
 
-			const domainAccount = new DomainAccount(this.domain.keyRegistry, wallet, acc.account, acc.name);
+			const domainAccount = new DomainAccount(this.domain.keysRegistry, wallet, acc.account, acc.name);
 
 			if (!domainAccount.freshestRemotePublicKey) {
 				await domainAccount.firstTimeReadRemoteKeys();
@@ -72,7 +72,7 @@ export class Accounts {
 			account.wallet.accounts.splice(widx, 1);
 		}
 		for (const privateKey of account.localPrivateKeys) {
-			await this.domain.keyRegistry.removeLocalPrivateKey(privateKey);
+			await this.domain.keysRegistry.removeLocalPrivateKey(privateKey);
 		}
 		this.save();
 	}
