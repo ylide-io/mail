@@ -45,11 +45,37 @@ export function buildUrl(params: string | UseNavParameters) {
 		  }`;
 }
 
+export interface NavOptions extends NavigateOptions {
+	goBackIfPossible?: boolean;
+}
+
 export const useNav = () => {
 	const navigate = useNavigate();
+	const location = useLocation();
 
-	return (value: string | UseNavParameters, options?: NavigateOptions) => {
-		navigate(buildUrl(value), options);
+	return (value: string | UseNavParameters, options?: NavOptions) => {
+		const newUrl = buildUrl(value);
+
+		if (options?.goBackIfPossible) {
+			const previousUrl = location.state?.previousUrl;
+
+			if (previousUrl && previousUrl === newUrl) {
+				history.back();
+				return;
+			}
+		}
+
+		navigate(newUrl, {
+			...options,
+			state: {
+				previousUrl: buildUrl({
+					path: location.pathname,
+					search: location.search,
+					hash: location.hash,
+				}),
+				...options?.state,
+			},
+		});
 	};
 };
 

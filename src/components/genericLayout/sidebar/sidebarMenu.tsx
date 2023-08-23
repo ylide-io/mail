@@ -100,6 +100,7 @@ function SidebarSection({ children, title, button }: SidebarSectionProps) {
 
 interface SidebarButtonProps {
 	href: string;
+	goBackIfPossible?: boolean;
 	icon?: ReactNode;
 	name: ReactNode;
 	rightButton?: {
@@ -109,7 +110,7 @@ interface SidebarButtonProps {
 	};
 }
 
-export const SidebarButton = observer(({ href, icon, name, rightButton }: SidebarButtonProps) => {
+export const SidebarButton = observer(({ href, goBackIfPossible, icon, name, rightButton }: SidebarButtonProps) => {
 	const location = useLocation();
 	const navigate = useNav();
 
@@ -133,7 +134,7 @@ export const SidebarButton = observer(({ href, icon, name, rightButton }: Sideba
 
 				if (!isExternal) {
 					e.preventDefault();
-					navigate(href);
+					navigate(href, { goBackIfPossible });
 				}
 			}}
 		>
@@ -256,6 +257,7 @@ export const SidebarMailSection = observer(() => {
 			>
 				<SidebarButton
 					href={generatePath(RoutePath.MAIL_FOLDER, { folderId: FolderId.Inbox })}
+					goBackIfPossible
 					icon={<InboxSvg />}
 					name={
 						<div className={css.inboxButton}>
@@ -267,12 +269,14 @@ export const SidebarMailSection = observer(() => {
 
 				<SidebarButton
 					href={generatePath(RoutePath.MAIL_FOLDER, { folderId: FolderId.Sent })}
+					goBackIfPossible
 					icon={<SentSvg />}
 					name={getFolderName(FolderId.Sent)}
 				/>
 
 				<SidebarButton
 					href={generatePath(RoutePath.MAIL_FOLDER, { folderId: FolderId.Archive })}
+					goBackIfPossible
 					icon={<ArchiveSvg />}
 					name={getFolderName(FolderId.Archive)}
 				/>
