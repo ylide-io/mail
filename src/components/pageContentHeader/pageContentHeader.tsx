@@ -10,6 +10,7 @@ export interface PageContentHeaderProps {
 	title?: ReactNode;
 	backButton?: {
 		href: string;
+		goBackIfPossible?: boolean;
 	};
 	right?: ReactNode;
 }
@@ -23,7 +24,7 @@ export const PageContentHeader = observer(({ title, backButton, right }: PageCon
 				{backButton && (
 					<ActionButton
 						className={css.backButton}
-						onClick={() => navigate(backButton.href)}
+						onClick={() => navigate(backButton.href, { goBackIfPossible: backButton?.goBackIfPossible })}
 						icon={<ArrowLeftSvg />}
 					/>
 				)}

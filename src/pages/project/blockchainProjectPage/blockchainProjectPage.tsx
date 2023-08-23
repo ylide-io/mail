@@ -60,6 +60,7 @@ const OfficialContent = observer(({ project, setTabsAsideContent }: OfficialCont
 	const accounts = getAllowedAccountForProject(project);
 
 	const postsQuery = useInfiniteQuery<DecodedBlockchainFeedPost[]>(['project', projectId, 'posts', 'official'], {
+		cacheTime: 15 * 60 * 1000,
 		queryFn: async ({ pageParam = 0 }) => {
 			analytics.blockchainFeedView(project.id);
 
@@ -83,28 +84,29 @@ const OfficialContent = observer(({ project, setTabsAsideContent }: OfficialCont
 	};
 
 	useQuery(['project', projectId, 'new-posts', 'official'], {
+		enabled: !postsQuery.isLoading,
 		queryFn: async () => {
-			if (!postsQuery.isLoading) {
-				const posts = await BlockchainFeedApi.getPosts({
-					feedId,
-					beforeTimestamp: 0,
-					adminMode: isAdminMode,
-				});
-				const hasNewPosts = !!(posts.length && messages.length && posts[0].id !== messages[0].original.id);
-				if (hasNewPosts) {
-					return setTabsAsideContent(
-						<ActionButton
-							className={css.newPostsButton}
-							look={ActionButtonLook.SECONDARY}
-							onClick={() => reloadFeed()}
-						>
-							Load new posts
-						</ActionButton>,
-					);
-				}
-			}
+			const posts = await BlockchainFeedApi.getPosts({
+				feedId,
+				beforeTimestamp: 0,
+				adminMode: isAdminMode,
+			});
 
-			setTabsAsideContent(undefined);
+			const hasNewPosts = !!(posts.length && messages.length && posts[0].id !== messages[0].original.id);
+
+			if (hasNewPosts) {
+				return setTabsAsideContent(
+					<ActionButton
+						className={css.newPostsButton}
+						look={ActionButtonLook.SECONDARY}
+						onClick={() => reloadFeed()}
+					>
+						Load new posts
+					</ActionButton>,
+				);
+			} else {
+				setTabsAsideContent(undefined);
+			}
 		},
 		refetchInterval: 15 * 1000,
 	});
@@ -186,6 +188,7 @@ const DiscussionContent = observer(({ project, setTabsAsideContent }: Discussion
 	const accounts = getAllowedAccountForProject(project);
 
 	const postsQuery = useInfiniteQuery<DecodedBlockchainFeedPost[]>(['project', projectId, 'posts', 'discussion'], {
+		cacheTime: 15 * 60 * 1000,
 		queryFn: async ({ pageParam = 0 }) => {
 			analytics.blockchainFeedView(project.id);
 
@@ -209,28 +212,29 @@ const DiscussionContent = observer(({ project, setTabsAsideContent }: Discussion
 	};
 
 	useQuery(['project', projectId, 'new-posts', 'discussion'], {
+		enabled: !postsQuery.isLoading,
 		queryFn: async () => {
-			if (!postsQuery.isLoading) {
-				const posts = await BlockchainFeedApi.getPosts({
-					feedId,
-					beforeTimestamp: 0,
-					adminMode: isAdminMode,
-				});
-				const hasNewPosts = !!(posts.length && messages.length && posts[0].id !== messages[0].original.id);
-				if (hasNewPosts) {
-					return setTabsAsideContent(
-						<ActionButton
-							className={css.newPostsButton}
-							look={ActionButtonLook.SECONDARY}
-							onClick={() => reloadFeed()}
-						>
-							Load new posts
-						</ActionButton>,
-					);
-				}
-			}
+			const posts = await BlockchainFeedApi.getPosts({
+				feedId,
+				beforeTimestamp: 0,
+				adminMode: isAdminMode,
+			});
 
-			setTabsAsideContent(undefined);
+			const hasNewPosts = !!(posts.length && messages.length && posts[0].id !== messages[0].original.id);
+
+			if (hasNewPosts) {
+				return setTabsAsideContent(
+					<ActionButton
+						className={css.newPostsButton}
+						look={ActionButtonLook.SECONDARY}
+						onClick={() => reloadFeed()}
+					>
+						Load new posts
+					</ActionButton>,
+				);
+			} else {
+				setTabsAsideContent(undefined);
+			}
 		},
 		refetchInterval: 15 * 1000,
 	});

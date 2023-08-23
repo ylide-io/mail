@@ -160,7 +160,7 @@ export const MailDetailsPage = observer(() => {
 	//
 
 	const onBackClick = () => {
-		navigate(generatePath(RoutePath.MAIL_FOLDER, { folderId: folderId! }));
+		navigate(generatePath(RoutePath.MAIL_FOLDER, { folderId: folderId! }), { goBackIfPossible: true });
 	};
 
 	const onReplyClick = (senderAddress: string, subject: string | null) => {
