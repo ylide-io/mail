@@ -1,8 +1,8 @@
 export const calcComissions = (blockchain: string, comissions: Record<string, string>[]): string => {
-	const filteredComissions = comissions.map(c => c[blockchain] || '0');
-	const comission = filteredComissions.reduce((acc, curr) => {
-		return acc + Number(curr);
-	});
+	if (!comissions.length) return '0';
+
+	const blockchainComissions = comissions.map(c => +c[blockchain] || 0);
+	const comission = blockchainComissions.reduce((acc, curr) => acc + curr);
 	return String(comission);
 };
 
