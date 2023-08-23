@@ -21,7 +21,7 @@ import { DomainAccount } from '../../../../stores/models/DomainAccount';
 import { OutgoingMailData, OutgoingMailDataMode } from '../../../../stores/outgoingMailData';
 import { HorizontalAlignment } from '../../../../utils/alignment';
 import { evmNameToNetwork } from '../../../../utils/blockchain';
-import { calcComissions } from '../../../../utils/calcComissions';
+import { calcCommission } from '../../../../utils/commission';
 import { openFilePicker, readFileAsDataURL } from '../../../../utils/file';
 import { hashToIpfsUrl, ipfsToHttpUrl } from '../../../../utils/ipfs';
 import { escapeRegex } from '../../../../utils/regex';
@@ -118,14 +118,14 @@ export const CreatePostForm = observer(
 
 			useEffect(() => {
 				let cancelled = false;
-				BlockchainFeedApi.getComissions({ feedId: mailData.feedId })
-					.then(comissions => {
+				BlockchainFeedApi.getCommissions({ feedId: mailData.feedId })
+					.then(commissions => {
 						if (cancelled || !mailData.from || !mailData.network) {
 							return;
 						}
 						const blockchain = domain.getBlockchainName(mailData.network);
-						const comission = calcComissions(blockchain, comissions);
-						mailData.extraPayment = comission || '0';
+						const commission = calcCommission(blockchain, commissions);
+						mailData.extraPayment = commission || '0';
 					})
 					.catch(err => {
 						console.error(err);

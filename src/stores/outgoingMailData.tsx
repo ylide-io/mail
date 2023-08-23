@@ -16,7 +16,7 @@ import { AppMode, REACT_APP__APP_MODE } from '../env';
 import { connectAccount } from '../utils/account';
 import { invariant } from '../utils/assert';
 import { blockchainMeta } from '../utils/blockchain';
-import { calcComissionDecimals, calcComissions } from '../utils/calcComissions';
+import { calcComissionDecimals, calcCommission } from '../utils/commission';
 import { broadcastMessage, editorJsToYMF, isEmptyEditorJsData, sendMessage } from '../utils/mail';
 import { truncateInMiddle } from '../utils/string';
 import { getEvmWalletNetwork } from '../utils/wallet';
@@ -245,9 +245,9 @@ export class OutgoingMailData {
 					? 'everscale'
 					: 'venom-testnet';
 				if (this.isGenericFeed) {
-					const comissions = await BlockchainFeedApi.getComissions({ feedId: this.feedId });
-					const comission = calcComissions(blockchain, comissions);
-					invariant(comission === this.extraPayment, 'Comissions mismatch');
+					const commissions = await BlockchainFeedApi.getCommissions({ feedId: this.feedId });
+					const commission = calcCommission(blockchain, commissions);
+					invariant(commission === this.extraPayment, 'Commissions mismatch');
 				}
 				const result = await broadcastMessage({
 					sender: this.from,

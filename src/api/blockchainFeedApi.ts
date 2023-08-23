@@ -229,7 +229,7 @@ export namespace BlockchainFeedApi {
 		});
 	}
 
-	export async function getComissions(params: { feedId: string }): Promise<Record<string, string>[]> {
+	export async function getCommissions(params: { feedId: string }): Promise<Record<string, string>[]> {
 		const data = await request<Record<string, number>[]>(`/feeds/${params.feedId}/comissions`, {
 			params: {
 				method: 'GET',

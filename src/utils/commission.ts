@@ -1,7 +1,7 @@
-export const calcComissions = (blockchain: string, comissions: Record<string, string>[]): string => {
-	if (!comissions.length) return '0';
+export const calcCommission = (blockchain: string, commissions: Record<string, string>[]): string => {
+	if (!commissions.length) return '0';
 
-	const blockchainComissions = comissions.map(c => +c[blockchain] || 0);
+	const blockchainComissions = commissions.map(c => +c[blockchain] || 0);
 	const comission = blockchainComissions.reduce((acc, curr) => acc + curr);
 	return String(comission);
 };
