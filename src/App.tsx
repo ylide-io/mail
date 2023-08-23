@@ -106,6 +106,7 @@ export const App = observer(() => {
 			defaultOptions: {
 				queries: {
 					cacheTime: 0,
+					staleTime: Infinity,
 					retry: false,
 					refetchOnWindowFocus: false,
 				},
