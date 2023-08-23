@@ -687,6 +687,7 @@ export class Domain {
 		};
 		await ensurePageLoaded;
 		tick('ensurePageLoaded');
+		console.log('window.__hasEverscaleProvider: ', window.__hasEverscaleProvider);
 		await this.reloadAvailableWallets();
 		tick('this.reloadAvailableWallets();');
 		await this.initWalletConnect();
