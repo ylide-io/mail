@@ -21,16 +21,23 @@ import { HorizontalAlignment } from '../../../utils/alignment';
 import { invariant } from '../../../utils/assert';
 import { ipfsToHttpUrl } from '../../../utils/ipfs';
 import { toAbsoluteUrl } from '../../../utils/url';
+import { DiscussionPost, generateDiscussionPostPath } from '../_common/discussionPost/discussionPost';
 import { generateOfficialPostPath, OfficialPostView } from '../_common/officialPost/officialPost';
 import css from './blockchainProjectPostPage.module.scss';
 
-export const BlockchainProjectPostPage = observer(() => {
+export interface BlockchainProjectPostPageProps {
+	isOfficial: boolean;
+}
+
+export const BlockchainProjectPostPage = observer(({ isOfficial }: BlockchainProjectPostPageProps) => {
 	const { projectId, postId } = useParams<{ projectId: BlockchainProjectId; postId: string }>();
 	invariant(projectId);
 	invariant(postId);
 
 	const project = getBlockchainProjectById(projectId);
-	const postPath = generateOfficialPostPath(projectId, postId);
+	const postPath = isOfficial
+		? generateOfficialPostPath(projectId, postId)
+		: generateDiscussionPostPath(projectId, postId);
 
 	const { isLoading, data } = useQuery(['feed', 'blockchain-project', 'post', postId], {
 		queryFn: async () => {
@@ -49,7 +56,12 @@ export const BlockchainProjectPostPage = observer(() => {
 		<GenericLayout>
 			<RegularPageContent>
 				<PageContentHeader
-					backButton={{ href: generatePath(RoutePath.PROJECT_ID, { projectId }) }}
+					backButton={{
+						href: isOfficial
+							? generatePath(RoutePath.PROJECT_ID_OFFICIAL, { projectId })
+							: generatePath(RoutePath.PROJECT_ID_DISCUSSION, { projectId }),
+						goBackIfPossible: true,
+					}}
 					title={project.name}
 					right={
 						data && (
@@ -89,7 +101,11 @@ export const BlockchainProjectPostPage = observer(() => {
 							image={attachmentHttpUrl}
 						/>
 
-						<OfficialPostView project={project} post={data} />
+						{isOfficial ? (
+							<OfficialPostView project={project} post={data} />
+						) : (
+							<DiscussionPost project={project} post={data} />
+						)}
 					</>
 				) : isLoading ? (
 					<YlideLoader className={css.loader} reason="Loading post ..." />
