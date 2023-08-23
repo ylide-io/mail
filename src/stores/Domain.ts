@@ -43,6 +43,7 @@ import { DomainAccount } from './models/DomainAccount';
 import { Wallet } from './models/Wallet';
 import { OTCStore } from './OTC';
 import tags from './Tags';
+import { ensurePageLoaded } from '../utils/ensurePageLoaded';
 
 // Ylide.verbose();
 
@@ -682,6 +683,8 @@ export class Domain {
 			console.debug(t, now - last + 'ms');
 			last = now;
 		};
+		await ensurePageLoaded;
+		tick('ensurePageLoaded');
 		await this.reloadAvailableWallets();
 		tick('this.reloadAvailableWallets();');
 		await this.initWalletConnect();
