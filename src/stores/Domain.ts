@@ -34,6 +34,7 @@ import { SwitchModal, SwitchModalMode } from '../components/switchModal/switchMo
 import { toast } from '../components/toast/toast';
 import { AppMode, REACT_APP__APP_MODE } from '../env';
 import { blockchainMeta } from '../utils/blockchain';
+import { ensurePageLoaded } from '../utils/ensurePageLoaded';
 import { walletsMeta } from '../utils/wallet';
 import { Accounts } from './Accounts';
 import contacts from './Contacts';
@@ -42,7 +43,6 @@ import { DomainAccount } from './models/DomainAccount';
 import { Wallet } from './models/Wallet';
 import { OTCStore } from './OTC';
 import tags from './Tags';
-import { ensurePageLoaded } from '../utils/ensurePageLoaded';
 
 // Ylide.verbose();
 
