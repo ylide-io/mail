@@ -221,6 +221,7 @@ workflows:
                               - hub-release
                               - otc-release
                               - mainview-release
+                              - mainview-staging
                               - dev
             - build_hub:
                   requires:
