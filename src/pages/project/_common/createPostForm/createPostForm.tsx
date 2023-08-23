@@ -66,7 +66,6 @@ export const CreatePostForm = observer(
 
 				mailData.mode = OutgoingMailDataMode.BROADCAST;
 				mailData.isGenericFeed = true;
-				mailData.extraPayment = '0';
 
 				return mailData;
 			}, []);
