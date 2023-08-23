@@ -1,6 +1,6 @@
 export type MainviewKeyPayload = {
 	signature: string;
-	timestamp: number;
+	messageTimestamp: number;
 	invite: string;
 	address: string;
 	publicKeyHex?: string;

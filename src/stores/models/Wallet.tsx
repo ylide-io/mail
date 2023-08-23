@@ -158,13 +158,13 @@ export class Wallet extends EventEmitter {
 	}
 
 	async constructMainViewKey(account: WalletAccount, invite: string): Promise<MainviewKeyPayload> {
-		const timestamp = Math.floor(Date.now() / 1000);
-		const message = `Ylide authorization, ${account.address.toLowerCase()}, timestamp: ${timestamp}`;
+		const messageTimestamp = Math.floor(Date.now() / 1000);
+		const message = `Ylide authorization, ${account.address.toLowerCase()}, timestamp: ${messageTimestamp}`;
 		if (this.controller instanceof EVMWalletController) {
 			const sig = await this.controller.signString(account, message);
 			return {
 				signature: sig.r + sig.s.substring(2) + sig.v.toString(16),
-				timestamp,
+				messageTimestamp,
 				address: account.address,
 				invite,
 			};
@@ -174,7 +174,7 @@ export class Wallet extends EventEmitter {
 			return {
 				address: account.address,
 				signature: signature,
-				timestamp,
+				messageTimestamp,
 				invite,
 				publicKeyHex: (account as TVMWalletAccount).$$meta.publicKeyHex,
 				signatureDataHash: dataHash,

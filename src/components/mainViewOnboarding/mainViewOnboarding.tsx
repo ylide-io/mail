@@ -74,9 +74,7 @@ export const MainViewOnboarding = observer(() => {
 
 					setStep(Step.BUILDING_FEED);
 
-					if (!payload.tvmType) {
-						await FeedManagerApi.init(token);
-					}
+					await FeedManagerApi.init(token, payload.tvmType);
 
 					// Update keys after Feed Manager initialized
 					account.mainViewKey = token;
