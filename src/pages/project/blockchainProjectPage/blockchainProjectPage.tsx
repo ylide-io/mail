@@ -44,6 +44,13 @@ function getAllowedAccountForProject(project: BlockchainProject) {
 		: domain.accounts.activeAccounts;
 }
 
+function isCustomAttachmentsAllowed(project: BlockchainProject) {
+	return (
+		project.attachmentMode === BlockchainProjectAttachmentMode.EVERYONE ||
+		(browserStorage.isUserAdmin && project.attachmentMode === BlockchainProjectAttachmentMode.ADMINS)
+	);
+}
+
 //
 
 interface OfficialContentProps {
@@ -125,11 +132,7 @@ const OfficialContent = observer(({ project, setTabsAsideContent }: OfficialCont
 				<CreatePostForm
 					accounts={accounts}
 					feedId={feedId}
-					allowCustomAttachments={
-						project.attachmentMode === BlockchainProjectAttachmentMode.EVERYONE ||
-						(browserStorage.isUserAdmin &&
-							project.attachmentMode === BlockchainProjectAttachmentMode.ADMINS)
-					}
+					allowCustomAttachments={isCustomAttachmentsAllowed(project)}
 					placeholder="Make a new post"
 					fixedChain={project.fixedChain}
 					onCreated={() => toast('Good job! Your post will appear shortly 🔥')}
@@ -256,11 +259,7 @@ const DiscussionContent = observer(({ project, setTabsAsideContent }: Discussion
 					ref={createPostFormRef}
 					accounts={accounts}
 					feedId={feedId}
-					allowCustomAttachments={
-						projectId === BlockchainProjectId.ETH_WHALES ||
-						projectId === BlockchainProjectId.TVM ||
-						browserStorage.isUserAdmin
-					}
+					allowCustomAttachments={isCustomAttachmentsAllowed(project)}
 					placeholder="What’s on your mind?"
 					fixedChain={project.fixedChain}
 					onCreated={() => toast('Good job! Your post will appear shortly 🔥')}
