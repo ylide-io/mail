@@ -49,10 +49,6 @@ export const useNav = () => {
 	const navigate = useNavigate();
 
 	return (value: string | UseNavParameters, options?: NavigateOptions) => {
-		if (!options?.preventScrollReset) {
-			window.scrollTo(0, 0);
-		}
-
 		navigate(buildUrl(value), options);
 	};
 };
