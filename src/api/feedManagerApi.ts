@@ -1,4 +1,5 @@
 import { REACT_APP__FEED_MANAGER } from '../env';
+import { MainviewKeyPayload } from '../types';
 import { createCleanSerachParams } from '../utils/url';
 import { FeedReason } from './feedServerApi';
 
@@ -86,20 +87,18 @@ export namespace FeedManagerApi {
 		token: string;
 	}
 
-	export async function authAddress(address: string, signature: string, messageTimestamp: number, invite?: string) {
+	export async function authAddress(payload: MainviewKeyPayload) {
 		return await request<AuthAddressResponse>(`/auth-address`, undefined, {
-			address,
-			signature,
-			messageTimestamp,
-			invite: invite || '',
+			...payload,
 		});
 	}
 
 	//
 
-	export async function init(token: string) {
+	export async function init(token: string, tvm?: string) {
 		return await request(`/init`, {
 			token,
+			tvm,
 		});
 	}
 

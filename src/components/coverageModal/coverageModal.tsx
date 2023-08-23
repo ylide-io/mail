@@ -26,8 +26,9 @@ export const CoverageModal = observer(({ onClose, account }: Props) => {
 		const unique: FeedManagerApi.CoverageItem[] = [];
 		const seenValues = new Set();
 		for (const item of items) {
-			if (!seenValues.has(item.projectName)) {
-				seenValues.add(item.projectName);
+			const feature = item.projectName || item.symbol || item.tokenId;
+			if (!seenValues.has(feature)) {
+				seenValues.add(feature);
 				unique.push(item);
 			}
 		}

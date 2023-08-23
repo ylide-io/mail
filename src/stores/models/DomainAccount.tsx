@@ -143,8 +143,8 @@ export class DomainAccount {
 		);
 	}
 
-	async makeMainViewKey() {
-		return await this.wallet.constructMainViewKey(this.account);
+	async makeMainViewKey(invite = '') {
+		return await this.wallet.constructMainViewKey(this.account, invite);
 	}
 
 	get mainViewKey() {
