@@ -78,8 +78,8 @@ class NotificationsAlert {
 				return {
 					enabledForCurrentAccounts: false,
 					alertNeeded: true,
-					// Display once again, if was displayed already
-					alertCounter: item === 'true' ? NOTIFICATIONS_ALERT_COUNT - 1 : 0,
+					// Display only once
+					alertCounter: NOTIFICATIONS_ALERT_COUNT - 1,
 				} as NotificationsAlertData;
 			}
 
