@@ -28,8 +28,8 @@ class Analytics {
 		track('open_social', { type });
 	}
 
-	openCreateCommunityForm() {
-		track('open_create_communify_form');
+	openCreateCommunityForm(place: string) {
+		track('open_create_community_form', { place });
 	}
 
 	// ACCOUNT

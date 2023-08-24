@@ -377,7 +377,7 @@ export const SidebarMenu = observer(() => {
 				<ActionButton
 					size={ActionButtonSize.MEDIUM}
 					look={ActionButtonLook.PRIMARY}
-					onClick={() => openCreateCommunityForm()}
+					onClick={() => openCreateCommunityForm('sidebar_bottom')}
 				>
 					Create Community
 				</ActionButton>

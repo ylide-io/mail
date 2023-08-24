@@ -72,7 +72,7 @@ export function ExplorePage() {
 						<ActionButton
 							size={ActionButtonSize.LARGE}
 							look={ActionButtonLook.HEAVY}
-							onClick={() => openCreateCommunityForm()}
+							onClick={() => openCreateCommunityForm('explore_bottom')}
 						>
 							Create your own community
 						</ActionButton>
