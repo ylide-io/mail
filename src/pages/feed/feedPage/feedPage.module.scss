@@ -24,16 +24,3 @@
 	justify-content: end;
 	gap: 8px;
 }
-
-.content {
-	overflow-y: scroll;
-	height: calc(100vh - 258px);
-
-	@include less920px {
-		height: calc(100vh - 164px);
-	}
-
-	@include less720px {
-		height: calc(100vh - 144px);
-	}
-}

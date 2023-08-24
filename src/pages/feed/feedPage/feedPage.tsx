@@ -1,6 +1,6 @@
 import { observable } from 'mobx';
 import { observer } from 'mobx-react';
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { InView } from 'react-intersection-observer';
 import { generatePath, useParams } from 'react-router-dom';
 
@@ -9,12 +9,10 @@ import { ActionButton, ActionButtonLook, ActionButtonSize } from '../../../compo
 import { CoverageModal } from '../../../components/coverageModal/coverageModal';
 import { ErrorMessage, ErrorMessageLook } from '../../../components/errorMessage/errorMessage';
 import { NarrowContent } from '../../../components/genericLayout/content/narrowContent/narrowContent';
-import { GenericLayout } from '../../../components/genericLayout/genericLayout';
-import { SimpleLoader } from '../../../components/simpleLoader/simpleLoader';
+import { GenericLayout, useGenericLayoutApi } from '../../../components/genericLayout/genericLayout';
 import { AppMode, REACT_APP__APP_MODE } from '../../../env';
 import { ReactComponent as ArrowUpSvg } from '../../../icons/ic20/arrowUp.svg';
 import { ReactComponent as CrossSvg } from '../../../icons/ic20/cross.svg';
-import { analytics } from '../../../stores/Analytics';
 import domain from '../../../stores/Domain';
 import { FeedStore } from '../../../stores/Feed';
 import { feedSettings } from '../../../stores/FeedSettings';
@@ -26,6 +24,8 @@ import { useNav } from '../../../utils/url';
 import { FeedPostItem } from '../_common/feedPostItem/feedPostItem';
 import css from './feedPage.module.scss';
 import ErrorCode = FeedServerApi.ErrorCode;
+import { SimpleLoader } from '../../../components/simpleLoader/simpleLoader';
+import { analytics } from '../../../stores/Analytics';
 
 const reloadFeedCounter = observable.box(0);
 
@@ -36,9 +36,9 @@ export function reloadFeed() {
 //
 
 const FeedPageContent = observer(() => {
-	const ref = useRef<any>(null);
 	const navigate = useNav();
 	const accounts = domain.accounts.activeAccounts;
+	const genericLayoutApi = useGenericLayoutApi();
 	const tags = feedSettings.tags;
 
 	const [showCoverageModal, setShowCoverageModal] = useState(false);
@@ -71,10 +71,6 @@ const FeedPageContent = observer(() => {
 
 	const reloadCounter = reloadFeedCounter.get();
 
-	const scrollToTop = useCallback(() => {
-		ref?.current?.scrollTo({ top: 0, behavior: 'smooth' });
-	}, [ref]);
-
 	const feed = useMemo(() => {
 		hookDependency(reloadCounter);
 
@@ -85,14 +81,14 @@ const FeedPageContent = observer(() => {
 			addressTokens: selectedAccounts.map(a => a.mainViewKey),
 		});
 
-		scrollToTop();
+		genericLayoutApi.scrollToTop();
 
 		if (canLoadFeed) {
 			feed.load();
 		}
 
 		return feed;
-	}, [canLoadFeed, tags, tag, scrollToTop, selectedAccounts, source, reloadCounter]);
+	}, [canLoadFeed, tags, tag, genericLayoutApi, selectedAccounts, source, reloadCounter]);
 
 	useEffect(() => {
 		return () => {
@@ -119,7 +115,6 @@ const FeedPageContent = observer(() => {
 
 	return (
 		<NarrowContent
-			ref={ref}
 			title={title}
 			titleSubItem={
 				!!source && (
@@ -132,14 +127,10 @@ const FeedPageContent = observer(() => {
 					</ActionButton>
 				)
 			}
-			contentClassName={css.content}
 			titleRight={
 				<div className={css.buttons}>
 					{!!feed.newPosts && (
-						<ActionButton
-							look={ActionButtonLook.SECONDARY}
-							onClick={() => feed.loadNew().then(scrollToTop)}
-						>
+						<ActionButton look={ActionButtonLook.SECONDARY} onClick={() => feed.loadNew()}>
 							Show {feed.newPosts} new posts
 						</ActionButton>
 					)}
@@ -170,7 +161,7 @@ const FeedPageContent = observer(() => {
 					size={ActionButtonSize.XLARGE}
 					look={ActionButtonLook.SECONDARY}
 					icon={<ArrowUpSvg />}
-					onClick={scrollToTop}
+					onClick={() => genericLayoutApi.scrollToTop()}
 				/>
 			)}
 
