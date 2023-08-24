@@ -366,19 +366,21 @@ export const SidebarMenu = observer(() => {
 					])}
 				</SidebarSection>
 
-				<SidebarSection
-					title="Newly Added"
-					button={{
-						text: 'Create',
-						onClick: () => openCreateCommunityForm(),
-					}}
-				>
+				<SidebarSection title="Newly Added">
 					{renderProjects([
 						BlockchainProjectId.DITTO_NETWORK,
 						BlockchainProjectId.HANMADI,
 						BlockchainProjectId.VENOMART,
 					])}
 				</SidebarSection>
+
+				<ActionButton
+					size={ActionButtonSize.MEDIUM}
+					look={ActionButtonLook.PRIMARY}
+					onClick={() => openCreateCommunityForm()}
+				>
+					Create Community
+				</ActionButton>
 			</SidebarBlock>
 		);
 	}
