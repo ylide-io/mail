@@ -44,7 +44,7 @@ export function ExplorePage() {
 
 			<RegularPageContent>
 				<div className={css.root}>
-					<div className={css.banner}>
+					<div className={css.banner} onClick={() => openCreateCommunityForm('explore_banner')}>
 						<img src={bannerSrc} alt="Banner" />
 					</div>
 
