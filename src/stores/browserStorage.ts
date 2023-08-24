@@ -1,4 +1,3 @@
-import { WalletAccount } from '@ylide/sdk';
 import { makeAutoObservable } from 'mobx';
 
 import { WidgetId } from '../pages/widgets/widgets';
@@ -12,12 +11,6 @@ export enum BrowserStorageKey {
 	LAST_MAILBOX_INCOMING_DATE = 'ylide_lastMailboxCheckDate',
 	SAVED_ACCOUNTS = 'ylide_savedAccounts',
 	NOTIFICATIONS_ALERT = 'ylide_notificationsAlert',
-}
-
-export interface SavedAccount {
-	name: string;
-	account: WalletAccount;
-	wallet: string;
 }
 
 export class BrowserStorage {
@@ -44,38 +37,6 @@ export class BrowserStorage {
 		} else {
 			storage.removeItem(key);
 		}
-	}
-
-	//
-
-	private _savedAccounts =
-		BrowserStorage.getItemWithTransform<SavedAccount[]>(BrowserStorageKey.SAVED_ACCOUNTS, val => {
-			const parsed = JSON.parse(val);
-			if (!Array.isArray(parsed)) {
-				return [];
-			} else {
-				return parsed.map((acc: any) => ({
-					...acc,
-					account: WalletAccount.fromBase64(acc.account),
-				}));
-			}
-		}) || [];
-
-	get savedAccounts() {
-		return this._savedAccounts;
-	}
-
-	set savedAccounts(value: SavedAccount[]) {
-		BrowserStorage.setItem(
-			BrowserStorageKey.SAVED_ACCOUNTS,
-			JSON.stringify(
-				value.map(v => ({
-					...v,
-					account: v.account.toBase64(),
-				})),
-			),
-		);
-		this._savedAccounts = value;
 	}
 
 	//
