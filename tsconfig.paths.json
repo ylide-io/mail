@@ -1,0 +1,10 @@
+{
+	"compilerOptions": {
+		"baseUrl": ".",
+		"paths": {
+			"@adraffy/ens-normalize": [
+				"node_modules/.pnpm/@adraffy+ens-normalize@1.9.0/node_modules/@adraffy/ens-normalize/dist/index.js"
+			]
+		}
+	}
+}

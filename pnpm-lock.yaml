@@ -190,6 +190,9 @@ devDependencies:
   process:
     specifier: 0.11.10
     version: 0.11.10
+  react-app-alias:
+    specifier: 2.2.2
+    version: 2.2.2
   react-app-rewired:
     specifier: 2.2.1
     version: 2.2.1(react-scripts@5.0.1)
@@ -11074,6 +11077,10 @@ packages:
       http-errors: 2.0.0
       iconv-lite: 0.4.24
       unpipe: 1.0.0
+    dev: true
+
+  /react-app-alias@2.2.2:
+    resolution: {integrity: sha512-mkebUkGLEBA8A8jripu5h1e3cccGl8wWHCUmyJo43/KhaN91DO3qyCLWGWneogqkG4PWhp2JHtlCJ06YSdHVYQ==}
     dev: true
 
   /react-app-polyfill@3.0.0:

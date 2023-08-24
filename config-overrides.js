@@ -1,7 +1,9 @@
 const webpack = require('webpack');
 const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
+const { aliasWebpack } = require('react-app-alias');
 
-module.exports = function override(config) {
+module.exports = function override(rawConfig) {
+	const config = aliasWebpack({})(rawConfig);
 	const fallback = config.resolve.fallback || {};
 	Object.assign(fallback, {
 		crypto: require.resolve('crypto-browserify'),
