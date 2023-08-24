@@ -2,15 +2,19 @@ import { makeAutoObservable } from 'mobx';
 
 import { WidgetId } from '../pages/widgets/widgets';
 
+// noinspection JSUnusedGlobalSymbols
 export enum BrowserStorageKey {
 	ADMIN_PASSWORD = 'ylide_adminPassword',
-	IS_MAIN_VIEW_BANNER_HIDDEN = 'ylide_isMainViewBannerHidden',
 	SAVE_DECODED_MESSAGES = 'ylide_saveDecodedMessages',
 	WIDGET_ID = 'ylide_widgetId',
 	MAIN_VIEW_KEYS = 'ylide_mainViewKeys',
 	LAST_MAILBOX_INCOMING_DATE = 'ylide_lastMailboxCheckDate',
 	SAVED_ACCOUNTS = 'ylide_savedAccounts',
 	NOTIFICATIONS_ALERT = 'ylide_notificationsAlert',
+
+	// LEGACY
+
+	IS_MAIN_VIEW_BANNER_HIDDEN = 'ylide_isMainViewBannerHidden',
 }
 
 export class BrowserStorage {
@@ -54,19 +58,6 @@ export class BrowserStorage {
 
 	get isUserAdmin() {
 		return !!this.adminPassword;
-	}
-
-	//
-
-	private _isMainViewBannerHidden = BrowserStorage.getItem(BrowserStorageKey.IS_MAIN_VIEW_BANNER_HIDDEN) === 'true';
-
-	get isMainViewBannerHidden() {
-		return this._isMainViewBannerHidden;
-	}
-
-	set isMainViewBannerHidden(value: boolean) {
-		BrowserStorage.setItem(BrowserStorageKey.IS_MAIN_VIEW_BANNER_HIDDEN, value.toString());
-		this._isMainViewBannerHidden = value;
 	}
 
 	//

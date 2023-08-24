@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 import { QueryClient, QueryClientProvider } from 'react-query';
 import { generatePath, Navigate, Route, Routes, useLocation, useSearchParams } from 'react-router-dom';
 
-import { ActionButton, ActionButtonLook, ActionButtonSize } from './components/ActionButton/ActionButton';
+import { ActionButton, ActionButtonSize } from './components/ActionButton/ActionButton';
 import { MainViewOnboarding } from './components/mainViewOnboarding/mainViewOnboarding';
 import { PageMeta } from './components/pageMeta/pageMeta';
 import { PopupManager } from './components/popup/popupManager/popupManager';
@@ -12,7 +12,6 @@ import { ToastManager } from './components/toast/toast';
 import { TransactionPopup } from './components/TransactionPopup/TransactionPopup';
 import { YlideLoader } from './components/ylideLoader/ylideLoader';
 import { AppMode, REACT_APP__APP_MODE } from './env';
-import { ReactComponent as CrossSvg } from './icons/ic20/cross.svg';
 import { AdminFeedPage } from './pages/AdminFeedPage';
 import { AdminPage } from './pages/AdminPage';
 import { ExplorePage } from './pages/explore/explorePage';
@@ -206,41 +205,6 @@ export const App = observer(() => {
 					}[REACT_APP__APP_MODE]
 				}
 			/>
-
-			{browserStorage.isMainViewBannerHidden || REACT_APP__APP_MODE === AppMode.MAIN_VIEW || (
-				<div
-					style={{
-						display: 'grid',
-						gridTemplateColumns: '1fr auto',
-						alignItems: 'center',
-						justifyItems: 'center',
-						gridGap: 8,
-						padding: 8,
-						color: '#fff',
-						fontSize: 14,
-						textAlign: 'center',
-						background: '#000',
-					}}
-				>
-					<div>
-						Introducing Mainview – your personalized crypto news hub! Stay ahead with dynamic news feeds
-						tailored to your token portfolio. Be the first – join the waitlist at{' '}
-						<a href="https://mainview.io" target="_blank" rel="noreferrer">
-							mainview.io
-						</a>
-						!
-					</div>
-
-					<ActionButton
-						style={{ color: '#fff' }}
-						look={ActionButtonLook.LITE}
-						icon={<CrossSvg />}
-						onClick={() => {
-							browserStorage.isMainViewBannerHidden = true;
-						}}
-					/>
-				</div>
-			)}
 
 			<QueryClientProvider client={queryClient}>
 				<PopupManager>
