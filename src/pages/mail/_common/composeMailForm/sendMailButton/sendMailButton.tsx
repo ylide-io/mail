@@ -10,6 +10,7 @@ import { Spinner } from '../../../../../components/spinner/spinner';
 import { toast } from '../../../../../components/toast/toast';
 import { ReactComponent as ArrowDownSvg } from '../../../../../icons/ic20/arrowDown.svg';
 import { ReactComponent as ReplySvg } from '../../../../../icons/ic20/reply.svg';
+import { browserStorage } from '../../../../../stores/browserStorage';
 import domain from '../../../../../stores/Domain';
 import { EvmBalances } from '../../../../../stores/evmBalances';
 import { OutgoingMailData } from '../../../../../stores/outgoingMailData';
@@ -58,6 +59,7 @@ export const SendMailButton = observer(
 			try {
 				if (await mailData.send()) {
 					toast('Your message has been sent successfully 🔥');
+					browserStorage.remindAboutNotifications();
 					onSent?.();
 				}
 			} catch (e) {

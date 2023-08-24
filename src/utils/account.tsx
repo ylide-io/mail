@@ -151,7 +151,7 @@ export async function connectAccount(params?: { place?: string }): Promise<Domai
 				/>
 			));
 
-			browserStorage.isNotificationAlertHappened = false;
+			browserStorage.newAccountConnected();
 
 			return domainAccount;
 		}

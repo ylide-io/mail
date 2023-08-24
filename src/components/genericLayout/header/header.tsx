@@ -59,7 +59,6 @@ const NavButton = ({ children, href }: NavButtonProps) => {
 
 const NotificationsButton = observer(() => {
 	const buttonRef = useRef(null);
-	const [isPopupOpen, setPopupOpen] = useState(false);
 
 	const { windowWidth } = useWindowSize();
 
@@ -77,17 +76,27 @@ const NotificationsButton = observer(() => {
 		const tgUrl = json.data;
 		invariant(tgUrl, 'No Telegram URL received');
 
+		browserStorage.notificationsEnabled();
+		setPopupOpen(false);
+
 		openInNewWidnow(tgUrl);
 	});
 
-	const notificationAlertHappened = browserStorage.isNotificationAlertHappened;
-	const [isAnimationNeeded, setAnimationNeeded] = useState(false);
+	const [animationNeeded, setAnimationNeeded] = useState(false);
+	const [popupOpen, setPopupOpen] = useState(false);
+
+	const notificationsAlert = browserStorage.notificationsAlert;
+
 	useEffect(() => {
-		if (!notificationAlertHappened) {
-			browserStorage.isNotificationAlertHappened = true;
-			setAnimationNeeded(true);
+		if (notificationsAlert.alertNeeded) {
+			// Reset if already animating
+			setAnimationNeeded(false);
+			setTimeout(() => setAnimationNeeded(true), 50);
+
+			setPopupOpen(true);
+			browserStorage.notificationReminderHappened();
 		}
-	}, [notificationAlertHappened]);
+	}, [notificationsAlert]);
 
 	return (
 		<>
@@ -97,14 +106,14 @@ const NotificationsButton = observer(() => {
 				look={ActionButtonLook.LITE}
 				icon={
 					<div>
-						<NotificationsSvg className={clsx(isAnimationNeeded && css.notificationIcon_animated)} />
+						<NotificationsSvg className={clsx(animationNeeded && css.notificationIcon_animated)} />
 					</div>
 				}
 				title="Notifications"
-				onClick={() => setPopupOpen(!isPopupOpen)}
+				onClick={() => setPopupOpen(!popupOpen)}
 			/>
 
-			{isPopupOpen && (
+			{popupOpen && (
 				<AnchoredPopup
 					className={css.notificationsPopup}
 					anchorRef={buttonRef}

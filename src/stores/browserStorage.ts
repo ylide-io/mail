@@ -20,6 +20,14 @@ export interface SavedAccount {
 	wallet: string;
 }
 
+export interface NotificationsAlertData {
+	enabledForCurrentAccounts?: boolean;
+	alertNeeded?: boolean;
+	alertCounter?: number;
+}
+
+const NOTIFICATIONS_ALERT_COUNT = 3;
+
 class BrowserStorage {
 	constructor() {
 		makeAutoObservable(this);
@@ -38,9 +46,9 @@ class BrowserStorage {
 		return item ? transform(item) : undefined;
 	}
 
-	private static setItem(key: BrowserStorageKey, value: any, storage: Storage = localStorage) {
+	private static setItem(key: BrowserStorageKey, value: string | null | undefined, storage: Storage = localStorage) {
 		if (value != null) {
-			storage.setItem(key, value.toString());
+			storage.setItem(key, value);
 		} else {
 			storage.removeItem(key);
 		}
@@ -104,7 +112,7 @@ class BrowserStorage {
 	}
 
 	set isMainViewBannerHidden(value: boolean) {
-		BrowserStorage.setItem(BrowserStorageKey.IS_MAIN_VIEW_BANNER_HIDDEN, value);
+		BrowserStorage.setItem(BrowserStorageKey.IS_MAIN_VIEW_BANNER_HIDDEN, value.toString());
 		this._isMainViewBannerHidden = value;
 	}
 
@@ -117,7 +125,7 @@ class BrowserStorage {
 	}
 
 	set saveDecodedMessages(value: boolean) {
-		BrowserStorage.setItem(BrowserStorageKey.SAVE_DECODED_MESSAGES, value);
+		BrowserStorage.setItem(BrowserStorageKey.SAVE_DECODED_MESSAGES, value.toString());
 		this._saveDecodedMessages = value;
 	}
 
@@ -167,15 +175,59 @@ class BrowserStorage {
 
 	//
 
-	private _isNotificationAlertHappened = BrowserStorage.getItem(BrowserStorageKey.NOTIFICATIONS_ALERT) === 'true';
+	private _notificationsAlert: NotificationsAlertData =
+		BrowserStorage.getItemWithTransform(BrowserStorageKey.NOTIFICATIONS_ALERT, item => {
+			// Migration
+			if (item === 'true' || item === 'false') {
+				return {
+					enabledForCurrentAccounts: false,
+					alertNeeded: true,
+					// Display once again, if was displayed already
+					alertCounter: item === 'true' ? NOTIFICATIONS_ALERT_COUNT - 1 : 0,
+				} as NotificationsAlertData;
+			}
 
-	get isNotificationAlertHappened() {
-		return this._isNotificationAlertHappened;
+			return JSON.parse(item);
+		}) || {};
+
+	get notificationsAlert() {
+		return this._notificationsAlert;
 	}
 
-	set isNotificationAlertHappened(value: boolean) {
-		BrowserStorage.setItem(BrowserStorageKey.NOTIFICATIONS_ALERT, value);
-		this._isNotificationAlertHappened = value;
+	patchNotificationsAlert(patch: NotificationsAlertData) {
+		const newValue = { ...this._notificationsAlert, ...patch };
+
+		BrowserStorage.setItem(BrowserStorageKey.NOTIFICATIONS_ALERT, JSON.stringify(newValue));
+		this._notificationsAlert = newValue;
+	}
+
+	newAccountConnected() {
+		this.patchNotificationsAlert({
+			enabledForCurrentAccounts: false,
+			alertNeeded: true,
+			alertCounter: 0,
+		});
+	}
+
+	remindAboutNotifications() {
+		if (!this._notificationsAlert.enabledForCurrentAccounts && (this._notificationsAlert.alertCounter || 0) < 3) {
+			this.patchNotificationsAlert({
+				alertNeeded: true,
+			});
+		}
+	}
+
+	notificationReminderHappened() {
+		this.patchNotificationsAlert({
+			alertNeeded: false,
+			alertCounter: (this._notificationsAlert.alertCounter || 0) + 1,
+		});
+	}
+
+	notificationsEnabled() {
+		this.patchNotificationsAlert({
+			enabledForCurrentAccounts: true,
+		});
 	}
 }
 
