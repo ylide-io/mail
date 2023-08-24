@@ -104,7 +104,7 @@ const FeedPageContent = observer(() => {
 			return feed.sourceId;
 		}
 		if (selectedAccounts.length === 1 && address) {
-			return `Smart feed for ${
+			return `Feed for ${
 				selectedAccounts[0].name
 					? selectedAccounts[0].name
 					: truncateInMiddle(selectedAccounts[0].account.address, 8, '..')
