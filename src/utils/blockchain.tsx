@@ -20,6 +20,7 @@ import { OptimismLogo } from '../icons/network/OptimismLogo';
 import { PolygonLogo } from '../icons/network/PolygonLogo';
 import { SolanaLogo } from '../icons/network/SolanaLogo';
 import { VenomLogo } from '../icons/network/VenomLogo';
+import { ZetaLogo } from '../icons/network/ZetaLogo';
 import domain from '../stores/Domain';
 
 export function isAddress(input: string): boolean {
@@ -61,6 +62,8 @@ export const BlockchainName = {
 	MOONRIVER: EVM_NAMES[EVMNetwork.MOONRIVER],
 	METIS: EVM_NAMES[EVMNetwork.METIS],
 	ASTAR: EVM_NAMES[EVMNetwork.ASTAR],
+	SHARDEUM: EVM_NAMES[EVMNetwork.SHARDEUM],
+	ZETA: EVM_NAMES[EVMNetwork.ZETA],
 };
 
 export interface IEthereumNetworkDescriptor {
@@ -100,7 +103,26 @@ export const blockchainMeta: Record<
 	},
 	[BlockchainName.NEAR]: {
 		title: 'Near',
-		logo: (s = 16) => <NearLogo size={30} />,
+		logo: (s = 16) => <NearLogo size={s} />,
+	},
+	[BlockchainName.SHARDEUM]: {
+		title: 'Shardeum',
+		logo: (s = 16) => <NearLogo size={s} />,
+	},
+	[BlockchainName.ZETA]: {
+		title: 'ZetaChain',
+		logo: (s = 16) => <ZetaLogo size={s} />,
+		ethNetwork: {
+			chainId: '0x1B59',
+			chainName: 'Zeta Chain',
+			nativeCurrency: {
+				name: 'aZETA',
+				symbol: 'aZETA',
+				decimals: 18,
+			},
+			rpcUrls: ['https://zetachain-athens-evm.blockpi.network/v1/rpc/public'],
+			blockExplorerUrls: ['https://zetachain-athens-3.blockscout.com'],
+		},
 	},
 	[BlockchainName.LOCAL_HARDHAT]: {
 		title: 'LocalNet',
