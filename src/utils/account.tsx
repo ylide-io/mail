@@ -2,6 +2,7 @@ import { EVMNetwork } from '@ylide/ethereum';
 
 import { ActionButton, ActionButtonLook, ActionButtonSize } from '../components/ActionButton/ActionButton';
 import { ActionModal } from '../components/actionModal/actionModal';
+import { notificationsAlert } from '../components/genericLayout/header/header';
 import { showLoadingModal } from '../components/loadingModal/loadingModal';
 import { NewPasswordModal } from '../components/newPasswordModal/newPasswordModal';
 import { SelectWalletModal } from '../components/selectWalletModal/selectWalletModal';
@@ -10,7 +11,6 @@ import { SwitchModal, SwitchModalMode } from '../components/switchModal/switchMo
 import { toast } from '../components/toast/toast';
 import { AppMode, REACT_APP__APP_MODE } from '../env';
 import { analytics } from '../stores/Analytics';
-import { browserStorage } from '../stores/browserStorage';
 import domain from '../stores/Domain';
 import { DomainAccount } from '../stores/models/DomainAccount';
 import { Wallet } from '../stores/models/Wallet';
@@ -151,7 +151,7 @@ export async function connectAccount(params?: { place?: string }): Promise<Domai
 				/>
 			));
 
-			browserStorage.newAccountConnected();
+			notificationsAlert.newAccountConnected();
 
 			return domainAccount;
 		}

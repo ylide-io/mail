@@ -3,7 +3,7 @@ import { makeAutoObservable } from 'mobx';
 
 import { WidgetId } from '../pages/widgets/widgets';
 
-enum BrowserStorageKey {
+export enum BrowserStorageKey {
 	ADMIN_PASSWORD = 'ylide_adminPassword',
 	IS_MAIN_VIEW_BANNER_HIDDEN = 'ylide_isMainViewBannerHidden',
 	SAVE_DECODED_MESSAGES = 'ylide_saveDecodedMessages',
@@ -20,24 +20,16 @@ export interface SavedAccount {
 	wallet: string;
 }
 
-export interface NotificationsAlertData {
-	enabledForCurrentAccounts?: boolean;
-	alertNeeded?: boolean;
-	alertCounter?: number;
-}
-
-const NOTIFICATIONS_ALERT_COUNT = 3;
-
-class BrowserStorage {
+export class BrowserStorage {
 	constructor() {
 		makeAutoObservable(this);
 	}
 
-	private static getItem<T = string>(key: BrowserStorageKey, storage: Storage = localStorage) {
+	static getItem<T = string>(key: BrowserStorageKey, storage: Storage = localStorage) {
 		return (storage.getItem(key) as T) || undefined;
 	}
 
-	private static getItemWithTransform<T>(
+	static getItemWithTransform<T>(
 		key: BrowserStorageKey,
 		transform: (item: string) => T,
 		storage: Storage = localStorage,
@@ -46,7 +38,7 @@ class BrowserStorage {
 		return item ? transform(item) : undefined;
 	}
 
-	private static setItem(key: BrowserStorageKey, value: string | null | undefined, storage: Storage = localStorage) {
+	static setItem(key: BrowserStorageKey, value: string | null | undefined, storage: Storage = localStorage) {
 		if (value != null) {
 			storage.setItem(key, value);
 		} else {
@@ -171,63 +163,6 @@ class BrowserStorage {
 	set lastMailboxCheckDate(value: Record<string, number>) {
 		BrowserStorage.setItem(BrowserStorageKey.LAST_MAILBOX_INCOMING_DATE, JSON.stringify(value));
 		this._lastMailboxCheckDate = value;
-	}
-
-	//
-
-	private _notificationsAlert: NotificationsAlertData =
-		BrowserStorage.getItemWithTransform(BrowserStorageKey.NOTIFICATIONS_ALERT, item => {
-			// Migration
-			if (item === 'true' || item === 'false') {
-				return {
-					enabledForCurrentAccounts: false,
-					alertNeeded: true,
-					// Display once again, if was displayed already
-					alertCounter: item === 'true' ? NOTIFICATIONS_ALERT_COUNT - 1 : 0,
-				} as NotificationsAlertData;
-			}
-
-			return JSON.parse(item);
-		}) || {};
-
-	get notificationsAlert() {
-		return this._notificationsAlert;
-	}
-
-	patchNotificationsAlert(patch: NotificationsAlertData) {
-		const newValue = { ...this._notificationsAlert, ...patch };
-
-		BrowserStorage.setItem(BrowserStorageKey.NOTIFICATIONS_ALERT, JSON.stringify(newValue));
-		this._notificationsAlert = newValue;
-	}
-
-	newAccountConnected() {
-		this.patchNotificationsAlert({
-			enabledForCurrentAccounts: false,
-			alertNeeded: true,
-			alertCounter: 0,
-		});
-	}
-
-	remindAboutNotifications() {
-		if (!this._notificationsAlert.enabledForCurrentAccounts && (this._notificationsAlert.alertCounter || 0) < 3) {
-			this.patchNotificationsAlert({
-				alertNeeded: true,
-			});
-		}
-	}
-
-	notificationReminderHappened() {
-		this.patchNotificationsAlert({
-			alertNeeded: false,
-			alertCounter: (this._notificationsAlert.alertCounter || 0) + 1,
-		});
-	}
-
-	notificationsEnabled() {
-		this.patchNotificationsAlert({
-			enabledForCurrentAccounts: true,
-		});
 	}
 }
 
