@@ -28,7 +28,7 @@ export const MiniProjectCard = observer(({ className, project }: MiniProjectCard
 				navigate(href);
 			}}
 		>
-			<ProjectAvatar className={css.logo} image={project.profileImage} blockie={project.name} />
+			<ProjectAvatar className={css.logo} project={project} />
 
 			<div className={css.name}>{project.name}</div>
 		</a>

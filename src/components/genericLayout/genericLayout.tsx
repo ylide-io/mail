@@ -1,6 +1,6 @@
 import clsx from 'clsx';
 import { observer } from 'mobx-react';
-import { createContext, PropsWithChildren, useContext, useEffect, useMemo } from 'react';
+import { createContext, PropsWithChildren, useContext, useEffect, useLayoutEffect, useMemo } from 'react';
 
 import { useBodyHiddenOverflow } from '../../utils/useBodyHiddenOverflow';
 import { Overlay } from '../overlay/overlay';
@@ -20,9 +20,17 @@ export const useGenericLayoutApi = () => useContext(GenericLayoutApiContext)!;
 
 //
 
-interface GenericLayoutProps extends PropsWithChildren<{}> {}
+interface GenericLayoutProps extends PropsWithChildren {
+	dontResetScrollOnMount?: undefined;
+}
 
-export const GenericLayout = observer(({ children }: GenericLayoutProps) => {
+export const GenericLayout = observer(({ children, dontResetScrollOnMount }: GenericLayoutProps) => {
+	useLayoutEffect(() => {
+		if (!dontResetScrollOnMount) {
+			window.scrollTo(0, 0);
+		}
+	}, [dontResetScrollOnMount]);
+
 	useBodyHiddenOverflow(isSidebarOpen.get());
 
 	useEffect(() => {

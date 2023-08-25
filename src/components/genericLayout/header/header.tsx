@@ -1,4 +1,5 @@
 import clsx from 'clsx';
+import { makeAutoObservable } from 'mobx';
 import { observer } from 'mobx-react';
 import { PropsWithChildren, useEffect, useRef, useState } from 'react';
 import { useMutation } from 'react-query';
@@ -11,7 +12,7 @@ import { ReactComponent as PlusSvg } from '../../../icons/ic20/plus.svg';
 import { ReactComponent as ContactsSvg } from '../../../icons/ic28/contacts.svg';
 import { ReactComponent as NotificationsSvg } from '../../../icons/ic28/notifications.svg';
 import { postWidgetMessage, WidgetId, WidgetMessageType } from '../../../pages/widgets/widgets';
-import { browserStorage } from '../../../stores/browserStorage';
+import { BrowserStorage, browserStorage, BrowserStorageKey } from '../../../stores/browserStorage';
 import domain from '../../../stores/Domain';
 import { FolderId } from '../../../stores/MailList';
 import { getGlobalOutgoingMailData } from '../../../stores/outgoingMailData';
@@ -57,9 +58,75 @@ const NavButton = ({ children, href }: NavButtonProps) => {
 
 //
 
+const NOTIFICATIONS_ALERT_COUNT = 3;
+
+interface NotificationsAlertData {
+	enabledForCurrentAccounts?: boolean;
+	alertNeeded?: boolean;
+	alertCounter?: number;
+}
+
+class NotificationsAlert {
+	constructor() {
+		makeAutoObservable(this);
+	}
+
+	value: NotificationsAlertData =
+		BrowserStorage.getItemWithTransform(BrowserStorageKey.NOTIFICATIONS_ALERT, item => {
+			// Migration
+			if (item === 'true' || item === 'false') {
+				return {
+					enabledForCurrentAccounts: false,
+					alertNeeded: true,
+					// Display only once
+					alertCounter: NOTIFICATIONS_ALERT_COUNT - 1,
+				} as NotificationsAlertData;
+			}
+
+			return JSON.parse(item);
+		}) || {};
+
+	patchValue(patch: NotificationsAlertData) {
+		const newValue = { ...this.value, ...patch };
+
+		BrowserStorage.setItem(BrowserStorageKey.NOTIFICATIONS_ALERT, JSON.stringify(newValue));
+		this.value = newValue;
+	}
+
+	newAccountConnected() {
+		this.patchValue({
+			enabledForCurrentAccounts: false,
+			alertNeeded: true,
+			alertCounter: 0,
+		});
+	}
+
+	remindAboutNotifications() {
+		if (!this.value.enabledForCurrentAccounts && (this.value.alertCounter || 0) < 3) {
+			this.patchValue({
+				alertNeeded: true,
+			});
+		}
+	}
+
+	reminderHappened() {
+		this.patchValue({
+			alertNeeded: false,
+			alertCounter: (this.value.alertCounter || 0) + 1,
+		});
+	}
+
+	notificationsEnabled() {
+		this.patchValue({
+			enabledForCurrentAccounts: true,
+		});
+	}
+}
+
+export const notificationsAlert = new NotificationsAlert();
+
 const NotificationsButton = observer(() => {
 	const buttonRef = useRef(null);
-	const [isPopupOpen, setPopupOpen] = useState(false);
 
 	const { windowWidth } = useWindowSize();
 
@@ -77,17 +144,27 @@ const NotificationsButton = observer(() => {
 		const tgUrl = json.data;
 		invariant(tgUrl, 'No Telegram URL received');
 
+		notificationsAlert.notificationsEnabled();
+		setPopupOpen(false);
+
 		openInNewWidnow(tgUrl);
 	});
 
-	const notificationAlertHappened = browserStorage.isNotificationAlertHappened;
-	const [isAnimationNeeded, setAnimationNeeded] = useState(false);
+	const [animationNeeded, setAnimationNeeded] = useState(false);
+	const [popupOpen, setPopupOpen] = useState(false);
+
+	const alertNeeded = notificationsAlert.value.alertNeeded;
+
 	useEffect(() => {
-		if (!notificationAlertHappened) {
-			browserStorage.isNotificationAlertHappened = true;
-			setAnimationNeeded(true);
+		if (alertNeeded) {
+			// Reset if already animating
+			setAnimationNeeded(false);
+			setTimeout(() => setAnimationNeeded(true), 50);
+
+			setPopupOpen(true);
+			notificationsAlert.reminderHappened();
 		}
-	}, [notificationAlertHappened]);
+	}, [alertNeeded]);
 
 	return (
 		<>
@@ -97,14 +174,14 @@ const NotificationsButton = observer(() => {
 				look={ActionButtonLook.LITE}
 				icon={
 					<div>
-						<NotificationsSvg className={clsx(isAnimationNeeded && css.notificationIcon_animated)} />
+						<NotificationsSvg className={clsx(animationNeeded && css.notificationIcon_animated)} />
 					</div>
 				}
 				title="Notifications"
-				onClick={() => setPopupOpen(!isPopupOpen)}
+				onClick={() => setPopupOpen(!popupOpen)}
 			/>
 
-			{isPopupOpen && (
+			{popupOpen && (
 				<AnchoredPopup
 					className={css.notificationsPopup}
 					anchorRef={buttonRef}

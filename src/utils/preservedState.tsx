@@ -1,5 +1,5 @@
 import { nanoid } from 'nanoid';
-import { useEffect, useMemo } from 'react';
+import { useEffect, useLayoutEffect, useMemo } from 'react';
 
 import { useHistoryState } from './history';
 import { useLatest } from './useLatest';
@@ -40,7 +40,7 @@ export function usePreservedState<T>(params: UsePreservedStateParams<T>): T | un
 
 	const factoryRef = useLatest(params.factory);
 
-	useEffect(() => {
+	useLayoutEffect(() => {
 		return () => {
 			// eslint-disable-next-line react-hooks/exhaustive-deps
 			data[key] = factoryRef.current();

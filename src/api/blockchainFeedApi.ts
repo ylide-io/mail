@@ -229,11 +229,20 @@ export namespace BlockchainFeedApi {
 		});
 	}
 
-	export async function getComissions(params: { feedId: string }) {
-		return await request<Record<string, string>[]>(`/feeds/${params.feedId}/comissions`, {
+	export async function getCommissions(params: { feedId: string }): Promise<Record<string, string>[]> {
+		const data = await request<Record<string, number>[]>(`/feeds/${params.feedId}/comissions`, {
 			params: {
 				method: 'GET',
 			},
+		});
+
+		// Backend sends {string: number}, but front expects string
+		return data.map(it => {
+			Object.keys(it).forEach(key => {
+				it[key] = String(it[key]) as any;
+			});
+
+			return it as any as Record<string, string>;
 		});
 	}
 }

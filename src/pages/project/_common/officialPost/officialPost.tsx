@@ -23,7 +23,7 @@ import { stickerIpfsIds } from '../createPostForm/stickerIpfsIds';
 import css from './officialPost.module.scss';
 
 export function generateOfficialPostPath(projectId: BlockchainProjectId, postId: string) {
-	return generatePath(RoutePath.PROJECT_ID_POST_ID, { projectId, postId: encodeURIComponent(postId) });
+	return generatePath(RoutePath.PROJECT_ID_OFFICIAL_POST_ID, { projectId, postId: encodeURIComponent(postId) });
 }
 
 interface OfficialPostViewProps {
@@ -101,7 +101,7 @@ export function OfficialPostView({ project, post }: OfficialPostViewProps) {
 	) : (
 		<PostItemContainer isCollapsable className={css.root}>
 			<div className={css.meta}>
-				<ProjectAvatar className={css.ava} blockie={post.msg.senderAddress} />
+				<ProjectAvatar className={css.ava} project={project} />
 
 				<div className={css.metaPrimary}>
 					<div className={css.sender}>{project.name}</div>

@@ -44,7 +44,7 @@ export function ExplorePage() {
 
 			<RegularPageContent>
 				<div className={css.root}>
-					<div className={css.banner}>
+					<div className={css.banner} onClick={() => openCreateCommunityForm('explore_banner')}>
 						<img src={bannerSrc} alt="Banner" />
 					</div>
 
@@ -72,7 +72,7 @@ export function ExplorePage() {
 						<ActionButton
 							size={ActionButtonSize.LARGE}
 							look={ActionButtonLook.HEAVY}
-							onClick={() => openCreateCommunityForm()}
+							onClick={() => openCreateCommunityForm('explore_bottom')}
 						>
 							Create your own community
 						</ActionButton>

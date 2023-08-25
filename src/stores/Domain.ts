@@ -1,5 +1,6 @@
 import { EthereumProvider } from '@walletconnect/ethereum-provider';
 import {
+	evm,
 	EVM_CHAINS,
 	EVM_NAMES,
 	EVM_RPCS,
@@ -8,13 +9,7 @@ import {
 	EVMWalletController,
 	evmWalletFactories,
 } from '@ylide/ethereum';
-import {
-	everscaleBlockchainFactory,
-	everscaleProxyWalletFactory,
-	everscaleWalletFactory,
-	venomBlockchainFactory,
-	venomWalletFactory,
-} from '@ylide/everscale';
+import { tvm } from '@ylide/everscale';
 import {
 	AbstractBlockchainController,
 	AbstractNameService,
@@ -29,7 +24,7 @@ import {
 	WalletAccount,
 	WalletControllerFactory,
 	Ylide,
-	YlideKeyRegistry,
+	YlideKeysRegistry,
 } from '@ylide/sdk';
 import { makeObservable, observable } from 'mobx';
 
@@ -39,6 +34,7 @@ import { SwitchModal, SwitchModalMode } from '../components/switchModal/switchMo
 import { toast } from '../components/toast/toast';
 import { AppMode, REACT_APP__APP_MODE } from '../env';
 import { blockchainMeta } from '../utils/blockchain';
+import { ensurePageLoaded } from '../utils/ensurePageLoaded';
 import { walletsMeta } from '../utils/wallet';
 import { Accounts } from './Accounts';
 import contacts from './Contacts';
@@ -50,43 +46,18 @@ import tags from './Tags';
 
 // Ylide.verbose();
 
-let INDEXER_BLOCKCHAINS: string[];
-
-if (REACT_APP__APP_MODE === AppMode.OTC) {
-	INDEXER_BLOCKCHAINS = ['POLYGON', 'FANTOM', 'GNOSIS'];
-} else {
-	INDEXER_BLOCKCHAINS = [
-		'everscale',
-		'venom-testnet',
-		'ETHEREUM',
-		'AVALANCHE',
-		'ARBITRUM',
-		'BNBCHAIN',
-		'OPTIMISM',
-		'POLYGON',
-		'FANTOM',
-		'KLAYTN',
-		'GNOSIS',
-		'AURORA',
-		'CELO',
-		'CRONOS',
-		'MOONBEAM',
-		'MOONRIVER',
-		'METIS',
-	];
-}
-
-//
-
 export class Domain {
 	savedPassword: string | null = null;
 
 	storage = new BrowserLocalStorage();
-	keyRegistry = new YlideKeyRegistry(this.storage);
+	keysRegistry = new YlideKeysRegistry(this.storage);
 
 	@observable initialized = false;
 
-	ylide: Ylide = new Ylide(this.keyRegistry, INDEXER_BLOCKCHAINS);
+	ylide: Ylide = new Ylide(
+		this.keysRegistry,
+		REACT_APP__APP_MODE === AppMode.OTC ? ['POLYGON', 'FANTOM', 'GNOSIS'] : undefined,
+	);
 
 	@observable txChain: EVMNetwork.FANTOM | EVMNetwork.POLYGON | EVMNetwork.GNOSIS = EVMNetwork.POLYGON;
 	@observable txWithBonus: boolean = false;
@@ -145,37 +116,11 @@ export class Domain {
 			this.ylide.registerWalletFactory(evmWalletFactories.binance);
 			this.ylide.registerWalletFactory(evmWalletFactories.walletconnect);
 		} else {
-			this.ylide.registerBlockchainFactory(evmBlockchainFactories[EVMNetwork.ETHEREUM]);
-			this.ylide.registerBlockchainFactory(evmBlockchainFactories[EVMNetwork.AVALANCHE]);
-			this.ylide.registerBlockchainFactory(evmBlockchainFactories[EVMNetwork.ARBITRUM]);
-			this.ylide.registerBlockchainFactory(evmBlockchainFactories[EVMNetwork.BNBCHAIN]);
-			this.ylide.registerBlockchainFactory(evmBlockchainFactories[EVMNetwork.OPTIMISM]);
-			this.ylide.registerBlockchainFactory(evmBlockchainFactories[EVMNetwork.POLYGON]);
-			this.ylide.registerBlockchainFactory(evmBlockchainFactories[EVMNetwork.FANTOM]);
-			this.ylide.registerBlockchainFactory(evmBlockchainFactories[EVMNetwork.KLAYTN]);
-			this.ylide.registerBlockchainFactory(evmBlockchainFactories[EVMNetwork.GNOSIS]);
-			this.ylide.registerBlockchainFactory(evmBlockchainFactories[EVMNetwork.AURORA]);
-			this.ylide.registerBlockchainFactory(evmBlockchainFactories[EVMNetwork.CELO]);
-			this.ylide.registerBlockchainFactory(evmBlockchainFactories[EVMNetwork.CRONOS]);
-			this.ylide.registerBlockchainFactory(evmBlockchainFactories[EVMNetwork.MOONBEAM]);
-			this.ylide.registerBlockchainFactory(evmBlockchainFactories[EVMNetwork.MOONRIVER]);
-			this.ylide.registerBlockchainFactory(evmBlockchainFactories[EVMNetwork.METIS]);
+			this.ylide.add(evm);
 
 			if (REACT_APP__APP_MODE !== AppMode.MAIN_VIEW) {
-				this.ylide.registerBlockchainFactory(everscaleBlockchainFactory);
-				this.ylide.registerWalletFactory(everscaleWalletFactory);
-				this.ylide.registerWalletFactory(everscaleProxyWalletFactory);
-
-				this.ylide.registerBlockchainFactory(venomBlockchainFactory);
-				this.ylide.registerWalletFactory(venomWalletFactory);
+				this.ylide.add(tvm);
 			}
-
-			this.ylide.registerWalletFactory(evmWalletFactories.metamask);
-			this.ylide.registerWalletFactory(evmWalletFactories.frontier);
-			this.ylide.registerWalletFactory(evmWalletFactories.coinbase);
-			this.ylide.registerWalletFactory(evmWalletFactories.trustwallet);
-			this.ylide.registerWalletFactory(evmWalletFactories.binance);
-			this.ylide.registerWalletFactory(evmWalletFactories.walletconnect);
 		}
 
 		window.addEventListener('keydown', e => {
@@ -290,7 +235,7 @@ export class Domain {
 		faucetType: EVMNetwork.GNOSIS | EVMNetwork.FANTOM | EVMNetwork.POLYGON,
 	) {
 		const faucet = await account.wallet.controller.getFaucet({ faucetType });
-		
+
 		const registrar = 1;
 
 		const data = await faucet.authorizePublishing(account.account, publicKey, registrar);
@@ -305,18 +250,19 @@ export class Domain {
 		};
 	}
 
-	async publishThroughFaucet(
-		faucetData: Awaited<ReturnType<Domain['getFaucetSignature']>>,
-	) {
-		
+	async publishThroughFaucet(faucetData: Awaited<ReturnType<Domain['getFaucetSignature']>>) {
 		try {
 			domain.enforceMainViewOnboarding = true;
 			try {
 				const result = await faucetData.faucet.attachPublicKey(faucetData.data);
-				
-				const key = await this.ylide.core.waitForPublicKey(faucetData.blockchain, faucetData.account.account.address, faucetData.publicKey.keyBytes);
+
+				const key = await this.ylide.core.waitForPublicKey(
+					faucetData.blockchain,
+					faucetData.account.account.address,
+					faucetData.publicKey.keyBytes,
+				);
 				if (key) {
-					await this.keyRegistry.addRemotePublicKey(key);
+					await this.keysRegistry.addRemotePublicKey(key);
 					faucetData.account.reloadKeys();
 					domain.publishingTxHash = result.txHash;
 					domain.isTxPublishing = false;
@@ -592,43 +538,47 @@ export class Domain {
 		}, 10000);
 		this.walletControllers[factory.blockchainGroup] = {
 			...(this.walletControllers[factory.blockchainGroup] || {}),
-			[factory.wallet]: await this.ylide.controllers.addWallet(factory.blockchainGroup, factory.wallet, {
-				dev: false, //document.location.hostname === 'localhost',
-				faucet: {
-					registrar: 1,
-					apiKey: { type: 'client', key: 'cl258c68bb0516f33e' },
-					// host: 'http://localhost:8392',
+			[factory.wallet]: await this.ylide.controllers.addWallet(
+				factory.wallet,
+				{
+					dev: false, //document.location.hostname === 'localhost',
+					faucet: {
+						registrar: 1,
+						apiKey: { type: 'client', key: 'cl258c68bb0516f33e' },
+						// host: 'http://localhost:8392',
+					},
+					onSwitchAccountRequest: this.handleSwitchRequest.bind(this, factory.wallet),
+					onNetworkSwitchRequest: async (
+						reason: string,
+						currentNetwork: EVMNetwork | undefined,
+						needNetwork: EVMNetwork,
+						needChainId: number,
+					) => {
+						try {
+							await this.switchEVMChain(
+								this.wallets.find(w => w.factory.wallet === factory.wallet)!,
+								needNetwork,
+							);
+						} catch (err) {
+							alert(
+								'Wrong network (' +
+									(currentNetwork ? EVM_NAMES[currentNetwork] : 'undefined') +
+									'), switch to ' +
+									EVM_NAMES[needNetwork],
+							);
+						}
+					},
+					walletConnectProvider:
+						factory.wallet === 'walletconnect' &&
+						!this.walletConnectState.loading &&
+						this.walletConnectState.connected
+							? this.walletConnectState.provider
+							: null,
+					// TODO Remove after fixing 'everscaleProxyWalletFactory'
+					provider: factory.wallet === 'everwallet-proxy' ? (window as any).__everProxy : undefined,
 				},
-				onSwitchAccountRequest: this.handleSwitchRequest.bind(this, factory.wallet),
-				onNetworkSwitchRequest: async (
-					reason: string,
-					currentNetwork: EVMNetwork | undefined,
-					needNetwork: EVMNetwork,
-					needChainId: number,
-				) => {
-					try {
-						await this.switchEVMChain(
-							this.wallets.find(w => w.factory.wallet === factory.wallet)!,
-							needNetwork,
-						);
-					} catch (err) {
-						alert(
-							'Wrong network (' +
-								(currentNetwork ? EVM_NAMES[currentNetwork] : 'undefined') +
-								'), switch to ' +
-								EVM_NAMES[needNetwork],
-						);
-					}
-				},
-				walletConnectProvider:
-					factory.wallet === 'walletconnect' &&
-					!this.walletConnectState.loading &&
-					this.walletConnectState.connected
-						? this.walletConnectState.provider
-						: null,
-				// TODO Remove after fixing 'everscaleProxyWalletFactory'
-				provider: factory.wallet === 'everwallet-proxy' ? (window as any).__everProxy : undefined,
-			}),
+				factory.blockchainGroup,
+			),
 		};
 		clearTimeout(somethingWentWrongTimer);
 		return true;
@@ -735,14 +685,17 @@ export class Domain {
 			console.debug(t, now - last + 'ms');
 			last = now;
 		};
+		await ensurePageLoaded;
+		tick('ensurePageLoaded');
+		console.log('window.__hasEverscaleProvider: ', window.__hasEverscaleProvider);
 		await this.reloadAvailableWallets();
 		tick('this.reloadAvailableWallets();');
 		await this.initWalletConnect();
 		tick('this.initWalletConnect();');
 		await this.extractWalletsData();
 		tick('this.extractWalletsData();');
-		await this.keyRegistry.init();
-		tick('this.keyRegistry.init();');
+		await this.keysRegistry.init();
+		tick('this.keysRegistry.init();');
 		await this.accounts.init();
 		tick('this.accounts.init();');
 		await contacts.init();

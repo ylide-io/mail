@@ -7,6 +7,11 @@
 .banner {
 	overflow: hidden;
 	border-radius: 16px;
+	cursor: pointer;
+
+	img {
+		display: block;
+	}
 
 	@include lessThan768w {
 		margin: calc(-1 * var(--generic-layout_spacing)) calc(-1 * var(--generic-layout_padding)) 0;

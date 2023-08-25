@@ -1,10 +1,56 @@
 import { WalletAccount } from '@ylide/sdk';
-import { computed, makeObservable, observable } from 'mobx';
+import { computed, makeAutoObservable, makeObservable, observable } from 'mobx';
 
-import { browserStorage } from './browserStorage';
+import { BrowserStorage, BrowserStorageKey } from './browserStorage';
 import { Domain } from './Domain';
 import { DomainAccount } from './models/DomainAccount';
 import { Wallet } from './models/Wallet';
+
+interface SavedAccount {
+	name: string;
+	account: WalletAccount;
+	wallet: string;
+}
+
+class SavedAccounts {
+	constructor() {
+		makeAutoObservable(this);
+	}
+
+	private _value =
+		BrowserStorage.getItemWithTransform<SavedAccount[]>(BrowserStorageKey.SAVED_ACCOUNTS, val => {
+			const parsed = JSON.parse(val);
+			if (!Array.isArray(parsed)) {
+				return [];
+			} else {
+				return parsed.map((acc: any) => ({
+					...acc,
+					account: WalletAccount.fromBase64(acc.account),
+				}));
+			}
+		}) || [];
+
+	get value() {
+		return this._value;
+	}
+
+	set value(value: SavedAccount[]) {
+		BrowserStorage.setItem(
+			BrowserStorageKey.SAVED_ACCOUNTS,
+			JSON.stringify(
+				value.map(v => ({
+					...v,
+					account: v.account.toBase64(),
+				})),
+			),
+		);
+		this._value = value;
+	}
+}
+
+const savedAccounts = new SavedAccounts();
+
+//
 
 export class Accounts {
 	@observable accounts: DomainAccount[] = [];
@@ -14,7 +60,7 @@ export class Accounts {
 	}
 
 	save() {
-		browserStorage.savedAccounts = this.accounts.map(acc => ({
+		savedAccounts.value = this.accounts.map(acc => ({
 			name: acc.name,
 			account: acc.account,
 			blockchainGroup: acc.wallet.factory.blockchainGroup,
@@ -23,7 +69,7 @@ export class Accounts {
 	}
 
 	async createNewDomainAccount(wallet: Wallet, account: WalletAccount) {
-		const domainAccount = new DomainAccount(this.domain.keyRegistry, wallet, account, '');
+		const domainAccount = new DomainAccount(this.domain.keysRegistry, wallet, account, '');
 		this.accounts.push(domainAccount);
 		wallet.accounts.push(domainAccount);
 		this.save();
@@ -31,8 +77,8 @@ export class Accounts {
 	}
 
 	async load() {
-		const savedAccounts = browserStorage.savedAccounts;
-		for (const acc of savedAccounts) {
+		const value = savedAccounts.value;
+		for (const acc of value) {
 			const wallet = this.domain.wallets.find(w => w.factory.wallet === acc.wallet);
 			if (!wallet) {
 				continue;
@@ -43,7 +89,7 @@ export class Accounts {
 				continue;
 			}
 
-			const domainAccount = new DomainAccount(this.domain.keyRegistry, wallet, acc.account, acc.name);
+			const domainAccount = new DomainAccount(this.domain.keysRegistry, wallet, acc.account, acc.name);
 
 			if (!domainAccount.freshestRemotePublicKey) {
 				await domainAccount.firstTimeReadRemoteKeys();
@@ -72,7 +118,7 @@ export class Accounts {
 			account.wallet.accounts.splice(widx, 1);
 		}
 		for (const privateKey of account.localPrivateKeys) {
-			await this.domain.keyRegistry.removeLocalPrivateKey(privateKey);
+			await this.domain.keysRegistry.removeLocalPrivateKey(privateKey);
 		}
 		this.save();
 	}
