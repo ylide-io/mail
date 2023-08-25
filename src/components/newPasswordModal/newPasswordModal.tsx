@@ -106,7 +106,7 @@ export function NewPasswordModal({
 			const account = domainAccountRef.current;
 			invariant(account);
 
-			const justPublishedKey = await new Promise<RemotePublicKey | null>((resolve, reject) => {
+			const justPublishedKey = await new Promise<RemotePublicKey | null>(resolve => {
 				let isDone = false;
 
 				asyncDelay(3000).then(() => (!isDone ? setStep(Step.LOADING) : null));
