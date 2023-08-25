@@ -64,6 +64,7 @@ export function getBlockchainProjectBannerImage(input: BlockchainProject | Block
 
 export interface BlockchainProject {
 	id: BlockchainProjectId;
+	hidden?: boolean;
 	feedId: {
 		official?: Uint256;
 		discussion?: Uint256;
@@ -111,6 +112,10 @@ export enum BlockchainProjectId {
 	GNOSIS_BUILDERS = 'gnosis_builders',
 	BET_FURY = 'bet_fury',
 	DITTO_NETWORK = 'ditto_network',
+
+	// TEST
+
+	TEST_B87O0G5K = 'test_b87o0g5k',
 }
 
 export enum BlockchainProjectTag {
@@ -477,5 +482,20 @@ export const blockchainProjects: BlockchainProject[] = [
 		website: 'https://dittonetwork.io',
 		tags: [BlockchainProjectTag.DEVELOPER_TOOLS],
 		attachmentMode: BlockchainProjectAttachmentMode.ADMINS,
+	},
+
+	// TEST
+
+	{
+		id: BlockchainProjectId.TEST_B87O0G5K,
+		hidden: true,
+		feedId: {
+			discussion: '2000000000000000000000000000000000000000000000000000000000000027' as Uint256,
+		},
+		name: 'Test Feed 😎',
+		description: 'This is an amazing test feed with some description.',
+		website: 'https://my-website.com',
+		tags: [],
+		attachmentMode: BlockchainProjectAttachmentMode.EVERYONE,
 	},
 ];
