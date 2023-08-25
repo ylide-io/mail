@@ -106,75 +106,55 @@ export function NewPasswordModal({
 			const account = domainAccountRef.current;
 			invariant(account);
 
-			const isOldWay = document.location.search.includes('oldWay=true');
+			const justPublishedKey = await new Promise<RemotePublicKey | null>(resolve => {
+				let isDone = false;
 
-			if (isOldWay) {
-				await Promise.all([
-					account.publishPublicKey(key, network),
-					asyncDelay(3000).then(() => setStep(Step.LOADING)),
-				]);
+				asyncDelay(3000).then(() => (!isDone ? setStep(Step.LOADING) : null));
 
-				const justPublishedKey = await domain.ylide.core.waitForPublicKey(
-					network ? EVM_NAMES[network] : account.wallet.currentBlockchain,
-					account.account.address,
-					key.publicKey.keyBytes,
-				);
+				account.publishPublicKey(key, network).then(() => {
+					if (isDone) {
+						return;
+					}
 
-				if (justPublishedKey) {
-					await domain.keyRegistry.addRemotePublicKey(justPublishedKey);
-					account.reloadKeys();
-				}
-			} else {
-				const justPublishedKey = await new Promise<RemotePublicKey | null>(resolve => {
-					let isDone = false;
+					domain.ylide.core
+						.waitForPublicKey(
+							network ? EVM_NAMES[network] : account.wallet.currentBlockchain,
+							account.account.address,
+							key.publicKey.keyBytes,
+						)
+						.then(foundKey => {
+							if (isDone) {
+								return;
+							}
 
-					asyncDelay(3000).then(() => (!isDone ? setStep(Step.LOADING) : null));
+							isDone = true;
 
-					account.publishPublicKey(key, network).then(() => {
-						if (isDone) {
-							return;
-						}
-
-						domain.ylide.core
-							.waitForPublicKey(
-								network ? EVM_NAMES[network] : account.wallet.currentBlockchain,
-								account.account.address,
-								key.publicKey.keyBytes,
-							)
-							.then(foundKey => {
-								if (isDone) {
-									return;
-								}
-
-								isDone = true;
-
-								resolve(foundKey);
-							});
-					});
-
-					asyncDelay(3000).then(() =>
-						domain.ylide.core
-							.waitForPublicKey(
-								network ? EVM_NAMES[network] : account.wallet.currentBlockchain,
-								account.account.address,
-								key.publicKey.keyBytes,
-							)
-							.then(foundKey => {
-								if (isDone) {
-									return;
-								}
-								if (foundKey) {
-									isDone = true;
-									resolve(foundKey);
-								}
-							}),
-					);
+							resolve(foundKey);
+						});
 				});
 
-				if (justPublishedKey) {
-					await domain.keyRegistry.addRemotePublicKey(justPublishedKey);
-					account.reloadKeys();
-				}
+				asyncDelay(3000).then(() =>
+					domain.ylide.core
+						.waitForPublicKey(
+							network ? EVM_NAMES[network] : account.wallet.currentBlockchain,
+							account.account.address,
+							key.publicKey.keyBytes,
+						)
+						.then(foundKey => {
+							if (isDone) {
+								return;
+							}
+							if (foundKey) {
+								isDone = true;
+								resolve(foundKey);
+							}
+						}),
+				);
+			});
+
+			if (justPublishedKey) {
+				await domain.keyRegistry.addRemotePublicKey(justPublishedKey);
+				account.reloadKeys();
 			}
 
 			analytics.walletRegistered(wallet.wallet, account.account.address);
