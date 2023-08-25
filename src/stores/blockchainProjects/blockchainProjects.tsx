@@ -492,8 +492,8 @@ export const blockchainProjects: BlockchainProject[] = [
 		feedId: {
 			discussion: '2000000000000000000000000000000000000000000000000000000000000027' as Uint256,
 		},
-		name: 'Test Feed 😎',
-		description: 'This is an amazing test feed with some description.',
+		name: 'Test Feed',
+		description: 'This is an amazing test feed with some description 😎',
 		website: 'https://my-website.com',
 		tags: [],
 		attachmentMode: BlockchainProjectAttachmentMode.EVERYONE,
