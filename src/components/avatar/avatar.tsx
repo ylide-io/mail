@@ -1,6 +1,7 @@
 import clsx from 'clsx';
 import { ReactNode } from 'react';
 
+import { BlockchainProject } from '../../stores/blockchainProjects/blockchainProjects';
 import { Blockie } from '../blockie/blockie';
 import { PropsWithClassName } from '../props';
 import css from './avatar.module.scss';
@@ -32,8 +33,18 @@ export function Avatar({ className, innerClassName, image, blockie, placeholder 
 
 //
 
-type ProjectAvatarProps = AvatarProps;
+interface ProjectAvatarProps extends PropsWithClassName {
+	innerClassName?: string;
+	project: BlockchainProject;
+}
 
-export function ProjectAvatar(props: ProjectAvatarProps) {
-	return <Avatar {...props} innerClassName={clsx(css.inner_project, props.innerClassName)} />;
+export function ProjectAvatar({ project, ...props }: ProjectAvatarProps) {
+	return (
+		<Avatar
+			{...props}
+			innerClassName={clsx(css.inner_project, props.innerClassName)}
+			image={project.profileImage}
+			blockie={project.id}
+		/>
+	);
 }

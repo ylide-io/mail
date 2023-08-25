@@ -101,7 +101,7 @@ export function OfficialPostView({ project, post }: OfficialPostViewProps) {
 	) : (
 		<PostItemContainer isCollapsable className={css.root}>
 			<div className={css.meta}>
-				<ProjectAvatar className={css.ava} blockie={post.msg.senderAddress} />
+				<ProjectAvatar className={css.ava} project={project} />
 
 				<div className={css.metaPrimary}>
 					<div className={css.sender}>{project.name}</div>

@@ -30,10 +30,7 @@ export function RichProjectCard({ project }: RichProjectCardProps) {
 			<BlockchainProjectBanner image={getBlockchainProjectBannerImage(project)} />
 
 			<div className={css.info}>
-				<ProjectAvatar
-					className={css.ava}
-					image={project.profileImage || 'https://picsum.photos/id/1067/200'}
-				/>
+				<ProjectAvatar className={css.ava} project={project} />
 
 				<div className={css.name}>{project.name}</div>
 

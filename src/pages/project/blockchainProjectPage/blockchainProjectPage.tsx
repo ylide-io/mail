@@ -423,7 +423,7 @@ export const BlockchainProjectPage = observer(() => {
 					<ProjectAvatar
 						className={css.projectLogo}
 						innerClassName={css.projectLogoInner}
-						image={project.profileImage || 'https://picsum.photos/id/1067/200'}
+						project={project}
 					/>
 
 					<h1 className={css.projectName}>{project.name}</h1>
