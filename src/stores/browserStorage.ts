@@ -11,6 +11,7 @@ export enum BrowserStorageKey {
 	LAST_MAILBOX_INCOMING_DATE = 'ylide_lastMailboxCheckDate',
 	SAVED_ACCOUNTS = 'ylide_savedAccounts',
 	NOTIFICATIONS_ALERT = 'ylide_notificationsAlert',
+	REMOTE_CONSOLE = 'ylide_remoteConsole',
 
 	// LEGACY
 
