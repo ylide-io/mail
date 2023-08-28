@@ -430,7 +430,7 @@ export const BlockchainProjectPage = observer(() => {
 
 					<div className={css.projectDescription}>{project.description}</div>
 
-					{(project.website || !!project.tags.length) && (
+					{(project.website || !!project.tags?.length) && (
 						<div className={css.projectMeta}>
 							{project.website && (
 								<a className={css.projectWebsite} href={project.website}>
@@ -440,7 +440,7 @@ export const BlockchainProjectPage = observer(() => {
 								</a>
 							)}
 
-							{!!project.tags.length && (
+							{!!project.tags?.length && (
 								<div className={css.tags}>
 									{project.tags.map(tag => (
 										<div key={tag} className={css.tag}>

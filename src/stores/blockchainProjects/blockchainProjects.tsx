@@ -74,7 +74,7 @@ export interface BlockchainProject {
 	profileImage?: string;
 	bannerImage?: string;
 	website?: string;
-	tags: BlockchainProjectTag[];
+	tags?: BlockchainProjectTag[];
 	fixedChain?: string;
 	attachmentMode?: BlockchainProjectAttachmentMode;
 }
@@ -145,7 +145,6 @@ export const blockchainProjects: BlockchainProject[] = [
 		name: 'General chat',
 		description: 'General chat to meet your web3 frens.',
 		profileImage: generalSrc,
-		tags: [],
 	},
 	{
 		id: BlockchainProjectId.ETH_WHALES,
@@ -495,7 +494,6 @@ export const blockchainProjects: BlockchainProject[] = [
 		name: 'Test Feed',
 		description: 'This is an amazing test feed with some description 😎',
 		website: 'https://my-website.com',
-		tags: [],
 		attachmentMode: BlockchainProjectAttachmentMode.EVERYONE,
 	},
 ];

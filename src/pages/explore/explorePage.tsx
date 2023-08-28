@@ -29,7 +29,7 @@ export function ExplorePage() {
 
 				<div className={css.smallGrid}>
 					{blockchainProjects
-						.filter(p => p.tags.includes(tag))
+						.filter(p => p.tags?.includes(tag))
 						.map(project => (
 							<RegularProjectCard project={project} />
 						))}
