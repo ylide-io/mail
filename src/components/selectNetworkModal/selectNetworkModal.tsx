@@ -4,8 +4,8 @@ import clsx from 'clsx';
 import { observer } from 'mobx-react';
 import { useMemo } from 'react';
 
+import { BalancesStore } from '../../stores/balancesStore';
 import domain from '../../stores/Domain';
-import { EvmBalances } from '../../stores/evmBalances';
 import { Wallet } from '../../stores/models/Wallet';
 import { blockchainMeta, evmNameToNetwork } from '../../utils/blockchain';
 import { Modal } from '../modal/modal';
@@ -43,8 +43,8 @@ export interface SelectNetworkModalProps {
 }
 
 export const SelectNetworkModal = observer(({ wallet, account, onClose }: SelectNetworkModalProps) => {
-	const evmBalances = useMemo(() => {
-		const balances = new EvmBalances();
+	const balances = useMemo(() => {
+		const balances = new BalancesStore();
 		balances.updateBalances(wallet, account.address);
 		return balances;
 	}, [account.address, wallet]);
@@ -81,8 +81,8 @@ export const SelectNetworkModal = observer(({ wallet, account, onClose }: Select
 				{domain.registeredBlockchains
 					.filter(f => f.blockchainGroup === 'evm')
 					.sort((a, b) => {
-						const aBalance = Number(evmBalances.getBalance(evmNameToNetwork(a.blockchain)!).toFixed(4));
-						const bBalance = Number(evmBalances.getBalance(evmNameToNetwork(b.blockchain)!).toFixed(4));
+						const aBalance = Number(balances.getBalance(a.blockchain).toFixed(4));
+						const bBalance = Number(balances.getBalance(b.blockchain).toFixed(4));
 						const aTx = txPrices[evmNameToNetwork(a.blockchain)!];
 						const bTx = txPrices[evmNameToNetwork(b.blockchain)!];
 						if (aBalance === bBalance) {
@@ -96,23 +96,20 @@ export const SelectNetworkModal = observer(({ wallet, account, onClose }: Select
 						return (
 							<div
 								className={clsx('wmn-plate', {
-									disabled: !Number(
-										evmBalances.getBalance(evmNameToNetwork(bc.blockchain)!).toFixed(4),
-									),
+									disabled: !Number(balances.getBalance(bc.blockchain).toFixed(4)),
 								})}
 								onClick={() => onClose?.(evmNameToNetwork(bc.blockchain)!)}
 							>
 								<div className="wmn-icon">{bData.logo(32)}</div>
 								<div className="wmn-title">
 									<div className="wmn-blockchain">{bData.title}</div>
-									{Number(evmBalances.getBalance(evmNameToNetwork(bc.blockchain)!).toFixed(4)) > 0 &&
-									idx === 0 ? (
+									{Number(balances.getBalance(bc.blockchain).toFixed(4)) > 0 && idx === 0 ? (
 										<div className="wmn-optimal">Optimal</div>
 									) : null}
 								</div>
 								<div className="wmn-balance">
 									<div className="wmn-wallet-balance">
-										{Number(evmBalances.getBalance(evmNameToNetwork(bc.blockchain)!).toFixed(4))}{' '}
+										{Number(balances.getBalance(bc.blockchain).toFixed(4))}{' '}
 										{bData.ethNetwork?.nativeCurrency.symbol || 'ETH'}
 									</div>
 									<div className="wmn-transaction-price">

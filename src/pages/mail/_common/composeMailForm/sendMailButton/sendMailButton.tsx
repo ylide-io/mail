@@ -1,4 +1,3 @@
-import { EVM_NAMES } from '@ylide/ethereum';
 import clsx from 'clsx';
 import { observer } from 'mobx-react';
 import { useMemo, useRef, useState } from 'react';
@@ -11,8 +10,8 @@ import { Spinner } from '../../../../../components/spinner/spinner';
 import { toast } from '../../../../../components/toast/toast';
 import { ReactComponent as ArrowDownSvg } from '../../../../../icons/ic20/arrowDown.svg';
 import { ReactComponent as ReplySvg } from '../../../../../icons/ic20/reply.svg';
+import { BalancesStore } from '../../../../../stores/balancesStore';
 import domain from '../../../../../stores/Domain';
-import { EvmBalances } from '../../../../../stores/evmBalances';
 import { OutgoingMailData } from '../../../../../stores/outgoingMailData';
 import { AlignmentDirection, HorizontalAlignment } from '../../../../../utils/alignment';
 import { invariant } from '../../../../../utils/assert';
@@ -43,8 +42,8 @@ export const SendMailButton = observer(
 			}
 		}, [blockchain]);
 
-		const evmBalances = useMemo(() => {
-			const balances = new EvmBalances();
+		const balances = useMemo(() => {
+			const balances = new BalancesStore();
 
 			if (from?.account) {
 				balances.updateBalances(from.account.wallet, from.account.account.address);
@@ -130,37 +129,35 @@ export const SendMailButton = observer(
 							>
 								{domain.registeredBlockchains
 									.filter(f => f.blockchainGroup === 'evm')
-									.map(bc => {
-										const bData = blockchainMeta[bc.blockchain];
-										const network = evmNameToNetwork(bc.blockchain)!;
+									.map(({ blockchain }) => {
+										const bData = blockchainMeta[blockchain];
 
 										return (
 											<DropDownItem
-												key={bc.blockchain}
+												key={blockchain}
 												mode={
-													!Number(evmBalances.getBalance(network).toFixed(4))
+													!Number(balances.getBalance(blockchain).toFixed(4))
 														? DropDownItemMode.DISABLED
 														: undefined
 												}
 												onSelect={async () => {
 													invariant(from);
 
-													await domain.switchEVMChain(from.account.wallet, network);
-													from.blockchain = EVM_NAMES[network];
+													await domain.switchEVMChain(
+														from.account.wallet,
+														evmNameToNetwork(blockchain)!,
+													);
+													from.blockchain = blockchain;
 
 													setMenuVisible(false);
 												}}
 											>
 												<GridRowBox>
-													{bData.logo(16)}
+													{bData.logo()}
 
 													<TruncateTextBox>
 														{bData.title} [
-														{Number(
-															evmBalances
-																.getBalance(evmNameToNetwork(bc.blockchain)!)
-																.toFixed(4),
-														)}{' '}
+														{Number(balances.getBalance(blockchain).toFixed(4))}{' '}
 														{bData.ethNetwork!.nativeCurrency.symbol}]
 													</TruncateTextBox>
 												</GridRowBox>
