@@ -68,11 +68,14 @@ export const CreatePostForm = observer(
 				return mailData;
 			}, []);
 
-			const { from, blockchain } = mailData;
+			const from = mailData.from;
 
 			useEffect(() => {
 				mailData.feedId = feedId;
-				mailData.blockchain = fixedChain;
+
+				if (from) {
+					from.blockchain = fixedChain;
+				}
 
 				mailData.validator = () => {
 					const text = mailData.plainTextData;
@@ -104,18 +107,20 @@ export const CreatePostForm = observer(
 
 					return true;
 				};
-			}, [fixedChain, mailData, feedId, replyTo]);
+			}, [fixedChain, mailData, feedId, replyTo, from]);
 
 			useEffect(() => {
-				mailData.from = mailData.from && accounts.includes(mailData.from) ? mailData.from : accounts[0];
+				if (!mailData.from?.account || !accounts.includes(mailData.from.account)) {
+					mailData.from = { account: accounts[0] };
+				}
 			}, [mailData, accounts]);
 
 			useEffect(() => {
 				let cancelled = false;
 				BlockchainFeedApi.getCommissions({ feedId: feedId })
 					.then(commissions => {
-						if (!cancelled && from && blockchain) {
-							const commission = calcCommission(blockchain, commissions);
+						if (!cancelled && from?.blockchain) {
+							const commission = calcCommission(from.blockchain, commissions);
 							mailData.extraPayment = commission || '0';
 						}
 					})
@@ -123,7 +128,7 @@ export const CreatePostForm = observer(
 				return () => {
 					cancelled = true;
 				};
-			}, [blockchain, feedId, from, mailData]);
+			}, [feedId, from?.blockchain, mailData]);
 
 			const [expanded, setExpanded] = useState(false);
 
@@ -312,8 +317,8 @@ export const CreatePostForm = observer(
 									className={css.accontSelect}
 									disabled={mailData.sending}
 									accounts={accounts}
-									activeAccount={mailData.from}
-									onChange={account => (mailData.from = account)}
+									activeAccount={mailData.from?.account}
+									onChange={account => (mailData.from = { account })}
 								/>
 
 								<div className={css.footerRight}>

@@ -210,7 +210,7 @@ export const DiscussionPost = observer(({ post, project, onReplyClick }: Discuss
 								analytics.blockchainFeedComposeMail(post.original.id, post.msg.senderAddress);
 
 								const mailData = new OutgoingMailData();
-								mailData.from = accounts[0];
+								mailData.from = { account: accounts[0] };
 								mailData.to = new Recipients([post.msg.senderAddress]);
 
 								openMailCompose({ mailData, place: 'project-discussion' });

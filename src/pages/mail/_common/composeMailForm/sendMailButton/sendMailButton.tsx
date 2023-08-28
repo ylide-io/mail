@@ -29,9 +29,7 @@ export interface SendMailButtonProps extends PropsWithClassName {
 export const SendMailButton = observer(
 	({ className, mailData, disabled, disableNetworkSwitch, onSent }: SendMailButtonProps) => {
 		const from = mailData.from;
-		const blockchain = mailData.blockchain;
-		const blockchainGroup = from?.wallet.factory.blockchainGroup;
-		const chainMeta = blockchain ? blockchainMeta[blockchain] : undefined;
+		const blockchain = from?.blockchain;
 
 		const menuAnchorRef = useRef(null);
 		const [menuVisible, setMenuVisible] = useState(false);
@@ -48,8 +46,8 @@ export const SendMailButton = observer(
 		const evmBalances = useMemo(() => {
 			const balances = new EvmBalances();
 
-			if (from) {
-				balances.updateBalances(from.wallet, from.account.address);
+			if (from?.account) {
+				balances.updateBalances(from.account.wallet, from.account.account.address);
 			}
 
 			return balances;
@@ -68,6 +66,8 @@ export const SendMailButton = observer(
 		};
 
 		const renderSendText = () => {
+			const chainMeta = blockchain ? blockchainMeta[blockchain] : undefined;
+
 			if (chainMeta) {
 				const payment =
 					mailData.extraPayment === '0' ? null : (
@@ -88,7 +88,7 @@ export const SendMailButton = observer(
 			return 'Send';
 		};
 
-		const withDropDown = blockchainGroup === 'evm' && !disableNetworkSwitch;
+		const withDropDown = from?.account?.wallet.factory.blockchainGroup === 'evm' && !disableNetworkSwitch;
 
 		return (
 			<div
@@ -145,8 +145,8 @@ export const SendMailButton = observer(
 												onSelect={async () => {
 													invariant(from);
 
-													await domain.switchEVMChain(from.wallet, network);
-													mailData.blockchain = EVM_NAMES[network];
+													await domain.switchEVMChain(from.account.wallet, network);
+													from.blockchain = EVM_NAMES[network];
 
 													setMenuVisible(false);
 												}}

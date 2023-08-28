@@ -110,8 +110,8 @@ export const OtcChatPage = observer(() => {
 
 	const mailData = useMemo(() => new OutgoingMailData(), []);
 	useEffect(() => {
-		if (mailData.from !== myAccount) {
-			mailData.from = myAccount;
+		if (mailData.from?.account !== myAccount) {
+			mailData.from = { account: myAccount };
 		}
 
 		if (!mailData.to.items.length || mailData.to.items[0].routing?.address !== address) {

@@ -36,9 +36,11 @@ export class OutgoingMailData {
 	isGenericFeed = false;
 	extraPayment = '0';
 
-	from?: DomainAccount;
+	from?: {
+		account: DomainAccount;
+		blockchain?: string;
+	};
 	to = new Recipients();
-	blockchain?: string;
 
 	subject = '';
 	editorData?: OutputData;
@@ -55,16 +57,16 @@ export class OutgoingMailData {
 		makeAutoObservable(this);
 
 		autorun(async () => {
-			this.from =
-				this.from && domain.accounts.activeAccounts.includes(this.from)
-					? this.from
-					: domain.accounts.activeAccounts[0];
+			if (!this.from?.account || !domain.accounts.activeAccounts.includes(this.from.account)) {
+				const account = domain.accounts.activeAccounts[0];
+				this.from = account && { account: account };
+			}
 
-			if (this.from) {
-				const newChain = await getActiveBlockchainNameForAccount(this.from);
+			if (this.from.account) {
+				const newChain = await getActiveBlockchainNameForAccount(this.from.account);
 
-				if (this.blockchain == null) {
-					this.blockchain = newChain;
+				if (this.from.blockchain == null) {
+					this.from.blockchain = newChain;
 				}
 			}
 		});
@@ -84,9 +86,11 @@ export class OutgoingMailData {
 		isGenericFeed?: boolean;
 		extraPayment?: string;
 
-		from?: DomainAccount;
+		from?: {
+			account: DomainAccount;
+			blockchain?: string;
+		};
 		to?: Recipients;
-		blockchain?: string;
 
 		subject?: string;
 		editorData?: OutputData;
@@ -101,9 +105,9 @@ export class OutgoingMailData {
 			this.isGenericFeed = data?.isGenericFeed || false;
 			this.extraPayment = data?.extraPayment || '0';
 
-			this.from = data?.from || domain.accounts.activeAccounts[0];
+			this.from =
+				data?.from || (domain.accounts.activeAccounts[0] && { account: domain.accounts.activeAccounts[0] });
 			this.to = data?.to || new Recipients();
-			this.blockchain = data?.blockchain;
 
 			this.subject = data?.subject || '';
 			this.editorData = data?.editorData;
@@ -141,21 +145,20 @@ export class OutgoingMailData {
 			const proxyAccount = domain.availableProxyAccounts[0];
 
 			if (!this.from) {
-				this.from = await connectAccount({ place: 'sending-message' });
-				if (!this.from) return false;
+				const account = await connectAccount({ place: 'sending-message' });
+				if (!account) return false;
 
-				if (this.from.wallet.factory.blockchainGroup === 'evm') {
-					const from = this.from;
+				this.from = { account };
 
+				if (account.wallet.factory.blockchainGroup === 'evm') {
 					const network: EVMNetwork | undefined = await showStaticComponent(resolve => (
-						<SelectNetworkModal wallet={from.wallet} account={from.account} onClose={resolve} />
+						<SelectNetworkModal wallet={account.wallet} account={account.account} onClose={resolve} />
 					));
 
-					this.blockchain = network != null ? EVM_NAMES[network] : undefined;
-
-					if (!this.blockchain) return false;
+					this.from.blockchain = network != null ? EVM_NAMES[network] : undefined;
+					if (!this.from.blockchain) return false;
 				}
-			} else if (proxyAccount && proxyAccount.account.address !== this.from.account.address) {
+			} else if (proxyAccount && proxyAccount.account.address !== this.from.account.account.address) {
 				const proceed = await showStaticComponent<boolean>(resolve => (
 					<ActionModal
 						title="Different accounts"
@@ -165,7 +168,7 @@ export class OutgoingMailData {
 								look={ActionButtonLook.PRIMARY}
 								onClick={() => resolve(true)}
 							>
-								Continue with {truncateInMiddle(this.from!.account.address, 8, '...')}
+								Continue with {truncateInMiddle(this.from!.account.account.address, 8, '...')}
 							</ActionButton>,
 							<ActionButton
 								size={ActionButtonSize.XLARGE}
@@ -180,7 +183,7 @@ export class OutgoingMailData {
 						You're going to send the message using
 						<br />
 						<b>
-							<AdaptiveText text={this.from!.account.address} />
+							<AdaptiveText text={this.from!.account.account.address} />
 						</b>
 						<br />
 						But the parent application uses
@@ -197,8 +200,8 @@ export class OutgoingMailData {
 			}
 
 			if (
-				this.from.wallet.factory.blockchainGroup === 'evm' &&
-				(await getEvmWalletNetwork(this.from.wallet)) == null
+				this.from.account.wallet.factory.blockchainGroup === 'evm' &&
+				(await getEvmWalletNetwork(this.from.account.wallet)) == null
 			) {
 				toast(
 					<>
@@ -209,9 +212,13 @@ export class OutgoingMailData {
 				return false;
 			}
 
-			const curr = await this.from.wallet.getCurrentAccount();
-			if (curr?.address !== this.from.account.address) {
-				await domain.handleSwitchRequest(this.from.wallet.factory.wallet, curr, this.from.account);
+			const curr = await this.from.account.wallet.getCurrentAccount();
+			if (curr?.address !== this.from.account.account.address) {
+				await domain.handleSwitchRequest(
+					this.from.account.wallet.factory.wallet,
+					curr,
+					this.from.account.account,
+				);
 			}
 
 			let content: YMF;
@@ -227,19 +234,19 @@ export class OutgoingMailData {
 
 			if (this.mode === OutgoingMailDataMode.MESSAGE) {
 				const result = await sendMessage({
-					sender: this.from,
+					sender: this.from.account,
 					subject: this.subject,
 					text: content,
 					attachments: this.attachments,
 					attachmentFiles: this.attachmentFiles,
 					recipients: this.to.items.map(r => r.routing?.address!),
-					blockchain: this.blockchain,
+					blockchain: this.from.blockchain,
 					feedId: this.feedId,
 				});
 
 				console.log('Sending result: ', result);
 			} else {
-				const blockchain = this.blockchain;
+				const blockchain = this.from.blockchain;
 				invariant(blockchain, 'Chain not defined');
 
 				if (this.isGenericFeed) {
@@ -248,7 +255,7 @@ export class OutgoingMailData {
 					invariant(commission === this.extraPayment, 'Commissions mismatch');
 				}
 				const result = await broadcastMessage({
-					sender: this.from,
+					sender: this.from.account,
 					subject: this.subject,
 					text: content,
 					attachments: this.attachments,
@@ -271,7 +278,7 @@ export class OutgoingMailData {
 									blockchainMeta[blockchain].ethNetwork?.nativeCurrency.decimals || 9,
 							  )
 						: '0',
-					blockchain: this.blockchain,
+					blockchain: this.from.blockchain,
 				});
 
 				console.log('Sending result: ', result);
