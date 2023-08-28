@@ -6,7 +6,7 @@ import { useMutation } from 'react-query';
 import AutoSizer from 'react-virtualized-auto-sizer';
 import { FixedSizeList as List } from 'react-window';
 
-import { FeedReason, FeedSource } from '../../../../api/feedServerApi';
+import { FeedReason, FeedSource, TokenInProtocol } from '../../../../api/feedServerApi';
 import { ActionButton, ActionButtonLook } from '../../../../components/ActionButton/ActionButton';
 import { Avatar } from '../../../../components/avatar/avatar';
 import { CheckBox } from '../../../../components/checkBox/checkBox';
@@ -26,7 +26,7 @@ import { reloadFeed } from '../../feedPage/feedPage';
 import { FeedLinkTypeIcon } from '../feedLinkTypeIcon/feedLinkTypeIcon';
 import css from './feedSettingsPopup.module.scss';
 
-type FeedReasonOrEmpty = FeedReason | '';
+type FeedReasonOrEmpty = FeedReason | TokenInProtocol | '';
 
 export interface FeedSettingsPopupProps {
 	account: DomainAccount;
@@ -55,7 +55,8 @@ export const FeedSettingsPopup = observer(({ account, onClose }: FeedSettingsPop
 		const grouped = sources.reduce((res, s) => {
 			const cryptoProjectId = s.cryptoProject?.id;
 			const cryptoProject =
-				(cryptoProjectId && config?.defaultProjects.find(p => p.projectId === cryptoProjectId)) || undefined;
+				(cryptoProjectId && config?.defaultProjects.find(p => p.projectId === Number(cryptoProjectId))) ||
+				undefined;
 			const reasons = cryptoProject?.reasons || [''];
 			for (const reason of reasons) {
 				const list = (res[reason] = res[reason] || []);
@@ -66,14 +67,16 @@ export const FeedSettingsPopup = observer(({ account, onClose }: FeedSettingsPop
 
 		const aggregated = (Object.keys(grouped) as FeedReasonOrEmpty[])
 			.sort((a: FeedReasonOrEmpty, b: FeedReasonOrEmpty) => {
-				const getOrder = (reason: FeedReasonOrEmpty) =>
-					reason
-						? {
-								[FeedReason.BALANCE]: 1,
-								[FeedReason.PROTOCOL]: 2,
-								[FeedReason.TRANSACTION]: 3,
-						  }[reason]
-						: 4;
+				const getOrder = (reason: FeedReasonOrEmpty) => {
+					if (reason === FeedReason.BALANCE) {
+						return 1;
+					} else if (reason === FeedReason.PROTOCOL) {
+						return 2;
+					} else if (reason === FeedReason.TRANSACTION) {
+						return 3;
+					}
+					return 4;
+				};
 
 				return getOrder(a) - getOrder(b);
 			})
@@ -122,6 +125,19 @@ export const FeedSettingsPopup = observer(({ account, onClose }: FeedSettingsPop
 		style: React.CSSProperties;
 	}) => {
 		const source = data[index];
+		const getReasonText = (reason: FeedReasonOrEmpty) => {
+			if (reason === FeedReason.BALANCE) {
+				return 'Tokens you hold';
+			} else if (reason === FeedReason.PROTOCOL) {
+				return 'Projects you have position in';
+			} else if (reason === FeedReason.TRANSACTION) {
+				return 'Projects you used';
+			}
+			if (Object.keys(sourcesByReason).length === 1) {
+				return 'Source';
+			}
+			return 'Other sources';
+		};
 		if (typeof source === 'string') {
 			const reason = source;
 			return (
@@ -139,17 +155,7 @@ export const FeedSettingsPopup = observer(({ account, onClose }: FeedSettingsPop
 							);
 						}}
 					/>
-					<div className={css.categoryReason}>
-						{reason
-							? {
-									[FeedReason.BALANCE]: 'Tokens you hold',
-									[FeedReason.PROTOCOL]: 'Projects you have position in',
-									[FeedReason.TRANSACTION]: 'Projects you used',
-							  }[reason]
-							: Object.keys(sourcesByReason).length === 1
-							? 'Source'
-							: 'Other sources'}
-					</div>
+					<div className={css.categoryReason}>{getReasonText(reason)}</div>
 					<div className={css.categoryProject}>Token / Project</div>
 				</div>
 			);

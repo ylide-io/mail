@@ -1,7 +1,7 @@
 import { REACT_APP__FEED_MANAGER } from '../env';
 import { MainviewKeyPayload } from '../types';
 import { createCleanSerachParams } from '../utils/url';
-import { FeedReason } from './feedServerApi';
+import { FeedReason, TokenInProtocol } from './feedServerApi';
 
 export namespace FeedManagerApi {
 	export enum ErrorCode {
@@ -110,39 +110,26 @@ export namespace FeedManagerApi {
 
 	export interface CoverageItem {
 		tokenId: string;
-		missing: boolean;
-		projectName: string | null;
-		name: string | null;
-		symbol: string | null;
+		covered: boolean;
+		projectName?: string;
+		symbol?: string;
 	}
 
 	export type CoverageInfo = {
 		items: CoverageItem[];
-	} & Ratio &
-		RatioUsd;
-
-	export interface Ratio {
 		ratio: number;
 		coveredCount: number;
 		total: number;
-	}
-	export interface RatioUsd {
 		ratioUsd: number;
 		usdTotal: number;
 		usdCovered: number;
-	}
-
-	export type CoverageResponse = {
-		tokens: CoverageInfo;
-		protocols: CoverageInfo;
-		transactions: Ratio;
 	};
 
-	export async function getCoverage(token: string) {
-		return await request<CoverageResponse>(`/coverage`, {
-			token,
-		});
-	}
+	export type Coverage = {
+		tokens: CoverageInfo;
+		protocols: CoverageInfo;
+		totalCoverage: string;
+	};
 
 	export type TagsResponse = {
 		id: number;
@@ -155,13 +142,28 @@ export namespace FeedManagerApi {
 
 	//
 
-	export interface UserProject {
-		projectId: string;
+	export type DefaultProject = {
+		projectId: number;
+		reasons: (FeedReason | TokenInProtocol)[];
+		reasonsData: {
+			id: string;
+			data: {
+				id?: string;
+				type: FeedReason | TokenInProtocol;
+				reason?: string;
+				balanceUsd?: number;
+				symbol?: string;
+				tokens?: {
+					id: string;
+					type: TokenInProtocol;
+					balanceUsd: number;
+					symbol: string;
+				}[];
+			}[];
+		}[];
 		projectName: string;
-		reasons: FeedReason[];
-		reasonsRaw: string[][];
-		reasonsDataRaw: any[];
-	}
+		covered: boolean;
+	};
 
 	export enum ConfigMode {
 		AUTO_ADD = 'auto-add',
@@ -178,11 +180,11 @@ export namespace FeedManagerApi {
 
 	export interface GetConfigResponse {
 		config: ConfigEntity;
-		defaultProjects: UserProject[];
+		defaultProjects: DefaultProject[];
 	}
 
 	export async function getConfig(data: { token: string }) {
-		return await request<GetConfigResponse>(`/get-config`, data);
+		return await request<GetConfigResponse>(`/v2/get-config`, data);
 	}
 
 	export async function setConfig(data: {

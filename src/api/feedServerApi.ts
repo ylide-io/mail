@@ -16,6 +16,12 @@ export enum FeedReason {
 	TRANSACTION = 'transaction',
 }
 
+export enum TokenInProtocol {
+	SUPPLY = 'supply',
+	REWARD = 'reward',
+	BORROW = 'borrow',
+}
+
 export interface FeedSource {
 	id: string;
 	name: string;
@@ -125,7 +131,7 @@ export namespace FeedServerApi {
 		checkNewPosts?: boolean;
 		signal?: AbortSignal;
 	}): Promise<GetPostsResponse> {
-		return await request(`/posts?${createCleanSerachParams(params)}`, { signal: params.signal });
+		return await request(`/v2/posts?${createCleanSerachParams(params)}`, { signal: params.signal });
 	}
 
 	export type GetPostResponse = { post: FeedPost };

@@ -232,9 +232,20 @@ export function FeedPostItem({ isInFeed, realtedAccounts, post }: FeedPostItemPr
 	const userCryptoProject = useMemo(() => {
 		if (realtedAccounts?.length === 1 && post.cryptoProjectId) {
 			const config = feedSettings.getAccountConfig(realtedAccounts[0]);
-			return config?.defaultProjects.find(p => p.projectId === post.cryptoProjectId);
+			return config?.defaultProjects.find(p => p.projectId === Number(post.cryptoProjectId));
 		}
 	}, [post.cryptoProjectId, realtedAccounts]);
+
+	const getReasonText = (reason: FeedReason | any) => {
+		if (reason === FeedReason.BALANCE) {
+			return 'You hold tokens of ';
+		} else if (reason === FeedReason.PROTOCOL) {
+			return 'Current position in ';
+		} else if (reason === FeedReason.TRANSACTION) {
+			return 'Historical tx in ';
+		}
+		return '';
+	};
 
 	return (
 		<>
@@ -271,14 +282,7 @@ export function FeedPostItem({ isInFeed, realtedAccounts, post }: FeedPostItemPr
 								  !!userCryptoProject.reasons.length &&
 								  !!userCryptoProject.projectName && (
 										<div className={css.reason} title="The reason why you see this post">
-											{
-												{
-													[FeedReason.BALANCE]: 'You hold tokens of ',
-													[FeedReason.PROTOCOL]: 'Current position in ',
-													[FeedReason.TRANSACTION]: 'Historical tx in ',
-												}[userCryptoProject.reasons[0]]
-											}
-
+											{getReasonText(userCryptoProject.reasons[0])}
 											<b>{userCryptoProject.projectName}</b>
 										</div>
 								  )}
@@ -341,7 +345,7 @@ export function FeedPostItem({ isInFeed, realtedAccounts, post }: FeedPostItemPr
 											{userCryptoProject && (
 												<DropDownItem
 													mode={DropDownItemMode.LITE}
-													onSelect={() => unfollow(userCryptoProject.projectId)}
+													onSelect={() => unfollow(String(userCryptoProject.projectId))}
 												>
 													Unfollow everything about <b>{userCryptoProject.projectName}</b>
 												</DropDownItem>

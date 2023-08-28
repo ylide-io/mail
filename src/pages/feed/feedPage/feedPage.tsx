@@ -52,7 +52,7 @@ const FeedPageContent = observer(() => {
 
 	const coverage = feedSettings.coverages.get(selectedAccounts[0]);
 	const totalCoverage = useMemo(() => {
-		if (!coverage || coverage === 'error' || coverage === 'loading') {
+		if (!coverage || coverage === 'loading') {
 			return null;
 		}
 		return coverage.totalCoverage;

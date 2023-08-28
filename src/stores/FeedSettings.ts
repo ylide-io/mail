@@ -2,7 +2,7 @@ import difference from 'lodash.difference';
 import { autorun, makeObservable, observable } from 'mobx';
 
 import { FeedManagerApi } from '../api/feedManagerApi';
-import { FeedServerApi, FeedSource } from '../api/feedServerApi';
+import { FeedReason, FeedServerApi, FeedSource, TokenInProtocol } from '../api/feedServerApi';
 import { analytics } from './Analytics';
 import domain from './Domain';
 import { DomainAccount } from './models/DomainAccount';
@@ -11,7 +11,7 @@ export interface FeedSettingsData {
 	mode: FeedManagerApi.ConfigMode;
 	includedSourceIds: string[];
 	excludedSourceIds: string[];
-	defaultProjects: FeedManagerApi.UserProject[];
+	defaultProjects: FeedManagerApi.DefaultProject[];
 }
 
 export class FeedSettings {
@@ -25,10 +25,7 @@ export class FeedSettings {
 	private configs = new Map<DomainAccount, FeedSettingsData | 'loading'>();
 
 	@observable
-	coverages = new Map<
-		DomainAccount,
-		(FeedManagerApi.CoverageResponse & { totalCoverage: string }) | 'loading' | 'error'
-	>();
+	coverages = new Map<DomainAccount, FeedManagerApi.Coverage | 'loading'>();
 
 	@observable
 	tags: { id: number; name: string }[] | 'loading' | 'error' = 'loading';
@@ -56,34 +53,115 @@ export class FeedSettings {
 						this.configs.set(account, 'loading');
 						this.coverages.set(account, 'loading');
 
-						const [configResponse, coverageResponse] = await Promise.allSettled([
-							FeedManagerApi.getConfig({ token: account.mainViewKey }),
-							FeedManagerApi.getCoverage(account.mainViewKey),
-						]);
-						if (configResponse.status === 'fulfilled') {
-							const { config, defaultProjects } = configResponse.value;
-							this.configs.set(account, {
-								mode: config.mode,
-								includedSourceIds: config.includedSourceIds,
-								excludedSourceIds: config.excludedSourceIds,
-								defaultProjects: defaultProjects,
-							});
-						} else {
-							this.isError = true;
-							console.log(`Failed to get config - ${configResponse.reason}`);
+						const configResponse = await FeedManagerApi.getConfig({
+							token: account.mainViewKey,
+						});
+
+						const { config, defaultProjects } = configResponse;
+						this.configs.set(account, {
+							mode: config.mode,
+							includedSourceIds: config.includedSourceIds,
+							excludedSourceIds: config.excludedSourceIds,
+							defaultProjects: defaultProjects,
+						});
+						const coverage: FeedManagerApi.Coverage = {
+							tokens: {
+								items: [],
+								ratio: 0,
+								coveredCount: 0,
+								total: 0,
+								ratioUsd: 0,
+								usdTotal: 0,
+								usdCovered: 0,
+							},
+							protocols: {
+								items: [],
+								ratio: 0,
+								coveredCount: 0,
+								total: 0,
+								ratioUsd: 0,
+								usdTotal: 0,
+								usdCovered: 0,
+							},
+							totalCoverage: '',
+						};
+						for (const project of defaultProjects) {
+							for (const { id, data } of project.reasonsData) {
+								for (const d of data) {
+									if (d.type === FeedReason.BALANCE) {
+										coverage.tokens.items.push({
+											tokenId: id,
+											covered: project.covered,
+											projectName: project.projectName,
+											symbol: d.symbol,
+										});
+										if (project.covered) {
+											coverage.tokens.coveredCount += 1;
+											coverage.tokens.usdCovered += d.balanceUsd || 0;
+										}
+										coverage.tokens.usdTotal += d.balanceUsd || 0;
+										coverage.tokens.total += 1;
+									} else if (d.type === FeedReason.PROTOCOL) {
+										coverage.protocols.items.push({
+											tokenId: id,
+											covered: project.covered,
+											projectName: project.projectName,
+										});
+										if (project.covered) {
+											coverage.protocols.coveredCount += 1;
+										}
+										coverage.protocols.total += 1;
+										if (d.tokens) {
+											for (const token of d.tokens) {
+												if (token.type === TokenInProtocol.BORROW) {
+													continue;
+												}
+												const projectToken = defaultProjects.find(data =>
+													data.reasonsData.some(({ id }) => id === token.id),
+												);
+												if (projectToken && projectToken.projectId !== 0) {
+													coverage.tokens.usdCovered += token.balanceUsd;
+												}
+												coverage.tokens.usdTotal += token.balanceUsd;
+											}
+										}
+									}
+								}
+							}
 						}
-						if (coverageResponse.status === 'fulfilled') {
-							const coverage = coverageResponse.value;
-							const total = coverage.tokens.usdTotal + coverage.protocols.usdTotal;
-							const covered = coverage.tokens.usdCovered + coverage.protocols.usdCovered;
-							const result = total > 0 ? (covered * 100) / total : 0;
-							const totalCoverage =
-								total === 0 ? 'N/A' : result === 100 ? '100%' : `${result.toFixed(1)}%`;
-							this.coverages.set(account, { ...coverage, totalCoverage });
-						} else {
-							this.coverages.set(account, 'error');
-							console.log(`Failed to get coverage - ${coverageResponse.reason}`);
+						coverage.tokens.usdCovered = Math.floor(coverage.tokens.usdCovered);
+						coverage.tokens.usdTotal = Math.floor(coverage.tokens.usdTotal);
+
+						coverage.protocols.usdTotal = Math.floor(coverage.protocols.usdTotal);
+						coverage.protocols.usdCovered = Math.floor(coverage.protocols.usdCovered);
+
+						if (coverage.tokens.total) {
+							coverage.tokens.ratio = Math.floor(
+								(coverage.tokens.coveredCount * 100) / coverage.tokens.total,
+							);
 						}
+						if (coverage.tokens.usdTotal) {
+							coverage.tokens.ratioUsd = Math.floor(
+								(coverage.tokens.usdCovered * 100) / coverage.tokens.usdTotal,
+							);
+						}
+						if (coverage.protocols.total) {
+							coverage.protocols.ratio = Math.floor(
+								(coverage.protocols.coveredCount * 100) / coverage.protocols.total,
+							);
+						}
+						if (coverage.protocols.usdTotal) {
+							coverage.protocols.ratioUsd = Math.floor(
+								(coverage.protocols.usdCovered * 100) / coverage.protocols.usdTotal,
+							);
+						}
+						const total = coverage.tokens.usdTotal + coverage.protocols.usdTotal;
+						const covered = coverage.tokens.usdCovered + coverage.protocols.usdCovered;
+						const result = total > 0 ? (covered * 100) / total : 0;
+						coverage.totalCoverage =
+							total === 0 ? 'N/A' : result === 100 ? '100%' : `${result.toFixed(1)}%`;
+						console.log(coverage);
+						this.coverages.set(account, coverage);
 					} catch (e) {
 						this.isError = true;
 					}
@@ -104,7 +182,7 @@ export class FeedSettings {
 
 		return this.sources
 			.filter(source =>
-				source.cryptoProject?.id && defaultProjectIds.includes(source.cryptoProject.id)
+				source.cryptoProject?.id && defaultProjectIds.includes(Number(source.cryptoProject.id))
 					? !config.excludedSourceIds.includes(source.id)
 					: config.includedSourceIds.includes(source.id),
 			)
@@ -137,7 +215,7 @@ export class FeedSettings {
 				source =>
 					!selectedSourceIds.includes(source.id) &&
 					source.cryptoProject?.id &&
-					defaultProjectIds.includes(source.cryptoProject.id),
+					defaultProjectIds.includes(Number(source.cryptoProject.id)),
 			)
 			.map(s => s.id);
 
@@ -145,7 +223,7 @@ export class FeedSettings {
 			.filter(
 				source =>
 					selectedSourceIds.includes(source.id) &&
-					(!source.cryptoProject?.id || !defaultProjectIds.includes(source.cryptoProject.id)),
+					(!source.cryptoProject?.id || !defaultProjectIds.includes(Number(source.cryptoProject.id))),
 			)
 			.map(s => s.id);
 
