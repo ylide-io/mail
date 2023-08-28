@@ -29,21 +29,21 @@ export interface SendMailButtonProps extends PropsWithClassName {
 export const SendMailButton = observer(
 	({ className, mailData, disabled, disableNetworkSwitch, onSent }: SendMailButtonProps) => {
 		const from = mailData.from;
+		const blockchain = mailData.blockchain;
 		const blockchainGroup = from?.wallet.factory.blockchainGroup;
+		const chainMeta = blockchain ? blockchainMeta[blockchain] : undefined;
 
 		const menuAnchorRef = useRef(null);
 		const [menuVisible, setMenuVisible] = useState(false);
 		const currency = useMemo(() => {
-			if (mailData.from) {
+			if (blockchain) {
 				try {
-					return domain.getBlockchainNativeCurrency(mailData.network);
-				} catch (err) {
-					return '';
-				}
+					return domain.getBlockchainNativeCurrency(blockchain);
+				} catch (err) {}
 			} else {
 				return '';
 			}
-		}, [mailData.from, mailData.network]);
+		}, [blockchain]);
 
 		const evmBalances = useMemo(() => {
 			const balances = new EvmBalances();
@@ -68,41 +68,21 @@ export const SendMailButton = observer(
 		};
 
 		const renderSendText = () => {
-			const payment =
-				mailData.extraPayment === '0' ? null : (
-					<span className={css.extraPayment}>
-						({mailData.extraPayment}
-						{currency ? ` ${currency}` : ''})
-					</span>
-				);
-			if (blockchainGroup === 'everscale') {
-				const bData = blockchainMeta.everscale;
-				return (
-					<>
-						Send via {bData.logo(14)} {bData.title}
-						{payment}
-					</>
-				);
-			} else if (blockchainGroup === 'venom-testnet') {
-				const bData = blockchainMeta['venom-testnet'];
-				return (
-					<>
-						Send via {bData.logo(14)} {bData.title}
-						{payment}
-					</>
-				);
-			} else if (blockchainGroup === 'evm' && mailData.network != null) {
-				const bData = blockchainMeta[EVM_NAMES[mailData.network]];
-				if (bData) {
-					return (
-						<>
-							Send via {bData.logo(16)} {bData.title}
-							{payment}
-						</>
+			if (chainMeta) {
+				const payment =
+					mailData.extraPayment === '0' ? null : (
+						<span className={css.extraPayment}>
+							({mailData.extraPayment}
+							{currency ? ` ${currency}` : ''})
+						</span>
 					);
-				} else {
-					console.log('WTF: ', mailData.network, EVM_NAMES[mailData.network]);
-				}
+
+				return (
+					<>
+						Send via {chainMeta.logo()} {chainMeta.title}
+						{payment}
+					</>
+				);
 			}
 
 			return 'Send';
@@ -166,7 +146,7 @@ export const SendMailButton = observer(
 													invariant(from);
 
 													await domain.switchEVMChain(from.wallet, network);
-													mailData.network = network;
+													mailData.blockchain = EVM_NAMES[network];
 
 													setMenuVisible(false);
 												}}

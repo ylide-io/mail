@@ -17,14 +17,14 @@ import {
 	MessageContentV4,
 	MessageContentV5,
 	MessageSecureContext,
+	RecipientInfo,
 	SendBroadcastResult,
 	SendMailResult,
 	ServiceCode,
 	Uint256,
+	WalletAccount,
 	YlideIpfsStorage,
 	YMF,
-	RecipientInfo,
-	WalletAccount,
 } from '@ylide/sdk';
 import { generatePath } from 'react-router-dom';
 import { useIsMatchesPattern, useNav } from './url';
@@ -40,15 +40,13 @@ import { ComposeMailPopup } from '../pages/mail/_common/composeMailPopup/compose
 import { invariant } from './assert';
 import domain from '../stores/Domain';
 import { DomainAccount } from '../stores/models/DomainAccount';
-import { EVMNetwork } from '@ylide/ethereum';
 import { analytics } from '../stores/Analytics';
 import { readFileAsArrayBuffer } from './file';
-import { getEvmWalletNetwork } from './wallet';
 import { VENOM_SERVICE_CODE } from '../constants';
 import { useCallback } from 'react';
 import { hashToIpfsUrl } from './ipfs';
 import { ILinkedMessage } from '../stores/MailList';
-import { formatAddress, isEvmBlockchain } from './blockchain';
+import { evmNameToNetwork, formatAddress, getActiveBlockchainNameForAccount, isEvmBlockchain } from './blockchain';
 import { htmlSelfClosingTagsToXHtml } from './string';
 import { toJS } from 'mobx';
 import { BigNumber } from '@ethersproject/bignumber';
@@ -62,7 +60,7 @@ export async function sendMessage({
 	attachments,
 	attachmentFiles,
 	recipients,
-	network,
+	blockchain,
 	feedId,
 }: {
 	sender: DomainAccount;
@@ -71,7 +69,7 @@ export async function sendMessage({
 	attachments: MessageAttachment[];
 	attachmentFiles: File[];
 	recipients: string[];
-	network?: EVMNetwork;
+	blockchain?: string;
 	feedId?: Uint256;
 }): Promise<SendMailResult> {
 	analytics.mailSentAttempt();
@@ -115,8 +113,9 @@ export async function sendMessage({
 		recipientInfos: recipients.map(address => new RecipientInfo({ address, blockchain: '' })),
 	});
 
-	if (network == null && sender.wallet.factory.blockchainGroup === 'evm') {
-		network = await getEvmWalletNetwork(sender.wallet);
+	if (!blockchain && sender.wallet.factory.blockchainGroup === 'evm') {
+		blockchain = await getActiveBlockchainNameForAccount(sender);
+		invariant(blockchain, 'Cannot get active EVM chain');
 	}
 
 	const result = await domain.ylide.core.sendMessage(
@@ -130,7 +129,7 @@ export async function sendMessage({
 			feedId,
 		},
 		{
-			network,
+			network: evmNameToNetwork(blockchain),
 		},
 	);
 
@@ -148,7 +147,7 @@ export async function broadcastMessage({
 	feedId,
 	isGenericFeed = false,
 	extraPayment = '0',
-	network,
+	blockchain,
 	value = '0',
 }: {
 	sender: DomainAccount;
@@ -159,7 +158,7 @@ export async function broadcastMessage({
 	feedId: Uint256;
 	isGenericFeed?: boolean;
 	extraPayment?: string;
-	network?: EVMNetwork;
+	blockchain?: string;
 	value?: string;
 }): Promise<SendBroadcastResult> {
 	analytics.mailSentAttempt();
@@ -201,8 +200,9 @@ export async function broadcastMessage({
 		recipientInfos: [],
 	});
 
-	if (network == null && sender.wallet.factory.blockchainGroup === 'evm') {
-		network = await getEvmWalletNetwork(sender.wallet);
+	if (!blockchain && sender.wallet.factory.blockchainGroup === 'evm') {
+		blockchain = await getActiveBlockchainNameForAccount(sender);
+		invariant(blockchain, 'Cannot get active EVM chain');
 	}
 
 	const result = await domain.ylide.core.broadcastMessage(
@@ -214,10 +214,10 @@ export async function broadcastMessage({
 			feedId,
 		},
 		{
-			network,
 			isGenericFeed,
 			extraPayment: BigNumber.from(extraPayment),
 			value: BigNumber.from(value),
+			network: evmNameToNetwork(blockchain),
 		},
 	);
 

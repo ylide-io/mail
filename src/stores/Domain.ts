@@ -159,9 +159,8 @@ export class Domain {
 			}));
 	}
 
-	getBlockchainNativeCurrency(network?: EVMNetwork) {
-		const name = this.getBlockchainName(network);
-		return blockchainMeta[name].symbol || blockchainMeta[name].ethNetwork?.nativeCurrency.symbol || '';
+	getBlockchainNativeCurrency(chain: string) {
+		return blockchainMeta[chain].symbol || blockchainMeta[chain].ethNetwork?.nativeCurrency.symbol || '';
 	}
 
 	getBlockchainName(network?: EVMNetwork) {

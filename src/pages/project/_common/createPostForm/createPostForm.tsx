@@ -16,11 +16,9 @@ import { ReactComponent as TrashSvg } from '../../../../icons/ic20/trash.svg';
 import { ReactComponent as ImageSvg } from '../../../../icons/ic28/image.svg';
 import { ReactComponent as StickerSvg } from '../../../../icons/ic28/sticker.svg';
 import { analytics } from '../../../../stores/Analytics';
-import domain from '../../../../stores/Domain';
 import { DomainAccount } from '../../../../stores/models/DomainAccount';
 import { OutgoingMailData, OutgoingMailDataMode } from '../../../../stores/outgoingMailData';
 import { HorizontalAlignment } from '../../../../utils/alignment';
-import { evmNameToNetwork } from '../../../../utils/blockchain';
 import { calcCommission } from '../../../../utils/commission';
 import { openFilePicker, readFileAsDataURL } from '../../../../utils/file';
 import { hashToIpfsUrl, ipfsToHttpUrl } from '../../../../utils/ipfs';
@@ -70,15 +68,11 @@ export const CreatePostForm = observer(
 				return mailData;
 			}, []);
 
+			const { from, blockchain } = mailData;
+
 			useEffect(() => {
 				mailData.feedId = feedId;
-
-				if (fixedChain) {
-					const evmNetwork = evmNameToNetwork(fixedChain);
-					if (evmNetwork != null) {
-						mailData.network = evmNetwork;
-					}
-				}
+				mailData.blockchain = fixedChain;
 
 				mailData.validator = () => {
 					const text = mailData.plainTextData;
@@ -118,22 +112,18 @@ export const CreatePostForm = observer(
 
 			useEffect(() => {
 				let cancelled = false;
-				BlockchainFeedApi.getCommissions({ feedId: mailData.feedId })
+				BlockchainFeedApi.getCommissions({ feedId: feedId })
 					.then(commissions => {
-						if (cancelled || !mailData.from || !mailData.network) {
-							return;
+						if (!cancelled && from && blockchain) {
+							const commission = calcCommission(blockchain, commissions);
+							mailData.extraPayment = commission || '0';
 						}
-						const blockchain = domain.getBlockchainName(mailData.network);
-						const commission = calcCommission(blockchain, commissions);
-						mailData.extraPayment = commission || '0';
 					})
-					.catch(err => {
-						console.error(err);
-					});
+					.catch(console.error);
 				return () => {
 					cancelled = true;
 				};
-			}, [mailData, mailData.from, mailData.network]);
+			}, [blockchain, feedId, from, mailData]);
 
 			const [expanded, setExpanded] = useState(false);
 

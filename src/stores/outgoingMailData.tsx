@@ -1,5 +1,5 @@
 import { OutputData } from '@editorjs/editorjs';
-import { EVMNetwork } from '@ylide/ethereum';
+import { EVM_NAMES, EVMNetwork } from '@ylide/ethereum';
 import { MessageAttachment, Uint256, YMF } from '@ylide/sdk';
 import { autorun, makeAutoObservable, transaction } from 'mobx';
 
@@ -15,7 +15,7 @@ import { HUB_FEED_ID, OTC_FEED_ID } from '../constants';
 import { AppMode, REACT_APP__APP_MODE } from '../env';
 import { connectAccount } from '../utils/account';
 import { invariant } from '../utils/assert';
-import { blockchainMeta } from '../utils/blockchain';
+import { blockchainMeta, getActiveBlockchainNameForAccount } from '../utils/blockchain';
 import { calcComissionDecimals, calcCommission } from '../utils/commission';
 import { broadcastMessage, editorJsToYMF, isEmptyEditorJsData, sendMessage } from '../utils/mail';
 import { truncateInMiddle } from '../utils/string';
@@ -38,7 +38,7 @@ export class OutgoingMailData {
 
 	from?: DomainAccount;
 	to = new Recipients();
-	network?: EVMNetwork;
+	blockchain?: string;
 
 	subject = '';
 	editorData?: OutputData;
@@ -60,14 +60,12 @@ export class OutgoingMailData {
 					? this.from
 					: domain.accounts.activeAccounts[0];
 
-			if (this.from?.wallet.factory.blockchainGroup === 'evm') {
-				const selectedNetwork = await getEvmWalletNetwork(this.from.wallet);
+			if (this.from) {
+				const newChain = await getActiveBlockchainNameForAccount(this.from);
 
-				if (this.network == null) {
-					this.network = selectedNetwork;
+				if (this.blockchain == null) {
+					this.blockchain = newChain;
 				}
-			} else {
-				this.network = undefined;
 			}
 		});
 	}
@@ -88,7 +86,7 @@ export class OutgoingMailData {
 
 		from?: DomainAccount;
 		to?: Recipients;
-		network?: EVMNetwork;
+		blockchain?: string;
 
 		subject?: string;
 		editorData?: OutputData;
@@ -105,7 +103,7 @@ export class OutgoingMailData {
 
 			this.from = data?.from || domain.accounts.activeAccounts[0];
 			this.to = data?.to || new Recipients();
-			this.network = data?.network;
+			this.blockchain = data?.blockchain;
 
 			this.subject = data?.subject || '';
 			this.editorData = data?.editorData;
@@ -149,11 +147,13 @@ export class OutgoingMailData {
 				if (this.from.wallet.factory.blockchainGroup === 'evm') {
 					const from = this.from;
 
-					this.network = await showStaticComponent(resolve => (
+					const network: EVMNetwork | undefined = await showStaticComponent(resolve => (
 						<SelectNetworkModal wallet={from.wallet} account={from.account} onClose={resolve} />
 					));
 
-					if (this.network == null) return false;
+					this.blockchain = network != null ? EVM_NAMES[network] : undefined;
+
+					if (!this.blockchain) return false;
 				}
 			} else if (proxyAccount && proxyAccount.account.address !== this.from.account.address) {
 				const proceed = await showStaticComponent<boolean>(resolve => (
@@ -233,17 +233,15 @@ export class OutgoingMailData {
 					attachments: this.attachments,
 					attachmentFiles: this.attachmentFiles,
 					recipients: this.to.items.map(r => r.routing?.address!),
-					network: this.network,
+					blockchain: this.blockchain,
 					feedId: this.feedId,
 				});
 
 				console.log('Sending result: ', result);
 			} else {
-				const blockchain = this.network
-					? domain.getBlockchainName(this.network)
-					: this.from.wallet.factory.wallet === 'everwallet'
-					? 'everscale'
-					: 'venom-testnet';
+				const blockchain = this.blockchain;
+				invariant(blockchain, 'Chain not defined');
+
 				if (this.isGenericFeed) {
 					const commissions = await BlockchainFeedApi.getCommissions({ feedId: this.feedId });
 					const commission = calcCommission(blockchain, commissions);
@@ -273,7 +271,7 @@ export class OutgoingMailData {
 									blockchainMeta[blockchain].ethNetwork?.nativeCurrency.decimals || 9,
 							  )
 						: '0',
-					network: this.network,
+					blockchain: this.blockchain,
 				});
 
 				console.log('Sending result: ', result);
