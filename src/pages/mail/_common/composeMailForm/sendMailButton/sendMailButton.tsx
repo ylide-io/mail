@@ -1,6 +1,6 @@
 import clsx from 'clsx';
 import { observer } from 'mobx-react';
-import { useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 
 import { GridRowBox, TruncateTextBox } from '../../../../../components/boxes/boxes';
 import { DropDown, DropDownItem, DropDownItemMode } from '../../../../../components/dropDown/dropDown';
@@ -55,6 +55,12 @@ export const SendMailButton = observer(
 				? getWalletSupportedBlockchains(mailData.from.account.wallet, allowedChains)
 				: [];
 		}, [allowedChains, mailData.from]);
+
+		useEffect(() => {
+			if (mailData.from?.blockchain && !allowedChainsForAccount.includes(mailData.from.blockchain)) {
+				mailData.setFromBlockchain(allowedChainsForAccount[0]);
+			}
+		}, [allowedChainsForAccount, mailData.from]);
 
 		const sendMail = async () => {
 			try {
