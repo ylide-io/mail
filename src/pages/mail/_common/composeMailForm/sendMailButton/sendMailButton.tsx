@@ -156,14 +156,7 @@ export const SendMailButton = observer(
 												}
 												onSelect={async () => {
 													invariant(mailData.from);
-
-													await domain.switchEVMChain(
-														mailData.from.account.wallet,
-														evmNameToNetwork(blockchain)!,
-													);
-
 													mailData.setFromBlockchain(blockchain);
-
 													setMenuVisible(false);
 												}}
 											>
