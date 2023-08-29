@@ -9,7 +9,7 @@ import { TrustWalletLogo } from '../icons/wallets/TrustWalletLogo';
 import { VenomLogo } from '../icons/wallets/VenomLogo';
 import { WalletConnectLogo } from '../icons/wallets/WalletConnectLogo';
 import { Wallet } from '../stores/models/Wallet';
-import { evmNameToNetwork } from './blockchain';
+import { BlockchainName, evmNameToNetwork, isEvmBlockchain } from './blockchain';
 
 export interface WalletMeta {
 	title: string;
@@ -172,6 +172,15 @@ export const walletsMeta: Record<string, WalletMeta> = {
 		blockchains: ['venom-testnet'],
 	},
 };
+
+export function isWalletSupportsBlockchain(wallet: Wallet, chain: string) {
+	return (
+		(isEvmBlockchain(chain) && wallet.factory.blockchainGroup === 'evm') ||
+		(chain === BlockchainName.VENOM_TESTNET && wallet.wallet === 'venomwallet') ||
+		(chain === BlockchainName.EVERSCALE && wallet.factory.wallet === 'everwallet') ||
+		(chain === BlockchainName.EVERSCALE && wallet.factory.wallet === 'everwallet-proxy')
+	);
+}
 
 export async function getEvmWalletNetwork(wallet: Wallet): Promise<EVMNetwork | undefined> {
 	try {

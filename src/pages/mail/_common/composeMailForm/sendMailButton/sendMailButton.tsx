@@ -1,6 +1,6 @@
 import clsx from 'clsx';
 import { observer } from 'mobx-react';
-import { useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 
 import { GridRowBox, TruncateTextBox } from '../../../../../components/boxes/boxes';
 import { DropDown, DropDownItem, DropDownItemMode } from '../../../../../components/dropDown/dropDown';
@@ -16,17 +16,18 @@ import { OutgoingMailData } from '../../../../../stores/outgoingMailData';
 import { AlignmentDirection, HorizontalAlignment } from '../../../../../utils/alignment';
 import { invariant } from '../../../../../utils/assert';
 import { blockchainMeta, evmNameToNetwork } from '../../../../../utils/blockchain';
+import { isWalletSupportsBlockchain } from '../../../../../utils/wallet';
 import css from './sendMailButton.module.scss';
 
 export interface SendMailButtonProps extends PropsWithClassName {
 	mailData: OutgoingMailData;
+	allowedChains?: string[];
 	disabled?: boolean;
-	disableNetworkSwitch?: boolean;
 	onSent?: () => void;
 }
 
 export const SendMailButton = observer(
-	({ className, mailData, disabled, disableNetworkSwitch, onSent }: SendMailButtonProps) => {
+	({ className, mailData, allowedChains, disabled, onSent }: SendMailButtonProps) => {
 		const from = mailData.from;
 		const blockchain = from?.blockchain;
 
@@ -51,6 +52,20 @@ export const SendMailButton = observer(
 
 			return balances;
 		}, [from]);
+
+		const allowedChainsForAccount = useMemo(() => {
+			if (allowedChains?.length && from?.account) {
+				return allowedChains.filter(chain => isWalletSupportsBlockchain(from.account.wallet, chain));
+			}
+		}, [allowedChains, from?.account]);
+
+		useEffect(() => {
+			if (from && allowedChainsForAccount?.length) {
+				if (!blockchain || !allowedChainsForAccount.includes(blockchain)) {
+					from.blockchain = allowedChainsForAccount[0];
+				}
+			}
+		}, [allowedChainsForAccount, blockchain, from]);
 
 		const sendMail = async () => {
 			try {
@@ -87,7 +102,8 @@ export const SendMailButton = observer(
 			return 'Send';
 		};
 
-		const withDropDown = from?.account?.wallet.factory.blockchainGroup === 'evm' && !disableNetworkSwitch;
+		const withDropDown =
+			from?.account?.wallet.factory.blockchainGroup === 'evm' && allowedChainsForAccount?.length !== 1;
 
 		return (
 			<div
@@ -129,6 +145,7 @@ export const SendMailButton = observer(
 							>
 								{domain.registeredBlockchains
 									.filter(f => f.blockchainGroup === 'evm')
+									.filter(f => !allowedChains?.length || allowedChains?.includes(f.blockchain))
 									.map(({ blockchain }) => {
 										const bData = blockchainMeta[blockchain];
 

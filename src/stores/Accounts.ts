@@ -130,12 +130,4 @@ export class Accounts {
 	@computed get hasActiveAccounts() {
 		return !!this.activeAccounts.length;
 	}
-
-	@computed get activeEvmAccounts() {
-		return this.activeAccounts.filter(a => a.wallet.factory.blockchainGroup === 'evm');
-	}
-
-	@computed get activeVenomAccounts() {
-		return this.activeAccounts.filter(a => a.wallet.wallet === 'venomwallet');
-	}
 }

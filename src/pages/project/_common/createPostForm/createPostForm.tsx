@@ -16,8 +16,13 @@ import { ReactComponent as TrashSvg } from '../../../../icons/ic20/trash.svg';
 import { ReactComponent as ImageSvg } from '../../../../icons/ic28/image.svg';
 import { ReactComponent as StickerSvg } from '../../../../icons/ic28/sticker.svg';
 import { analytics } from '../../../../stores/Analytics';
-import { DomainAccount } from '../../../../stores/models/DomainAccount';
+import {
+	BlockchainProject,
+	BlockchainProjectAttachmentMode,
+} from '../../../../stores/blockchainProjects/blockchainProjects';
+import { browserStorage } from '../../../../stores/browserStorage';
 import { OutgoingMailData, OutgoingMailDataMode } from '../../../../stores/outgoingMailData';
+import { getAllowedAccountsForBlockchains } from '../../../../utils/account';
 import { HorizontalAlignment } from '../../../../utils/alignment';
 import { calcCommission } from '../../../../utils/commission';
 import { openFilePicker, readFileAsDataURL } from '../../../../utils/file';
@@ -33,31 +38,21 @@ export interface CreatePostFormApi {
 }
 
 export interface CreatePostFormProps extends PropsWithClassName {
-	accounts: DomainAccount[];
+	project: BlockchainProject;
 	feedId: Uint256;
-	allowCustomAttachments: boolean;
 	placeholder: string;
-	fixedChain?: string;
 	onCreated?: () => void;
 }
 
 export const CreatePostForm = observer(
 	forwardRef(
-		(
-			{
-				className,
-				accounts,
-				feedId,
-				allowCustomAttachments,
-				placeholder,
-				fixedChain,
-				onCreated,
-			}: CreatePostFormProps,
-			ref: Ref<CreatePostFormApi>,
-		) => {
-			const textAreaApiRef = useRef<AutoSizeTextAreaApi>(null);
+		({ className, project, feedId, placeholder, onCreated }: CreatePostFormProps, ref: Ref<CreatePostFormApi>) => {
+			const allowedChains = project.allowedChains;
+			const accounts = useMemo(() => getAllowedAccountsForBlockchains(allowedChains), [allowedChains]);
 
-			const [replyTo, setReplyTo] = useState<DecodedBlockchainFeedPost>();
+			const allowCustomAttachments =
+				project.attachmentMode === BlockchainProjectAttachmentMode.EVERYONE ||
+				(browserStorage.isUserAdmin && project.attachmentMode === BlockchainProjectAttachmentMode.ADMINS);
 
 			const mailData = useMemo(() => {
 				const mailData = new OutgoingMailData();
@@ -68,14 +63,10 @@ export const CreatePostForm = observer(
 				return mailData;
 			}, []);
 
-			const from = mailData.from;
+			const [replyTo, setReplyTo] = useState<DecodedBlockchainFeedPost>();
 
 			useEffect(() => {
 				mailData.feedId = feedId;
-
-				if (from) {
-					from.blockchain = fixedChain;
-				}
 
 				mailData.validator = () => {
 					const text = mailData.plainTextData;
@@ -107,20 +98,20 @@ export const CreatePostForm = observer(
 
 					return true;
 				};
-			}, [fixedChain, mailData, feedId, replyTo, from]);
+			}, [feedId, mailData, replyTo]);
 
 			useEffect(() => {
 				if (!mailData.from?.account || !accounts.includes(mailData.from.account)) {
 					mailData.from = { account: accounts[0] };
 				}
-			}, [mailData, accounts]);
+			}, [mailData.from, accounts, mailData]);
 
 			useEffect(() => {
 				let cancelled = false;
 				BlockchainFeedApi.getCommissions({ feedId: feedId })
 					.then(commissions => {
-						if (!cancelled && from?.blockchain) {
-							const commission = calcCommission(from.blockchain, commissions);
+						if (!cancelled && mailData.from?.blockchain) {
+							const commission = calcCommission(mailData.from.blockchain, commissions);
 							mailData.extraPayment = commission || '0';
 						}
 					})
@@ -128,7 +119,9 @@ export const CreatePostForm = observer(
 				return () => {
 					cancelled = true;
 				};
-			}, [feedId, from?.blockchain, mailData]);
+			}, [feedId, mailData, mailData.from]);
+
+			const textAreaApiRef = useRef<AutoSizeTextAreaApi>(null);
 
 			const [expanded, setExpanded] = useState(false);
 
@@ -374,7 +367,7 @@ export const CreatePostForm = observer(
 
 											<SendMailButton
 												mailData={mailData}
-												disableNetworkSwitch={!!fixedChain}
+												allowedChains={allowedChains}
 												onSent={onSent}
 											/>
 										</>

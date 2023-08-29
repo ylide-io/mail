@@ -19,39 +19,20 @@ import { ReactComponent as TagSvg } from '../../../icons/ic20/tag.svg';
 import { analytics } from '../../../stores/Analytics';
 import {
 	BlockchainProject,
-	BlockchainProjectAttachmentMode,
 	BlockchainProjectId,
 	getBlockchainProjectBannerImage,
 	getBlockchainProjectById,
 } from '../../../stores/blockchainProjects/blockchainProjects';
 import { browserStorage } from '../../../stores/browserStorage';
-import domain from '../../../stores/Domain';
 import { RoutePath } from '../../../stores/routePath';
-import { connectAccount } from '../../../utils/account';
+import { connectAccount, getAllowedAccountsForBlockchains } from '../../../utils/account';
 import { assertUnreachable, invariant } from '../../../utils/assert';
-import { blockchainMeta, BlockchainName, isEvmBlockchain } from '../../../utils/blockchain';
+import { blockchainMeta } from '../../../utils/blockchain';
 import { beautifyUrl, useIsMatchesPattern, useNav } from '../../../utils/url';
 import { CreatePostForm, CreatePostFormApi } from '../_common/createPostForm/createPostForm';
 import { DiscussionPost } from '../_common/discussionPost/discussionPost';
 import { OfficialPost } from '../_common/officialPost/officialPost';
 import css from './blockchainProjectPage.module.scss';
-
-function getAllowedAccountForProject(project: BlockchainProject) {
-	return project.fixedChain === BlockchainName.VENOM_TESTNET
-		? domain.accounts.activeVenomAccounts
-		: isEvmBlockchain(project.fixedChain)
-		? domain.accounts.activeEvmAccounts
-		: domain.accounts.activeAccounts;
-}
-
-function isCustomAttachmentsAllowed(project: BlockchainProject) {
-	return (
-		project.attachmentMode === BlockchainProjectAttachmentMode.EVERYONE ||
-		(browserStorage.isUserAdmin && project.attachmentMode === BlockchainProjectAttachmentMode.ADMINS)
-	);
-}
-
-//
 
 interface OfficialContentProps {
 	project: BlockchainProject;
@@ -64,7 +45,7 @@ const OfficialContent = observer(({ project, setTabsAsideContent }: OfficialCont
 	invariant(feedId, 'No official feed id');
 
 	const isAdminMode = useIsMatchesPattern(RoutePath.PROJECT_ID_OFFICIAL_ADMIN) && browserStorage.isUserAdmin;
-	const accounts = getAllowedAccountForProject(project);
+	const accounts = getAllowedAccountsForBlockchains(project.allowedChains || []);
 
 	const postsQuery = useInfiniteQuery<DecodedBlockchainFeedPost[]>(['project', projectId, 'posts', 'official'], {
 		cacheTime: 15 * 60 * 1000,
@@ -130,11 +111,9 @@ const OfficialContent = observer(({ project, setTabsAsideContent }: OfficialCont
 
 			{browserStorage.isUserAdmin && !!accounts.length && (
 				<CreatePostForm
-					accounts={accounts}
+					project={project}
 					feedId={feedId}
-					allowCustomAttachments={isCustomAttachmentsAllowed(project)}
 					placeholder="Make a new post"
-					fixedChain={project.fixedChain}
 					onCreated={() => toast('Good job! Your post will appear shortly 🔥')}
 				/>
 			)}
@@ -188,7 +167,7 @@ const DiscussionContent = observer(({ project, setTabsAsideContent }: Discussion
 	invariant(feedId, 'No discussion feed id');
 
 	const isAdminMode = useIsMatchesPattern(RoutePath.PROJECT_ID_DISCUSSION_ADMIN) && browserStorage.isUserAdmin;
-	const accounts = getAllowedAccountForProject(project);
+	const accounts = getAllowedAccountsForBlockchains(project.allowedChains || []);
 
 	const postsQuery = useInfiniteQuery<DecodedBlockchainFeedPost[]>(['project', projectId, 'posts', 'discussion'], {
 		cacheTime: 15 * 60 * 1000,
@@ -246,6 +225,17 @@ const DiscussionContent = observer(({ project, setTabsAsideContent }: Discussion
 
 	const createPostFormRef = useRef<CreatePostFormApi>(null);
 
+	function renderAllowedChainsText() {
+		return (
+			project.allowedChains?.length && (
+				<div>
+					Posting to this feed is allowed using{' '}
+					<b>{project.allowedChains.map(chain => blockchainMeta[chain].title).join(', ')}</b> only.
+				</div>
+			)
+		);
+	}
+
 	return (
 		<div className={css.content}>
 			<PageMeta
@@ -257,22 +247,16 @@ const DiscussionContent = observer(({ project, setTabsAsideContent }: Discussion
 			{accounts.length ? (
 				<CreatePostForm
 					ref={createPostFormRef}
-					accounts={accounts}
+					project={project}
 					feedId={feedId}
-					allowCustomAttachments={isCustomAttachmentsAllowed(project)}
 					placeholder="What’s on your mind?"
-					fixedChain={project.fixedChain}
 					onCreated={() => toast('Good job! Your post will appear shortly 🔥')}
 				/>
 			) : (
 				<ErrorMessage look={ErrorMessageLook.INFO}>
-					<div>
-						<b>Connect your wallet to post messages to this feed 👌</b>
-						{project.fixedChain &&
-							` Posting is allowed using ${
-								(project.fixedChain && blockchainMeta[project.fixedChain].title) || ''
-							} blockchain only.`}
-					</div>
+					<b>Connect your wallet to post messages to this feed 👌</b>
+
+					{renderAllowedChainsText()}
 
 					<ActionButton
 						look={ActionButtonLook.PRIMARY}
@@ -297,13 +281,10 @@ const DiscussionContent = observer(({ project, setTabsAsideContent }: Discussion
 									createPostFormRef.current?.replyTo(message);
 								} else {
 									toast(
-										`You need to connect ${
-											project.fixedChain === BlockchainName.VENOM_TESTNET
-												? 'a Venom'
-												: isEvmBlockchain(project.fixedChain)
-												? 'an EVM'
-												: 'an'
-										} account in order to reply 👍`,
+										<>
+											You need to connect an account in order to reply 👍
+											{renderAllowedChainsText()}
+										</>,
 									);
 								}
 							}}

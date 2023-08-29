@@ -76,6 +76,7 @@ export interface BlockchainProject {
 	website?: string;
 	tags?: BlockchainProjectTag[];
 	fixedChain?: string;
+	allowedChains?: string[];
 	attachmentMode?: BlockchainProjectAttachmentMode;
 }
 
@@ -155,7 +156,7 @@ export const blockchainProjects: BlockchainProject[] = [
 		description: 'Here you can meet the fellow ETH supporters. Btw, messages are sent only via Ethereum chain.',
 		profileImage: ethWhalesSrc,
 		tags: [BlockchainProjectTag.ECOSYSTEM],
-		fixedChain: BlockchainName.ETHEREUM,
+		allowedChains: [BlockchainName.ETHEREUM],
 		attachmentMode: BlockchainProjectAttachmentMode.EVERYONE,
 	},
 	{
@@ -185,7 +186,7 @@ export const blockchainProjects: BlockchainProject[] = [
 		bannerImage: oasisGalleryBannerSrc,
 		website: 'https://oasis.gallery/',
 		tags: [BlockchainProjectTag.NFT, BlockchainProjectTag.VENOM],
-		fixedChain: BlockchainName.VENOM_TESTNET,
+		allowedChains: [BlockchainName.VENOM_TESTNET],
 	},
 	{
 		id: BlockchainProjectId.SNIPA,
@@ -199,7 +200,7 @@ export const blockchainProjects: BlockchainProject[] = [
 		bannerImage: snipaBannerSrc,
 		website: 'https://snipa.finance/',
 		tags: [BlockchainProjectTag.DEFI, BlockchainProjectTag.VENOM],
-		fixedChain: BlockchainName.VENOM_TESTNET,
+		allowedChains: [BlockchainName.VENOM_TESTNET],
 	},
 	{
 		id: BlockchainProjectId.VENOM_BLOCKCHAIN,
@@ -212,7 +213,7 @@ export const blockchainProjects: BlockchainProject[] = [
 		bannerImage: venomBlockchainBannerSrc,
 		website: 'https://venom.foundation/',
 		tags: [BlockchainProjectTag.ECOSYSTEM, BlockchainProjectTag.VENOM],
-		fixedChain: BlockchainName.VENOM_TESTNET,
+		allowedChains: [BlockchainName.VENOM_TESTNET],
 	},
 	{
 		id: BlockchainProjectId.VENOM_BRIDGE,
@@ -227,7 +228,7 @@ export const blockchainProjects: BlockchainProject[] = [
 		bannerImage: venomBridgeBannerSrc,
 		website: 'https://venombridge.com/',
 		tags: [BlockchainProjectTag.DEFI, BlockchainProjectTag.VENOM],
-		fixedChain: BlockchainName.VENOM_TESTNET,
+		allowedChains: [BlockchainName.VENOM_TESTNET],
 	},
 	{
 		id: BlockchainProjectId.WEB3_WORLD,
@@ -241,7 +242,7 @@ export const blockchainProjects: BlockchainProject[] = [
 		bannerImage: web3WorldBannerSrc,
 		website: 'https://web3.world/',
 		tags: [BlockchainProjectTag.DEFI, BlockchainProjectTag.VENOM],
-		fixedChain: BlockchainName.VENOM_TESTNET,
+		allowedChains: [BlockchainName.VENOM_TESTNET],
 	},
 	{
 		id: BlockchainProjectId.VENTORY,
@@ -256,7 +257,7 @@ export const blockchainProjects: BlockchainProject[] = [
 		bannerImage: ventoryBannerSrc,
 		website: 'https://testnet.ventory.gg/',
 		tags: [BlockchainProjectTag.NFT, BlockchainProjectTag.VENOM],
-		fixedChain: BlockchainName.VENOM_TESTNET,
+		allowedChains: [BlockchainName.VENOM_TESTNET],
 	},
 	{
 		id: BlockchainProjectId.GRAVIX,
@@ -271,7 +272,7 @@ export const blockchainProjects: BlockchainProject[] = [
 		bannerImage: gravixBannerSrc,
 		website: 'https://gravix.io/',
 		tags: [BlockchainProjectTag.DEFI, BlockchainProjectTag.VENOM],
-		fixedChain: BlockchainName.VENOM_TESTNET,
+		allowedChains: [BlockchainName.VENOM_TESTNET],
 	},
 	{
 		id: BlockchainProjectId.STAX,
@@ -286,7 +287,7 @@ export const blockchainProjects: BlockchainProject[] = [
 		bannerImage: staxBannerSrc,
 		website: 'https://stax.live',
 		tags: [BlockchainProjectTag.NFT, BlockchainProjectTag.VENOM],
-		fixedChain: BlockchainName.VENOM_TESTNET,
+		allowedChains: [BlockchainName.VENOM_TESTNET],
 		attachmentMode: BlockchainProjectAttachmentMode.ADMINS,
 	},
 	{
@@ -302,7 +303,7 @@ export const blockchainProjects: BlockchainProject[] = [
 		bannerImage: venomIdBannerSrc,
 		website: 'https://venomid.network/',
 		tags: [BlockchainProjectTag.SOCIAL, BlockchainProjectTag.VENOM],
-		fixedChain: BlockchainName.VENOM_TESTNET,
+		allowedChains: [BlockchainName.VENOM_TESTNET],
 		attachmentMode: BlockchainProjectAttachmentMode.ADMINS,
 	},
 	{
@@ -318,7 +319,7 @@ export const blockchainProjects: BlockchainProject[] = [
 		bannerImage: venomRecapBannerSrc,
 		website: 'https://twitter.com/VenomRecap',
 		tags: [BlockchainProjectTag.SOCIAL, BlockchainProjectTag.VENOM],
-		fixedChain: BlockchainName.VENOM_TESTNET,
+		allowedChains: [BlockchainName.VENOM_TESTNET],
 		attachmentMode: BlockchainProjectAttachmentMode.ADMINS,
 	},
 	{
@@ -333,7 +334,7 @@ export const blockchainProjects: BlockchainProject[] = [
 		bannerImage: venomApeClubBannerSrc,
 		website: 'https://venomape.club/',
 		tags: [BlockchainProjectTag.NFT, BlockchainProjectTag.VENOM],
-		fixedChain: BlockchainName.VENOM_TESTNET,
+		allowedChains: [BlockchainName.VENOM_TESTNET],
 		attachmentMode: BlockchainProjectAttachmentMode.ADMINS,
 	},
 	{
@@ -349,7 +350,7 @@ export const blockchainProjects: BlockchainProject[] = [
 		bannerImage: raveBannerSrc,
 		website: 'https://ravegame.net/',
 		tags: [BlockchainProjectTag.GAMING, BlockchainProjectTag.VENOM],
-		fixedChain: BlockchainName.VENOM_TESTNET,
+		allowedChains: [BlockchainName.VENOM_TESTNET],
 		attachmentMode: BlockchainProjectAttachmentMode.ADMINS,
 	},
 	{
@@ -365,7 +366,7 @@ export const blockchainProjects: BlockchainProject[] = [
 		bannerImage: venomartBannerSrc,
 		website: 'https://venomart.io/',
 		tags: [BlockchainProjectTag.NFT, BlockchainProjectTag.VENOM],
-		fixedChain: BlockchainName.VENOM_TESTNET,
+		allowedChains: [BlockchainName.VENOM_TESTNET],
 		attachmentMode: BlockchainProjectAttachmentMode.ADMINS,
 	},
 	{
@@ -449,7 +450,7 @@ export const blockchainProjects: BlockchainProject[] = [
 		bannerImage: gnosisBuildersBannerSrc,
 		website: 'https://www.gnosis.builders/',
 		tags: [BlockchainProjectTag.ECOSYSTEM, BlockchainProjectTag.SOCIAL],
-		fixedChain: BlockchainName.GNOSIS,
+		allowedChains: [BlockchainName.GNOSIS],
 		attachmentMode: BlockchainProjectAttachmentMode.ADMINS,
 	},
 	{
@@ -494,6 +495,7 @@ export const blockchainProjects: BlockchainProject[] = [
 		name: 'Test Feed',
 		description: 'This is an amazing test feed with some description 😎',
 		website: 'https://my-website.com',
+		allowedChains: [BlockchainName.BASE, BlockchainName.ZETA, BlockchainName.LINEA],
 		attachmentMode: BlockchainProjectAttachmentMode.EVERYONE,
 	},
 ];
