@@ -135,6 +135,10 @@ export enum BlockchainProjectAttachmentMode {
 	EVERYONE = 'EVERYONE',
 }
 
+const allChainsExceptTest = Object.values(BlockchainName).filter(
+	chain => ![BlockchainName.BASE, BlockchainName.ZETA, BlockchainName.LINEA].includes(chain),
+);
+
 export const blockchainProjects: BlockchainProject[] = [
 	// GENERAL
 
@@ -146,6 +150,7 @@ export const blockchainProjects: BlockchainProject[] = [
 		name: 'General chat',
 		description: 'General chat to meet your web3 frens.',
 		profileImage: generalSrc,
+		allowedChains: allChainsExceptTest,
 	},
 	{
 		id: BlockchainProjectId.ETH_WHALES,
@@ -170,6 +175,7 @@ export const blockchainProjects: BlockchainProject[] = [
 		profileImage: ylideSrc,
 		website: 'https://ylide.io/',
 		tags: [BlockchainProjectTag.SOCIAL, BlockchainProjectTag.VENOM],
+		allowedChains: allChainsExceptTest,
 	},
 
 	// VENOM
@@ -381,6 +387,7 @@ export const blockchainProjects: BlockchainProject[] = [
 		bannerImage: revoltBannerSrc,
 		website: 'https://twitter.com/RevoltNFT?s=20',
 		tags: [BlockchainProjectTag.NFT, BlockchainProjectTag.VENOM],
+		allowedChains: allChainsExceptTest,
 		attachmentMode: BlockchainProjectAttachmentMode.ADMINS,
 	},
 
@@ -397,6 +404,7 @@ export const blockchainProjects: BlockchainProject[] = [
 		profileImage: tvmSrc,
 		bannerImage: tvmBannerSrc,
 		tags: [BlockchainProjectTag.TVM, BlockchainProjectTag.ECOSYSTEM, BlockchainProjectTag.VENOM],
+		allowedChains: allChainsExceptTest,
 		attachmentMode: BlockchainProjectAttachmentMode.ADMINS,
 	},
 	{
@@ -410,6 +418,7 @@ export const blockchainProjects: BlockchainProject[] = [
 		profileImage: hanmadiSrc,
 		bannerImage: hanmadiBannerSrc,
 		tags: [BlockchainProjectTag.TVM, BlockchainProjectTag.VENOM],
+		allowedChains: allChainsExceptTest,
 		attachmentMode: BlockchainProjectAttachmentMode.EVERYONE,
 	},
 	{
@@ -422,6 +431,7 @@ export const blockchainProjects: BlockchainProject[] = [
 		description: '한국의 크립토 마케팅회사',
 		profileImage: weaverSrc,
 		tags: [BlockchainProjectTag.TVM],
+		allowedChains: allChainsExceptTest,
 		attachmentMode: BlockchainProjectAttachmentMode.EVERYONE,
 	},
 	{
@@ -436,6 +446,7 @@ export const blockchainProjects: BlockchainProject[] = [
 		bannerImage: oneClickCryptoBannerSrc,
 		website: 'https://www.oneclick.fi/',
 		tags: [BlockchainProjectTag.DEFI],
+		allowedChains: allChainsExceptTest,
 		attachmentMode: BlockchainProjectAttachmentMode.ADMINS,
 	},
 	{
@@ -466,6 +477,7 @@ export const blockchainProjects: BlockchainProject[] = [
 		bannerImage: betFuryBannerSrc,
 		website: 'https://betfury.io/',
 		tags: [BlockchainProjectTag.GAMING],
+		allowedChains: allChainsExceptTest,
 		attachmentMode: BlockchainProjectAttachmentMode.ADMINS,
 	},
 	{
