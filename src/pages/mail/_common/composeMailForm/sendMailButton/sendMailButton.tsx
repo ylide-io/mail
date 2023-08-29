@@ -1,6 +1,6 @@
 import clsx from 'clsx';
 import { observer } from 'mobx-react';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
 
 import { GridRowBox, TruncateTextBox } from '../../../../../components/boxes/boxes';
 import { DropDown, DropDownItem, DropDownItemMode } from '../../../../../components/dropDown/dropDown';
@@ -15,8 +15,8 @@ import domain from '../../../../../stores/Domain';
 import { OutgoingMailData } from '../../../../../stores/outgoingMailData';
 import { AlignmentDirection, HorizontalAlignment } from '../../../../../utils/alignment';
 import { invariant } from '../../../../../utils/assert';
-import { blockchainMeta, evmNameToNetwork } from '../../../../../utils/blockchain';
-import { isWalletSupportsBlockchain } from '../../../../../utils/wallet';
+import { blockchainMeta } from '../../../../../utils/blockchain';
+import { getWalletSupportedBlockchains } from '../../../../../utils/wallet';
 import css from './sendMailButton.module.scss';
 
 export interface SendMailButtonProps extends PropsWithClassName {
@@ -51,18 +51,10 @@ export const SendMailButton = observer(
 		}, [mailData.from]);
 
 		const allowedChainsForAccount = useMemo(() => {
-			if (allowedChains?.length && mailData.from?.account) {
-				return allowedChains.filter(chain => isWalletSupportsBlockchain(mailData.from!.account.wallet, chain));
-			}
+			return mailData.from?.account
+				? getWalletSupportedBlockchains(mailData.from.account.wallet, allowedChains)
+				: [];
 		}, [allowedChains, mailData.from]);
-
-		useEffect(() => {
-			if (mailData.from && allowedChainsForAccount?.length) {
-				if (!mailData.from.blockchain || !allowedChainsForAccount.includes(mailData.from.blockchain)) {
-					mailData.setFromBlockchain(allowedChainsForAccount[0]);
-				}
-			}
-		}, [allowedChainsForAccount, mailData, mailData.from]);
 
 		const sendMail = async () => {
 			try {
@@ -140,38 +132,34 @@ export const SendMailButton = observer(
 								horizontalAlign={HorizontalAlignment.END}
 								onCloseRequest={() => setMenuVisible(false)}
 							>
-								{domain.registeredBlockchains
-									.filter(f => f.blockchainGroup === 'evm')
-									.filter(f => !allowedChains?.length || allowedChains?.includes(f.blockchain))
-									.map(({ blockchain }) => {
-										const bData = blockchainMeta[blockchain];
+								{allowedChainsForAccount.map(chain => {
+									const bData = blockchainMeta[chain];
 
-										return (
-											<DropDownItem
-												key={blockchain}
-												mode={
-													!Number(balances.getBalance(blockchain).toFixed(4))
-														? DropDownItemMode.DISABLED
-														: undefined
-												}
-												onSelect={async () => {
-													invariant(mailData.from);
-													mailData.setFromBlockchain(blockchain);
-													setMenuVisible(false);
-												}}
-											>
-												<GridRowBox>
-													{bData.logo()}
+									return (
+										<DropDownItem
+											key={chain}
+											mode={
+												!Number(balances.getBalance(chain).toFixed(4))
+													? DropDownItemMode.DISABLED
+													: undefined
+											}
+											onSelect={async () => {
+												invariant(mailData.from);
+												mailData.setFromBlockchain(chain);
+												setMenuVisible(false);
+											}}
+										>
+											<GridRowBox>
+												{bData.logo()}
 
-													<TruncateTextBox>
-														{bData.title} [
-														{Number(balances.getBalance(blockchain).toFixed(4))}{' '}
-														{bData.ethNetwork!.nativeCurrency.symbol}]
-													</TruncateTextBox>
-												</GridRowBox>
-											</DropDownItem>
-										);
-									})}
+												<TruncateTextBox>
+													{bData.title} [{Number(balances.getBalance(chain).toFixed(4))}{' '}
+													{bData.ethNetwork!.nativeCurrency.symbol}]
+												</TruncateTextBox>
+											</GridRowBox>
+										</DropDownItem>
+									);
+								})}
 							</DropDown>
 						)}
 					</>

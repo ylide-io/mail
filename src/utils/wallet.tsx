@@ -8,6 +8,7 @@ import { MetaMaskLogo } from '../icons/wallets/MetaMaskLogo';
 import { TrustWalletLogo } from '../icons/wallets/TrustWalletLogo';
 import { VenomLogo } from '../icons/wallets/VenomLogo';
 import { WalletConnectLogo } from '../icons/wallets/WalletConnectLogo';
+import domain from '../stores/Domain';
 import { Wallet } from '../stores/models/Wallet';
 import { BlockchainName, evmNameToNetwork, isEvmBlockchain } from './blockchain';
 
@@ -77,6 +78,16 @@ export function isWalletSupportsBlockchain(wallet: Wallet, chain: string) {
 		(chain === BlockchainName.EVERSCALE && wallet.factory.wallet === 'everwallet') ||
 		(chain === BlockchainName.EVERSCALE && wallet.factory.wallet === 'everwallet-proxy')
 	);
+}
+
+export function getWalletSupportedBlockchains(wallet: Wallet, limitChains?: string[]): string[] {
+	return domain.registeredBlockchains
+		.filter(
+			b =>
+				isWalletSupportsBlockchain(wallet, b.blockchain) &&
+				(!limitChains?.length || limitChains.includes(b.blockchain)),
+		)
+		.map(b => b.blockchain);
 }
 
 export async function getEvmWalletNetwork(wallet: Wallet): Promise<EVMNetwork | undefined> {

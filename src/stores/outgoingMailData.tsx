@@ -19,7 +19,7 @@ import { blockchainMeta, getActiveBlockchainNameForAccount } from '../utils/bloc
 import { calcComissionDecimals, calcCommission } from '../utils/commission';
 import { broadcastMessage, editorJsToYMF, isEmptyEditorJsData, sendMessage } from '../utils/mail';
 import { truncateInMiddle } from '../utils/string';
-import { getEvmWalletNetwork, isWalletSupportsBlockchain } from '../utils/wallet';
+import { getEvmWalletNetwork, getWalletSupportedBlockchains, isWalletSupportsBlockchain } from '../utils/wallet';
 import domain from './Domain';
 import { DomainAccount } from './models/DomainAccount';
 
@@ -66,8 +66,9 @@ export class OutgoingMailData {
 
 			if (this.from?.account) {
 				const newChain = await getActiveBlockchainNameForAccount(this.from.account);
+				const supportedChains = getWalletSupportedBlockchains(this.from.account.wallet);
 
-				if (this.from.blockchain == null) {
+				if (this.from.blockchain == null || !supportedChains.includes(this.from.blockchain)) {
 					this.setFromBlockchain(newChain);
 				}
 			}
