@@ -1,7 +1,7 @@
 import {
-	EVMWalletController,
 	EVM_NAMES,
 	EVMNetwork,
+	EVMWalletController,
 	IEVMMailerContractLink,
 	IEVMRegistryContractLink,
 } from '@ylide/ethereum';

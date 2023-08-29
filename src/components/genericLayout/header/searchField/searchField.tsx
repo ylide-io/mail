@@ -25,7 +25,7 @@ export const SearchField = ({ className }: PropsWithClassName) => {
 		setResults(cleanTerm ? blockchainProjects.filter(p => p.name.toLowerCase().includes(cleanTerm)) : []);
 
 		setPopupOpen(!!cleanTerm);
-	}, [term]);
+	}, [cleanTerm]);
 
 	useEffect(() => {
 		setPopupOpen(prev => prev || (isFocused && !!cleanTerm));

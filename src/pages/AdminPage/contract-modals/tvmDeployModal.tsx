@@ -1,4 +1,4 @@
-import { TVMWalletController, ITVMMailerContractLink, ITVMRegistryContractLink } from '@ylide/everscale';
+import { ITVMMailerContractLink, ITVMRegistryContractLink, TVMWalletController } from '@ylide/everscale';
 import clsx from 'clsx';
 import { FC, useCallback, useState } from 'react';
 
@@ -37,13 +37,9 @@ export const TVMDeployContractModal: FC<TVMDeployContractModalProps> = ({ contra
 				account.account.address,
 			);
 		} else if (contract.title === 'RegistryV1') {
-			address = await (account.wallet.controller as any as TVMWalletController).deployRegistryV1(
-				account.account,
-			);
+			address = await (account.wallet.controller as any as TVMWalletController).deployRegistryV1(account.account);
 		} else if (contract.title === 'RegistryV2') {
-			address = await (account.wallet.controller as any as TVMWalletController).deployRegistryV2(
-				account.account,
-			);
+			address = await (account.wallet.controller as any as TVMWalletController).deployRegistryV2(account.account);
 		} else setAddress(address);
 	}, [account, contract]);
 

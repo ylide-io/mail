@@ -55,6 +55,18 @@ export function OfficialPostView({ project, post }: OfficialPostViewProps) {
 
 	const [isRemoved, setRemoved] = useState(false);
 
+	const unbanPost = useCallback(() => {
+		BlockchainFeedApi.unbanPost({ ids: [post.msg.msgId], secret: browserStorage.adminPassword || '' })
+			.then(() => {
+				toast('Restored 🔥');
+				setRemoved(false);
+			})
+			.catch(e => {
+				toast('Error 🤦‍♀️');
+				throw e;
+			});
+	}, [post.msg.msgId]);
+
 	const banPost = useCallback(() => {
 		BlockchainFeedApi.banPost({ ids: [post.msg.msgId], secret: browserStorage.adminPassword || '' })
 			.then(() => {
@@ -80,19 +92,7 @@ export function OfficialPostView({ project, post }: OfficialPostViewProps) {
 					throw e;
 				}
 			});
-	}, [post.msg.msgId]);
-
-	const unbanPost = useCallback(() => {
-		BlockchainFeedApi.unbanPost({ ids: [post.msg.msgId], secret: browserStorage.adminPassword || '' })
-			.then(() => {
-				toast('Restored 🔥');
-				setRemoved(false);
-			})
-			.catch(e => {
-				toast('Error 🤦‍♀️');
-				throw e;
-			});
-	}, [post.msg.msgId]);
+	}, [post.msg.msgId, unbanPost]);
 
 	//
 

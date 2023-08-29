@@ -102,6 +102,18 @@ export const DiscussionPost = observer(({ post, project, onReplyClick }: Discuss
 
 	const [isReviewed, setReviewed] = useState(false);
 
+	const unbanPost = useCallback(() => {
+		BlockchainFeedApi.unbanPost({ ids: [post.msg.msgId], secret: browserStorage.adminPassword || '' })
+			.then(() => {
+				toast('Un-banned 🔥');
+				setReviewed(false);
+			})
+			.catch(e => {
+				toast('Error 🤦‍♀️');
+				throw e;
+			});
+	}, [post.msg.msgId]);
+
 	const banAddress = useCallback(() => {
 		BlockchainFeedApi.banAddresses({
 			addresses: [post.msg.senderAddress],
@@ -146,7 +158,7 @@ export const DiscussionPost = observer(({ post, project, onReplyClick }: Discuss
 					throw e;
 				}
 			});
-	}, [post.msg.msgId]);
+	}, [post.msg.msgId, unbanPost]);
 
 	const approvePost = useCallback(() => {
 		BlockchainFeedApi.approvePost({ ids: [post.msg.msgId], secret: browserStorage.adminPassword || '' })
@@ -161,18 +173,6 @@ export const DiscussionPost = observer(({ post, project, onReplyClick }: Discuss
 					toast('Error 🤦‍♀️');
 					throw e;
 				}
-			});
-	}, [post.msg.msgId]);
-
-	const unbanPost = useCallback(() => {
-		BlockchainFeedApi.unbanPost({ ids: [post.msg.msgId], secret: browserStorage.adminPassword || '' })
-			.then(() => {
-				toast('Un-banned 🔥');
-				setReviewed(false);
-			})
-			.catch(e => {
-				toast('Error 🤦‍♀️');
-				throw e;
 			});
 	}, [post.msg.msgId]);
 
