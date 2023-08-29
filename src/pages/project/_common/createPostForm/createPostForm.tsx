@@ -102,7 +102,7 @@ export const CreatePostForm = observer(
 
 			useEffect(() => {
 				if (!mailData.from?.account || !accounts.includes(mailData.from.account)) {
-					mailData.from = { account: accounts[0] };
+					mailData.setFrom(accounts[0]);
 				}
 			}, [mailData.from, accounts, mailData]);
 
@@ -311,7 +311,7 @@ export const CreatePostForm = observer(
 									disabled={mailData.sending}
 									accounts={accounts}
 									activeAccount={mailData.from?.account}
-									onChange={account => (mailData.from = { account })}
+									onChange={account => mailData.setFrom(account)}
 								/>
 
 								<div className={css.footerRight}>
