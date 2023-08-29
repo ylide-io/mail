@@ -481,6 +481,7 @@ export const blockchainProjects: BlockchainProject[] = [
 		bannerImage: dittoBannerSrc,
 		website: 'https://dittonetwork.io',
 		tags: [BlockchainProjectTag.DEVELOPER_TOOLS],
+		allowedChains: [BlockchainName.POLYGON, BlockchainName.VENOM_TESTNET],
 		attachmentMode: BlockchainProjectAttachmentMode.ADMINS,
 	},
 
