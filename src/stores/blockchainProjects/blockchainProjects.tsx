@@ -3,7 +3,10 @@ import { Uint256 } from '@ylide/sdk';
 import { VENOM_FEED_ID } from '../../constants';
 import { BlockchainName } from '../../utils/blockchain';
 import _defaultBannerSrc from './bannerImages/_default.png';
+import altsomeBannerSrc from './bannerImages/altsome.jpg';
 import betFuryBannerSrc from './bannerImages/betFury.jpg';
+import chepeGamesBannerSrc from './bannerImages/chepeGames.jpg';
+import dexifyBannerSrc from './bannerImages/dexify.jpg';
 import dittoBannerSrc from './bannerImages/ditto.jpg';
 import gnosisBuildersBannerSrc from './bannerImages/gnosisBuilders.jpg';
 import gravixBannerSrc from './bannerImages/gravix.jpg';
@@ -21,9 +24,13 @@ import venomBlockchainBannerSrc from './bannerImages/venomBlockchain.jpg';
 import venomBridgeBannerSrc from './bannerImages/venomBridge.jpg';
 import venomIdBannerSrc from './bannerImages/venomId.jpg';
 import venomRecapBannerSrc from './bannerImages/venomRecap.jpg';
+import venomVietnamBannerSrc from './bannerImages/venomVietnam.jpg';
 import ventoryBannerSrc from './bannerImages/ventory.jpg';
 import web3WorldBannerSrc from './bannerImages/web3World.jpg';
+import altsomeSrc from './profileImages/altsome.jpg';
 import betFurySrc from './profileImages/betFury.jpg';
+import chepeGamesSrc from './profileImages/chepeGames.jpg';
+import dexifySrc from './profileImages/dexify.jpg';
 import dittoSrc from './profileImages/ditto.jpg';
 import ethWhalesSrc from './profileImages/ethWhales.png';
 import generalSrc from './profileImages/general.png';
@@ -43,6 +50,7 @@ import venomBlockchainSrc from './profileImages/venomBlockchain.png';
 import venomBridgeSrc from './profileImages/venomBridge.png';
 import venomIdSrc from './profileImages/venomId.jpg';
 import venomRecapSrc from './profileImages/venomRecap.jpg';
+import venomVietnamSrc from './profileImages/venomVietnam.jpg';
 import ventorySrc from './profileImages/ventory.png';
 import weaverSrc from './profileImages/weaver.jpg';
 import web3WorldSrc from './profileImages/web3World.png';
@@ -103,6 +111,9 @@ export enum BlockchainProjectId {
 	RAVE = 'rave',
 	VENOMART = 'venomart',
 	REVOLT = 'revolt',
+	VENOM_VIETNAM = 'venom_vietnam',
+	CHEPE_GAMES = 'chepe_games',
+	DEXIFY = 'dexify',
 
 	// OTHERS
 
@@ -113,6 +124,7 @@ export enum BlockchainProjectId {
 	GNOSIS_BUILDERS = 'gnosis_builders',
 	BET_FURY = 'bet_fury',
 	DITTO_NETWORK = 'ditto_network',
+	ALTSOME = 'altsome',
 
 	// TEST
 
@@ -390,6 +402,51 @@ export const blockchainProjects: BlockchainProject[] = [
 		allowedChains: allChainsExceptTest,
 		attachmentMode: BlockchainProjectAttachmentMode.ADMINS,
 	},
+	{
+		id: BlockchainProjectId.VENOM_VIETNAM,
+		feedId: {
+			official: '2000000000000000000000000000000000000000000000000000000000000028' as Uint256,
+			discussion: '2000000000000000000000000000000000000000000000000000000000000029' as Uint256,
+		},
+		name: 'Cộng đồng Venom VietNam',
+		description: 'Giao lưu học hỏi và trải nghiệm mạng.',
+		profileImage: venomVietnamSrc,
+		bannerImage: venomVietnamBannerSrc,
+		website: 'https://twitter.com/VenomVietnam',
+		tags: [BlockchainProjectTag.SOCIAL, BlockchainProjectTag.VENOM],
+		allowedChains: allChainsExceptTest,
+		attachmentMode: BlockchainProjectAttachmentMode.ADMINS,
+	},
+	{
+		id: BlockchainProjectId.CHEPE_GAMES,
+		feedId: {
+			official: '200000000000000000000000000000000000000000000000000000000000002c' as Uint256,
+			discussion: '200000000000000000000000000000000000000000000000000000000000002d' as Uint256,
+		},
+		name: 'Chepe Games',
+		description: 'Web3 gaming platform for everyone. Built on Venom Network. Play with Chepe, earn with Chepe.',
+		profileImage: chepeGamesSrc,
+		bannerImage: chepeGamesBannerSrc,
+		website: 'https://twitter.com/Chepe_Gaming',
+		tags: [BlockchainProjectTag.GAMING, BlockchainProjectTag.VENOM],
+		allowedChains: allChainsExceptTest,
+		attachmentMode: BlockchainProjectAttachmentMode.ADMINS,
+	},
+	{
+		id: BlockchainProjectId.DEXIFY,
+		feedId: {
+			official: '200000000000000000000000000000000000000000000000000000000000002e' as Uint256,
+			discussion: '200000000000000000000000000000000000000000000000000000000000002f' as Uint256,
+		},
+		name: 'DEXIFY',
+		description: 'Building the Infrastructure for On-chain Asset Management.',
+		profileImage: dexifySrc,
+		bannerImage: dexifyBannerSrc,
+		website: 'https://www.dexify.io/',
+		tags: [BlockchainProjectTag.DEFI, BlockchainProjectTag.VENOM],
+		allowedChains: [BlockchainName.VENOM_TESTNET],
+		attachmentMode: BlockchainProjectAttachmentMode.ADMINS,
+	},
 
 	// OTHERS
 
@@ -494,6 +551,21 @@ export const blockchainProjects: BlockchainProject[] = [
 		website: 'https://dittonetwork.io',
 		tags: [BlockchainProjectTag.DEVELOPER_TOOLS],
 		allowedChains: [BlockchainName.POLYGON, BlockchainName.VENOM_TESTNET],
+		attachmentMode: BlockchainProjectAttachmentMode.ADMINS,
+	},
+	{
+		id: BlockchainProjectId.ALTSOME,
+		feedId: {
+			official: '200000000000000000000000000000000000000000000000000000000000002a' as Uint256,
+			discussion: '200000000000000000000000000000000000000000000000000000000000002b' as Uint256,
+		},
+		name: 'Altsome',
+		description: 'A Hybrid Crypto Aggregator and Community Network.',
+		profileImage: altsomeSrc,
+		bannerImage: altsomeBannerSrc,
+		website: 'https://altsome.com/',
+		tags: [BlockchainProjectTag.DEFI, BlockchainProjectTag.NFT],
+		allowedChains: allChainsExceptTest,
 		attachmentMode: BlockchainProjectAttachmentMode.ADMINS,
 	},
 
