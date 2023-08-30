@@ -72,7 +72,6 @@ export function getBlockchainProjectBannerImage(input: BlockchainProject | Block
 
 export interface BlockchainProject {
 	id: BlockchainProjectId;
-	hidden?: boolean;
 	feedId: {
 		official?: Uint256;
 		discussion?: Uint256;
@@ -580,7 +579,6 @@ export const blockchainProjects: BlockchainProject[] = [
 
 	{
 		id: BlockchainProjectId.TEST_B87O0G5K,
-		hidden: true,
 		feedId: {
 			discussion: '2000000000000000000000000000000000000000000000000000000000000027' as Uint256,
 		},
