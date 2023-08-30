@@ -4,6 +4,7 @@ import { ArbitrumLogo } from '../icons/network/ArbitrumLogo';
 import { AstarLogo } from '../icons/network/AstarLogo';
 import { AuroraLogo } from '../icons/network/AuroraLogo';
 import { AvalancheLogo } from '../icons/network/AvalancheLogo';
+import { BaseLogo } from '../icons/network/BaseLogo';
 import { BNBChainLogo } from '../icons/network/BNBChainLogo';
 import { CeloLogo } from '../icons/network/CeloLogo';
 import { CronosLogo } from '../icons/network/CronosLogo';
@@ -12,6 +13,7 @@ import { EverscaleLogo } from '../icons/network/EverscaleLogo';
 import { FantomLogo } from '../icons/network/FantomLogo';
 import { GnosisLogo } from '../icons/network/GnosisLogo';
 import { KlaytnLogo } from '../icons/network/KlaytnLogo';
+import { LineaLogo } from '../icons/network/LineaLogo';
 import { MetisLogo } from '../icons/network/MetisLogo';
 import { MoonbeamLogo } from '../icons/network/MoonbeamLogo';
 import { MoonriverLogo } from '../icons/network/MoonriverLogo';
@@ -20,6 +22,7 @@ import { OptimismLogo } from '../icons/network/OptimismLogo';
 import { PolygonLogo } from '../icons/network/PolygonLogo';
 import { SolanaLogo } from '../icons/network/SolanaLogo';
 import { VenomLogo } from '../icons/network/VenomLogo';
+import { ZetaLogo } from '../icons/network/ZetaLogo';
 import domain from '../stores/Domain';
 
 export function isAddress(input: string): boolean {
@@ -61,6 +64,9 @@ export const BlockchainName = {
 	MOONRIVER: EVM_NAMES[EVMNetwork.MOONRIVER],
 	METIS: EVM_NAMES[EVMNetwork.METIS],
 	ASTAR: EVM_NAMES[EVMNetwork.ASTAR],
+	BASE: EVM_NAMES[EVMNetwork.BASE],
+	ZETA: EVM_NAMES[EVMNetwork.ZETA],
+	LINEA: EVM_NAMES[EVMNetwork.LINEA],
 };
 
 export interface IEthereumNetworkDescriptor {
@@ -100,7 +106,52 @@ export const blockchainMeta: Record<
 	},
 	[BlockchainName.NEAR]: {
 		title: 'Near',
-		logo: (s = 16) => <NearLogo size={30} />,
+		logo: (s = 16) => <NearLogo size={s} />,
+	},
+	[BlockchainName.LINEA]: {
+		title: 'Linea',
+		logo: (s = 16) => <LineaLogo size={s} />,
+		ethNetwork: {
+			chainId: '0xe708',
+			chainName: 'Linea',
+			nativeCurrency: {
+				name: 'ETH',
+				symbol: 'ETH',
+				decimals: 18,
+			},
+			rpcUrls: ['https://linea.blockpi.network/v1/rpc/public'],
+			blockExplorerUrls: ['https://lineascan.build'],
+		},
+	},
+	[BlockchainName.BASE]: {
+		title: 'Base',
+		logo: (s = 16) => <BaseLogo size={s} />,
+		ethNetwork: {
+			chainId: '0x2105',
+			chainName: 'Base',
+			nativeCurrency: {
+				name: 'ETH',
+				symbol: 'ETH',
+				decimals: 18,
+			},
+			rpcUrls: ['https://base.blockpi.network/v1/rpc/public'],
+			blockExplorerUrls: ['https://basescan.org'],
+		},
+	},
+	[BlockchainName.ZETA]: {
+		title: 'ZetaChain',
+		logo: (s = 16) => <ZetaLogo size={s} />,
+		ethNetwork: {
+			chainId: '0x1B59',
+			chainName: 'Zeta Chain',
+			nativeCurrency: {
+				name: 'aZETA',
+				symbol: 'aZETA',
+				decimals: 18,
+			},
+			rpcUrls: ['https://zetachain-athens-evm.blockpi.network/v1/rpc/public'],
+			blockExplorerUrls: ['https://zetachain-athens-3.blockscout.com'],
+		},
 	},
 	[BlockchainName.LOCAL_HARDHAT]: {
 		title: 'LocalNet',

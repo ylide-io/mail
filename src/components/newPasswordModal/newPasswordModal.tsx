@@ -98,7 +98,7 @@ export function NewPasswordModal({
 		onClose?.();
 	}
 
-	async function publishLocalKey(key: YlidePrivateKey) {
+	async function publishLocalKey(key: YlidePrivateKey, network: EVMNetwork | undefined) {
 		try {
 			console.log(`publishLocalKey`);
 			setStep(Step.PUBLISH_KEY);
@@ -256,7 +256,7 @@ export function NewPasswordModal({
 				if (wallet.factory.blockchainGroup === 'evm') {
 					setStep(Step.SELECT_NETWORK);
 				} else {
-					await publishLocalKey(tempLocalKey);
+					await publishLocalKey(tempLocalKey, network);
 				}
 			}
 		} else if (freshestKey.key.publicKey.equals(tempLocalKey.publicKey)) {
@@ -268,7 +268,7 @@ export function NewPasswordModal({
 			onClose?.(domainAccount);
 		} else if (forceNew || withoutPassword) {
 			await createDomainAccount(wallet, account, tempLocalKey);
-			await publishLocalKey(tempLocalKey);
+			await publishLocalKey(tempLocalKey, network);
 		} else {
 			toast('Password is wrong. Please try again ❤');
 			setStep(Step.ENTER_PASSWORD);
@@ -278,7 +278,7 @@ export function NewPasswordModal({
 	async function networkSelect(network: EVMNetwork) {
 		setNetwork(network);
 		setStep(Step.PUBLISH_KEY);
-		await publishLocalKey(domainAccountRef.current!.localPrivateKeys[0]);
+		await publishLocalKey(domainAccountRef.current!.localPrivateKeys[0], network);
 	}
 
 	return (
