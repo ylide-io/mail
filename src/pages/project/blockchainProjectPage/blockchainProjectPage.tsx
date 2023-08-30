@@ -27,7 +27,7 @@ import { browserStorage } from '../../../stores/browserStorage';
 import { RoutePath } from '../../../stores/routePath';
 import { connectAccount, getAllowedAccountsForBlockchains } from '../../../utils/account';
 import { assertUnreachable, invariant } from '../../../utils/assert';
-import { blockchainMeta } from '../../../utils/blockchain';
+import { blockchainMeta, isEvmBlockchain } from '../../../utils/blockchain';
 import { beautifyUrl, useIsMatchesPattern, useNav } from '../../../utils/url';
 import { CreatePostForm, CreatePostFormApi } from '../_common/createPostForm/createPostForm';
 import { DiscussionPost } from '../_common/discussionPost/discussionPost';
@@ -230,7 +230,16 @@ const DiscussionContent = observer(({ project, setTabsAsideContent }: Discussion
 			project.allowedChains?.length && (
 				<div>
 					Posting to this feed is allowed using{' '}
-					<b>{project.allowedChains.map(chain => blockchainMeta[chain].title).join(', ')}</b> only.
+					<b>
+						{project.allowedChains
+							.reduce((list, chain) => {
+								chain = isEvmBlockchain(chain) ? 'EVM' : blockchainMeta[chain].title;
+								list.includes(chain) || list.push(chain);
+								return list;
+							}, [] as string[])
+							.join(', ')}
+					</b>{' '}
+					only.
 				</div>
 			)
 		);
