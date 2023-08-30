@@ -16,11 +16,14 @@ import { ReactComponent as TrashSvg } from '../../../../icons/ic20/trash.svg';
 import { ReactComponent as ImageSvg } from '../../../../icons/ic28/image.svg';
 import { ReactComponent as StickerSvg } from '../../../../icons/ic28/sticker.svg';
 import { analytics } from '../../../../stores/Analytics';
-import domain from '../../../../stores/Domain';
-import { DomainAccount } from '../../../../stores/models/DomainAccount';
+import {
+	BlockchainProject,
+	BlockchainProjectAttachmentMode,
+} from '../../../../stores/blockchainProjects/blockchainProjects';
+import { browserStorage } from '../../../../stores/browserStorage';
 import { OutgoingMailData, OutgoingMailDataMode } from '../../../../stores/outgoingMailData';
+import { getAllowedAccountsForBlockchains } from '../../../../utils/account';
 import { HorizontalAlignment } from '../../../../utils/alignment';
-import { evmNameToNetwork } from '../../../../utils/blockchain';
 import { calcCommission } from '../../../../utils/commission';
 import { openFilePicker, readFileAsDataURL } from '../../../../utils/file';
 import { hashToIpfsUrl, ipfsToHttpUrl } from '../../../../utils/ipfs';
@@ -35,31 +38,21 @@ export interface CreatePostFormApi {
 }
 
 export interface CreatePostFormProps extends PropsWithClassName {
-	accounts: DomainAccount[];
+	project: BlockchainProject;
 	feedId: Uint256;
-	allowCustomAttachments: boolean;
 	placeholder: string;
-	fixedChain?: string;
 	onCreated?: () => void;
 }
 
 export const CreatePostForm = observer(
 	forwardRef(
-		(
-			{
-				className,
-				accounts,
-				feedId,
-				allowCustomAttachments,
-				placeholder,
-				fixedChain,
-				onCreated,
-			}: CreatePostFormProps,
-			ref: Ref<CreatePostFormApi>,
-		) => {
-			const textAreaApiRef = useRef<AutoSizeTextAreaApi>(null);
+		({ className, project, feedId, placeholder, onCreated }: CreatePostFormProps, ref: Ref<CreatePostFormApi>) => {
+			const allowedChains = project.allowedChains;
+			const accounts = useMemo(() => getAllowedAccountsForBlockchains(allowedChains), [allowedChains]);
 
-			const [replyTo, setReplyTo] = useState<DecodedBlockchainFeedPost>();
+			const allowCustomAttachments =
+				project.attachmentMode === BlockchainProjectAttachmentMode.EVERYONE ||
+				(browserStorage.isUserAdmin && project.attachmentMode === BlockchainProjectAttachmentMode.ADMINS);
 
 			const mailData = useMemo(() => {
 				const mailData = new OutgoingMailData();
@@ -70,15 +63,10 @@ export const CreatePostForm = observer(
 				return mailData;
 			}, []);
 
+			const [replyTo, setReplyTo] = useState<DecodedBlockchainFeedPost>();
+
 			useEffect(() => {
 				mailData.feedId = feedId;
-
-				if (fixedChain) {
-					const evmNetwork = evmNameToNetwork(fixedChain);
-					if (evmNetwork != null) {
-						mailData.network = evmNetwork;
-					}
-				}
 
 				mailData.validator = () => {
 					const text = mailData.plainTextData;
@@ -110,30 +98,30 @@ export const CreatePostForm = observer(
 
 					return true;
 				};
-			}, [fixedChain, mailData, feedId, replyTo]);
+			}, [feedId, mailData, replyTo]);
 
 			useEffect(() => {
-				mailData.from = mailData.from && accounts.includes(mailData.from) ? mailData.from : accounts[0];
-			}, [mailData, accounts]);
+				if (!mailData.from || !accounts.includes(mailData.from)) {
+					mailData.from = accounts[0];
+				}
+			}, [mailData.from, accounts, mailData]);
 
 			useEffect(() => {
 				let cancelled = false;
-				BlockchainFeedApi.getCommissions({ feedId: mailData.feedId })
+				BlockchainFeedApi.getCommissions({ feedId: feedId })
 					.then(commissions => {
-						if (cancelled || !mailData.from || !mailData.network) {
-							return;
+						if (!cancelled && mailData.blockchain) {
+							const commission = calcCommission(mailData.blockchain, commissions);
+							mailData.extraPayment = commission || '0';
 						}
-						const blockchain = domain.getBlockchainName(mailData.network);
-						const commission = calcCommission(blockchain, commissions);
-						mailData.extraPayment = commission || '0';
 					})
-					.catch(err => {
-						console.error(err);
-					});
+					.catch(console.error);
 				return () => {
 					cancelled = true;
 				};
-			}, [mailData, mailData.from, mailData.network]);
+			}, [feedId, mailData, mailData.blockchain]);
+
+			const textAreaApiRef = useRef<AutoSizeTextAreaApi>(null);
 
 			const [expanded, setExpanded] = useState(false);
 
@@ -379,7 +367,7 @@ export const CreatePostForm = observer(
 
 											<SendMailButton
 												mailData={mailData}
-												disableNetworkSwitch={!!fixedChain}
+												allowedChains={allowedChains}
 												onSent={onSent}
 											/>
 										</>

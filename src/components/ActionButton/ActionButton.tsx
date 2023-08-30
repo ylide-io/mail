@@ -1,6 +1,7 @@
 import clsx from 'clsx';
-import { ButtonHTMLAttributes, forwardRef, PropsWithChildren, ReactNode, Ref } from 'react';
+import { forwardRef, HTMLAttributes, MouseEventHandler, PropsWithChildren, ReactNode, Ref } from 'react';
 
+import { useNav } from '../../utils/url';
 import { PropsWithClassName } from '../props';
 import { Spinner } from '../spinner/spinner';
 import css from './ActionButton.module.scss';
@@ -23,10 +24,12 @@ export enum ActionButtonLook {
 	HEAVY = 'HEAVY',
 }
 
-interface ActionButtonProps extends PropsWithChildren<{}>, PropsWithClassName, ButtonHTMLAttributes<HTMLButtonElement> {
+interface ActionButtonProps extends PropsWithChildren, PropsWithClassName, HTMLAttributes<HTMLElement> {
 	size?: ActionButtonSize;
 	look?: ActionButtonLook;
 	icon?: ReactNode;
+	href?: string;
+	onClick?: MouseEventHandler;
 	isSingleLine?: boolean;
 	isDisabled?: boolean;
 	isLoading?: boolean;
@@ -34,9 +37,23 @@ interface ActionButtonProps extends PropsWithChildren<{}>, PropsWithClassName, B
 
 export const ActionButton = forwardRef(
 	(
-		{ children, className, size, look, icon, isSingleLine, isDisabled, isLoading, ...props }: ActionButtonProps,
-		ref: Ref<HTMLButtonElement>,
+		{
+			children,
+			className,
+			size,
+			look,
+			icon,
+			href,
+			onClick,
+			isSingleLine,
+			isDisabled,
+			isLoading,
+			...props
+		}: ActionButtonProps,
+		ref: Ref<HTMLButtonElement & HTMLAnchorElement>,
 	) => {
+		const navigate = useNav();
+
 		const sizeClass = {
 			[ActionButtonSize.XSMALL]: css.root_xsmallSize,
 			[ActionButtonSize.SMALL]: css.root_smallSize,
@@ -55,8 +72,10 @@ export const ActionButton = forwardRef(
 			[ActionButtonLook.HEAVY]: css.root_heavyLook,
 		}[look || ActionButtonLook.DEFAULT];
 
+		const Component = href ? 'a' : 'button';
+
 		return (
-			<button
+			<Component
 				ref={ref}
 				className={clsx(
 					css.root,
@@ -70,12 +89,21 @@ export const ActionButton = forwardRef(
 					className,
 				)}
 				disabled={isDisabled || isLoading}
+				href={href}
+				onClick={e => {
+					onClick?.(e);
+
+					if (href) {
+						e.preventDefault();
+						navigate(href);
+					}
+				}}
 				{...props}
 			>
 				{icon && <div className={css.icon}>{icon}</div>}
 				{children != null && <div className={css.content}>{children}</div>}
 				{isLoading && <Spinner className={css.loader} />}
-			</button>
+			</Component>
 		);
 	},
 );

@@ -119,7 +119,7 @@ export const OtcChatPage = observer(() => {
 		}
 
 		mailData.plainTextData = newMessage;
-	}, [address, mailData, myAccount, newMessage]);
+	}, [address, mailData, mailData.from, myAccount, newMessage]);
 
 	const [isIframeOpen, setIframeOpen] = useState(false);
 	const [isIframeMinimized, setIframeMinimized] = useState(false);

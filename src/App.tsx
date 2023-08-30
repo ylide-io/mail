@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 import { QueryClient, QueryClientProvider } from 'react-query';
 import { generatePath, Navigate, Route, Routes, useLocation, useSearchParams } from 'react-router-dom';
 
-import { ActionButton, ActionButtonSize } from './components/ActionButton/ActionButton';
+import { ActionButton, ActionButtonLook, ActionButtonSize } from './components/ActionButton/ActionButton';
 import { MainViewOnboarding } from './components/mainViewOnboarding/mainViewOnboarding';
 import { PageMeta } from './components/pageMeta/pageMeta';
 import { PopupManager } from './components/popup/popupManager/popupManager';
@@ -39,6 +39,8 @@ import domain from './stores/Domain';
 import { FolderId } from './stores/MailList';
 import { RoutePath } from './stores/routePath';
 import walletConnect from './stores/WalletConnect';
+import { enableRemoteConsole, remoteConsoleChannel } from './utils/dev';
+import { openInNewWidnow } from './utils/misc';
 import { useIsMatchesPattern, useNav } from './utils/url';
 
 export enum AppTheme {
@@ -52,10 +54,8 @@ const RemoveTrailingSlash = () => {
 	const navigate = useNav();
 
 	useEffect(() => {
-		const adminParam = searchParams.get('admin');
-
 		if (location.pathname.match('/.*/$')) {
-			navigate(
+			return navigate(
 				{
 					path: location.pathname.replace(/\/+$/, ''),
 					search: location.search,
@@ -65,10 +65,30 @@ const RemoveTrailingSlash = () => {
 					replace: true,
 				},
 			);
-		} else if (adminParam) {
+		}
+
+		const adminParam = searchParams.get('admin');
+		if (adminParam) {
 			browserStorage.adminPassword = adminParam.startsWith('yldpwd') ? adminParam : undefined;
 			searchParams.delete('admin');
-			navigate(
+			return navigate(
+				{
+					path: location.pathname,
+					search: searchParams,
+					hash: location.hash,
+				},
+				{
+					replace: true,
+				},
+			);
+		}
+
+		const consoleReParam = searchParams.get('cre');
+		if (consoleReParam != null) {
+			enableRemoteConsole();
+
+			searchParams.delete('cre');
+			return navigate(
 				{
 					path: location.pathname,
 					search: searchParams,
@@ -205,6 +225,30 @@ export const App = observer(() => {
 					}[REACT_APP__APP_MODE]
 				}
 			/>
+
+			{!!remoteConsoleChannel.get() && (
+				<div
+					style={{
+						display: 'grid',
+						gridTemplateColumns: '1fr auto',
+						alignItems: 'center',
+						gridGap: 8,
+						padding: 8,
+						color: '#fff',
+						background: '#000',
+					}}
+				>
+					<div>Remote console enabled</div>
+
+					<ActionButton
+						style={{ color: '#fff' }}
+						look={ActionButtonLook.LITE}
+						onClick={() => openInNewWidnow(`https://console.re/${remoteConsoleChannel.get()}`)}
+					>
+						Open
+					</ActionButton>
+				</div>
+			)}
 
 			<QueryClientProvider client={queryClient}>
 				<PopupManager>

@@ -1,5 +1,5 @@
 import { OutputData } from '@editorjs/editorjs';
-import { EVMNetwork } from '@ylide/ethereum';
+import { EVM_NAMES, EVMNetwork } from '@ylide/ethereum';
 import { MessageAttachment, Uint256, YMF } from '@ylide/sdk';
 import { autorun, makeAutoObservable, transaction } from 'mobx';
 
@@ -15,11 +15,11 @@ import { HUB_FEED_ID, OTC_FEED_ID } from '../constants';
 import { AppMode, REACT_APP__APP_MODE } from '../env';
 import { connectAccount } from '../utils/account';
 import { invariant } from '../utils/assert';
-import { blockchainMeta } from '../utils/blockchain';
+import { blockchainMeta, getActiveBlockchainNameForAccount } from '../utils/blockchain';
 import { calcComissionDecimals, calcCommission } from '../utils/commission';
 import { broadcastMessage, editorJsToYMF, isEmptyEditorJsData, sendMessage } from '../utils/mail';
 import { truncateInMiddle } from '../utils/string';
-import { getEvmWalletNetwork } from '../utils/wallet';
+import { getEvmWalletNetwork, getWalletSupportedBlockchains, isWalletSupportsBlockchain } from '../utils/wallet';
 import domain from './Domain';
 import { DomainAccount } from './models/DomainAccount';
 
@@ -36,9 +36,9 @@ export class OutgoingMailData {
 	isGenericFeed = false;
 	extraPayment = '0';
 
-	from?: DomainAccount;
+	private _from?: DomainAccount;
+	private _blockchain?: string;
 	to = new Recipients();
-	network?: EVMNetwork;
 
 	subject = '';
 	editorData?: OutputData;
@@ -55,21 +55,40 @@ export class OutgoingMailData {
 		makeAutoObservable(this);
 
 		autorun(async () => {
-			this.from =
-				this.from && domain.accounts.activeAccounts.includes(this.from)
-					? this.from
-					: domain.accounts.activeAccounts[0];
+			if (!this.from || !domain.accounts.activeAccounts.includes(this.from)) {
+				this.from = domain.accounts.activeAccounts[0];
+			}
 
-			if (this.from?.wallet.factory.blockchainGroup === 'evm') {
-				const selectedNetwork = await getEvmWalletNetwork(this.from.wallet);
+			if (this.from) {
+				const newChain = await getActiveBlockchainNameForAccount(this.from);
+				const supportedChains = getWalletSupportedBlockchains(this.from.wallet);
 
-				if (this.network == null) {
-					this.network = selectedNetwork;
+				if (this.blockchain == null || !supportedChains.includes(this.blockchain)) {
+					this.blockchain = newChain;
 				}
-			} else {
-				this.network = undefined;
 			}
 		});
+	}
+
+	get from() {
+		return this._from;
+	}
+
+	set from(account: DomainAccount | undefined) {
+		this._from = account;
+	}
+
+	get blockchain() {
+		return this._blockchain;
+	}
+
+	set blockchain(chain: string | undefined) {
+		invariant(
+			!chain || (this.from && isWalletSupportsBlockchain(this.from.wallet, chain)),
+			`FROM account doesn't support [${chain}] chain`,
+		);
+
+		this._blockchain = chain;
 	}
 
 	get hasEditorData() {
@@ -87,8 +106,8 @@ export class OutgoingMailData {
 		extraPayment?: string;
 
 		from?: DomainAccount;
+		blockchain?: string;
 		to?: Recipients;
-		network?: EVMNetwork;
 
 		subject?: string;
 		editorData?: OutputData;
@@ -103,9 +122,9 @@ export class OutgoingMailData {
 			this.isGenericFeed = data?.isGenericFeed || false;
 			this.extraPayment = data?.extraPayment || '0';
 
-			this.from = data?.from || domain.accounts.activeAccounts[0];
+			this.from = data?.from;
+			this.blockchain = data?.blockchain;
 			this.to = data?.to || new Recipients();
-			this.network = data?.network;
 
 			this.subject = data?.subject || '';
 			this.editorData = data?.editorData;
@@ -143,17 +162,20 @@ export class OutgoingMailData {
 			const proxyAccount = domain.availableProxyAccounts[0];
 
 			if (!this.from) {
-				this.from = await connectAccount({ place: 'sending-message' });
-				if (!this.from) return false;
+				const account = await connectAccount({ place: 'sending-message' });
+				if (!account) return false;
 
-				if (this.from.wallet.factory.blockchainGroup === 'evm') {
-					const from = this.from;
+				this.from = account;
 
-					this.network = await showStaticComponent(resolve => (
-						<SelectNetworkModal wallet={from.wallet} account={from.account} onClose={resolve} />
+				if (account.wallet.factory.blockchainGroup === 'evm') {
+					const network: EVMNetwork | undefined = await showStaticComponent(resolve => (
+						<SelectNetworkModal wallet={account.wallet} account={account.account} onClose={resolve} />
 					));
 
-					if (this.network == null) return false;
+					const chain = network != null ? EVM_NAMES[network] : undefined;
+					if (!chain) return false;
+
+					this.blockchain = chain;
 				}
 			} else if (proxyAccount && proxyAccount.account.address !== this.from.account.address) {
 				const proceed = await showStaticComponent<boolean>(resolve => (
@@ -196,6 +218,8 @@ export class OutgoingMailData {
 				if (!proceed) return false;
 			}
 
+			invariant(this.from);
+
 			if (
 				this.from.wallet.factory.blockchainGroup === 'evm' &&
 				(await getEvmWalletNetwork(this.from.wallet)) == null
@@ -233,22 +257,21 @@ export class OutgoingMailData {
 					attachments: this.attachments,
 					attachmentFiles: this.attachmentFiles,
 					recipients: this.to.items.map(r => r.routing?.address!),
-					network: this.network,
+					blockchain: this.blockchain,
 					feedId: this.feedId,
 				});
 
 				console.log('Sending result: ', result);
 			} else {
-				const blockchain = this.network
-					? domain.getBlockchainName(this.network)
-					: this.from.wallet.factory.wallet === 'everwallet'
-					? 'everscale'
-					: 'venom-testnet';
+				const blockchain = this.blockchain;
+				invariant(blockchain, 'Chain not defined');
+
 				if (this.isGenericFeed) {
 					const commissions = await BlockchainFeedApi.getCommissions({ feedId: this.feedId });
 					const commission = calcCommission(blockchain, commissions);
 					invariant(commission === this.extraPayment, 'Commissions mismatch');
 				}
+
 				const result = await broadcastMessage({
 					sender: this.from,
 					subject: this.subject,
@@ -273,7 +296,7 @@ export class OutgoingMailData {
 									blockchainMeta[blockchain].ethNetwork?.nativeCurrency.decimals || 9,
 							  )
 						: '0',
-					network: this.network,
+					blockchain: blockchain,
 				});
 
 				console.log('Sending result: ', result);

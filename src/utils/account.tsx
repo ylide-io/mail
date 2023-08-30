@@ -16,7 +16,7 @@ import { DomainAccount } from '../stores/models/DomainAccount';
 import { Wallet } from '../stores/models/Wallet';
 import { getQueryString } from './getQueryString';
 import { truncateInMiddle } from './string';
-import { walletsMeta } from './wallet';
+import { isWalletSupportsBlockchain, walletsMeta } from './wallet';
 
 export function formatAccountName(account: DomainAccount) {
 	const walletName = walletsMeta[account.wallet.wallet].title;
@@ -24,6 +24,14 @@ export function formatAccountName(account: DomainAccount) {
 	return account.name
 		? `${account.name} (${truncateInMiddle(account.account.address, 8, '..')}, ${walletName})`
 		: `${truncateInMiddle(account.account.address, 12, '..')} (${walletName})`;
+}
+
+//
+
+export function getAllowedAccountsForBlockchains(chains: string[] | undefined) {
+	return domain.accounts.activeAccounts.filter(account => {
+		return !chains?.length || chains.some(chain => isWalletSupportsBlockchain(account.wallet, chain));
+	});
 }
 
 //

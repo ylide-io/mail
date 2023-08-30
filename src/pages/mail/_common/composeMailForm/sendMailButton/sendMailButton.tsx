@@ -1,7 +1,6 @@
-import { EVM_NAMES } from '@ylide/ethereum';
 import clsx from 'clsx';
 import { observer } from 'mobx-react';
-import { useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 
 import { GridRowBox, TruncateTextBox } from '../../../../../components/boxes/boxes';
 import { DropDown, DropDownItem, DropDownItemMode } from '../../../../../components/dropDown/dropDown';
@@ -11,49 +10,55 @@ import { Spinner } from '../../../../../components/spinner/spinner';
 import { toast } from '../../../../../components/toast/toast';
 import { ReactComponent as ArrowDownSvg } from '../../../../../icons/ic20/arrowDown.svg';
 import { ReactComponent as ReplySvg } from '../../../../../icons/ic20/reply.svg';
+import { BalancesStore } from '../../../../../stores/balancesStore';
 import domain from '../../../../../stores/Domain';
-import { EvmBalances } from '../../../../../stores/evmBalances';
 import { OutgoingMailData } from '../../../../../stores/outgoingMailData';
 import { AlignmentDirection, HorizontalAlignment } from '../../../../../utils/alignment';
 import { invariant } from '../../../../../utils/assert';
-import { blockchainMeta, evmNameToNetwork } from '../../../../../utils/blockchain';
+import { blockchainMeta } from '../../../../../utils/blockchain';
+import { getWalletSupportedBlockchains } from '../../../../../utils/wallet';
 import css from './sendMailButton.module.scss';
 
 export interface SendMailButtonProps extends PropsWithClassName {
 	mailData: OutgoingMailData;
+	allowedChains?: string[];
 	disabled?: boolean;
-	disableNetworkSwitch?: boolean;
 	onSent?: () => void;
 }
 
 export const SendMailButton = observer(
-	({ className, mailData, disabled, disableNetworkSwitch, onSent }: SendMailButtonProps) => {
-		const from = mailData.from;
-		const blockchainGroup = from?.wallet.factory.blockchainGroup;
-
+	({ className, mailData, allowedChains, disabled, onSent }: SendMailButtonProps) => {
 		const menuAnchorRef = useRef(null);
 		const [menuVisible, setMenuVisible] = useState(false);
 		const currency = useMemo(() => {
-			if (mailData.from) {
+			if (mailData.blockchain) {
 				try {
-					return domain.getBlockchainNativeCurrency(mailData.network);
-				} catch (err) {
-					return '';
-				}
+					return domain.getBlockchainNativeCurrency(mailData.blockchain);
+				} catch (err) {}
 			} else {
 				return '';
 			}
-		}, [mailData.from, mailData.network]);
+		}, [mailData.blockchain]);
 
-		const evmBalances = useMemo(() => {
-			const balances = new EvmBalances();
+		const balances = useMemo(() => {
+			const balances = new BalancesStore();
 
-			if (from) {
-				balances.updateBalances(from.wallet, from.account.address);
+			if (mailData.from) {
+				balances.updateBalances(mailData.from.wallet, mailData.from.account.address);
 			}
 
 			return balances;
-		}, [from]);
+		}, [mailData.from]);
+
+		const allowedChainsForAccount = useMemo(() => {
+			return mailData.from ? getWalletSupportedBlockchains(mailData.from.wallet, allowedChains) : [];
+		}, [allowedChains, mailData.from]);
+
+		useEffect(() => {
+			if (mailData.blockchain && !allowedChainsForAccount.includes(mailData.blockchain)) {
+				mailData.blockchain = allowedChainsForAccount[0];
+			}
+		}, [allowedChainsForAccount, mailData, mailData.blockchain]);
 
 		const sendMail = async () => {
 			try {
@@ -68,47 +73,30 @@ export const SendMailButton = observer(
 		};
 
 		const renderSendText = () => {
-			const payment =
-				mailData.extraPayment === '0' ? null : (
-					<span className={css.extraPayment}>
-						({mailData.extraPayment}
-						{currency ? ` ${currency}` : ''})
-					</span>
-				);
-			if (blockchainGroup === 'everscale') {
-				const bData = blockchainMeta.everscale;
-				return (
-					<>
-						Send via {bData.logo(14)} {bData.title}
-						{payment}
-					</>
-				);
-			} else if (blockchainGroup === 'venom-testnet') {
-				const bData = blockchainMeta['venom-testnet'];
-				return (
-					<>
-						Send via {bData.logo(14)} {bData.title}
-						{payment}
-					</>
-				);
-			} else if (blockchainGroup === 'evm' && mailData.network != null) {
-				const bData = blockchainMeta[EVM_NAMES[mailData.network]];
-				if (bData) {
-					return (
-						<>
-							Send via {bData.logo(16)} {bData.title}
-							{payment}
-						</>
+			const chainMeta = mailData.blockchain ? blockchainMeta[mailData.blockchain] : undefined;
+
+			if (chainMeta) {
+				const payment =
+					mailData.extraPayment === '0' ? null : (
+						<span className={css.extraPayment}>
+							({mailData.extraPayment}
+							{currency ? ` ${currency}` : ''})
+						</span>
 					);
-				} else {
-					console.log('WTF: ', mailData.network, EVM_NAMES[mailData.network]);
-				}
+
+				return (
+					<>
+						Send via {chainMeta.logo()} {chainMeta.title}
+						{payment}
+					</>
+				);
 			}
 
 			return 'Send';
 		};
 
-		const withDropDown = blockchainGroup === 'evm' && !disableNetworkSwitch;
+		const withDropDown =
+			mailData.from?.wallet.factory.blockchainGroup === 'evm' && allowedChainsForAccount?.length !== 1;
 
 		return (
 			<div
@@ -148,45 +136,34 @@ export const SendMailButton = observer(
 								horizontalAlign={HorizontalAlignment.END}
 								onCloseRequest={() => setMenuVisible(false)}
 							>
-								{domain.registeredBlockchains
-									.filter(f => f.blockchainGroup === 'evm')
-									.map(bc => {
-										const bData = blockchainMeta[bc.blockchain];
-										const network = evmNameToNetwork(bc.blockchain)!;
+								{allowedChainsForAccount.map(chain => {
+									const bData = blockchainMeta[chain];
 
-										return (
-											<DropDownItem
-												key={bc.blockchain}
-												mode={
-													!Number(evmBalances.getBalance(network).toFixed(4))
-														? DropDownItemMode.DISABLED
-														: undefined
-												}
-												onSelect={async () => {
-													invariant(from);
+									return (
+										<DropDownItem
+											key={chain}
+											mode={
+												!Number(balances.getBalance(chain).toFixed(4))
+													? DropDownItemMode.DISABLED
+													: undefined
+											}
+											onSelect={async () => {
+												invariant(mailData.from);
+												mailData.blockchain = chain;
+												setMenuVisible(false);
+											}}
+										>
+											<GridRowBox>
+												{bData.logo()}
 
-													await domain.switchEVMChain(from.wallet, network);
-													mailData.network = network;
-
-													setMenuVisible(false);
-												}}
-											>
-												<GridRowBox>
-													{bData.logo(16)}
-
-													<TruncateTextBox>
-														{bData.title} [
-														{Number(
-															evmBalances
-																.getBalance(evmNameToNetwork(bc.blockchain)!)
-																.toFixed(4),
-														)}{' '}
-														{bData.ethNetwork!.nativeCurrency.symbol}]
-													</TruncateTextBox>
-												</GridRowBox>
-											</DropDownItem>
-										);
-									})}
+												<TruncateTextBox>
+													{bData.title} [{Number(balances.getBalance(chain).toFixed(4))}{' '}
+													{bData.ethNetwork!.nativeCurrency.symbol}]
+												</TruncateTextBox>
+											</GridRowBox>
+										</DropDownItem>
+									);
+								})}
 							</DropDown>
 						)}
 					</>
