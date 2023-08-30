@@ -62,8 +62,9 @@ export const SidebarBurger = observer(({ className, children }: SidebarBurgerPro
 interface SidebarSectionProps extends PropsWithChildren<{}> {
 	title?: ReactNode;
 	button?: {
-		look?: ActionButtonLook;
 		text: ReactNode;
+		look?: ActionButtonLook;
+		href?: string;
 		onClick?: () => void;
 	};
 }
@@ -77,9 +78,10 @@ function SidebarSection({ children, title, button }: SidebarSectionProps) {
 
 					{button && (
 						<ActionButton
+							className={css.sectionButton}
 							size={ActionButtonSize.XSMALL}
 							look={button.look || ActionButtonLook.SUBTILE}
-							className={css.sectionButton}
+							href={button.href}
 							onClick={() => {
 								isSidebarOpen.set(false);
 								button?.onClick?.();
@@ -355,7 +357,10 @@ export const SidebarMenu = observer(() => {
 			<SidebarBlock>
 				<SidebarSection
 					title="Trending"
-					button={{ text: 'Explore', onClick: () => navigate(generatePath(RoutePath.ROOT)) }}
+					button={{
+						text: 'Explore',
+						href: generatePath(RoutePath.ROOT),
+					}}
 				>
 					{renderProjects([
 						BlockchainProjectId.TVM,

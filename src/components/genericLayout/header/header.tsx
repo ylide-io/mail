@@ -259,10 +259,7 @@ export const Header = observer(({ className }: PropsWithClassName) => {
 							look={ActionButtonLook.LITE}
 							icon={<ContactsSvg />}
 							title="Contacts"
-							onClick={e => {
-								e.preventDefault();
-								navigate(generatePath(RoutePath.MAIL_CONTACTS));
-							}}
+							href={generatePath(RoutePath.MAIL_CONTACTS)}
 						/>
 					)}
 				</div>

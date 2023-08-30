@@ -1,6 +1,6 @@
 import clsx from 'clsx';
 import { observer } from 'mobx-react';
-import { PropsWithChildren } from 'react';
+import { PropsWithChildren, useMemo } from 'react';
 
 import { ActionButton, ActionButtonLook, ActionButtonSize } from '../../components/ActionButton/ActionButton';
 import { AdaptiveAddress } from '../../components/adaptiveAddress/adaptiveAddress';
@@ -11,7 +11,7 @@ import { TextField, TextFieldLook } from '../../components/textField/textField';
 import { ReactComponent as SettingsSvg } from '../../icons/ic20/settings.svg';
 import css from './testPage.module.scss';
 
-export function Row({ children }: PropsWithChildren<{}>) {
+export function Row({ children }: PropsWithChildren) {
 	return (
 		<div
 			style={{
@@ -28,6 +28,8 @@ export function Row({ children }: PropsWithChildren<{}>) {
 //
 
 export const TestPage = observer(() => {
+	const recipients = useMemo(() => new Recipients(), []);
+
 	return (
 		<div className={css.verticalGrid} style={{ padding: 50 }}>
 			<Row>
@@ -35,6 +37,12 @@ export const TestPage = observer(() => {
 				<ActionButton>Text Only</ActionButton>
 				<ActionButton icon={<SettingsSvg />}>With Icon</ActionButton>
 				<ActionButton icon={<SettingsSvg />} />
+			</Row>
+
+			<Row>
+				href
+				<ActionButton>No Href</ActionButton>
+				<ActionButton href={'/'}>With Href</ActionButton>
 			</Row>
 
 			<Row>
@@ -217,7 +225,7 @@ export const TestPage = observer(() => {
 
 			<Row>
 				RecipientInput
-				<RecipientInput value={new Recipients()} />
+				<RecipientInput value={recipients} />
 			</Row>
 
 			<hr style={{ margin: '32px 0' }} />
