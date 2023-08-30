@@ -1,6 +1,6 @@
 import './mailboxEditor.scss';
 
-import { useRef, useState } from 'react';
+import { forwardRef, Ref, useImperativeHandle, useRef, useState } from 'react';
 import { createReactEditorJS } from 'react-editor-js';
 
 import { OutgoingMailData } from '../../../../stores/outgoingMailData';
@@ -8,11 +8,15 @@ import { EDITOR_JS_TOOLS } from '../../../../utils/mail';
 
 const ReactEditorJS = createReactEditorJS();
 
+export interface MailboxEditorApi {
+	focus: () => void;
+}
+
 interface MailboxEditorProps {
 	mailData: OutgoingMailData;
 }
 
-export function MailboxEditor({ mailData }: MailboxEditorProps) {
+export const MailboxEditor = forwardRef(({ mailData }: MailboxEditorProps, ref: Ref<MailboxEditorApi>) => {
 	const instanceRef = useRef<any>(null);
 
 	const [initialEditorData] = useState(() => mailData.editorData);
@@ -26,16 +30,24 @@ export function MailboxEditor({ mailData }: MailboxEditorProps) {
 		}
 	}
 
+	useImperativeHandle(
+		ref,
+		() => ({
+			focus: () => instanceRef.current?.focus(),
+		}),
+		[],
+	);
+
 	return (
 		<ReactEditorJS
 			tools={EDITOR_JS_TOOLS}
 			//@ts-ignore
 			data={initialEditorData}
 			onChange={handleSave}
-			instanceRef={(instance: any) => (instanceRef.current = instance)}
+			instanceRef={(instance: any) => (instanceRef.current = instance.dangerouslyLowLevelInstance)}
 			onInitialize={(instance: any) => {
-				instanceRef.current = instance;
+				instanceRef.current = instance.dangerouslyLowLevelInstance;
 			}}
 		/>
 	);
-}
+});

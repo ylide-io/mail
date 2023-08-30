@@ -1,5 +1,5 @@
 import clsx from 'clsx';
-import { forwardRef, HTMLAttributes, MouseEventHandler, PropsWithChildren, ReactNode, Ref } from 'react';
+import { forwardRef, HTMLAttributes, PropsWithChildren, ReactNode, Ref } from 'react';
 
 import { useNav } from '../../utils/url';
 import { PropsWithClassName } from '../props';
@@ -29,7 +29,6 @@ interface ActionButtonProps extends PropsWithChildren, PropsWithClassName, HTMLA
 	look?: ActionButtonLook;
 	icon?: ReactNode;
 	href?: string;
-	onClick?: MouseEventHandler;
 	isSingleLine?: boolean;
 	isDisabled?: boolean;
 	isLoading?: boolean;

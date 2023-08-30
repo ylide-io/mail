@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 
 import { ActionButton, ActionButtonLook, ActionButtonSize } from '../ActionButton/ActionButton';
 import { ActionModal } from '../actionModal/actionModal';
@@ -21,6 +21,7 @@ export function ForgotPasswordModal({ onClose }: ForgotPasswordModalProps) {
 
 	const [password, setPassword] = useState('');
 	const [passwordRepeat, setPasswordRepeat] = useState('');
+	const passwordRepeatRef = useRef<HTMLInputElement>(null);
 
 	const [withoutPassword, setWithoutPassword] = useState(false);
 
@@ -141,16 +142,19 @@ export function ForgotPasswordModal({ onClose }: ForgotPasswordModalProps) {
 							type="password"
 							placeholder="Enter Ylide password"
 							value={password}
-							onValueChange={setPassword}
 							disabled={withoutPassword}
+							onValueChange={setPassword}
+							onEnter={() => passwordRepeatRef.current?.focus()}
 						/>
 
 						<TextField
+							ref={passwordRepeatRef}
 							type="password"
 							placeholder="Repeat your password"
 							value={passwordRepeat}
-							onValueChange={setPasswordRepeat}
 							disabled={withoutPassword}
+							onValueChange={setPasswordRepeat}
+							onEnter={() => onSave()}
 						/>
 
 						<CheckBox isChecked={withoutPassword} onChange={toggle}>

@@ -1,5 +1,5 @@
 import clsx from 'clsx';
-import { forwardRef, InputHTMLAttributes, Ref } from 'react';
+import { forwardRef, InputHTMLAttributes, KeyboardEventHandler, Ref } from 'react';
 
 import css from './textField.module.scss';
 
@@ -13,10 +13,14 @@ export interface TextFieldProps extends InputHTMLAttributes<HTMLInputElement> {
 	look?: TextFieldLook;
 	isError?: boolean;
 	onValueChange?: (value: string) => void;
+	onEnter?: KeyboardEventHandler;
 }
 
 export const TextField = forwardRef(
-	({ className, look, isError, onValueChange, ...props }: TextFieldProps, ref: Ref<HTMLInputElement>) => {
+	(
+		{ className, look, isError, onValueChange, onKeyDown, onEnter, ...props }: TextFieldProps,
+		ref: Ref<HTMLInputElement>,
+	) => {
 		const lookClass = {
 			[TextFieldLook.DEFAULT]: css.root_defaultLook,
 			[TextFieldLook.PROMO]: css.root_promoLook,
@@ -30,6 +34,13 @@ export const TextField = forwardRef(
 				onChange={e => {
 					props.onChange?.(e);
 					onValueChange?.(e.target.value);
+				}}
+				onKeyDown={e => {
+					onKeyDown?.(e);
+
+					if (e.keyCode === 13) {
+						onEnter?.(e);
+					}
 				}}
 				{...props}
 			/>

@@ -4,18 +4,17 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { FeedManagerApi } from '../../api/feedManagerApi';
 import { APP_NAME } from '../../constants';
 import domain from '../../stores/Domain';
-import { feedSettings } from '../../stores/FeedSettings';
 import { DomainAccount } from '../../stores/models/DomainAccount';
 import { connectAccount, disconnectAccount } from '../../utils/account';
 import { invariant } from '../../utils/assert';
 import { ActionButton, ActionButtonLook, ActionButtonSize } from '../ActionButton/ActionButton';
 import { ActionModal } from '../actionModal/actionModal';
 import { AdaptiveAddress } from '../adaptiveAddress/adaptiveAddress';
+import { CoverageModal } from '../coverageModal/coverageModal';
 import { TextField } from '../textField/textField';
 import { toast } from '../toast/toast';
 import css from './mainViewOnboarding.module.scss';
 import ErrorCode = FeedManagerApi.ErrorCode;
-import { CoverageModal } from '../coverageModal/coverageModal';
 
 enum Step {
 	CONNECT_ACCOUNT = 'CONNECT_ACCOUNT',
@@ -271,6 +270,7 @@ export const MainViewOnboarding = observer(() => {
 						placeholder="Invite code"
 						value={inviteCode}
 						onValueChange={setInviteCode}
+						onEnter={() => checkInvite()}
 					/>
 				</ActionModal>
 			)}
