@@ -24,7 +24,6 @@ import venomBlockchainBannerSrc from './bannerImages/venomBlockchain.jpg';
 import venomBridgeBannerSrc from './bannerImages/venomBridge.jpg';
 import venomIdBannerSrc from './bannerImages/venomId.jpg';
 import venomRecapBannerSrc from './bannerImages/venomRecap.jpg';
-import venomVietnamBannerSrc from './bannerImages/venomVietnam.jpg';
 import ventoryBannerSrc from './bannerImages/ventory.jpg';
 import web3WorldBannerSrc from './bannerImages/web3World.jpg';
 import altsomeSrc from './profileImages/altsome.jpg';
@@ -50,7 +49,6 @@ import venomBlockchainSrc from './profileImages/venomBlockchain.png';
 import venomBridgeSrc from './profileImages/venomBridge.png';
 import venomIdSrc from './profileImages/venomId.jpg';
 import venomRecapSrc from './profileImages/venomRecap.jpg';
-import venomVietnamSrc from './profileImages/venomVietnam.jpg';
 import ventorySrc from './profileImages/ventory.png';
 import weaverSrc from './profileImages/weaver.jpg';
 import web3WorldSrc from './profileImages/web3World.png';
@@ -110,7 +108,6 @@ export enum BlockchainProjectId {
 	RAVE = 'rave',
 	VENOMART = 'venomart',
 	REVOLT = 'revolt',
-	VENOM_VIETNAM = 'venom_vietnam',
 	CHEPE_GAMES = 'chepe_games',
 	DEXIFY = 'dexify',
 
@@ -405,21 +402,6 @@ export const blockchainProjects: BlockchainProject[] = [
 		bannerImage: revoltBannerSrc,
 		website: 'https://twitter.com/RevoltNFT?s=20',
 		tags: [BlockchainProjectTag.NFT, BlockchainProjectTag.VENOM],
-		allowedChains: allChainsExceptTest,
-		attachmentMode: BlockchainProjectAttachmentMode.ADMINS,
-	},
-	{
-		id: BlockchainProjectId.VENOM_VIETNAM,
-		feedId: {
-			official: '2000000000000000000000000000000000000000000000000000000000000028' as Uint256,
-			discussion: '2000000000000000000000000000000000000000000000000000000000000029' as Uint256,
-		},
-		name: 'Cộng đồng Venom VietNam',
-		description: 'Giao lưu học hỏi và trải nghiệm mạng.',
-		profileImage: venomVietnamSrc,
-		bannerImage: venomVietnamBannerSrc,
-		website: 'https://twitter.com/VenomVietnam',
-		tags: [BlockchainProjectTag.SOCIAL, BlockchainProjectTag.VENOM],
 		allowedChains: allChainsExceptTest,
 		attachmentMode: BlockchainProjectAttachmentMode.ADMINS,
 	},
