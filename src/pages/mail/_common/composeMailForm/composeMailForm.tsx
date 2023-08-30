@@ -49,9 +49,9 @@ export const ComposeMailForm = observer(
 						<>
 							<div className={css.metaLabel}>From</div>
 							<AccountSelect
-								activeAccount={mailData.from?.account}
+								activeAccount={mailData.from}
 								displayConnectButton={displayConnectAccountButton}
-								onChange={account => mailData.setFrom(account)}
+								onChange={account => (mailData.from = account)}
 							/>
 						</>
 					)}

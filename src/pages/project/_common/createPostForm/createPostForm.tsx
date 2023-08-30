@@ -101,8 +101,8 @@ export const CreatePostForm = observer(
 			}, [feedId, mailData, replyTo]);
 
 			useEffect(() => {
-				if (!mailData.from?.account || !accounts.includes(mailData.from.account)) {
-					mailData.setFrom(accounts[0]);
+				if (!mailData.from || !accounts.includes(mailData.from)) {
+					mailData.from = accounts[0];
 				}
 			}, [mailData.from, accounts, mailData]);
 
@@ -110,8 +110,8 @@ export const CreatePostForm = observer(
 				let cancelled = false;
 				BlockchainFeedApi.getCommissions({ feedId: feedId })
 					.then(commissions => {
-						if (!cancelled && mailData.from?.blockchain) {
-							const commission = calcCommission(mailData.from.blockchain, commissions);
+						if (!cancelled && mailData.blockchain) {
+							const commission = calcCommission(mailData.blockchain, commissions);
 							mailData.extraPayment = commission || '0';
 						}
 					})
@@ -119,7 +119,7 @@ export const CreatePostForm = observer(
 				return () => {
 					cancelled = true;
 				};
-			}, [feedId, mailData, mailData.from]);
+			}, [feedId, mailData, mailData.blockchain]);
 
 			const textAreaApiRef = useRef<AutoSizeTextAreaApi>(null);
 
@@ -310,8 +310,8 @@ export const CreatePostForm = observer(
 									className={css.accontSelect}
 									disabled={mailData.sending}
 									accounts={accounts}
-									activeAccount={mailData.from?.account}
-									onChange={account => mailData.setFrom(account)}
+									activeAccount={mailData.from}
+									onChange={account => (mailData.from = account)}
 								/>
 
 								<div className={css.footerRight}>

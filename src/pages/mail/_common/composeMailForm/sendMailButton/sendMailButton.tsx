@@ -31,36 +31,34 @@ export const SendMailButton = observer(
 		const menuAnchorRef = useRef(null);
 		const [menuVisible, setMenuVisible] = useState(false);
 		const currency = useMemo(() => {
-			if (mailData.from?.blockchain) {
+			if (mailData.blockchain) {
 				try {
-					return domain.getBlockchainNativeCurrency(mailData.from.blockchain);
+					return domain.getBlockchainNativeCurrency(mailData.blockchain);
 				} catch (err) {}
 			} else {
 				return '';
 			}
-		}, [mailData.from]);
+		}, [mailData.blockchain]);
 
 		const balances = useMemo(() => {
 			const balances = new BalancesStore();
 
-			if (mailData.from?.account) {
-				balances.updateBalances(mailData.from.account.wallet, mailData.from.account.account.address);
+			if (mailData.from) {
+				balances.updateBalances(mailData.from.wallet, mailData.from.account.address);
 			}
 
 			return balances;
 		}, [mailData.from]);
 
 		const allowedChainsForAccount = useMemo(() => {
-			return mailData.from?.account
-				? getWalletSupportedBlockchains(mailData.from.account.wallet, allowedChains)
-				: [];
+			return mailData.from ? getWalletSupportedBlockchains(mailData.from.wallet, allowedChains) : [];
 		}, [allowedChains, mailData.from]);
 
 		useEffect(() => {
-			if (mailData.from?.blockchain && !allowedChainsForAccount.includes(mailData.from.blockchain)) {
-				mailData.setFromBlockchain(allowedChainsForAccount[0]);
+			if (mailData.blockchain && !allowedChainsForAccount.includes(mailData.blockchain)) {
+				mailData.blockchain = allowedChainsForAccount[0];
 			}
-		}, [allowedChainsForAccount, mailData.from]);
+		}, [allowedChainsForAccount, mailData, mailData.blockchain]);
 
 		const sendMail = async () => {
 			try {
@@ -75,7 +73,7 @@ export const SendMailButton = observer(
 		};
 
 		const renderSendText = () => {
-			const chainMeta = mailData.from?.blockchain ? blockchainMeta[mailData.from.blockchain] : undefined;
+			const chainMeta = mailData.blockchain ? blockchainMeta[mailData.blockchain] : undefined;
 
 			if (chainMeta) {
 				const payment =
@@ -98,7 +96,7 @@ export const SendMailButton = observer(
 		};
 
 		const withDropDown =
-			mailData.from?.account?.wallet.factory.blockchainGroup === 'evm' && allowedChainsForAccount?.length !== 1;
+			mailData.from?.wallet.factory.blockchainGroup === 'evm' && allowedChainsForAccount?.length !== 1;
 
 		return (
 			<div
@@ -151,7 +149,7 @@ export const SendMailButton = observer(
 											}
 											onSelect={async () => {
 												invariant(mailData.from);
-												mailData.setFromBlockchain(chain);
+												mailData.blockchain = chain;
 												setMenuVisible(false);
 											}}
 										>
