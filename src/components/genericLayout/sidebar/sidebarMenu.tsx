@@ -365,17 +365,17 @@ export const SidebarMenu = observer(() => {
 					{renderProjects([
 						BlockchainProjectId.TVM,
 						BlockchainProjectId.OASIS_GALLERY,
-						BlockchainProjectId.GRAVIX,
-						BlockchainProjectId.WEB3_WORLD,
-						BlockchainProjectId.YLIDE,
+						BlockchainProjectId.VENTORY,
+						BlockchainProjectId.HANMADI,
+						BlockchainProjectId.DITTO_NETWORK,
 					])}
 				</SidebarSection>
 
 				<SidebarSection title="Newly Added">
 					{renderProjects([
-						BlockchainProjectId.DITTO_NETWORK,
-						BlockchainProjectId.HANMADI,
-						BlockchainProjectId.VENOMART,
+						BlockchainProjectId.DEXIFY,
+						BlockchainProjectId.CHEPE_GAMES,
+						BlockchainProjectId.ALTSOME,
 					])}
 				</SidebarSection>
 
