@@ -159,7 +159,9 @@ export async function connectAccount(params?: { place?: string }): Promise<Domai
 				/>
 			));
 
-			notificationsAlert.newAccountConnected();
+			if (domainAccount) {
+				notificationsAlert.newAccountConnected();
+			}
 
 			return domainAccount;
 		}

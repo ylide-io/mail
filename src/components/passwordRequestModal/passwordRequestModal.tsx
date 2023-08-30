@@ -33,10 +33,11 @@ export function PasswordRequestModal({ reason, onClose }: PasswordRequestModalPr
 			<p>Please, enter your Ylide password to {reason}</p>
 
 			<TextField
-				value={password}
-				onValueChange={setPassword}
 				type="password"
 				placeholder="Enter your Ylide password"
+				value={password}
+				onValueChange={setPassword}
+				onEnter={() => onClose?.(password)}
 			/>
 
 			<div style={{ textAlign: 'right', marginTop: 8, marginRight: 8 }}>

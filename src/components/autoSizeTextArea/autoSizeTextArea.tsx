@@ -43,9 +43,13 @@ export const AutoSizeTextArea = forwardRef(
 		const textareaRef = useRef<HTMLTextAreaElement>(null);
 		useAutoSizeTextArea({ textareaRef, value, maxHeight, resetKey });
 
-		useImperativeHandle(ref, () => ({
-			focus: () => textareaRef.current?.focus(),
-		}));
+		useImperativeHandle(
+			ref,
+			() => ({
+				focus: () => textareaRef.current?.focus(),
+			}),
+			[],
+		);
 
 		return (
 			<textarea

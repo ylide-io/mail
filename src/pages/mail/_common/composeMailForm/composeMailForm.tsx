@@ -15,7 +15,7 @@ import { OutgoingMailData } from '../../../../stores/outgoingMailData';
 import { AlignmentDirection } from '../../../../utils/alignment';
 import { formatFileSize, openFilePicker } from '../../../../utils/file';
 import { formatSubject } from '../../../../utils/mail';
-import { MailboxEditor } from '../../composePage/mailboxEditor/mailboxEditor';
+import { MailboxEditor, MailboxEditorApi } from '../../composePage/mailboxEditor/mailboxEditor';
 import css from './composeMailForm.module.scss';
 import { SendMailButton } from './sendMailButton/sendMailButton';
 
@@ -28,6 +28,8 @@ export interface ComposeMailFormProps extends PropsWithClassName {
 
 export const ComposeMailForm = observer(
 	({ className, isRecipientInputDisabled, displayConnectAccountButton, mailData, onSent }: ComposeMailFormProps) => {
+		const editorRef = useRef<MailboxEditorApi>(null);
+
 		const attachButtonRef = useRef(null);
 		const [isAttachmentPopupOpen, setAttachmentPopupOpen] = useState(false);
 
@@ -64,11 +66,12 @@ export const ComposeMailForm = observer(
 						placeholder={formatSubject('')}
 						value={mailData.subject}
 						onValueChange={value => (mailData.subject = value)}
+						onEnter={() => editorRef.current?.focus()}
 					/>
 				</div>
 
 				<div className={css.content}>
-					<MailboxEditor mailData={mailData} />
+					<MailboxEditor ref={editorRef} mailData={mailData} />
 				</div>
 
 				<div className={css.footer}>

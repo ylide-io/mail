@@ -34,7 +34,7 @@ import dittoSrc from './profileImages/ditto.jpg';
 import ethWhalesSrc from './profileImages/ethWhales.png';
 import generalSrc from './profileImages/general.png';
 import gnosisBuildersSrc from './profileImages/gnosisBuilders.jpg';
-import gravixSrc from './profileImages/gravix.png';
+import gravixSrc from './profileImages/gravix.jpg';
 import hanmadiSrc from './profileImages/hanmadi.jpg';
 import oasisGallerySrc from './profileImages/oasisGallery.png';
 import oneClickCryptoSrc from './profileImages/oneClickCrypto.jpg';

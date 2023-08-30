@@ -327,10 +327,11 @@ export function NewPasswordModal({
 									<TextField
 										look={TextFieldLook.PROMO}
 										autoFocus
-										value={password}
-										onValueChange={setPassword}
 										type="password"
 										placeholder="Enter your Ylide password"
+										value={password}
+										onValueChange={setPassword}
+										onEnter={() => createLocalKey({ password })}
 									/>
 
 									<div
