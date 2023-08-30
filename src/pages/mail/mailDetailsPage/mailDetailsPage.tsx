@@ -61,7 +61,7 @@ export const MailDetailsPage = observer(() => {
 
 				const domainAccount = accounts.find(a => a.account.address === accountAddress);
 				invariant(domainAccount, () => {
-					toast(`Connect account ${truncateInMiddle(accountAddress, 8, '..')} to read this message 👍`);
+					toast(`Connect account ${truncateInMiddle(accountAddress, 12, '..')} to read this message 👍`);
 					return 'No account';
 				});
 
