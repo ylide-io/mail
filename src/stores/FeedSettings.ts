@@ -14,6 +14,133 @@ export interface FeedSettingsData {
 	defaultProjects: FeedManagerApi.UserProject[];
 }
 
+const getDefaultCoverage = (): FeedManagerApi.Coverage => ({
+	tokens: {
+		items: [],
+		ratio: 0,
+		ratioUsd: 0,
+		coveredCount: 0,
+		usdTotal: 0,
+		usdCovered: 0,
+		total: 0,
+	},
+	protocols: {
+		items: [],
+		ratio: 0,
+		ratioUsd: 0,
+		coveredCount: 0,
+		usdTotal: 0,
+		usdCovered: 0,
+		total: 0,
+	},
+	totalCoverage: 'N/A',
+});
+
+const calculateCoverage = (data: FeedManagerApi.CoverageData[]) => {
+	const coverage = data;
+	const result: FeedManagerApi.Coverage = getDefaultCoverage();
+	for (const c of coverage) {
+		if (c.missing) {
+			for (const reason of c.reasonsData) {
+				if (reason.type === 'balance') {
+					result.tokens.items.push({
+						tokenId: c.tokenId,
+						name: c.tokenName,
+						symbol: c.tokenSymbol,
+						missing: c.missing,
+						projectName: c.projectName,
+					});
+					result.tokens.usdTotal += reason.balanceUsd;
+				} else if (reason.type === 'protocol') {
+					result.protocols.items.push({
+						tokenId: c.tokenId,
+						name: c.protocolName,
+						symbol: c.protocolTokenSymbol,
+						missing: c.missing,
+						projectName: c.projectName,
+					});
+					let sum = 0;
+					if ('portfolio_item_list' in reason.data) {
+						sum = reason.data.portfolio_item_list.reduce((acc, s) => acc + s.stats.net_usd_value, 0);
+					} else if ('pools' in reason.data) {
+						sum =
+							Number(reason.data.liquidity?.totalUsdValue || 0) +
+							reason.data.pools.reduce((acc, p) => {
+								acc += Number(p.totalUsdValue);
+								return acc;
+							}, 0);
+					}
+					result.protocols.usdTotal += sum;
+				}
+			}
+		} else {
+			for (const reason of c.reasonsData) {
+				if (reason.type === 'balance') {
+					result.tokens.items.push({
+						tokenId: c.tokenId,
+						name: c.tokenName,
+						symbol: c.tokenSymbol,
+						missing: c.missing,
+						projectName: c.projectName,
+					});
+					result.tokens.coveredCount += 1;
+					result.tokens.usdTotal += reason.balanceUsd;
+					result.tokens.usdCovered += reason.balanceUsd;
+				} else if (reason.type === 'protocol') {
+					result.protocols.items.push({
+						tokenId: c.tokenId,
+						name: c.protocolName,
+						symbol: c.protocolTokenSymbol,
+						missing: c.missing,
+						projectName: c.projectName,
+					});
+					let sum = 0;
+					if ('portfolio_item_list' in reason.data) {
+						sum = reason.data.portfolio_item_list.reduce((acc, s) => acc + s.stats.net_usd_value, 0);
+					} else if ('pools' in reason.data) {
+						sum =
+							Number(reason.data.liquidity?.totalUsdValue || 0) +
+							reason.data.pools.reduce((acc, p) => {
+								acc += Number(p.totalUsdValue);
+								return acc;
+							}, 0);
+					}
+					result.protocols.usdTotal += sum;
+					result.protocols.usdCovered += sum;
+					result.protocols.coveredCount += 1;
+				}
+			}
+		}
+	}
+
+	result.tokens.total = result.tokens.items.length;
+	result.protocols.total = result.protocols.items.length;
+
+	result.tokens.usdCovered = Math.floor(result.tokens.usdCovered);
+	result.tokens.usdTotal = Math.floor(result.tokens.usdTotal);
+
+	result.protocols.usdTotal = Math.floor(result.protocols.usdTotal);
+	result.protocols.usdCovered = Math.floor(result.protocols.usdCovered);
+
+	if (result.tokens.items.length) {
+		result.tokens.ratio = Math.floor((result.tokens.coveredCount * 100) / result.tokens.items.length);
+	}
+	if (result.tokens.usdTotal) {
+		result.tokens.ratioUsd = Math.floor((result.tokens.usdCovered * 100) / result.tokens.usdTotal);
+	}
+	if (result.protocols.items.length) {
+		result.protocols.ratio = Math.floor((result.protocols.coveredCount * 100) / result.protocols.items.length);
+	}
+	if (result.protocols.usdTotal) {
+		result.protocols.ratioUsd = Math.floor((result.protocols.usdCovered * 100) / result.protocols.usdTotal);
+	}
+	const total = result.tokens.usdTotal + result.protocols.usdTotal;
+	const covered = result.tokens.usdCovered + result.protocols.usdCovered;
+	const totalResult = total > 0 ? (covered * 100) / total : 0;
+	result.totalCoverage = total === 0 ? 'N/A' : totalResult === 100 ? '100%' : `${totalResult.toFixed(1)}%`;
+	return result;
+};
+
 export class FeedSettings {
 	@observable
 	isError = false;
@@ -25,10 +152,7 @@ export class FeedSettings {
 	private configs = new Map<DomainAccount, FeedSettingsData | 'loading'>();
 
 	@observable
-	coverages = new Map<
-		DomainAccount,
-		(FeedManagerApi.CoverageResponse & { totalCoverage: string }) | 'loading' | 'error'
-	>();
+	coverages = new Map<DomainAccount, FeedManagerApi.Coverage | 'loading' | 'error'>();
 
 	@observable
 	tags: { id: number; name: string }[] | 'loading' | 'error' = 'loading';
@@ -73,13 +197,8 @@ export class FeedSettings {
 							console.log(`Failed to get config - ${configResponse.reason}`);
 						}
 						if (coverageResponse.status === 'fulfilled') {
-							const coverage = coverageResponse.value;
-							const total = coverage.tokens.usdTotal + coverage.protocols.usdTotal;
-							const covered = coverage.tokens.usdCovered + coverage.protocols.usdCovered;
-							const result = total > 0 ? (covered * 100) / total : 0;
-							const totalCoverage =
-								total === 0 ? 'N/A' : result === 100 ? '100%' : `${result.toFixed(1)}%`;
-							this.coverages.set(account, { ...coverage, totalCoverage });
+							const coverage = calculateCoverage(coverageResponse.value);
+							this.coverages.set(account, coverage);
 						} else {
 							this.coverages.set(account, 'error');
 							console.log(`Failed to get coverage - ${coverageResponse.reason}`);

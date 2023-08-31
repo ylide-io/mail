@@ -132,14 +132,65 @@ export namespace FeedManagerApi {
 		usdCovered: number;
 	}
 
-	export type CoverageResponse = {
+	export type Coverage = {
 		tokens: CoverageInfo;
 		protocols: CoverageInfo;
-		transactions: Ratio;
+		totalCoverage: string;
+	};
+
+	export interface CoverageData {
+		tokenId: string;
+		address: string;
+		missing: boolean;
+		projectName: string | null;
+		tokenName: string | null;
+		tokenSymbol: string | null;
+		protocolName: string | null;
+		protocolTokenSymbol: string | null;
+		reasonsData: [
+			| { type: 'balance'; balanceUsd: number }
+			| { type: 'transaction' }
+			| {
+					type: 'protocol';
+					data: {
+						portfolio_item_list: [{ stats: { net_usd_value: number } }];
+					};
+			  }
+			| {
+					type: 'protocol';
+					data: TVMAccountsDataResponse;
+			  },
+		];
+	}
+
+	export type TVMAccountsDataResponse = {
+		address: string;
+		pools: {
+			poolAddress: string;
+			poolType: string;
+			totalUsdValue: string;
+			supplyTokenList: {
+				amount: string;
+				decimals: number;
+				rootAddress: string;
+				symbol: string;
+				usdValue: string;
+			}[];
+		}[];
+		liquidity?: {
+			totalUsdValue: string;
+			supplyTokenList: {
+				amount: string;
+				decimals: number;
+				rootAddress: string;
+				symbol: string;
+				usdValue: string;
+			}[];
+		};
 	};
 
 	export async function getCoverage(token: string) {
-		return await request<CoverageResponse>(`/coverage`, {
+		return await request<CoverageData[]>(`/v2/coverage`, {
 			token,
 		});
 	}
