@@ -39,14 +39,14 @@ export const CoverageModal = observer(({ onClose, account }: Props) => {
 		if (!coverage || coverage === 'error' || coverage === 'loading') {
 			return [];
 		}
-		return uniq(coverage.tokens.items);
+		return uniq(coverage.tokens.items).sort((a, b) => Number(a.missing) - Number(b.missing));
 	}, [coverage]);
 
 	const uniqProtocols = useMemo(() => {
 		if (!coverage || coverage === 'error' || coverage === 'loading') {
 			return [];
 		}
-		return uniq(coverage.protocols.items);
+		return uniq(coverage.protocols.items).sort((a, b) => Number(a.missing) - Number(b.missing));
 	}, [coverage]);
 
 	const getRowTextToken = (row: {
