@@ -118,6 +118,9 @@ export class Domain {
 		} else {
 			this.ylide.add(evm);
 
+			// Temp fix
+			this.ylide.registerWalletFactory(evmWalletFactories.walletconnect);
+
 			if (REACT_APP__APP_MODE !== AppMode.MAIN_VIEW) {
 				this.ylide.add(tvm);
 			}
