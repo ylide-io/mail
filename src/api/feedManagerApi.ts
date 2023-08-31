@@ -96,9 +96,15 @@ export namespace FeedManagerApi {
 	//
 
 	export async function init(token: string, tvm?: string) {
-		return await request(`/init`, {
+		return await request<undefined | { inLine: boolean }>(`/init`, {
 			token,
 			tvm,
+		});
+	}
+
+	export async function checkInit(token: string) {
+		return await request<boolean>(`/check-init`, {
+			token,
 		});
 	}
 
