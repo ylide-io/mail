@@ -255,7 +255,7 @@ export namespace BlockchainFeedApi {
 
 //
 
-const COMMUNITY_ADMIN_CACHE_TIME = 1000 * 60 * 30;
+const COMMUNITY_ADMIN_CACHE_TIME = 1000 * 60 * 5;
 
 interface CommunityAdminEntry {
 	admin: boolean;
