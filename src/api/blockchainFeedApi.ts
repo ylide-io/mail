@@ -1,8 +1,10 @@
 import { ITVMMessage } from '@ylide/everscale';
 import { IMessage, IMessageContent, IMessageCorruptedContent } from '@ylide/sdk';
+import { makeAutoObservable, observable } from 'mobx';
 
 import { REACT_APP__BLOCKCHAIN_FEED } from '../env';
 import { IMessageDecodedContent } from '../indexedDB/IndexedDB';
+import { BrowserStorage, BrowserStorageKey } from '../stores/browserStorage';
 import { invariant } from '../utils/assert';
 import { decodeBroadcastContent } from '../utils/mail';
 import { createCleanSerachParams } from '../utils/url';
@@ -102,6 +104,10 @@ export namespace BlockchainFeedApi {
 
 	export async function getPostsStatus(params: { ids: string[] }) {
 		return await request<{ bannedPosts: string[] }>('/posts-status', { query: { id: params.ids } });
+	}
+
+	export async function isAdmin(feedId: string, address: string) {
+		return await request('/is-admin', { query: { feedId, address } });
 	}
 
 	export async function banAddresses(params: { addresses: string[]; secret: string }) {
@@ -246,3 +252,64 @@ export namespace BlockchainFeedApi {
 		});
 	}
 }
+
+//
+
+const COMMUNITY_ADMIN_CACHE_TIME = 1000 * 60 * 30;
+
+interface CommunityAdminEntry {
+	admin: boolean;
+	checkDate: number;
+}
+
+class CommunityAdmin {
+	@observable.ref private value: Record<
+		string, // feedId
+		Record<
+			string, // address
+			CommunityAdminEntry
+		>
+	> = BrowserStorage.getJsonItem(BrowserStorageKey.COMMUNITY_ADMIN) || {};
+
+	constructor() {
+		makeAutoObservable(this);
+	}
+
+	isAdmin(feedId: string, address: string): boolean {
+		const entries = this.value[feedId] || {};
+		const entry = entries[address];
+		const admin = !!entry?.admin;
+		const checkDate = entry?.checkDate || 0;
+
+		if (Date.now() - checkDate > COMMUNITY_ADMIN_CACHE_TIME) {
+			this.updateIsAdmin(feedId, address);
+		}
+
+		return admin;
+	}
+
+	private async updateIsAdmin(feedId: string, address: string) {
+		this.patchEntry(feedId, address, { checkDate: Date.now() });
+
+		const res = await BlockchainFeedApi.isAdmin(feedId, address);
+		const admin = res === 'true';
+		const newValue = this.patchEntry(feedId, address, { admin });
+
+		BrowserStorage.setJsonItem(BrowserStorageKey.COMMUNITY_ADMIN, newValue);
+	}
+
+	private patchEntry(feedId: string, address: string, entry: Partial<CommunityAdminEntry>) {
+		return (this.value = {
+			...this.value,
+			[feedId]: {
+				...this.value[feedId],
+				[address]: {
+					...this.value[feedId]?.[address],
+					...entry,
+				},
+			},
+		});
+	}
+}
+
+export const communityAdmin = new CommunityAdmin();

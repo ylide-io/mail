@@ -21,8 +21,8 @@ import {
 	BlockchainProjectAttachmentMode,
 } from '../../../../stores/blockchainProjects/blockchainProjects';
 import { browserStorage } from '../../../../stores/browserStorage';
+import { DomainAccount } from '../../../../stores/models/DomainAccount';
 import { OutgoingMailData, OutgoingMailDataMode } from '../../../../stores/outgoingMailData';
-import { getAllowedAccountsForBlockchains } from '../../../../utils/account';
 import { HorizontalAlignment } from '../../../../utils/alignment';
 import { calcCommission } from '../../../../utils/commission';
 import { openFilePicker, readFileAsDataURL } from '../../../../utils/file';
@@ -40,15 +40,18 @@ export interface CreatePostFormApi {
 export interface CreatePostFormProps extends PropsWithClassName {
 	project: BlockchainProject;
 	feedId: Uint256;
+	accounts: DomainAccount[];
 	placeholder: string;
 	onCreated?: () => void;
 }
 
 export const CreatePostForm = observer(
 	forwardRef(
-		({ className, project, feedId, placeholder, onCreated }: CreatePostFormProps, ref: Ref<CreatePostFormApi>) => {
+		(
+			{ className, project, feedId, accounts, placeholder, onCreated }: CreatePostFormProps,
+			ref: Ref<CreatePostFormApi>,
+		) => {
 			const allowedChains = project.allowedChains;
-			const accounts = useMemo(() => getAllowedAccountsForBlockchains(allowedChains), [allowedChains]);
 
 			const allowCustomAttachments =
 				project.attachmentMode === BlockchainProjectAttachmentMode.EVERYONE ||
