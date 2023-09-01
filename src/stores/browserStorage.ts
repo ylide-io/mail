@@ -12,6 +12,7 @@ export enum BrowserStorageKey {
 	SAVED_ACCOUNTS = 'ylide_savedAccounts',
 	NOTIFICATIONS_ALERT = 'ylide_notificationsAlert',
 	REMOTE_CONSOLE = 'ylide_remoteConsole',
+	COMMUNITY_ADMIN = 'ylide_communityAdmin',
 
 	// LEGACY
 
@@ -36,12 +37,20 @@ export class BrowserStorage {
 		return item ? transform(item) : undefined;
 	}
 
+	static getJsonItem<T>(key: BrowserStorageKey, storage: Storage = localStorage) {
+		return BrowserStorage.getItemWithTransform(key, JSON.parse, storage);
+	}
+
 	static setItem(key: BrowserStorageKey, value: string | null | undefined, storage: Storage = localStorage) {
 		if (value != null) {
 			storage.setItem(key, value);
 		} else {
 			storage.removeItem(key);
 		}
+	}
+
+	static setJsonItem<T>(key: BrowserStorageKey, value: T, storage: Storage = localStorage) {
+		return BrowserStorage.setItem(key, value != null ? JSON.stringify(value) : null, storage);
 	}
 
 	//
@@ -89,32 +98,29 @@ export class BrowserStorage {
 
 	//
 
-	private _mainViewKeys =
-		BrowserStorage.getItemWithTransform(
-			BrowserStorageKey.MAIN_VIEW_KEYS,
-			item => JSON.parse(item) as Record<string, string | undefined>,
-		) || {};
+	private _mainViewKeys: Record<string, string | undefined> =
+		BrowserStorage.getJsonItem(BrowserStorageKey.MAIN_VIEW_KEYS) || {};
 
 	get mainViewKeys() {
 		return this._mainViewKeys;
 	}
 
 	set mainViewKeys(value: Record<string, string | undefined>) {
-		BrowserStorage.setItem(BrowserStorageKey.MAIN_VIEW_KEYS, JSON.stringify(value));
+		BrowserStorage.setJsonItem(BrowserStorageKey.MAIN_VIEW_KEYS, value);
 		this._mainViewKeys = value;
 	}
 
 	//
 
 	private _lastMailboxCheckDate: Record<string, number> =
-		BrowserStorage.getItemWithTransform(BrowserStorageKey.LAST_MAILBOX_INCOMING_DATE, JSON.parse) || {};
+		BrowserStorage.getJsonItem(BrowserStorageKey.LAST_MAILBOX_INCOMING_DATE) || {};
 
 	get lastMailboxCheckDate() {
 		return this._lastMailboxCheckDate;
 	}
 
 	set lastMailboxCheckDate(value: Record<string, number>) {
-		BrowserStorage.setItem(BrowserStorageKey.LAST_MAILBOX_INCOMING_DATE, JSON.stringify(value));
+		BrowserStorage.setJsonItem(BrowserStorageKey.LAST_MAILBOX_INCOMING_DATE, value);
 		this._lastMailboxCheckDate = value;
 	}
 }
