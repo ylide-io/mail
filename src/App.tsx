@@ -38,7 +38,6 @@ import { browserStorage } from './stores/browserStorage';
 import domain from './stores/Domain';
 import { FolderId } from './stores/MailList';
 import { RoutePath } from './stores/routePath';
-import walletConnect from './stores/WalletConnect';
 import { enableRemoteConsole, remoteConsoleChannel } from './utils/dev';
 import { openInNewWidnow } from './utils/misc';
 import { useIsMatchesPattern, useNav } from './utils/url';
@@ -153,13 +152,6 @@ export const App = observer(() => {
 				.finally(() => console.debug(`Initialization took ${Date.now() - start}ms`));
 		}
 	}, [isTestPage]);
-
-	useEffect(() => {
-		if (!domain.accounts.hasActiveAccounts) {
-			walletConnect.load();
-		}
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [domain.accounts.hasActiveAccounts]);
 
 	useEffect(() => {
 		analytics.pageView(location.pathname);

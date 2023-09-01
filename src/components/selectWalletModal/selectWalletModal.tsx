@@ -7,7 +7,7 @@ import QRCode from 'react-qr-code';
 
 import domain from '../../stores/Domain';
 import { Wallet } from '../../stores/models/Wallet';
-import walletConnect from '../../stores/WalletConnect';
+import { walletConnectRegistry } from '../../stores/WalletConnect';
 import { copyToClipboard } from '../../utils/clipboard';
 import { openInNewWidnow } from '../../utils/misc';
 import { walletsMeta } from '../../utils/wallet';
@@ -26,7 +26,7 @@ export const SelectWalletModal = observer(({ onClose }: SelectWalletModalProps) 
 
 	const platform = isMobile ? 'mobile' : 'desktop';
 	const links = browserUtils.getMobileLinkRegistry(
-		browserUtils.formatMobileRegistry(walletConnect.registry, platform),
+		browserUtils.formatMobileRegistry(walletConnectRegistry.registry, platform),
 	);
 
 	useEffect(() => {
@@ -292,7 +292,7 @@ export const SelectWalletModal = observer(({ onClose }: SelectWalletModalProps) 
 									/>
 
 									<div className="wallets-list">
-										{walletConnect.loading ? (
+										{walletConnectRegistry.loading ? (
 											<YlideLoader />
 										) : (
 											links
@@ -356,7 +356,7 @@ export const SelectWalletModal = observer(({ onClose }: SelectWalletModalProps) 
 								/>
 
 								<div className="wallets-list">
-									{walletConnect.loading ? (
+									{walletConnectRegistry.loading ? (
 										<YlideLoader />
 									) : (
 										links
