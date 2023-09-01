@@ -76,7 +76,7 @@ export const MainViewOnboarding = observer(() => {
 
 					const res = await FeedManagerApi.init(token, payload.tvmType);
 					const checkInit = async (): Promise<any> => {
-						await new Promise(r => setTimeout(() => r(1), 3000));
+						await new Promise(r => setTimeout(() => r(1), 5000));
 						const initiated = await FeedManagerApi.checkInit(token);
 						if (!initiated) {
 							return checkInit();
