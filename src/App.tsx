@@ -1,4 +1,5 @@
 import { observer } from 'mobx-react';
+import { nanoid } from 'nanoid';
 import { useEffect, useState } from 'react';
 import { QueryClient, QueryClientProvider } from 'react-query';
 import { generatePath, Navigate, Route, Routes, useLocation, useSearchParams } from 'react-router-dom';
@@ -136,7 +137,7 @@ export const App = observer(() => {
 		document.documentElement.dataset.theme = REACT_APP__APP_MODE === AppMode.MAIN_VIEW ? AppTheme.V2 : AppTheme.V1;
 	}, []);
 
-	const [isInitError, setInitError] = useState(false);
+	const [initErrorId, setInitErrorId] = useState('');
 
 	const isTestPage = useIsMatchesPattern(RoutePath.TEST);
 
@@ -146,8 +147,14 @@ export const App = observer(() => {
 			domain
 				.init()
 				.catch(err => {
-					setInitError(true);
-					console.log('Initialization error: ', JSON.stringify(err), err);
+					const errorId = nanoid(8);
+					const msg = `Initialization error [${errorId}]: ${
+						(err instanceof Error && err.stack) || JSON.stringify(err)
+					}`;
+
+					setInitErrorId(errorId);
+					console.log(msg);
+					throw new Error(msg);
 				})
 				.finally(() => console.debug(`Initialization took ${Date.now() - start}ms`));
 		}
@@ -157,7 +164,7 @@ export const App = observer(() => {
 		analytics.pageView(location.pathname);
 	}, [location.pathname]);
 
-	if (isInitError) {
+	if (initErrorId) {
 		return (
 			<div
 				style={{
@@ -171,7 +178,9 @@ export const App = observer(() => {
 					fontSize: 18,
 				}}
 			>
-				<div>Initialization error 😭</div>
+				<div>
+					Initialization error <span style={{ opacity: 0.5 }}>[{initErrorId}]</span>
+				</div>
 
 				<ActionButton size={ActionButtonSize.MEDIUM} onClick={() => window.location.reload()}>
 					Try again
