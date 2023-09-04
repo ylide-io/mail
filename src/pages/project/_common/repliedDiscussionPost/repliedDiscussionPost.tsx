@@ -5,7 +5,7 @@ import { useMemo } from 'react';
 import { DecodedBlockchainFeedPost } from '../../../../api/blockchainFeedApi';
 import { AdaptiveAddress } from '../../../../components/adaptiveAddress/adaptiveAddress';
 import { GalleryModal } from '../../../../components/galleryModal/galleryModal';
-import { NlToBr } from '../../../../components/nlToBr/nlToBr';
+import { TextProcessor } from '../../../../components/textProcessor/textProcessor';
 import { MessageDecodedTextDataType } from '../../../../indexedDB/IndexedDB';
 import { getIpfsHashFromUrl, ipfsToHttpUrl } from '../../../../utils/ipfs';
 import { stickerIpfsIds } from '../createPostForm/stickerIpfsIds';
@@ -35,7 +35,7 @@ export const RepliedDiscussionPost = observer(({ post }: RepliedDiscussionPostPr
 			<AdaptiveAddress className={css.sender} address={post.msg.senderAddress} maxLength={12} />
 
 			<div className={css.text}>
-				<NlToBr text={decodedText} />
+				<TextProcessor text={decodedText} nlToBr linksToAnchors />
 			</div>
 
 			{attachmentHttpUrl && (

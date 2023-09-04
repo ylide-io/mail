@@ -10,8 +10,8 @@ import { ActionButton, ActionButtonLook, ActionButtonSize } from '../../../compo
 import { AdaptiveAddress } from '../../../components/adaptiveAddress/adaptiveAddress';
 import { AutoSizeTextArea } from '../../../components/autoSizeTextArea/autoSizeTextArea';
 import { ErrorMessage } from '../../../components/errorMessage/errorMessage';
-import { NlToBr } from '../../../components/nlToBr/nlToBr';
 import { Recipients } from '../../../components/recipientInput/recipientInput';
+import { TextProcessor } from '../../../components/textProcessor/textProcessor';
 import { YlideLoader } from '../../../components/ylideLoader/ylideLoader';
 import { REACT_APP__OTC_PROVIDER } from '../../../env';
 import { ReactComponent as ContactSvg } from '../../../icons/ic20/contact.svg';
@@ -47,7 +47,7 @@ export function Chat({ data }: ChatProps) {
 						key={entry.id}
 						className={clsx(css.message, entry.isIncoming ? css.message_in : css.message_out)}
 					>
-						<NlToBr
+						<TextProcessor
 							text={
 								decoded?.decodedTextData ? parseEditorJsJson(decoded?.decodedTextData) : '[Encrypted]'
 							}

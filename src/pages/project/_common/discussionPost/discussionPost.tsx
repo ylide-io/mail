@@ -16,10 +16,10 @@ import { Avatar } from '../../../../components/avatar/avatar';
 import { BlockChainLabel } from '../../../../components/BlockChainLabel/BlockChainLabel';
 import { GridRowBox } from '../../../../components/boxes/boxes';
 import { GalleryModal } from '../../../../components/galleryModal/galleryModal';
-import { NlToBr } from '../../../../components/nlToBr/nlToBr';
 import { ReadableDate } from '../../../../components/readableDate/readableDate';
 import { Recipients } from '../../../../components/recipientInput/recipientInput';
 import { Spinner, SpinnerLook } from '../../../../components/spinner/spinner';
+import { TextProcessor } from '../../../../components/textProcessor/textProcessor';
 import { toast } from '../../../../components/toast/toast';
 import { ReactComponent as CrossSvg } from '../../../../icons/ic20/cross.svg';
 import { ReactComponent as ExternalSvg } from '../../../../icons/ic20/external.svg';
@@ -278,7 +278,7 @@ export const DiscussionPost = observer(({ post, project, onReplyClick }: Discuss
 				<div className={css.content}>
 					{!!decodedText && (
 						<div className={css.text}>
-							<NlToBr text={decodedText} />
+							<TextProcessor text={decodedText} nlToBr linksToAnchors />
 						</div>
 					)}
 

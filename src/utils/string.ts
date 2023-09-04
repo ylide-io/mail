@@ -19,3 +19,35 @@ export function htmlSelfClosingTagsToXHtml(html: string) {
 		'<$1$2 />',
 	);
 }
+
+export function transformMatches<T>(
+	input: string,
+	regex: RegExp,
+	transform: (item: string, index: number) => T,
+): Array<T | string> {
+	const res = [];
+	const matches = [...input.matchAll(regex)];
+
+	if (matches.length) {
+		matches.forEach((m, i) => {
+			const value = m[0];
+
+			if (i === 0 && m.index! > 0) {
+				res.push(input.slice(0, m.index));
+			}
+
+			res.push(transform(value, m.index!));
+
+			if (i === matches.length - 1) {
+				const s = input.slice(m.index! + value.length);
+				if (s) {
+					res.push(s);
+				}
+			}
+		});
+	} else {
+		res.push(input);
+	}
+
+	return res;
+}
