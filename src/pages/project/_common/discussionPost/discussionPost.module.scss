@@ -88,9 +88,8 @@
 }
 
 .text {
+	@include article-text;
 	font-size: 14px;
-	line-height: $line-height_text;
-	word-break: break-word;
 }
 
 .sticker {

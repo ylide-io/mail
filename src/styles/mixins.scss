@@ -110,6 +110,16 @@ $mediaHeight768: 768px;
 	white-space: nowrap;
 }
 
+@mixin article-text {
+	line-height: $line-height_text;
+	word-break: break-word;
+
+	a:hover,
+	a:focus-visible {
+		text-decoration: underline;
+	}
+}
+
 // MISC
 
 @mixin flex-row($align-items, $justify-content) {

@@ -11,8 +11,7 @@
 }
 
 .text {
-	line-height: $line-height_text;
-	word-break: break-word;
+	@include article-text;
 }
 
 .sticker {

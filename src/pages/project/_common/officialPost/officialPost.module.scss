@@ -67,9 +67,8 @@
 }
 
 .text {
+	@include article-text;
 	font-size: 16px;
-	line-height: $line-height_text;
-	word-break: break-word;
 
 	@include lessThan1366x768 {
 		font-size: 14px;
