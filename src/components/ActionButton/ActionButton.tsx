@@ -1,7 +1,7 @@
 import clsx from 'clsx';
 import { forwardRef, HTMLAttributes, PropsWithChildren, ReactNode, Ref } from 'react';
 
-import { useNav } from '../../utils/url';
+import { isExternalUrl, useNav } from '../../utils/url';
 import { PropsWithClassName } from '../props';
 import { Spinner } from '../spinner/spinner';
 import css from './ActionButton.module.scss';
@@ -72,6 +72,9 @@ export const ActionButton = forwardRef(
 		}[look || ActionButtonLook.DEFAULT];
 
 		const Component = href ? 'a' : 'button';
+		const externalHref = !!href && isExternalUrl(href);
+		const target = externalHref ? '_blank' : undefined;
+		const rel = externalHref ? 'noreferrer' : undefined;
 
 		return (
 			<Component
@@ -89,10 +92,12 @@ export const ActionButton = forwardRef(
 				)}
 				disabled={isDisabled || isLoading}
 				href={href}
+				target={target}
+				rel={rel}
 				onClick={e => {
 					onClick?.(e);
 
-					if (href) {
+					if (href && !externalHref) {
 						e.preventDefault();
 						navigate(href);
 					}

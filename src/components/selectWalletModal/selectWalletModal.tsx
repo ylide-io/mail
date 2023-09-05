@@ -7,7 +7,7 @@ import QRCode from 'react-qr-code';
 
 import domain from '../../stores/Domain';
 import { Wallet } from '../../stores/models/Wallet';
-import walletConnect from '../../stores/WalletConnect';
+import { walletConnectRegistry } from '../../stores/WalletConnect';
 import { copyToClipboard } from '../../utils/clipboard';
 import { openInNewWidnow } from '../../utils/misc';
 import { walletsMeta } from '../../utils/wallet';
@@ -26,7 +26,7 @@ export const SelectWalletModal = observer(({ onClose }: SelectWalletModalProps) 
 
 	const platform = isMobile ? 'mobile' : 'desktop';
 	const links = browserUtils.getMobileLinkRegistry(
-		browserUtils.formatMobileRegistry(walletConnect.registry, platform),
+		browserUtils.formatMobileRegistry(walletConnectRegistry.registry, platform),
 	);
 
 	useEffect(() => {
@@ -43,7 +43,7 @@ export const SelectWalletModal = observer(({ onClose }: SelectWalletModalProps) 
 
 	const [copy, setCopy] = useState(false);
 	const [activeTab, setActiveTab] = useState<'qr' | 'desktop' | 'install'>(
-		!domain.walletConnectState.loading && domain.walletConnectState.connected ? 'install' : 'qr',
+		!domain.walletConnectState.loading && domain.walletConnectState.connection ? 'install' : 'qr',
 	);
 	const [search, setSearch] = useState('');
 
@@ -179,8 +179,8 @@ export const SelectWalletModal = observer(({ onClose }: SelectWalletModalProps) 
 				{activeTab === 'qr' ? (
 					isDesktop ? (
 						<div className="qr-content">
-							{!domain.walletConnectState.loading && domain.walletConnectState.connected ? (
-								renderWalletConnectAlreadyUsed(domain.walletConnectState.walletName)
+							{!domain.walletConnectState.loading && domain.walletConnectState.connection ? (
+								renderWalletConnectAlreadyUsed(domain.walletConnectState.connection.walletName)
 							) : (
 								<>
 									<div className="svg-background">
@@ -247,7 +247,7 @@ export const SelectWalletModal = observer(({ onClose }: SelectWalletModalProps) 
 										<QRCode
 											value={
 												!domain.walletConnectState.loading &&
-												!domain.walletConnectState.connected
+												!domain.walletConnectState.connection
 													? domain.walletConnectState.url
 													: ''
 											}
@@ -262,7 +262,7 @@ export const SelectWalletModal = observer(({ onClose }: SelectWalletModalProps) 
 										onClick={() => {
 											copyToClipboard(
 												!domain.walletConnectState.loading &&
-													!domain.walletConnectState.connected
+													!domain.walletConnectState.connection
 													? domain.walletConnectState.url
 													: '',
 											);
@@ -278,8 +278,8 @@ export const SelectWalletModal = observer(({ onClose }: SelectWalletModalProps) 
 						</div>
 					) : (
 						<>
-							{!domain.walletConnectState.loading && domain.walletConnectState.connected ? (
-								renderWalletConnectAlreadyUsed(domain.walletConnectState.walletName)
+							{!domain.walletConnectState.loading && domain.walletConnectState.connection ? (
+								renderWalletConnectAlreadyUsed(domain.walletConnectState.connection.walletName)
 							) : (
 								<>
 									<TextField
@@ -292,7 +292,7 @@ export const SelectWalletModal = observer(({ onClose }: SelectWalletModalProps) 
 									/>
 
 									<div className="wallets-list">
-										{walletConnect.loading ? (
+										{walletConnectRegistry.loading ? (
 											<YlideLoader />
 										) : (
 											links
@@ -304,7 +304,7 @@ export const SelectWalletModal = observer(({ onClose }: SelectWalletModalProps) 
 															onClick={() => {
 																const href = browserUtils.formatIOSMobile(
 																	!domain.walletConnectState.loading &&
-																		!domain.walletConnectState.connected
+																		!domain.walletConnectState.connection
 																		? domain.walletConnectState.url
 																		: '',
 																	w,
@@ -342,8 +342,8 @@ export const SelectWalletModal = observer(({ onClose }: SelectWalletModalProps) 
 					)
 				) : activeTab === 'desktop' ? (
 					<>
-						{!domain.walletConnectState.loading && domain.walletConnectState.connected ? (
-							renderWalletConnectAlreadyUsed(domain.walletConnectState.walletName)
+						{!domain.walletConnectState.loading && domain.walletConnectState.connection ? (
+							renderWalletConnectAlreadyUsed(domain.walletConnectState.connection.walletName)
 						) : (
 							<>
 								<TextField
@@ -356,7 +356,7 @@ export const SelectWalletModal = observer(({ onClose }: SelectWalletModalProps) 
 								/>
 
 								<div className="wallets-list">
-									{walletConnect.loading ? (
+									{walletConnectRegistry.loading ? (
 										<YlideLoader />
 									) : (
 										links
@@ -368,7 +368,7 @@ export const SelectWalletModal = observer(({ onClose }: SelectWalletModalProps) 
 														onClick={() => {
 															const href = browserUtils.formatIOSMobile(
 																!domain.walletConnectState.loading &&
-																	!domain.walletConnectState.connected
+																	!domain.walletConnectState.connection
 																	? domain.walletConnectState.url
 																	: '',
 																w,

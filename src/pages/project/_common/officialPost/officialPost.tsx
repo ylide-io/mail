@@ -8,9 +8,9 @@ import { ActionButton, ActionButtonLook, ActionButtonSize } from '../../../../co
 import { ProjectAvatar } from '../../../../components/avatar/avatar';
 import { GridRowBox } from '../../../../components/boxes/boxes';
 import { GalleryModal } from '../../../../components/galleryModal/galleryModal';
-import { NlToBr } from '../../../../components/nlToBr/nlToBr';
 import { PostItemContainer } from '../../../../components/postItemContainer/postItemContainer';
 import { ReadableDate } from '../../../../components/readableDate/readableDate';
+import { TextProcessor } from '../../../../components/textProcessor/textProcessor';
 import { toast } from '../../../../components/toast/toast';
 import { ReactComponent as CrossSvg } from '../../../../icons/ic20/cross.svg';
 import { MessageDecodedTextDataType } from '../../../../indexedDB/IndexedDB';
@@ -135,7 +135,7 @@ export function OfficialPostView({ project, post }: OfficialPostViewProps) {
 
 			<div className={css.body}>
 				<div className={css.text}>
-					<NlToBr text={decodedText} />
+					<TextProcessor text={decodedText} nlToBr linksToAnchors />
 				</div>
 
 				{attachmentHttpUrl && (

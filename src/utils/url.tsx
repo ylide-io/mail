@@ -29,6 +29,12 @@ export function beautifyUrl(url: string) {
 	return `${host}${path}${search}${hash}`;
 }
 
+export function isExternalUrl(url: string) {
+	const a = document.createElement('a');
+	a.href = url;
+	return a.host !== location.host;
+}
+
 //
 
 interface UseNavParameters {

@@ -4,7 +4,12 @@ import { InView } from 'react-intersection-observer';
 import { useInfiniteQuery, useQuery } from 'react-query';
 import { generatePath, Navigate, useParams } from 'react-router-dom';
 
-import { BlockchainFeedApi, decodeBlockchainFeedPost, DecodedBlockchainFeedPost } from '../../../api/blockchainFeedApi';
+import {
+	BlockchainFeedApi,
+	communityAdmin,
+	decodeBlockchainFeedPost,
+	DecodedBlockchainFeedPost,
+} from '../../../api/blockchainFeedApi';
 import { ActionButton, ActionButtonLook, ActionButtonSize } from '../../../components/ActionButton/ActionButton';
 import { ProjectAvatar } from '../../../components/avatar/avatar';
 import { BlockchainProjectBanner } from '../../../components/blockchainProjectBanner/blockchainProjectBanner';
@@ -44,8 +49,10 @@ const OfficialContent = observer(({ project, setTabsAsideContent }: OfficialCont
 	const feedId = project.feedId.official;
 	invariant(feedId, 'No official feed id');
 
-	const isAdminMode = useIsMatchesPattern(RoutePath.PROJECT_ID_OFFICIAL_ADMIN) && browserStorage.isUserAdmin;
-	const accounts = getAllowedAccountsForBlockchains(project.allowedChains || []);
+	const adminAccounts = getAllowedAccountsForBlockchains(project.allowedChains || []).filter(a =>
+		communityAdmin.isAdmin(feedId, a.account.address),
+	);
+	const isAdminFeedMode = useIsMatchesPattern(RoutePath.PROJECT_ID_OFFICIAL_ADMIN) && !!adminAccounts.length;
 
 	const postsQuery = useInfiniteQuery<DecodedBlockchainFeedPost[]>(['project', projectId, 'posts', 'official'], {
 		cacheTime: 15 * 60 * 1000,
@@ -55,7 +62,7 @@ const OfficialContent = observer(({ project, setTabsAsideContent }: OfficialCont
 			const posts = await BlockchainFeedApi.getPosts({
 				feedId,
 				beforeTimestamp: pageParam,
-				adminMode: isAdminMode,
+				adminMode: isAdminFeedMode,
 			});
 			return posts.map(decodeBlockchainFeedPost);
 		},
@@ -77,7 +84,7 @@ const OfficialContent = observer(({ project, setTabsAsideContent }: OfficialCont
 			const posts = await BlockchainFeedApi.getPosts({
 				feedId,
 				beforeTimestamp: 0,
-				adminMode: isAdminMode,
+				adminMode: isAdminFeedMode,
 			});
 
 			const hasNewPosts = !!(posts.length && messages.length && posts[0].id !== messages[0].original.id);
@@ -109,10 +116,11 @@ const OfficialContent = observer(({ project, setTabsAsideContent }: OfficialCont
 				image={project.bannerImage}
 			/>
 
-			{browserStorage.isUserAdmin && !!accounts.length && (
+			{!!adminAccounts.length && (
 				<CreatePostForm
 					project={project}
 					feedId={feedId}
+					accounts={adminAccounts}
 					placeholder="Make a new post"
 					onCreated={() => toast('Good job! Your post will appear shortly 🔥')}
 				/>
@@ -166,8 +174,8 @@ const DiscussionContent = observer(({ project, setTabsAsideContent }: Discussion
 	const feedId = project.feedId.discussion;
 	invariant(feedId, 'No discussion feed id');
 
-	const isAdminMode = useIsMatchesPattern(RoutePath.PROJECT_ID_DISCUSSION_ADMIN) && browserStorage.isUserAdmin;
 	const accounts = getAllowedAccountsForBlockchains(project.allowedChains || []);
+	const isAdminFeedMode = useIsMatchesPattern(RoutePath.PROJECT_ID_DISCUSSION_ADMIN) && browserStorage.isUserAdmin;
 
 	const postsQuery = useInfiniteQuery<DecodedBlockchainFeedPost[]>(['project', projectId, 'posts', 'discussion'], {
 		cacheTime: 15 * 60 * 1000,
@@ -177,7 +185,7 @@ const DiscussionContent = observer(({ project, setTabsAsideContent }: Discussion
 			const posts = await BlockchainFeedApi.getPosts({
 				feedId,
 				beforeTimestamp: pageParam,
-				adminMode: isAdminMode,
+				adminMode: isAdminFeedMode,
 			});
 			return posts.map(decodeBlockchainFeedPost);
 		},
@@ -199,7 +207,7 @@ const DiscussionContent = observer(({ project, setTabsAsideContent }: Discussion
 			const posts = await BlockchainFeedApi.getPosts({
 				feedId,
 				beforeTimestamp: 0,
-				adminMode: isAdminMode,
+				adminMode: isAdminFeedMode,
 			});
 
 			const hasNewPosts = !!(posts.length && messages.length && posts[0].id !== messages[0].original.id);
@@ -258,6 +266,7 @@ const DiscussionContent = observer(({ project, setTabsAsideContent }: Discussion
 					ref={createPostFormRef}
 					project={project}
 					feedId={feedId}
+					accounts={accounts}
 					placeholder="What’s on your mind?"
 					onCreated={() => toast('Good job! Your post will appear shortly 🔥')}
 				/>
