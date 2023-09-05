@@ -278,7 +278,7 @@ export const DiscussionPost = observer(({ post, project, onReplyClick }: Discuss
 				<div className={css.content}>
 					{!!decodedText && (
 						<div className={css.text}>
-							<TextProcessor text={decodedText} nlToBr linksToAnchors />
+							<TextProcessor text={decodedText} nlToBr linksToAnchors unsafeLinks />
 						</div>
 					)}
 

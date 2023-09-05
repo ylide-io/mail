@@ -171,6 +171,7 @@ button,
 a {
 	color: var(--link-color);
 	text-decoration: none;
+	cursor: pointer; // cursor is 'text' for anchors with no [href]
 }
 
 b,

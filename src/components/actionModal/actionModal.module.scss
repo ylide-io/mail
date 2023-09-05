@@ -17,8 +17,10 @@ https://trello.com/c/i9GAsOaF
 }
 
 .content {
+	@include article-text;
+	display: flex;
+	flex-direction: column;
 	font-size: 14px;
-	line-height: $line-height_text;
 
 	> :not(:last-child) {
 		margin: 0 0 24px;
