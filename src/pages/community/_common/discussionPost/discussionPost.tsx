@@ -221,7 +221,7 @@ export const DiscussionPost = observer(({ post, community, onReplyClick }: Discu
 					</div>
 
 					<div className={css.metaRight}>
-						<BlockChainLabel blockchain={blockchain} />
+						<BlockChainLabel className={css.chainLabel} blockchain={blockchain} />
 
 						{explorerUrl && (
 							<a
