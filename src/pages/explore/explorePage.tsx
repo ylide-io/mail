@@ -63,6 +63,7 @@ export function ExplorePage() {
 					{renderTagBlock(BlockchainProjectTag.NFT)}
 					{renderTagBlock(BlockchainProjectTag.VENOM)}
 					{renderTagBlock(BlockchainProjectTag.TVM)}
+					{renderTagBlock(BlockchainProjectTag.AURORA_ECOSYSTEM)}
 					{renderTagBlock(BlockchainProjectTag.SOCIAL)}
 					{renderTagBlock(BlockchainProjectTag.ECOSYSTEM)}
 					{renderTagBlock(BlockchainProjectTag.GAMING)}

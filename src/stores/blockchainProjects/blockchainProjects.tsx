@@ -4,6 +4,18 @@ import { VENOM_FEED_ID } from '../../constants';
 import { BlockchainName } from '../../utils/blockchain';
 import _defaultBannerSrc from './bannerImages/_default.png';
 import altsomeBannerSrc from './bannerImages/altsome.jpg';
+import auroraAfricaBannerSrc from './bannerImages/auroraAfrica.jpg';
+import auroraBrazilBannerSrc from './bannerImages/auroraBrazil.jpg';
+import auroraChinaBannerSrc from './bannerImages/auroraChina.jpg';
+import auroraEastEuropeBannerSrc from './bannerImages/auroraEastEurope.jpg';
+import auroraHuntersBannerSrc from './bannerImages/auroraHunters.jpg';
+import auroraIndiaBannerSrc from './bannerImages/auroraIndia.jpg';
+import auroraIndonesiaBannerSrc from './bannerImages/auroraIndonesia.jpg';
+import auroraLatamBannerSrc from './bannerImages/auroraLatam.jpg';
+import auroraTurkeyBannerSrc from './bannerImages/auroraTurkey.jpg';
+import auroraVenezuelaBannerSrc from './bannerImages/auroraVenezuela.jpg';
+import auroraVietnamBannerSrc from './bannerImages/auroraVietnam.jpg';
+import aurorityBannerSrc from './bannerImages/aurority.jpg';
 import betFuryBannerSrc from './bannerImages/betFury.jpg';
 import chepeGamesBannerSrc from './bannerImages/chepeGames.jpg';
 import dexifyBannerSrc from './bannerImages/dexify.jpg';
@@ -27,6 +39,18 @@ import venomRecapBannerSrc from './bannerImages/venomRecap.jpg';
 import ventoryBannerSrc from './bannerImages/ventory.jpg';
 import web3WorldBannerSrc from './bannerImages/web3World.jpg';
 import altsomeSrc from './profileImages/altsome.jpg';
+import auroraAfricaSrc from './profileImages/auroraAfrica.jpg';
+import auroraBrazilSrc from './profileImages/auroraBrazil.jpg';
+import auroraChinaSrc from './profileImages/auroraChina.jpg';
+import auroraEastEuropeSrc from './profileImages/auroraEastEurope.jpg';
+import auroraHuntersSrc from './profileImages/auroraHunters.jpg';
+import auroraIndiaSrc from './profileImages/auroraIndia.jpg';
+import auroraIndonesiaSrc from './profileImages/auroraIndonesia.jpg';
+import auroraLatamSrc from './profileImages/auroraLatam.jpg';
+import auroraTurkeySrc from './profileImages/auroraTurkey.jpg';
+import auroraVenezuelaSrc from './profileImages/auroraVenezuela.jpg';
+import auroraVietnamSrc from './profileImages/auroraVietnam.jpg';
+import auroritySrc from './profileImages/aurority.jpg';
 import betFurySrc from './profileImages/betFury.jpg';
 import chepeGamesSrc from './profileImages/chepeGames.jpg';
 import dexifySrc from './profileImages/dexify.jpg';
@@ -111,6 +135,21 @@ export enum BlockchainProjectId {
 	CHEPE_GAMES = 'chepe_games',
 	DEXIFY = 'dexify',
 
+	// AURORA
+
+	AURORA_AFRICA = 'aurora_africa',
+	AURORA_BRAZIL = 'aurora_brazil',
+	AURORA_CHINA = 'aurora_china',
+	AURORA_EAST_EUROPE = 'aurora_east_europe',
+	AURORA_INDIA = 'aurora_india',
+	AURORA_INDONESIA = 'aurora_indonesia',
+	AURORA_LATAM = 'aurora_latam',
+	AURORA_TURKIYE = 'aurora_turkiye',
+	AURORA_VENEZUELA = 'aurora_venezuela',
+	AURORA_HUNTERS = 'aurora_hunters',
+	AURORA_VIETNAM = 'aurora_vietnam',
+	AURORA_AURORITY = 'aurora_aurority',
+
 	// OTHERS
 
 	TVM = 'tvm',
@@ -136,6 +175,7 @@ export enum BlockchainProjectTag {
 	TVM = 'TVM',
 	GAMING = 'Gaming',
 	DEVELOPER_TOOLS = 'Developer Tools',
+	AURORA_ECOSYSTEM = 'Aurora Ecosystem',
 }
 
 export enum BlockchainProjectAttachmentMode {
@@ -433,6 +473,191 @@ export const blockchainProjects: BlockchainProject[] = [
 		website: 'https://www.dexify.io/',
 		tags: [BlockchainProjectTag.DEFI, BlockchainProjectTag.VENOM],
 		allowedChains: [BlockchainName.VENOM_TESTNET],
+		attachmentMode: BlockchainProjectAttachmentMode.ADMINS,
+	},
+
+	// AURORA
+
+	{
+		id: BlockchainProjectId.AURORA_AFRICA,
+		feedId: {
+			official: '2000000000000000000000000000000000000000000000000000000000000030' as Uint256,
+			discussion: '2000000000000000000000000000000000000000000000000000000000000031' as Uint256,
+		},
+		name: 'Aurora (Africa)',
+		description:
+			'Aurora Africa is a regional guild focused on educating and growing the Aurora community in Africa.',
+		profileImage: auroraAfricaSrc,
+		bannerImage: auroraAfricaBannerSrc,
+		website: 'https://t.me/AuroraAfrica',
+		tags: [BlockchainProjectTag.AURORA_ECOSYSTEM],
+		allowedChains: [BlockchainName.AURORA],
+		attachmentMode: BlockchainProjectAttachmentMode.ADMINS,
+	},
+	{
+		id: BlockchainProjectId.AURORA_BRAZIL,
+		feedId: {
+			official: '2000000000000000000000000000000000000000000000000000000000000032' as Uint256,
+			discussion: '2000000000000000000000000000000000000000000000000000000000000033' as Uint256,
+		},
+		name: 'Aurora (Brazil)',
+		description: 'Seja bem vindo ao grupo oficial Aurora Brasil. Aurora é a blockchain EVM da Near Protocol.',
+		profileImage: auroraBrazilSrc,
+		bannerImage: auroraBrazilBannerSrc,
+		website: 'https://t.me/aurorabrasil',
+		tags: [BlockchainProjectTag.AURORA_ECOSYSTEM],
+		allowedChains: [BlockchainName.AURORA],
+		attachmentMode: BlockchainProjectAttachmentMode.ADMINS,
+	},
+	{
+		id: BlockchainProjectId.AURORA_CHINA,
+		feedId: {
+			official: '2000000000000000000000000000000000000000000000000000000000000034' as Uint256,
+			discussion: '2000000000000000000000000000000000000000000000000000000000000035' as Uint256,
+		},
+		name: 'Aurora (China)',
+		description: 'Join our awesome regional Community in China!',
+		profileImage: auroraChinaSrc,
+		bannerImage: auroraChinaBannerSrc,
+		website: 'https://t.me/Aurora_chinese',
+		tags: [BlockchainProjectTag.AURORA_ECOSYSTEM],
+		allowedChains: [BlockchainName.AURORA],
+		attachmentMode: BlockchainProjectAttachmentMode.ADMINS,
+	},
+	{
+		id: BlockchainProjectId.AURORA_EAST_EUROPE,
+		feedId: {
+			official: '2000000000000000000000000000000000000000000000000000000000000036' as Uint256,
+			discussion: '2000000000000000000000000000000000000000000000000000000000000037' as Uint256,
+		},
+		name: 'Aurora (East Europe)',
+		description: 'Join our awesome regional Community in Eastern Europe!',
+		profileImage: auroraEastEuropeSrc,
+		bannerImage: auroraEastEuropeBannerSrc,
+		website: 'https://t.me/aurora_ee',
+		tags: [BlockchainProjectTag.AURORA_ECOSYSTEM],
+		allowedChains: [BlockchainName.AURORA],
+		attachmentMode: BlockchainProjectAttachmentMode.ADMINS,
+	},
+	{
+		id: BlockchainProjectId.AURORA_INDIA,
+		feedId: {
+			official: '2000000000000000000000000000000000000000000000000000000000000038' as Uint256,
+			discussion: '2000000000000000000000000000000000000000000000000000000000000039' as Uint256,
+		},
+		name: 'Aurora (India)',
+		description: 'Join our awesome regional Community in India!',
+		profileImage: auroraIndiaSrc,
+		bannerImage: auroraIndiaBannerSrc,
+		website: 'https://t.me/auroraindia',
+		tags: [BlockchainProjectTag.AURORA_ECOSYSTEM],
+		allowedChains: [BlockchainName.AURORA],
+		attachmentMode: BlockchainProjectAttachmentMode.ADMINS,
+	},
+	{
+		id: BlockchainProjectId.AURORA_INDONESIA,
+		feedId: {
+			official: '200000000000000000000000000000000000000000000000000000000000003a' as Uint256,
+			discussion: '200000000000000000000000000000000000000000000000000000000000003b' as Uint256,
+		},
+		name: 'Aurora (Indonesia)',
+		description: 'Akun official resmi Komunitas Aurora Indonesia | EVM Layer-2 NEAR Protocol | $AURORA',
+		profileImage: auroraIndonesiaSrc,
+		bannerImage: auroraIndonesiaBannerSrc,
+		website: 'https://t.me/AuroraIndonesiaHQ',
+		tags: [BlockchainProjectTag.AURORA_ECOSYSTEM],
+		allowedChains: [BlockchainName.AURORA],
+		attachmentMode: BlockchainProjectAttachmentMode.ADMINS,
+	},
+	{
+		id: BlockchainProjectId.AURORA_LATAM,
+		feedId: {
+			official: '200000000000000000000000000000000000000000000000000000000000003c' as Uint256,
+			discussion: '200000000000000000000000000000000000000000000000000000000000003d' as Uint256,
+		},
+		name: 'Aurora (LATAM)',
+		description: 'Aurora es una L2 + EVM de NEAR Protocol. Realiza transacciones gratuitas en aurora.plus',
+		profileImage: auroraLatamSrc,
+		bannerImage: auroraLatamBannerSrc,
+		website: 'https://t.me/AuroraLatam',
+		tags: [BlockchainProjectTag.AURORA_ECOSYSTEM],
+		allowedChains: [BlockchainName.AURORA],
+		attachmentMode: BlockchainProjectAttachmentMode.ADMINS,
+	},
+	{
+		id: BlockchainProjectId.AURORA_TURKIYE,
+		feedId: {
+			official: '200000000000000000000000000000000000000000000000000000000000003e' as Uint256,
+			discussion: '200000000000000000000000000000000000000000000000000000000000003f' as Uint256,
+		},
+		name: 'Aurora (Türkiye)',
+		description: 'Resmi Aurora Türk topluluk kanalı',
+		profileImage: auroraTurkeySrc,
+		bannerImage: auroraTurkeyBannerSrc,
+		website: 'https://t.me/auroraisneartr',
+		tags: [BlockchainProjectTag.AURORA_ECOSYSTEM],
+		allowedChains: [BlockchainName.AURORA],
+		attachmentMode: BlockchainProjectAttachmentMode.ADMINS,
+	},
+	{
+		id: BlockchainProjectId.AURORA_VENEZUELA,
+		feedId: {
+			official: '2000000000000000000000000000000000000000000000000000000000000040' as Uint256,
+			discussion: '2000000000000000000000000000000000000000000000000000000000000041' as Uint256,
+		},
+		name: 'Aurora (Venezuela)',
+		description:
+			'Aurora ES Near es un espacio para educar a la comunidad sobre Near Protocol y Aurora Network así como el ecosistema que los conforma.',
+		profileImage: auroraVenezuelaSrc,
+		bannerImage: auroraVenezuelaBannerSrc,
+		website: 'https://t.me/venezuelaaurora',
+		tags: [BlockchainProjectTag.AURORA_ECOSYSTEM],
+		allowedChains: [BlockchainName.AURORA],
+		attachmentMode: BlockchainProjectAttachmentMode.ADMINS,
+	},
+	{
+		id: BlockchainProjectId.AURORA_HUNTERS,
+		feedId: {
+			official: '2000000000000000000000000000000000000000000000000000000000000042' as Uint256,
+			discussion: '2000000000000000000000000000000000000000000000000000000000000043' as Uint256,
+		},
+		name: 'Aurora (Hunters)',
+		description: 'Join our awesome Aurora Hunters Community!',
+		profileImage: auroraHuntersSrc,
+		bannerImage: auroraHuntersBannerSrc,
+		website: 'https://t.me/AuroraHunters_chat',
+		tags: [BlockchainProjectTag.AURORA_ECOSYSTEM],
+		allowedChains: [BlockchainName.AURORA],
+		attachmentMode: BlockchainProjectAttachmentMode.ADMINS,
+	},
+	{
+		id: BlockchainProjectId.AURORA_VIETNAM,
+		feedId: {
+			official: '2000000000000000000000000000000000000000000000000000000000000044' as Uint256,
+			discussion: '2000000000000000000000000000000000000000000000000000000000000045' as Uint256,
+		},
+		name: 'Aurora (Vietnam)',
+		description: 'Kênh thông tin chính thức của Aurora tại Việt Nam.',
+		profileImage: auroraVietnamSrc,
+		bannerImage: auroraVietnamBannerSrc,
+		website: 'https://t.me/auroravietnamofficial',
+		tags: [BlockchainProjectTag.AURORA_ECOSYSTEM],
+		allowedChains: [BlockchainName.AURORA],
+		attachmentMode: BlockchainProjectAttachmentMode.ADMINS,
+	},
+	{
+		id: BlockchainProjectId.AURORA_AURORITY,
+		feedId: {
+			official: '2000000000000000000000000000000000000000000000000000000000000046' as Uint256,
+			discussion: '2000000000000000000000000000000000000000000000000000000000000047' as Uint256,
+		},
+		name: 'Aurora (Aurority)',
+		description: "Aurority's Official Discussion Chat",
+		profileImage: auroritySrc,
+		bannerImage: aurorityBannerSrc,
+		website: 'https://t.me/auroritychat',
+		tags: [BlockchainProjectTag.AURORA_ECOSYSTEM],
+		allowedChains: [BlockchainName.AURORA],
 		attachmentMode: BlockchainProjectAttachmentMode.ADMINS,
 	},
 
