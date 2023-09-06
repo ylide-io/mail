@@ -4,6 +4,7 @@ import { VENOM_FEED_ID } from '../../constants';
 import { BlockchainName } from '../../utils/blockchain';
 import _defaultBannerSrc from './bannerImages/_default.png';
 import altsomeBannerSrc from './bannerImages/altsome.jpg';
+import auroraBannerSrc from './bannerImages/aurora.jpg';
 import auroraAfricaBannerSrc from './bannerImages/auroraAfrica.jpg';
 import auroraBrazilBannerSrc from './bannerImages/auroraBrazil.jpg';
 import auroraChinaBannerSrc from './bannerImages/auroraChina.jpg';
@@ -39,6 +40,7 @@ import venomRecapBannerSrc from './bannerImages/venomRecap.jpg';
 import ventoryBannerSrc from './bannerImages/ventory.jpg';
 import web3WorldBannerSrc from './bannerImages/web3World.jpg';
 import altsomeSrc from './profileImages/altsome.jpg';
+import auroraSrc from './profileImages/aurora.jpg';
 import auroraAfricaSrc from './profileImages/auroraAfrica.jpg';
 import auroraBrazilSrc from './profileImages/auroraBrazil.jpg';
 import auroraChinaSrc from './profileImages/auroraChina.jpg';
@@ -137,6 +139,7 @@ export enum BlockchainProjectId {
 
 	// AURORA
 
+	AURORA = 'aurora',
 	AURORA_AFRICA = 'aurora_africa',
 	AURORA_BRAZIL = 'aurora_brazil',
 	AURORA_CHINA = 'aurora_china',
@@ -478,6 +481,22 @@ export const blockchainProjects: BlockchainProject[] = [
 
 	// AURORA
 
+	{
+		id: BlockchainProjectId.AURORA,
+		feedId: {
+			official: '2000000000000000000000000000000000000000000000000000000000000048' as Uint256,
+			discussion: '2000000000000000000000000000000000000000000000000000000000000049' as Uint256,
+		},
+		name: 'Aurora',
+		description:
+			'Aurora is a next-generation Ethereum compatible blockchain and ecosystem that runs on the NEAR Protocol, and powers the innovations behind Aurora Cloud.',
+		profileImage: auroraSrc,
+		bannerImage: auroraBannerSrc,
+		website: 'https://aurora.dev/',
+		tags: [BlockchainProjectTag.AURORA_ECOSYSTEM],
+		allowedChains: [BlockchainName.AURORA],
+		attachmentMode: BlockchainProjectAttachmentMode.ADMINS,
+	},
 	{
 		id: BlockchainProjectId.AURORA_AFRICA,
 		feedId: {
