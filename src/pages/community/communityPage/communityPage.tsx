@@ -11,8 +11,8 @@ import {
 	DecodedBlockchainFeedPost,
 } from '../../../api/blockchainFeedApi';
 import { ActionButton, ActionButtonLook, ActionButtonSize } from '../../../components/ActionButton/ActionButton';
-import { ProjectAvatar } from '../../../components/avatar/avatar';
-import { BlockchainProjectBanner } from '../../../components/blockchainProjectBanner/blockchainProjectBanner';
+import { CommunityAvatar } from '../../../components/avatar/avatar';
+import { CommunityBanner } from '../../../components/communityBanner/communityBanner';
 import { ErrorMessage, ErrorMessageLook } from '../../../components/errorMessage/errorMessage';
 import { RegularPageContent } from '../../../components/genericLayout/content/regularPageContent/regularPageContent';
 import { GenericLayout } from '../../../components/genericLayout/genericLayout';
@@ -22,13 +22,13 @@ import { YlideLoader } from '../../../components/ylideLoader/ylideLoader';
 import { ReactComponent as LinkSvg } from '../../../icons/ic20/link.svg';
 import { ReactComponent as TagSvg } from '../../../icons/ic20/tag.svg';
 import { analytics } from '../../../stores/Analytics';
-import {
-	BlockchainProject,
-	BlockchainProjectId,
-	getBlockchainProjectBannerImage,
-	getBlockchainProjectById,
-} from '../../../stores/blockchainProjects/blockchainProjects';
 import { browserStorage } from '../../../stores/browserStorage';
+import {
+	Community,
+	CommunityId,
+	getCommunityBannerImage,
+	getCommunityById,
+} from '../../../stores/communities/communities';
 import { RoutePath } from '../../../stores/routePath';
 import { connectAccount, getAllowedAccountsForBlockchains } from '../../../utils/account';
 import { assertUnreachable, invariant } from '../../../utils/assert';
@@ -37,27 +37,27 @@ import { beautifyUrl, useIsMatchesPattern, useNav } from '../../../utils/url';
 import { CreatePostForm, CreatePostFormApi } from '../_common/createPostForm/createPostForm';
 import { DiscussionPost } from '../_common/discussionPost/discussionPost';
 import { OfficialPost } from '../_common/officialPost/officialPost';
-import css from './blockchainProjectPage.module.scss';
+import css from './communityPage.module.scss';
 
 interface OfficialContentProps {
-	project: BlockchainProject;
+	community: Community;
 	setTabsAsideContent: (node: ReactNode) => void;
 }
 
-const OfficialContent = observer(({ project, setTabsAsideContent }: OfficialContentProps) => {
-	const projectId = project.id;
-	const feedId = project.feedId.official;
+const OfficialContent = observer(({ community, setTabsAsideContent }: OfficialContentProps) => {
+	const communityId = community.id;
+	const feedId = community.feedId.official;
 	invariant(feedId, 'No official feed id');
 
-	const adminAccounts = getAllowedAccountsForBlockchains(project.allowedChains || []).filter(a =>
+	const adminAccounts = getAllowedAccountsForBlockchains(community.allowedChains || []).filter(a =>
 		communityAdmin.isAdmin(feedId, a.account.address),
 	);
 	const isAdminFeedMode = useIsMatchesPattern(RoutePath.PROJECT_ID_OFFICIAL_ADMIN) && !!adminAccounts.length;
 
-	const postsQuery = useInfiniteQuery<DecodedBlockchainFeedPost[]>(['project', projectId, 'posts', 'official'], {
+	const postsQuery = useInfiniteQuery<DecodedBlockchainFeedPost[]>(['community', communityId, 'posts', 'official'], {
 		cacheTime: 15 * 60 * 1000,
 		queryFn: async ({ pageParam = 0 }) => {
-			analytics.blockchainFeedView(project.id);
+			analytics.blockchainFeedView(community.id);
 
 			const posts = await BlockchainFeedApi.getPosts({
 				feedId,
@@ -78,7 +78,7 @@ const OfficialContent = observer(({ project, setTabsAsideContent }: OfficialCont
 		postsQuery.refetch();
 	};
 
-	useQuery(['project', projectId, 'new-posts', 'official'], {
+	useQuery(['community', communityId, 'new-posts', 'official'], {
 		enabled: !postsQuery.isLoading,
 		queryFn: async () => {
 			const posts = await BlockchainFeedApi.getPosts({
@@ -111,14 +111,14 @@ const OfficialContent = observer(({ project, setTabsAsideContent }: OfficialCont
 	return (
 		<div className={css.content}>
 			<PageMeta
-				title={`${project.name} on Ylide Social Hub`}
-				description={project.description}
-				image={project.bannerImage}
+				title={`${community.name} on Ylide Social Hub`}
+				description={community.description}
+				image={community.bannerImage}
 			/>
 
 			{!!adminAccounts.length && (
 				<CreatePostForm
-					project={project}
+					community={community}
 					feedId={feedId}
 					accounts={adminAccounts}
 					placeholder="Make a new post"
@@ -129,7 +129,7 @@ const OfficialContent = observer(({ project, setTabsAsideContent }: OfficialCont
 			{messages.length ? (
 				<>
 					{messages.map((message, idx) => (
-						<OfficialPost key={idx} project={project} post={message} />
+						<OfficialPost key={idx} community={community} post={message} />
 					))}
 
 					{postsQuery.isError
@@ -140,7 +140,7 @@ const OfficialContent = observer(({ project, setTabsAsideContent }: OfficialCont
 									rootMargin="100px"
 									onChange={inView => {
 										if (inView) {
-											analytics.blockchainFeedLoadMore(project.id);
+											analytics.blockchainFeedLoadMore(community.id);
 											postsQuery.fetchNextPage();
 										}
 									}}
@@ -165,33 +165,36 @@ const OfficialContent = observer(({ project, setTabsAsideContent }: OfficialCont
 //
 
 interface DiscussionContentProps {
-	project: BlockchainProject;
+	community: Community;
 	setTabsAsideContent: (node: ReactNode) => void;
 }
 
-const DiscussionContent = observer(({ project, setTabsAsideContent }: DiscussionContentProps) => {
-	const projectId = project.id;
-	const feedId = project.feedId.discussion;
+const DiscussionContent = observer(({ community, setTabsAsideContent }: DiscussionContentProps) => {
+	const communityId = community.id;
+	const feedId = community.feedId.discussion;
 	invariant(feedId, 'No discussion feed id');
 
-	const accounts = getAllowedAccountsForBlockchains(project.allowedChains || []);
+	const accounts = getAllowedAccountsForBlockchains(community.allowedChains || []);
 	const isAdminFeedMode = useIsMatchesPattern(RoutePath.PROJECT_ID_DISCUSSION_ADMIN) && browserStorage.isUserAdmin;
 
-	const postsQuery = useInfiniteQuery<DecodedBlockchainFeedPost[]>(['project', projectId, 'posts', 'discussion'], {
-		cacheTime: 15 * 60 * 1000,
-		queryFn: async ({ pageParam = 0 }) => {
-			analytics.blockchainFeedView(project.id);
+	const postsQuery = useInfiniteQuery<DecodedBlockchainFeedPost[]>(
+		['community', communityId, 'posts', 'discussion'],
+		{
+			cacheTime: 15 * 60 * 1000,
+			queryFn: async ({ pageParam = 0 }) => {
+				analytics.blockchainFeedView(community.id);
 
-			const posts = await BlockchainFeedApi.getPosts({
-				feedId,
-				beforeTimestamp: pageParam,
-				adminMode: isAdminFeedMode,
-			});
-			return posts.map(decodeBlockchainFeedPost);
+				const posts = await BlockchainFeedApi.getPosts({
+					feedId,
+					beforeTimestamp: pageParam,
+					adminMode: isAdminFeedMode,
+				});
+				return posts.map(decodeBlockchainFeedPost);
+			},
+			getNextPageParam: lastPage =>
+				lastPage.length ? lastPage[lastPage.length - 1].original.createTimestamp : undefined,
 		},
-		getNextPageParam: lastPage =>
-			lastPage.length ? lastPage[lastPage.length - 1].original.createTimestamp : undefined,
-	});
+	);
 
 	const messages = postsQuery.data?.pages.flat() || [];
 
@@ -201,7 +204,7 @@ const DiscussionContent = observer(({ project, setTabsAsideContent }: Discussion
 		postsQuery.refetch();
 	};
 
-	useQuery(['project', projectId, 'new-posts', 'discussion'], {
+	useQuery(['community', communityId, 'new-posts', 'discussion'], {
 		enabled: !postsQuery.isLoading,
 		queryFn: async () => {
 			const posts = await BlockchainFeedApi.getPosts({
@@ -235,11 +238,11 @@ const DiscussionContent = observer(({ project, setTabsAsideContent }: Discussion
 
 	function renderAllowedChainsText() {
 		return (
-			project.allowedChains?.length && (
+			community.allowedChains?.length && (
 				<div>
 					Posting to this feed is allowed using{' '}
 					<b>
-						{project.allowedChains
+						{community.allowedChains
 							.reduce((list, chain) => {
 								chain = isEvmBlockchain(chain) ? 'EVM' : blockchainMeta[chain].title;
 								list.includes(chain) || list.push(chain);
@@ -256,15 +259,15 @@ const DiscussionContent = observer(({ project, setTabsAsideContent }: Discussion
 	return (
 		<div className={css.content}>
 			<PageMeta
-				title={`${project.name} chat on Ylide Social Hub`}
-				description={project.description}
-				image={project.bannerImage}
+				title={`${community.name} chat on Ylide Social Hub`}
+				description={community.description}
+				image={community.bannerImage}
 			/>
 
 			{accounts.length ? (
 				<CreatePostForm
 					ref={createPostFormRef}
-					project={project}
+					community={community}
 					feedId={feedId}
 					accounts={accounts}
 					placeholder="What’s on your mind?"
@@ -278,7 +281,7 @@ const DiscussionContent = observer(({ project, setTabsAsideContent }: Discussion
 
 					<ActionButton
 						look={ActionButtonLook.PRIMARY}
-						onClick={() => connectAccount({ place: 'blockchain-project-feed_no-accounts' })}
+						onClick={() => connectAccount({ place: 'community_no-accounts' })}
 					>
 						Connect account
 					</ActionButton>
@@ -290,10 +293,10 @@ const DiscussionContent = observer(({ project, setTabsAsideContent }: Discussion
 					{messages.map((message, idx) => (
 						<DiscussionPost
 							key={idx}
-							project={project}
+							community={community}
 							post={message}
 							onReplyClick={() => {
-								analytics.blockchainFeedReply(project.id, message.original.id);
+								analytics.blockchainFeedReply(community.id, message.original.id);
 
 								if (accounts.length) {
 									createPostFormRef.current?.replyTo(message);
@@ -317,7 +320,7 @@ const DiscussionContent = observer(({ project, setTabsAsideContent }: Discussion
 									rootMargin="100px"
 									onChange={inView => {
 										if (inView) {
-											analytics.blockchainFeedLoadMore(project.id);
+											analytics.blockchainFeedLoadMore(community.id);
 											postsQuery.fetchNextPage();
 										}
 									}}
@@ -341,32 +344,29 @@ const DiscussionContent = observer(({ project, setTabsAsideContent }: Discussion
 
 //
 
-export enum BlockchainProjectPagePart {
+export enum CommunityPagePart {
 	OFFICIAL = 'OFFICIAL',
 	DISCUSSION = 'DISCUSSION',
 }
 
-export const BlockchainProjectPage = observer(() => {
+export const CommunityPage = observer(() => {
 	const navigate = useNav();
 
-	const { projectId } = useParams<{ projectId?: BlockchainProjectId }>();
+	const { projectId } = useParams<{ projectId?: CommunityId }>();
 	invariant(projectId, 'Project ID must be specified');
 
-	const project = getBlockchainProjectById(projectId);
-	invariant(project, 'Project not found');
-	invariant(project.feedId.official || project.feedId.discussion, 'Project feed Id must be specified');
+	const community = getCommunityById(projectId);
+	invariant(community, 'Project not found');
+	invariant(community.feedId.official || community.feedId.discussion, 'Project feed Id must be specified');
 
-	const isProjectRoot = useIsMatchesPattern(RoutePath.PROJECT_ID);
-	const isProjectAnnouncements = useIsMatchesPattern(
-		RoutePath.PROJECT_ID_OFFICIAL,
-		RoutePath.PROJECT_ID_OFFICIAL_ADMIN,
-	);
-	const isProjectDiscussion = useIsMatchesPattern(
+	const isCommunityRootPath = useIsMatchesPattern(RoutePath.PROJECT_ID);
+	const isAnnouncementsPath = useIsMatchesPattern(RoutePath.PROJECT_ID_OFFICIAL, RoutePath.PROJECT_ID_OFFICIAL_ADMIN);
+	const isDiscussionPath = useIsMatchesPattern(
 		RoutePath.PROJECT_ID_DISCUSSION,
 		RoutePath.PROJECT_ID_DISCUSSION_ADMIN,
 	);
 
-	const part = isProjectAnnouncements ? BlockchainProjectPagePart.OFFICIAL : BlockchainProjectPagePart.DISCUSSION;
+	const part = isAnnouncementsPath ? CommunityPagePart.OFFICIAL : CommunityPagePart.DISCUSSION;
 
 	const [tabsAsideContent, setTabsAsideContent] = useState<ReactNode>();
 
@@ -374,7 +374,7 @@ export const BlockchainProjectPage = observer(() => {
 		return () => setTabsAsideContent(undefined);
 	}, [part]);
 
-	function renderTab(params: { part: BlockchainProjectPagePart; name: ReactNode; href: string }) {
+	function renderTab(params: { part: CommunityPagePart; name: ReactNode; href: string }) {
 		const isActive = params.part === part;
 		const look = isActive ? ActionButtonLook.HEAVY : ActionButtonLook.LITE;
 
@@ -389,12 +389,12 @@ export const BlockchainProjectPage = observer(() => {
 		);
 	}
 
-	if (isProjectRoot) {
+	if (isCommunityRootPath) {
 		return (
 			<Navigate
 				replace
 				to={
-					project.feedId.discussion
+					community.feedId.discussion
 						? generatePath(RoutePath.PROJECT_ID_DISCUSSION, { projectId })
 						: generatePath(RoutePath.PROJECT_ID_OFFICIAL, { projectId })
 				}
@@ -402,11 +402,11 @@ export const BlockchainProjectPage = observer(() => {
 		);
 	}
 
-	if (isProjectAnnouncements && !project.feedId.official) {
+	if (isAnnouncementsPath && !community.feedId.official) {
 		return <Navigate replace to={generatePath(RoutePath.PROJECT_ID_DISCUSSION, { projectId })} />;
 	}
 
-	if (isProjectDiscussion && !project.feedId.discussion) {
+	if (isDiscussionPath && !community.feedId.discussion) {
 		return <Navigate replace to={generatePath(RoutePath.PROJECT_ID_OFFICIAL, { projectId })} />;
 	}
 
@@ -414,34 +414,31 @@ export const BlockchainProjectPage = observer(() => {
 		<GenericLayout>
 			<RegularPageContent>
 				<div key={projectId}>
-					<BlockchainProjectBanner
-						className={css.projectBanner}
-						image={getBlockchainProjectBannerImage(project)}
+					<CommunityBanner className={css.communityBanner} image={getCommunityBannerImage(community)} />
+
+					<CommunityAvatar
+						className={css.communityLogo}
+						innerClassName={css.communityLogoInner}
+						community={community}
 					/>
 
-					<ProjectAvatar
-						className={css.projectLogo}
-						innerClassName={css.projectLogoInner}
-						project={project}
-					/>
+					<h1 className={css.communityName}>{community.name}</h1>
 
-					<h1 className={css.projectName}>{project.name}</h1>
+					{!!community.description && <div className={css.communityDescription}>{community.description}</div>}
 
-					{!!project.description && <div className={css.projectDescription}>{project.description}</div>}
-
-					{(project.website || !!project.tags?.length) && (
-						<div className={css.projectMeta}>
-							{project.website && (
-								<a className={css.projectWebsite} href={project.website}>
+					{(community.website || !!community.tags?.length) && (
+						<div className={css.communityMeta}>
+							{community.website && (
+								<a className={css.communityWebsite} href={community.website}>
 									<LinkSvg />
 
-									{beautifyUrl(project.website)}
+									{beautifyUrl(community.website)}
 								</a>
 							)}
 
-							{!!project.tags?.length && (
+							{!!community.tags?.length && (
 								<div className={css.tags}>
-									{project.tags.map(tag => (
+									{community.tags.map(tag => (
 										<div key={tag} className={css.tag}>
 											<TagSvg />
 											{tag}
@@ -455,28 +452,30 @@ export const BlockchainProjectPage = observer(() => {
 					<div className={css.main}>
 						<div className={css.tabsWrapper}>
 							<div className={css.tabs}>
-								{!!project.feedId.discussion &&
+								{!!community.feedId.discussion &&
 									renderTab({
-										part: BlockchainProjectPagePart.DISCUSSION,
+										part: CommunityPagePart.DISCUSSION,
 										name: 'Discussion',
-										href: generatePath(RoutePath.PROJECT_ID_DISCUSSION, { projectId: project.id }),
+										href: generatePath(RoutePath.PROJECT_ID_DISCUSSION, {
+											projectId: community.id,
+										}),
 									})}
 
-								{!!project.feedId.official &&
+								{!!community.feedId.official &&
 									renderTab({
-										part: BlockchainProjectPagePart.OFFICIAL,
+										part: CommunityPagePart.OFFICIAL,
 										name: 'Announcements',
-										href: generatePath(RoutePath.PROJECT_ID_OFFICIAL, { projectId: project.id }),
+										href: generatePath(RoutePath.PROJECT_ID_OFFICIAL, { projectId: community.id }),
 									})}
 							</div>
 
 							{tabsAsideContent && <div className={css.tabsAsideContent}>{tabsAsideContent}</div>}
 						</div>
 
-						{part === BlockchainProjectPagePart.OFFICIAL ? (
-							<OfficialContent project={project} setTabsAsideContent={setTabsAsideContent} />
-						) : part === BlockchainProjectPagePart.DISCUSSION ? (
-							<DiscussionContent project={project} setTabsAsideContent={setTabsAsideContent} />
+						{part === CommunityPagePart.OFFICIAL ? (
+							<OfficialContent community={community} setTabsAsideContent={setTabsAsideContent} />
+						) : part === CommunityPagePart.DISCUSSION ? (
+							<DiscussionContent community={community} setTabsAsideContent={setTabsAsideContent} />
 						) : (
 							assertUnreachable(part)
 						)}

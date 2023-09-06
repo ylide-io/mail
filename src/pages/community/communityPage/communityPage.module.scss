@@ -7,7 +7,7 @@
 
 //
 
-.projectBanner {
+.communityBanner {
 	border-radius: 16px;
 
 	@include lessThan768w {
@@ -16,7 +16,7 @@
 	}
 }
 
-.projectLogo {
+.communityLogo {
 	margin: -66px auto 0;
 	width: 100px;
 
@@ -26,24 +26,24 @@
 	}
 }
 
-.projectLogoInner {
+.communityLogoInner {
 	box-shadow: 0 0 0 2px var(--background-color);
 }
 
-.projectName {
+.communityName {
 	margin: 22px 0 0;
 	font-size: 24px;
 	font-weight: $font-weight_semi-bold;
 	text-align: center;
 }
 
-.projectDescription {
+.communityDescription {
 	margin: 12px 0 0;
 	font-size: 16px;
 	text-align: center;
 }
 
-.projectMeta {
+.communityMeta {
 	display: grid;
 	grid-auto-flow: column;
 	grid-gap: 32px;
@@ -57,7 +57,7 @@
 	}
 }
 
-.projectWebsite {
+.communityWebsite {
 	@include expand-click-area;
 	display: grid;
 	grid-auto-flow: column;

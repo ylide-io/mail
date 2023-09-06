@@ -5,7 +5,7 @@ import { generatePath } from 'react-router-dom';
 
 import { BlockchainFeedApi, DecodedBlockchainFeedPost } from '../../../../api/blockchainFeedApi';
 import { ActionButton, ActionButtonLook, ActionButtonSize } from '../../../../components/ActionButton/ActionButton';
-import { ProjectAvatar } from '../../../../components/avatar/avatar';
+import { CommunityAvatar } from '../../../../components/avatar/avatar';
 import { GridRowBox } from '../../../../components/boxes/boxes';
 import { GalleryModal } from '../../../../components/galleryModal/galleryModal';
 import { PostItemContainer } from '../../../../components/postItemContainer/postItemContainer';
@@ -14,28 +14,28 @@ import { TextProcessor } from '../../../../components/textProcessor/textProcesso
 import { toast } from '../../../../components/toast/toast';
 import { ReactComponent as CrossSvg } from '../../../../icons/ic20/cross.svg';
 import { MessageDecodedTextDataType } from '../../../../indexedDB/IndexedDB';
-import { BlockchainProject, BlockchainProjectId } from '../../../../stores/blockchainProjects/blockchainProjects';
 import { browserStorage } from '../../../../stores/browserStorage';
+import { Community, CommunityId } from '../../../../stores/communities/communities';
 import { RoutePath } from '../../../../stores/routePath';
 import { getIpfsHashFromUrl, ipfsToHttpUrl } from '../../../../utils/ipfs';
 import { useNav } from '../../../../utils/url';
 import { stickerIpfsIds } from '../createPostForm/stickerIpfsIds';
 import css from './officialPost.module.scss';
 
-export function generateOfficialPostPath(projectId: BlockchainProjectId, postId: string) {
+export function generateOfficialPostPath(projectId: CommunityId, postId: string) {
 	return generatePath(RoutePath.PROJECT_ID_OFFICIAL_POST_ID, { projectId, postId: encodeURIComponent(postId) });
 }
 
 interface OfficialPostViewProps {
-	project: BlockchainProject;
+	community: Community;
 	post: DecodedBlockchainFeedPost;
 }
 
-export function OfficialPostView({ project, post }: OfficialPostViewProps) {
+export function OfficialPostView({ community, post }: OfficialPostViewProps) {
 	const navigate = useNav();
 	const isAdminMode = browserStorage.isUserAdmin;
 
-	const postUrl = generateOfficialPostPath(project.id, post.original.id);
+	const postUrl = generateOfficialPostPath(community.id, post.original.id);
 
 	const decodedTextData = post.decoded.decodedTextData;
 	const decodedText = useMemo(
@@ -101,10 +101,10 @@ export function OfficialPostView({ project, post }: OfficialPostViewProps) {
 	) : (
 		<PostItemContainer isCollapsable className={css.root}>
 			<div className={css.meta}>
-				<ProjectAvatar className={css.ava} project={project} />
+				<CommunityAvatar className={css.ava} community={community} />
 
 				<div className={css.metaPrimary}>
-					<div className={css.sender}>{project.name}</div>
+					<div className={css.sender}>{community.name}</div>
 
 					<div>
 						<a
@@ -158,18 +158,18 @@ export function OfficialPostView({ project, post }: OfficialPostViewProps) {
 //
 
 interface OfficialPostProps {
-	project: BlockchainProject;
+	community: Community;
 	post: DecodedBlockchainFeedPost;
 }
 
-export function OfficialPost({ project, post }: OfficialPostProps) {
+export function OfficialPost({ community, post }: OfficialPostProps) {
 	const scrollRef = useRef<HTMLDivElement>(null);
 
 	return (
 		<div style={{ position: 'relative' }}>
 			<div ref={scrollRef} style={{ position: 'absolute', top: -100 }} />
 
-			<OfficialPostView project={project} post={post} />
+			<OfficialPostView community={community} post={post} />
 		</div>
 	);
 }

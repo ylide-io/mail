@@ -16,11 +16,8 @@ import { ReactComponent as TrashSvg } from '../../../../icons/ic20/trash.svg';
 import { ReactComponent as ImageSvg } from '../../../../icons/ic28/image.svg';
 import { ReactComponent as StickerSvg } from '../../../../icons/ic28/sticker.svg';
 import { analytics } from '../../../../stores/Analytics';
-import {
-	BlockchainProject,
-	BlockchainProjectAttachmentMode,
-} from '../../../../stores/blockchainProjects/blockchainProjects';
 import { browserStorage } from '../../../../stores/browserStorage';
+import { Community, CommunityAttachmentMode } from '../../../../stores/communities/communities';
 import { DomainAccount } from '../../../../stores/models/DomainAccount';
 import { OutgoingMailData, OutgoingMailDataMode } from '../../../../stores/outgoingMailData';
 import { HorizontalAlignment } from '../../../../utils/alignment';
@@ -38,7 +35,7 @@ export interface CreatePostFormApi {
 }
 
 export interface CreatePostFormProps extends PropsWithClassName {
-	project: BlockchainProject;
+	community: Community;
 	feedId: Uint256;
 	accounts: DomainAccount[];
 	placeholder: string;
@@ -48,14 +45,14 @@ export interface CreatePostFormProps extends PropsWithClassName {
 export const CreatePostForm = observer(
 	forwardRef(
 		(
-			{ className, project, feedId, accounts, placeholder, onCreated }: CreatePostFormProps,
+			{ className, community, feedId, accounts, placeholder, onCreated }: CreatePostFormProps,
 			ref: Ref<CreatePostFormApi>,
 		) => {
-			const allowedChains = project.allowedChains;
+			const allowedChains = community.allowedChains;
 
 			const allowCustomAttachments =
-				project.attachmentMode === BlockchainProjectAttachmentMode.EVERYONE ||
-				(browserStorage.isUserAdmin && project.attachmentMode === BlockchainProjectAttachmentMode.ADMINS);
+				community.attachmentMode === CommunityAttachmentMode.EVERYONE ||
+				(browserStorage.isUserAdmin && community.attachmentMode === CommunityAttachmentMode.ADMINS);
 
 			const mailData = useMemo(() => {
 				const mailData = new OutgoingMailData();
@@ -222,7 +219,7 @@ export const CreatePostForm = observer(
 				};
 			}, [mailData, replyTo]);
 
-			const serviceStatus = useQuery(['project', 'service-status'], {
+			const serviceStatus = useQuery(['community', 'service-status'], {
 				queryFn: async () => (await BlockchainFeedApi.getServiceStatus()).status,
 				initialData: 'ACTIVE',
 				refetchInterval: 10000,

@@ -1,13 +1,13 @@
 import clsx from 'clsx';
 
 import { PropsWithClassName } from '../props';
-import css from './blockchainProjectBanner.module.scss';
+import css from './communityBanner.module.scss';
 
-export interface BlockchainProjectBannerProps extends PropsWithClassName {
+export interface CommunityBannerProps extends PropsWithClassName {
 	image: string;
 }
 
-export function BlockchainProjectBanner({ className, image }: BlockchainProjectBannerProps) {
+export function CommunityBanner({ className, image }: CommunityBannerProps) {
 	return (
 		<div className={clsx(css.root, className)}>
 			<div

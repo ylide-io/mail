@@ -27,8 +27,8 @@ import { ReactComponent as MailSvg } from '../../../../icons/ic20/mail.svg';
 import { ReactComponent as TickSvg } from '../../../../icons/ic20/tick.svg';
 import { MessageDecodedTextDataType } from '../../../../indexedDB/IndexedDB';
 import { analytics } from '../../../../stores/Analytics';
-import { BlockchainProject, BlockchainProjectId } from '../../../../stores/blockchainProjects/blockchainProjects';
 import { browserStorage } from '../../../../stores/browserStorage';
+import { Community, CommunityId } from '../../../../stores/communities/communities';
 import domain from '../../../../stores/Domain';
 import { OutgoingMailData } from '../../../../stores/outgoingMailData';
 import { RoutePath } from '../../../../stores/routePath';
@@ -41,7 +41,7 @@ import { stickerIpfsIds } from '../createPostForm/stickerIpfsIds';
 import { RepliedDiscussionPost } from '../repliedDiscussionPost/repliedDiscussionPost';
 import css from './discussionPost.module.scss';
 
-export function generateDiscussionPostPath(projectId: BlockchainProjectId, postId: string) {
+export function generateDiscussionPostPath(projectId: CommunityId, postId: string) {
 	return generatePath(RoutePath.PROJECT_ID_DISCUSSION_POST_ID, { projectId, postId: encodeURIComponent(postId) });
 }
 
@@ -49,18 +49,18 @@ export function generateDiscussionPostPath(projectId: BlockchainProjectId, postI
 
 interface DiscussionPostProps {
 	post: DecodedBlockchainFeedPost;
-	project: BlockchainProject;
+	community: Community;
 	onReplyClick?: () => void;
 }
 
-export const DiscussionPost = observer(({ post, project, onReplyClick }: DiscussionPostProps) => {
+export const DiscussionPost = observer(({ post, community, onReplyClick }: DiscussionPostProps) => {
 	const navigate = useNav();
 	const isAdminMode = browserStorage.isUserAdmin;
 
 	const isAuthorAdmin = !!post.original.isAdmin;
 	const blockchain = post.original.blockchain;
 	const txId = post.msg.$$meta.tx?.hash || post.msg.$$meta.id;
-	const postUrl = generateDiscussionPostPath(project.id, post.original.id);
+	const postUrl = generateDiscussionPostPath(community.id, post.original.id);
 	const explorerUrl = generateBlockchainExplorerUrl(blockchain, txId);
 
 	const openMailCompose = useOpenMailCompose();

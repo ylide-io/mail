@@ -80,22 +80,22 @@ import weaverSrc from './profileImages/weaver.jpg';
 import web3WorldSrc from './profileImages/web3World.png';
 import ylideSrc from './profileImages/ylide.png';
 
-function inputToBlockchainProject(input: BlockchainProject | BlockchainProjectId): BlockchainProject {
-	return typeof input === 'string' ? getBlockchainProjectById(input) : input;
+function inputToCommunity(input: Community | CommunityId): Community {
+	return typeof input === 'string' ? getCommunityById(input) : input;
 }
 
-export function getBlockchainProjectById(id: BlockchainProjectId) {
-	return blockchainProjects.find(p => p.id === id)!;
+export function getCommunityById(id: CommunityId) {
+	return communities.find(p => p.id === id)!;
 }
 
-export function getBlockchainProjectBannerImage(input: BlockchainProject | BlockchainProjectId) {
-	return inputToBlockchainProject(input).bannerImage || _defaultBannerSrc;
+export function getCommunityBannerImage(input: Community | CommunityId) {
+	return inputToCommunity(input).bannerImage || _defaultBannerSrc;
 }
 
 //
 
-export interface BlockchainProject {
-	id: BlockchainProjectId;
+export interface Community {
+	id: CommunityId;
 	feedId: {
 		official?: Uint256;
 		discussion?: Uint256;
@@ -105,13 +105,13 @@ export interface BlockchainProject {
 	profileImage?: string;
 	bannerImage?: string;
 	website?: string;
-	tags?: BlockchainProjectTag[];
+	tags?: CommunityTag[];
 	fixedChain?: string;
 	allowedChains?: string[];
-	attachmentMode?: BlockchainProjectAttachmentMode;
+	attachmentMode?: CommunityAttachmentMode;
 }
 
-export enum BlockchainProjectId {
+export enum CommunityId {
 	// GENERAL
 
 	GENERAL = 'general',
@@ -169,7 +169,7 @@ export enum BlockchainProjectId {
 	TEST_B87O0G5K = 'test_b87o0g5k',
 }
 
-export enum BlockchainProjectTag {
+export enum CommunityTag {
 	SOCIAL = 'Social',
 	VENOM = 'Venom',
 	NFT = 'NFT',
@@ -181,7 +181,7 @@ export enum BlockchainProjectTag {
 	AURORA_ECOSYSTEM = 'Aurora Ecosystem',
 }
 
-export enum BlockchainProjectAttachmentMode {
+export enum CommunityAttachmentMode {
 	ADMINS = 'ADMINS',
 	EVERYONE = 'EVERYONE',
 }
@@ -197,11 +197,11 @@ const allChainsExceptTest = Object.values(BlockchainName).filter(
 		].includes(chain),
 );
 
-export const blockchainProjects: BlockchainProject[] = [
+export const communities: Community[] = [
 	// GENERAL
 
 	{
-		id: BlockchainProjectId.GENERAL,
+		id: CommunityId.GENERAL,
 		feedId: {
 			discussion: '2000000000000000000000000000000000000000000000000000000000000003' as Uint256,
 		},
@@ -211,19 +211,19 @@ export const blockchainProjects: BlockchainProject[] = [
 		allowedChains: allChainsExceptTest,
 	},
 	{
-		id: BlockchainProjectId.ETH_WHALES,
+		id: CommunityId.ETH_WHALES,
 		feedId: {
 			discussion: '2000000000000000000000000000000000000000000000000000000000000004' as Uint256,
 		},
 		name: 'ETH Whales',
 		description: 'Here you can meet the fellow ETH supporters. Btw, messages are sent only via Ethereum chain.',
 		profileImage: ethWhalesSrc,
-		tags: [BlockchainProjectTag.ECOSYSTEM],
+		tags: [CommunityTag.ECOSYSTEM],
 		allowedChains: [BlockchainName.ETHEREUM],
-		attachmentMode: BlockchainProjectAttachmentMode.EVERYONE,
+		attachmentMode: CommunityAttachmentMode.EVERYONE,
 	},
 	{
-		id: BlockchainProjectId.YLIDE,
+		id: CommunityId.YLIDE,
 		feedId: {
 			official: '200000000000000000000000000000000000000000000000000000000000000f' as Uint256,
 			discussion: '100000000000000000000000000000000000000000000000000000000000000f' as Uint256,
@@ -232,14 +232,14 @@ export const blockchainProjects: BlockchainProject[] = [
 		description: 'Protocol for wallet-to-wallet communication with built-in payments.',
 		profileImage: ylideSrc,
 		website: 'https://ylide.io/',
-		tags: [BlockchainProjectTag.SOCIAL, BlockchainProjectTag.VENOM],
+		tags: [CommunityTag.SOCIAL, CommunityTag.VENOM],
 		allowedChains: allChainsExceptTest,
 	},
 
 	// VENOM
 
 	{
-		id: BlockchainProjectId.OASIS_GALLERY,
+		id: CommunityId.OASIS_GALLERY,
 		feedId: {
 			official: '2000000000000000000000000000000000000000000000000000000000000006' as Uint256,
 			discussion: '1000000000000000000000000000000000000000000000000000000000000006' as Uint256,
@@ -249,11 +249,11 @@ export const blockchainProjects: BlockchainProject[] = [
 		profileImage: oasisGallerySrc,
 		bannerImage: oasisGalleryBannerSrc,
 		website: 'https://oasis.gallery/',
-		tags: [BlockchainProjectTag.NFT, BlockchainProjectTag.VENOM],
+		tags: [CommunityTag.NFT, CommunityTag.VENOM],
 		allowedChains: [BlockchainName.VENOM_TESTNET],
 	},
 	{
-		id: BlockchainProjectId.SNIPA,
+		id: CommunityId.SNIPA,
 		feedId: {
 			official: '2000000000000000000000000000000000000000000000000000000000000007' as Uint256,
 			discussion: '1000000000000000000000000000000000000000000000000000000000000007' as Uint256,
@@ -263,11 +263,11 @@ export const blockchainProjects: BlockchainProject[] = [
 		profileImage: snipaSrc,
 		bannerImage: snipaBannerSrc,
 		website: 'https://snipa.finance/',
-		tags: [BlockchainProjectTag.DEFI, BlockchainProjectTag.VENOM],
+		tags: [CommunityTag.DEFI, CommunityTag.VENOM],
 		allowedChains: [BlockchainName.VENOM_TESTNET],
 	},
 	{
-		id: BlockchainProjectId.VENOM_BLOCKCHAIN,
+		id: CommunityId.VENOM_BLOCKCHAIN,
 		feedId: {
 			discussion: VENOM_FEED_ID,
 		},
@@ -276,11 +276,11 @@ export const blockchainProjects: BlockchainProject[] = [
 		profileImage: venomBlockchainSrc,
 		bannerImage: venomBlockchainBannerSrc,
 		website: 'https://venom.foundation/',
-		tags: [BlockchainProjectTag.ECOSYSTEM, BlockchainProjectTag.VENOM],
+		tags: [CommunityTag.ECOSYSTEM, CommunityTag.VENOM],
 		allowedChains: [BlockchainName.VENOM_TESTNET],
 	},
 	{
-		id: BlockchainProjectId.VENOM_BRIDGE,
+		id: CommunityId.VENOM_BRIDGE,
 		feedId: {
 			official: '2000000000000000000000000000000000000000000000000000000000000009' as Uint256,
 			discussion: '1000000000000000000000000000000000000000000000000000000000000009' as Uint256,
@@ -291,11 +291,11 @@ export const blockchainProjects: BlockchainProject[] = [
 		profileImage: venomBridgeSrc,
 		bannerImage: venomBridgeBannerSrc,
 		website: 'https://venombridge.com/',
-		tags: [BlockchainProjectTag.DEFI, BlockchainProjectTag.VENOM],
+		tags: [CommunityTag.DEFI, CommunityTag.VENOM],
 		allowedChains: [BlockchainName.VENOM_TESTNET],
 	},
 	{
-		id: BlockchainProjectId.WEB3_WORLD,
+		id: CommunityId.WEB3_WORLD,
 		feedId: {
 			official: '200000000000000000000000000000000000000000000000000000000000000e' as Uint256,
 			discussion: '100000000000000000000000000000000000000000000000000000000000000e' as Uint256,
@@ -305,11 +305,11 @@ export const blockchainProjects: BlockchainProject[] = [
 		profileImage: web3WorldSrc,
 		bannerImage: web3WorldBannerSrc,
 		website: 'https://web3.world/',
-		tags: [BlockchainProjectTag.DEFI, BlockchainProjectTag.VENOM],
+		tags: [CommunityTag.DEFI, CommunityTag.VENOM],
 		allowedChains: [BlockchainName.VENOM_TESTNET],
 	},
 	{
-		id: BlockchainProjectId.VENTORY,
+		id: CommunityId.VENTORY,
 		feedId: {
 			official: '2000000000000000000000000000000000000000000000000000000000000010' as Uint256,
 			discussion: '1000000000000000000000000000000000000000000000000000000000000010' as Uint256,
@@ -320,11 +320,11 @@ export const blockchainProjects: BlockchainProject[] = [
 		profileImage: ventorySrc,
 		bannerImage: ventoryBannerSrc,
 		website: 'https://testnet.ventory.gg/',
-		tags: [BlockchainProjectTag.NFT, BlockchainProjectTag.VENOM],
+		tags: [CommunityTag.NFT, CommunityTag.VENOM],
 		allowedChains: [BlockchainName.VENOM_TESTNET],
 	},
 	{
-		id: BlockchainProjectId.GRAVIX,
+		id: CommunityId.GRAVIX,
 		feedId: {
 			official: '2000000000000000000000000000000000000000000000000000000000000011' as Uint256,
 			discussion: '1000000000000000000000000000000000000000000000000000000000000011' as Uint256,
@@ -335,11 +335,11 @@ export const blockchainProjects: BlockchainProject[] = [
 		profileImage: gravixSrc,
 		bannerImage: gravixBannerSrc,
 		website: 'https://gravix.io/',
-		tags: [BlockchainProjectTag.DEFI, BlockchainProjectTag.VENOM],
+		tags: [CommunityTag.DEFI, CommunityTag.VENOM],
 		allowedChains: [BlockchainName.VENOM_TESTNET],
 	},
 	{
-		id: BlockchainProjectId.STAX,
+		id: CommunityId.STAX,
 		feedId: {
 			official: '2000000000000000000000000000000000000000000000000000000000000005' as Uint256,
 			discussion: '1000000000000000000000000000000000000000000000000000000000000005' as Uint256,
@@ -350,12 +350,12 @@ export const blockchainProjects: BlockchainProject[] = [
 		profileImage: staxSrc,
 		bannerImage: staxBannerSrc,
 		website: 'https://stax.live',
-		tags: [BlockchainProjectTag.NFT, BlockchainProjectTag.VENOM],
+		tags: [CommunityTag.NFT, CommunityTag.VENOM],
 		allowedChains: [BlockchainName.VENOM_TESTNET],
-		attachmentMode: BlockchainProjectAttachmentMode.ADMINS,
+		attachmentMode: CommunityAttachmentMode.ADMINS,
 	},
 	{
-		id: BlockchainProjectId.VENOM_ID,
+		id: CommunityId.VENOM_ID,
 		feedId: {
 			official: '200000000000000000000000000000000000000000000000000000000000000a' as Uint256,
 			discussion: '100000000000000000000000000000000000000000000000000000000000000a' as Uint256,
@@ -366,12 +366,12 @@ export const blockchainProjects: BlockchainProject[] = [
 		profileImage: venomIdSrc,
 		bannerImage: venomIdBannerSrc,
 		website: 'https://venomid.network/',
-		tags: [BlockchainProjectTag.SOCIAL, BlockchainProjectTag.VENOM],
+		tags: [CommunityTag.SOCIAL, CommunityTag.VENOM],
 		allowedChains: [BlockchainName.VENOM_TESTNET],
-		attachmentMode: BlockchainProjectAttachmentMode.ADMINS,
+		attachmentMode: CommunityAttachmentMode.ADMINS,
 	},
 	{
-		id: BlockchainProjectId.VENOM_RECAP,
+		id: CommunityId.VENOM_RECAP,
 		feedId: {
 			official: '200000000000000000000000000000000000000000000000000000000000000b' as Uint256,
 			discussion: '100000000000000000000000000000000000000000000000000000000000000b' as Uint256,
@@ -382,12 +382,12 @@ export const blockchainProjects: BlockchainProject[] = [
 		profileImage: venomRecapSrc,
 		bannerImage: venomRecapBannerSrc,
 		website: 'https://twitter.com/VenomRecap',
-		tags: [BlockchainProjectTag.SOCIAL, BlockchainProjectTag.VENOM],
+		tags: [CommunityTag.SOCIAL, CommunityTag.VENOM],
 		allowedChains: [BlockchainName.VENOM_TESTNET],
-		attachmentMode: BlockchainProjectAttachmentMode.ADMINS,
+		attachmentMode: CommunityAttachmentMode.ADMINS,
 	},
 	{
-		id: BlockchainProjectId.VENOM_APE_CLUB,
+		id: CommunityId.VENOM_APE_CLUB,
 		feedId: {
 			official: '200000000000000000000000000000000000000000000000000000000000000c' as Uint256,
 			discussion: '100000000000000000000000000000000000000000000000000000000000000c' as Uint256,
@@ -397,12 +397,12 @@ export const blockchainProjects: BlockchainProject[] = [
 		profileImage: venomApeClubSrc,
 		bannerImage: venomApeClubBannerSrc,
 		website: 'https://venomape.club/',
-		tags: [BlockchainProjectTag.NFT, BlockchainProjectTag.VENOM],
+		tags: [CommunityTag.NFT, CommunityTag.VENOM],
 		allowedChains: [BlockchainName.VENOM_TESTNET],
-		attachmentMode: BlockchainProjectAttachmentMode.ADMINS,
+		attachmentMode: CommunityAttachmentMode.ADMINS,
 	},
 	{
-		id: BlockchainProjectId.RAVE,
+		id: CommunityId.RAVE,
 		feedId: {
 			official: '2000000000000000000000000000000000000000000000000000000000000018' as Uint256,
 			discussion: '2000000000000000000000000000000000000000000000000000000000000019' as Uint256,
@@ -413,12 +413,12 @@ export const blockchainProjects: BlockchainProject[] = [
 		profileImage: raveSrc,
 		bannerImage: raveBannerSrc,
 		website: 'https://ravegame.net/',
-		tags: [BlockchainProjectTag.GAMING, BlockchainProjectTag.VENOM],
+		tags: [CommunityTag.GAMING, CommunityTag.VENOM],
 		allowedChains: [BlockchainName.VENOM_TESTNET],
-		attachmentMode: BlockchainProjectAttachmentMode.ADMINS,
+		attachmentMode: CommunityAttachmentMode.ADMINS,
 	},
 	{
-		id: BlockchainProjectId.VENOMART,
+		id: CommunityId.VENOMART,
 		feedId: {
 			official: '2000000000000000000000000000000000000000000000000000000000000021' as Uint256,
 			discussion: '2000000000000000000000000000000000000000000000000000000000000022' as Uint256,
@@ -429,12 +429,12 @@ export const blockchainProjects: BlockchainProject[] = [
 		profileImage: venomartSrc,
 		bannerImage: venomartBannerSrc,
 		website: 'https://venomart.io/',
-		tags: [BlockchainProjectTag.NFT, BlockchainProjectTag.VENOM],
+		tags: [CommunityTag.NFT, CommunityTag.VENOM],
 		allowedChains: [BlockchainName.VENOM_TESTNET],
-		attachmentMode: BlockchainProjectAttachmentMode.ADMINS,
+		attachmentMode: CommunityAttachmentMode.ADMINS,
 	},
 	{
-		id: BlockchainProjectId.REVOLT,
+		id: CommunityId.REVOLT,
 		feedId: {
 			official: '2000000000000000000000000000000000000000000000000000000000000023' as Uint256,
 			discussion: '2000000000000000000000000000000000000000000000000000000000000024' as Uint256,
@@ -444,12 +444,12 @@ export const blockchainProjects: BlockchainProject[] = [
 		profileImage: revoltSrc,
 		bannerImage: revoltBannerSrc,
 		website: 'https://twitter.com/RevoltNFT?s=20',
-		tags: [BlockchainProjectTag.NFT, BlockchainProjectTag.VENOM],
+		tags: [CommunityTag.NFT, CommunityTag.VENOM],
 		allowedChains: allChainsExceptTest,
-		attachmentMode: BlockchainProjectAttachmentMode.ADMINS,
+		attachmentMode: CommunityAttachmentMode.ADMINS,
 	},
 	{
-		id: BlockchainProjectId.CHEPE_GAMES,
+		id: CommunityId.CHEPE_GAMES,
 		feedId: {
 			official: '200000000000000000000000000000000000000000000000000000000000002c' as Uint256,
 			discussion: '200000000000000000000000000000000000000000000000000000000000002d' as Uint256,
@@ -459,12 +459,12 @@ export const blockchainProjects: BlockchainProject[] = [
 		profileImage: chepeGamesSrc,
 		bannerImage: chepeGamesBannerSrc,
 		website: 'https://twitter.com/Chepe_Gaming',
-		tags: [BlockchainProjectTag.GAMING, BlockchainProjectTag.VENOM],
+		tags: [CommunityTag.GAMING, CommunityTag.VENOM],
 		allowedChains: allChainsExceptTest,
-		attachmentMode: BlockchainProjectAttachmentMode.ADMINS,
+		attachmentMode: CommunityAttachmentMode.ADMINS,
 	},
 	{
-		id: BlockchainProjectId.DEXIFY,
+		id: CommunityId.DEXIFY,
 		feedId: {
 			official: '200000000000000000000000000000000000000000000000000000000000002e' as Uint256,
 			discussion: '200000000000000000000000000000000000000000000000000000000000002f' as Uint256,
@@ -474,15 +474,15 @@ export const blockchainProjects: BlockchainProject[] = [
 		profileImage: dexifySrc,
 		bannerImage: dexifyBannerSrc,
 		website: 'https://www.dexify.io/',
-		tags: [BlockchainProjectTag.DEFI, BlockchainProjectTag.VENOM],
+		tags: [CommunityTag.DEFI, CommunityTag.VENOM],
 		allowedChains: [BlockchainName.VENOM_TESTNET],
-		attachmentMode: BlockchainProjectAttachmentMode.ADMINS,
+		attachmentMode: CommunityAttachmentMode.ADMINS,
 	},
 
 	// AURORA
 
 	{
-		id: BlockchainProjectId.AURORA,
+		id: CommunityId.AURORA,
 		feedId: {
 			official: '2000000000000000000000000000000000000000000000000000000000000048' as Uint256,
 			discussion: '2000000000000000000000000000000000000000000000000000000000000049' as Uint256,
@@ -493,12 +493,12 @@ export const blockchainProjects: BlockchainProject[] = [
 		profileImage: auroraSrc,
 		bannerImage: auroraBannerSrc,
 		website: 'https://aurora.dev/',
-		tags: [BlockchainProjectTag.AURORA_ECOSYSTEM],
+		tags: [CommunityTag.AURORA_ECOSYSTEM],
 		allowedChains: [BlockchainName.AURORA],
-		attachmentMode: BlockchainProjectAttachmentMode.ADMINS,
+		attachmentMode: CommunityAttachmentMode.ADMINS,
 	},
 	{
-		id: BlockchainProjectId.AURORA_AFRICA,
+		id: CommunityId.AURORA_AFRICA,
 		feedId: {
 			official: '2000000000000000000000000000000000000000000000000000000000000030' as Uint256,
 			discussion: '2000000000000000000000000000000000000000000000000000000000000031' as Uint256,
@@ -509,12 +509,12 @@ export const blockchainProjects: BlockchainProject[] = [
 		profileImage: auroraAfricaSrc,
 		bannerImage: auroraAfricaBannerSrc,
 		website: 'https://t.me/AuroraAfrica',
-		tags: [BlockchainProjectTag.AURORA_ECOSYSTEM],
+		tags: [CommunityTag.AURORA_ECOSYSTEM],
 		allowedChains: [BlockchainName.AURORA],
-		attachmentMode: BlockchainProjectAttachmentMode.ADMINS,
+		attachmentMode: CommunityAttachmentMode.ADMINS,
 	},
 	{
-		id: BlockchainProjectId.AURORA_BRAZIL,
+		id: CommunityId.AURORA_BRAZIL,
 		feedId: {
 			official: '2000000000000000000000000000000000000000000000000000000000000032' as Uint256,
 			discussion: '2000000000000000000000000000000000000000000000000000000000000033' as Uint256,
@@ -524,12 +524,12 @@ export const blockchainProjects: BlockchainProject[] = [
 		profileImage: auroraBrazilSrc,
 		bannerImage: auroraBrazilBannerSrc,
 		website: 'https://t.me/aurorabrasil',
-		tags: [BlockchainProjectTag.AURORA_ECOSYSTEM],
+		tags: [CommunityTag.AURORA_ECOSYSTEM],
 		allowedChains: [BlockchainName.AURORA],
-		attachmentMode: BlockchainProjectAttachmentMode.ADMINS,
+		attachmentMode: CommunityAttachmentMode.ADMINS,
 	},
 	{
-		id: BlockchainProjectId.AURORA_CHINA,
+		id: CommunityId.AURORA_CHINA,
 		feedId: {
 			official: '2000000000000000000000000000000000000000000000000000000000000034' as Uint256,
 			discussion: '2000000000000000000000000000000000000000000000000000000000000035' as Uint256,
@@ -539,12 +539,12 @@ export const blockchainProjects: BlockchainProject[] = [
 		profileImage: auroraChinaSrc,
 		bannerImage: auroraChinaBannerSrc,
 		website: 'https://t.me/Aurora_chinese',
-		tags: [BlockchainProjectTag.AURORA_ECOSYSTEM],
+		tags: [CommunityTag.AURORA_ECOSYSTEM],
 		allowedChains: [BlockchainName.AURORA],
-		attachmentMode: BlockchainProjectAttachmentMode.ADMINS,
+		attachmentMode: CommunityAttachmentMode.ADMINS,
 	},
 	{
-		id: BlockchainProjectId.AURORA_EAST_EUROPE,
+		id: CommunityId.AURORA_EAST_EUROPE,
 		feedId: {
 			official: '2000000000000000000000000000000000000000000000000000000000000036' as Uint256,
 			discussion: '2000000000000000000000000000000000000000000000000000000000000037' as Uint256,
@@ -554,12 +554,12 @@ export const blockchainProjects: BlockchainProject[] = [
 		profileImage: auroraEastEuropeSrc,
 		bannerImage: auroraEastEuropeBannerSrc,
 		website: 'https://t.me/aurora_ee',
-		tags: [BlockchainProjectTag.AURORA_ECOSYSTEM],
+		tags: [CommunityTag.AURORA_ECOSYSTEM],
 		allowedChains: [BlockchainName.AURORA],
-		attachmentMode: BlockchainProjectAttachmentMode.ADMINS,
+		attachmentMode: CommunityAttachmentMode.ADMINS,
 	},
 	{
-		id: BlockchainProjectId.AURORA_INDIA,
+		id: CommunityId.AURORA_INDIA,
 		feedId: {
 			official: '2000000000000000000000000000000000000000000000000000000000000038' as Uint256,
 			discussion: '2000000000000000000000000000000000000000000000000000000000000039' as Uint256,
@@ -569,12 +569,12 @@ export const blockchainProjects: BlockchainProject[] = [
 		profileImage: auroraIndiaSrc,
 		bannerImage: auroraIndiaBannerSrc,
 		website: 'https://t.me/auroraindia',
-		tags: [BlockchainProjectTag.AURORA_ECOSYSTEM],
+		tags: [CommunityTag.AURORA_ECOSYSTEM],
 		allowedChains: [BlockchainName.AURORA],
-		attachmentMode: BlockchainProjectAttachmentMode.ADMINS,
+		attachmentMode: CommunityAttachmentMode.ADMINS,
 	},
 	{
-		id: BlockchainProjectId.AURORA_INDONESIA,
+		id: CommunityId.AURORA_INDONESIA,
 		feedId: {
 			official: '200000000000000000000000000000000000000000000000000000000000003a' as Uint256,
 			discussion: '200000000000000000000000000000000000000000000000000000000000003b' as Uint256,
@@ -584,12 +584,12 @@ export const blockchainProjects: BlockchainProject[] = [
 		profileImage: auroraIndonesiaSrc,
 		bannerImage: auroraIndonesiaBannerSrc,
 		website: 'https://t.me/AuroraIndonesiaHQ',
-		tags: [BlockchainProjectTag.AURORA_ECOSYSTEM],
+		tags: [CommunityTag.AURORA_ECOSYSTEM],
 		allowedChains: [BlockchainName.AURORA],
-		attachmentMode: BlockchainProjectAttachmentMode.ADMINS,
+		attachmentMode: CommunityAttachmentMode.ADMINS,
 	},
 	{
-		id: BlockchainProjectId.AURORA_LATAM,
+		id: CommunityId.AURORA_LATAM,
 		feedId: {
 			official: '200000000000000000000000000000000000000000000000000000000000003c' as Uint256,
 			discussion: '200000000000000000000000000000000000000000000000000000000000003d' as Uint256,
@@ -599,12 +599,12 @@ export const blockchainProjects: BlockchainProject[] = [
 		profileImage: auroraLatamSrc,
 		bannerImage: auroraLatamBannerSrc,
 		website: 'https://t.me/AuroraLatam',
-		tags: [BlockchainProjectTag.AURORA_ECOSYSTEM],
+		tags: [CommunityTag.AURORA_ECOSYSTEM],
 		allowedChains: [BlockchainName.AURORA],
-		attachmentMode: BlockchainProjectAttachmentMode.ADMINS,
+		attachmentMode: CommunityAttachmentMode.ADMINS,
 	},
 	{
-		id: BlockchainProjectId.AURORA_TURKIYE,
+		id: CommunityId.AURORA_TURKIYE,
 		feedId: {
 			official: '200000000000000000000000000000000000000000000000000000000000003e' as Uint256,
 			discussion: '200000000000000000000000000000000000000000000000000000000000003f' as Uint256,
@@ -614,12 +614,12 @@ export const blockchainProjects: BlockchainProject[] = [
 		profileImage: auroraTurkeySrc,
 		bannerImage: auroraTurkeyBannerSrc,
 		website: 'https://t.me/auroraisneartr',
-		tags: [BlockchainProjectTag.AURORA_ECOSYSTEM],
+		tags: [CommunityTag.AURORA_ECOSYSTEM],
 		allowedChains: [BlockchainName.AURORA],
-		attachmentMode: BlockchainProjectAttachmentMode.ADMINS,
+		attachmentMode: CommunityAttachmentMode.ADMINS,
 	},
 	{
-		id: BlockchainProjectId.AURORA_VENEZUELA,
+		id: CommunityId.AURORA_VENEZUELA,
 		feedId: {
 			official: '2000000000000000000000000000000000000000000000000000000000000040' as Uint256,
 			discussion: '2000000000000000000000000000000000000000000000000000000000000041' as Uint256,
@@ -630,12 +630,12 @@ export const blockchainProjects: BlockchainProject[] = [
 		profileImage: auroraVenezuelaSrc,
 		bannerImage: auroraVenezuelaBannerSrc,
 		website: 'https://t.me/venezuelaaurora',
-		tags: [BlockchainProjectTag.AURORA_ECOSYSTEM],
+		tags: [CommunityTag.AURORA_ECOSYSTEM],
 		allowedChains: [BlockchainName.AURORA],
-		attachmentMode: BlockchainProjectAttachmentMode.ADMINS,
+		attachmentMode: CommunityAttachmentMode.ADMINS,
 	},
 	{
-		id: BlockchainProjectId.AURORA_HUNTERS,
+		id: CommunityId.AURORA_HUNTERS,
 		feedId: {
 			official: '2000000000000000000000000000000000000000000000000000000000000042' as Uint256,
 			discussion: '2000000000000000000000000000000000000000000000000000000000000043' as Uint256,
@@ -645,12 +645,12 @@ export const blockchainProjects: BlockchainProject[] = [
 		profileImage: auroraHuntersSrc,
 		bannerImage: auroraHuntersBannerSrc,
 		website: 'https://t.me/AuroraHunters_chat',
-		tags: [BlockchainProjectTag.AURORA_ECOSYSTEM],
+		tags: [CommunityTag.AURORA_ECOSYSTEM],
 		allowedChains: [BlockchainName.AURORA],
-		attachmentMode: BlockchainProjectAttachmentMode.ADMINS,
+		attachmentMode: CommunityAttachmentMode.ADMINS,
 	},
 	{
-		id: BlockchainProjectId.AURORA_VIETNAM,
+		id: CommunityId.AURORA_VIETNAM,
 		feedId: {
 			official: '2000000000000000000000000000000000000000000000000000000000000044' as Uint256,
 			discussion: '2000000000000000000000000000000000000000000000000000000000000045' as Uint256,
@@ -660,12 +660,12 @@ export const blockchainProjects: BlockchainProject[] = [
 		profileImage: auroraVietnamSrc,
 		bannerImage: auroraVietnamBannerSrc,
 		website: 'https://t.me/auroravietnamofficial',
-		tags: [BlockchainProjectTag.AURORA_ECOSYSTEM],
+		tags: [CommunityTag.AURORA_ECOSYSTEM],
 		allowedChains: [BlockchainName.AURORA],
-		attachmentMode: BlockchainProjectAttachmentMode.ADMINS,
+		attachmentMode: CommunityAttachmentMode.ADMINS,
 	},
 	{
-		id: BlockchainProjectId.AURORA_AURORITY,
+		id: CommunityId.AURORA_AURORITY,
 		feedId: {
 			official: '2000000000000000000000000000000000000000000000000000000000000046' as Uint256,
 			discussion: '2000000000000000000000000000000000000000000000000000000000000047' as Uint256,
@@ -675,15 +675,15 @@ export const blockchainProjects: BlockchainProject[] = [
 		profileImage: auroritySrc,
 		bannerImage: aurorityBannerSrc,
 		website: 'https://t.me/auroritychat',
-		tags: [BlockchainProjectTag.AURORA_ECOSYSTEM],
+		tags: [CommunityTag.AURORA_ECOSYSTEM],
 		allowedChains: [BlockchainName.AURORA],
-		attachmentMode: BlockchainProjectAttachmentMode.ADMINS,
+		attachmentMode: CommunityAttachmentMode.ADMINS,
 	},
 
 	// OTHERS
 
 	{
-		id: BlockchainProjectId.TVM,
+		id: CommunityId.TVM,
 		feedId: {
 			official: '2000000000000000000000000000000000000000000000000000000000000001' as Uint256,
 			discussion: '2000000000000000000000000000000000000000000000000000000000000002' as Uint256,
@@ -692,12 +692,12 @@ export const blockchainProjects: BlockchainProject[] = [
 		description: '베놈과 에버스케일을 포함한 TVM 블록체인의 주요 업데이트 내용을 공유하는 채널',
 		profileImage: tvmSrc,
 		bannerImage: tvmBannerSrc,
-		tags: [BlockchainProjectTag.TVM, BlockchainProjectTag.ECOSYSTEM, BlockchainProjectTag.VENOM],
+		tags: [CommunityTag.TVM, CommunityTag.ECOSYSTEM, CommunityTag.VENOM],
 		allowedChains: allChainsExceptTest,
-		attachmentMode: BlockchainProjectAttachmentMode.ADMINS,
+		attachmentMode: CommunityAttachmentMode.ADMINS,
 	},
 	{
-		id: BlockchainProjectId.HANMADI,
+		id: CommunityId.HANMADI,
 		feedId: {
 			official: '2000000000000000000000000000000000000000000000000000000000000025' as Uint256,
 			discussion: '2000000000000000000000000000000000000000000000000000000000000026' as Uint256,
@@ -706,12 +706,12 @@ export const blockchainProjects: BlockchainProject[] = [
 		description: '누구나 자유로이 한마디!',
 		profileImage: hanmadiSrc,
 		bannerImage: hanmadiBannerSrc,
-		tags: [BlockchainProjectTag.TVM, BlockchainProjectTag.VENOM],
+		tags: [CommunityTag.TVM, CommunityTag.VENOM],
 		allowedChains: allChainsExceptTest,
-		attachmentMode: BlockchainProjectAttachmentMode.EVERYONE,
+		attachmentMode: CommunityAttachmentMode.EVERYONE,
 	},
 	{
-		id: BlockchainProjectId.WEAVER,
+		id: CommunityId.WEAVER,
 		feedId: {
 			official: '200000000000000000000000000000000000000000000000000000000000001a' as Uint256,
 			discussion: '200000000000000000000000000000000000000000000000000000000000001b' as Uint256,
@@ -719,12 +719,12 @@ export const blockchainProjects: BlockchainProject[] = [
 		name: 'Weaver',
 		description: '한국의 크립토 마케팅회사',
 		profileImage: weaverSrc,
-		tags: [BlockchainProjectTag.TVM],
+		tags: [CommunityTag.TVM],
 		allowedChains: allChainsExceptTest,
-		attachmentMode: BlockchainProjectAttachmentMode.EVERYONE,
+		attachmentMode: CommunityAttachmentMode.EVERYONE,
 	},
 	{
-		id: BlockchainProjectId.ONE_CLICK_CRYPTO,
+		id: CommunityId.ONE_CLICK_CRYPTO,
 		feedId: {
 			official: '200000000000000000000000000000000000000000000000000000000000000d' as Uint256,
 			discussion: '100000000000000000000000000000000000000000000000000000000000000d' as Uint256,
@@ -734,12 +734,12 @@ export const blockchainProjects: BlockchainProject[] = [
 		profileImage: oneClickCryptoSrc,
 		bannerImage: oneClickCryptoBannerSrc,
 		website: 'https://www.oneclick.fi/',
-		tags: [BlockchainProjectTag.DEFI],
+		tags: [CommunityTag.DEFI],
 		allowedChains: allChainsExceptTest,
-		attachmentMode: BlockchainProjectAttachmentMode.ADMINS,
+		attachmentMode: CommunityAttachmentMode.ADMINS,
 	},
 	{
-		id: BlockchainProjectId.GNOSIS_BUILDERS,
+		id: CommunityId.GNOSIS_BUILDERS,
 		feedId: {
 			official: '2000000000000000000000000000000000000000000000000000000000000012' as Uint256,
 			discussion: '2000000000000000000000000000000000000000000000000000000000000013' as Uint256,
@@ -749,12 +749,12 @@ export const blockchainProjects: BlockchainProject[] = [
 		profileImage: gnosisBuildersSrc,
 		bannerImage: gnosisBuildersBannerSrc,
 		website: 'https://www.gnosis.builders/',
-		tags: [BlockchainProjectTag.ECOSYSTEM, BlockchainProjectTag.SOCIAL],
+		tags: [CommunityTag.ECOSYSTEM, CommunityTag.SOCIAL],
 		allowedChains: [BlockchainName.GNOSIS],
-		attachmentMode: BlockchainProjectAttachmentMode.ADMINS,
+		attachmentMode: CommunityAttachmentMode.ADMINS,
 	},
 	{
-		id: BlockchainProjectId.BET_FURY,
+		id: CommunityId.BET_FURY,
 		feedId: {
 			official: '2000000000000000000000000000000000000000000000000000000000000016' as Uint256,
 			discussion: '2000000000000000000000000000000000000000000000000000000000000017' as Uint256,
@@ -765,12 +765,12 @@ export const blockchainProjects: BlockchainProject[] = [
 		profileImage: betFurySrc,
 		bannerImage: betFuryBannerSrc,
 		website: 'https://betfury.io/',
-		tags: [BlockchainProjectTag.GAMING],
+		tags: [CommunityTag.GAMING],
 		allowedChains: allChainsExceptTest,
-		attachmentMode: BlockchainProjectAttachmentMode.ADMINS,
+		attachmentMode: CommunityAttachmentMode.ADMINS,
 	},
 	{
-		id: BlockchainProjectId.DITTO_NETWORK,
+		id: CommunityId.DITTO_NETWORK,
 		feedId: {
 			official: '200000000000000000000000000000000000000000000000000000000000001f' as Uint256,
 			discussion: '2000000000000000000000000000000000000000000000000000000000000020' as Uint256,
@@ -781,12 +781,12 @@ export const blockchainProjects: BlockchainProject[] = [
 		profileImage: dittoSrc,
 		bannerImage: dittoBannerSrc,
 		website: 'https://dittonetwork.io',
-		tags: [BlockchainProjectTag.DEVELOPER_TOOLS],
+		tags: [CommunityTag.DEVELOPER_TOOLS],
 		allowedChains: [BlockchainName.POLYGON, BlockchainName.VENOM_TESTNET],
-		attachmentMode: BlockchainProjectAttachmentMode.ADMINS,
+		attachmentMode: CommunityAttachmentMode.ADMINS,
 	},
 	{
-		id: BlockchainProjectId.ALTSOME,
+		id: CommunityId.ALTSOME,
 		feedId: {
 			official: '200000000000000000000000000000000000000000000000000000000000002a' as Uint256,
 			discussion: '200000000000000000000000000000000000000000000000000000000000002b' as Uint256,
@@ -796,15 +796,15 @@ export const blockchainProjects: BlockchainProject[] = [
 		profileImage: altsomeSrc,
 		bannerImage: altsomeBannerSrc,
 		website: 'https://altsome.com/',
-		tags: [BlockchainProjectTag.DEFI, BlockchainProjectTag.NFT],
+		tags: [CommunityTag.DEFI, CommunityTag.NFT],
 		allowedChains: allChainsExceptTest,
-		attachmentMode: BlockchainProjectAttachmentMode.ADMINS,
+		attachmentMode: CommunityAttachmentMode.ADMINS,
 	},
 
 	// TEST
 
 	{
-		id: BlockchainProjectId.TEST_B87O0G5K,
+		id: CommunityId.TEST_B87O0G5K,
 		feedId: {
 			discussion: '2000000000000000000000000000000000000000000000000000000000000027' as Uint256,
 		},
@@ -812,6 +812,6 @@ export const blockchainProjects: BlockchainProject[] = [
 		description: 'This is an amazing test feed with some description 😎',
 		website: 'https://my-website.com',
 		allowedChains: [BlockchainName.BASE, BlockchainName.ZETA, BlockchainName.LINEA],
-		attachmentMode: BlockchainProjectAttachmentMode.EVERYONE,
+		attachmentMode: CommunityAttachmentMode.EVERYONE,
 	},
 ];

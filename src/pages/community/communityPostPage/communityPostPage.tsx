@@ -15,7 +15,7 @@ import { SharePopup } from '../../../components/sharePopup/sharePopup';
 import { YlideLoader } from '../../../components/ylideLoader/ylideLoader';
 import { ReactComponent as ShareSvg } from '../../../icons/ic20/share.svg';
 import { MessageDecodedTextDataType } from '../../../indexedDB/IndexedDB';
-import { BlockchainProjectId, getBlockchainProjectById } from '../../../stores/blockchainProjects/blockchainProjects';
+import { CommunityId, getCommunityById } from '../../../stores/communities/communities';
 import { RoutePath } from '../../../stores/routePath';
 import { HorizontalAlignment } from '../../../utils/alignment';
 import { invariant } from '../../../utils/assert';
@@ -23,23 +23,23 @@ import { ipfsToHttpUrl } from '../../../utils/ipfs';
 import { toAbsoluteUrl } from '../../../utils/url';
 import { DiscussionPost, generateDiscussionPostPath } from '../_common/discussionPost/discussionPost';
 import { generateOfficialPostPath, OfficialPostView } from '../_common/officialPost/officialPost';
-import css from './blockchainProjectPostPage.module.scss';
+import css from './communityPostPage.module.scss';
 
-export interface BlockchainProjectPostPageProps {
+export interface CommunityPostPageProps {
 	isOfficial: boolean;
 }
 
-export const BlockchainProjectPostPage = observer(({ isOfficial }: BlockchainProjectPostPageProps) => {
-	const { projectId, postId } = useParams<{ projectId: BlockchainProjectId; postId: string }>();
+export const CommunityPostPage = observer(({ isOfficial }: CommunityPostPageProps) => {
+	const { projectId, postId } = useParams<{ projectId: CommunityId; postId: string }>();
 	invariant(projectId);
 	invariant(postId);
 
-	const project = getBlockchainProjectById(projectId);
+	const community = getCommunityById(projectId);
 	const postPath = isOfficial
 		? generateOfficialPostPath(projectId, postId)
 		: generateDiscussionPostPath(projectId, postId);
 
-	const { isLoading, data } = useQuery(['feed', 'blockchain-project', 'post', postId], {
+	const { isLoading, data } = useQuery(['community', 'post', postId], {
 		queryFn: async () => {
 			const post = await BlockchainFeedApi.getPost({ id: postId });
 			return decodeBlockchainFeedPost(post!);
@@ -62,7 +62,7 @@ export const BlockchainProjectPostPage = observer(({ isOfficial }: BlockchainPro
 							: generatePath(RoutePath.PROJECT_ID_DISCUSSION, { projectId }),
 						goBackIfPossible: true,
 					}}
-					title={project.name}
+					title={community.name}
 					right={
 						data && (
 							<>
@@ -97,14 +97,14 @@ export const BlockchainProjectPostPage = observer(({ isOfficial }: BlockchainPro
 									? data.decoded.decodedTextData.value.toPlainText()
 									: data.decoded.decodedTextData.value
 							}
-							description={`${project.name} // ${project.description}`}
+							description={`${community.name} // ${community.description}`}
 							image={attachmentHttpUrl}
 						/>
 
 						{isOfficial ? (
-							<OfficialPostView project={project} post={data} />
+							<OfficialPostView community={community} post={data} />
 						) : (
-							<DiscussionPost project={project} post={data} />
+							<DiscussionPost community={community} post={data} />
 						)}
 					</>
 				) : isLoading ? (

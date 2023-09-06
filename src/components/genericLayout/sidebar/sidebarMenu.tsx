@@ -20,12 +20,8 @@ import { ReactComponent as TwitterSvg } from '../../../icons/social/twitter.svg'
 import { sideFeedIcon } from '../../../icons/static/sideFeedIcon';
 import { FeedSettingsPopup } from '../../../pages/feed/_common/feedSettingsPopup/feedSettingsPopup';
 import { analytics } from '../../../stores/Analytics';
-import {
-	BlockchainProject,
-	BlockchainProjectId,
-	getBlockchainProjectById,
-} from '../../../stores/blockchainProjects/blockchainProjects';
 import { browserStorage } from '../../../stores/browserStorage';
+import { Community, CommunityId, getCommunityById } from '../../../stores/communities/communities';
 import domain from '../../../stores/Domain';
 import { feedSettings } from '../../../stores/FeedSettings';
 import { FolderId, getFolderName, MailList } from '../../../stores/MailList';
@@ -36,7 +32,7 @@ import { openCreateCommunityForm } from '../../../utils/misc';
 import { useIsMatchesPath, useNav } from '../../../utils/url';
 import { ActionButton, ActionButtonLook, ActionButtonSize } from '../../ActionButton/ActionButton';
 import { AdaptiveText } from '../../adaptiveText/adaptiveText';
-import { MiniProjectCard } from '../../blockchainProjectCards/miniProjectCard/miniProjectCard';
+import { MiniCommunityCard } from '../../communityCards/miniCommunityCard/miniCommunityCard';
 import { PropsWithClassName } from '../../props';
 import { toast } from '../../toast/toast';
 import css from './sidebarMenu.module.scss';
@@ -163,15 +159,15 @@ export const SidebarButton = observer(({ href, goBackIfPossible, icon, name, rig
 
 //
 
-interface SidebarProjectProps {
-	project: BlockchainProject;
+interface SidebarCommunityProps {
+	community: Community;
 }
 
-export function SidebarProject({ project }: SidebarProjectProps) {
-	const href = generatePath(RoutePath.PROJECT_ID, { projectId: project.id });
+export function SidebarCommunity({ community }: SidebarCommunityProps) {
+	const href = generatePath(RoutePath.PROJECT_ID, { projectId: community.id });
 	const isActive = useIsMatchesPath(href);
 
-	return <MiniProjectCard className={clsx(isActive && css.sidebarProject_active)} project={project} />;
+	return <MiniCommunityCard className={clsx(isActive && css.sidebarCommunity_active)} community={community} />;
 }
 
 //
@@ -346,11 +342,11 @@ export const SidebarMenu = observer(() => {
 		);
 	}
 
-	function renderBlockchainProjectsSection() {
+	function renderCommunitiesSection() {
 		if (REACT_APP__APP_MODE !== AppMode.HUB) return;
 
-		function renderProjects(projects: BlockchainProjectId[]) {
-			return projects.map(id => <SidebarProject key={id} project={getBlockchainProjectById(id)} />);
+		function renderCommunities(communities: CommunityId[]) {
+			return communities.map(id => <SidebarCommunity key={id} community={getCommunityById(id)} />);
 		}
 
 		return (
@@ -362,21 +358,17 @@ export const SidebarMenu = observer(() => {
 						href: generatePath(RoutePath.ROOT),
 					}}
 				>
-					{renderProjects([
-						BlockchainProjectId.TVM,
-						BlockchainProjectId.OASIS_GALLERY,
-						BlockchainProjectId.VENTORY,
-						BlockchainProjectId.HANMADI,
-						BlockchainProjectId.DITTO_NETWORK,
+					{renderCommunities([
+						CommunityId.TVM,
+						CommunityId.OASIS_GALLERY,
+						CommunityId.VENTORY,
+						CommunityId.HANMADI,
+						CommunityId.DITTO_NETWORK,
 					])}
 				</SidebarSection>
 
 				<SidebarSection title="Newly Added">
-					{renderProjects([
-						BlockchainProjectId.DEXIFY,
-						BlockchainProjectId.CHEPE_GAMES,
-						BlockchainProjectId.ALTSOME,
-					])}
+					{renderCommunities([CommunityId.DEXIFY, CommunityId.CHEPE_GAMES, CommunityId.ALTSOME])}
 				</SidebarSection>
 
 				<ActionButton
@@ -423,7 +415,7 @@ export const SidebarMenu = observer(() => {
 		<div className={css.root}>
 			{renderOtcSection()}
 			{renderSmartFeedSection()}
-			{renderBlockchainProjectsSection()}
+			{renderCommunitiesSection()}
 			{renderFeedDiscoverySection()}
 			{renderMailSection()}
 
