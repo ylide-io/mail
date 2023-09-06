@@ -34,7 +34,7 @@ export function RichProjectCard({ project }: RichProjectCardProps) {
 
 				<div className={css.name}>{project.name}</div>
 
-				<div>{project.description}</div>
+				<div>{project.description || `${project.name} community`}</div>
 			</div>
 		</a>
 	);

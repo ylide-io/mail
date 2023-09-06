@@ -427,7 +427,7 @@ export const BlockchainProjectPage = observer(() => {
 
 					<h1 className={css.projectName}>{project.name}</h1>
 
-					<div className={css.projectDescription}>{project.description}</div>
+					{!!project.description && <div className={css.projectDescription}>{project.description}</div>}
 
 					{(project.website || !!project.tags?.length) && (
 						<div className={css.projectMeta}>

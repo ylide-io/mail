@@ -75,7 +75,7 @@ export interface BlockchainProject {
 		discussion?: Uint256;
 	};
 	name: string;
-	description: string;
+	description?: string;
 	profileImage?: string;
 	bannerImage?: string;
 	website?: string;

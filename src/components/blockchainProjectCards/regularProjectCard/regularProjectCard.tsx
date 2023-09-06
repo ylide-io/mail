@@ -27,7 +27,7 @@ export function RegularProjectCard({ project }: RegularProjectCardProps) {
 
 			<div className={css.name}>{project.name}</div>
 
-			<div className={css.description}>{project.description}</div>
+			<div className={css.description}>{project.description || `${project.name} community`}</div>
 		</a>
 	);
 }
