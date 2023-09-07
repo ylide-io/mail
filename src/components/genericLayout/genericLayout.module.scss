@@ -1,33 +1,31 @@
-$padding: 40px;
-
 $sidebarWidth: 280px;
 
 .root {
-	--generic-layout_padding: 40px;
-	--generic-layout_spacing: 32px;
+	--generic-layout_outer-padding: 40px;
+	--generic-layout_inner-spacing: 32px;
 
 	flex: 1 1 auto;
 	display: grid;
 	grid-template-rows: auto 1fr;
-	grid-gap: var(--generic-layout_spacing);
+	grid-gap: var(--generic-layout_inner-spacing);
 	align-items: start;
 	position: relative;
 
 	@include lessThan1366x768 {
-		--generic-layout_padding: 20px;
-		--generic-layout_spacing: 20px;
+		--generic-layout_outer-padding: 20px;
+		--generic-layout_inner-spacing: 20px;
 	}
 
 	@include lessThan768w {
-		--generic-layout_padding: 12px;
-		--generic-layout_spacing: 12px;
+		--generic-layout_outer-padding: 12px;
+		--generic-layout_inner-spacing: 12px;
 
 		grid-gap: 0;
 	}
 }
 
 .header {
-	padding: 0 var(--generic-layout_padding);
+	padding: 0 var(--generic-layout_outer-padding);
 	height: 80px;
 	background: var(--surface-color);
 
@@ -43,9 +41,9 @@ $sidebarWidth: 280px;
 .main {
 	display: grid;
 	grid-template-columns: $sidebarWidth 1fr;
-	grid-gap: var(--generic-layout_spacing);
+	grid-gap: var(--generic-layout_inner-spacing);
 	margin: 0 auto;
-	padding: 0 var(--generic-layout_padding);
+	padding: 0 var(--generic-layout_outer-padding);
 	width: 100%;
 	max-width: 1280px;
 
