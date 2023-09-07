@@ -16,11 +16,12 @@ $interactive-elem-size_xlarge: 44px;
 
 // RESPONSIVE
 
-$mediaWidth1366: 1366px;
+$mediaWidth1440: 1440px;
 $mediaWidth1152: 1152px;
 $mediaWidth768: 768px;
 $mediaWidth640: 640px;
 
+$mediaHeight900: 900px;
 $mediaHeight768: 768px;
 
 @mixin lessThan($width: null, $height: null) {
@@ -41,8 +42,8 @@ $mediaHeight768: 768px;
 	}
 }
 
-@mixin lessThan1366x768() {
-	@include lessThan($mediaWidth1366, $mediaHeight768) {
+@mixin lessThan1440x900() {
+	@include lessThan($mediaWidth1440, $mediaHeight900) {
 		@content;
 	}
 }

@@ -34,7 +34,7 @@
 	grid-template-columns: 1fr 1fr;
 	grid-gap: 32px;
 
-	@include lessThan1366x768 {
+	@include lessThan1440x900 {
 		grid-gap: 20px;
 	}
 

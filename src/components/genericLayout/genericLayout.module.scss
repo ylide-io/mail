@@ -2,7 +2,7 @@ $sidebarWidth: 280px;
 
 .root {
 	--generic-layout_outer-padding: 40px;
-	--generic-layout_inner-spacing: 32px;
+	--generic-layout_inner-spacing: 28px;
 
 	flex: 1 1 auto;
 	display: grid;
@@ -11,9 +11,12 @@ $sidebarWidth: 280px;
 	align-items: start;
 	position: relative;
 
-	@include lessThan1366x768 {
-		--generic-layout_outer-padding: 20px;
+	@include lessThan1440x900 {
 		--generic-layout_inner-spacing: 20px;
+	}
+
+	@include lessThan1152w {
+		--generic-layout_outer-padding: 20px;
 	}
 
 	@include lessThan768w {
@@ -29,7 +32,7 @@ $sidebarWidth: 280px;
 	height: 80px;
 	background: var(--surface-color);
 
-	@include lessThan768w {
+	@include lessThan1152w {
 		height: 64px;
 	}
 
@@ -47,9 +50,13 @@ $sidebarWidth: 280px;
 	width: 100%;
 	max-width: 1280px;
 
+	@include lessThan1440x900 {
+		max-width: 1140px;
+	}
+
 	@include lessThan1152w {
 		grid-template-columns: 1fr;
-		max-width: 960px;
+		max-width: 800px;
 	}
 
 	@include lessThan768w {

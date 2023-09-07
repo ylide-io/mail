@@ -70,7 +70,7 @@
 	@include article-text;
 	font-size: 16px;
 
-	@include lessThan1366x768 {
+	@include lessThan1440x900 {
 		font-size: 14px;
 	}
 }
