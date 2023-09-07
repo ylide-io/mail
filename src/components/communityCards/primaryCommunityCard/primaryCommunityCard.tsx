@@ -44,26 +44,28 @@ export const PrimaryCommunityCard = observer(({ community }: PrimaryCommunityCar
 					{!!community.description && <div className={css.description}>{community.description}</div>}
 
 					<div className={css.meta}>
-						<div className={css.metaLeft}>
-							{!!community.tags?.length && (
-								<div className={css.tags}>
-									{community.tags.map(tag => (
-										<div key={tag} className={css.tag}>
-											<TagSvg />
-											{tag}
-										</div>
-									))}
-								</div>
-							)}
+						{(!!community.tags?.length || !!community.website) && (
+							<div className={css.metaLeft}>
+								{!!community.tags?.length && (
+									<div className={css.tags}>
+										{community.tags.map(tag => (
+											<div key={tag} className={css.tag}>
+												<TagSvg />
+												{tag}
+											</div>
+										))}
+									</div>
+								)}
 
-							{community.website && (
-								<a className={css.website} href={community.website}>
-									<LinkSvg />
+								{!!community.website && (
+									<a className={css.website} href={community.website}>
+										<LinkSvg />
 
-									{beautifyUrl(community.website)}
-								</a>
-							)}
-						</div>
+										{beautifyUrl(community.website)}
+									</a>
+								)}
+							</div>
+						)}
 
 						{!!admins.length && (
 							<ActionButton
