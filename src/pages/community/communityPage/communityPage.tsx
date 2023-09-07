@@ -11,16 +11,13 @@ import {
 	DecodedBlockchainFeedPost,
 } from '../../../api/blockchainFeedApi';
 import { ActionButton, ActionButtonLook, ActionButtonSize } from '../../../components/ActionButton/ActionButton';
-import { CommunityAvatar } from '../../../components/avatar/avatar';
-import { CommunityBanner } from '../../../components/communityBanner/communityBanner';
+import { PrimaryCommunityCard } from '../../../components/communityCards/primaryCommunityCard/primaryCommunityCard';
 import { ErrorMessage, ErrorMessageLook } from '../../../components/errorMessage/errorMessage';
 import { RegularPageContent } from '../../../components/genericLayout/content/regularPageContent/regularPageContent';
 import { GenericLayout } from '../../../components/genericLayout/genericLayout';
 import { PageMeta } from '../../../components/pageMeta/pageMeta';
 import { toast } from '../../../components/toast/toast';
 import { YlideLoader } from '../../../components/ylideLoader/ylideLoader';
-import { ReactComponent as LinkSvg } from '../../../icons/ic20/link.svg';
-import { ReactComponent as TagSvg } from '../../../icons/ic20/tag.svg';
 import { analytics } from '../../../stores/Analytics';
 import { browserStorage } from '../../../stores/browserStorage';
 import { Community, CommunityId, getCommunityById } from '../../../stores/communities/communities';
@@ -28,7 +25,7 @@ import { RoutePath } from '../../../stores/routePath';
 import { connectAccount, getAllowedAccountsForBlockchains } from '../../../utils/account';
 import { assertUnreachable, invariant } from '../../../utils/assert';
 import { blockchainMeta, isEvmBlockchain } from '../../../utils/blockchain';
-import { beautifyUrl, useIsMatchesPattern, useNav } from '../../../utils/url';
+import { useIsMatchesPattern, useNav } from '../../../utils/url';
 import { CreatePostForm, CreatePostFormApi } from '../_common/createPostForm/createPostForm';
 import { DiscussionPost } from '../_common/discussionPost/discussionPost';
 import { OfficialPost } from '../_common/officialPost/officialPost';
@@ -407,74 +404,39 @@ export const CommunityPage = observer(() => {
 
 	return (
 		<GenericLayout>
-			<RegularPageContent>
-				<div key={projectId}>
-					<CommunityBanner className={css.communityBanner} community={community} />
+			<RegularPageContent key={projectId}>
+				<PrimaryCommunityCard community={community} />
 
-					<CommunityAvatar
-						className={css.communityLogo}
-						innerClassName={css.communityLogoInner}
-						community={community}
-					/>
+				<div className={css.main}>
+					<div className={css.tabsWrapper}>
+						<div className={css.tabs}>
+							{!!community.feedId.discussion &&
+								renderTab({
+									part: CommunityPagePart.DISCUSSION,
+									name: 'Discussion',
+									href: generatePath(RoutePath.PROJECT_ID_DISCUSSION, {
+										projectId: community.id,
+									}),
+								})}
 
-					<h1 className={css.communityName}>{community.name}</h1>
-
-					{!!community.description && <div className={css.communityDescription}>{community.description}</div>}
-
-					{(community.website || !!community.tags?.length) && (
-						<div className={css.communityMeta}>
-							{community.website && (
-								<a className={css.communityWebsite} href={community.website}>
-									<LinkSvg />
-
-									{beautifyUrl(community.website)}
-								</a>
-							)}
-
-							{!!community.tags?.length && (
-								<div className={css.tags}>
-									{community.tags.map(tag => (
-										<div key={tag} className={css.tag}>
-											<TagSvg />
-											{tag}
-										</div>
-									))}
-								</div>
-							)}
-						</div>
-					)}
-
-					<div className={css.main}>
-						<div className={css.tabsWrapper}>
-							<div className={css.tabs}>
-								{!!community.feedId.discussion &&
-									renderTab({
-										part: CommunityPagePart.DISCUSSION,
-										name: 'Discussion',
-										href: generatePath(RoutePath.PROJECT_ID_DISCUSSION, {
-											projectId: community.id,
-										}),
-									})}
-
-								{!!community.feedId.official &&
-									renderTab({
-										part: CommunityPagePart.OFFICIAL,
-										name: 'Announcements',
-										href: generatePath(RoutePath.PROJECT_ID_OFFICIAL, { projectId: community.id }),
-									})}
-							</div>
-
-							{tabsAsideContent && <div className={css.tabsAsideContent}>{tabsAsideContent}</div>}
+							{!!community.feedId.official &&
+								renderTab({
+									part: CommunityPagePart.OFFICIAL,
+									name: 'Announcements',
+									href: generatePath(RoutePath.PROJECT_ID_OFFICIAL, { projectId: community.id }),
+								})}
 						</div>
 
-						{part === CommunityPagePart.OFFICIAL ? (
-							<OfficialContent community={community} setTabsAsideContent={setTabsAsideContent} />
-						) : part === CommunityPagePart.DISCUSSION ? (
-							<DiscussionContent community={community} setTabsAsideContent={setTabsAsideContent} />
-						) : (
-							assertUnreachable(part)
-						)}
+						{tabsAsideContent && <div className={css.tabsAsideContent}>{tabsAsideContent}</div>}
 					</div>
+
+					{part === CommunityPagePart.OFFICIAL ? (
+						<OfficialContent community={community} setTabsAsideContent={setTabsAsideContent} />
+					) : part === CommunityPagePart.DISCUSSION ? (
+						<DiscussionContent community={community} setTabsAsideContent={setTabsAsideContent} />
+					) : (
+						assertUnreachable(part)
+					)}
 				</div>
 			</RegularPageContent>
 		</GenericLayout>
