@@ -33,7 +33,7 @@ enum Step {
 }
 
 interface NewPasswordModalProps {
-	faucetType: null | 'polygon' | 'gnosis' | 'fantom';
+	faucetType: null | EVMNetwork.POLYGON | EVMNetwork.GNOSIS | EVMNetwork.FANTOM;
 	bonus: boolean;
 	wallet: Wallet;
 	account: WalletAccount;
@@ -100,7 +100,7 @@ export function NewPasswordModal({
 		onClose?.();
 	}
 
-	async function publishLocalKey(key: YlidePrivateKey) {
+	async function publishLocalKey(key: YlidePrivateKey, network: EVMNetwork | undefined) {
 		try {
 			console.log(`publishLocalKey`);
 			setStep(Step.PUBLISH_KEY);
@@ -108,20 +108,54 @@ export function NewPasswordModal({
 			const account = domainAccountRef.current;
 			invariant(account);
 
-			await Promise.all([
-				account.publishPublicKey(key, network),
-				// Display loader after 3 seconds
-				asyncDelay(3000).then(() => setStep(Step.LOADING)),
-			]);
+			const justPublishedKey = await new Promise<RemotePublicKey | null>((resolve, reject) => {
+				let isDone = false;
 
-			const justPublishedKey = await domain.waitForPublicKey(
-				false,
-				network ? EVM_NAMES[network] : account.wallet.currentBlockchain,
-				account.account.address,
-				key.publicKey.keyBytes,
-			);
+				asyncDelay(3000).then(() => (!isDone ? setStep(Step.LOADING) : null));
+
+				account.publishPublicKey(key, network).then(() => {
+					if (isDone) {
+						return;
+					}
+
+					domain.ylide.core
+						.waitForPublicKey(
+							network ? EVM_NAMES[network] : account.wallet.currentBlockchain,
+							account.account.address,
+							key.publicKey.keyBytes,
+						)
+						.then(foundKey => {
+							if (isDone) {
+								return;
+							}
+
+							isDone = true;
+
+							resolve(foundKey);
+						});
+				});
+
+				asyncDelay(3000).then(() =>
+					domain.ylide.core
+						.waitForPublicKey(
+							network ? EVM_NAMES[network] : account.wallet.currentBlockchain,
+							account.account.address,
+							key.publicKey.keyBytes,
+						)
+						.then(foundKey => {
+							if (isDone) {
+								return;
+							}
+							if (foundKey) {
+								isDone = true;
+								resolve(foundKey);
+							}
+						}),
+				);
+			});
+
 			if (justPublishedKey) {
-				await domain.keyRegistry.addRemotePublicKey(justPublishedKey);
+				await domain.keysRegistry.addRemotePublicKey(justPublishedKey);
 				account.reloadKeys();
 			}
 
@@ -164,8 +198,13 @@ export function NewPasswordModal({
 					}
 				} else {
 					// strange... I'm not sure Qamon keys work here
-					console.log('createLocalKey', 'INSECURE_KEY_V1');
-					tempLocalKey = await wallet.constructLocalKeyV1(account, password);
+					if (forceSecond) {
+						console.log('createLocalKey', 'INSECURE_KEY_V2 non-venom');
+						tempLocalKey = await wallet.constructLocalKeyV2(account, password);
+					} else {
+						console.log('createLocalKey', 'INSECURE_KEY_V1 non-venom');
+						tempLocalKey = await wallet.constructLocalKeyV1(account, password);
+					}
 				}
 			} else if (freshestKey?.key.publicKey.keyVersion === YlideKeyVersion.KEY_V2) {
 				// if user already using password - we should use it too
@@ -190,11 +229,11 @@ export function NewPasswordModal({
 		if (!freshestKey || needToRepublishKey) {
 			const domainAccount = await createDomainAccount(wallet, account, tempLocalKey);
 			if (faucetType && wallet.factory.blockchainGroup === 'evm') {
-				const actualFaucetType = needToRepublishKey ? 'polygon' : faucetType;
+				const actualFaucetType = needToRepublishKey ? EVMNetwork.POLYGON : faucetType;
 
 				setStep(Step.GENERATE_KEY);
 
-				const { chainId, timestampLock, registrar, signature } = await domain.getFaucetSignature(
+				const faucetData = await domain.getFaucetSignature(
 					domainAccount,
 					tempLocalKey.publicKey,
 					actualFaucetType,
@@ -209,16 +248,7 @@ export function NewPasswordModal({
 				domain.txPlateVisible = true;
 				domain.txWithBonus = bonus;
 
-				const promise = domain.publishThroughFaucet(
-					domainAccount,
-					tempLocalKey.publicKey,
-					actualFaucetType,
-					bonus,
-					chainId,
-					timestampLock,
-					registrar,
-					signature,
-				);
+				const promise = domain.publishThroughFaucet(faucetData);
 
 				if (waitTxPublishing) {
 					await promise;
@@ -229,11 +259,11 @@ export function NewPasswordModal({
 				if (wallet.factory.blockchainGroup === 'evm') {
 					setStep(Step.SELECT_NETWORK);
 				} else {
-					await publishLocalKey(tempLocalKey);
+					await publishLocalKey(tempLocalKey, network);
 				}
 			}
 		} else if (freshestKey.key.publicKey.equals(tempLocalKey.publicKey)) {
-			await domain.keyRegistry.addRemotePublicKeys(
+			await domain.keysRegistry.addRemotePublicKeys(
 				Object.values(remoteKeys).filter(it => !!it) as RemotePublicKey[],
 			);
 			const domainAccount = await createDomainAccount(wallet, account, tempLocalKey);
@@ -241,7 +271,7 @@ export function NewPasswordModal({
 			onClose?.(domainAccount);
 		} else if (forceNew || withoutPassword) {
 			await createDomainAccount(wallet, account, tempLocalKey);
-			await publishLocalKey(tempLocalKey);
+			await publishLocalKey(tempLocalKey, network);
 		} else {
 			toast('Password is wrong. Please try again ❤');
 			setStep(Step.ENTER_PASSWORD);
@@ -251,7 +281,7 @@ export function NewPasswordModal({
 	async function networkSelect(network: EVMNetwork) {
 		setNetwork(network);
 		setStep(Step.PUBLISH_KEY);
-		await publishLocalKey(domainAccountRef.current!.localPrivateKeys[0]);
+		await publishLocalKey(domainAccountRef.current!.localPrivateKeys[0], network);
 	}
 
 	return (

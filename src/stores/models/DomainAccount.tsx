@@ -1,5 +1,5 @@
 import { EVMNetwork } from '@ylide/ethereum';
-import { RemotePublicKey, ServiceCode, WalletAccount, YlideCore, YlideKeyRegistry, YlidePrivateKey } from '@ylide/sdk';
+import { RemotePublicKey, ServiceCode, WalletAccount, YlideCore, YlideKeysRegistry, YlidePrivateKey } from '@ylide/sdk';
 import { computed, makeAutoObservable, observable } from 'mobx';
 
 import { AdaptiveAddress } from '../../components/adaptiveAddress/adaptiveAddress';
@@ -15,7 +15,7 @@ export class DomainAccount {
 	private _name: string;
 
 	constructor(
-		public readonly keyRegistry: YlideKeyRegistry,
+		public readonly keysRegistry: YlideKeysRegistry,
 		public readonly wallet: Wallet,
 		public readonly account: WalletAccount,
 		name: string,
@@ -28,9 +28,9 @@ export class DomainAccount {
 	}
 
 	public reloadKeys() {
-		this._localPrivateKeys = this.keyRegistry.getLocalPrivateKeys(this.account.address);
-		this._remotePublicKeys = this.keyRegistry.getRemotePublicKeys(this.account.address);
-		this._freshestRemotePublicKey = this.keyRegistry.getFreshestRemotePublicKey(this.account.address) || undefined;
+		this._localPrivateKeys = this.keysRegistry.getLocalPrivateKeys(this.account.address);
+		this._remotePublicKeys = this.keysRegistry.getRemotePublicKeys(this.account.address);
+		this._freshestRemotePublicKey = this.keysRegistry.getFreshestRemotePublicKey(this.account.address) || undefined;
 	}
 
 	@computed get localPrivateKeys() {
@@ -50,7 +50,7 @@ export class DomainAccount {
 		for (const blockchain of Object.keys(remoteKeys)) {
 			const remoteKey = remoteKeys[blockchain];
 			if (remoteKey) {
-				await this.keyRegistry.addRemotePublicKey(remoteKey);
+				await this.keysRegistry.addRemotePublicKey(remoteKey);
 			}
 		}
 
@@ -61,7 +61,7 @@ export class DomainAccount {
 		console.log('background read keys history');
 		const remoteKeys = await this.wallet.domain.ylide.core.getAddressesKeysHistory([this.account.address]);
 		for (const remoteKey of remoteKeys[this.account.address]) {
-			await this.keyRegistry.addRemotePublicKey(remoteKey);
+			await this.keysRegistry.addRemotePublicKey(remoteKey);
 		}
 
 		this.reloadKeys();
@@ -77,7 +77,7 @@ export class DomainAccount {
 			for (const blockchain of Object.keys(remoteKeys)) {
 				const remoteKey = remoteKeys[blockchain];
 				if (remoteKey) {
-					await this.keyRegistry.addRemotePublicKey(remoteKey);
+					await this.keysRegistry.addRemotePublicKey(remoteKey);
 				}
 			}
 
@@ -127,7 +127,7 @@ export class DomainAccount {
 	}
 
 	async addNewLocalPrivateKey(key: YlidePrivateKey) {
-		await this.keyRegistry.addLocalPrivateKey(key);
+		await this.keysRegistry.addLocalPrivateKey(key);
 		this.reloadKeys();
 	}
 
@@ -143,8 +143,8 @@ export class DomainAccount {
 		);
 	}
 
-	async makeMainViewKey() {
-		return await this.wallet.constructMainViewKey(this.account);
+	async makeMainViewKey(invite = '') {
+		return await this.wallet.constructMainViewKey(this.account, invite);
 	}
 
 	get mainViewKey() {

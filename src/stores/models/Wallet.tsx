@@ -1,4 +1,5 @@
-import { EthereumWalletController } from '@ylide/ethereum';
+import { EVMWalletController } from '@ylide/ethereum';
+import { TVMWalletAccount, TVMWalletController } from '@ylide/everscale';
 import {
 	AbstractWalletController,
 	PrivateKeyAvailabilityState,
@@ -11,6 +12,7 @@ import { autobind } from 'core-decorators';
 import EventEmitter from 'eventemitter3';
 import { computed, makeObservable, observable } from 'mobx';
 
+import { MainviewKeyPayload } from '../../types';
 import { Domain } from '../Domain';
 import { DomainAccount } from './DomainAccount';
 
@@ -115,7 +117,7 @@ export class Wallet extends EventEmitter {
 	}
 
 	async constructLocalKeyV3(account: WalletAccount) {
-		return await this.domain.keyRegistry.instantiateNewPrivateKey(
+		return await this.domain.keysRegistry.instantiateNewPrivateKey(
 			account.blockchainGroup,
 			account.address,
 			YlideKeyVersion.KEY_V3,
@@ -128,7 +130,7 @@ export class Wallet extends EventEmitter {
 	}
 
 	async constructLocalKeyV2(account: WalletAccount, password: string) {
-		return await this.domain.keyRegistry.instantiateNewPrivateKey(
+		return await this.domain.keysRegistry.instantiateNewPrivateKey(
 			account.blockchainGroup,
 			account.address,
 			YlideKeyVersion.KEY_V2,
@@ -142,7 +144,7 @@ export class Wallet extends EventEmitter {
 	}
 
 	async constructLocalKeyV1(account: WalletAccount, password: string) {
-		return await this.domain.keyRegistry.instantiateNewPrivateKey(
+		return await this.domain.keysRegistry.instantiateNewPrivateKey(
 			account.blockchainGroup,
 			account.address,
 			YlideKeyVersion.INSECURE_KEY_V1,
@@ -155,19 +157,31 @@ export class Wallet extends EventEmitter {
 		);
 	}
 
-	async constructMainViewKey(account: WalletAccount) {
-		if (!(this.controller instanceof EthereumWalletController)) {
-			throw new Error('Not implemented');
-		}
+	async constructMainViewKey(account: WalletAccount, invite: string): Promise<MainviewKeyPayload> {
 		const messageTimestamp = Math.floor(Date.now() / 1000);
-		const sig = await this.controller.signString(
-			account,
-			`Ylide authorization, ${account.address.toLowerCase()}, timestamp: ${messageTimestamp}`,
-		);
-		return {
-			signature: sig.r + sig.s.substring(2) + sig.v.toString(16),
-			timestamp: messageTimestamp,
-		};
+		const message = `Ylide authorization, ${account.address.toLowerCase()}, timestamp: ${messageTimestamp}`;
+		if (this.controller instanceof EVMWalletController) {
+			const sig = await this.controller.signString(account, message);
+			return {
+				signature: sig.r + sig.s.substring(2) + sig.v.toString(16),
+				messageTimestamp,
+				address: account.address,
+				invite,
+			};
+		}
+		if (this.controller instanceof TVMWalletController) {
+			const { signature, dataHash } = await this.controller.signString(account, message);
+			return {
+				address: account.address,
+				signature: signature,
+				messageTimestamp,
+				invite,
+				publicKeyHex: (account as TVMWalletAccount).$$meta.publicKeyHex,
+				signatureDataHash: dataHash,
+				tvmType: account.wallet as 'venomwallet' | 'everwallet',
+			};
+		}
+		throw new Error('Unknown wallet');
 	}
 
 	async getCurrentAccount(): Promise<WalletAccount | null> {

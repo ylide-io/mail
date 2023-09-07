@@ -26,8 +26,9 @@ export const CoverageModal = observer(({ onClose, account }: Props) => {
 		const unique: FeedManagerApi.CoverageItem[] = [];
 		const seenValues = new Set();
 		for (const item of items) {
-			if (!seenValues.has(item.projectName)) {
-				seenValues.add(item.projectName);
+			const feature = item.projectName || item.symbol || item.tokenId;
+			if (!seenValues.has(feature)) {
+				seenValues.add(feature);
 				unique.push(item);
 			}
 		}
@@ -38,14 +39,14 @@ export const CoverageModal = observer(({ onClose, account }: Props) => {
 		if (!coverage || coverage === 'error' || coverage === 'loading') {
 			return [];
 		}
-		return uniq(coverage.tokens.items);
+		return uniq(coverage.tokens.items).sort((a, b) => Number(a.missing) - Number(b.missing));
 	}, [coverage]);
 
 	const uniqProtocols = useMemo(() => {
 		if (!coverage || coverage === 'error' || coverage === 'loading') {
 			return [];
 		}
-		return uniq(coverage.protocols.items);
+		return uniq(coverage.protocols.items).sort((a, b) => Number(a.missing) - Number(b.missing));
 	}, [coverage]);
 
 	const getRowTextToken = (row: {

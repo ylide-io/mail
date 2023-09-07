@@ -1,4 +1,5 @@
 import { REACT_APP__FEED_MANAGER } from '../env';
+import { MainviewKeyPayload } from '../types';
 import { createCleanSerachParams } from '../utils/url';
 import { FeedReason } from './feedServerApi';
 
@@ -86,19 +87,23 @@ export namespace FeedManagerApi {
 		token: string;
 	}
 
-	export async function authAddress(address: string, signature: string, messageTimestamp: number, invite?: string) {
+	export async function authAddress(payload: MainviewKeyPayload) {
 		return await request<AuthAddressResponse>(`/auth-address`, undefined, {
-			address,
-			signature,
-			messageTimestamp,
-			invite: invite || '',
+			...payload,
 		});
 	}
 
 	//
 
-	export async function init(token: string) {
-		return await request(`/init`, {
+	export async function init(token: string, tvm?: string) {
+		return await request<undefined | { inLine: boolean }>(`/init`, {
+			token,
+			tvm,
+		});
+	}
+
+	export async function checkInit(token: string) {
+		return await request<boolean>(`/check-init`, {
 			token,
 		});
 	}
@@ -133,14 +138,65 @@ export namespace FeedManagerApi {
 		usdCovered: number;
 	}
 
-	export type CoverageResponse = {
+	export type Coverage = {
 		tokens: CoverageInfo;
 		protocols: CoverageInfo;
-		transactions: Ratio;
+		totalCoverage: string;
+	};
+
+	export interface CoverageData {
+		tokenId: string;
+		address: string;
+		missing: boolean;
+		projectName: string | null;
+		tokenName: string | null;
+		tokenSymbol: string | null;
+		protocolName: string | null;
+		protocolTokenSymbol: string | null;
+		reasonsData: [
+			| { type: 'balance'; balanceUsd: number }
+			| { type: 'transaction' }
+			| {
+					type: 'protocol';
+					data: {
+						portfolio_item_list: [{ stats: { net_usd_value: number } }];
+					};
+			  }
+			| {
+					type: 'protocol';
+					data: TVMAccountsDataResponse;
+			  },
+		];
+	}
+
+	export type TVMAccountsDataResponse = {
+		address: string;
+		pools: {
+			poolAddress: string;
+			poolType: string;
+			totalUsdValue: string;
+			supplyTokenList: {
+				amount: string;
+				decimals: number;
+				rootAddress: string;
+				symbol: string;
+				usdValue: string;
+			}[];
+		}[];
+		liquidity?: {
+			totalUsdValue: string;
+			supplyTokenList: {
+				amount: string;
+				decimals: number;
+				rootAddress: string;
+				symbol: string;
+				usdValue: string;
+			}[];
+		};
 	};
 
 	export async function getCoverage(token: string) {
-		return await request<CoverageResponse>(`/coverage`, {
+		return await request<CoverageData[]>(`/v2/coverage`, {
 			token,
 		});
 	}

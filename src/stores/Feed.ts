@@ -93,7 +93,7 @@ export class FeedStore {
 		if (!this.checkNewPostsProcess) {
 			this.checkNewPostsProcess = setInterval(() => {
 				this.checkNewPosts();
-			}, 10000);
+			}, 30000);
 		}
 	}
 
