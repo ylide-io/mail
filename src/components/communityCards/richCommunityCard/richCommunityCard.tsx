@@ -1,6 +1,6 @@
 import { generatePath } from 'react-router-dom';
 
-import { Community, getCommunityBannerImage } from '../../../stores/communities/communities';
+import { Community } from '../../../stores/communities/communities';
 import { RoutePath } from '../../../stores/routePath';
 import { useNav } from '../../../utils/url';
 import { CommunityAvatar } from '../../avatar/avatar';
@@ -24,7 +24,7 @@ export function RichCommunityCard({ community }: RichCommunityCardProps) {
 				navigate(href);
 			}}
 		>
-			<CommunityBanner image={getCommunityBannerImage(community)} />
+			<CommunityBanner community={community} />
 
 			<div className={css.info}>
 				<CommunityAvatar className={css.ava} community={community} />

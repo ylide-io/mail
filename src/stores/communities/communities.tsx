@@ -2,7 +2,6 @@ import { Uint256 } from '@ylide/sdk';
 
 import { VENOM_FEED_ID } from '../../constants';
 import { BlockchainName } from '../../utils/blockchain';
-import _defaultBannerSrc from './bannerImages/_default.png';
 import altsomeBannerSrc from './bannerImages/altsome.jpg';
 import auroraBannerSrc from './bannerImages/aurora.jpg';
 import auroraAfricaBannerSrc from './bannerImages/auroraAfrica.jpg';
@@ -86,10 +85,6 @@ function inputToCommunity(input: Community | CommunityId): Community {
 
 export function getCommunityById(id: CommunityId) {
 	return communities.find(p => p.id === id)!;
-}
-
-export function getCommunityBannerImage(input: Community | CommunityId) {
-	return inputToCommunity(input).bannerImage || _defaultBannerSrc;
 }
 
 //

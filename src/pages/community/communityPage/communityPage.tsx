@@ -23,12 +23,7 @@ import { ReactComponent as LinkSvg } from '../../../icons/ic20/link.svg';
 import { ReactComponent as TagSvg } from '../../../icons/ic20/tag.svg';
 import { analytics } from '../../../stores/Analytics';
 import { browserStorage } from '../../../stores/browserStorage';
-import {
-	Community,
-	CommunityId,
-	getCommunityBannerImage,
-	getCommunityById,
-} from '../../../stores/communities/communities';
+import { Community, CommunityId, getCommunityById } from '../../../stores/communities/communities';
 import { RoutePath } from '../../../stores/routePath';
 import { connectAccount, getAllowedAccountsForBlockchains } from '../../../utils/account';
 import { assertUnreachable, invariant } from '../../../utils/assert';
@@ -414,7 +409,7 @@ export const CommunityPage = observer(() => {
 		<GenericLayout>
 			<RegularPageContent>
 				<div key={projectId}>
-					<CommunityBanner className={css.communityBanner} image={getCommunityBannerImage(community)} />
+					<CommunityBanner className={css.communityBanner} community={community} />
 
 					<CommunityAvatar
 						className={css.communityLogo}
