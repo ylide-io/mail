@@ -53,7 +53,7 @@
 		border: 0;
 	}
 
-	@include less720px {
+	@include lessThan768w {
 		&:last-child {
 			padding-bottom: 32px;
 		}
@@ -68,7 +68,7 @@
 	padding: 24px 24px 0 88px;
 	color: var(--secondary-text-color);
 
-	@include less720px {
+	@include lessThan768w {
 		padding-left: 24px;
 	}
 }
@@ -82,7 +82,7 @@
 	padding: 20px;
 	border-top: 1px solid var(--border-color);
 
-	@include less720px {
+	@include lessThan768w {
 		display: none;
 	}
 }

@@ -9,7 +9,7 @@
 	align-items: center;
 	margin: 0 0 8px;
 
-	@include less920px {
+	@include lessThan768w {
 		grid-template-columns: 1fr;
 		grid-gap: 12px;
 	}
@@ -27,7 +27,7 @@
 	grid-gap: 8px;
 	align-items: center;
 
-	@include less920px {
+	@include lessThan768w {
 		justify-self: start;
 	}
 }

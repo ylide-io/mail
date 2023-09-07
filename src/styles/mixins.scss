@@ -20,6 +20,7 @@ $mediaWidth1440: 1440px;
 $mediaWidth1152: 1152px;
 $mediaWidth768: 768px;
 $mediaWidth640: 640px;
+$mediaWidth480: 480px;
 
 $mediaHeight900: 900px;
 $mediaHeight768: 768px;
@@ -72,20 +73,8 @@ $mediaHeight768: 768px;
 	}
 }
 
-@mixin less920px() {
-	@media (max-width: 920px) {
-		@content;
-	}
-}
-
-@mixin less720px() {
-	@media (max-width: 720px) {
-		@content;
-	}
-}
-
-@mixin less480px() {
-	@media (max-width: 480px) {
+@mixin lessThan480w() {
+	@include lessThan($mediaWidth480) {
 		@content;
 	}
 }

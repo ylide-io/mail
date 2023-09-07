@@ -3,7 +3,7 @@
 	grid-template-columns: 32px 1fr;
 	grid-gap: 8px;
 
-	@include less480px {
+	@include lessThan480w {
 		--blockchain-label_display: none;
 	}
 }
@@ -82,7 +82,7 @@
 	background: var(--surface-color);
 	border-radius: 16px;
 
-	@include less480px {
+	@include lessThan480w {
 		padding: 12px;
 	}
 

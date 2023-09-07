@@ -39,7 +39,7 @@
 	grid-gap: 8px;
 }
 
-@include less920px {
+@include lessThan768w {
 	.root {
 		flex-direction: column;
 		align-items: stretch;

@@ -57,7 +57,7 @@ $hPadding: 20px;
 	text-align: right;
 	margin-right: 24px;
 
-	@include less480px {
+	@include lessThan480w {
 		display: none;
 	}
 }
@@ -75,7 +75,7 @@ $hPadding: 20px;
 		margin: 0 0 0 12px;
 	}
 
-	@include less480px {
+	@include lessThan480w {
 		display: grid;
 		grid-template-columns: auto 1fr;
 		grid-row-gap: 8px;
@@ -87,7 +87,7 @@ $hPadding: 20px;
 .row_data {
 	height: 40px;
 
-	@include less480px {
+	@include lessThan480w {
 		height: auto;
 	}
 }
@@ -95,7 +95,7 @@ $hPadding: 20px;
 //
 
 .sourceCheckBox {
-	@include less480px {
+	@include lessThan480w {
 		grid-row: 1/4;
 	}
 }
@@ -139,7 +139,7 @@ $hPadding: 20px;
 	text-align: center;
 	font-weight: $font-weight_semi-bold;
 
-	@include less480px {
+	@include lessThan480w {
 		text-align: left;
 	}
 }

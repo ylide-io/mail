@@ -62,7 +62,7 @@
 .footer {
 	display: flex;
 
-	@include less720px {
+	@include lessThan768w {
 		display: grid;
 		justify-items: end;
 		grid-gap: 8px;
@@ -74,7 +74,7 @@
 	width: 100%;
 	max-width: 268px;
 
-	@include less720px {
+	@include lessThan768w {
 		margin: 0;
 	}
 }
