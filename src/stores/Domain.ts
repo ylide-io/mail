@@ -118,11 +118,11 @@ export class Domain {
 			this.ylide.registerWalletFactory(evmWalletFactories.walletconnect);
 		} else {
 			this.ylide.add(evm);
-			const urlParams = new URLSearchParams(window.location.search);
-			const tvmEnabled = urlParams.get('tvmEnabled');
-			if (tvmEnabled === 'true') {
-				this.ylide.add(tvm);
-			}
+			// const urlParams = new URLSearchParams(window.location.search);
+			// const tvmEnabled = urlParams.get('tvmEnabled');
+			// if (tvmEnabled === 'true') {
+			this.ylide.add(tvm);
+			// }
 		}
 
 		window.addEventListener('keydown', e => {
