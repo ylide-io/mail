@@ -6,7 +6,7 @@ import { useMutation } from 'react-query';
 import AutoSizer from 'react-virtualized-auto-sizer';
 import { FixedSizeList as List } from 'react-window';
 
-import { FeedReason, FeedSource } from '../../../../api/feedServerApi';
+import { FeedReason, FeedReasonOrEmpty, FeedSource } from '../../../../api/feedServerApi';
 import { ActionButton, ActionButtonLook } from '../../../../components/ActionButton/ActionButton';
 import { Avatar } from '../../../../components/avatar/avatar';
 import { CheckBox } from '../../../../components/checkBox/checkBox';
@@ -18,15 +18,13 @@ import { toast } from '../../../../components/toast/toast';
 import { DASH } from '../../../../constants';
 import { ReactComponent as ContactSvg } from '../../../../icons/ic20/contact.svg';
 import { ReactComponent as SearchSvg } from '../../../../icons/ic28/search.svg';
-import { feedSettings } from '../../../../stores/FeedSettings';
+import { feedSettings, getReasonOrder } from '../../../../stores/FeedSettings';
 import { DomainAccount } from '../../../../stores/models/DomainAccount';
 import { toggleArrayItem } from '../../../../utils/array';
 import { invariant } from '../../../../utils/assert';
 import { reloadFeed } from '../../feedPage/feedPage';
 import { FeedLinkTypeIcon } from '../feedLinkTypeIcon/feedLinkTypeIcon';
 import css from './feedSettingsPopup.module.scss';
-
-type FeedReasonOrEmpty = FeedReason | '';
 
 export interface FeedSettingsPopupProps {
 	account: DomainAccount;
@@ -58,45 +56,39 @@ export const FeedSettingsPopup = observer(({ account, onClose }: FeedSettingsPop
 				(cryptoProjectId && config?.defaultProjects.find(p => p.projectId === cryptoProjectId)) || undefined;
 			const reasons = cryptoProject?.reasons || [''];
 			for (const reason of reasons) {
-				const list = (res[reason] = res[reason] || []);
-				list.push(s);
+				if (
+					reason === 'balance' ||
+					reason === 'protocol' ||
+					reason === '' ||
+					(reasons.length === 1 && reason === 'transaction')
+				) {
+					const list = (res[reason] = res[reason] || []);
+					list.push(s);
+				}
 			}
 			return res;
 		}, {} as Record<FeedReasonOrEmpty, FeedSource[]>);
 
-		const aggregated = (Object.keys(grouped) as FeedReasonOrEmpty[])
-			.sort((a: FeedReasonOrEmpty, b: FeedReasonOrEmpty) => {
-				const getOrder = (reason: FeedReasonOrEmpty) =>
-					reason
-						? {
-								[FeedReason.BALANCE]: 1,
-								[FeedReason.PROTOCOL]: 2,
-								[FeedReason.TRANSACTION]: 3,
-						  }[reason]
-						: 4;
-
-				return getOrder(a) - getOrder(b);
-			})
-			.reduce((res, reason) => {
-				const withoutProjects: FeedSource[] = [];
-				const withProjects: FeedSource[] = [];
-				for (const source of grouped[reason]) {
-					if (source.cryptoProject?.name) {
-						withProjects.push(source);
-					} else {
-						withoutProjects.push(source);
-					}
+		const aggregated = getReasonOrder(Object.keys(grouped) as FeedReasonOrEmpty[]).reduce((res, reason) => {
+			const withoutProjects: FeedSource[] = [];
+			const withProjects: FeedSource[] = [];
+			for (const source of grouped[reason]) {
+				if (source.cryptoProject?.name) {
+					withProjects.push(source);
+				} else {
+					withoutProjects.push(source);
 				}
-				return {
-					...res,
-					[reason]: sortBy(
-						withProjects
-							.sort((b, a) => b.cryptoProject!.name.localeCompare(a.cryptoProject!.name))
-							.concat(withoutProjects),
-						(s: FeedSource) => !selectedSourceIds.includes(s.id),
-					),
-				};
-			}, {} as Record<FeedReasonOrEmpty, FeedSource[]>);
+			}
+			return {
+				...res,
+				[reason]: sortBy(
+					withProjects
+						.sort((b, a) => b.cryptoProject!.name.localeCompare(a.cryptoProject!.name))
+						.concat(withoutProjects),
+					(s: FeedSource) => !selectedSourceIds.includes(s.id),
+				),
+			};
+		}, {} as Record<FeedReasonOrEmpty, FeedSource[]>);
 
 		return [aggregated, (Object.entries(aggregated) as [FeedReasonOrEmpty, FeedSource[]][]).flat(2)];
 		// do not include selectedSourceIds,

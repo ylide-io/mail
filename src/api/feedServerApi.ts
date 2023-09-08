@@ -16,6 +16,8 @@ export enum FeedReason {
 	TRANSACTION = 'transaction',
 }
 
+export type FeedReasonOrEmpty = FeedReason | '';
+
 export interface FeedSource {
 	id: string;
 	name: string;

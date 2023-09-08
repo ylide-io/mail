@@ -2,7 +2,7 @@ import difference from 'lodash.difference';
 import { autorun, makeObservable, observable } from 'mobx';
 
 import { FeedManagerApi } from '../api/feedManagerApi';
-import { FeedServerApi, FeedSource } from '../api/feedServerApi';
+import { FeedReason, FeedReasonOrEmpty, FeedServerApi, FeedSource } from '../api/feedServerApi';
 import { analytics } from './Analytics';
 import domain from './Domain';
 import { DomainAccount } from './models/DomainAccount';
@@ -141,6 +141,13 @@ const calculateCoverage = (data: FeedManagerApi.CoverageData[]) => {
 	return result;
 };
 
+export const getReasonOrder = (reasons: FeedReasonOrEmpty[]) =>
+	reasons.sort((a: FeedReasonOrEmpty, b: FeedReasonOrEmpty) => {
+		const getOrder = (reason: FeedReasonOrEmpty) =>
+			({ [FeedReason.BALANCE]: 1, [FeedReason.PROTOCOL]: 2, [FeedReason.TRANSACTION]: 3, '': 4 }[reason]);
+		return getOrder(a) - getOrder(b);
+	});
+
 export class FeedSettings {
 	@observable
 	isError = false;
@@ -190,7 +197,11 @@ export class FeedSettings {
 								mode: config.mode,
 								includedSourceIds: config.includedSourceIds,
 								excludedSourceIds: config.excludedSourceIds,
-								defaultProjects: defaultProjects,
+								defaultProjects: defaultProjects.map(p => {
+									// @ts-ignore
+									p.reasons = getReasonOrder(p.reasons);
+									return p;
+								}),
 							});
 						} else {
 							this.isError = true;
