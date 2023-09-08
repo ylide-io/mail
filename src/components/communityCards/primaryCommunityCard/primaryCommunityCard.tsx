@@ -92,6 +92,7 @@ export const PrimaryCommunityCard = observer(({ community }: PrimaryCommunityCar
 								horizontalAlign={HorizontalAlignment.END}
 								alignerOptions={{
 									fitLeftToViewport: true,
+									fitHeightToViewport: true,
 								}}
 								onCloseRequest={() => setAdminPopupOpen(false)}
 							>
