@@ -1,6 +1,8 @@
 import { observer } from 'mobx-react';
 import { useRef, useState } from 'react';
+import { useQuery } from 'react-query';
 
+import { BlockchainFeedApi } from '../../../api/blockchainFeedApi';
 import { ReactComponent as ClipboardSvg } from '../../../icons/ic20/clipboard.svg';
 import { ReactComponent as ContactSvg } from '../../../icons/ic20/contact.svg';
 import { ReactComponent as LinkSvg } from '../../../icons/ic20/link.svg';
@@ -26,7 +28,11 @@ export interface PrimaryCommunityCardProps {
 
 export const PrimaryCommunityCard = observer(({ community }: PrimaryCommunityCardProps) => {
 	const adminButtonRef = useRef(null);
-	const admins = ['dskfjgserut99ugf9s0h7g09dfsh9fsd8h998gsd09f8g', 'gjsdfjg'];
+
+	const adminsQuery = useQuery(['community', community.id, 'admins'], {
+		queryFn: () => BlockchainFeedApi.getAdmins(community.feedId.official || community.feedId.discussion!),
+	});
+	const admins = adminsQuery.data || [];
 	const [adminPopupOpen, setAdminPopupOpen] = useState(false);
 
 	const openMailCompose = useOpenMailCompose();

@@ -106,6 +106,10 @@ export namespace BlockchainFeedApi {
 		return await request<{ bannedPosts: string[] }>('/posts-status', { query: { id: params.ids } });
 	}
 
+	export async function getAdmins(feedId: string) {
+		return await request<string[]>('/admins', { query: { feedId } });
+	}
+
 	export async function isAdmin(feedId: string, address: string) {
 		return await request('/is-admin', { query: { feedId, address } });
 	}
