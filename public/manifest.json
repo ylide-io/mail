@@ -1,5 +1,5 @@
 {
-	"name": "MainView",
+	"name": "Mainview",
 	"start_url": "https://app.mainview.io/",
 	"display": "standalone",
 	"icons": [
