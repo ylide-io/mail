@@ -6,9 +6,9 @@ import { generatePath, Navigate, useParams } from 'react-router-dom';
 
 import {
 	BlockchainFeedApi,
-	communityAdmin,
 	decodeBlockchainFeedPost,
 	DecodedBlockchainFeedPost,
+	useCommunityAdminsQuery,
 } from '../../../api/blockchainFeedApi';
 import { ActionButton, ActionButtonLook, ActionButtonSize } from '../../../components/ActionButton/ActionButton';
 import { PrimaryCommunityCard } from '../../../components/communityCards/primaryCommunityCard/primaryCommunityCard';
@@ -41,9 +41,12 @@ const OfficialContent = observer(({ community, setTabsAsideContent }: OfficialCo
 	const feedId = community.feedId.official;
 	invariant(feedId, 'No official feed id');
 
-	const adminAccounts = getAllowedAccountsForBlockchains(community.allowedChains || []).filter(a =>
-		communityAdmin.isAdmin(feedId, a.account.address),
-	);
+	const adminAccountsQuery = useCommunityAdminsQuery(community);
+	const adminAccounts = adminAccountsQuery.data
+		? getAllowedAccountsForBlockchains(community.allowedChains || []).filter(a =>
+				adminAccountsQuery.data.includes(a.account.address),
+		  )
+		: [];
 	const isAdminFeedMode = useIsMatchesPattern(RoutePath.PROJECT_ID_OFFICIAL_ADMIN) && !!adminAccounts.length;
 
 	const postsQuery = useInfiniteQuery<DecodedBlockchainFeedPost[]>(['community', communityId, 'posts', 'official'], {

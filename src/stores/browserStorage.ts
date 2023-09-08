@@ -12,11 +12,11 @@ export enum BrowserStorageKey {
 	SAVED_ACCOUNTS = 'ylide_savedAccounts',
 	NOTIFICATIONS_ALERT = 'ylide_notificationsAlert',
 	REMOTE_CONSOLE = 'ylide_remoteConsole',
-	COMMUNITY_ADMIN = 'ylide_communityAdmin',
 
 	// LEGACY
 
 	IS_MAIN_VIEW_BANNER_HIDDEN = 'ylide_isMainViewBannerHidden',
+	COMMUNITY_ADMIN = 'ylide_communityAdmin',
 }
 
 export class BrowserStorage {
