@@ -118,6 +118,7 @@ export class Domain {
 			this.ylide.registerWalletFactory(evmWalletFactories.walletconnect);
 		} else {
 			this.ylide.add(evm);
+			this.ylide.registerWalletFactory(evmWalletFactories.walletconnect);
 			// const urlParams = new URLSearchParams(window.location.search);
 			// const tvmEnabled = urlParams.get('tvmEnabled');
 			// if (tvmEnabled === 'true') {
