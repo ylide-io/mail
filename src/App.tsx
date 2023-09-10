@@ -227,7 +227,7 @@ export const App = observer(() => {
 						{
 							[AppMode.HUB]: 'Ylide Social Hub: Web3 Community Chats Powered by Ylide Protocol',
 							[AppMode.OTC]: 'OTC Trading Powered by Ylide Protocol',
-							[AppMode.MAIN_VIEW]: 'MainView: Your Smart News Feed',
+							[AppMode.MAIN_VIEW]: 'Mainview: Your Smart News Feed',
 						}[REACT_APP__APP_MODE]
 					}
 				</title>
