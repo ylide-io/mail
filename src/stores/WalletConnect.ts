@@ -147,8 +147,9 @@ export class WalletConnectState {
 
 		const chains = Object.keys(rpcMap).map(Number);
 		let isAvailable = true;
+		const projectId = 'e9deead089b3383b2db777961e3fa244';
 		const wcTest = await EthereumProvider.init({
-			projectId: 'e9deead089b3383b2db777961e3fa244',
+			projectId,
 			chains,
 			// TODO: remove after fix by WalletConnect - https://github.com/WalletConnect/walletconnect-monorepo/issues/2641
 			// WalletConnect couldn't reproduce the issue, but we had it.
@@ -181,8 +182,7 @@ export class WalletConnectState {
 			await domain.extractWalletsData();
 		} else {
 			const wcReal = await EthereumProvider.init({
-				// TODO: change to Ylide project id
-				projectId: 'd6c2e9408725b77204b9e628d482e980',
+				projectId,
 				chains,
 				// TODO: remove after fix by WalletConnect - https://github.com/WalletConnect/walletconnect-monorepo/issues/2641
 				// WalletConnect couldn't reproduce the issue, but we had it.
