@@ -15,7 +15,7 @@ import { StaticComponentManager } from './components/staticComponentManager/stat
 import { ToastManager } from './components/toast/toast';
 import { TransactionPopup } from './components/TransactionPopup/TransactionPopup';
 import { YlideLoader } from './components/ylideLoader/ylideLoader';
-import { AppMode, REACT_APP__APP_MODE } from './env';
+import { AppMode, REACT_APP__APP_MODE, VAPID_PUBLIC_KEY } from './env';
 import { ReactComponent as CrossSvg } from './icons/ic20/cross.svg';
 import { AdminFeedPage } from './pages/AdminFeedPage';
 import { AdminPage } from './pages/AdminPage';
@@ -163,7 +163,7 @@ export const App = observer(() => {
 						.getRegistration()
 						.then(registration =>
 							registration?.pushManager.subscribe({
-								applicationServerKey: urlBase64ToUint8Array(process.env.VAPID_PUBLIC_KEY!),
+								applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY!),
 								userVisibleOnly: true,
 							}),
 						)
