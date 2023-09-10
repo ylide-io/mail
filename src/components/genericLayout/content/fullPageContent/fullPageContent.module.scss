@@ -1,5 +1,5 @@
 .root {
-	padding: 0 0 var(--generic-layout_spacing);
+	padding: 0 0 var(--generic-layout_inner-spacing);
 	height: 100%;
 
 	@include lessThan768w {

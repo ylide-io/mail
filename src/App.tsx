@@ -15,6 +15,8 @@ import { YlideLoader } from './components/ylideLoader/ylideLoader';
 import { AppMode, REACT_APP__APP_MODE } from './env';
 import { AdminFeedPage } from './pages/AdminFeedPage';
 import { AdminPage } from './pages/AdminPage';
+import { CommunityPage } from './pages/community/communityPage/communityPage';
+import { CommunityPostPage } from './pages/community/communityPostPage/communityPostPage';
 import { ExplorePage } from './pages/explore/explorePage';
 import { FeedPage } from './pages/feed/feedPage/feedPage';
 import { FeedPostPage } from './pages/feed/feedPostPage/feedPostPage';
@@ -27,8 +29,6 @@ import { OtcAssetsPage } from './pages/otc/OtcAssetsPage/OtcAssetsPage';
 import { OtcChatPage } from './pages/otc/OtcChatPage/OtcChatPage';
 import { OtcChatsPage } from './pages/otc/OtcChatsPage/OtcChatsPage';
 import { OtcWalletsPage } from './pages/otc/OtcWalletsPage/OtcWalletsPage';
-import { BlockchainProjectPage } from './pages/project/blockchainProjectPage/blockchainProjectPage';
-import { BlockchainProjectPostPage } from './pages/project/blockchainProjectPostPage/blockchainProjectPostPage';
 import { SettingsPage } from './pages/settings/settingsPage';
 import { TestPage } from './pages/test/testPage';
 import { WalletsPage } from './pages/wallets/walletsPage';
@@ -312,18 +312,18 @@ export const App = observer(() => {
 							to: generatePath(RoutePath.ROOT),
 						})}
 
-						<Route path={RoutePath.PROJECT_ID} element={<BlockchainProjectPage />} />
-						<Route path={RoutePath.PROJECT_ID_OFFICIAL} element={<BlockchainProjectPage />} />
-						<Route path={RoutePath.PROJECT_ID_OFFICIAL_POST_ID} element={<BlockchainProjectPage />} />
+						<Route path={RoutePath.PROJECT_ID} element={<CommunityPage />} />
+						<Route path={RoutePath.PROJECT_ID_OFFICIAL} element={<CommunityPage />} />
+						<Route path={RoutePath.PROJECT_ID_OFFICIAL_POST_ID} element={<CommunityPage />} />
 						<Route
 							path={RoutePath.PROJECT_ID_OFFICIAL_ADMIN}
-							element={<BlockchainProjectPostPage isOfficial={true} />}
+							element={<CommunityPostPage isOfficial={true} />}
 						/>
-						<Route path={RoutePath.PROJECT_ID_DISCUSSION} element={<BlockchainProjectPage />} />
-						<Route path={RoutePath.PROJECT_ID_DISCUSSION_ADMIN} element={<BlockchainProjectPage />} />
+						<Route path={RoutePath.PROJECT_ID_DISCUSSION} element={<CommunityPage />} />
+						<Route path={RoutePath.PROJECT_ID_DISCUSSION_ADMIN} element={<CommunityPage />} />
 						<Route
 							path={RoutePath.PROJECT_ID_DISCUSSION_POST_ID}
-							element={<BlockchainProjectPostPage isOfficial={false} />}
+							element={<CommunityPostPage isOfficial={false} />}
 						/>
 
 						{/* MAIL */}

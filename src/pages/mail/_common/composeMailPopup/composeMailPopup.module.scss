@@ -10,11 +10,13 @@
 	max-height: 100%;
 	background: var(--surface-color);
 	border-radius: 10px 10px 0 0;
-	box-shadow: 4px 4px 24px rgba(var(--accent2-rgb-color), 0.4), -16px -8px 64px rgba(var(--accent-rgb-color), 0.25);
+	box-shadow:
+		4px 4px 24px rgba(var(--accent2-rgb-color), 0.4),
+		-16px -8px 64px rgba(var(--accent-rgb-color), 0.25);
 	opacity: 0;
 	transition: all 200ms;
 
-	@include less720px {
+	@include lessThan640w {
 		right: 0;
 		width: 100%;
 		border-radius: 0;
@@ -25,7 +27,7 @@
 	opacity: 1;
 	height: 520px;
 
-	@include less720px {
+	@include lessThan640w {
 		height: 100%;
 	}
 }
@@ -39,7 +41,7 @@
 	background: var(--secondary-surface-color);
 	border-radius: 10px 10px 0 0;
 
-	@include less720px {
+	@include lessThan640w {
 		border-radius: 0;
 	}
 }

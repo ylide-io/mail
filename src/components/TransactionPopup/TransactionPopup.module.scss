@@ -6,7 +6,7 @@
 	top: 70px;
 	z-index: 10;
 
-	@include less480px {
+	@include lessThan480w {
 		position: sticky;
 		top: 10px;
 		margin-top: 10px;

@@ -2,7 +2,7 @@
 	width: 80vw;
 	height: 90vh;
 
-	@include lessThan1366x768 {
+	@include lessThan1440x900 {
 		width: 95vw;
 		height: 95vh;
 	}

@@ -22,7 +22,7 @@
 		border-top: 1px solid var(--border-color);
 	}
 
-	@include less480px {
+	@include lessThan480w {
 		padding: 12px;
 		grid-gap: 12px;
 	}
@@ -39,7 +39,7 @@
 	position: relative;
 	width: 48px;
 
-	@include less480px {
+	@include lessThan480w {
 		width: 32px;
 	}
 }
@@ -88,7 +88,7 @@
 	justify-content: center;
 	padding: 20px 0;
 
-	@include less480px {
+	@include lessThan480w {
 		padding: 12px 0;
 	}
 }

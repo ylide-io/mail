@@ -259,7 +259,7 @@
 	}
 }
 
-@include less720px {
+@include lessThan768w {
 	.ava {
 		grid-row: 1/2;
 	}

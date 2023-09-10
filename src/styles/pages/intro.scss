@@ -76,7 +76,7 @@
 		margin-left: 20px;
 		margin-right: 20px;
 
-		@include less480px {
+		@include lessThan480w {
 			width: 180px;
 
 			margin-left: 6px;

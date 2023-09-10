@@ -7,7 +7,7 @@
 .headerTitle {
 	font-size: 32px;
 
-	@include less720px {
+	@include lessThan768w {
 		font-size: 28px;
 	}
 }

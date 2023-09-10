@@ -1,0 +1,146 @@
+.root {
+	background: var(--surface-color);
+	border-radius: 16px;
+
+	@include lessThan768w {
+		margin: calc(-1 * var(--generic-layout_inner-spacing)) calc(-1 * var(--generic-layout_outer-padding)) 0;
+		border-radius: 0;
+	}
+}
+
+.banner {
+	border-top-left-radius: 16px;
+	border-top-right-radius: 16px;
+
+	@include lessThan768w {
+		border-radius: 0;
+	}
+}
+
+.body {
+	display: grid;
+	grid-template-columns: 64px 1fr;
+	grid-gap: 16px;
+	padding: 20px;
+
+	@include lessThan640w {
+		grid-gap: 8px;
+		padding: 20px 12px;
+	}
+}
+
+.name {
+	font-size: 20px;
+	font-weight: $font-weight_semi-bold;
+}
+
+.description {
+	margin: 8px 0 0;
+}
+
+.meta {
+	display: grid;
+	grid-auto-flow: column;
+	grid-gap: 8px;
+	align-items: center;
+	justify-content: space-between;
+	margin: 12px 0 0;
+
+	@include lessThan(920px) {
+		grid-auto-flow: row;
+		justify-items: start;
+	}
+}
+
+.metaLeft {
+	display: grid;
+	grid-auto-flow: column;
+	grid-gap: 32px;
+	align-items: center;
+
+	@include lessThan768w {
+		grid-auto-flow: row;
+		grid-gap: 8px;
+		justify-items: start;
+	}
+}
+
+.tags {
+	display: grid;
+	grid-auto-flow: column;
+	grid-gap: 8px;
+}
+
+.tag {
+	display: grid;
+	grid-auto-flow: column;
+	grid-gap: 4px;
+	align-items: center;
+	padding: 0 8px 0 4px;
+	height: $interactive-elem-size_xsmall;
+	font-size: 10px;
+	font-weight: $font-weight_medium;
+	text-transform: uppercase;
+	background: var(--secondary-surface-color);
+	border-radius: 6px;
+}
+
+.website {
+	@include expand-click-area;
+	display: grid;
+	grid-auto-flow: column;
+	grid-gap: 4px;
+	align-items: center;
+	justify-content: center;
+
+	&:hover {
+		text-decoration: underline;
+	}
+
+	> svg {
+		color: var(--text-color);
+	}
+}
+
+//
+
+$adminPopupPadding: 20px;
+
+.adminPopup {
+	display: flex;
+	position: fixed;
+	padding: 4px 0;
+	max-width: 320px;
+}
+
+.adminInner {
+	display: grid;
+	grid-gap: 16px;
+	padding: $adminPopupPadding;
+	background: var(--surface-color);
+	border-radius: 16px;
+	box-shadow: var(--popup-shadow);
+}
+
+.adminItems {
+	display: grid;
+	grid-gap: 8px;
+	margin: 0 (-$adminPopupPadding) (-$adminPopupPadding);
+	padding: 0 $adminPopupPadding $adminPopupPadding;
+	max-height: 200px;
+	overflow: auto;
+}
+
+.adminItem {
+	display: flex;
+	align-items: center;
+	min-width: 0;
+
+	> :not(:last-child) {
+		margin: 0 8px 0 0;
+	}
+}
+
+.adminAddress {
+	flex: 1;
+}

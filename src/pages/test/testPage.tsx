@@ -48,19 +48,25 @@ export const TestPage = observer(() => {
 			<Row>
 				look
 				<ActionButton look={ActionButtonLook.DEFAULT} icon={<SettingsSvg />}>
-					Default
+					DEFAULT
 				</ActionButton>
 				<ActionButton look={ActionButtonLook.PRIMARY} icon={<SettingsSvg />}>
-					Primary
+					PRIMARY
 				</ActionButton>
 				<ActionButton look={ActionButtonLook.SECONDARY} icon={<SettingsSvg />}>
-					Secondary
-				</ActionButton>
-				<ActionButton look={ActionButtonLook.LITE} icon={<SettingsSvg />}>
-					Lite
+					SECONDARY
 				</ActionButton>
 				<ActionButton look={ActionButtonLook.DANGEROUS} icon={<SettingsSvg />}>
-					Dangerous
+					DANGEROUS
+				</ActionButton>
+				<ActionButton look={ActionButtonLook.LITE} icon={<SettingsSvg />}>
+					LITE
+				</ActionButton>
+				<ActionButton look={ActionButtonLook.SUBTILE} icon={<SettingsSvg />}>
+					SUBTILE
+				</ActionButton>
+				<ActionButton look={ActionButtonLook.HEAVY} icon={<SettingsSvg />}>
+					HEAVY
 				</ActionButton>
 			</Row>
 

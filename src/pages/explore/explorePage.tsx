@@ -1,22 +1,17 @@
 import { ActionButton, ActionButtonLook, ActionButtonSize } from '../../components/ActionButton/ActionButton';
-import { RegularProjectCard } from '../../components/blockchainProjectCards/regularProjectCard/regularProjectCard';
-import { RichProjectCard } from '../../components/blockchainProjectCards/richProjectCard/richProjectCard';
+import { RegularCommunityCard } from '../../components/communityCards/regularCommunityCard/regularCommunityCard';
+import { RichCommunityCard } from '../../components/communityCards/richCommunityCard/richCommunityCard';
 import { RegularPageContent } from '../../components/genericLayout/content/regularPageContent/regularPageContent';
 import { GenericLayout } from '../../components/genericLayout/genericLayout';
 import { PageMeta } from '../../components/pageMeta/pageMeta';
 import { ReactComponent as TagSvg } from '../../icons/ic28/tag.svg';
-import {
-	BlockchainProjectId,
-	blockchainProjects,
-	BlockchainProjectTag,
-	getBlockchainProjectById,
-} from '../../stores/blockchainProjects/blockchainProjects';
+import { communities, CommunityId, CommunityTag, getCommunityById } from '../../stores/communities/communities';
 import { openCreateCommunityForm } from '../../utils/misc';
 import bannerSrc from './banner.png';
 import css from './explorePage.module.scss';
 
 export function ExplorePage() {
-	function renderTagBlock(tag: BlockchainProjectTag) {
+	function renderTagBlock(tag: CommunityTag) {
 		return (
 			<div>
 				<div className={css.tagTitle}>
@@ -28,10 +23,10 @@ export function ExplorePage() {
 				</div>
 
 				<div className={css.smallGrid}>
-					{blockchainProjects
+					{communities
 						.filter(p => p.tags?.includes(tag))
-						.map(project => (
-							<RegularProjectCard project={project} />
+						.map(community => (
+							<RegularCommunityCard community={community} />
 						))}
 				</div>
 			</div>
@@ -53,20 +48,21 @@ export function ExplorePage() {
 					</h1>
 
 					<div className={css.bigGrid}>
-						<RichProjectCard project={getBlockchainProjectById(BlockchainProjectId.GENERAL)} />
-						<RichProjectCard project={getBlockchainProjectById(BlockchainProjectId.YLIDE)} />
-						<RichProjectCard project={getBlockchainProjectById(BlockchainProjectId.VENOM_BLOCKCHAIN)} />
-						<RichProjectCard project={getBlockchainProjectById(BlockchainProjectId.ETH_WHALES)} />
+						<RichCommunityCard community={getCommunityById(CommunityId.GENERAL)} />
+						<RichCommunityCard community={getCommunityById(CommunityId.YLIDE)} />
+						<RichCommunityCard community={getCommunityById(CommunityId.VENOM_BLOCKCHAIN)} />
+						<RichCommunityCard community={getCommunityById(CommunityId.ETH_WHALES)} />
 					</div>
 
-					{renderTagBlock(BlockchainProjectTag.DEFI)}
-					{renderTagBlock(BlockchainProjectTag.NFT)}
-					{renderTagBlock(BlockchainProjectTag.VENOM)}
-					{renderTagBlock(BlockchainProjectTag.TVM)}
-					{renderTagBlock(BlockchainProjectTag.SOCIAL)}
-					{renderTagBlock(BlockchainProjectTag.ECOSYSTEM)}
-					{renderTagBlock(BlockchainProjectTag.GAMING)}
-					{renderTagBlock(BlockchainProjectTag.DEVELOPER_TOOLS)}
+					{renderTagBlock(CommunityTag.DEFI)}
+					{renderTagBlock(CommunityTag.NFT)}
+					{renderTagBlock(CommunityTag.VENOM)}
+					{renderTagBlock(CommunityTag.TVM)}
+					{renderTagBlock(CommunityTag.AURORA_ECOSYSTEM)}
+					{renderTagBlock(CommunityTag.SOCIAL)}
+					{renderTagBlock(CommunityTag.ECOSYSTEM)}
+					{renderTagBlock(CommunityTag.GAMING)}
+					{renderTagBlock(CommunityTag.DEVELOPER_TOOLS)}
 
 					<div className={css.footer}>
 						<ActionButton
