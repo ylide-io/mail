@@ -136,6 +136,16 @@ export namespace FeedServerApi {
 		return await request(`/posts/${id}`);
 	}
 
+	export async function subscribe(subscription: PushSubscription) {
+		return await request('/save-subscription', {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json',
+			},
+			body: JSON.stringify(subscription),
+		});
+	}
+
 	//
 
 	export type GetSourcesResponse = { sources: FeedSource[] };
