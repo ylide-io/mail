@@ -262,16 +262,18 @@ export class Domain {
 					domain.isTxPublishing = false;
 				} else {
 					domain.isTxPublishing = false;
-					console.log('Something went wrong with key publishing :(\n\n' + JSON.stringify(result, null, '\t'));
+					console.error(
+						'Something went wrong with key publishing :(\n\n' + JSON.stringify(result, null, '\t'),
+					);
 				}
 			} catch (err: any) {
-				console.log(`Something went wrong with key publishing: ${err.message}`, err.stack);
+				console.error(`Something went wrong with key publishing: ${err.message}`, err.stack);
 				toast('Something went wrong with key publishing :( Please, try again');
 				domain.isTxPublishing = false;
 				domain.txPlateVisible = false;
 			}
 		} catch (err) {
-			console.log('faucet publication error: ', err);
+			console.error('faucet publication error: ', err);
 			domain.isTxPublishing = false;
 			domain.txPlateVisible = false;
 		}
@@ -360,7 +362,7 @@ export class Domain {
 				});
 			}
 		} catch (error) {
-			console.log('error: ', error);
+			console.error('error: ', error);
 		}
 		try {
 			if (this.walletConnectState.connection) {
@@ -398,7 +400,7 @@ export class Domain {
 			}
 		}
 		const somethingWentWrongTimer = setTimeout(() => {
-			console.log(`Something went wrong with ${factory.wallet} wallet`);
+			console.error(`Something went wrong with ${factory.wallet} wallet`);
 		}, 10000);
 		this.walletControllers[factory.blockchainGroup] = {
 			...(this.walletControllers[factory.blockchainGroup] || {}),

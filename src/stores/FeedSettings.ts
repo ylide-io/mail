@@ -58,7 +58,7 @@ export class FeedSettings {
 							});
 						} else {
 							this.isError = true;
-							console.log(`Failed to get config - ${configResponse.reason}`);
+							console.error(`Failed to get config - ${configResponse.reason}`);
 						}
 						if (coverageResponse.status === 'fulfilled') {
 							const coverage = coverageResponse.value;
@@ -69,7 +69,7 @@ export class FeedSettings {
 							this.coverages.set(account, { ...coverage, totalCoverage });
 						} else {
 							this.coverages.set(account, 'error');
-							console.log(`Failed to get coverage - ${coverageResponse.reason}`);
+							console.error(`Failed to get coverage - ${coverageResponse.reason}`);
 						}
 					} catch (e) {
 						this.isError = true;
@@ -82,7 +82,7 @@ export class FeedSettings {
 				this.tags = r;
 			})
 			.catch(e => {
-				console.log(`Error fetching tags - ${e}`);
+				console.error(`Error fetching tags - ${e}`);
 			});
 
 		FeedServerApi.getSources()

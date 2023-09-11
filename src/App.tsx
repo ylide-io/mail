@@ -153,7 +153,7 @@ export const App = observer(() => {
 					}`;
 
 					setInitErrorId(errorId);
-					console.log(msg);
+					console.error(msg);
 					throw new Error(msg);
 				})
 				.finally(() => console.debug(`Initialization took ${Date.now() - start}ms`));
