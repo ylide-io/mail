@@ -37,6 +37,8 @@ import { walletsMeta } from '../utils/wallet';
 import { Accounts } from './Accounts';
 import contacts from './Contacts';
 import { EverwalletProxy } from './EverwalletProxy';
+import { feedSettings } from './FeedSettings';
+import { mailStore } from './MailList';
 import { DomainAccount } from './models/DomainAccount';
 import { Wallet } from './models/Wallet';
 import { OTCStore } from './OTC';
@@ -569,6 +571,10 @@ export class Domain {
 		tick('contacts.init();');
 		await tags.getTags();
 		tick('tags.getTags();');
+		await mailStore.init();
+		tick('mailStore.init();');
+		await feedSettings.init();
+		tick('feedSettings.init();');
 		this.initialized = true;
 
 		// hacks for VenomWallet again :(

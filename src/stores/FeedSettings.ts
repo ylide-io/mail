@@ -33,19 +33,9 @@ export class FeedSettings {
 
 	constructor() {
 		makeObservable(this);
+	}
 
-		FeedManagerApi.getTags()
-			.then(r => {
-				this.tags = r;
-			})
-			.catch(e => {
-				console.log(`Error fetching tags - ${e}`);
-			});
-
-		FeedServerApi.getSources()
-			.then(({ sources }) => (this.sources = sources))
-			.catch(() => (this.isError = true));
-
+	async init() {
 		autorun(() => {
 			domain.accounts.activeAccounts
 				.filter(account => account.mainViewKey && !this.configs.has(account))
@@ -86,6 +76,18 @@ export class FeedSettings {
 					}
 				});
 		});
+
+		FeedManagerApi.getTags()
+			.then(r => {
+				this.tags = r;
+			})
+			.catch(e => {
+				console.log(`Error fetching tags - ${e}`);
+			});
+
+		FeedServerApi.getSources()
+			.then(({ sources }) => (this.sources = sources))
+			.catch(() => (this.isError = true));
 	}
 
 	getAccountConfig(account: DomainAccount): FeedSettingsData | undefined {

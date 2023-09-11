@@ -378,17 +378,17 @@ class MailStore {
 
 	constructor() {
 		makeAutoObservable(this);
+	}
 
+	async init() {
 		// Reset when account list changes
 		reaction(
 			() => domain.accounts.activeAccounts,
 			() => (this.lastMessagesList = []),
 		);
 
-		this.init();
-	}
+		//
 
-	async init() {
 		const dbDecodedMessages = await messagesDB.retrieveAllDecodedMessages();
 		this.decodedMessagesById = dbDecodedMessages.reduce(
 			(p, c) => ({
