@@ -545,37 +545,39 @@ export class Domain {
 	}
 
 	async init() {
-		if (this.initialized) {
-			return;
-		}
+		if (this.initialized) return;
+
 		let last = Date.now();
 		const tick = (t: string) => {
 			const now = Date.now();
-			console.debug(t, now - last + 'ms');
+			console.debug('DOMAIN INIT', t, now - last + 'ms');
 			last = now;
 		};
+
 		await ensurePageLoaded;
 		tick('ensurePageLoaded');
 		console.log('window.__hasEverscaleProvider: ', window.__hasEverscaleProvider);
+
 		await this.reloadAvailableWallets();
 		tick('this.reloadAvailableWallets();');
+
 		await this.walletConnectState.init();
 		tick('this.initWalletConnect();');
+
 		await this.extractWalletsData();
 		tick('this.extractWalletsData();');
+
 		await this.keysRegistry.init();
 		tick('this.keysRegistry.init();');
+
 		await this.accounts.init();
 		tick('this.accounts.init();');
-		await contacts.init();
-		tick('contacts.init();');
-		await tags.getTags();
-		tick('tags.getTags();');
-		await mailStore.init();
-		tick('mailStore.init();');
-		await feedSettings.init();
-		tick('feedSettings.init();');
-		this.initialized = true;
+
+		contacts.init();
+		tags.init();
+		mailStore.init();
+		feedSettings.init();
+		tick('rest ...');
 
 		// hacks for VenomWallet again :(
 		// let scTimes = 0;
@@ -592,6 +594,8 @@ export class Domain {
 		// };
 
 		// schedule();
+
+		this.initialized = true;
 	}
 }
 

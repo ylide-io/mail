@@ -12,16 +12,10 @@ class Tags {
 		makeAutoObservable(this);
 	}
 
-	async getTags(): Promise<ITag[]> {
-		if (!this.tags.length) {
-			await this.retrieveTags();
-		}
-		return this.tags;
-	}
-
-	async retrieveTags(): Promise<void> {
-		const dbTags = await tagsDB.retrieveAllTags();
-		this.tags = dbTags.reverse();
+	init() {
+		tagsDB.retrieveAllTags().then(res => {
+			this.tags = res.reverse();
+		});
 	}
 
 	async saveTag(tag: ITag): Promise<void> {

@@ -1,5 +1,4 @@
 import { observer } from 'mobx-react';
-import { useEffect } from 'react';
 
 import { ActionButton, ActionButtonLook, ActionButtonSize } from '../../../components/ActionButton/ActionButton';
 import { ReactComponent as PlusSvg } from '../../../icons/ic20/plus.svg';
@@ -8,10 +7,6 @@ import { ContactsLayout, ContactsTab } from './contactsLayout/contactsLayout';
 import TagListItem from './tagListItem/tagListItem';
 
 export const ContactTagsPage = observer(() => {
-	useEffect(() => {
-		tags.retrieveTags();
-	}, []);
-
 	return (
 		<ContactsLayout
 			activeTab={ContactsTab.TAGS}

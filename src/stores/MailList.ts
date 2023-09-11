@@ -380,33 +380,30 @@ class MailStore {
 		makeAutoObservable(this);
 	}
 
-	async init() {
+	init() {
 		// Reset when account list changes
 		reaction(
 			() => domain.accounts.activeAccounts,
 			() => (this.lastMessagesList = []),
 		);
 
-		//
+		messagesDB.retrieveAllDecodedMessages().then(dbDecodedMessages => {
+			this.decodedMessagesById = dbDecodedMessages.reduce(
+				(p, c) => ({
+					...p,
+					[c.msgId]: MessagesDB.deserializeMessageDecodedContent(c),
+				}),
+				{},
+			);
+		});
 
-		const dbDecodedMessages = await messagesDB.retrieveAllDecodedMessages();
-		this.decodedMessagesById = dbDecodedMessages.reduce(
-			(p, c) => ({
-				...p,
-				[c.msgId]: MessagesDB.deserializeMessageDecodedContent(c),
-			}),
-			{},
-		);
+		messagesDB.getReadMessages().then(dbReadMessage => {
+			this.readMessageIds = new Set(dbReadMessage);
+		});
 
-		//
-
-		const dbReadMessage = await messagesDB.getReadMessages();
-		this.readMessageIds = new Set(dbReadMessage);
-
-		//
-
-		const dbDeletedMessages = await messagesDB.retrieveAllDeletedMessages();
-		this.deletedMessageIds = new Set(dbDeletedMessages);
+		messagesDB.retrieveAllDeletedMessages().then(dbDeletedMessages => {
+			this.deletedMessageIds = new Set(dbDeletedMessages);
+		});
 	}
 
 	async decodeMessage(msgId: string, msg: IMessage, recipient?: WalletAccount) {

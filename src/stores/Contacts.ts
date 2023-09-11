@@ -7,8 +7,6 @@ import { invariant } from '../utils/assert';
 import { formatAddress } from '../utils/blockchain';
 
 class Contacts {
-	loading = false;
-	loaded = false;
 	contacts: IContact[] = [];
 
 	newContact: IContact | null = null;
@@ -19,20 +17,10 @@ class Contacts {
 		makeAutoObservable(this);
 	}
 
-	async init() {
-		try {
-			this.loading = true;
-			await this.retrieveContacts();
-			this.loaded = true;
-		} finally {
-			this.loading = false;
-		}
-	}
-
-	async retrieveContacts(): Promise<void> {
-		const dbContacts = await contactsDB.retrieveAllContacts();
-
-		this.contacts = dbContacts.reverse();
+	init() {
+		contactsDB.retrieveAllContacts().then(res => {
+			this.contacts = res.reverse();
+		});
 	}
 
 	async createContact(contact: IContact): Promise<void> {
