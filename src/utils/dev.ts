@@ -4,18 +4,17 @@ import { nanoid } from 'nanoid';
 
 import { BrowserStorage, BrowserStorageKey } from '../stores/browserStorage';
 
-let lastTime = 0;
+const lastTimeDb: Record<string, number | undefined> = {};
 
-export function timePoint(data?: unknown) {
-	const now = Date.now();
+export function timePoint(params: { key: string }) {
+	return (message?: unknown) => {
+		const now = Date.now();
+		const lastTime = lastTimeDb[params.key] || 0;
 
-	if (lastTime) {
-		console.log(`@ ${now - lastTime}ms`, data);
-	} else {
-		console.log(`@ start`, data);
-	}
+		lastTimeDb[params.key] = now;
 
-	lastTime = now;
+		console.debug(lastTime ? `@ ${params.key}: ${now - lastTime}ms` : `@ ${params.key}: start`, message);
+	};
 }
 
 //

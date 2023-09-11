@@ -32,6 +32,7 @@ import { SwitchModal, SwitchModalMode } from '../components/switchModal/switchMo
 import { toast } from '../components/toast/toast';
 import { AppMode, REACT_APP__APP_MODE } from '../env';
 import { blockchainMeta } from '../utils/blockchain';
+import { timePoint } from '../utils/dev';
 import { ensurePageLoaded } from '../utils/ensurePageLoaded';
 import { walletsMeta } from '../utils/wallet';
 import { Accounts } from './Accounts';
@@ -448,12 +449,7 @@ export class Domain {
 	}
 
 	async extractWalletsData() {
-		let last = Date.now();
-		const tick = (t: string) => {
-			const now = Date.now();
-			console.debug(t, now - last + 'ms');
-			last = now;
-		};
+		const tick = timePoint({ key: 'extractWalletsData' });
 
 		this.registeredWallets = this.ylide.walletsList.map(w => w.factory);
 		this.registeredBlockchains = this.ylide.blockchainsList.map(b => b.factory);
@@ -547,16 +543,11 @@ export class Domain {
 	async init() {
 		if (this.initialized) return;
 
-		let last = Date.now();
-		const tick = (t: string) => {
-			const now = Date.now();
-			console.debug('DOMAIN INIT', t, now - last + 'ms');
-			last = now;
-		};
+		const tick = timePoint({ key: 'DOMAIN INIT' });
 
 		await ensurePageLoaded;
 		tick('ensurePageLoaded');
-		console.log('window.__hasEverscaleProvider: ', window.__hasEverscaleProvider);
+		console.debug('window.__hasEverscaleProvider: ', window.__hasEverscaleProvider);
 
 		await this.reloadAvailableWallets();
 		tick('this.reloadAvailableWallets();');
