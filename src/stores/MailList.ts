@@ -2,7 +2,6 @@ import { EVMBlockchainController } from '@ylide/ethereum';
 import { TVMBlockchainController } from '@ylide/everscale';
 import {
 	AbstractBlockchainController,
-	asyncDelay,
 	BlockchainSourceType,
 	IBlockchainSourceSubject,
 	IMessage,
@@ -53,8 +52,6 @@ export function getFolderName(folderId: FolderId) {
 }
 
 //
-
-// const MailPageSize = 10;
 
 const FILTERED_OUT = {};
 
@@ -165,9 +162,6 @@ export class MailList<M = ILinkedMessage> {
 		mailbox?: { accounts: DomainAccount[]; folderId: FolderId; sender?: string; filter?: (id: string) => boolean };
 		venomFeed?: boolean;
 	}) {
-		// hotfix https://trello.com/c/sEtvpbrG
-		await asyncDelay(100);
-
 		const { messagesFilter, messageHandler, mailbox, venomFeed } = props;
 
 		this.messagesFilter = messagesFilter;
