@@ -59,6 +59,7 @@
 		"@types/lodash.difference": "^4.5.7",
 		"@types/lodash.sortby": "^4.7.7",
 		"@types/react-helmet": "^6.1.6",
+		"@types/ws": "^8.5.5",
 		"@walletconnect/browser-utils": "1.8.0",
 		"@walletconnect/ethereum-provider": "2.8.6",
 		"@walletconnect/modal": "2.5.9",
@@ -108,7 +109,8 @@
 		"workbox-range-requests": "^6.6.0",
 		"workbox-routing": "^6.6.0",
 		"workbox-strategies": "^6.6.0",
-		"workbox-streams": "^6.6.0"
+		"workbox-streams": "^6.6.0",
+		"ws": "^8.14.1"
 	},
 	"devDependencies": {
 		"@types/editorjs__header": "2.6.0",
