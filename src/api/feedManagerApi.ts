@@ -210,6 +210,10 @@ export namespace FeedManagerApi {
 		return await request<TagsResponse>('/tags');
 	}
 
+	export async function subscribe(token: string, subscription: PushSubscription | null) {
+		return await request('/save-subscription', undefined, { token, subscription });
+	}
+
 	//
 
 	export interface UserProject {

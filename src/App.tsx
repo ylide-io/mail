@@ -5,7 +5,6 @@ import { Helmet } from 'react-helmet';
 import { QueryClient, QueryClientProvider } from 'react-query';
 import { generatePath, Navigate, Route, Routes, useLocation, useSearchParams } from 'react-router-dom';
 
-import { FeedServerApi } from './api/feedServerApi';
 import { ActionButton, ActionButtonLook, ActionButtonSize } from './components/ActionButton/ActionButton';
 import { Faq } from './components/faq/faq';
 import { MainviewLoader } from './components/mainviewLoader/mainviewLoader';
@@ -15,7 +14,7 @@ import { StaticComponentManager } from './components/staticComponentManager/stat
 import { ToastManager } from './components/toast/toast';
 import { TransactionPopup } from './components/TransactionPopup/TransactionPopup';
 import { YlideLoader } from './components/ylideLoader/ylideLoader';
-import { AppMode, REACT_APP__APP_MODE, VAPID_PUBLIC_KEY } from './env';
+import { AppMode, REACT_APP__APP_MODE } from './env';
 import { ReactComponent as CrossSvg } from './icons/ic20/cross.svg';
 import { AdminFeedPage } from './pages/AdminFeedPage';
 import { AdminPage } from './pages/AdminPage';
@@ -140,38 +139,6 @@ export const App = observer(() => {
 	useEffect(() => {
 		analytics.pageView(location.pathname);
 	}, [location.pathname]);
-
-	function urlBase64ToUint8Array(base64String: string) {
-		const padding = '='.repeat((4 - (base64String.length % 4)) % 4);
-		const base64 = (base64String + padding).replace(/\-/g, '+').replace(/_/g, '/');
-		const rawData = atob(base64);
-		const outputArray = new Uint8Array(rawData.length);
-		for (let i = 0; i < rawData.length; ++i) {
-			outputArray[i] = rawData.charCodeAt(i);
-		}
-		return outputArray;
-	}
-
-	useEffect(() => {
-		const urlParams = new URLSearchParams(window.location.search);
-		const pwaEnabled = urlParams.get('pwaEnabled');
-		if (pwaEnabled === 'true') {
-			console.log('Request notification permission');
-			Notification.requestPermission().then(result => {
-				if (result === 'granted') {
-					navigator.serviceWorker
-						.getRegistration()
-						.then(registration =>
-							registration?.pushManager.subscribe({
-								applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY!),
-								userVisibleOnly: true,
-							}),
-						)
-						.then(subscription => subscription && FeedServerApi.subscribe(subscription));
-				}
-			});
-		}
-	}, []);
 
 	if (initErrorId) {
 		return (

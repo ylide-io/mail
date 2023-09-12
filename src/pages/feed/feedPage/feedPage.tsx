@@ -10,7 +10,7 @@ import { CoverageModal } from '../../../components/coverageModal/coverageModal';
 import { ErrorMessage, ErrorMessageLook } from '../../../components/errorMessage/errorMessage';
 import { NarrowContent } from '../../../components/genericLayout/content/narrowContent/narrowContent';
 import { GenericLayout, useGenericLayoutApi } from '../../../components/genericLayout/genericLayout';
-import { AppMode, REACT_APP__APP_MODE } from '../../../env';
+import { AppMode, REACT_APP__APP_MODE, VAPID_PUBLIC_KEY } from '../../../env';
 import { ReactComponent as ArrowUpSvg } from '../../../icons/ic20/arrowUp.svg';
 import { ReactComponent as CrossSvg } from '../../../icons/ic20/cross.svg';
 import domain from '../../../stores/Domain';
@@ -24,6 +24,7 @@ import { useNav } from '../../../utils/url';
 import { FeedPostItem } from '../_common/feedPostItem/feedPostItem';
 import css from './feedPage.module.scss';
 import ErrorCode = FeedServerApi.ErrorCode;
+import { FeedManagerApi } from '../../../api/feedManagerApi';
 import { SimpleLoader } from '../../../components/simpleLoader/simpleLoader';
 import { analytics } from '../../../stores/Analytics';
 
@@ -57,6 +58,42 @@ const FeedPageContent = observer(() => {
 		}
 		return coverage.totalCoverage;
 	}, [coverage]);
+
+	function urlBase64ToUint8Array(base64String: string) {
+		const padding = '='.repeat((4 - (base64String.length % 4)) % 4);
+		const base64 = (base64String + padding).replace(/\-/g, '+').replace(/_/g, '/');
+		const rawData = atob(base64);
+		const outputArray = new Uint8Array(rawData.length);
+		for (let i = 0; i < rawData.length; ++i) {
+			outputArray[i] = rawData.charCodeAt(i);
+		}
+		return outputArray;
+	}
+
+	useEffect(() => {
+		const urlParams = new URLSearchParams(window.location.search);
+		const pwaEnabled = urlParams.get('pwaEnabled');
+		if (pwaEnabled === 'true') {
+			console.log('Request notification permission');
+			Notification.requestPermission().then(result => {
+				if (result === 'granted') {
+					navigator.serviceWorker
+						.getRegistration()
+						.then(registration =>
+							registration?.pushManager.subscribe({
+								applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY!),
+								userVisibleOnly: true,
+							}),
+						)
+						.then(
+							subscription =>
+								subscription &&
+								Promise.all(accounts.map(a => FeedManagerApi.subscribe(a.mainViewKey, subscription))),
+						);
+				}
+			});
+		}
+	}, [accounts]);
 
 	useEffect(() => {
 		if (address && !selectedAccounts.length) {
