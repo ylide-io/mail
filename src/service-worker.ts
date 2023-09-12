@@ -16,6 +16,9 @@ import { StaleWhileRevalidate } from 'workbox-strategies';
 
 import { PUBLIC_URL } from './env';
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const version = 1;
+
 declare const self: ServiceWorkerGlobalScope;
 
 clientsClaim();
