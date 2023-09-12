@@ -360,7 +360,7 @@ export const SidebarMenu = observer(() => {
 				>
 					{renderCommunities([
 						CommunityId.TVM,
-						CommunityId.OASIS_GALLERY,
+						CommunityId.MAIN_VIEW,
 						CommunityId.VENTORY,
 						CommunityId.HANMADI,
 						CommunityId.DITTO_NETWORK,

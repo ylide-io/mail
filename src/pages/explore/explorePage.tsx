@@ -61,7 +61,7 @@ export function ExplorePage() {
 					{renderTagBlock(CommunityTag.SOCIAL)}
 					{renderTagBlock(CommunityTag.ECOSYSTEM)}
 					{renderTagBlock(CommunityTag.GAMING)}
-					{renderTagBlock(CommunityTag.DEVELOPER_TOOLS)}
+					{renderTagBlock(CommunityTag.TRADING)}
 
 					<div className={css.footer}>
 						<ActionButton
