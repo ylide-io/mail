@@ -144,7 +144,7 @@ const FeedPageContent = observer(() => {
 
 	useEffect(() => {
 		return () => {
-			feed.clearProcess();
+			feed.cleanUp();
 		};
 	}, [feed]);
 

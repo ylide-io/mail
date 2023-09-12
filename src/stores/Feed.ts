@@ -45,29 +45,25 @@ export class FeedStore {
 		if (this.addresses) {
 			this.socket = new WebSocket(REACT_APP__POST_PUSHER!);
 
-			const open = () => {
+			this.socket.onopen = () => {
 				this.socket?.send(this.addresses?.join(',') || '');
-				console.log('New connection opened');
 			};
-			this.socket.addEventListener('open', open);
 
-			this.socket.addEventListener('error', console.error);
+			this.socket.onerror = error => {
+				console.error(error);
+			};
 
-			this.socket.addEventListener('message', data => {
+			this.socket.onmessage = data => {
 				if (data.data) {
 					// currently returns always 1
 					const newPosts = Number(JSON.parse(data.data));
 					this.newPosts += newPosts;
 				}
-			});
+			};
 
-			this.socket.addEventListener('close', () => {
+			this.socket.onclose = event => {
 				this.socket = undefined;
-				console.log(`Post Push WebSocket closed. Reconnecting in 1s...`);
-				setTimeout(() => {
-					this.initWebsocket();
-				}, 1000);
-			});
+			};
 		}
 	}
 
@@ -146,7 +142,7 @@ export class FeedStore {
 		}
 	}
 
-	clearProcess() {
+	cleanUp() {
 		this.socket?.close();
 	}
 
