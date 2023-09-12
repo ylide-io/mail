@@ -225,6 +225,6 @@ export async function requestWalletAuthentication(wallet: Wallet) {
 
 		await wallet.controller.requestAuthentication();
 	} catch (e) {
-		console.log('Error in requestSwitchAccount', e);
+		console.error('Error in requestSwitchAccount', e);
 	}
 }

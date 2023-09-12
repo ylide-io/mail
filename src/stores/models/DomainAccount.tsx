@@ -58,7 +58,6 @@ export class DomainAccount {
 	}
 
 	async backgroundReadKeysHistory() {
-		console.log('background read keys history');
 		const remoteKeys = await this.wallet.domain.ylide.core.getAddressesKeysHistory([this.account.address]);
 		for (const remoteKey of remoteKeys[this.account.address]) {
 			await this.keysRegistry.addRemotePublicKey(remoteKey);

@@ -304,7 +304,7 @@ export class OutgoingMailData {
 
 			return true;
 		} catch (e) {
-			console.log('Error sending message', e);
+			console.error('Error sending message', e);
 			throw e;
 		} finally {
 			this.sending = false;

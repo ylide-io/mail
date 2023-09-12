@@ -97,6 +97,6 @@ export async function getEvmWalletNetwork(wallet: Wallet): Promise<EVMNetwork | 
 			return evmNameToNetwork(blockchainName);
 		}
 	} catch (e) {
-		console.log(`Failed to get EVM network (${wallet.wallet})`);
+		console.error(`Failed to get EVM network (${wallet.wallet})`);
 	}
 }

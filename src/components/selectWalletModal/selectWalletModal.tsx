@@ -309,11 +309,12 @@ export const SelectWalletModal = observer(({ onClose }: SelectWalletModalProps) 
 																		: '',
 																	w,
 																);
-																console.log('opening href: ', href);
+
 																browserUtils.saveMobileLinkInfo({
 																	name: w.name,
 																	href: href,
 																});
+
 																openInNewWidnow(href);
 															}}
 														>

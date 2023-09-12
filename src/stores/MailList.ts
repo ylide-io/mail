@@ -2,7 +2,6 @@ import { EVMBlockchainController } from '@ylide/ethereum';
 import { TVMBlockchainController } from '@ylide/everscale';
 import {
 	AbstractBlockchainController,
-	asyncDelay,
 	BlockchainSourceType,
 	IBlockchainSourceSubject,
 	IMessage,
@@ -53,8 +52,6 @@ export function getFolderName(folderId: FolderId) {
 }
 
 //
-
-// const MailPageSize = 10;
 
 const FILTERED_OUT = {};
 
@@ -165,9 +162,6 @@ export class MailList<M = ILinkedMessage> {
 		mailbox?: { accounts: DomainAccount[]; folderId: FolderId; sender?: string; filter?: (id: string) => boolean };
 		venomFeed?: boolean;
 	}) {
-		// hotfix https://trello.com/c/sEtvpbrG
-		await asyncDelay(100);
-
 		const { messagesFilter, messageHandler, mailbox, venomFeed } = props;
 
 		this.messagesFilter = messagesFilter;
@@ -384,35 +378,32 @@ class MailStore {
 
 	constructor() {
 		makeAutoObservable(this);
+	}
 
+	init() {
 		// Reset when account list changes
 		reaction(
 			() => domain.accounts.activeAccounts,
 			() => (this.lastMessagesList = []),
 		);
 
-		this.init();
-	}
+		messagesDB.retrieveAllDecodedMessages().then(dbDecodedMessages => {
+			this.decodedMessagesById = dbDecodedMessages.reduce(
+				(p, c) => ({
+					...p,
+					[c.msgId]: MessagesDB.deserializeMessageDecodedContent(c),
+				}),
+				{},
+			);
+		});
 
-	async init() {
-		const dbDecodedMessages = await messagesDB.retrieveAllDecodedMessages();
-		this.decodedMessagesById = dbDecodedMessages.reduce(
-			(p, c) => ({
-				...p,
-				[c.msgId]: MessagesDB.deserializeMessageDecodedContent(c),
-			}),
-			{},
-		);
+		messagesDB.getReadMessages().then(dbReadMessage => {
+			this.readMessageIds = new Set(dbReadMessage);
+		});
 
-		//
-
-		const dbReadMessage = await messagesDB.getReadMessages();
-		this.readMessageIds = new Set(dbReadMessage);
-
-		//
-
-		const dbDeletedMessages = await messagesDB.retrieveAllDeletedMessages();
-		this.deletedMessageIds = new Set(dbDeletedMessages);
+		messagesDB.retrieveAllDeletedMessages().then(dbDeletedMessages => {
+			this.deletedMessageIds = new Set(dbDeletedMessages);
+		});
 	}
 
 	async decodeMessage(msgId: string, msg: IMessage, recipient?: WalletAccount) {

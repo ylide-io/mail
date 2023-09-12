@@ -33,19 +33,9 @@ export class FeedSettings {
 
 	constructor() {
 		makeObservable(this);
+	}
 
-		FeedManagerApi.getTags()
-			.then(r => {
-				this.tags = r;
-			})
-			.catch(e => {
-				console.log(`Error fetching tags - ${e}`);
-			});
-
-		FeedServerApi.getSources()
-			.then(({ sources }) => (this.sources = sources))
-			.catch(() => (this.isError = true));
-
+	async init() {
 		autorun(() => {
 			domain.accounts.activeAccounts
 				.filter(account => account.mainViewKey && !this.configs.has(account))
@@ -68,7 +58,7 @@ export class FeedSettings {
 							});
 						} else {
 							this.isError = true;
-							console.log(`Failed to get config - ${configResponse.reason}`);
+							console.error(`Failed to get config - ${configResponse.reason}`);
 						}
 						if (coverageResponse.status === 'fulfilled') {
 							const coverage = coverageResponse.value;
@@ -79,13 +69,25 @@ export class FeedSettings {
 							this.coverages.set(account, { ...coverage, totalCoverage });
 						} else {
 							this.coverages.set(account, 'error');
-							console.log(`Failed to get coverage - ${coverageResponse.reason}`);
+							console.error(`Failed to get coverage - ${coverageResponse.reason}`);
 						}
 					} catch (e) {
 						this.isError = true;
 					}
 				});
 		});
+
+		FeedManagerApi.getTags()
+			.then(r => {
+				this.tags = r;
+			})
+			.catch(e => {
+				console.error(`Error fetching tags - ${e}`);
+			});
+
+		FeedServerApi.getSources()
+			.then(({ sources }) => (this.sources = sources))
+			.catch(() => (this.isError = true));
 	}
 
 	getAccountConfig(account: DomainAccount): FeedSettingsData | undefined {

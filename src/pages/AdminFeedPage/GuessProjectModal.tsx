@@ -31,7 +31,6 @@ export const GuessProjectModal = ({ token, guessData, onClose }: Props) => {
 	async function getProjects(query: string) {
 		const res = await fetch(`${BASE_URL}/projects?query=${query}`);
 		const { data } = await res.json();
-		console.log(data);
 		setProjects(data);
 	}
 

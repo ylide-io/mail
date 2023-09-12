@@ -32,11 +32,14 @@ import { SwitchModal, SwitchModalMode } from '../components/switchModal/switchMo
 import { toast } from '../components/toast/toast';
 import { AppMode, REACT_APP__APP_MODE } from '../env';
 import { blockchainMeta } from '../utils/blockchain';
+import { timePoint } from '../utils/dev';
 import { ensurePageLoaded } from '../utils/ensurePageLoaded';
 import { walletsMeta } from '../utils/wallet';
 import { Accounts } from './Accounts';
 import contacts from './Contacts';
 import { EverwalletProxy } from './EverwalletProxy';
+import { feedSettings } from './FeedSettings';
+import { mailStore } from './MailList';
 import { DomainAccount } from './models/DomainAccount';
 import { Wallet } from './models/Wallet';
 import { OTCStore } from './OTC';
@@ -259,16 +262,18 @@ export class Domain {
 					domain.isTxPublishing = false;
 				} else {
 					domain.isTxPublishing = false;
-					console.log('Something went wrong with key publishing :(\n\n' + JSON.stringify(result, null, '\t'));
+					console.error(
+						'Something went wrong with key publishing :(\n\n' + JSON.stringify(result, null, '\t'),
+					);
 				}
 			} catch (err: any) {
-				console.log(`Something went wrong with key publishing: ${err.message}`, err.stack);
+				console.error(`Something went wrong with key publishing: ${err.message}`, err.stack);
 				toast('Something went wrong with key publishing :( Please, try again');
 				domain.isTxPublishing = false;
 				domain.txPlateVisible = false;
 			}
 		} catch (err) {
-			console.log('faucet publication error: ', err);
+			console.error('faucet publication error: ', err);
 			domain.isTxPublishing = false;
 			domain.txPlateVisible = false;
 		}
@@ -357,7 +362,7 @@ export class Domain {
 				});
 			}
 		} catch (error) {
-			console.log('error: ', error);
+			console.error('error: ', error);
 		}
 		try {
 			if (this.walletConnectState.connection) {
@@ -395,7 +400,7 @@ export class Domain {
 			}
 		}
 		const somethingWentWrongTimer = setTimeout(() => {
-			console.log(`Something went wrong with ${factory.wallet} wallet`);
+			console.error(`Something went wrong with ${factory.wallet} wallet`);
 		}, 10000);
 		this.walletControllers[factory.blockchainGroup] = {
 			...(this.walletControllers[factory.blockchainGroup] || {}),
@@ -446,12 +451,7 @@ export class Domain {
 	}
 
 	async extractWalletsData() {
-		let last = Date.now();
-		const tick = (t: string) => {
-			const now = Date.now();
-			console.debug(t, now - last + 'ms');
-			last = now;
-		};
+		const tick = timePoint({ key: 'extractWalletsData' });
 
 		this.registeredWallets = this.ylide.walletsList.map(w => w.factory);
 		this.registeredBlockchains = this.ylide.blockchainsList.map(b => b.factory);
@@ -543,33 +543,34 @@ export class Domain {
 	}
 
 	async init() {
-		if (this.initialized) {
-			return;
-		}
-		let last = Date.now();
-		const tick = (t: string) => {
-			const now = Date.now();
-			console.debug(t, now - last + 'ms');
-			last = now;
-		};
+		if (this.initialized) return;
+
+		const tick = timePoint({ key: 'DOMAIN INIT' });
+
 		await ensurePageLoaded;
 		tick('ensurePageLoaded');
-		console.log('window.__hasEverscaleProvider: ', window.__hasEverscaleProvider);
+		console.debug('window.__hasEverscaleProvider: ', window.__hasEverscaleProvider);
+
 		await this.reloadAvailableWallets();
 		tick('this.reloadAvailableWallets();');
+
 		await this.walletConnectState.init();
 		tick('this.initWalletConnect();');
+
 		await this.extractWalletsData();
 		tick('this.extractWalletsData();');
+
 		await this.keysRegistry.init();
 		tick('this.keysRegistry.init();');
+
 		await this.accounts.init();
 		tick('this.accounts.init();');
-		await contacts.init();
-		tick('contacts.init();');
-		await tags.getTags();
-		tick('tags.getTags();');
-		this.initialized = true;
+
+		contacts.init();
+		tags.init();
+		mailStore.init();
+		feedSettings.init();
+		tick('rest ...');
 
 		// hacks for VenomWallet again :(
 		// let scTimes = 0;
@@ -586,6 +587,8 @@ export class Domain {
 		// };
 
 		// schedule();
+
+		this.initialized = true;
 	}
 }
 
