@@ -15,9 +15,10 @@ import { registerRoute } from 'workbox-routing';
 import { StaleWhileRevalidate } from 'workbox-strategies';
 
 import { PUBLIC_URL } from './env';
+import { RoutePath } from './stores/routePath';
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-const version = 2;
+const version = 3;
 
 declare const self: ServiceWorkerGlobalScope;
 
@@ -85,12 +86,20 @@ self.addEventListener('message', event => {
 // Any other custom service worker logic can go here.
 self.addEventListener('push', async event => {
 	if (event.data) {
-		const { title, body, icon, image, badge } = await event.data.json();
-		self.registration.showNotification(title, {
-			body,
-			icon,
-			image,
-			badge,
-		});
+		const { title, body, data, image, badge } = await event.data.json();
+		event.waitUntil(
+			self.registration.showNotification(title, {
+				body,
+				icon: './android-icon-96x96.png',
+				image,
+				badge,
+				data,
+			}),
+		);
 	}
+});
+
+self.addEventListener('notificationclick', event => {
+	event.notification.close();
+	event.waitUntil(self.clients.openWindow(RoutePath.FEED_POST.replace(':postId', event.notification.data.postId)));
 });
