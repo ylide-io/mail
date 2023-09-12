@@ -110,6 +110,11 @@ $mediaHeight768: 768px;
 	}
 }
 
+@mixin no-text-selection {
+	-webkit-user-select: none; /* Safari */
+	user-select: none;
+}
+
 // MISC
 
 @mixin flex-row($align-items, $justify-content) {
