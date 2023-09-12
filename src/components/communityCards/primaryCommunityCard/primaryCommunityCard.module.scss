@@ -66,9 +66,9 @@
 }
 
 .tags {
-	display: grid;
-	grid-auto-flow: column;
-	grid-gap: 8px;
+	display: flex;
+	flex-wrap: wrap;
+	gap: 8px;
 }
 
 .tag {
