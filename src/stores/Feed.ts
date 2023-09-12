@@ -47,6 +47,7 @@ export class FeedStore {
 
 			const open = () => {
 				this.socket?.send(this.addresses?.join(',') || '');
+				console.log('New connection opened');
 			};
 			this.socket.addEventListener('open', open);
 
