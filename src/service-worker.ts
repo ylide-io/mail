@@ -82,9 +82,12 @@ self.addEventListener('message', event => {
 // Any other custom service worker logic can go here.
 self.addEventListener('push', async event => {
 	if (event.data) {
-		const { title, body } = await event.data.json();
+		const { title, body, icon, image, badge } = await event.data.json();
 		self.registration.showNotification(title, {
 			body,
+			icon,
+			image,
+			badge,
 		});
 	}
 });
