@@ -1,6 +1,6 @@
 import { observable } from 'mobx';
 import { observer } from 'mobx-react';
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { InView } from 'react-intersection-observer';
 import { generatePath, useParams } from 'react-router-dom';
 
@@ -70,30 +70,44 @@ const FeedPageContent = observer(() => {
 		return outputArray;
 	}
 
+	const grantPushForAll = useCallback(async () => {
+		return navigator.serviceWorker
+			.getRegistration()
+			.then(registration =>
+				registration?.pushManager.subscribe({
+					applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY!),
+					userVisibleOnly: true,
+				}),
+			)
+			.then(
+				subscription =>
+					subscription &&
+					Promise.all(accounts.map(a => FeedManagerApi.subscribe(a.mainViewKey, subscription))),
+			);
+	}, [accounts]);
+
 	useEffect(() => {
 		const urlParams = new URLSearchParams(window.location.search);
 		const pwaEnabled = urlParams.get('pwaEnabled');
-		if (pwaEnabled === 'true') {
-			console.log('Request notification permission');
-			Notification.requestPermission().then(result => {
-				if (result === 'granted') {
-					navigator.serviceWorker
-						.getRegistration()
-						.then(registration =>
-							registration?.pushManager.subscribe({
-								applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY!),
-								userVisibleOnly: true,
-							}),
-						)
-						.then(
-							subscription =>
-								subscription &&
-								Promise.all(accounts.map(a => FeedManagerApi.subscribe(a.mainViewKey, subscription))),
-						);
+		if (pwaEnabled === 'true' && accounts.length >= 1) {
+			navigator.permissions.query({ name: 'notifications' }).then(r => {
+				if (r.state === 'prompt') {
+					console.log('Request notification permission');
+					Notification.requestPermission().then(result => {
+						if (result === 'granted') {
+							grantPushForAll();
+						}
+					});
+				} else if (r.state === 'granted') {
+					console.log('Grant permission for all wallets');
+					grantPushForAll();
+				} else if (r.state === 'denied') {
+					console.log('Revoke permission for all wallets');
+					Promise.all(accounts.map(a => FeedManagerApi.subscribe(a.mainViewKey, null)));
 				}
 			});
 		}
-	}, [accounts]);
+	}, [accounts, grantPushForAll]);
 
 	useEffect(() => {
 		if (address && !selectedAccounts.length) {
