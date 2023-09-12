@@ -58,7 +58,6 @@ export function ExplorePage() {
 					{renderTagBlock(CommunityTag.NFT)}
 					{renderTagBlock(CommunityTag.VENOM)}
 					{renderTagBlock(CommunityTag.TVM)}
-					{renderTagBlock(CommunityTag.AURORA_ECOSYSTEM)}
 					{renderTagBlock(CommunityTag.SOCIAL)}
 					{renderTagBlock(CommunityTag.ECOSYSTEM)}
 					{renderTagBlock(CommunityTag.GAMING)}
