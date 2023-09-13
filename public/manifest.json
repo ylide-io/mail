@@ -1,13 +1,10 @@
 {
 	"name": "Ylide Social Hub",
-	"short_name": "hub.ylide.io",
 	"description": "Multi-accounting Web3 mailbox with native Safe support.",
 	"start_url": "/",
 	"display": "standalone",
-
 	"iconPath": "ms-icon-310x310.png",
 	"providedBy": { "name": "Ylide Social Hub", "url": "https://hub.ylide.io/" },
-
 	"icons": [
 		{
 			"src": "/android-icon-36x36.png",
