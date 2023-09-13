@@ -198,7 +198,6 @@ export const App = observer(() => {
 						}[REACT_APP__APP_MODE]
 					}
 				</title>
-				<link rel="manifest" href="/manifest.webmanifest.json" />
 				<meta
 					name="description"
 					content={
