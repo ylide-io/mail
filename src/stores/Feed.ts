@@ -20,6 +20,7 @@ export class FeedStore {
 	readonly sourceId: string | undefined;
 	readonly addressTokens: string[] | undefined;
 	readonly addresses: string[] | undefined;
+	private closedIntentionally = false;
 
 	socket: WebSocket | undefined;
 
@@ -63,6 +64,12 @@ export class FeedStore {
 
 			this.socket.onclose = event => {
 				this.socket = undefined;
+				if (!this.closedIntentionally) {
+					console.log(`Post Push WebSocket closed. Reconnecting in 1s...`);
+					setTimeout(() => {
+						this.initWebsocket();
+					}, 1000);
+				}
 			};
 		}
 	}
@@ -143,6 +150,7 @@ export class FeedStore {
 	}
 
 	cleanUp() {
+		this.closedIntentionally = true;
 		this.socket?.close();
 	}
 
