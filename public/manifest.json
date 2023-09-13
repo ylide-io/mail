@@ -1,8 +1,8 @@
 {
 	"name": "Mainview - Your Smart Crypto News Aggregator",
-	"short_name": "app.mainview.io",
-	"start_url": "/",
+	"short_name": "Mainview",
 	"description": "Mainview is the leading crypto news aggregator that empowers investors, traders, and asset managers with personalized newsfeeds based on their crypto holdings. Stay informed and make smarter investment decisions with Mainview.",
+	"start_url": "/",
 	"display": "standalone",
 	"theme_color": "#000000",
 	"background_color": "#e4ebf0",
