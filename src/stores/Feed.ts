@@ -56,9 +56,9 @@ export class FeedStore {
 
 			this.socket.onmessage = data => {
 				if (data.data) {
-					// currently returns always 1
-					const newPosts = Number(JSON.parse(data.data));
-					this.newPosts += newPosts;
+					const postId = String(data.data);
+					if (this.posts.some(p => p.id === postId)) return;
+					this.newPosts += 1;
 				}
 			};
 

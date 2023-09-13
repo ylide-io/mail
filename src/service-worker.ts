@@ -18,7 +18,7 @@ import { PUBLIC_URL } from './env';
 import { RoutePath } from './stores/routePath';
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-const version = 5;
+const version = 6;
 
 declare const self: ServiceWorkerGlobalScope;
 
@@ -86,13 +86,13 @@ self.addEventListener('message', event => {
 // Any other custom service worker logic can go here.
 self.addEventListener('push', async event => {
 	if (event.data) {
-		const { title, body, data, image, badge } = await event.data.json();
+		const { title, body, data, image, icon } = await event.data.json();
 		event.waitUntil(
 			self.registration.showNotification(title, {
 				body,
-				icon: './android-icon-96x96.png',
+				icon,
 				image,
-				badge,
+				badge: './android-icon-192x192.png',
 				data,
 			}),
 		);
