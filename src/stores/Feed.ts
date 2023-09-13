@@ -1,7 +1,6 @@
 import { makeObservable, observable } from 'mobx';
 
 import { FeedPost, FeedServerApi } from '../api/feedServerApi';
-import { REACT_APP__POST_PUSHER } from '../env';
 import { analytics } from './Analytics';
 
 const FEED_PAGE_SIZE = 10;
@@ -19,59 +18,18 @@ export class FeedStore {
 	readonly tags: { id: number; name: string }[] = [];
 	readonly sourceId: string | undefined;
 	readonly addressTokens: string[] | undefined;
-	readonly addresses: string[] | undefined;
-	private closedIntentionally = false;
 
-	socket: WebSocket | undefined;
+	abortController: AbortController | undefined;
+	checkNewPostsProcess: NodeJS.Timer | undefined;
 
-	constructor(params: {
-		tags?: { id: number; name: string }[];
-		sourceId?: string;
-		addressTokens?: string[];
-		addresses?: string[];
-	}) {
+	constructor(params: { tags?: { id: number; name: string }[]; sourceId?: string; addressTokens?: string[] }) {
 		if (params.tags) {
 			this.tags = params.tags;
 		}
 		this.sourceId = params.sourceId;
 		this.addressTokens = params.addressTokens;
-		this.addresses = params.addresses;
 
 		makeObservable(this);
-
-		this.initWebsocket();
-	}
-
-	private initWebsocket() {
-		if (this.addresses) {
-			this.socket = new WebSocket(REACT_APP__POST_PUSHER!);
-
-			this.socket.onopen = () => {
-				this.socket?.send(this.addresses?.join(',') || '');
-			};
-
-			this.socket.onerror = error => {
-				console.error(error);
-			};
-
-			this.socket.onmessage = data => {
-				if (data.data) {
-					const postId = String(data.data);
-					if (this.posts.some(p => p.id === postId)) return;
-					this.newPosts += 1;
-				}
-			};
-
-			this.socket.onclose = event => {
-				this.socket = undefined;
-				if (!this.closedIntentionally) {
-					console.log(`Post Push WebSocket closed. Reconnecting in 1s...`);
-					setTimeout(() => {
-						this.initWebsocket();
-					}, 1000);
-				}
-			};
-		}
 	}
 
 	private async genericLoad(params: {
@@ -80,6 +38,7 @@ export class FeedStore {
 		lastPostId?: string;
 		firstPostId?: string;
 		checkNewPosts?: boolean;
+		signal?: AbortSignal;
 	}): Promise<FeedServerApi.GetPostsResponse | undefined> {
 		try {
 			this.loading = true;
@@ -118,6 +77,7 @@ export class FeedStore {
 	}
 
 	async load() {
+		this.abortCheckNewPosts();
 		if (this.loading) return;
 
 		const data = await this.genericLoad({
@@ -130,9 +90,15 @@ export class FeedStore {
 			this.moreAvailable = data.moreAvailable;
 			this.newPosts = data.newPosts;
 		}
+		if (!this.checkNewPostsProcess) {
+			this.checkNewPostsProcess = setInterval(() => {
+				this.checkNewPosts();
+			}, 10000);
+		}
 	}
 
 	async loadMore() {
+		this.abortCheckNewPosts();
 		if (this.loading) return;
 
 		const data = await this.genericLoad({
@@ -149,12 +115,47 @@ export class FeedStore {
 		}
 	}
 
-	cleanUp() {
-		this.closedIntentionally = true;
-		this.socket?.close();
+	async checkNewPosts() {
+		if (this.loading) return;
+		const firstPostId = this.posts.at(0)?.id;
+		if (firstPostId) {
+			this.abortController = new AbortController();
+			const data = await this.genericLoad({
+				needOld: false,
+				length: 0,
+				checkNewPosts: true,
+				firstPostId,
+				signal: this.abortController.signal,
+			});
+
+			if (data) {
+				this.newPosts = data.newPosts;
+			}
+		}
+	}
+
+	abortCheckNewPosts() {
+		if (this.abortController) {
+			this.abortController.abort();
+			this.abortController = undefined;
+			this.loading = false;
+		}
+	}
+
+	clearProcess() {
+		if (this.checkNewPostsProcess) {
+			clearInterval(this.checkNewPostsProcess);
+		} else {
+			// FeedPage unmounted before process has been created
+			// wait for it to cancel successfully
+			setTimeout(() => {
+				this.clearProcess();
+			}, 1000);
+		}
 	}
 
 	async loadNew() {
+		this.abortCheckNewPosts();
 		if (this.loading) return;
 
 		const data = await this.genericLoad({

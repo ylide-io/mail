@@ -128,7 +128,6 @@ const FeedPageContent = observer(() => {
 			tags: tags !== 'error' && tags !== 'loading' ? tags.filter(t => t.id === Number(tag)) : [],
 			sourceId: source,
 			addressTokens: selectedAccounts.map(a => a.mainViewKey),
-			addresses: selectedAccounts.map(a => a.account.address),
 		});
 
 		genericLayoutApi.scrollToTop();
@@ -142,7 +141,7 @@ const FeedPageContent = observer(() => {
 
 	useEffect(() => {
 		return () => {
-			feed.cleanUp();
+			feed.clearProcess();
 		};
 	}, [feed]);
 
