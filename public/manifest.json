@@ -1,12 +1,13 @@
 {
+	"name": "Mainview - Your Smart Crypto News Aggregator",
+	"short_name": "app.mainview.io",
+	"start_url": "/",
+	"description": "Mainview is the leading crypto news aggregator that empowers investors, traders, and asset managers with personalized newsfeeds based on their crypto holdings. Stay informed and make smarter investment decisions with Mainview.",
+	"display": "standalone",
 	"theme_color": "#000000",
 	"background_color": "#e4ebf0",
-	"display": "standalone",
 	"scope": "/",
-	"name": "Mainview - Your Smart Crypto News Aggregator",
-	"short_name": "Mainview",
 	"providedBy": { "name": "Mainview", "url": "https://mainview.io/" },
-	"start_url": "https://mainview.io/",
 	"icons": [
 		{
 			"src": "/icon-192x192.png",
@@ -28,6 +29,5 @@
 			"sizes": "512x512",
 			"type": "image/png"
 		}
-	],
-	"description": "Mainview is the leading crypto news aggregator that empowers investors, traders, and asset managers with personalized newsfeeds based on their crypto holdings. Stay informed and make smarter investment decisions with Mainview."
+	]
 }
