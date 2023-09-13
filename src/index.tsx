@@ -1,5 +1,5 @@
-import 'normalize.css';
 import 'minireset.css';
+import 'normalize.css';
 import './styles/index.scss';
 
 import { configure } from 'mobx';
@@ -24,9 +24,4 @@ root.render(
 	</BrowserRouter>,
 );
 
-const urlParams = new URLSearchParams(window.location.search);
-const pwaEnabled = urlParams.get('pwaEnabled');
-if (pwaEnabled === 'true') {
-	console.log('register service worker');
-	serviceWorkerRegistration.register();
-}
+serviceWorkerRegistration.register();

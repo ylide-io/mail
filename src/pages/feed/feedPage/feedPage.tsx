@@ -87,9 +87,7 @@ const FeedPageContent = observer(() => {
 	}, [accounts]);
 
 	useEffect(() => {
-		const urlParams = new URLSearchParams(window.location.search);
-		const pwaEnabled = urlParams.get('pwaEnabled');
-		if (pwaEnabled === 'true' && accounts.length >= 1) {
+		if (accounts.length >= 1) {
 			navigator.permissions.query({ name: 'notifications' }).then(r => {
 				if (r.state === 'prompt') {
 					console.log('Request notification permission');
