@@ -88,7 +88,7 @@ const FeedPageContent = observer(() => {
 
 	useEffect(() => {
 		if (accounts.length >= 1) {
-			navigator.permissions.query({ name: 'notifications' }).then(r => {
+			navigator?.permissions?.query({ name: 'notifications' }).then(r => {
 				if (r.state === 'prompt') {
 					console.log('Request notification permission');
 					Notification.requestPermission().then(result => {
