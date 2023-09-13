@@ -92,7 +92,7 @@ self.addEventListener('push', async event => {
 				body,
 				icon,
 				image,
-				badge: './android-icon-192x192.png',
+				badge: '/icon-192x192.png',
 				data,
 			}),
 		);
