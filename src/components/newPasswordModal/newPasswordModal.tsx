@@ -38,19 +38,10 @@ interface NewPasswordModalProps {
 	wallet: Wallet;
 	account: WalletAccount;
 	remoteKeys: Record<string, RemotePublicKey | null>;
-	waitTxPublishing?: boolean;
 	onClose?: (account?: DomainAccount) => void;
 }
 
-export function NewPasswordModal({
-	faucetType,
-	bonus,
-	wallet,
-	account,
-	remoteKeys,
-	waitTxPublishing,
-	onClose,
-}: NewPasswordModalProps) {
+export function NewPasswordModal({ faucetType, bonus, wallet, account, remoteKeys, onClose }: NewPasswordModalProps) {
 	const [searchParams] = useSearchParams();
 	const freshestKey: { key: RemotePublicKey; blockchain: string } | undefined = useMemo(
 		() =>
@@ -161,8 +152,10 @@ export function NewPasswordModal({
 
 			analytics.walletRegistered(wallet.wallet, account.account.address);
 			onClose?.(account);
+			return true;
 		} catch (e) {
 			exitUnsuccessfully({ message: 'Transaction was not published. Please, try again', e });
+			return false;
 		}
 	}
 
@@ -248,10 +241,10 @@ export function NewPasswordModal({
 				domain.txPlateVisible = true;
 				domain.txWithBonus = bonus;
 
-				const promise = domain.publishThroughFaucet(faucetData);
+				const success = await domain.publishThroughFaucet(faucetData);
 
-				if (waitTxPublishing) {
-					await promise;
+				if (success) {
+					domain.enforceMainViewOnboarding = domainAccount;
 				}
 
 				onClose?.(domainAccount);
@@ -259,7 +252,10 @@ export function NewPasswordModal({
 				if (wallet.factory.blockchainGroup === 'evm') {
 					setStep(Step.SELECT_NETWORK);
 				} else {
-					await publishLocalKey(tempLocalKey, network);
+					const success = await publishLocalKey(tempLocalKey, network);
+					if (success) {
+						domain.enforceMainViewOnboarding = domainAccount;
+					}
 				}
 			}
 		} else if (freshestKey.key.publicKey.equals(tempLocalKey.publicKey)) {
@@ -268,10 +264,14 @@ export function NewPasswordModal({
 			);
 			const domainAccount = await createDomainAccount(wallet, account, tempLocalKey);
 			analytics.walletConnected(wallet.wallet, account.address);
+			domain.enforceMainViewOnboarding = domainAccount;
 			onClose?.(domainAccount);
 		} else if (forceNew || withoutPassword) {
-			await createDomainAccount(wallet, account, tempLocalKey);
-			await publishLocalKey(tempLocalKey, network);
+			const domainAccount = await createDomainAccount(wallet, account, tempLocalKey);
+			const success = await publishLocalKey(tempLocalKey, network);
+			if (success) {
+				domain.enforceMainViewOnboarding = domainAccount;
+			}
 		} else {
 			toast('Password is wrong. Please try again ❤');
 			setStep(Step.ENTER_PASSWORD);

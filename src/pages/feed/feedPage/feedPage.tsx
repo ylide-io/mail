@@ -70,24 +70,26 @@ const FeedPageContent = observer(() => {
 		return outputArray;
 	}
 
-	const grantPushForAll = useCallback(async () => {
-		return navigator.serviceWorker
-			.getRegistration()
-			.then(registration =>
-				registration?.pushManager.subscribe({
-					applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY!),
-					userVisibleOnly: true,
-				}),
-			)
-			.then(
-				subscription =>
-					subscription &&
-					Promise.all(accounts.map(a => FeedManagerApi.subscribe(a.mainViewKey, subscription))),
-			);
+	const grantPushForAll = useCallback(() => {
+		if (accounts.every(a => a.mainViewKey)) {
+			navigator.serviceWorker
+				.getRegistration()
+				.then(registration =>
+					registration?.pushManager.subscribe({
+						applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY!),
+						userVisibleOnly: true,
+					}),
+				)
+				.then(
+					subscription =>
+						subscription &&
+						Promise.all(accounts.map(a => FeedManagerApi.subscribe(a.mainViewKey, subscription))),
+				);
+		}
 	}, [accounts]);
 
 	useEffect(() => {
-		if (accounts.length >= 1) {
+		if (accounts.length >= 1 && accounts.every(a => a.mainViewKey)) {
 			navigator?.permissions?.query({ name: 'notifications' }).then(r => {
 				if (r.state === 'prompt') {
 					console.log('Request notification permission');
@@ -201,8 +203,8 @@ const FeedPageContent = observer(() => {
 				</div>
 			}
 		>
-			{showCoverageModal && (
-				<CoverageModal onClose={() => setShowCoverageModal(false)} account={selectedAccounts[0]} />
+			{showCoverageModal && coverage && coverage !== 'error' && coverage !== 'loading' && (
+				<CoverageModal onClose={() => setShowCoverageModal(false)} coverage={coverage} />
 			)}
 			{!!feed.posts.length && (
 				<ActionButton

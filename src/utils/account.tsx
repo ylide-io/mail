@@ -132,16 +132,19 @@ export async function connectAccount(params?: { place?: string }): Promise<Domai
 
 			const domainAccount = await showStaticComponent<DomainAccount>(resolve => (
 				<NewPasswordModal
-					faucetType={['polygon', 'fantom', 'gnosis'].includes(qqs.faucet) ? ({
-						'polygon': EVMNetwork.POLYGON as const,
-						'fantom': EVMNetwork.FANTOM as const,
-						'gnosis': EVMNetwork.GNOSIS as const,
-					}[qqs.faucet as ('polygon' | 'fantom' | 'gnosis')]) : EVMNetwork.GNOSIS}
+					faucetType={
+						['polygon', 'fantom', 'gnosis'].includes(qqs.faucet)
+							? {
+									polygon: EVMNetwork.POLYGON as const,
+									fantom: EVMNetwork.FANTOM as const,
+									gnosis: EVMNetwork.GNOSIS as const,
+							  }[qqs.faucet as 'polygon' | 'fantom' | 'gnosis']
+							: EVMNetwork.GNOSIS
+					}
 					bonus={qqs.bonus === 'true'}
 					wallet={wallet!}
 					account={account}
 					remoteKeys={remoteKeys.remoteKeys}
-					waitTxPublishing={REACT_APP__APP_MODE === AppMode.OTC}
 					onClose={resolve}
 				/>
 			));
@@ -163,11 +166,15 @@ export async function activateAccount(params: { account: DomainAccount }) {
 
 	await showStaticComponent<DomainAccount>(resolve => (
 		<NewPasswordModal
-			faucetType={['polygon', 'fantom', 'gnosis'].includes(qqs.faucet) ? ({
-				'polygon': EVMNetwork.POLYGON as const,
-				'fantom': EVMNetwork.FANTOM as const,
-				'gnosis': EVMNetwork.GNOSIS as const,
-			}[qqs.faucet as ('polygon' | 'fantom' | 'gnosis')]) : EVMNetwork.GNOSIS}
+			faucetType={
+				['polygon', 'fantom', 'gnosis'].includes(qqs.faucet)
+					? {
+							polygon: EVMNetwork.POLYGON as const,
+							fantom: EVMNetwork.FANTOM as const,
+							gnosis: EVMNetwork.GNOSIS as const,
+					  }[qqs.faucet as 'polygon' | 'fantom' | 'gnosis']
+					: EVMNetwork.GNOSIS
+			}
 			bonus={qqs.bonus === 'true'}
 			wallet={wallet}
 			account={account.account}

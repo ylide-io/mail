@@ -18,7 +18,7 @@ import { PUBLIC_URL } from './env';
 import { RoutePath } from './stores/routePath';
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-const version = 7;
+const version = 8;
 
 declare const self: ServiceWorkerGlobalScope;
 

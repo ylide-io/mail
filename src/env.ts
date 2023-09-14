@@ -4,6 +4,7 @@ export const REACT_APP__BLOCKCHAIN_FEED = process.env.REACT_APP__BLOCKCHAIN_FEED
 export const VAPID_PUBLIC_KEY = process.env.REACT_APP__VAPID_PUBLIC_KEY as string | undefined;
 export const PUBLIC_URL = process.env.REACT_APP__PUBLIC_URL as string | undefined;
 export const REACT_APP__POST_PUSHER = process.env.REACT_APP__POST_PUSHER as string | undefined;
+export const REACT_APP__MV_PUBLIC_KEY = process.env.REACT_APP__MV_PUBLIC_KEY as string | undefined;
 
 export enum AppMode {
 	HUB = 'HUB',

@@ -1,5 +1,5 @@
 import { REACT_APP__FEED_MANAGER } from '../env';
-import { MainviewKeyPayload } from '../types';
+import { AuthorizationPayload } from '../types';
 import { createCleanSerachParams } from '../utils/url';
 import { FeedReason } from './feedServerApi';
 
@@ -33,13 +33,24 @@ export namespace FeedManagerApi {
 
 	export type FeedManagerResponse<Data> = FeedManagerSuccessResponse<Data> | FeedManagerErrorResponse;
 
-	async function request<Res = void>(path: string, query?: Record<string, any>, data?: any): Promise<Res> {
+	async function request<Res = void>({
+		path,
+		query,
+		data,
+		token,
+	}: {
+		path: string;
+		query?: Record<string, any>;
+		data?: any;
+		token?: string;
+	}): Promise<Res> {
 		const response = await fetch(
-			`${REACT_APP__FEED_MANAGER}${path}?${query ? createCleanSerachParams(query) : ''}`,
+			`${REACT_APP__FEED_MANAGER}${path}${query ? '?' + createCleanSerachParams(query) : ''}`,
 			{
 				method: data ? 'POST' : 'GET',
 				headers: {
 					'Content-Type': 'application/json',
+					'Authorization': `Bearer ${token}`,
 				},
 				body: data ? JSON.stringify(data) : undefined,
 			},
@@ -69,49 +80,22 @@ export namespace FeedManagerApi {
 
 	//
 
-	export interface CheckInviteResponse {
-		used: boolean;
-		usedByThisAddress: boolean;
-	}
-
-	export async function checkInvite(invite: string, address: string) {
-		return await request<CheckInviteResponse>(`/check-invite`, {
-			invite,
-			address,
-		});
-	}
-
-	//
-
 	export interface AuthAddressResponse {
 		token: string;
 	}
 
-	export async function authAddress(payload: MainviewKeyPayload) {
-		return await request<AuthAddressResponse>(`/auth-address`, undefined, {
-			...payload,
-		});
+	export async function authAddress(data: AuthorizationPayload) {
+		return await request<AuthAddressResponse>({ path: `/v3/auth-address`, data });
 	}
 
 	//
 
 	export async function init(token: string, tvm?: string) {
-		return await request<undefined | { inLine: boolean }>(`/init`, {
-			token,
-			tvm,
-		});
+		return await request<undefined | { inLine: boolean }>({ path: `/v3/init`, token, query: { tvm } });
 	}
 
 	export async function checkInit(token: string) {
-		return await request<boolean>(`/check-init`, {
-			token,
-		});
-	}
-
-	export async function isAddressActive(address: string) {
-		return await request<boolean>(`/is-address-active`, {
-			address,
-		});
+		return await request<boolean>({ path: `/v3/check-init`, token });
 	}
 
 	export interface CoverageItem {
@@ -196,9 +180,7 @@ export namespace FeedManagerApi {
 	};
 
 	export async function getCoverage(token: string) {
-		return await request<CoverageData[]>(`/v2/coverage`, {
-			token,
-		});
+		return await request<CoverageData[]>({ path: `/v3/coverage`, token });
 	}
 
 	export type TagsResponse = {
@@ -207,11 +189,11 @@ export namespace FeedManagerApi {
 	}[];
 
 	export async function getTags() {
-		return await request<TagsResponse>('/tags');
+		return await request<TagsResponse>({ path: '/v3/tags' });
 	}
 
 	export async function subscribe(token: string, subscription: PushSubscription | null) {
-		return await request('/save-subscription', undefined, { token, subscription });
+		return await request({ path: '/v3/save-subscription', token, data: { subscription } });
 	}
 
 	//
@@ -243,7 +225,7 @@ export namespace FeedManagerApi {
 	}
 
 	export async function getConfig(data: { token: string }) {
-		return await request<GetConfigResponse>(`/get-config`, data);
+		return await request<GetConfigResponse>({ path: `/v3/get-config`, token: data.token });
 	}
 
 	export async function setConfig(data: {
@@ -254,6 +236,6 @@ export namespace FeedManagerApi {
 			excludedSourceIds: string[];
 		};
 	}) {
-		return await request(`/set-config`, {}, data);
+		return await request({ path: `/v3/set-config`, data: data.config, token: data.token });
 	}
 }

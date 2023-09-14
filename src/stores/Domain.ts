@@ -64,7 +64,7 @@ export class Domain {
 	@observable txWithBonus: boolean = false;
 	@observable txPlateVisible: boolean = false;
 	@observable isTxPublishing: boolean = false;
-	@observable enforceMainViewOnboarding: boolean = false;
+	@observable enforceMainViewOnboarding: DomainAccount | null = null;
 	@observable publishingTxHash: string = '';
 
 	@observable devMode = false; //document.location.href.includes('localhost');
@@ -255,7 +255,6 @@ export class Domain {
 
 	async publishThroughFaucet(faucetData: Awaited<ReturnType<Domain['getFaucetSignature']>>) {
 		try {
-			domain.enforceMainViewOnboarding = true;
 			try {
 				const result = await faucetData.faucet.attachPublicKey(faucetData.data);
 
@@ -269,20 +268,24 @@ export class Domain {
 					faucetData.account.reloadKeys();
 					domain.publishingTxHash = result.txHash;
 					domain.isTxPublishing = false;
+					return true;
 				} else {
 					domain.isTxPublishing = false;
 					console.log('Something went wrong with key publishing :(\n\n' + JSON.stringify(result, null, '\t'));
+					return false;
 				}
 			} catch (err: any) {
 				console.log(`Something went wrong with key publishing: ${err.message}`, err.stack);
 				toast('Something went wrong with key publishing :( Please, try again');
 				domain.isTxPublishing = false;
 				domain.txPlateVisible = false;
+				return false;
 			}
 		} catch (err) {
 			console.log('faucet publication error: ', err);
 			domain.isTxPublishing = false;
 			domain.txPlateVisible = false;
+			return false;
 		}
 	}
 
