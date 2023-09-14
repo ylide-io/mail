@@ -80,7 +80,7 @@ export const GenericLayout = observer(({ children, dontResetScrollOnMount }: Gen
 						<SidebarMenu />
 					</div>
 
-					<div>{children}</div>
+					<div className={css.content}>{children}</div>
 				</div>
 			</div>
 		</GenericLayoutApiContext.Provider>
