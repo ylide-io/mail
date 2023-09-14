@@ -16,6 +16,11 @@
 	grid-template-rows: auto 1fr;
 	grid-gap: 4px 12px;
 	padding: 20px;
+
+	@include lessThan640w {
+		grid-template-columns: 48px 1fr;
+		padding: var(--generic-layout_outer-padding);
+	}
 }
 
 .ava {
