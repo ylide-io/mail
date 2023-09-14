@@ -192,7 +192,7 @@ export namespace FeedManagerApi {
 		return await request<TagsResponse>({ path: '/v3/tags' });
 	}
 
-	export async function subscribe(token: string, subscription: PushSubscription | null) {
+	export async function subscribe(token: string, subscription: PushSubscription) {
 		return await request({ path: '/v3/save-subscription', token, data: { subscription } });
 	}
 

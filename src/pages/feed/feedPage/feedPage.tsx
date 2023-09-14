@@ -92,18 +92,13 @@ const FeedPageContent = observer(() => {
 		if (accounts.length >= 1 && accounts.every(a => a.mainViewKey)) {
 			navigator?.permissions?.query({ name: 'notifications' }).then(r => {
 				if (r.state === 'prompt') {
-					console.log('Request notification permission');
 					Notification.requestPermission().then(result => {
 						if (result === 'granted') {
 							grantPushForAll();
 						}
 					});
 				} else if (r.state === 'granted') {
-					console.log('Grant permission for all wallets');
 					grantPushForAll();
-				} else if (r.state === 'denied') {
-					console.log('Revoke permission for all wallets');
-					Promise.all(accounts.map(a => FeedManagerApi.subscribe(a.mainViewKey, null)));
 				}
 			});
 		}
