@@ -89,6 +89,7 @@ export class FeedStore {
 			this.posts = data.items;
 			this.moreAvailable = data.moreAvailable;
 			this.newPosts = data.newPosts;
+			navigator.setAppBadge?.(data.newPosts);
 		}
 		if (!this.checkNewPostsProcess) {
 			this.checkNewPostsProcess = setInterval(() => {
@@ -112,6 +113,7 @@ export class FeedStore {
 			this.posts.push(...data.items);
 			this.moreAvailable = data.moreAvailable;
 			this.newPosts = data.newPosts;
+			navigator.setAppBadge?.(data.newPosts);
 		}
 	}
 
@@ -130,6 +132,7 @@ export class FeedStore {
 
 			if (data) {
 				this.newPosts = data.newPosts;
+				navigator.setAppBadge?.(data.newPosts);
 			}
 		}
 	}
@@ -168,6 +171,7 @@ export class FeedStore {
 		if (data) {
 			this.posts.unshift(...data.items);
 			this.newPosts = 0;
+			navigator.setAppBadge?.(0);
 		}
 	}
 }
