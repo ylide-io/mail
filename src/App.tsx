@@ -5,6 +5,7 @@ import { QueryClient, QueryClientProvider } from 'react-query';
 import { generatePath, Navigate, Route, Routes, useLocation, useSearchParams } from 'react-router-dom';
 
 import { ActionButton, ActionButtonLook, ActionButtonSize } from './components/ActionButton/ActionButton';
+import { IosInstallPwaPopup } from './components/iosInstallPwaPopup/iosInstallPwaPopup';
 import { MainViewOnboarding } from './components/mainViewOnboarding/mainViewOnboarding';
 import { PageMeta } from './components/pageMeta/pageMeta';
 import { PopupManager } from './components/popup/popupManager/popupManager';
@@ -378,6 +379,8 @@ export const App = observer(() => {
 					<ToastManager />
 
 					{REACT_APP__APP_MODE === AppMode.MAIN_VIEW && <MainViewOnboarding />}
+
+					<IosInstallPwaPopup />
 				</PopupManager>
 			</QueryClientProvider>
 		</>

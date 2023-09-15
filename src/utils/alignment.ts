@@ -126,7 +126,7 @@ export function alignAtViewportCenter(element: HTMLElement) {
 	element.style.top = `${constrain(document.documentElement.clientHeight / 2.75 - elemRect.height / 2.75, 0)}px`;
 }
 
-export function alignAtViewportBottom(element: HTMLElement) {
+export function alignAtViewportCenterBottom(element: HTMLElement) {
 	const elemRect = element.getBoundingClientRect();
 	element.style.left = `${constrain(document.documentElement.clientWidth / 2 - elemRect.width / 2, 0)}px`;
 	element.style.bottom = '0';
