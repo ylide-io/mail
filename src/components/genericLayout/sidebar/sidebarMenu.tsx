@@ -14,10 +14,6 @@ import { ReactComponent as SidebarMenuSvg } from '../../../icons/ic28/sidebarMen
 import { ReactComponent as SidebarMenuCloseSvg } from '../../../icons/ic28/sidebarMenu_close.svg';
 import { ReactComponent as InboxSvg } from '../../../icons/inbox.svg';
 import { ReactComponent as SentSvg } from '../../../icons/sent.svg';
-import { ReactComponent as DiscordSvg } from '../../../icons/social/discord.svg';
-import { ReactComponent as LinkedInSvg } from '../../../icons/social/linkedIn.svg';
-import { ReactComponent as MediumSvg } from '../../../icons/social/medium.svg';
-import { ReactComponent as TelegramSvg } from '../../../icons/social/telegram.svg';
 import { ReactComponent as TwitterSvg } from '../../../icons/social/twitter.svg';
 import { sideFeedIcon } from '../../../icons/static/sideFeedIcon';
 import { FeedSettingsPopup } from '../../../pages/feed/_common/feedSettingsPopup/feedSettingsPopup';
@@ -321,6 +317,7 @@ export const SidebarMenu = observer(() => {
 
 											analytics.mainviewFeedSettingsClick(account.account.address);
 
+											isSidebarOpen.set(false);
 											setFeedSettingsAccount(account);
 										},
 								  }
