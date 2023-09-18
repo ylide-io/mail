@@ -1,4 +1,7 @@
+import { RefObject, useEffect } from 'react';
+
 import { Rect } from './rect';
+import { useLatest } from './useLatest';
 
 // SCROLL
 
@@ -31,6 +34,38 @@ export function getElementRect(element: HTMLElement): Rect {
 	const clientRect = element.getBoundingClientRect();
 
 	return new Rect(clientRect.left, clientRect.top, clientRect.width, clientRect.height);
+}
+
+export function useOutsideMouseDown({
+	rootRef,
+	outsideClickChecker,
+	callback,
+}: {
+	rootRef: RefObject<Element>;
+	outsideClickChecker?: (elem: HTMLElement) => boolean;
+	callback?: () => void;
+}) {
+	const outsideClickCheckerRef = useLatest(outsideClickChecker);
+	const callbackRef = useLatest(callback);
+
+	useEffect(() => {
+		function onDocElemMouseDown(e: MouseEvent | TouchEvent) {
+			if (
+				!getElementParentOrSelf(
+					e.target as HTMLElement,
+					elem => elem === rootRef.current || !!outsideClickCheckerRef.current?.(elem),
+				)
+			) {
+				callbackRef.current?.();
+			}
+		}
+
+		document.documentElement.addEventListener('mousedown', onDocElemMouseDown);
+
+		return () => {
+			document.documentElement.removeEventListener('mousedown', onDocElemMouseDown);
+		};
+	}, [callbackRef, outsideClickCheckerRef, rootRef]);
 }
 
 // TREE

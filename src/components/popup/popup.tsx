@@ -1,8 +1,8 @@
 import React, { PropsWithChildren, useContext, useLayoutEffect, useRef } from 'react';
 
 import { invariant } from '../../utils/assert';
+import { useOutsideMouseDown } from '../../utils/ui';
 import { useEscPress } from '../../utils/useEscPress';
-import { useOutsideClick } from '../../utils/useOutsideClick';
 import { PropsWithClassName } from '../props';
 import { PopupManagerContext, PopupManagerPortalLevel } from './popupManager/popupManager';
 
@@ -52,7 +52,11 @@ export function Popup({
 		};
 	}, [align]);
 
-	useOutsideClick(rootRef, customOutsideClickChecker, closeOnOutsideClick ? onClose : undefined);
+	useOutsideMouseDown({
+		rootRef,
+		outsideClickChecker: customOutsideClickChecker,
+		callback: closeOnOutsideClick ? onClose : undefined,
+	});
 
 	useEscPress(onClose);
 
