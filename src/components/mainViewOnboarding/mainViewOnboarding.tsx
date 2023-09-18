@@ -39,17 +39,19 @@ export const MainViewOnboarding = observer(() => {
 	const disconnect = useCallback((account: DomainAccount) => disconnectAccount({ account }).then(reset), [reset]);
 
 	const authorize = useCallback(
-		async (account: DomainAccount) => {
+		async ({ domainAccount, password }: { domainAccount: DomainAccount; password: string }) => {
 			try {
 				setStep(Step.BUILDING_FEED);
 
-				const payload = await account.makeMainViewKey();
+				const payload = await domainAccount.makeMainViewKey(password);
 				invariant(payload);
 				const { token } = await FeedManagerApi.authAddress(payload);
 
 				const res = await FeedManagerApi.init(
 					token,
-					account.wallet.controller instanceof TVMWalletController ? account.wallet.wallet : undefined,
+					domainAccount.wallet.controller instanceof TVMWalletController
+						? domainAccount.wallet.wallet
+						: undefined,
 				);
 				const checkInit = async (): Promise<any> => {
 					await new Promise(r => setTimeout(() => r(1), 5000));
@@ -62,12 +64,12 @@ export const MainViewOnboarding = observer(() => {
 					await checkInit();
 				}
 
-				account.mainViewKey = token;
-				setFreshAccount(account);
+				domainAccount.mainViewKey = token;
+				setFreshAccount(domainAccount);
 			} catch (e) {
 				console.log(e);
 				toast('Unexpected error 🤷‍♂️');
-				disconnect(account);
+				disconnect(domainAccount);
 			}
 		},
 		[disconnect],

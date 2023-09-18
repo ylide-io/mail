@@ -244,7 +244,7 @@ export function NewPasswordModal({ faucetType, bonus, wallet, account, remoteKey
 				const success = await domain.publishThroughFaucet(faucetData);
 
 				if (success) {
-					domain.enforceMainViewOnboarding = domainAccount;
+					domain.enforceMainViewOnboarding = { domainAccount, password };
 				}
 
 				onClose?.(domainAccount);
@@ -254,7 +254,7 @@ export function NewPasswordModal({ faucetType, bonus, wallet, account, remoteKey
 				} else {
 					const success = await publishLocalKey(tempLocalKey, network);
 					if (success) {
-						domain.enforceMainViewOnboarding = domainAccount;
+						domain.enforceMainViewOnboarding = { domainAccount, password };
 					}
 				}
 			}
@@ -264,13 +264,13 @@ export function NewPasswordModal({ faucetType, bonus, wallet, account, remoteKey
 			);
 			const domainAccount = await createDomainAccount(wallet, account, tempLocalKey);
 			analytics.walletConnected(wallet.wallet, account.address);
-			domain.enforceMainViewOnboarding = domainAccount;
+			domain.enforceMainViewOnboarding = { domainAccount, password };
 			onClose?.(domainAccount);
 		} else if (forceNew || withoutPassword) {
 			const domainAccount = await createDomainAccount(wallet, account, tempLocalKey);
 			const success = await publishLocalKey(tempLocalKey, network);
 			if (success) {
-				domain.enforceMainViewOnboarding = domainAccount;
+				domain.enforceMainViewOnboarding = { domainAccount, password };
 			}
 		} else {
 			toast('Password is wrong. Please try again ❤');

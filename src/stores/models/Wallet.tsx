@@ -161,6 +161,7 @@ export class Wallet extends EventEmitter {
 	async constructMainViewKey(
 		account: WalletAccount,
 		accountPrivateKey: YlidePrivateKey,
+		password: string,
 	): Promise<AuthorizationPayload> {
 		const mvPublicKey = new Uint8Array(Buffer.from(REACT_APP__MV_PUBLIC_KEY!, 'hex'));
 
@@ -168,11 +169,18 @@ export class Wallet extends EventEmitter {
 			JSON.stringify({ address: account.address.toLowerCase(), timestamp: Date.now() }),
 		).bytes;
 
-		return accountPrivateKey.execute(async privateKey => ({
-			messageEncrypted: privateKey.encrypt(messageBytes, mvPublicKey),
-			publicKey: privateKey.publicKey,
-			address: account.address,
-		}));
+		return accountPrivateKey.execute(
+			async privateKey => ({
+				messageEncrypted: privateKey.encrypt(messageBytes, mvPublicKey),
+				publicKey: privateKey.publicKey,
+				address: account.address,
+			}),
+			{
+				onPrivateKeyRequest: async (address, magicString) =>
+					await this.controller.signMagicString(account, magicString),
+				onYlidePasswordRequest: async address => password,
+			},
+		);
 	}
 
 	async getCurrentAccount(): Promise<WalletAccount | null> {
