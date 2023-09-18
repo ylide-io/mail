@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from 'react';
 
 import { APP_NAME } from '../../constants';
 import { alignAtViewportCenterBottom } from '../../utils/alignment';
-import { isIos, isPwa } from '../../utils/environment';
+import { isIosSafari, isPwa } from '../../utils/environment';
 import { useOnMountAnimation } from '../../utils/useOnMountAnimation';
 import { Popup } from '../popup/popup';
 import css from './iosInstallPwaPopup.module.scss';
@@ -22,7 +22,7 @@ export const IosInstallPwaPopup = observer(() => {
 		return () => clearTimeout(timer);
 	}, []);
 
-	if (!isIos() || isPwa()) {
+	if (!isIosSafari() || isPwa()) {
 		return <></>;
 	}
 
