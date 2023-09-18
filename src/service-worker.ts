@@ -92,7 +92,7 @@ self.addEventListener('push', async event => {
 				body,
 				icon,
 				image,
-				badge: '/badge-96x96.png',
+				badge: '/badge-96x96.png?v2',
 				data,
 			}),
 		);

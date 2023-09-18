@@ -10,13 +10,13 @@
 	"providedBy": { "name": "Mainview", "url": "https://mainview.io/" },
 	"icons": [
 		{
-			"src": "/android-icon-192x192.png",
+			"src": "/android-icon-192x192.png?v2",
 			"sizes": "192x192",
 			"type": "image/png",
 			"purpose": "any"
 		},
 		{
-			"src": "/android-icon-192x192.png",
+			"src": "/android-icon-192x192.png?v2",
 			"sizes": "192x192",
 			"type": "image/png",
 			"purpose": "maskable"
