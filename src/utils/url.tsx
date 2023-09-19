@@ -68,6 +68,10 @@ export const useNav = () => {
 	};
 };
 
+export const usePreviousUrl = () => {
+	return useLocation().state?.previousUrl;
+};
+
 //
 
 export function useIsMatchesPattern(...routes: RoutePath[]) {
