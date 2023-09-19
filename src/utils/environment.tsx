@@ -4,7 +4,7 @@ const uaParser = new UAParser();
 
 export function isIosSafari() {
 	return (
-		!!uaParser.getBrowser().name?.includes('Safari') &&
+		uaParser.getBrowser().name === 'Mobile Safari' &&
 		!!uaParser.getDevice().type?.match(/mobile|tablet/) &&
 		uaParser.getOS().name === 'iOS'
 	);
