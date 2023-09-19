@@ -41,7 +41,6 @@ import domain from './stores/Domain';
 import { FolderId } from './stores/MailList';
 import { RoutePath } from './stores/routePath';
 import { enableRemoteConsole, remoteConsoleChannel } from './utils/dev';
-import { isPwa } from './utils/environment';
 import { openInNewWidnow } from './utils/misc';
 import { useIsMatchesPattern, useNav } from './utils/url';
 
@@ -120,11 +119,6 @@ function redirect({ from, to }: RedirectProps) {
 //
 
 export const App = observer(() => {
-	// Temp
-	useEffect(() => {
-		setTimeout(() => console.log('isPwa', isPwa()), 10000);
-	}, []);
-
 	const location = useLocation();
 
 	const [queryClient] = useState(
