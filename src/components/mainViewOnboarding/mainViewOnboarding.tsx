@@ -13,6 +13,7 @@ import { ActionButton, ActionButtonLook, ActionButtonSize } from '../ActionButto
 import { ActionModal } from '../actionModal/actionModal';
 import { CoverageModal } from '../coverageModal/coverageModal';
 import { toast } from '../toast/toast';
+import { IosInstallPwaPopup } from '../iosInstallPwaPopup/iosInstallPwaPopup';
 
 enum Step {
 	CONNECT_ACCOUNT_INFO = 'CONNECT_ACCOUNT_INFO',
@@ -114,26 +115,36 @@ export const MainViewOnboarding = observer(() => {
 				</ActionModal>
 			)}
 
-			{step === Step.BUILDING_FEED && (coverage === 'loading' || coverage === 'error' || !coverage) && (
-				<ActionModal
-					title="We're setting up your personalized feed"
-					buttons={<ActionButton isLoading size={ActionButtonSize.XLARGE} look={ActionButtonLook.PRIMARY} />}
-				>
-					We're currently fetching data about your tokens and transactions to create a tailored experience
-					just for you. This may take a few moments. Thank you for your patience.
-				</ActionModal>
+			{step === Step.BUILDING_FEED && (
+				<>
+					{!coverage || coverage === 'loading' || coverage === 'error' ? (
+						<ActionModal
+							title="We're setting up your personalized feed"
+							buttons={
+								<ActionButton
+									isLoading
+									size={ActionButtonSize.XLARGE}
+									look={ActionButtonLook.PRIMARY}
+								/>
+							}
+						>
+							We're currently fetching data about your tokens and transactions to create a tailored
+							experience just for you. This may take a few moments. Thank you for your patience.
+						</ActionModal>
+					) : (
+						<CoverageModal
+							onClose={() => {
+								setFreshAccount(null);
+								toast(`Welcome to ${APP_NAME} 🔥`);
+								reset();
+							}}
+							coverage={coverage}
+						/>
+					)}
+				</>
 			)}
 
-			{coverage && coverage !== 'loading' && coverage !== 'error' && (
-				<CoverageModal
-					onClose={() => {
-						setFreshAccount(null);
-						toast(`Welcome to ${APP_NAME} 🔥`);
-						reset();
-					}}
-					coverage={coverage}
-				/>
-			)}
+			{!step && <IosInstallPwaPopup />}
 		</>
 	);
 });
