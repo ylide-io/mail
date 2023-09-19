@@ -24,7 +24,7 @@ export function ExplorePage() {
 
 				<div className={css.smallGrid}>
 					{communities
-						.filter(p => p.tags?.includes(tag))
+						.filter(c => c.tags?.includes(tag) && !c.hidden)
 						.map(community => (
 							<RegularCommunityCard community={community} />
 						))}

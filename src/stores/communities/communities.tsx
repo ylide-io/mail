@@ -2,6 +2,7 @@ import { Uint256 } from '@ylide/sdk';
 
 import { VENOM_FEED_ID } from '../../constants';
 import { BlockchainName } from '../../utils/blockchain';
+import createXBannerSrc from './bannerImages/alienSwap.jpg';
 import altsomeBannerSrc from './bannerImages/altsome.jpg';
 import auroraBannerSrc from './bannerImages/aurora.jpg';
 import auroraAfricaBannerSrc from './bannerImages/auroraAfrica.jpg';
@@ -39,6 +40,7 @@ import venomIdBannerSrc from './bannerImages/venomId.jpg';
 import venomRecapBannerSrc from './bannerImages/venomRecap.jpg';
 import ventoryBannerSrc from './bannerImages/ventory.jpg';
 import web3WorldBannerSrc from './bannerImages/web3World.jpg';
+import createXSrc from './profileImages/alienSwap.jpg';
 import altsomeSrc from './profileImages/altsome.jpg';
 import auroraSrc from './profileImages/aurora.jpg';
 import auroraAfricaSrc from './profileImages/auroraAfrica.jpg';
@@ -99,6 +101,7 @@ export interface Community {
 	bannerImage?: string;
 	website?: string;
 	tags?: CommunityTag[];
+	hidden?: boolean;
 	fixedChain?: string;
 	allowedChains?: string[];
 	attachmentMode?: CommunityAttachmentMode;
@@ -157,6 +160,7 @@ export enum CommunityId {
 	BET_FURY = 'bet_fury',
 	DITTO_NETWORK = 'ditto_network',
 	ALTSOME = 'altsome',
+	ALIEN_SWAP = 'alien_swap',
 
 	// TEST
 
@@ -808,6 +812,23 @@ export const communities: Community[] = [
 		bannerImage: altsomeBannerSrc,
 		website: 'https://altsome.com/',
 		tags: [CommunityTag.DEFI, CommunityTag.NFT],
+		allowedChains: allChainsExceptTest,
+		attachmentMode: CommunityAttachmentMode.ADMINS,
+	},
+	{
+		id: CommunityId.ALIEN_SWAP,
+		feedId: {
+			official: '200000000000000000000000000000000000000000000000000000000000004c' as Uint256,
+			discussion: '200000000000000000000000000000000000000000000000000000000000004d' as Uint256,
+		},
+		name: 'AlienSwap (TEST)',
+		description:
+			'The first membership-based NFT marketplace and aggregator, AlienSwap builds the leading NFT trading layer.',
+		profileImage: createXSrc,
+		bannerImage: createXBannerSrc,
+		website: 'https://alienswap.xyz/',
+		tags: [CommunityTag.NFT],
+		hidden: true,
 		allowedChains: allChainsExceptTest,
 		attachmentMode: CommunityAttachmentMode.ADMINS,
 	},
