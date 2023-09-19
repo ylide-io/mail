@@ -28,6 +28,8 @@ export const MainViewOnboarding = observer(() => {
 
 	const [step, setStep] = useState<Step>();
 
+	const enforceMainViewOnboarding = domain.enforceMainViewOnboarding;
+
 	// Disconnect inactive accounts before begin
 	useEffect(() => {
 		domain.accounts.accounts
@@ -77,20 +79,22 @@ export const MainViewOnboarding = observer(() => {
 	);
 
 	useEffect(() => {
-		if (domain.enforceMainViewOnboarding) {
-			authorize(domain.enforceMainViewOnboarding);
+		if (enforceMainViewOnboarding) {
+			authorize(enforceMainViewOnboarding);
 		}
-	}, [domain.enforceMainViewOnboarding, authorize]);
+	}, [enforceMainViewOnboarding, authorize]);
 
 	const connect = useCallback(async () => {
-		connectAccount({ place: 'mv_onboarding' }).catch(() => {
+		const newAccount = await connectAccount({ place: 'mv_onboarding' });
+		if (!newAccount && !accounts.length) {
 			setStep(Step.CONNECT_ACCOUNT_INFO);
-		});
-	}, []);
+		}
+	}, [accounts]);
 
 	useEffect(() => {
 		// Do nothing if something is happening already
 		if (step) return;
+
 		if (!accounts.length) {
 			connect();
 		}

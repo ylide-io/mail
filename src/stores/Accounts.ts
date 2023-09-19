@@ -63,14 +63,13 @@ export class Accounts {
 	}
 
 	async removeAccount(account: DomainAccount) {
-		const idx = this.accounts.indexOf(account);
-		if (idx > -1) {
-			this.accounts.splice(idx, 1);
-		}
+		this.accounts = this.accounts.filter(a => a !== account);
+
 		const widx = account.wallet.accounts.indexOf(account);
 		if (widx > -1) {
 			account.wallet.accounts.splice(widx, 1);
 		}
+
 		for (const privateKey of account.localPrivateKeys) {
 			await this.domain.keysRegistry.removeLocalPrivateKey(privateKey);
 		}
