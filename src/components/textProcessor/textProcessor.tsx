@@ -100,8 +100,8 @@ export function TextProcessor({ text, nlToBr, linksToAnchors, unsafeLinks }: Tex
 			pieces = pieces.reduce<ReactNode[]>((res, curr, i) => {
 				if (typeof curr === 'string') {
 					res.push(
-						// https://regexr.com/7jk80
-						...transformMatches(curr, /((?<=^|\s)(https?:\/\/)\S{3,1024})(?=$|\s)/gi, (item, j) =>
+						// https://regexr.com/7kc9g
+						...transformMatches(curr, /((https?:\/\/)\S{3,1024})/gi, (item, j) =>
 							unsafeLinks && isExternalUrl(item) ? (
 								<UnsafeAnchor key={`linksToAnchors ${i} ${j}`} url={item} />
 							) : (
