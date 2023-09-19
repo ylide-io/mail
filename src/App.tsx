@@ -42,7 +42,7 @@ import { browserStorage } from './stores/browserStorage';
 import domain from './stores/Domain';
 import { RoutePath } from './stores/routePath';
 import walletConnect from './stores/WalletConnect';
-import { useIsMatchingRoute, useNav } from './utils/url';
+import { useIsMatchesPattern, useNav } from './utils/url';
 
 export enum AppTheme {
 	V1 = 'v1',
@@ -108,7 +108,7 @@ export const App = observer(() => {
 
 	const [initErrorId, setInitErrorId] = useState('');
 
-	const isTestPage = useIsMatchingRoute(RoutePath.TEST);
+	const isTestPage = useIsMatchesPattern(RoutePath.TEST);
 
 	useEffect(() => {
 		if (!isTestPage) {
