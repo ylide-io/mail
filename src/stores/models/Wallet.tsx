@@ -171,8 +171,8 @@ export class Wallet extends EventEmitter {
 
 		return accountPrivateKey.execute(
 			async privateKey => ({
-				messageEncrypted: privateKey.encrypt(messageBytes, mvPublicKey),
-				publicKey: privateKey.publicKey,
+				messageEncrypted: Buffer.from(privateKey.encrypt(messageBytes, mvPublicKey)).toString('hex'),
+				publicKey: Buffer.from(privateKey.publicKey).toString('hex'),
 				address: account.address,
 			}),
 			{

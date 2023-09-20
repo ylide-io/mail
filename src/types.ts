@@ -1,5 +1,5 @@
 export type AuthorizationPayload = {
-	messageEncrypted: Uint8Array;
-	publicKey: Uint8Array;
+	messageEncrypted: string;
+	publicKey: string;
 	address: string;
 };
