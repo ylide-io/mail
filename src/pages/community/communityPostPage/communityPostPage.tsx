@@ -43,7 +43,10 @@ export const CommunityPostPage = observer(({ isOfficial }: CommunityPostPageProp
 
 	const { isLoading, data } = useQuery(['community', 'post', postId], {
 		queryFn: async () => {
-			const post = await BlockchainFeedApi.getPost({ id: postId, addresses: accounts.map(a => a.account.address.toLowerCase())});
+			const post = await BlockchainFeedApi.getPost({
+				id: postId,
+				addresses: accounts.map(a => a.account.address),
+			});
 			return decodeBlockchainFeedPost(post!);
 		},
 	});

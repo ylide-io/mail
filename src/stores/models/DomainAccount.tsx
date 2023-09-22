@@ -177,16 +177,16 @@ export class DomainAccount {
 
 	async createAuthKey() {
 		if (this._localPrivateKeys[0]) {
-			const mvPublicKey = new Uint8Array(Buffer.from(REACT_APP__FEED_PUBLIC_KEY!, 'hex'));
+			const mvPublicKey = SmartBuffer.ofHexString(REACT_APP__FEED_PUBLIC_KEY!).bytes;
 
 			const messageBytes = SmartBuffer.ofUTF8String(
-				JSON.stringify({ address: this.account.address.toLowerCase(), timestamp: Date.now() }),
+				JSON.stringify({ address: this.account.address, timestamp: Date.now() }),
 			).bytes;
 
 			return this._localPrivateKeys[0].execute(
 				async privateKey => ({
-					messageEncrypted: Buffer.from(privateKey.encrypt(messageBytes, mvPublicKey)).toString('hex'),
-					publicKey: Buffer.from(privateKey.publicKey).toString('hex'),
+					messageEncrypted: new SmartBuffer(privateKey.encrypt(messageBytes, mvPublicKey)).toHexString(),
+					publicKey: new SmartBuffer(privateKey.publicKey).toHexString(),
 					address: this.account.address,
 				}),
 				// TODO: handle users with password

@@ -76,7 +76,7 @@ const OfficialContent = observer(({ community, setTabsAsideContent }: OfficialCo
 				feedId,
 				beforeTimestamp: pageParam,
 				adminMode: isFeedModeratorMode,
-				addresses: accounts.map(a => a.account.address.toLowerCase())
+				addresses: accounts.map(a => a.account.address),
 			});
 			return posts.map(decodeBlockchainFeedPost);
 		},
@@ -99,7 +99,7 @@ const OfficialContent = observer(({ community, setTabsAsideContent }: OfficialCo
 				feedId,
 				beforeTimestamp: 0,
 				adminMode: isFeedModeratorMode,
-				addresses: accounts.map(a => a.account.address.toLowerCase())
+				addresses: accounts.map(a => a.account.address),
 			});
 
 			const hasNewPosts = !!(posts.length && messages.length && posts[0].id !== messages[0].original.id);
@@ -203,7 +203,7 @@ const DiscussionContent = observer(({ community, setTabsAsideContent }: Discussi
 					feedId,
 					beforeTimestamp: pageParam,
 					adminMode: isFeedModeratorMode,
-					addresses: accounts.map(a => a.account.address.toLowerCase())
+					addresses: accounts.map(a => a.account.address),
 				});
 				return posts.map(decodeBlockchainFeedPost);
 			},
@@ -227,7 +227,7 @@ const DiscussionContent = observer(({ community, setTabsAsideContent }: Discussi
 				feedId,
 				beforeTimestamp: 0,
 				adminMode: isFeedModeratorMode,
-				addresses: accounts.map(a => a.account.address.toLowerCase())
+				addresses: accounts.map(a => a.account.address),
 			});
 
 			const hasNewPosts = !!(posts.length && messages.length && posts[0].id !== messages[0].original.id);
