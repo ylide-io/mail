@@ -21,6 +21,7 @@ import { YlideLoader } from '../../../components/ylideLoader/ylideLoader';
 import { analytics } from '../../../stores/Analytics';
 import { browserStorage } from '../../../stores/browserStorage';
 import { Community, CommunityId, getCommunityById } from '../../../stores/communities/communities';
+import domain from '../../../stores/Domain';
 import { RoutePath } from '../../../stores/routePath';
 import { connectAccount, getAllowedAccountsForBlockchains } from '../../../utils/account';
 import { assertUnreachable, invariant } from '../../../utils/assert';
@@ -62,6 +63,8 @@ const OfficialContent = observer(({ community, setTabsAsideContent }: OfficialCo
 	const feedId = community.feedId.official;
 	invariant(feedId, 'No official feed id');
 
+	const accounts = domain.accounts.activeAccounts;
+
 	const { adminAccounts, isFeedAdmin, isFeedModeratorMode } = useCommunityAccounts(community, true);
 
 	const postsQuery = useInfiniteQuery<DecodedBlockchainFeedPost[]>(['community', communityId, 'posts', 'official'], {
@@ -73,6 +76,7 @@ const OfficialContent = observer(({ community, setTabsAsideContent }: OfficialCo
 				feedId,
 				beforeTimestamp: pageParam,
 				adminMode: isFeedModeratorMode,
+				addresses: accounts.map(a => a.account.address.toLowerCase())
 			});
 			return posts.map(decodeBlockchainFeedPost);
 		},
@@ -95,6 +99,7 @@ const OfficialContent = observer(({ community, setTabsAsideContent }: OfficialCo
 				feedId,
 				beforeTimestamp: 0,
 				adminMode: isFeedModeratorMode,
+				addresses: accounts.map(a => a.account.address.toLowerCase())
 			});
 
 			const hasNewPosts = !!(posts.length && messages.length && posts[0].id !== messages[0].original.id);
@@ -198,6 +203,7 @@ const DiscussionContent = observer(({ community, setTabsAsideContent }: Discussi
 					feedId,
 					beforeTimestamp: pageParam,
 					adminMode: isFeedModeratorMode,
+					addresses: accounts.map(a => a.account.address.toLowerCase())
 				});
 				return posts.map(decodeBlockchainFeedPost);
 			},
@@ -221,6 +227,7 @@ const DiscussionContent = observer(({ community, setTabsAsideContent }: Discussi
 				feedId,
 				beforeTimestamp: 0,
 				adminMode: isFeedModeratorMode,
+				addresses: accounts.map(a => a.account.address.toLowerCase())
 			});
 
 			const hasNewPosts = !!(posts.length && messages.length && posts[0].id !== messages[0].original.id);

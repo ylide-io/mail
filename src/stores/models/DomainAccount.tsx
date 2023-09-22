@@ -1,9 +1,12 @@
 import { EVMNetwork } from '@ylide/ethereum';
 import { RemotePublicKey, ServiceCode, WalletAccount, YlideCore, YlideKeysRegistry, YlidePrivateKey } from '@ylide/sdk';
+import { SmartBuffer } from '@ylide/smart-buffer';
 import { computed, makeAutoObservable, observable } from 'mobx';
 
+import { BlockchainFeedApi } from '../../api/blockchainFeedApi';
 import { AdaptiveAddress } from '../../components/adaptiveAddress/adaptiveAddress';
 import { toast } from '../../components/toast/toast';
+import { REACT_APP__FEED_PUBLIC_KEY } from '../../env';
 import { browserStorage } from '../browserStorage';
 import { Wallet } from './Wallet';
 
@@ -25,6 +28,21 @@ export class DomainAccount {
 		this._name = name;
 
 		this.reloadKeys();
+
+		this.reloadAuthKey();
+	}
+
+	public async reloadAuthKey() {
+		if (!this.authKey) {
+			try {
+				const key = await this.createAuthKey();
+				if (!key) return;
+				const { token } = await BlockchainFeedApi.auth(key);
+				this.authKey = token;
+			} catch (e) {
+				console.error(e);
+			}
+		}
 	}
 
 	public reloadKeys() {
@@ -153,6 +171,42 @@ export class DomainAccount {
 	set mainViewKey(key: string) {
 		browserStorage.mainViewKeys = {
 			...browserStorage.mainViewKeys,
+			[this.account.address]: key || undefined,
+		};
+	}
+
+	async createAuthKey() {
+		if (this._localPrivateKeys[0]) {
+			const mvPublicKey = new Uint8Array(Buffer.from(REACT_APP__FEED_PUBLIC_KEY!, 'hex'));
+
+			const messageBytes = SmartBuffer.ofUTF8String(
+				JSON.stringify({ address: this.account.address.toLowerCase(), timestamp: Date.now() }),
+			).bytes;
+
+			return this._localPrivateKeys[0].execute(
+				async privateKey => ({
+					messageEncrypted: Buffer.from(privateKey.encrypt(messageBytes, mvPublicKey)).toString('hex'),
+					publicKey: Buffer.from(privateKey.publicKey).toString('hex'),
+					address: this.account.address,
+				}),
+				// TODO: handle users with password
+				// {
+				// 	onPrivateKeyRequest: async (address: string, magicString: string) =>
+				// 		await this.wallet.controller.signMagicString(this.account, magicString),
+				// 	onYlidePasswordRequest: async _ => password,
+				// },
+			);
+		}
+		return null;
+	}
+
+	get authKey() {
+		return browserStorage.authKeys[this.account.address] || '';
+	}
+
+	set authKey(key: string) {
+		browserStorage.authKeys = {
+			...browserStorage.authKeys,
 			[this.account.address]: key || undefined,
 		};
 	}

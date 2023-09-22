@@ -93,7 +93,7 @@ export const DiscussionPost = observer(({ post, community, onReplyClick }: Discu
 	const repliedPostQuery = useQuery(['feed', 'venom', 'reply-to', replyToId], {
 		enabled: !!replyToId,
 		queryFn: async () => {
-			const post = await BlockchainFeedApi.getPost({ id: replyToId! });
+			const post = await BlockchainFeedApi.getPost({ id: replyToId!, addresses: accounts.map(a => a.account.address.toLowerCase()) });
 			return post ? decodeBlockchainFeedPost(post) : undefined;
 		},
 	});

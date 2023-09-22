@@ -16,6 +16,7 @@ import { YlideLoader } from '../../../components/ylideLoader/ylideLoader';
 import { ReactComponent as ShareSvg } from '../../../icons/ic20/share.svg';
 import { MessageDecodedTextDataType } from '../../../indexedDB/IndexedDB';
 import { CommunityId, getCommunityById } from '../../../stores/communities/communities';
+import domain from '../../../stores/Domain';
 import { RoutePath } from '../../../stores/routePath';
 import { HorizontalAlignment } from '../../../utils/alignment';
 import { invariant } from '../../../utils/assert';
@@ -33,6 +34,7 @@ export const CommunityPostPage = observer(({ isOfficial }: CommunityPostPageProp
 	const { projectId, postId } = useParams<{ projectId: CommunityId; postId: string }>();
 	invariant(projectId);
 	invariant(postId);
+	const accounts = domain.accounts.activeAccounts;
 
 	const community = getCommunityById(projectId);
 	const postPath = isOfficial
@@ -41,7 +43,7 @@ export const CommunityPostPage = observer(({ isOfficial }: CommunityPostPageProp
 
 	const { isLoading, data } = useQuery(['community', 'post', postId], {
 		queryFn: async () => {
-			const post = await BlockchainFeedApi.getPost({ id: postId });
+			const post = await BlockchainFeedApi.getPost({ id: postId, addresses: accounts.map(a => a.account.address.toLowerCase())});
 			return decodeBlockchainFeedPost(post!);
 		},
 	});

@@ -129,7 +129,7 @@ export namespace BlockchainFeedApi {
 	}
 
 	export async function banPost(params: { ids: string[]; secret: string }) {
-		return await request('/ban-posts', {
+		return await request('/v2/ban-posts', {
 			query: { secret: params.secret, id: params.ids },
 			params: { method: 'POST' },
 		});
@@ -151,15 +151,25 @@ export namespace BlockchainFeedApi {
 		});
 	}
 
-	export async function getPosts(params: { feedId: string; beforeTimestamp: number; adminMode?: boolean }) {
-		return await request<BlockchainFeedPost[]>('/posts', {
-			query: { feedId: params.feedId, beforeTimestamp: params.beforeTimestamp, adminMode: params.adminMode },
+	export async function getPosts(params: {
+		feedId: string;
+		beforeTimestamp: number;
+		adminMode?: boolean;
+		addresses?: string[];
+	}) {
+		return await request<BlockchainFeedPost[]>('/v2/posts', {
+			query: {
+				feedId: params.feedId,
+				beforeTimestamp: params.beforeTimestamp,
+				adminMode: params.adminMode,
+				address: params.addresses,
+			},
 		});
 	}
 
-	export async function getPost(params: { id: string; adminMode?: boolean }) {
-		return await request<BlockchainFeedPost | null>('/post', {
-			query: { id: params.id, adminMode: params.adminMode },
+	export async function getPost(params: { id: string; adminMode?: boolean; addresses?: string[] }) {
+		return await request<BlockchainFeedPost | null>('/v2/post', {
+			query: { id: params.id, adminMode: params.adminMode, address: params.addresses },
 		});
 	}
 
@@ -253,6 +263,39 @@ export namespace BlockchainFeedApi {
 			});
 
 			return it as any as Record<string, string>;
+		});
+	}
+
+	export async function auth(body: { messageEncrypted: string; publicKey: string; address: string }) {
+		return await request<{ token: string }>('/auth', {
+			params: {
+				headers: {
+					'Content-Type': 'application/json',
+				},
+				body: JSON.stringify(body),
+				method: 'POST',
+			},
+		});
+	}
+
+	export async function reaction({
+		postId,
+		reaction,
+		authKey,
+	}: {
+		postId: string;
+		reaction: string;
+		authKey: string;
+	}) {
+		return await request('/reaction', {
+			params: {
+				headers: {
+					'Content-Type': 'application/json',
+					'Authorization': `Bearer ${authKey}`,
+				},
+				body: JSON.stringify({ postId, reaction }),
+				method: 'POST',
+			},
 		});
 	}
 }
