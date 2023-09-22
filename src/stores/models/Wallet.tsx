@@ -163,7 +163,7 @@ export class Wallet extends EventEmitter {
 		accountPrivateKey: YlidePrivateKey,
 		password: string,
 	): Promise<AuthorizationPayload> {
-		const mvPublicKey = new Uint8Array(Buffer.from(REACT_APP__MV_PUBLIC_KEY!, 'hex'));
+		const mvPublicKey = SmartBuffer.ofHexString(REACT_APP__MV_PUBLIC_KEY!).bytes;
 
 		const messageBytes = SmartBuffer.ofUTF8String(
 			JSON.stringify({ address: account.address.toLowerCase(), timestamp: Date.now() }),
@@ -171,8 +171,8 @@ export class Wallet extends EventEmitter {
 
 		return accountPrivateKey.execute(
 			async privateKey => ({
-				messageEncrypted: Buffer.from(privateKey.encrypt(messageBytes, mvPublicKey)).toString('hex'),
-				publicKey: Buffer.from(privateKey.publicKey).toString('hex'),
+				messageEncrypted: new SmartBuffer(privateKey.encrypt(messageBytes, mvPublicKey)).toHexString(),
+				publicKey: new SmartBuffer(privateKey.publicKey).toHexString(),
 				address: account.address,
 			}),
 			{
