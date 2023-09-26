@@ -24,6 +24,7 @@ import { toast } from '../../../../components/toast/toast';
 import { ReactComponent as CrossSvg } from '../../../../icons/ic20/cross.svg';
 import { ReactComponent as ExternalSvg } from '../../../../icons/ic20/external.svg';
 import { ReactComponent as MailSvg } from '../../../../icons/ic20/mail.svg';
+import { ReactComponent as ReplySvg } from '../../../../icons/ic20/reply.svg';
 import { ReactComponent as TickSvg } from '../../../../icons/ic20/tick.svg';
 import { MessageDecodedTextDataType } from '../../../../indexedDB/IndexedDB';
 import { analytics } from '../../../../stores/Analytics';
@@ -181,6 +182,16 @@ export const DiscussionPost = observer(({ post, community, onReplyClick }: Discu
 
 	//
 
+	const onComposeMailClick = () => {
+		analytics.blockchainFeedComposeMail(post.original.id, post.msg.senderAddress);
+
+		const mailData = new OutgoingMailData();
+		mailData.from = accounts[0];
+		mailData.to = new Recipients([post.msg.senderAddress]);
+
+		openMailCompose({ mailData, place: 'project-discussion' });
+	};
+
 	return isReviewed ? (
 		<></>
 	) : (
@@ -205,22 +216,6 @@ export const DiscussionPost = observer(({ post, community, onReplyClick }: Discu
 								}
 							}}
 						/>
-
-						<button
-							className={clsx(css.actionItem, css.actionItem_icon, css.actionItem_interactive)}
-							title="Compose mail"
-							onClick={() => {
-								analytics.blockchainFeedComposeMail(post.original.id, post.msg.senderAddress);
-
-								const mailData = new OutgoingMailData();
-								mailData.from = accounts[0];
-								mailData.to = new Recipients([post.msg.senderAddress]);
-
-								openMailCompose({ mailData, place: 'project-discussion' });
-							}}
-						>
-							<MailSvg />
-						</button>
 					</div>
 
 					<div className={css.metaRight}>
@@ -310,8 +305,20 @@ export const DiscussionPost = observer(({ post, community, onReplyClick }: Discu
 							<ReadableDate value={post.msg.createdAt * 1000} />
 						</a>
 
-						<button className={clsx(css.actionItem, css.actionItem_interactive)} onClick={onReplyClick}>
-							<b>Reply</b>
+						<button
+							className={clsx(css.actionItem, css.actionItem_icon, css.actionItem_interactive)}
+							title="Reply"
+							onClick={onReplyClick}
+						>
+							<ReplySvg />
+						</button>
+
+						<button
+							className={clsx(css.actionItem, css.actionItem_icon, css.actionItem_interactive)}
+							title="Send private message"
+							onClick={onComposeMailClick}
+						>
+							<MailSvg />
 						</button>
 					</div>
 				</div>

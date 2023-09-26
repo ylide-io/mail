@@ -111,7 +111,7 @@
 	grid-auto-flow: column;
 	align-items: center;
 	justify-content: start;
-	grid-gap: 12px;
+	grid-gap: 8px;
 
 	&:after {
 		// Needed to make meta-button's negative margin work when it's the only element
@@ -141,7 +141,6 @@
 }
 
 .actionItem_icon {
-	margin: -99px -2px;
 	width: 20px;
 	height: 20px;
 }
