@@ -4,7 +4,9 @@ import { PropsWithChildren, useMemo } from 'react';
 
 import { ActionButton, ActionButtonLook, ActionButtonSize } from '../../components/ActionButton/ActionButton';
 import { AdaptiveAddress } from '../../components/adaptiveAddress/adaptiveAddress';
+import { Avatar } from '../../components/avatar/avatar';
 import { CheckBox } from '../../components/checkBox/checkBox';
+import { Emoji } from '../../components/emoji/emoji';
 import { RecipientInput, Recipients } from '../../components/recipientInput/recipientInput';
 import { TagInput, TagInputItem } from '../../components/tagInput/tagInput';
 import { TextField, TextFieldLook } from '../../components/textField/textField';
@@ -250,6 +252,28 @@ export const TestPage = observer(() => {
 				<CheckBox isChecked isDisabled>
 					Disabled
 				</CheckBox>
+			</Row>
+
+			<hr style={{ margin: '32px 0' }} />
+
+			<Row>
+				<div style={{ width: '50px' }}>
+					<Avatar blockie="asdasd" />
+				</div>
+				<div style={{ width: '20px' }}>
+					<Avatar blockie="asdasd" />
+				</div>
+			</Row>
+
+			<hr style={{ margin: '32px 0' }} />
+
+			<Row>
+				<div style={{ width: '50px' }}>
+					<Emoji>😀</Emoji>
+				</div>
+				<div style={{ width: '20px' }}>
+					<Emoji>👍</Emoji>
+				</div>
 			</Row>
 
 			<hr style={{ margin: '32px 0' }} />
