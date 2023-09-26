@@ -161,3 +161,16 @@ $mediaHeight768: 768px;
 		}
 	}
 }
+
+//
+
+@mixin popup-root {
+	position: fixed;
+	padding: 4px 0;
+}
+
+@mixin popup-inner($borderRadius: 16px) {
+	background: var(--surface-color);
+	border-radius: $borderRadius;
+	box-shadow: var(--popup-shadow);
+}

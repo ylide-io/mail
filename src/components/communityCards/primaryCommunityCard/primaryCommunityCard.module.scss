@@ -107,19 +107,16 @@
 $adminPopupPadding: 20px;
 
 .adminPopup {
+	@include popup-root;
 	display: flex;
-	position: fixed;
-	padding: 4px 0;
 	max-width: 320px;
 }
 
 .adminInner {
+	@include popup-inner;
 	display: grid;
 	grid-gap: 16px;
 	padding: $adminPopupPadding;
-	background: var(--surface-color);
-	border-radius: 16px;
-	box-shadow: var(--popup-shadow);
 }
 
 .adminItems {

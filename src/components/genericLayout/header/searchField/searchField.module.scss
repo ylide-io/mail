@@ -27,19 +27,16 @@
 //
 
 .popup {
+	@include popup-root;
 	display: grid;
-	position: fixed;
-	padding: 4px 0;
 }
 
 .content {
+	@include popup-inner;
 	padding: 12px 0;
 	min-width: 0;
 	max-height: 320px;
 	overflow-y: auto;
-	background: var(--surface-color);
-	border-radius: 16px;
-	box-shadow: var(--popup-shadow);
 }
 
 .heading {
