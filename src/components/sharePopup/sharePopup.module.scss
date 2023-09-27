@@ -1,15 +1,12 @@
 .root {
-	position: fixed;
-	padding: 4px 0;
+	@include popup-root;
 }
 
 .content {
+	@include popup-inner(8px);
 	display: grid;
 	grid-gap: 12px;
 	padding: 16px;
-	background: var(--surface-color);
-	border-radius: 8px;
-	box-shadow: var(--popup-shadow);
 }
 
 .icon {

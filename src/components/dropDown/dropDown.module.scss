@@ -1,18 +1,14 @@
-$shift: 4px;
 $contentPadding: 6px;
 
 .root {
-	position: fixed;
-	padding: $shift 0;
+	@include popup-root;
 }
 
 .content {
+	@include popup-inner(4px);
 	padding: $contentPadding 0;
 	height: 100%;
 	max-height: $interactive-elem-size * 8 + ($interactive-elem-size / 2) + $contentPadding;
-	background: var(--surface-color);
-	border-radius: 4px;
-	box-shadow: var(--popup-shadow);
 	overflow-y: auto;
 }
 

@@ -1,8 +1,8 @@
 import { MessageAttachmentLinkV1 } from '@ylide/sdk';
 import clsx from 'clsx';
 import { observer } from 'mobx-react';
-import { useCallback, useMemo, useState } from 'react';
-import { useQuery } from 'react-query';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useMutation, useQuery } from 'react-query';
 import { generatePath } from 'react-router-dom';
 
 import {
@@ -16,26 +16,33 @@ import { Avatar } from '../../../../components/avatar/avatar';
 import { BlockChainLabel } from '../../../../components/BlockChainLabel/BlockChainLabel';
 import { GridRowBox } from '../../../../components/boxes/boxes';
 import { GalleryModal } from '../../../../components/galleryModal/galleryModal';
+import { ReactionBadge } from '../../../../components/reactionBadge/reactionBadge';
 import { ReadableDate } from '../../../../components/readableDate/readableDate';
 import { Recipients } from '../../../../components/recipientInput/recipientInput';
+import { SetReactionFlow } from '../../../../components/setReactionFlow/setReactionFlow';
 import { Spinner, SpinnerLook } from '../../../../components/spinner/spinner';
 import { TextProcessor } from '../../../../components/textProcessor/textProcessor';
 import { toast } from '../../../../components/toast/toast';
 import { ReactComponent as CrossSvg } from '../../../../icons/ic20/cross.svg';
 import { ReactComponent as ExternalSvg } from '../../../../icons/ic20/external.svg';
 import { ReactComponent as MailSvg } from '../../../../icons/ic20/mail.svg';
+import { ReactComponent as ReplySvg } from '../../../../icons/ic20/reply.svg';
+import { ReactComponent as SmileSvg } from '../../../../icons/ic20/smile.svg';
 import { ReactComponent as TickSvg } from '../../../../icons/ic20/tick.svg';
 import { MessageDecodedTextDataType } from '../../../../indexedDB/IndexedDB';
 import { analytics } from '../../../../stores/Analytics';
 import { browserStorage } from '../../../../stores/browserStorage';
 import { Community, CommunityId } from '../../../../stores/communities/communities';
 import domain from '../../../../stores/Domain';
+import { DomainAccount } from '../../../../stores/models/DomainAccount';
 import { OutgoingMailData } from '../../../../stores/outgoingMailData';
 import { RoutePath } from '../../../../stores/routePath';
+import { invariant } from '../../../../utils/assert';
 import { generateBlockchainExplorerUrl } from '../../../../utils/blockchain';
 import { copyToClipboard } from '../../../../utils/clipboard';
 import { getIpfsHashFromUrl, ipfsToHttpUrl } from '../../../../utils/ipfs';
 import { useOpenMailCompose } from '../../../../utils/mail';
+import { getAccountsForReaction } from '../../../../utils/reactions';
 import { useNav } from '../../../../utils/url';
 import { stickerIpfsIds } from '../createPostForm/stickerIpfsIds';
 import { RepliedDiscussionPost } from '../repliedDiscussionPost/repliedDiscussionPost';
@@ -53,9 +60,25 @@ interface DiscussionPostProps {
 	onReplyClick?: () => void;
 }
 
-export const DiscussionPost = observer(({ post, community, onReplyClick }: DiscussionPostProps) => {
+export const DiscussionPost = observer(({ post: initialPost, community, onReplyClick }: DiscussionPostProps) => {
 	const navigate = useNav();
 	const isAdminMode = browserStorage.isUserAdmin;
+
+	// Workaround for https://github.com/TanStack/query/issues/6067
+	const [reloadedPost, setReloadedPost] = useState<DecodedBlockchainFeedPost>();
+	useEffect(() => setReloadedPost(undefined), [initialPost.original.id]);
+
+	const reloadPostMutation = useMutation({
+		mutationFn: async () => {
+			const post = await BlockchainFeedApi.getPost({
+				id: initialPost.original.id,
+				addresses: domain.accounts.activeAccounts.map(a => a.account.address),
+			});
+			setReloadedPost(decodeBlockchainFeedPost(post!));
+		},
+	});
+
+	const post = reloadedPost || initialPost;
 
 	const isAuthorAdmin = !!post.original.isAdmin;
 	const blockchain = post.original.blockchain;
@@ -100,6 +123,73 @@ export const DiscussionPost = observer(({ post, community, onReplyClick }: Discu
 			return post ? decodeBlockchainFeedPost(post) : undefined;
 		},
 	});
+
+	//
+
+	const onComposeMailClick = () => {
+		analytics.blockchainFeedComposeMail(post.original.id, post.msg.senderAddress);
+
+		const mailData = new OutgoingMailData();
+		mailData.from = accounts[0];
+		mailData.to = new Recipients([post.msg.senderAddress]);
+
+		openMailCompose({ mailData, place: 'project-discussion' });
+	};
+
+	//
+
+	const reactionsCountsEntries = Object.entries(post.original.reactionsCounts);
+
+	const setReactionMutation = useMutation({
+		mutationFn: async (variables: { reaction: string; account: DomainAccount }) => {
+			invariant(variables.account.authKey, 'No auth key');
+
+			await BlockchainFeedApi.setReaction({
+				postId: post.msg.msgId,
+				reaction: variables.reaction,
+				authKey: variables.account.authKey,
+			});
+
+			await reloadPostMutation.mutateAsync();
+		},
+		onError: error => {
+			toast(`Couldn't set reaction 😟`);
+			console.error(error);
+		},
+	});
+
+	const setReaction = async (reaction: string, account: DomainAccount) => {
+		if (setReactionMutation.isLoading || removeReactionMutation.isLoading) return;
+
+		await setReactionMutation.mutateAsync({ reaction, account });
+	};
+
+	const removeReactionMutation = useMutation({
+		mutationFn: async (variables: { accounts: DomainAccount[] }) => {
+			await Promise.all(
+				variables.accounts
+					.filter(account => account.authKey && post.original.addressReactions[account.account.address])
+					.map(account =>
+						BlockchainFeedApi.removeReaction({
+							postId: post.msg.msgId,
+							authKey: account.authKey,
+						}),
+					),
+			);
+
+			await reloadPostMutation.mutateAsync();
+		},
+		onError: error => {
+			toast(`Couldn't remove reaction 😟`);
+			console.error(error);
+		},
+	});
+
+	const removeReaction = async (accounts: DomainAccount[]) => {
+		if (setReactionMutation.isLoading || removeReactionMutation.isLoading) return;
+
+		await removeReactionMutation.mutateAsync({ accounts });
+	};
 
 	//
 
@@ -195,7 +285,7 @@ export const DiscussionPost = observer(({ post, community, onReplyClick }: Discu
 						<AdaptiveAddress
 							className={css.sender}
 							contentClassName={isAuthorAdmin ? css.senderContent_admin : undefined}
-							maxLength={12}
+							maxLength={24}
 							address={post.msg.senderAddress}
 							onClick={e => {
 								if (e.shiftKey && browserStorage.isUserAdmin) {
@@ -205,22 +295,6 @@ export const DiscussionPost = observer(({ post, community, onReplyClick }: Discu
 								}
 							}}
 						/>
-
-						<button
-							className={clsx(css.actionItem, css.actionItem_icon, css.actionItem_interactive)}
-							title="Compose mail"
-							onClick={() => {
-								analytics.blockchainFeedComposeMail(post.original.id, post.msg.senderAddress);
-
-								const mailData = new OutgoingMailData();
-								mailData.from = accounts[0];
-								mailData.to = new Recipients([post.msg.senderAddress]);
-
-								openMailCompose({ mailData, place: 'project-discussion' });
-							}}
-						>
-							<MailSvg />
-						</button>
 					</div>
 
 					<div className={css.metaRight}>
@@ -310,9 +384,83 @@ export const DiscussionPost = observer(({ post, community, onReplyClick }: Discu
 							<ReadableDate value={post.msg.createdAt * 1000} />
 						</a>
 
-						<button className={clsx(css.actionItem, css.actionItem_interactive)} onClick={onReplyClick}>
-							<b>Reply</b>
+						<button
+							className={clsx(css.actionItem, css.actionItem_icon, css.actionItem_interactive)}
+							title="Reply"
+							onClick={onReplyClick}
+						>
+							<ReplySvg />
 						</button>
+
+						<button
+							className={clsx(css.actionItem, css.actionItem_icon, css.actionItem_interactive)}
+							title="Send private message"
+							onClick={onComposeMailClick}
+						>
+							<MailSvg />
+						</button>
+
+						<SetReactionFlow onSelect={setReaction}>
+							{({ anchorRef, onAnchorClick }) => (
+								<button
+									ref={anchorRef}
+									className={clsx(css.actionItem, css.actionItem_icon, css.actionItem_interactive)}
+									title="Reactions"
+									onClick={() => onAnchorClick()}
+								>
+									{setReactionMutation.isLoading || removeReactionMutation.isLoading ? (
+										<Spinner size={16} />
+									) : (
+										<SmileSvg />
+									)}
+								</button>
+							)}
+						</SetReactionFlow>
+
+						{reactionsCountsEntries.length ? (
+							reactionsCountsEntries.map(([reaction, count]) => {
+								const accountsForReaction = getAccountsForReaction(
+									reaction,
+									post.original.addressReactions,
+								);
+
+								return accountsForReaction.length ? (
+									<ReactionBadge
+										className={css.reaction}
+										reaction={reaction}
+										counter={count || 1}
+										isActive
+										onClick={() => removeReaction(accountsForReaction)}
+									/>
+								) : (
+									<SetReactionFlow key={reaction} initialReaction={reaction} onSelect={setReaction}>
+										{({ anchorRef, onAnchorClick }) => (
+											<ReactionBadge
+												ref={anchorRef}
+												className={css.reaction}
+												reaction={reaction}
+												counter={count || 1}
+												onClick={onAnchorClick}
+											/>
+										)}
+									</SetReactionFlow>
+								);
+							})
+						) : (
+							<div className={css.noReactions}>
+								{['❤️', '👍', '🎉'].map(reaction => (
+									<SetReactionFlow key={reaction} initialReaction={reaction} onSelect={setReaction}>
+										{({ anchorRef, onAnchorClick }) => (
+											<ReactionBadge
+												ref={anchorRef}
+												reaction={reaction}
+												onClick={onAnchorClick}
+											/>
+										)}
+									</SetReactionFlow>
+								))}
+							</div>
+						)}
 					</div>
 				</div>
 			</div>

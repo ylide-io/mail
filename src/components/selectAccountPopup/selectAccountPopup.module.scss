@@ -1,0 +1,40 @@
+.root {
+	@include popup-root;
+	max-width: 320px;
+}
+
+.inner {
+	@include popup-inner(8px);
+}
+
+.title {
+	padding: 12px 12px 8px;
+	color: var(--secondary-text-color);
+	font-weight: $font-weight_medium;
+}
+
+.list {
+	padding: 0 8px 8px;
+	max-height: 112px;
+	overflow-y: auto;
+}
+
+.account {
+	display: grid;
+	grid-template-columns: 24px auto;
+	grid-gap: 8px;
+	align-items: center;
+	padding: 4px;
+	font-size: 12px;
+	font-weight: $font-weight_medium;
+	border-radius: 4px;
+	cursor: pointer;
+
+	&:hover {
+		background: var(--surface-hover-heavy-color);
+	}
+}
+
+.accountText {
+	@include truncate-text;
+}

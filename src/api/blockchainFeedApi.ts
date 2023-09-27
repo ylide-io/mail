@@ -5,6 +5,7 @@ import { useQuery } from 'react-query';
 import { REACT_APP__BLOCKCHAIN_FEED } from '../env';
 import { IMessageDecodedContent } from '../indexedDB/IndexedDB';
 import { Community } from '../stores/communities/communities';
+import { randomArrayElem } from '../utils/array';
 import { invariant } from '../utils/assert';
 import { decodeBroadcastContent } from '../utils/mail';
 import { createCleanSerachParams } from '../utils/url';
@@ -18,6 +19,8 @@ export interface BlockchainFeedPost {
 	banned: boolean;
 	blockchain: string;
 	isAdmin?: boolean;
+	addressReactions: Record<string, string | undefined>;
+	reactionsCounts: Record<string, number | undefined>;
 }
 
 export interface DecodedBlockchainFeedPost {
@@ -71,13 +74,13 @@ export namespace BlockchainFeedApi {
 	export function getUrl() {
 		return (
 			REACT_APP__BLOCKCHAIN_FEED ||
-			[
+			randomArrayElem([
 				'https://blockchain-feed1.ylide.io',
 				'https://blockchain-feed2.ylide.io',
 				'https://blockchain-feed3.ylide.io',
 				'https://blockchain-feed4.ylide.io',
 				'https://blockchain-feed5.ylide.io',
-			][Math.floor(Math.random() * 5)]
+			])
 		);
 	}
 
@@ -278,7 +281,7 @@ export namespace BlockchainFeedApi {
 		});
 	}
 
-	export async function reaction({
+	export async function setReaction({
 		postId,
 		reaction,
 		authKey,
@@ -295,6 +298,19 @@ export namespace BlockchainFeedApi {
 				},
 				body: JSON.stringify({ postId, reaction }),
 				method: 'POST',
+			},
+		});
+	}
+
+	export async function removeReaction({ postId, authKey }: { postId: string; authKey: string }) {
+		return await request('/reaction', {
+			params: {
+				headers: {
+					'Content-Type': 'application/json',
+					'Authorization': `Bearer ${authKey}`,
+				},
+				body: JSON.stringify({ postId }),
+				method: 'DELETE',
 			},
 		});
 	}

@@ -115,6 +115,14 @@ $mediaHeight768: 768px;
 	user-select: none;
 }
 
+@mixin pseudo-nbsp($fontSize: inherit, $lineHeight: inherit, $pseudo: after) {
+	&:#{$pseudo} {
+		content: ' ';
+		font-size: $fontSize;
+		line-height: $lineHeight;
+	}
+}
+
 // MISC
 
 @mixin flex-row($align-items, $justify-content) {
@@ -160,4 +168,17 @@ $mediaHeight768: 768px;
 			opacity: 0.9;
 		}
 	}
+}
+
+//
+
+@mixin popup-root {
+	position: fixed;
+	padding: 4px 0;
+}
+
+@mixin popup-inner($borderRadius: 16px) {
+	background: var(--surface-color);
+	border-radius: $borderRadius;
+	box-shadow: var(--popup-shadow);
 }

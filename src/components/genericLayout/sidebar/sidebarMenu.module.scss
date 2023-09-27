@@ -74,7 +74,7 @@
 }
 
 .sidebarButton_active:before {
-	background: var(--accent2-surface-color);
+	background: var(--accent2-surface-alpha-color);
 }
 
 .sidebarButton:hover,
@@ -120,7 +120,7 @@
 //
 
 .sidebarCommunity_active:before {
-	background: var(--accent2-surface-color);
+	background: var(--accent2-surface-alpha-color);
 }
 
 //

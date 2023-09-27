@@ -90,19 +90,16 @@
 }
 
 .stickerPopup {
-	position: fixed;
-	padding: 4px 0;
+	@include popup-root;
 }
 
 .stickerPopupContent {
+	@include popup-inner(8px);
 	display: grid;
 	grid-template-columns: repeat(4, auto);
 	padding: 8px;
 	max-height: 260px;
 	overflow-y: auto;
-	background: var(--surface-color);
-	border-radius: 8px;
-	box-shadow: var(--popup-shadow);
 
 	> img {
 		width: 64px;

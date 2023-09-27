@@ -1,0 +1,45 @@
+.root {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	min-width: 22px;
+	height: 22px;
+	font-size: 12px;
+	font-weight: $font-weight_semi-bold;
+	color: var(--accent2-color);
+	background: var(--accent2-surface-color);
+	border-radius: 99px;
+	cursor: default;
+}
+
+.root_hasCounter {
+	padding: 0 6px;
+}
+
+.root_clickable {
+	@include expand-click-area(2px);
+	cursor: pointer;
+
+	&:hover {
+		background: var(--accent2-surface-hover-color);
+	}
+}
+
+.root_active {
+	color: var(--on-accent2-color);
+	background: var(--accent2-color);
+
+	&.root_clickable:hover {
+		background: var(--accent2-hover-color);
+	}
+}
+
+.emoji {
+	width: 16px;
+	height: 16px;
+}
+
+.counter {
+	margin: 0 0 0 4px;
+	padding: 0.5px 0 0;
+}

@@ -76,7 +76,7 @@
 
 .navButton_active {
 	color: var(--accent-color);
-	background: var(--accent-surface-color);
+	background: var(--accent-surface-alpha-color);
 }
 
 .navButton:not(.navButton_active):hover {
@@ -141,19 +141,16 @@
 //
 
 .notificationsPopup {
-	position: fixed;
-	padding: 4px 0;
+	@include popup-root;
 	max-width: 320px;
 }
 
 .notificationsPopupInner {
+	@include popup-inner;
 	display: grid;
 	justify-content: center;
 	grid-gap: 16px;
 	padding: 20px;
-	background: var(--surface-color);
-	border-radius: 16px;
-	box-shadow: var(--popup-shadow);
 }
 
 .notificationIcon_animated {

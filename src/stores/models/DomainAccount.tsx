@@ -7,6 +7,7 @@ import { BlockchainFeedApi } from '../../api/blockchainFeedApi';
 import { AdaptiveAddress } from '../../components/adaptiveAddress/adaptiveAddress';
 import { toast } from '../../components/toast/toast';
 import { REACT_APP__FEED_PUBLIC_KEY } from '../../env';
+import { invariant } from '../../utils/assert';
 import { browserStorage } from '../browserStorage';
 import { Wallet } from './Wallet';
 
@@ -36,7 +37,8 @@ export class DomainAccount {
 		if (!this.authKey) {
 			try {
 				const key = await this.createAuthKey();
-				if (!key) return;
+				invariant(key, 'Auth key not created');
+
 				const { token } = await BlockchainFeedApi.auth(key);
 				this.authKey = token;
 			} catch (e) {
