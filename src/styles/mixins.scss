@@ -115,6 +115,14 @@ $mediaHeight768: 768px;
 	user-select: none;
 }
 
+@mixin pseudo-nbsp($fontSize: inherit, $lineHeight: inherit, $pseudo: after) {
+	&:#{$pseudo} {
+		content: ' ';
+		font-size: $fontSize;
+		line-height: $lineHeight;
+	}
+}
+
 // MISC
 
 @mixin flex-row($align-items, $justify-content) {

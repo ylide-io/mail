@@ -23,12 +23,8 @@
 }
 
 .metaRight {
+	@include pseudo-nbsp($pseudo: before);
 	margin: 4px 2px 0 0;
-
-	&:before {
-		// Needed to make meta-button's negative margin work when it's the only element
-		content: ' ';
-	}
 }
 
 .ava {

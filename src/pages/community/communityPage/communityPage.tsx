@@ -63,8 +63,6 @@ const OfficialContent = observer(({ community, setTabsAsideContent }: OfficialCo
 	const feedId = community.feedId.official;
 	invariant(feedId, 'No official feed id');
 
-	const accounts = domain.accounts.activeAccounts;
-
 	const { adminAccounts, isFeedAdmin, isFeedModeratorMode } = useCommunityAccounts(community, true);
 
 	const postsQuery = useInfiniteQuery<DecodedBlockchainFeedPost[]>(['community', communityId, 'posts', 'official'], {
@@ -76,7 +74,7 @@ const OfficialContent = observer(({ community, setTabsAsideContent }: OfficialCo
 				feedId,
 				beforeTimestamp: pageParam,
 				adminMode: isFeedModeratorMode,
-				addresses: accounts.map(a => a.account.address),
+				addresses: domain.accounts.activeAccounts.map(a => a.account.address),
 			});
 			return posts.map(decodeBlockchainFeedPost);
 		},
@@ -99,7 +97,7 @@ const OfficialContent = observer(({ community, setTabsAsideContent }: OfficialCo
 				feedId,
 				beforeTimestamp: 0,
 				adminMode: isFeedModeratorMode,
-				addresses: accounts.map(a => a.account.address),
+				addresses: domain.accounts.activeAccounts.map(a => a.account.address),
 			});
 
 			const hasNewPosts = !!(posts.length && messages.length && posts[0].id !== messages[0].original.id);
@@ -203,7 +201,7 @@ const DiscussionContent = observer(({ community, setTabsAsideContent }: Discussi
 					feedId,
 					beforeTimestamp: pageParam,
 					adminMode: isFeedModeratorMode,
-					addresses: accounts.map(a => a.account.address),
+					addresses: domain.accounts.activeAccounts.map(a => a.account.address),
 				});
 				return posts.map(decodeBlockchainFeedPost);
 			},
@@ -227,7 +225,7 @@ const DiscussionContent = observer(({ community, setTabsAsideContent }: Discussi
 				feedId,
 				beforeTimestamp: 0,
 				adminMode: isFeedModeratorMode,
-				addresses: accounts.map(a => a.account.address),
+				addresses: domain.accounts.activeAccounts.map(a => a.account.address),
 			});
 
 			const hasNewPosts = !!(posts.length && messages.length && posts[0].id !== messages[0].original.id);
@@ -308,9 +306,9 @@ const DiscussionContent = observer(({ community, setTabsAsideContent }: Discussi
 
 			{messages.length ? (
 				<>
-					{messages.map((message, idx) => (
+					{messages.map(message => (
 						<DiscussionPost
-							key={idx}
+							key={message.original.id}
 							community={community}
 							post={message}
 							onReplyClick={() => {
