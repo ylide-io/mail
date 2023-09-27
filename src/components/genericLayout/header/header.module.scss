@@ -76,7 +76,7 @@
 
 .navButton_active {
 	color: var(--accent-color);
-	background: var(--accent-surface-color);
+	background: var(--accent-surface-alpha-color);
 }
 
 .navButton:not(.navButton_active):hover {
