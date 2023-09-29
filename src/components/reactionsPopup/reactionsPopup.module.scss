@@ -8,14 +8,14 @@
 
 .grid {
 	display: grid;
-	grid-template-columns: repeat(8, auto);
+	grid-template-columns: repeat(auto-fill, 32px);
+	justify-content: center;
 	padding: 4px;
+	max-width: 264px;
 }
 
 .item {
 	padding: 6px;
-	width: 32px;
-	height: 32px;
 	border-radius: 4px;
 	cursor: pointer;
 

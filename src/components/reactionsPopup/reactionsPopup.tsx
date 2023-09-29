@@ -26,6 +26,10 @@ export const ReactionsPopup = observer(({ anchorRef, onSelect, onClose }: Reacti
 			className={css.root}
 			anchorRef={anchorRef}
 			horizontalAlign={HorizontalAlignment.START}
+			alignerOptions={{
+				fitLeftToViewport: true,
+				fitWidthToViewport: true,
+			}}
 			onCloseRequest={onClose}
 		>
 			<div className={css.inner}>
