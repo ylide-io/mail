@@ -24,6 +24,7 @@ import { Community, CommunityId } from '../../../../stores/communities/communiti
 import domain from '../../../../stores/Domain';
 import { RoutePath } from '../../../../stores/routePath';
 import { getIpfsHashFromUrl, ipfsToHttpUrl } from '../../../../utils/ipfs';
+import { ReactQueryKey } from '../../../../utils/reactQuery';
 import { useNav } from '../../../../utils/url';
 import { stickerIpfsIds } from '../createPostForm/stickerIpfsIds';
 import { PostReactions } from '../postReactions/postReactions';
@@ -42,7 +43,7 @@ export function OfficialPostView({ community, post: initialPost }: OfficialPostV
 	const navigate = useNav();
 	const isAdminMode = browserStorage.isUserAdmin;
 
-	const reloadPostQuery = useQuery(['community', 'post', initialPost.original.id], {
+	const reloadPostQuery = useQuery(ReactQueryKey.communityPost(initialPost.original.id), {
 		enabled: false,
 		queryFn: async () => {
 			const post = await BlockchainFeedApi.getPost({

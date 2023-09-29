@@ -37,6 +37,7 @@ import { generateBlockchainExplorerUrl } from '../../../../utils/blockchain';
 import { copyToClipboard } from '../../../../utils/clipboard';
 import { getIpfsHashFromUrl, ipfsToHttpUrl } from '../../../../utils/ipfs';
 import { useOpenMailCompose } from '../../../../utils/mail';
+import { ReactQueryKey } from '../../../../utils/reactQuery';
 import { useNav } from '../../../../utils/url';
 import { stickerIpfsIds } from '../createPostForm/stickerIpfsIds';
 import { PostReactions } from '../postReactions/postReactions';
@@ -59,7 +60,7 @@ export const DiscussionPost = observer(({ post: initialPost, community, onReplyC
 	const navigate = useNav();
 	const isAdminMode = browserStorage.isUserAdmin;
 
-	const reloadPostQuery = useQuery(['community', 'post', initialPost.original.id], {
+	const reloadPostQuery = useQuery(ReactQueryKey.communityPost(initialPost.original.id), {
 		enabled: false,
 		queryFn: async () => {
 			const post = await BlockchainFeedApi.getPost({
@@ -106,7 +107,7 @@ export const DiscussionPost = observer(({ post: initialPost, community, onReplyC
 		}
 	}, [decodedTextData]);
 
-	const repliedPostQuery = useQuery(['feed', 'venom', 'reply-to', replyToId], {
+	const repliedPostQuery = useQuery(ReactQueryKey.communityPost(replyToId || ''), {
 		enabled: !!replyToId,
 		queryFn: async () => {
 			const post = await BlockchainFeedApi.getPost({

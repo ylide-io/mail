@@ -21,6 +21,7 @@ import { RoutePath } from '../../../stores/routePath';
 import { HorizontalAlignment } from '../../../utils/alignment';
 import { invariant } from '../../../utils/assert';
 import { ipfsToHttpUrl } from '../../../utils/ipfs';
+import { ReactQueryKey } from '../../../utils/reactQuery';
 import { toAbsoluteUrl } from '../../../utils/url';
 import { DiscussionPost, generateDiscussionPostPath } from '../_common/discussionPost/discussionPost';
 import { generateOfficialPostPath, OfficialPostView } from '../_common/officialPost/officialPost';
@@ -41,7 +42,7 @@ export const CommunityPostPage = observer(({ isOfficial }: CommunityPostPageProp
 		? generateOfficialPostPath(projectId, postId)
 		: generateDiscussionPostPath(projectId, postId);
 
-	const { isLoading, data } = useQuery(['community', 'post', postId], {
+	const { isLoading, data } = useQuery(ReactQueryKey.communityPost(postId), {
 		queryFn: async () => {
 			const post = await BlockchainFeedApi.getPost({
 				id: postId,

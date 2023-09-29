@@ -29,6 +29,7 @@ import {
 	plainTextToEditorJsData,
 	useOpenMailCompose,
 } from '../../../utils/mail';
+import { ReactQueryKey } from '../../../utils/reactQuery';
 import { truncateInMiddle } from '../../../utils/string';
 import { useNav } from '../../../utils/url';
 import css from './mailDetailsPage.module.scss';
@@ -49,44 +50,50 @@ export const MailDetailsPage = observer(() => {
 
 	const accounts = domain.accounts.activeAccounts;
 
-	const messageQuery = useQuery(['mail-details', id, accounts.map(a => a.account.address).join(',')], {
-		queryFn: async () => {
-			let message = mailStore.lastMessagesList.find(m => m.id === id!);
+	const messageQuery = useQuery(
+		ReactQueryKey.mailDetails(
+			id,
+			accounts.map(a => a.account.address),
+		),
+		{
+			queryFn: async () => {
+				let message = mailStore.lastMessagesList.find(m => m.id === id!);
 
-			if (!message) {
-				const [msgId, ...rest] = id.split(':');
-				const accountAddress = rest.join(':');
-				invariant(msgId, 'No msgId');
-				invariant(accountAddress, 'No account address');
+				if (!message) {
+					const [msgId, ...rest] = id.split(':');
+					const accountAddress = rest.join(':');
+					invariant(msgId, 'No msgId');
+					invariant(accountAddress, 'No account address');
 
-				const domainAccount = accounts.find(a => a.account.address === accountAddress);
-				invariant(domainAccount, () => {
-					toast(`Connect account ${truncateInMiddle(accountAddress, 12, '..')} to read this message 👍`);
-					return 'No account';
-				});
+					const domainAccount = accounts.find(a => a.account.address === accountAddress);
+					invariant(domainAccount, () => {
+						toast(`Connect account ${truncateInMiddle(accountAddress, 12, '..')} to read this message 👍`);
+						return 'No account';
+					});
 
-				const msg = await domain.getMessageByMsgId(msgId);
-				invariant(msg);
+					const msg = await domain.getMessageByMsgId(msgId);
+					invariant(msg);
 
-				message = await ILinkedMessage.fromIMessage(folderId, msg, domainAccount);
-			}
+					message = await ILinkedMessage.fromIMessage(folderId, msg, domainAccount);
+				}
 
-			let decoded = mailStore.decodedMessagesById[message.msgId];
+				let decoded = mailStore.decodedMessagesById[message.msgId];
 
-			if (!decoded) {
-				await mailStore.decodeMessage(message.msgId, message.msg, message.recipient?.account);
-				decoded = mailStore.decodedMessagesById[message.msgId];
-				invariant(decoded, 'No decoded');
-			}
+				if (!decoded) {
+					await mailStore.decodeMessage(message.msgId, message.msg, message.recipient?.account);
+					decoded = mailStore.decodedMessagesById[message.msgId];
+					invariant(decoded, 'No decoded');
+				}
 
-			mailStore.markMessagesAsReaded([id]);
+				mailStore.markMessagesAsReaded([id]);
 
-			return {
-				message,
-				decoded,
-			};
+				return {
+					message,
+					decoded,
+				};
+			},
 		},
-	});
+	);
 
 	const initialMessage = messageQuery.data?.message;
 	const initialDecoded = messageQuery.data?.decoded;

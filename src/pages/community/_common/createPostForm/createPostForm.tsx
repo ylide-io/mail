@@ -23,6 +23,7 @@ import { HorizontalAlignment } from '../../../../utils/alignment';
 import { calcCommission } from '../../../../utils/commission';
 import { openFilePicker, readFileAsDataURL } from '../../../../utils/file';
 import { hashToIpfsUrl, ipfsToHttpUrl } from '../../../../utils/ipfs';
+import { ReactQueryKey } from '../../../../utils/reactQuery';
 import { escapeRegex } from '../../../../utils/regex';
 import { SendMailButton } from '../../../mail/_common/composeMailForm/sendMailButton/sendMailButton';
 import { RepliedDiscussionPost } from '../repliedDiscussionPost/repliedDiscussionPost';
@@ -219,7 +220,7 @@ export const CreatePostForm = observer(
 				};
 			}, [mailData, replyTo]);
 
-			const serviceStatus = useQuery(['community', 'service-status'], {
+			const serviceStatus = useQuery(ReactQueryKey.communityServiceStatus(), {
 				queryFn: async () => (await BlockchainFeedApi.getServiceStatus()).status,
 				initialData: 'ACTIVE',
 				refetchInterval: 10000,

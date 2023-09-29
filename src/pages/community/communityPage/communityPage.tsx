@@ -26,6 +26,7 @@ import { RoutePath } from '../../../stores/routePath';
 import { connectAccount, getAllowedAccountsForBlockchains } from '../../../utils/account';
 import { assertUnreachable, invariant } from '../../../utils/assert';
 import { blockchainMeta, isEvmBlockchain } from '../../../utils/blockchain';
+import { ReactQueryKey } from '../../../utils/reactQuery';
 import { useIsMatchesPattern, useNav } from '../../../utils/url';
 import { CreatePostForm, CreatePostFormApi } from '../_common/createPostForm/createPostForm';
 import { DiscussionPost } from '../_common/discussionPost/discussionPost';
@@ -90,7 +91,7 @@ const OfficialContent = observer(({ community, setTabsAsideContent }: OfficialCo
 		postsQuery.refetch();
 	};
 
-	useQuery(['community', communityId, 'new-posts', 'official'], {
+	useQuery(ReactQueryKey.communityNewOfficialPosts(communityId), {
 		enabled: !postsQuery.isLoading,
 		queryFn: async () => {
 			const posts = await BlockchainFeedApi.getPosts({
@@ -218,7 +219,7 @@ const DiscussionContent = observer(({ community, setTabsAsideContent }: Discussi
 		postsQuery.refetch();
 	};
 
-	useQuery(['community', communityId, 'new-posts', 'discussion'], {
+	useQuery(ReactQueryKey.communityNewDiscussionPosts(communityId), {
 		enabled: !postsQuery.isLoading,
 		queryFn: async () => {
 			const posts = await BlockchainFeedApi.getPosts({

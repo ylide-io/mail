@@ -8,6 +8,7 @@ import { Community } from '../stores/communities/communities';
 import { randomArrayElem } from '../utils/array';
 import { invariant } from '../utils/assert';
 import { decodeBroadcastContent } from '../utils/mail';
+import { ReactQueryKey } from '../utils/reactQuery';
 import { createCleanSerachParams } from '../utils/url';
 
 export interface BlockchainFeedPost {
@@ -304,7 +305,7 @@ export namespace BlockchainFeedApi {
 }
 
 export function useCommunityAdminsQuery(community: Community) {
-	return useQuery(['community', community.id, 'admins'], {
+	return useQuery(ReactQueryKey.communityAdmins(community.id), {
 		queryFn: () => BlockchainFeedApi.getAdmins(community.feedId.official || community.feedId.discussion!),
 	});
 }
