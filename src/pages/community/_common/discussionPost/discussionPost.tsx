@@ -59,7 +59,6 @@ export const DiscussionPost = observer(({ post: initialPost, community, onReplyC
 	const navigate = useNav();
 	const isAdminMode = browserStorage.isUserAdmin;
 
-	// Workaround for https://github.com/TanStack/query/issues/6067
 	const [reloadedPost, setReloadedPost] = useState<DecodedBlockchainFeedPost>();
 	useEffect(() => setReloadedPost(undefined), [initialPost.original.id]);
 
