@@ -418,34 +418,38 @@ export const DiscussionPost = observer(({ post: initialPost, community, onReplyC
 						</SetReactionFlow>
 
 						{reactionsCountsEntries.length ? (
-							reactionsCountsEntries.map(([reaction, count]) => {
-								const accountsForReaction = getAccountsForReaction(
-									reaction,
-									post.original.addressReactions,
-								);
+							<div className={css.reactions}>
+								{reactionsCountsEntries.map(([reaction, count]) => {
+									const accountsForReaction = getAccountsForReaction(
+										reaction,
+										post.original.addressReactions,
+									);
 
-								return accountsForReaction.length ? (
-									<ReactionBadge
-										className={css.reaction}
-										reaction={reaction}
-										counter={count || 1}
-										isActive
-										onClick={() => removeReaction(accountsForReaction)}
-									/>
-								) : (
-									<SetReactionFlow key={reaction} initialReaction={reaction} onSelect={setReaction}>
-										{({ anchorRef, onAnchorClick }) => (
-											<ReactionBadge
-												ref={anchorRef}
-												className={css.reaction}
-												reaction={reaction}
-												counter={count || 1}
-												onClick={onAnchorClick}
-											/>
-										)}
-									</SetReactionFlow>
-								);
-							})
+									return accountsForReaction.length ? (
+										<ReactionBadge
+											reaction={reaction}
+											counter={count || 1}
+											isActive
+											onClick={() => removeReaction(accountsForReaction)}
+										/>
+									) : (
+										<SetReactionFlow
+											key={reaction}
+											initialReaction={reaction}
+											onSelect={setReaction}
+										>
+											{({ anchorRef, onAnchorClick }) => (
+												<ReactionBadge
+													ref={anchorRef}
+													reaction={reaction}
+													counter={count || 1}
+													onClick={onAnchorClick}
+												/>
+											)}
+										</SetReactionFlow>
+									);
+								})}
+							</div>
 						) : (
 							<div className={css.noReactions}>
 								{['❤️', '👍', '🎉'].map(reaction => (

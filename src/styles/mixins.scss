@@ -125,6 +125,15 @@ $mediaHeight768: 768px;
 
 // MISC
 
+@mixin flex-row-with-gap($gap) {
+	display: flex;
+	align-items: center;
+
+	> :not(:last-child) {
+		margin-right: $gap;
+	}
+}
+
 @mixin flex-row($align-items, $justify-content) {
 	display: flex;
 	flex-direction: row;

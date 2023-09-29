@@ -28,7 +28,6 @@
 }
 
 .metaRight {
-	@include pseudo-nbsp($pseudo: before);
 	display: grid;
 	grid-auto-flow: column;
 	grid-gap: 8px;
@@ -103,29 +102,27 @@
 }
 
 .contentFooter {
-	@include pseudo-nbsp(12px);
-	display: grid;
-	grid-auto-flow: column;
-	align-items: center;
-	justify-content: start;
-	grid-gap: 8px;
+	@include flex-row-with-gap(8px);
+	flex-wrap: wrap;
+	row-gap: 4px;
+	margin: -3px 0;
 }
 
-.reaction {
-	margin: -99px 0;
+.reactions {
+	@include flex-row-with-gap(4px);
+	flex-wrap: wrap;
+	row-gap: 4px;
 }
 
 .noReactions {
 	display: grid;
 	grid-auto-flow: column;
 	grid-gap: 2px;
-	margin: -99px 0;
 }
 
 //
 
 .actionItem {
-	margin: -99px 0;
 	color: var(--secondary-text-color);
 	font-size: 12px;
 
