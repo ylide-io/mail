@@ -287,7 +287,7 @@ export namespace BlockchainFeedApi {
 		authKey,
 	}: {
 		postId: string;
-		reaction: string;
+		reaction: string | null;
 		authKey: string;
 	}) {
 		return await request('/reaction', {
@@ -298,19 +298,6 @@ export namespace BlockchainFeedApi {
 				},
 				body: JSON.stringify({ postId, reaction }),
 				method: 'POST',
-			},
-		});
-	}
-
-	export async function removeReaction({ postId, authKey }: { postId: string; authKey: string }) {
-		return await request('/reaction', {
-			params: {
-				headers: {
-					'Content-Type': 'application/json',
-					'Authorization': `Bearer ${authKey}`,
-				},
-				body: JSON.stringify({ postId }),
-				method: 'DELETE',
 			},
 		});
 	}

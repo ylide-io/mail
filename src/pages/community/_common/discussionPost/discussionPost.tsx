@@ -170,8 +170,9 @@ export const DiscussionPost = observer(({ post: initialPost, community, onReplyC
 				variables.accounts
 					.filter(account => account.authKey && post.original.addressReactions[account.account.address])
 					.map(account =>
-						BlockchainFeedApi.removeReaction({
+						BlockchainFeedApi.setReaction({
 							postId: post.msg.msgId,
+							reaction: null,
 							authKey: account.authKey,
 						}),
 					),
