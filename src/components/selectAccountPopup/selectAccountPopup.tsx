@@ -21,6 +21,10 @@ export const SelectAccountPopup = observer(({ anchorRef, accounts, onSelect, onC
 			className={css.root}
 			anchorRef={anchorRef}
 			horizontalAlign={HorizontalAlignment.START}
+			alignerOptions={{
+				fitLeftToViewport: true,
+				fitWidthToViewport: true,
+			}}
 			onCloseRequest={onClose}
 		>
 			<div className={css.inner}>
