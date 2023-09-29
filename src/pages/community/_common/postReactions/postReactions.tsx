@@ -15,7 +15,7 @@ import css from './postReactions.module.scss';
 export interface PostReactionsProps {
 	reactionButtonClassName: string;
 	post: DecodedBlockchainFeedPost;
-	reloadPost: () => Promise<void>;
+	reloadPost: () => Promise<unknown>;
 }
 
 export const PostReactions = observer(({ reactionButtonClassName, post, reloadPost }: PostReactionsProps) => {

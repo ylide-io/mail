@@ -1,8 +1,8 @@
 import { MessageAttachmentLinkV1 } from '@ylide/sdk';
 import clsx from 'clsx';
 import { observer } from 'mobx-react';
-import { useCallback, useEffect, useMemo, useState } from 'react';
-import { useMutation, useQuery } from 'react-query';
+import { useCallback, useMemo, useState } from 'react';
+import { useQuery } from 'react-query';
 import { generatePath } from 'react-router-dom';
 
 import {
@@ -59,20 +59,19 @@ export const DiscussionPost = observer(({ post: initialPost, community, onReplyC
 	const navigate = useNav();
 	const isAdminMode = browserStorage.isUserAdmin;
 
-	const [reloadedPost, setReloadedPost] = useState<DecodedBlockchainFeedPost>();
-	useEffect(() => setReloadedPost(undefined), [initialPost.original.id]);
-
-	const reloadPostMutation = useMutation({
-		mutationFn: async () => {
+	const reloadPostQuery = useQuery(['community', 'post', initialPost.original.id], {
+		enabled: false,
+		queryFn: async () => {
 			const post = await BlockchainFeedApi.getPost({
 				id: initialPost.original.id,
 				addresses: domain.accounts.activeAccounts.map(a => a.account.address),
 			});
-			setReloadedPost(decodeBlockchainFeedPost(post!));
+
+			return decodeBlockchainFeedPost(post!);
 		},
 	});
 
-	const post = reloadedPost || initialPost;
+	const post = reloadPostQuery.data || initialPost;
 
 	const isAuthorAdmin = !!post.original.isAdmin;
 	const blockchain = post.original.blockchain;
@@ -341,7 +340,7 @@ export const DiscussionPost = observer(({ post: initialPost, community, onReplyC
 
 						<PostReactions
 							post={post}
-							reloadPost={reloadPostMutation.mutateAsync}
+							reloadPost={reloadPostQuery.refetch}
 							reactionButtonClassName={clsx(
 								css.actionItem,
 								css.actionItem_icon,
