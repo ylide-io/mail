@@ -4,8 +4,11 @@ $contentPadding: 6px;
 	@include popup-root;
 }
 
-.content {
+.inner {
 	@include popup-inner(4px);
+}
+
+.content {
 	padding: $contentPadding 0;
 	height: 100%;
 	max-height: $interactive-elem-size * 8 + ($interactive-elem-size / 2) + $contentPadding;

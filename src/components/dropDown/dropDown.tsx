@@ -20,6 +20,8 @@ const alignerOptions: DefaultAnchoredElementAlignerOptions = {
 };
 
 export interface DropDownProps extends PropsWithChildren<{}>, PropsWithClassName {
+	innerClassName?: string;
+	contentClassName?: string;
 	anchorRef: RefObject<HTMLElement>;
 	horizontalAlign?: HorizontalAlignment;
 	verticalAlign?: VerticalAlignment;
@@ -30,6 +32,8 @@ export interface DropDownProps extends PropsWithChildren<{}>, PropsWithClassName
 export function DropDown({
 	children,
 	className,
+	innerClassName,
+	contentClassName,
 	anchorRef,
 	horizontalAlign,
 	verticalAlign,
@@ -46,8 +50,10 @@ export function DropDown({
 			alignerOptions={alignerOptions}
 			onCloseRequest={onCloseRequest}
 		>
-			<div className={css.content} onMouseDown={e => e.preventDefault()}>
-				{children}
+			<div className={clsx(css.inner, innerClassName)}>
+				<div className={clsx(css.content, contentClassName)} onMouseDown={e => e.preventDefault()}>
+					{children}
+				</div>
 			</div>
 		</AnchoredPopup>
 	);
