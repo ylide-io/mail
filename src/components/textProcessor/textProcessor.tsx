@@ -84,7 +84,6 @@ interface TextProcessorProps {
 
 export function TextProcessor({ text, nlToBr, linksToAnchors, unsafeLinks, highlightHashtags }: TextProcessorProps) {
 	const pieces = useMemo(() => {
-		console.log('text', text);
 		let pieces: ReactNode[] = [text];
 
 		if (nlToBr) {
@@ -139,7 +138,7 @@ export function TextProcessor({ text, nlToBr, linksToAnchors, unsafeLinks, highl
 				return res;
 			}, []);
 		}
-		console.log('pieces', pieces);
+
 		return pieces;
 	}, [text, nlToBr, linksToAnchors, highlightHashtags, unsafeLinks]);
 
