@@ -16,7 +16,6 @@ import { ReactComponent as TrashSvg } from '../../../../icons/ic20/trash.svg';
 import { ReactComponent as ImageSvg } from '../../../../icons/ic28/image.svg';
 import { ReactComponent as StickerSvg } from '../../../../icons/ic28/sticker.svg';
 import { analytics } from '../../../../stores/Analytics';
-import { browserStorage } from '../../../../stores/browserStorage';
 import { Community, CommunityAttachmentMode } from '../../../../stores/communities/communities';
 import { DomainAccount } from '../../../../stores/models/DomainAccount';
 import { OutgoingMailData, OutgoingMailDataMode } from '../../../../stores/outgoingMailData';
@@ -24,6 +23,7 @@ import { HorizontalAlignment } from '../../../../utils/alignment';
 import { calcCommission } from '../../../../utils/commission';
 import { openFilePicker, readFileAsDataURL } from '../../../../utils/file';
 import { hashToIpfsUrl, ipfsToHttpUrl } from '../../../../utils/ipfs';
+import { ReactQueryKey } from '../../../../utils/reactQuery';
 import { escapeRegex } from '../../../../utils/regex';
 import { SendMailButton } from '../../../mail/_common/composeMailForm/sendMailButton/sendMailButton';
 import { RepliedDiscussionPost } from '../repliedDiscussionPost/repliedDiscussionPost';
@@ -38,6 +38,7 @@ export interface CreatePostFormProps extends PropsWithClassName {
 	community: Community;
 	feedId: Uint256;
 	accounts: DomainAccount[];
+	adminMode?: boolean;
 	placeholder: string;
 	onCreated?: () => void;
 }
@@ -45,14 +46,14 @@ export interface CreatePostFormProps extends PropsWithClassName {
 export const CreatePostForm = observer(
 	forwardRef(
 		(
-			{ className, community, feedId, accounts, placeholder, onCreated }: CreatePostFormProps,
+			{ className, community, feedId, accounts, adminMode, placeholder, onCreated }: CreatePostFormProps,
 			ref: Ref<CreatePostFormApi>,
 		) => {
 			const allowedChains = community.allowedChains;
 
 			const allowCustomAttachments =
 				community.attachmentMode === CommunityAttachmentMode.EVERYONE ||
-				(browserStorage.isUserAdmin && community.attachmentMode === CommunityAttachmentMode.ADMINS);
+				(adminMode && community.attachmentMode === CommunityAttachmentMode.ADMINS);
 
 			const mailData = useMemo(() => {
 				const mailData = new OutgoingMailData();
@@ -219,7 +220,7 @@ export const CreatePostForm = observer(
 				};
 			}, [mailData, replyTo]);
 
-			const serviceStatus = useQuery(['community', 'service-status'], {
+			const serviceStatus = useQuery(ReactQueryKey.communityServiceStatus(), {
 				queryFn: async () => (await BlockchainFeedApi.getServiceStatus()).status,
 				initialData: 'ACTIVE',
 				refetchInterval: 10000,

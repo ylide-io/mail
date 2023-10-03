@@ -1,0 +1,67 @@
+$opacity: 0.98;
+
+.root {
+	position: fixed;
+	padding: 4px 8px;
+	max-width: 320px;
+	transform: translateY(-12px);
+	opacity: 0;
+	transition: all 1s 1s;
+	will-change: transform;
+	pointer-events: none;
+}
+
+.root_animate {
+	transform: translateY(0);
+	opacity: $opacity;
+	animation-name: root-moving;
+	animation-delay: 3s;
+	animation-duration: 5s;
+	animation-iteration-count: infinite;
+}
+
+.root_hiding {
+	opacity: 0 !important;
+}
+
+@keyframes root-moving {
+	0% {
+		transform: translateY(0);
+	}
+
+	15% {
+		transform: translateY(-8px);
+	}
+
+	30% {
+		transform: translateY(0);
+	}
+}
+
+//
+
+.body {
+	padding: 12px;
+	color: var(--on-accent-color);
+	font-size: 12px;
+	font-weight: $font-weight_semi-bold;
+	text-align: center;
+	background: var(--accent-color);
+	border-radius: 12px;
+	box-shadow: 0 4px 20px rgba(var(--accent-rgb-color), 0.5);
+
+	svg {
+		display: inline;
+		vertical-align: text-bottom;
+	}
+}
+
+.title {
+	margin: 0 0 12px;
+	font-size: 14px;
+}
+
+.arrow {
+	margin: auto;
+	color: var(--accent-color);
+}

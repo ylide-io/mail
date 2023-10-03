@@ -1,0 +1,30 @@
+.root {
+	@include popup-root;
+}
+
+.inner {
+	@include popup-inner(8px);
+}
+
+.grid {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, 32px);
+	justify-content: center;
+	padding: 4px;
+	max-width: 264px;
+}
+
+.item {
+	padding: 6px;
+	border-radius: 4px;
+	cursor: pointer;
+
+	&:hover {
+		background: var(--surface-hover-heavy-color);
+	}
+}
+
+.divider {
+	height: 1px;
+	background: var(--border-color);
+}

@@ -33,11 +33,6 @@
 	grid-gap: 8px;
 	align-items: center;
 	margin: 0 0 0 auto;
-
-	&:before {
-		// Needed to make meta-button's negative margin work when it's the only element
-		content: ' ';
-	}
 }
 
 .adminTag {
@@ -78,7 +73,7 @@
 .content {
 	display: grid;
 	grid-gap: 8px;
-	padding: 16px;
+	padding: 12px 16px;
 	background: var(--surface-color);
 	border-radius: 16px;
 
@@ -107,22 +102,15 @@
 }
 
 .contentFooter {
-	display: grid;
-	grid-auto-flow: column;
-	align-items: center;
-	justify-content: start;
-	grid-gap: 12px;
-
-	&:after {
-		// Needed to make meta-button's negative margin work when it's the only element
-		content: ' ';
-	}
+	@include flex-row-with-gap(8px);
+	flex-wrap: wrap;
+	row-gap: 4px;
+	margin: -3px 0;
 }
 
 //
 
 .actionItem {
-	margin: -99px 0;
 	color: var(--secondary-text-color);
 	font-size: 12px;
 
@@ -141,7 +129,9 @@
 }
 
 .actionItem_icon {
-	margin: -99px -2px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
 	width: 20px;
 	height: 20px;
 }

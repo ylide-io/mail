@@ -2,6 +2,7 @@ import { Uint256 } from '@ylide/sdk';
 
 import { VENOM_FEED_ID } from '../../constants';
 import { BlockchainName } from '../../utils/blockchain';
+import createXBannerSrc from './bannerImages/alienSwap.jpg';
 import altsomeBannerSrc from './bannerImages/altsome.jpg';
 import auroraBannerSrc from './bannerImages/aurora.jpg';
 import auroraAfricaBannerSrc from './bannerImages/auroraAfrica.jpg';
@@ -23,6 +24,7 @@ import dittoBannerSrc from './bannerImages/ditto.jpg';
 import gnosisBuildersBannerSrc from './bannerImages/gnosisBuilders.jpg';
 import gravixBannerSrc from './bannerImages/gravix.jpg';
 import hanmadiBannerSrc from './bannerImages/hanmadi.jpg';
+import mainViewBannerSrc from './bannerImages/mainView.jpg';
 import oasisGalleryBannerSrc from './bannerImages/oasisGallery.jpg';
 import oneClickCryptoBannerSrc from './bannerImages/oneClickCrypto.jpg';
 import raveBannerSrc from './bannerImages/rave.jpg';
@@ -38,6 +40,7 @@ import venomIdBannerSrc from './bannerImages/venomId.jpg';
 import venomRecapBannerSrc from './bannerImages/venomRecap.jpg';
 import ventoryBannerSrc from './bannerImages/ventory.jpg';
 import web3WorldBannerSrc from './bannerImages/web3World.jpg';
+import createXSrc from './profileImages/alienSwap.jpg';
 import altsomeSrc from './profileImages/altsome.jpg';
 import auroraSrc from './profileImages/aurora.jpg';
 import auroraAfricaSrc from './profileImages/auroraAfrica.jpg';
@@ -61,6 +64,7 @@ import generalSrc from './profileImages/general.png';
 import gnosisBuildersSrc from './profileImages/gnosisBuilders.jpg';
 import gravixSrc from './profileImages/gravix.jpg';
 import hanmadiSrc from './profileImages/hanmadi.jpg';
+import mainViewSrc from './profileImages/mainView.jpg';
 import oasisGallerySrc from './profileImages/oasisGallery.png';
 import oneClickCryptoSrc from './profileImages/oneClickCrypto.jpg';
 import raveSrc from './profileImages/rave.jpg';
@@ -78,10 +82,6 @@ import ventorySrc from './profileImages/ventory.png';
 import weaverSrc from './profileImages/weaver.jpg';
 import web3WorldSrc from './profileImages/web3World.png';
 import ylideSrc from './profileImages/ylide.png';
-
-function inputToCommunity(input: Community | CommunityId): Community {
-	return typeof input === 'string' ? getCommunityById(input) : input;
-}
 
 export function getCommunityById(id: CommunityId) {
 	return communities.find(p => p.id === id)!;
@@ -101,6 +101,7 @@ export interface Community {
 	bannerImage?: string;
 	website?: string;
 	tags?: CommunityTag[];
+	hidden?: boolean;
 	fixedChain?: string;
 	allowedChains?: string[];
 	attachmentMode?: CommunityAttachmentMode;
@@ -112,6 +113,7 @@ export enum CommunityId {
 	GENERAL = 'general',
 	ETH_WHALES = 'eth_whales',
 	YLIDE = 'ylide',
+	MAIN_VIEW = 'mainview',
 
 	// VENOM
 
@@ -158,6 +160,7 @@ export enum CommunityId {
 	BET_FURY = 'bet_fury',
 	DITTO_NETWORK = 'ditto_network',
 	ALTSOME = 'altsome',
+	ALIEN_SWAP = 'alien_swap',
 
 	// TEST
 
@@ -172,8 +175,9 @@ export enum CommunityTag {
 	ECOSYSTEM = 'Ecosystem',
 	TVM = 'TVM',
 	GAMING = 'Gaming',
-	DEVELOPER_TOOLS = 'Developer Tools',
+	TRADING = 'Trading',
 	AURORA_ECOSYSTEM = 'Aurora Ecosystem',
+	RESEARCH = 'Research',
 }
 
 export enum CommunityAttachmentMode {
@@ -229,6 +233,22 @@ export const communities: Community[] = [
 		website: 'https://ylide.io/',
 		tags: [CommunityTag.SOCIAL, CommunityTag.VENOM],
 		allowedChains: allChainsExceptTest,
+	},
+	{
+		id: CommunityId.MAIN_VIEW,
+		feedId: {
+			official: '200000000000000000000000000000000000000000000000000000000000004a' as Uint256,
+			discussion: '200000000000000000000000000000000000000000000000000000000000004b' as Uint256,
+		},
+		name: 'Mainview',
+		description:
+			'Mainview is the leading crypto news aggregator that empowers investors, traders, and asset managers with personalized newsfeeds based on their crypto holdings. Stay informed and make smarter investment decisions with Mainview.',
+		profileImage: mainViewSrc,
+		bannerImage: mainViewBannerSrc,
+		website: 'https://mainview.io/',
+		tags: [CommunityTag.RESEARCH, CommunityTag.TRADING],
+		allowedChains: allChainsExceptTest,
+		attachmentMode: CommunityAttachmentMode.ADMINS,
 	},
 
 	// VENOM
@@ -776,7 +796,7 @@ export const communities: Community[] = [
 		profileImage: dittoSrc,
 		bannerImage: dittoBannerSrc,
 		website: 'https://dittonetwork.io',
-		tags: [CommunityTag.DEVELOPER_TOOLS],
+		tags: [CommunityTag.TRADING],
 		allowedChains: [BlockchainName.POLYGON, BlockchainName.VENOM_TESTNET],
 		attachmentMode: CommunityAttachmentMode.ADMINS,
 	},
@@ -792,6 +812,23 @@ export const communities: Community[] = [
 		bannerImage: altsomeBannerSrc,
 		website: 'https://altsome.com/',
 		tags: [CommunityTag.DEFI, CommunityTag.NFT],
+		allowedChains: allChainsExceptTest,
+		attachmentMode: CommunityAttachmentMode.ADMINS,
+	},
+	{
+		id: CommunityId.ALIEN_SWAP,
+		feedId: {
+			official: '200000000000000000000000000000000000000000000000000000000000004c' as Uint256,
+			discussion: '200000000000000000000000000000000000000000000000000000000000004d' as Uint256,
+		},
+		name: 'AlienSwap (TEST)',
+		description:
+			'The first membership-based NFT marketplace and aggregator, AlienSwap builds the leading NFT trading layer.',
+		profileImage: createXSrc,
+		bannerImage: createXBannerSrc,
+		website: 'https://alienswap.xyz/',
+		tags: [CommunityTag.NFT],
+		hidden: true,
 		allowedChains: allChainsExceptTest,
 		attachmentMode: CommunityAttachmentMode.ADMINS,
 	},

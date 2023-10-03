@@ -5,8 +5,10 @@ import { useQuery } from 'react-query';
 import { REACT_APP__BLOCKCHAIN_FEED } from '../env';
 import { IMessageDecodedContent } from '../indexedDB/IndexedDB';
 import { Community } from '../stores/communities/communities';
+import { randomArrayElem } from '../utils/array';
 import { invariant } from '../utils/assert';
 import { decodeBroadcastContent } from '../utils/mail';
+import { ReactQueryKey } from '../utils/reactQuery';
 import { createCleanSerachParams } from '../utils/url';
 
 export interface BlockchainFeedPost {
@@ -18,6 +20,8 @@ export interface BlockchainFeedPost {
 	banned: boolean;
 	blockchain: string;
 	isAdmin?: boolean;
+	addressReactions: Record<string, string | undefined>;
+	reactionsCounts: Record<string, number | undefined>;
 }
 
 export interface DecodedBlockchainFeedPost {
@@ -71,13 +75,13 @@ export namespace BlockchainFeedApi {
 	export function getUrl() {
 		return (
 			REACT_APP__BLOCKCHAIN_FEED ||
-			[
+			randomArrayElem([
 				'https://blockchain-feed1.ylide.io',
 				'https://blockchain-feed2.ylide.io',
 				'https://blockchain-feed3.ylide.io',
 				'https://blockchain-feed4.ylide.io',
 				'https://blockchain-feed5.ylide.io',
-			][Math.floor(Math.random() * 5)]
+			])
 		);
 	}
 
@@ -129,7 +133,7 @@ export namespace BlockchainFeedApi {
 	}
 
 	export async function banPost(params: { ids: string[]; secret: string }) {
-		return await request('/ban-posts', {
+		return await request('/v2/ban-posts', {
 			query: { secret: params.secret, id: params.ids },
 			params: { method: 'POST' },
 		});
@@ -151,15 +155,25 @@ export namespace BlockchainFeedApi {
 		});
 	}
 
-	export async function getPosts(params: { feedId: string; beforeTimestamp: number; adminMode?: boolean }) {
-		return await request<BlockchainFeedPost[]>('/posts', {
-			query: { feedId: params.feedId, beforeTimestamp: params.beforeTimestamp, adminMode: params.adminMode },
+	export async function getPosts(params: {
+		feedId: string;
+		beforeTimestamp: number;
+		adminMode?: boolean;
+		addresses?: string[];
+	}) {
+		return await request<BlockchainFeedPost[]>('/v2/posts', {
+			query: {
+				feedId: params.feedId,
+				beforeTimestamp: params.beforeTimestamp,
+				adminMode: params.adminMode,
+				address: params.addresses,
+			},
 		});
 	}
 
-	export async function getPost(params: { id: string; adminMode?: boolean }) {
-		return await request<BlockchainFeedPost | null>('/post', {
-			query: { id: params.id, adminMode: params.adminMode },
+	export async function getPost(params: { id: string; adminMode?: boolean; addresses?: string[] }) {
+		return await request<BlockchainFeedPost | null>('/v2/post', {
+			query: { id: params.id, adminMode: params.adminMode, address: params.addresses },
 		});
 	}
 
@@ -255,10 +269,43 @@ export namespace BlockchainFeedApi {
 			return it as any as Record<string, string>;
 		});
 	}
+
+	export async function auth(body: { messageEncrypted: string; publicKey: string; address: string }) {
+		return await request<{ token: string }>('/auth', {
+			params: {
+				headers: {
+					'Content-Type': 'application/json',
+				},
+				body: JSON.stringify(body),
+				method: 'POST',
+			},
+		});
+	}
+
+	export async function setReaction({
+		postId,
+		reaction,
+		authKey,
+	}: {
+		postId: string;
+		reaction: string | null;
+		authKey: string;
+	}) {
+		return await request('/reaction', {
+			params: {
+				headers: {
+					'Content-Type': 'application/json',
+					'Authorization': `Bearer ${authKey}`,
+				},
+				body: JSON.stringify({ postId, reaction }),
+				method: 'POST',
+			},
+		});
+	}
 }
 
 export function useCommunityAdminsQuery(community: Community) {
-	return useQuery(['community', community.id, 'admins'], {
+	return useQuery(ReactQueryKey.communityAdmins(community.id), {
 		queryFn: () => BlockchainFeedApi.getAdmins(community.feedId.official || community.feedId.discussion!),
 	});
 }

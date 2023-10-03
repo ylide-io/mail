@@ -1,14 +1,11 @@
 .root {
-	position: fixed;
-	padding: 4px 0;
+	@include popup-root;
 	max-width: 500px;
 }
 
 .content {
+	@include popup-inner;
 	display: grid;
-	background: var(--surface-color);
-	border-radius: 10px;
-	box-shadow: var(--popup-shadow);
 }
 
 .item {

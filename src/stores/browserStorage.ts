@@ -8,6 +8,7 @@ export enum BrowserStorageKey {
 	SAVE_DECODED_MESSAGES = 'ylide_saveDecodedMessages',
 	WIDGET_ID = 'ylide_widgetId',
 	MAIN_VIEW_KEYS = 'ylide_mainViewKeys',
+	AUTH_KEYS = 'ylide_authKeys',
 	LAST_MAILBOX_INCOMING_DATE = 'ylide_lastMailboxCheckDate',
 	SAVED_ACCOUNTS = 'ylide_savedAccounts',
 	NOTIFICATIONS_ALERT = 'ylide_notificationsAlert',
@@ -108,6 +109,18 @@ export class BrowserStorage {
 	set mainViewKeys(value: Record<string, string | undefined>) {
 		BrowserStorage.setJsonItem(BrowserStorageKey.MAIN_VIEW_KEYS, value);
 		this._mainViewKeys = value;
+	}
+
+	private _authKeys: Record<string, string | undefined> =
+		BrowserStorage.getJsonItem(BrowserStorageKey.AUTH_KEYS) || {};
+
+	get authKeys() {
+		return this._authKeys;
+	}
+
+	set authKeys(value: Record<string, string | undefined>) {
+		BrowserStorage.setJsonItem(BrowserStorageKey.AUTH_KEYS, value);
+		this._authKeys = value;
 	}
 
 	//

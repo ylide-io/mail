@@ -12,6 +12,7 @@ import { OutgoingMailData } from '../../../stores/outgoingMailData';
 import { HorizontalAlignment } from '../../../utils/alignment';
 import { copyToClipboard } from '../../../utils/clipboard';
 import { useOpenMailCompose } from '../../../utils/mail';
+import { truncateInMiddle } from '../../../utils/string';
 import { beautifyUrl } from '../../../utils/url';
 import { ActionButton, ActionButtonLook, ActionButtonSize } from '../../ActionButton/ActionButton';
 import { AdaptiveAddress } from '../../adaptiveAddress/adaptiveAddress';
@@ -64,7 +65,7 @@ export const PrimaryCommunityCard = observer(({ community }: PrimaryCommunityCar
 									<a className={css.website} href={community.website}>
 										<LinkSvg />
 
-										{beautifyUrl(community.website)}
+										{truncateInMiddle(beautifyUrl(community.website), 32, '..')}
 									</a>
 								)}
 							</div>

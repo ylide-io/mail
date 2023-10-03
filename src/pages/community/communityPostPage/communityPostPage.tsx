@@ -16,10 +16,12 @@ import { YlideLoader } from '../../../components/ylideLoader/ylideLoader';
 import { ReactComponent as ShareSvg } from '../../../icons/ic20/share.svg';
 import { MessageDecodedTextDataType } from '../../../indexedDB/IndexedDB';
 import { CommunityId, getCommunityById } from '../../../stores/communities/communities';
+import domain from '../../../stores/Domain';
 import { RoutePath } from '../../../stores/routePath';
 import { HorizontalAlignment } from '../../../utils/alignment';
 import { invariant } from '../../../utils/assert';
 import { ipfsToHttpUrl } from '../../../utils/ipfs';
+import { ReactQueryKey } from '../../../utils/reactQuery';
 import { toAbsoluteUrl } from '../../../utils/url';
 import { DiscussionPost, generateDiscussionPostPath } from '../_common/discussionPost/discussionPost';
 import { generateOfficialPostPath, OfficialPostView } from '../_common/officialPost/officialPost';
@@ -33,15 +35,19 @@ export const CommunityPostPage = observer(({ isOfficial }: CommunityPostPageProp
 	const { projectId, postId } = useParams<{ projectId: CommunityId; postId: string }>();
 	invariant(projectId);
 	invariant(postId);
+	const accounts = domain.accounts.activeAccounts;
 
 	const community = getCommunityById(projectId);
 	const postPath = isOfficial
 		? generateOfficialPostPath(projectId, postId)
 		: generateDiscussionPostPath(projectId, postId);
 
-	const { isLoading, data } = useQuery(['community', 'post', postId], {
+	const { isLoading, data } = useQuery(ReactQueryKey.communityPost(postId), {
 		queryFn: async () => {
-			const post = await BlockchainFeedApi.getPost({ id: postId });
+			const post = await BlockchainFeedApi.getPost({
+				id: postId,
+				addresses: accounts.map(a => a.account.address),
+			});
 			return decodeBlockchainFeedPost(post!);
 		},
 	});

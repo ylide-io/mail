@@ -21,15 +21,38 @@ import { YlideLoader } from '../../../components/ylideLoader/ylideLoader';
 import { analytics } from '../../../stores/Analytics';
 import { browserStorage } from '../../../stores/browserStorage';
 import { Community, CommunityId, getCommunityById } from '../../../stores/communities/communities';
+import domain from '../../../stores/Domain';
 import { RoutePath } from '../../../stores/routePath';
 import { connectAccount, getAllowedAccountsForBlockchains } from '../../../utils/account';
 import { assertUnreachable, invariant } from '../../../utils/assert';
 import { blockchainMeta, isEvmBlockchain } from '../../../utils/blockchain';
+import { ReactQueryKey } from '../../../utils/reactQuery';
 import { useIsMatchesPattern, useNav } from '../../../utils/url';
 import { CreatePostForm, CreatePostFormApi } from '../_common/createPostForm/createPostForm';
 import { DiscussionPost } from '../_common/discussionPost/discussionPost';
 import { OfficialPost } from '../_common/officialPost/officialPost';
 import css from './communityPage.module.scss';
+
+function useCommunityAccounts(community: Community, isOfficial: boolean) {
+	const accounts = getAllowedAccountsForBlockchains(community.allowedChains || []);
+
+	const adminAccountsQuery = useCommunityAdminsQuery(community);
+	const adminAccounts = adminAccountsQuery.data
+		? accounts.filter(a => adminAccountsQuery.data.includes(a.account.address))
+		: [];
+	const isFeedAdmin = !!adminAccounts.length;
+
+	const isFeedModeratorMode =
+		useIsMatchesPattern(isOfficial ? RoutePath.PROJECT_ID_OFFICIAL_ADMIN : RoutePath.PROJECT_ID_DISCUSSION_ADMIN) &&
+		(isFeedAdmin || browserStorage.isUserAdmin);
+
+	return {
+		accounts,
+		adminAccounts,
+		isFeedAdmin,
+		isFeedModeratorMode,
+	};
+}
 
 interface OfficialContentProps {
 	community: Community;
@@ -41,13 +64,7 @@ const OfficialContent = observer(({ community, setTabsAsideContent }: OfficialCo
 	const feedId = community.feedId.official;
 	invariant(feedId, 'No official feed id');
 
-	const adminAccountsQuery = useCommunityAdminsQuery(community);
-	const adminAccounts = adminAccountsQuery.data
-		? getAllowedAccountsForBlockchains(community.allowedChains || []).filter(a =>
-				adminAccountsQuery.data.includes(a.account.address),
-		  )
-		: [];
-	const isAdminFeedMode = useIsMatchesPattern(RoutePath.PROJECT_ID_OFFICIAL_ADMIN) && !!adminAccounts.length;
+	const { adminAccounts, isFeedAdmin, isFeedModeratorMode } = useCommunityAccounts(community, true);
 
 	const postsQuery = useInfiniteQuery<DecodedBlockchainFeedPost[]>(['community', communityId, 'posts', 'official'], {
 		cacheTime: 15 * 60 * 1000,
@@ -57,7 +74,8 @@ const OfficialContent = observer(({ community, setTabsAsideContent }: OfficialCo
 			const posts = await BlockchainFeedApi.getPosts({
 				feedId,
 				beforeTimestamp: pageParam,
-				adminMode: isAdminFeedMode,
+				adminMode: isFeedModeratorMode,
+				addresses: domain.accounts.activeAccounts.map(a => a.account.address),
 			});
 			return posts.map(decodeBlockchainFeedPost);
 		},
@@ -73,13 +91,14 @@ const OfficialContent = observer(({ community, setTabsAsideContent }: OfficialCo
 		postsQuery.refetch();
 	};
 
-	useQuery(['community', communityId, 'new-posts', 'official'], {
+	useQuery(ReactQueryKey.communityNewOfficialPosts(communityId), {
 		enabled: !postsQuery.isLoading,
 		queryFn: async () => {
 			const posts = await BlockchainFeedApi.getPosts({
 				feedId,
 				beforeTimestamp: 0,
-				adminMode: isAdminFeedMode,
+				adminMode: isFeedModeratorMode,
+				addresses: domain.accounts.activeAccounts.map(a => a.account.address),
 			});
 
 			const hasNewPosts = !!(posts.length && messages.length && posts[0].id !== messages[0].original.id);
@@ -111,11 +130,12 @@ const OfficialContent = observer(({ community, setTabsAsideContent }: OfficialCo
 				image={community.bannerImage}
 			/>
 
-			{!!adminAccounts.length && (
+			{isFeedAdmin && (
 				<CreatePostForm
 					community={community}
 					feedId={feedId}
 					accounts={adminAccounts}
+					adminMode
 					placeholder="Make a new post"
 					onCreated={() => toast('Good job! Your post will appear shortly 🔥')}
 				/>
@@ -169,8 +189,7 @@ const DiscussionContent = observer(({ community, setTabsAsideContent }: Discussi
 	const feedId = community.feedId.discussion;
 	invariant(feedId, 'No discussion feed id');
 
-	const accounts = getAllowedAccountsForBlockchains(community.allowedChains || []);
-	const isAdminFeedMode = useIsMatchesPattern(RoutePath.PROJECT_ID_DISCUSSION_ADMIN) && browserStorage.isUserAdmin;
+	const { accounts, isFeedAdmin, isFeedModeratorMode } = useCommunityAccounts(community, false);
 
 	const postsQuery = useInfiniteQuery<DecodedBlockchainFeedPost[]>(
 		['community', communityId, 'posts', 'discussion'],
@@ -182,7 +201,8 @@ const DiscussionContent = observer(({ community, setTabsAsideContent }: Discussi
 				const posts = await BlockchainFeedApi.getPosts({
 					feedId,
 					beforeTimestamp: pageParam,
-					adminMode: isAdminFeedMode,
+					adminMode: isFeedModeratorMode,
+					addresses: domain.accounts.activeAccounts.map(a => a.account.address),
 				});
 				return posts.map(decodeBlockchainFeedPost);
 			},
@@ -199,13 +219,14 @@ const DiscussionContent = observer(({ community, setTabsAsideContent }: Discussi
 		postsQuery.refetch();
 	};
 
-	useQuery(['community', communityId, 'new-posts', 'discussion'], {
+	useQuery(ReactQueryKey.communityNewDiscussionPosts(communityId), {
 		enabled: !postsQuery.isLoading,
 		queryFn: async () => {
 			const posts = await BlockchainFeedApi.getPosts({
 				feedId,
 				beforeTimestamp: 0,
-				adminMode: isAdminFeedMode,
+				adminMode: isFeedModeratorMode,
+				addresses: domain.accounts.activeAccounts.map(a => a.account.address),
 			});
 
 			const hasNewPosts = !!(posts.length && messages.length && posts[0].id !== messages[0].original.id);
@@ -265,6 +286,7 @@ const DiscussionContent = observer(({ community, setTabsAsideContent }: Discussi
 					community={community}
 					feedId={feedId}
 					accounts={accounts}
+					adminMode={isFeedAdmin}
 					placeholder="What’s on your mind?"
 					onCreated={() => toast('Good job! Your post will appear shortly 🔥')}
 				/>
@@ -285,9 +307,9 @@ const DiscussionContent = observer(({ community, setTabsAsideContent }: Discussi
 
 			{messages.length ? (
 				<>
-					{messages.map((message, idx) => (
+					{messages.map(message => (
 						<DiscussionPost
-							key={idx}
+							key={message.original.id}
 							community={community}
 							post={message}
 							onReplyClick={() => {

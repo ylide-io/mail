@@ -110,7 +110,29 @@ $mediaHeight768: 768px;
 	}
 }
 
+@mixin no-text-selection {
+	-webkit-user-select: none; /* Safari */
+	user-select: none;
+}
+
+@mixin pseudo-nbsp($fontSize: inherit, $lineHeight: inherit, $pseudo: after) {
+	&:#{$pseudo} {
+		content: ' ';
+		font-size: $fontSize;
+		line-height: $lineHeight;
+	}
+}
+
 // MISC
+
+@mixin flex-row-with-gap($gap) {
+	display: flex;
+	align-items: center;
+
+	> :not(:last-child) {
+		margin-right: $gap;
+	}
+}
 
 @mixin flex-row($align-items, $justify-content) {
 	display: flex;
@@ -155,4 +177,17 @@ $mediaHeight768: 768px;
 			opacity: 0.9;
 		}
 	}
+}
+
+//
+
+@mixin popup-root {
+	position: fixed;
+	padding: 4px 0;
+}
+
+@mixin popup-inner($borderRadius: 16px) {
+	background: var(--surface-color);
+	border-radius: $borderRadius;
+	box-shadow: var(--popup-shadow);
 }

@@ -5,6 +5,8 @@ import { Wallet } from './models/Wallet';
 export class BalancesStore {
 	private balances: Record<string, number> = {};
 
+	isUpdating = false;
+
 	constructor() {
 		makeAutoObservable(this);
 	}
@@ -14,6 +16,8 @@ export class BalancesStore {
 	}
 
 	async updateBalances(wallet: Wallet, address: string) {
+		this.isUpdating = true;
+
 		const rawBalances = await wallet.getBalancesOf(address);
 
 		transaction(() => {
@@ -22,6 +26,6 @@ export class BalancesStore {
 			});
 		});
 
-		return this.balances;
+		this.isUpdating = false;
 	}
 }

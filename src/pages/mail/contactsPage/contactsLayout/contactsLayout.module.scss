@@ -30,6 +30,10 @@
 	@include lessThan768w {
 		justify-self: start;
 	}
+
+	@include lessThan480w {
+		grid-auto-flow: row;
+	}
 }
 
 .tags {

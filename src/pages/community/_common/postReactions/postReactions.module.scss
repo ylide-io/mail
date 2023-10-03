@@ -1,0 +1,11 @@
+.reactions {
+	@include flex-row-with-gap(4px);
+	flex-wrap: wrap;
+	row-gap: 4px;
+}
+
+.noReactions {
+	display: grid;
+	grid-auto-flow: column;
+	grid-gap: 2px;
+}

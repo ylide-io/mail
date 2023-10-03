@@ -24,7 +24,7 @@ export function ExplorePage() {
 
 				<div className={css.smallGrid}>
 					{communities
-						.filter(p => p.tags?.includes(tag))
+						.filter(c => c.tags?.includes(tag) && !c.hidden)
 						.map(community => (
 							<RegularCommunityCard community={community} />
 						))}
@@ -61,7 +61,7 @@ export function ExplorePage() {
 					{renderTagBlock(CommunityTag.SOCIAL)}
 					{renderTagBlock(CommunityTag.ECOSYSTEM)}
 					{renderTagBlock(CommunityTag.GAMING)}
-					{renderTagBlock(CommunityTag.DEVELOPER_TOOLS)}
+					{renderTagBlock(CommunityTag.TRADING)}
 
 					<div className={css.footer}>
 						<ActionButton

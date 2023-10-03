@@ -18,3 +18,19 @@ export function formatNumber(value: number, opts: Intl.NumberFormatOptions = {})
 		...opts,
 	}).format(value);
 }
+
+//
+
+const counterFormat = new Intl.NumberFormat(LOCALE, {
+	style: 'decimal',
+	minimumFractionDigits: 0,
+	maximumFractionDigits: 1,
+});
+
+export function formatCounter(value: number) {
+	return value >= 1e6
+		? `${counterFormat.format(value / 1e6)}M`
+		: value >= 1e3
+		? `${counterFormat.format(value / 1e3)}k`
+		: value;
+}

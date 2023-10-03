@@ -12,6 +12,10 @@
 	&:focus-visible {
 		background: var(--secondary-surface-color);
 	}
+
+	@include lessThan640w {
+		padding: var(--generic-layout_outer-padding);
+	}
 }
 
 .ava {

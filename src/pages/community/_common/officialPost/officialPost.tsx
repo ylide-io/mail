@@ -1,9 +1,14 @@
 import { MessageAttachmentLinkV1 } from '@ylide/sdk';
 import clsx from 'clsx';
 import { useCallback, useMemo, useRef, useState } from 'react';
+import { useQuery } from 'react-query';
 import { generatePath } from 'react-router-dom';
 
-import { BlockchainFeedApi, DecodedBlockchainFeedPost } from '../../../../api/blockchainFeedApi';
+import {
+	BlockchainFeedApi,
+	decodeBlockchainFeedPost,
+	DecodedBlockchainFeedPost,
+} from '../../../../api/blockchainFeedApi';
 import { ActionButton, ActionButtonLook, ActionButtonSize } from '../../../../components/ActionButton/ActionButton';
 import { CommunityAvatar } from '../../../../components/avatar/avatar';
 import { GridRowBox } from '../../../../components/boxes/boxes';
@@ -16,10 +21,13 @@ import { ReactComponent as CrossSvg } from '../../../../icons/ic20/cross.svg';
 import { MessageDecodedTextDataType } from '../../../../indexedDB/IndexedDB';
 import { browserStorage } from '../../../../stores/browserStorage';
 import { Community, CommunityId } from '../../../../stores/communities/communities';
+import domain from '../../../../stores/Domain';
 import { RoutePath } from '../../../../stores/routePath';
 import { getIpfsHashFromUrl, ipfsToHttpUrl } from '../../../../utils/ipfs';
+import { ReactQueryKey } from '../../../../utils/reactQuery';
 import { useNav } from '../../../../utils/url';
 import { stickerIpfsIds } from '../createPostForm/stickerIpfsIds';
+import { PostReactions } from '../postReactions/postReactions';
 import css from './officialPost.module.scss';
 
 export function generateOfficialPostPath(projectId: CommunityId, postId: string) {
@@ -31,10 +39,23 @@ interface OfficialPostViewProps {
 	post: DecodedBlockchainFeedPost;
 }
 
-export function OfficialPostView({ community, post }: OfficialPostViewProps) {
+export function OfficialPostView({ community, post: initialPost }: OfficialPostViewProps) {
 	const navigate = useNav();
 	const isAdminMode = browserStorage.isUserAdmin;
 
+	const reloadPostQuery = useQuery(ReactQueryKey.communityPost(initialPost.original.id), {
+		enabled: false,
+		queryFn: async () => {
+			const post = await BlockchainFeedApi.getPost({
+				id: initialPost.original.id,
+				addresses: domain.accounts.activeAccounts.map(a => a.account.address),
+			});
+
+			return decodeBlockchainFeedPost(post!);
+		},
+	});
+
+	const post = reloadPostQuery.data || initialPost;
 	const postUrl = generateOfficialPostPath(community.id, post.original.id);
 
 	const decodedTextData = post.decoded.decodedTextData;
@@ -135,7 +156,7 @@ export function OfficialPostView({ community, post }: OfficialPostViewProps) {
 
 			<div className={css.body}>
 				<div className={css.text}>
-					<TextProcessor text={decodedText} nlToBr linksToAnchors />
+					<TextProcessor text={decodedText} nlToBr linksToAnchors highlightHashtags />
 				</div>
 
 				{attachmentHttpUrl && (
@@ -150,6 +171,14 @@ export function OfficialPostView({ community, post }: OfficialPostViewProps) {
 						}}
 					/>
 				)}
+			</div>
+
+			<div className={css.footer}>
+				<PostReactions
+					reactionButtonClassName={clsx(css.actionItem, css.actionItem_interactive, css.actionItem_icon)}
+					post={post}
+					reloadPost={reloadPostQuery.refetch}
+				/>
 			</div>
 		</PostItemContainer>
 	);

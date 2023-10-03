@@ -1,6 +1,5 @@
 .root {
-	display: grid;
-	grid-gap: 20px;
+	padding: 20px 20px 12px;
 
 	@include lessThan768w {
 		padding: 12px;
@@ -23,12 +22,8 @@
 }
 
 .metaRight {
+	@include pseudo-nbsp($pseudo: before);
 	margin: 4px 2px 0 0;
-
-	&:before {
-		// Needed to make meta-button's negative margin work when it's the only element
-		content: ' ';
-	}
 }
 
 .ava {
@@ -64,6 +59,7 @@
 .body {
 	display: grid;
 	grid-gap: 20px;
+	margin: 20px 0 0;
 }
 
 .text {
@@ -83,4 +79,13 @@
 
 .cover {
 	@include feed-attachment-image;
+}
+
+//
+
+.footer {
+	@include flex-row-with-gap(8px);
+	flex-wrap: wrap;
+	row-gap: 4px;
+	margin: 12px 0 0;
 }
