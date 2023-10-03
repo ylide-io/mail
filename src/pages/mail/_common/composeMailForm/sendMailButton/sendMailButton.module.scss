@@ -72,25 +72,6 @@
 	}
 }
 
-.balancesInner {
-	position: relative;
-}
-
-.balancesLoader {
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	position: absolute;
-	right: 0;
-	bottom: 0;
-	left: 0;
-	padding: 4px;
-	font-size: 12px;
-	background: linear-gradient(180deg, rgba(255, 255, 255, 0) 0%, #ffffff 100%);
-	border-radius: 4px;
-	pointer-events: none;
-}
-
 .extraPayment {
 	font-size: 10px;
 	margin-left: 4px;

@@ -41,13 +41,7 @@ export const SendMailButton = observer(
 		}, [mailData.blockchain]);
 
 		const balances = useMemo(() => {
-			const balances = new BalancesStore();
-
-			if (mailData.from) {
-				balances.updateBalances(mailData.from.wallet, mailData.from.account.address);
-			}
-
-			return balances;
+			return mailData.from?.wallet.getBalancesOf(mailData.from.account.address) || new BalancesStore();
 		}, [mailData.from]);
 
 		const allowedChainsForAccount = useMemo(() => {
@@ -131,19 +125,11 @@ export const SendMailButton = observer(
 
 						{menuVisible && (
 							<DropDown
-								innerClassName={css.balancesInner}
 								anchorRef={menuAnchorRef}
 								alignmentDirection={AlignmentDirection.TOP}
 								horizontalAlign={HorizontalAlignment.END}
 								onCloseRequest={() => setMenuVisible(false)}
 							>
-								{balances.isUpdating && (
-									<div className={css.balancesLoader}>
-										<Spinner style={{ marginRight: 4, marginBottom: 1 }} />
-										Updating ...
-									</div>
-								)}
-
 								{allowedChainsForAccount.map(chain => {
 									const bData = blockchainMeta[chain];
 
