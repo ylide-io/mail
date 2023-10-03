@@ -56,6 +56,7 @@ export function ExplorePage() {
 
 					{renderTagBlock(CommunityTag.DEFI)}
 					{renderTagBlock(CommunityTag.NFT)}
+					{renderTagBlock(CommunityTag.ZETACHAIN_ECOSYSTEM)}
 					{renderTagBlock(CommunityTag.VENOM)}
 					{renderTagBlock(CommunityTag.TVM)}
 					{renderTagBlock(CommunityTag.SOCIAL)}
