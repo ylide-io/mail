@@ -205,14 +205,7 @@ export enum CommunityAttachmentMode {
 }
 
 const allChainsExceptTest = Object.values(BlockchainName).filter(
-	chain =>
-		![
-			BlockchainName.SOLANA,
-			BlockchainName.NEAR,
-			BlockchainName.BASE,
-			BlockchainName.ZETA,
-			BlockchainName.LINEA,
-		].includes(chain),
+	chain => ![BlockchainName.SOLANA, BlockchainName.NEAR, BlockchainName.BASE, BlockchainName.LINEA].includes(chain),
 );
 
 export const communities: Community[] = [
