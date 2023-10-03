@@ -1,5 +1,5 @@
 import * as Sentry from '@sentry/react';
-import { nanoid } from 'nanoid';
+import { customAlphabet } from 'nanoid';
 
 import packageJson from '../../package.json';
 import { AppMode, REACT_APP__APP_MODE } from '../env';
@@ -39,7 +39,7 @@ export function initSentry() {
 export function captureSentryExceptionWithId(message: unknown, cause?: unknown) {
 	cause != null && console.error(cause);
 
-	const id = nanoid(8);
+	const id = customAlphabet('ABCDEFGHIJKLMNOPQRSTUVWXYZ', 8);
 	const error = new Error(`${id}: ${message}`);
 	console.error(error);
 	Sentry.captureException(error);
