@@ -156,7 +156,7 @@ export function OfficialPostView({ community, post: initialPost }: OfficialPostV
 
 			<div className={css.body}>
 				<div className={css.text}>
-					<TextProcessor text={decodedText} nlToBr linksToAnchors />
+					<TextProcessor text={decodedText} nlToBr linksToAnchors highlightHashtags />
 				</div>
 
 				{attachmentHttpUrl && (

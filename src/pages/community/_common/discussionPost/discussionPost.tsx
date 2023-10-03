@@ -294,7 +294,7 @@ export const DiscussionPost = observer(({ post: initialPost, community, onReplyC
 				<div className={css.content}>
 					{!!decodedText && (
 						<div className={css.text}>
-							<TextProcessor text={decodedText} nlToBr linksToAnchors unsafeLinks />
+							<TextProcessor text={decodedText} nlToBr linksToAnchors unsafeLinks highlightHashtags />
 						</div>
 					)}
 

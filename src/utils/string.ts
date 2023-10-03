@@ -29,21 +29,28 @@ export function transformMatches<T>(
 	const matches = [...input.matchAll(regex)];
 
 	if (matches.length) {
+		let lastAddedIndex = 0;
+
 		matches.forEach((m, i) => {
 			const value = m[0];
 
-			if (i === 0 && m.index! > 0) {
-				res.push(input.slice(0, m.index));
+			// Before first match
+			if (m.index! > lastAddedIndex) {
+				res.push(input.slice(lastAddedIndex, m.index));
 			}
 
+			// Add match
 			res.push(transform(value, m.index!));
 
+			// After last match
 			if (i === matches.length - 1) {
 				const s = input.slice(m.index! + value.length);
 				if (s) {
 					res.push(s);
 				}
 			}
+
+			lastAddedIndex = m.index! + value.length;
 		});
 	} else {
 		res.push(input);

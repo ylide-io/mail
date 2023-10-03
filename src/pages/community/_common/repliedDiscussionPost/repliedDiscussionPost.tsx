@@ -35,7 +35,7 @@ export const RepliedDiscussionPost = observer(({ post }: RepliedDiscussionPostPr
 			<AdaptiveAddress className={css.sender} address={post.msg.senderAddress} maxLength={12} />
 
 			<div className={css.text}>
-				<TextProcessor text={decodedText} nlToBr linksToAnchors />
+				<TextProcessor text={decodedText} nlToBr linksToAnchors highlightHashtags />
 			</div>
 
 			{attachmentHttpUrl && (

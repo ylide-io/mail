@@ -5,6 +5,7 @@ import { transformMatches, truncateInMiddle } from '../../utils/string';
 import { isExternalUrl } from '../../utils/url';
 import { ActionButton, ActionButtonLook, ActionButtonSize } from '../ActionButton/ActionButton';
 import { ActionModal } from '../actionModal/actionModal';
+import css from './textProcessor.module.scss';
 
 interface UnsafeAnchorProps {
 	url: string;
@@ -78,10 +79,12 @@ interface TextProcessorProps {
 	nlToBr?: boolean;
 	linksToAnchors?: boolean;
 	unsafeLinks?: boolean;
+	highlightHashtags?: boolean;
 }
 
-export function TextProcessor({ text, nlToBr, linksToAnchors, unsafeLinks }: TextProcessorProps) {
+export function TextProcessor({ text, nlToBr, linksToAnchors, unsafeLinks, highlightHashtags }: TextProcessorProps) {
 	const pieces = useMemo(() => {
+		console.log('text', text);
 		let pieces: ReactNode[] = [text];
 
 		if (nlToBr) {
@@ -119,8 +122,26 @@ export function TextProcessor({ text, nlToBr, linksToAnchors, unsafeLinks }: Tex
 			}, []);
 		}
 
+		if (highlightHashtags) {
+			pieces = pieces.reduce<ReactNode[]>((res, curr, i) => {
+				if (typeof curr === 'string') {
+					res.push(
+						...transformMatches(curr, /#\w{2,32}\b/gi, (item, j) => (
+							<span key={`highlightHashtags ${i} ${j}`} className={css.tag}>
+								{item}
+							</span>
+						)),
+					);
+				} else {
+					res.push(curr);
+				}
+
+				return res;
+			}, []);
+		}
+		console.log('pieces', pieces);
 		return pieces;
-	}, [unsafeLinks, linksToAnchors, nlToBr, text]);
+	}, [text, nlToBr, linksToAnchors, highlightHashtags, unsafeLinks]);
 
 	return <>{pieces}</>;
 }

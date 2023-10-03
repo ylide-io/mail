@@ -38,4 +38,8 @@ test('transformMatches', () => {
 			item => `URL[${item}]`,
 		).join('|'),
 	).toStrictEqual('some |URL[https://regexr.com/7jk80]| here');
+
+	expect(
+		transformMatches('yoyoyo #gm yeah #whazzup', /#\w{2,32}\b/gi, item => `[${item.slice(1)}]`).join('|'),
+	).toStrictEqual('yoyoyo |[gm]| yeah |[whazzup]');
 });
