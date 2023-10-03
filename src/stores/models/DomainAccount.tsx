@@ -129,10 +129,6 @@ export class DomainAccount {
 		this.wallet.domain.accounts.save();
 	}
 
-	async getBalances(): Promise<Record<string, { original: string; numeric: number; e18: string }>> {
-		return await this.wallet.getBalancesOf(this.account.address);
-	}
-
 	get uint256Address() {
 		return this.wallet.controller.addressToUint256(this.account.address);
 	}

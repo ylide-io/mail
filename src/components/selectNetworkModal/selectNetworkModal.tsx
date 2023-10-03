@@ -4,7 +4,6 @@ import clsx from 'clsx';
 import { observer } from 'mobx-react';
 import { useMemo } from 'react';
 
-import { BalancesStore } from '../../stores/balancesStore';
 import domain from '../../stores/Domain';
 import { Wallet } from '../../stores/models/Wallet';
 import { blockchainMeta, evmNameToNetwork } from '../../utils/blockchain';
@@ -44,9 +43,7 @@ export interface SelectNetworkModalProps {
 
 export const SelectNetworkModal = observer(({ wallet, account, onClose }: SelectNetworkModalProps) => {
 	const balances = useMemo(() => {
-		const balances = new BalancesStore();
-		balances.updateBalances(wallet, account.address);
-		return balances;
+		return wallet.getBalancesOf(account.address);
 	}, [account.address, wallet]);
 
 	return (

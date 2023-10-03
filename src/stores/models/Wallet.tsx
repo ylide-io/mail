@@ -11,6 +11,7 @@ import { autobind } from 'core-decorators';
 import EventEmitter from 'eventemitter3';
 import { computed, makeObservable, observable } from 'mobx';
 
+import { BalancesStore } from '../balancesStore';
 import { Domain } from '../Domain';
 import { DomainAccount } from './DomainAccount';
 
@@ -121,7 +122,7 @@ export class Wallet extends EventEmitter {
 			YlideKeyVersion.KEY_V3,
 			PrivateKeyAvailabilityState.AVAILABLE,
 			{
-				onPrivateKeyRequest: async (address, magicString) =>
+				onPrivateKeyRequest: async (_address, magicString) =>
 					await this.controller.signMagicString(account, magicString),
 			},
 		);
@@ -134,9 +135,9 @@ export class Wallet extends EventEmitter {
 			YlideKeyVersion.KEY_V2,
 			PrivateKeyAvailabilityState.AVAILABLE,
 			{
-				onPrivateKeyRequest: async (address, magicString) =>
+				onPrivateKeyRequest: async (_address, magicString) =>
 					await this.controller.signMagicString(account, magicString),
-				onYlidePasswordRequest: async address => password,
+				onYlidePasswordRequest: async _address => password,
 			},
 		);
 	}
@@ -148,9 +149,9 @@ export class Wallet extends EventEmitter {
 			YlideKeyVersion.INSECURE_KEY_V1,
 			PrivateKeyAvailabilityState.AVAILABLE,
 			{
-				onPrivateKeyRequest: async (address, magicString) =>
+				onPrivateKeyRequest: async (_address, magicString) =>
 					await this.controller.signMagicString(account, magicString),
-				onYlidePasswordRequest: async address => password,
+				onYlidePasswordRequest: async _address => password,
 			},
 		);
 	}
@@ -188,47 +189,16 @@ export class Wallet extends EventEmitter {
 		return acc;
 	}
 
-	// async instantiateNewAccount(account: IGenericAccount, keypair: YlideKeyPair, keyVersion: YlidePublicKeyVersion) {
-	// 	return new Promise<DomainAccount>(async resolve => {
-	// 		const existingAcc = this.domain.accounts.accounts.find(
-	// 			acc => acc.account.address.toLowerCase() === account.address.toLowerCase(),
-	// 		);
-	// 		if (existingAcc) {
-	// 			return resolve(existingAcc);
-	// 		}
-	// 		this.domain.accounts.onceNewAccount(account, acc => {
-	// 			resolve(acc);
-	// 		});
-	// 		await this.domain.keystore.storeKey(keypair, keyVersion, this.factory.blockchainGroup, this.factory.wallet);
-	// 	});
-	// }
+	getBalancesOf(address: string): BalancesStore {
+		const store = new BalancesStore();
 
-	async getBalancesOf(address: string): Promise<Record<string, { original: string; numeric: number; e18: string }>> {
-		const chains = this.domain.registeredBlockchains.filter(
-			bc => bc.blockchainGroup === this.factory.blockchainGroup,
-		);
-		const balances = await Promise.all(
-			chains.map(async chain => {
-				return this.domain.blockchains[chain.blockchain].getBalance(address);
-			}),
-		);
-		return chains.reduce(
-			(p, c, i) => ({
-				...p,
-				[c.blockchain]: balances[i],
-			}),
-			{} as Record<string, { original: string; numeric: number; e18: string }>,
-		);
+		this.domain.registeredBlockchains
+			.filter(bc => bc.blockchainGroup === this.factory.blockchainGroup)
+			.forEach(async chain => {
+				const balance = await this.domain.blockchains[chain.blockchain].getBalance(address);
+				store.setBalance(chain.blockchain, balance.numeric);
+			});
+
+		return store;
 	}
-
-	// async connectNonCurrentAccount() {
-	// 	if (this.controller.isMultipleAccountsSupported()) {
-	// 		return 'SUGGEST_CHANGE';
-	// 	}
-	// 	const acc = await this.getCurrentAccount();
-	// 	if (acc) {
-	// 		await this.controller.disconnectAccount(acc);
-	// 	}
-	// 	return await this.connectCurrentAccount();
-	// }
 }
