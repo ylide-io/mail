@@ -19,20 +19,16 @@ import auroraVietnamBannerSrc from './bannerImages/auroraVietnam.jpg';
 import aurorityBannerSrc from './bannerImages/aurority.jpg';
 import betFuryBannerSrc from './bannerImages/betFury.jpg';
 import chepeGamesBannerSrc from './bannerImages/chepeGames.jpg';
-import cosmosChickenCoopBannerSrc from './bannerImages/cosmosChickenCoop.jpg';
 import dexifyBannerSrc from './bannerImages/dexify.jpg';
 import dittoBannerSrc from './bannerImages/ditto.jpg';
-import eddyFinanceBannerSrc from './bannerImages/eddyFinance.jpg';
 import gnosisBuildersBannerSrc from './bannerImages/gnosisBuilders.jpg';
 import gravixBannerSrc from './bannerImages/gravix.jpg';
 import hanmadiBannerSrc from './bannerImages/hanmadi.jpg';
-import hominidsBannerSrc from './bannerImages/hominids.jpg';
 import mainViewBannerSrc from './bannerImages/mainView.jpg';
 import oasisGalleryBannerSrc from './bannerImages/oasisGallery.jpg';
 import oneClickCryptoBannerSrc from './bannerImages/oneClickCrypto.jpg';
 import raveBannerSrc from './bannerImages/rave.jpg';
 import revoltBannerSrc from './bannerImages/revolt.jpg';
-import sleekWalletBannerSrc from './bannerImages/sleekWallet.jpg';
 import snipaBannerSrc from './bannerImages/snipa.jpg';
 import staxBannerSrc from './bannerImages/stax.jpg';
 import tvmBannerSrc from './bannerImages/tvm.jpg';
@@ -44,7 +40,6 @@ import venomIdBannerSrc from './bannerImages/venomId.jpg';
 import venomRecapBannerSrc from './bannerImages/venomRecap.jpg';
 import ventoryBannerSrc from './bannerImages/ventory.jpg';
 import web3WorldBannerSrc from './bannerImages/web3World.jpg';
-import znsConnectBannerSrc from './bannerImages/znsConnect.jpg';
 import createXSrc from './profileImages/alienSwap.jpg';
 import altsomeSrc from './profileImages/altsome.jpg';
 import auroraSrc from './profileImages/aurora.jpg';
@@ -62,22 +57,18 @@ import auroraVietnamSrc from './profileImages/auroraVietnam.jpg';
 import auroritySrc from './profileImages/aurority.jpg';
 import betFurySrc from './profileImages/betFury.jpg';
 import chepeGamesSrc from './profileImages/chepeGames.jpg';
-import cosmosChickenCoopSrc from './profileImages/cosmosChickenCoop.jpg';
 import dexifySrc from './profileImages/dexify.jpg';
 import dittoSrc from './profileImages/ditto.jpg';
-import eddyFinanceSrc from './profileImages/eddyFinance.jpg';
 import ethWhalesSrc from './profileImages/ethWhales.png';
 import generalSrc from './profileImages/general.png';
 import gnosisBuildersSrc from './profileImages/gnosisBuilders.jpg';
 import gravixSrc from './profileImages/gravix.jpg';
 import hanmadiSrc from './profileImages/hanmadi.jpg';
-import hominidsSrc from './profileImages/hominids.jpg';
 import mainViewSrc from './profileImages/mainView.jpg';
 import oasisGallerySrc from './profileImages/oasisGallery.png';
 import oneClickCryptoSrc from './profileImages/oneClickCrypto.jpg';
 import raveSrc from './profileImages/rave.jpg';
 import revoltSrc from './profileImages/revolt.jpg';
-import sleekWalletSrc from './profileImages/sleekWallet.jpg';
 import snipaSrc from './profileImages/snipa.png';
 import staxSrc from './profileImages/stax.jpg';
 import tvmSrc from './profileImages/tvm.png';
@@ -91,7 +82,6 @@ import ventorySrc from './profileImages/ventory.png';
 import weaverSrc from './profileImages/weaver.jpg';
 import web3WorldSrc from './profileImages/web3World.png';
 import ylideSrc from './profileImages/ylide.png';
-import znsConnectSrc from './profileImages/znsConnect.jpg';
 
 export function getCommunityById(id: CommunityId) {
 	return communities.find(p => p.id === id)!;
@@ -160,14 +150,6 @@ export enum CommunityId {
 	AURORA_VIETNAM = 'aurora_vietnam',
 	AURORA_AURORITY = 'aurora_aurority',
 
-	// ZETACHAIN
-
-	ZNS_CONNECT = 'znsConnect',
-	COSMOS_CHICKEN_COOP = 'cosmosChickenCoop',
-	EDDY_FINANCE = 'eddyFinance',
-	HOMINIDS = 'hominids',
-	SLEEK_WALLET = 'sleekWallet',
-
 	// OTHERS
 
 	TVM = 'tvm',
@@ -196,7 +178,6 @@ export enum CommunityTag {
 	TRADING = 'Trading',
 	AURORA_ECOSYSTEM = 'Aurora Ecosystem',
 	RESEARCH = 'Research',
-	ZETACHAIN_ECOSYSTEM = 'Zetachain Ecosystem',
 }
 
 export enum CommunityAttachmentMode {
@@ -711,89 +692,6 @@ export const communities: Community[] = [
 		website: 'https://t.me/auroritychat',
 		tags: [CommunityTag.AURORA_ECOSYSTEM],
 		allowedChains: [BlockchainName.AURORA],
-		attachmentMode: CommunityAttachmentMode.ADMINS,
-	},
-
-	// ZETACHAIN
-
-	{
-		id: CommunityId.ZNS_CONNECT,
-		feedId: {
-			official: '200000000000000000000000000000000000000000000000000000000000004e' as Uint256,
-			discussion: '200000000000000000000000000000000000000000000000000000000000004f' as Uint256,
-		},
-		name: 'ZNS Connect',
-		description:
-			'#ZNSConnect - the decentralized name service for linking Omnichain 🛡️ Designed for Web3, Identifier and more 🔮',
-		profileImage: znsConnectSrc,
-		bannerImage: znsConnectBannerSrc,
-		website: 'https://app.znsconnect.io',
-		tags: [CommunityTag.ZETACHAIN_ECOSYSTEM],
-		allowedChains: [BlockchainName.ZETA],
-		attachmentMode: CommunityAttachmentMode.ADMINS,
-	},
-	{
-		id: CommunityId.COSMOS_CHICKEN_COOP,
-		feedId: {
-			official: '2000000000000000000000000000000000000000000000000000000000000050' as Uint256,
-			discussion: '2000000000000000000000000000000000000000000000000000000000000051' as Uint256,
-		},
-		name: 'Cosmos Chicken Coop',
-		description:
-			'Cosmos Chicken Coop is a fantastic, fun, engaging, and secure way to learn the world of crypto. This is primarily a game and at the same time a whole platform for management. ',
-		profileImage: cosmosChickenCoopSrc,
-		bannerImage: cosmosChickenCoopBannerSrc,
-		website: 'https://cosmoschickencoop.io/',
-		tags: [CommunityTag.ZETACHAIN_ECOSYSTEM],
-		allowedChains: [BlockchainName.ZETA],
-		attachmentMode: CommunityAttachmentMode.ADMINS,
-	},
-	{
-		id: CommunityId.EDDY_FINANCE,
-		feedId: {
-			official: '2000000000000000000000000000000000000000000000000000000000000052' as Uint256,
-			discussion: '2000000000000000000000000000000000000000000000000000000000000053' as Uint256,
-		},
-		name: 'Eddy Finance',
-		description:
-			'The first Omnichain DEX on ZetaChain that streamlines native asset transfers across networks with unmatched speed and cost-efficiency without any wrapping.',
-		profileImage: eddyFinanceSrc,
-		bannerImage: eddyFinanceBannerSrc,
-		website: 'https://eddy.finance/',
-		tags: [CommunityTag.ZETACHAIN_ECOSYSTEM],
-		allowedChains: [BlockchainName.ZETA],
-		attachmentMode: CommunityAttachmentMode.ADMINS,
-	},
-	{
-		id: CommunityId.HOMINIDS,
-		feedId: {
-			official: '2000000000000000000000000000000000000000000000000000000000000054' as Uint256,
-			discussion: '2000000000000000000000000000000000000000000000000000000000000055' as Uint256,
-		},
-		name: 'HOMINIDS',
-		description:
-			'A culture shift and an extraordinary brand built by ordinary people. A community based metaverse platform, 3D graphic-based new future of social media.',
-		profileImage: hominidsSrc,
-		bannerImage: hominidsBannerSrc,
-		website: 'https://hominids.io/',
-		tags: [CommunityTag.ZETACHAIN_ECOSYSTEM],
-		allowedChains: [BlockchainName.ZETA],
-		attachmentMode: CommunityAttachmentMode.ADMINS,
-	},
-	{
-		id: CommunityId.SLEEK_WALLET,
-		feedId: {
-			official: '2000000000000000000000000000000000000000000000000000000000000056' as Uint256,
-			discussion: '2000000000000000000000000000000000000000000000000000000000000057' as Uint256,
-		},
-		name: 'Sleek Wallet',
-		description:
-			'Sleek Wallet, the first self-custodial ERC4337 omnichain wallet supported by ZetaChain. It revolutionizes the user experience by offering gasless, seedless, actionless, and seamless functionality.',
-		profileImage: sleekWalletSrc,
-		bannerImage: sleekWalletBannerSrc,
-		website: 'https://sleekwallet.io/',
-		tags: [CommunityTag.ZETACHAIN_ECOSYSTEM],
-		allowedChains: [BlockchainName.ZETA],
 		attachmentMode: CommunityAttachmentMode.ADMINS,
 	},
 

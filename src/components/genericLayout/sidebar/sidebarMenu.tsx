@@ -359,16 +359,16 @@ export const SidebarMenu = observer(() => {
 					}}
 				>
 					{renderCommunities([
-						CommunityId.ZNS_CONNECT,
-						CommunityId.COSMOS_CHICKEN_COOP,
-						CommunityId.EDDY_FINANCE,
-						CommunityId.HOMINIDS,
-						CommunityId.SLEEK_WALLET,
+						CommunityId.TVM,
+						CommunityId.MAIN_VIEW,
+						CommunityId.VENTORY,
+						CommunityId.HANMADI,
+						CommunityId.DITTO_NETWORK,
 					])}
 				</SidebarSection>
 
 				<SidebarSection title="Newly Added">
-					{renderCommunities([CommunityId.MAIN_VIEW, CommunityId.DEXIFY, CommunityId.HANMADI])}
+					{renderCommunities([CommunityId.DEXIFY, CommunityId.CHEPE_GAMES, CommunityId.ALTSOME])}
 				</SidebarSection>
 
 				<ActionButton
