@@ -67,7 +67,6 @@ const OfficialContent = observer(({ community, setTabsAsideContent }: OfficialCo
 	const { adminAccounts, isFeedAdmin, isFeedModeratorMode } = useCommunityAccounts(community, true);
 
 	const postsQuery = useInfiniteQuery<DecodedBlockchainFeedPost[]>(['community', communityId, 'posts', 'official'], {
-		cacheTime: 15 * 60 * 1000,
 		queryFn: async ({ pageParam = 0 }) => {
 			analytics.blockchainFeedView(community.id);
 
@@ -194,7 +193,6 @@ const DiscussionContent = observer(({ community, setTabsAsideContent }: Discussi
 	const postsQuery = useInfiniteQuery<DecodedBlockchainFeedPost[]>(
 		['community', communityId, 'posts', 'discussion'],
 		{
-			cacheTime: 15 * 60 * 1000,
 			queryFn: async ({ pageParam = 0 }) => {
 				analytics.blockchainFeedView(community.id);
 
