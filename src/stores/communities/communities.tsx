@@ -196,7 +196,7 @@ export enum CommunityTag {
 	TRADING = 'Trading',
 	AURORA_ECOSYSTEM = 'Aurora Ecosystem',
 	RESEARCH = 'Research',
-	ZETACHAIN_ECOSYSTEM = 'Zetachain Ecosystem',
+	ZETACHAIN_ECOSYSTEM = 'ZetaChain Ecosystem',
 }
 
 export enum CommunityAttachmentMode {
