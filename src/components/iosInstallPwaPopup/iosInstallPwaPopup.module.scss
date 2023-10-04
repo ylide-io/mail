@@ -1,6 +1,7 @@
 $opacity: 0.98;
 
 .root {
+	display: grid;
 	position: fixed;
 	padding: 4px 8px;
 	max-width: 320px;
@@ -62,6 +63,13 @@ $opacity: 0.98;
 }
 
 .arrow {
-	margin: auto;
+	justify-self: center;
 	color: var(--accent-color);
+
+	.root_ipad & {
+		order: -1;
+		justify-self: right;
+		margin: 0 18px 0 0;
+		transform: rotate(180deg);
+	}
 }
