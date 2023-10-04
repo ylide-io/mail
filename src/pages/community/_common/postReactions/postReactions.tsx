@@ -1,4 +1,5 @@
 import { observer } from 'mobx-react';
+import { useMemo } from 'react';
 import { useMutation } from 'react-query';
 
 import { BlockchainFeedApi, DecodedBlockchainFeedPost } from '../../../../api/blockchainFeedApi';
@@ -19,7 +20,10 @@ export interface PostReactionsProps {
 }
 
 export const PostReactions = observer(({ reactionButtonClassName, post, reloadPost }: PostReactionsProps) => {
-	const reactionsCountsEntries = Object.entries(post.original.reactionsCounts);
+	const reactionsCountsEntries = useMemo(
+		() => Object.entries(post.original.reactionsCounts).sort((a, b) => Number(b[1]) - Number(a[1])),
+		[post.original.reactionsCounts],
+	);
 
 	const setReactionMutation = useMutation({
 		mutationFn: async (variables: { reaction: string; account: DomainAccount }) => {
