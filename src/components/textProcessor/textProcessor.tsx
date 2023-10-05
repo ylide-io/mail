@@ -125,7 +125,7 @@ export function TextProcessor({ text, nlToBr, linksToAnchors, unsafeLinks, highl
 			pieces = pieces.reduce<ReactNode[]>((res, curr, i) => {
 				if (typeof curr === 'string') {
 					res.push(
-						...transformMatches(curr, /#\w{2,32}\b/gi, (item, j) => (
+						...transformMatches(curr, /#\w+/g, (item, j) => (
 							<span key={`highlightHashtags ${i} ${j}`} className={css.tag}>
 								{item}
 							</span>

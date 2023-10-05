@@ -11,6 +11,7 @@ import { ReactComponent as SmileSvg } from '../../../../icons/ic20/smile.svg';
 import { DomainAccount } from '../../../../stores/models/DomainAccount';
 import { invariant } from '../../../../utils/assert';
 import { getAccountsForReaction } from '../../../../utils/reactions';
+import { captureSentryExceptionWithId } from '../../../../utils/sentry';
 import css from './postReactions.module.scss';
 
 export interface PostReactionsProps {
@@ -38,8 +39,8 @@ export const PostReactions = observer(({ reactionButtonClassName, post, reloadPo
 			await reloadPost();
 		},
 		onError: error => {
+			captureSentryExceptionWithId('Failed to set reaction', error);
 			toast(`Couldn't set reaction 😟`);
-			console.error(error);
 		},
 	});
 
@@ -66,8 +67,8 @@ export const PostReactions = observer(({ reactionButtonClassName, post, reloadPo
 			await reloadPost();
 		},
 		onError: error => {
+			captureSentryExceptionWithId('Failed to remove reaction', error);
 			toast(`Couldn't remove reaction 😟`);
-			console.error(error);
 		},
 	});
 

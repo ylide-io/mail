@@ -1,4 +1,5 @@
 import * as Sentry from '@sentry/react';
+import { nanoid } from 'nanoid';
 
 import packageJson from '../../package.json';
 import { AppMode, REACT_APP__APP_MODE } from '../env';
@@ -33,4 +34,14 @@ export function initSentry() {
 		// We recommend adjusting this value in production
 		tracesSampleRate: 1.0,
 	});
+}
+
+export function captureSentryExceptionWithId(message: unknown, cause?: unknown) {
+	cause != null && console.error(cause);
+
+	const id = nanoid(8);
+	const error = new Error(`${id}: ${message}`);
+	console.error(error);
+	Sentry.captureException(error);
+	return id;
 }

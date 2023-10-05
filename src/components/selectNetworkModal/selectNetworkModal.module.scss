@@ -1,0 +1,92 @@
+.root {
+	display: flex;
+	flex-direction: column;
+	height: 520px;
+	padding: 12px 0 0;
+}
+
+.title {
+	font-size: 24px;
+	text-align: center;
+	margin-bottom: 12px;
+}
+
+.list {
+	flex-grow: 1;
+	padding: 24px;
+	overflow-y: auto;
+}
+
+.wmnPlate {
+	@include flex-row(stretch, flex-start);
+	border: 1px solid var(--border-color);
+	border-radius: 12px;
+	padding: 9px 12px;
+	height: 58px;
+	margin-bottom: 8px;
+
+	cursor: pointer;
+
+	&:hover {
+		box-shadow: 0 0 10px rgba(var(--shade-rgb-color), 0.3);
+	}
+}
+
+.wmnPlate_disabled {
+	pointer-events: none;
+	opacity: 0.5;
+}
+
+.wmnIcon {
+	@include flex-row(center, center);
+
+	width: 32px;
+	flex-grow: 0;
+	margin-right: 12px;
+}
+
+.wmnTitle {
+	@include flex-column(flex-start, space-evenly);
+	flex-grow: 1;
+}
+
+.wmnBlockchain {
+	font-style: normal;
+	font-weight: 400;
+	font-size: 16px;
+	line-height: 20px;
+}
+
+.wmnOptimal {
+	font-style: normal;
+	font-weight: 400;
+	font-size: 11px;
+	line-height: 16px;
+	color: var(--accent-color);
+	padding: 0 8px;
+
+	background: rgba(var(--accent-rgb-color), 0.08);
+	border-radius: 14px;
+}
+
+.wmnBalance {
+	@include flex-column(flex-end, space-between);
+}
+
+.wmnWalletBalance {
+	font-style: normal;
+	font-weight: 300;
+	font-size: 14px;
+	line-height: 20px;
+	text-align: right;
+}
+
+.wmnTransactionPrice {
+	font-style: normal;
+	font-weight: 300;
+	font-size: 12px;
+	line-height: 16px;
+	text-align: right;
+
+	color: var(--secondary-text-color);
+}

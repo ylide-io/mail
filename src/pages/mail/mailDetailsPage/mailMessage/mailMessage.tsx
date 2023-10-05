@@ -30,6 +30,7 @@ import {
 	getMessageReceivers,
 	getMessageSenders,
 } from '../../../../utils/mail';
+import { captureSentryExceptionWithId } from '../../../../utils/sentry';
 import css from './mailMessage.module.scss';
 
 const ReactEditorJS = createReactEditorJS();
@@ -192,6 +193,7 @@ export function Attachment({ attachment, message }: AttachmentProps) {
 
 			downloadFile(decrypted, attachment.fileName);
 		} catch (e) {
+			captureSentryExceptionWithId('Failed to download attachment', e);
 			toast("Couldn't download file 😒");
 		} finally {
 			setDownloading(false);

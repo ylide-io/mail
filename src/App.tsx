@@ -1,5 +1,4 @@
 import { observer } from 'mobx-react';
-import { nanoid } from 'nanoid';
 import { useEffect, useState } from 'react';
 import { QueryClient, QueryClientProvider } from 'react-query';
 import { generatePath, Navigate, Route, Routes, useLocation, useSearchParams } from 'react-router-dom';
@@ -42,6 +41,7 @@ import { FolderId } from './stores/MailList';
 import { RoutePath } from './stores/routePath';
 import { enableRemoteConsole, remoteConsoleChannel } from './utils/dev';
 import { openInNewWidnow } from './utils/misc';
+import { captureSentryExceptionWithId } from './utils/sentry';
 import { useIsMatchesPattern, useNav } from './utils/url';
 
 export enum AppTheme {
@@ -148,14 +148,8 @@ export const App = observer(() => {
 			domain
 				.init()
 				.catch(err => {
-					const errorId = nanoid(8);
-					const msg = `Initialization error [${errorId}]: ${
-						(err instanceof Error && err.stack) || JSON.stringify(err)
-					}`;
-
+					const errorId = captureSentryExceptionWithId('Initialization error', err);
 					setInitErrorId(errorId);
-					console.error(msg);
-					throw new Error(msg);
 				})
 				.finally(() => console.debug(`Initialization took ${Date.now() - start}ms`));
 		}

@@ -4,7 +4,9 @@ https://trello.com/c/i9GAsOaF
  */
 
 .root {
-	padding: 32px;
+	--action-modal_padding: 32px;
+
+	padding: var(--action-modal_padding);
 
 	> :not(:last-child) {
 		margin: 0 0 24px;
