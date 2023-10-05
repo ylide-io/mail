@@ -15,6 +15,7 @@ import { ActionButton, ActionButtonLook, ActionButtonSize } from '../ActionButto
 import { Modal } from '../modal/modal';
 import { TextField, TextFieldLook } from '../textField/textField';
 import { YlideLoader } from '../ylideLoader/ylideLoader';
+import css from './selectWalletModal.module.scss';
 
 interface SelectWalletModalProps {
 	onClose?: (wallet?: Wallet) => void;
@@ -85,7 +86,7 @@ export const SelectWalletModal = observer(({ onClose }: SelectWalletModalProps) 
 
 	function renderWalletConnectAlreadyUsed(walletName: string) {
 		return (
-			<div className="overall">
+			<div className={css.overall}>
 				WalletConnect can be used to connect only one account.
 				<br />
 				<br />
@@ -106,30 +107,30 @@ export const SelectWalletModal = observer(({ onClose }: SelectWalletModalProps) 
 	}
 
 	return (
-		<Modal className="wallet-modal" onClose={onClose}>
-			<h3 className="wm-title">Select wallet</h3>
+		<Modal className={css.root} onClose={onClose}>
+			<h3 className={css.title}>Select wallet</h3>
 
 			{!!availableBrowserWallets.length && (
-				<div className="available-wallets">
-					<div className="aw-title">Available browser extensions</div>
-					<div className="wallets-container">
+				<div className={css.availableWallets}>
+					<div className={css.awTitle}>Available browser extensions</div>
+					<div className={css.walletsContainer}>
 						{availableBrowserWallets.map(w => (
 							<div
-								className="wallet-icon"
+								className={css.walletIcon}
 								key={w}
 								onClick={() => onClose?.(domain.wallets.find(it => it.wallet === w))}
 							>
-								<div className="wallet-icon-block">
-									<div className="wallet-icon-image">{walletsMeta[w].logo(32)}</div>
+								<div className={css.walletIconBlock}>
+									<div className={css.walletIconImage}>{walletsMeta[w].logo(32)}</div>
 								</div>
-								<div className="wallet-icon-title">{walletsMeta[w].title}</div>
+								<div className={css.walletIconTitle}>{walletsMeta[w].title}</div>
 							</div>
 						))}
 					</div>
 				</div>
 			)}
 
-			<div className="wm-tabs">
+			<div className={css.wmTabs}>
 				{isDesktop ? (
 					<>
 						<div
@@ -137,7 +138,7 @@ export const SelectWalletModal = observer(({ onClose }: SelectWalletModalProps) 
 								setActiveTab('qr');
 								setSearch('');
 							}}
-							className={clsx('wm-tab', { active: activeTab === 'qr' })}
+							className={clsx(css.wmTab, activeTab === 'qr' && css.wmTab_active)}
 						>
 							QR code
 						</div>
@@ -146,7 +147,7 @@ export const SelectWalletModal = observer(({ onClose }: SelectWalletModalProps) 
 								setActiveTab('desktop');
 								setSearch('');
 							}}
-							className={clsx('wm-tab', { active: activeTab === 'desktop' })}
+							className={clsx(css.wmTab, activeTab === 'desktop' && css.wmTab_active)}
 						>
 							Desktop
 						</div>
@@ -155,7 +156,7 @@ export const SelectWalletModal = observer(({ onClose }: SelectWalletModalProps) 
 								setActiveTab('install');
 								setSearch('');
 							}}
-							className={clsx('wm-tab', { active: activeTab === 'install' })}
+							className={clsx(css.wmTab, activeTab === 'install' && css.wmTab_active)}
 						>
 							Install
 						</div>
@@ -167,7 +168,7 @@ export const SelectWalletModal = observer(({ onClose }: SelectWalletModalProps) 
 								setActiveTab('qr');
 								setSearch('');
 							}}
-							className={clsx('wm-tab', { active: activeTab === 'qr' })}
+							className={clsx(css.wmTab, activeTab === 'qr' && css.wmTab_active)}
 						>
 							Mobile
 						</div>
@@ -175,17 +176,17 @@ export const SelectWalletModal = observer(({ onClose }: SelectWalletModalProps) 
 				)}
 			</div>
 
-			<div className="wm-tab-content">
+			<div className={css.wmTabContent}>
 				{activeTab === 'qr' ? (
 					isDesktop ? (
-						<div className="qr-content">
+						<div className={css.qrContent}>
 							{!domain.walletConnectState.loading && domain.walletConnectState.connection ? (
 								renderWalletConnectAlreadyUsed(domain.walletConnectState.connection.walletName)
 							) : (
 								<>
-									<div className="svg-background">
+									<div className={css.svgBackground}>
 										<svg
-											className="left-top"
+											className={css.svgBackground_leftTop}
 											width="34"
 											height="34"
 											viewBox="0 0 34 34"
@@ -200,7 +201,7 @@ export const SelectWalletModal = observer(({ onClose }: SelectWalletModalProps) 
 											/>
 										</svg>
 										<svg
-											className="left-bottom"
+											className={css.svgBackground_leftBottom}
 											width="34"
 											height="34"
 											viewBox="0 0 34 34"
@@ -215,7 +216,7 @@ export const SelectWalletModal = observer(({ onClose }: SelectWalletModalProps) 
 											/>
 										</svg>
 										<svg
-											className="right-top"
+											className={css.svgBackground_rightTop}
 											width="34"
 											height="34"
 											viewBox="0 0 34 34"
@@ -230,7 +231,7 @@ export const SelectWalletModal = observer(({ onClose }: SelectWalletModalProps) 
 											/>
 										</svg>
 										<svg
-											className="right-bottom"
+											className={css.svgBackground_rightBottom}
 											width="34"
 											height="34"
 											viewBox="0 0 34 34"
@@ -253,7 +254,7 @@ export const SelectWalletModal = observer(({ onClose }: SelectWalletModalProps) 
 											}
 										/>
 									</div>
-									<div className="qr-text">
+									<div className={css.qrText}>
 										Scan QR code with
 										<br />a WalletConnect compatible wallet
 									</div>
@@ -269,7 +270,7 @@ export const SelectWalletModal = observer(({ onClose }: SelectWalletModalProps) 
 											setCopy(true);
 											setTimeout(() => setCopy(false), 1000);
 										}}
-										className="qr-link"
+										className={css.qrLink}
 									>
 										{copy ? 'Copied' : 'Copy to clipboard'}
 									</a>
@@ -283,7 +284,7 @@ export const SelectWalletModal = observer(({ onClose }: SelectWalletModalProps) 
 							) : (
 								<>
 									<TextField
-										className="wm-tab-search"
+										className={css.wmTabSearch}
 										look={TextFieldLook.LITE}
 										type="text"
 										placeholder="Search"
@@ -291,7 +292,7 @@ export const SelectWalletModal = observer(({ onClose }: SelectWalletModalProps) 
 										onValueChange={setSearch}
 									/>
 
-									<div className="wallets-list">
+									<div className={css.walletsList}>
 										{walletConnectRegistry.loading ? (
 											<YlideLoader />
 										) : (
@@ -300,7 +301,7 @@ export const SelectWalletModal = observer(({ onClose }: SelectWalletModalProps) 
 												.map(w => {
 													return (
 														<div
-															className="wallet-icon"
+															className={css.walletIcon}
 															onClick={() => {
 																const href = browserUtils.formatIOSMobile(
 																	!domain.walletConnectState.loading &&
@@ -318,8 +319,8 @@ export const SelectWalletModal = observer(({ onClose }: SelectWalletModalProps) 
 																openInNewWidnow(href);
 															}}
 														>
-															<div className="wallet-icon-block">
-																<div className="wallet-icon-image">
+															<div className={css.walletIconBlock}>
+																<div className={css.walletIconImage}>
 																	<img
 																		src={w.logo}
 																		alt="Wallet Logo"
@@ -331,7 +332,7 @@ export const SelectWalletModal = observer(({ onClose }: SelectWalletModalProps) 
 																	/>
 																</div>
 															</div>
-															<div className="wallet-icon-title">{w.shortName}</div>
+															<div className={css.walletIconTitle}>{w.shortName}</div>
 														</div>
 													);
 												})
@@ -348,7 +349,7 @@ export const SelectWalletModal = observer(({ onClose }: SelectWalletModalProps) 
 						) : (
 							<>
 								<TextField
-									className="wm-tab-search"
+									className={css.wmTabSearch}
 									look={TextFieldLook.LITE}
 									type="text"
 									placeholder="Search"
@@ -356,7 +357,7 @@ export const SelectWalletModal = observer(({ onClose }: SelectWalletModalProps) 
 									onValueChange={setSearch}
 								/>
 
-								<div className="wallets-list">
+								<div className={css.walletsList}>
 									{walletConnectRegistry.loading ? (
 										<YlideLoader />
 									) : (
@@ -365,7 +366,7 @@ export const SelectWalletModal = observer(({ onClose }: SelectWalletModalProps) 
 											.map(w => {
 												return (
 													<div
-														className="wallet-icon"
+														className={css.walletIcon}
 														onClick={() => {
 															const href = browserUtils.formatIOSMobile(
 																!domain.walletConnectState.loading &&
@@ -381,8 +382,8 @@ export const SelectWalletModal = observer(({ onClose }: SelectWalletModalProps) 
 															openInNewWidnow(href);
 														}}
 													>
-														<div className="wallet-icon-block">
-															<div className="wallet-icon-image">
+														<div className={css.walletIconBlock}>
+															<div className={css.walletIconImage}>
 																<img
 																	src={w.logo}
 																	alt="Wallet Logo"
@@ -394,7 +395,7 @@ export const SelectWalletModal = observer(({ onClose }: SelectWalletModalProps) 
 																/>
 															</div>
 														</div>
-														<div className="wallet-icon-title">{w.name}</div>
+														<div className={css.walletIconTitle}>{w.name}</div>
 													</div>
 												);
 											})
@@ -406,7 +407,7 @@ export const SelectWalletModal = observer(({ onClose }: SelectWalletModalProps) 
 				) : activeTab === 'install' ? (
 					<>
 						<TextField
-							className="wm-tab-search"
+							className={css.wmTabSearch}
 							look={TextFieldLook.LITE}
 							type="text"
 							placeholder="Search"
@@ -414,7 +415,7 @@ export const SelectWalletModal = observer(({ onClose }: SelectWalletModalProps) 
 							onValueChange={setSearch}
 						/>
 
-						<div className="wallets-list">
+						<div className={css.walletsList}>
 							{walletsToInstall
 								.filter(w =>
 									walletsMeta[w]
@@ -425,16 +426,16 @@ export const SelectWalletModal = observer(({ onClose }: SelectWalletModalProps) 
 									const wData = walletsMeta[w];
 									return (
 										<div
-											className="wallet-icon"
+											className={css.walletIcon}
 											key={w}
 											onClick={() => {
 												openInNewWidnow(wData.link);
 											}}
 										>
-											<div className="wallet-icon-block">
-												<div className="wallet-icon-image">{wData.logo(32)}</div>
+											<div className={css.walletIconBlock}>
+												<div className={css.walletIconImage}>{wData.logo(32)}</div>
 											</div>
-											<div className="wallet-icon-title">{wData.title}</div>
+											<div className={css.walletIconTitle}>{wData.title}</div>
 										</div>
 									);
 								})}

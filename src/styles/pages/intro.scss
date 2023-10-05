@@ -201,14 +201,3 @@
 		padding: 20px;
 	}
 }
-
-.overall {
-	@include flex-column(center, center);
-	background-color: var(--inverted-surface-color);
-	color: var(--on-inverted-surface-color);
-	font-size: 18px;
-	text-align: center;
-	padding: 20px;
-	line-height: 140%;
-	border-radius: 10px;
-}

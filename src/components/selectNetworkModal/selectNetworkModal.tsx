@@ -9,6 +9,7 @@ import { Wallet } from '../../stores/models/Wallet';
 import { blockchainMeta, evmNameToNetwork } from '../../utils/blockchain';
 import { Modal } from '../modal/modal';
 import { WalletTag } from '../walletTag/walletTag';
+import css from './selectNetworkModal.module.scss';
 
 const txPrices: Record<EVMNetwork, number> = {
 	[EVMNetwork.LOCAL_HARDHAT]: 0.001,
@@ -47,7 +48,7 @@ export const SelectNetworkModal = observer(({ wallet, account, onClose }: Select
 	}, [account.address, wallet]);
 
 	return (
-		<Modal className="account-modal wallet-modal" onClose={onClose}>
+		<Modal className={css.root} onClose={onClose}>
 			<div
 				style={{
 					padding: 24,
@@ -60,21 +61,9 @@ export const SelectNetworkModal = observer(({ wallet, account, onClose }: Select
 				<WalletTag wallet={wallet.factory.wallet} address={account.address} />
 			</div>
 
-			<h3 className="wm-title">Choose network</h3>
+			<h3 className={css.title}>Choose network</h3>
 
-			<div
-				className="wm-body"
-				style={{
-					marginTop: -24,
-					paddingTop: 24,
-					marginLeft: -24,
-					marginRight: -24,
-					paddingLeft: 24,
-					paddingRight: 24,
-					overflowY: 'scroll',
-					maxHeight: 390,
-				}}
-			>
+			<div className={css.list}>
 				{domain.registeredBlockchains
 					.filter(f => f.blockchainGroup === 'evm')
 					.sort((a, b) => {
@@ -92,24 +81,24 @@ export const SelectNetworkModal = observer(({ wallet, account, onClose }: Select
 						const bData = blockchainMeta[bc.blockchain];
 						return (
 							<div
-								className={clsx('wmn-plate', {
-									disabled: !Number(balances.getBalance(bc.blockchain).toFixed(4)),
+								className={clsx(css.wmnPlate, {
+									[css.wmnPlate_disabled]: !Number(balances.getBalance(bc.blockchain).toFixed(4)),
 								})}
 								onClick={() => onClose?.(evmNameToNetwork(bc.blockchain)!)}
 							>
-								<div className="wmn-icon">{bData.logo(32)}</div>
-								<div className="wmn-title">
-									<div className="wmn-blockchain">{bData.title}</div>
+								<div className={css.wmnIcon}>{bData.logo(32)}</div>
+								<div className={css.wmnTitle}>
+									<div className={css.wmnBlockchain}>{bData.title}</div>
 									{Number(balances.getBalance(bc.blockchain).toFixed(4)) > 0 && idx === 0 ? (
-										<div className="wmn-optimal">Optimal</div>
+										<div className={css.wmnOptimal}>Optimal</div>
 									) : null}
 								</div>
-								<div className="wmn-balance">
-									<div className="wmn-wallet-balance">
+								<div className={css.wmnBalance}>
+									<div className={css.wmnWalletBalance}>
 										{Number(balances.getBalance(bc.blockchain).toFixed(4))}{' '}
 										{bData.ethNetwork?.nativeCurrency.symbol || 'ETH'}
 									</div>
-									<div className="wmn-transaction-price">
+									<div className={css.wmnTransactionPrice}>
 										Transaction = 0.0004 {bData.ethNetwork?.nativeCurrency.symbol || 'ETH'}
 									</div>
 								</div>
