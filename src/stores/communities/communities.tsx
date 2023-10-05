@@ -220,6 +220,7 @@ export const communities: Community[] = [
 		description: 'General chat to meet your web3 frens.',
 		profileImage: generalSrc,
 		allowedChains: allChainsExceptTest,
+		attachmentMode: CommunityAttachmentMode.ADMINS,
 	},
 	{
 		id: CommunityId.ETH_WHALES,
@@ -245,6 +246,7 @@ export const communities: Community[] = [
 		website: 'https://ylide.io/',
 		tags: [CommunityTag.SOCIAL, CommunityTag.VENOM],
 		allowedChains: allChainsExceptTest,
+		attachmentMode: CommunityAttachmentMode.ADMINS,
 	},
 	{
 		id: CommunityId.MAIN_VIEW,
