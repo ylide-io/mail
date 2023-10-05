@@ -2,6 +2,7 @@ import { Uint256 } from '@ylide/sdk';
 
 import { VENOM_FEED_ID } from '../../constants';
 import { BlockchainName } from '../../utils/blockchain';
+import aceSwapBannerSrc from './bannerImages/aceSwap.jpg';
 import createXBannerSrc from './bannerImages/alienSwap.jpg';
 import altsomeBannerSrc from './bannerImages/altsome.jpg';
 import auroraBannerSrc from './bannerImages/aurora.jpg';
@@ -32,7 +33,9 @@ import oasisGalleryBannerSrc from './bannerImages/oasisGallery.jpg';
 import oneClickCryptoBannerSrc from './bannerImages/oneClickCrypto.jpg';
 import raveBannerSrc from './bannerImages/rave.jpg';
 import revoltBannerSrc from './bannerImages/revolt.jpg';
+import sendtokensBannerSrc from './bannerImages/sendtokens.jpg';
 import sleekWalletBannerSrc from './bannerImages/sleekWallet.jpg';
+import smartDeployerBannerSrc from './bannerImages/smartDeployer.jpg';
 import snipaBannerSrc from './bannerImages/snipa.jpg';
 import staxBannerSrc from './bannerImages/stax.jpg';
 import tvmBannerSrc from './bannerImages/tvm.jpg';
@@ -45,6 +48,7 @@ import venomRecapBannerSrc from './bannerImages/venomRecap.jpg';
 import ventoryBannerSrc from './bannerImages/ventory.jpg';
 import web3WorldBannerSrc from './bannerImages/web3World.jpg';
 import znsConnectBannerSrc from './bannerImages/znsConnect.jpg';
+import aceSwapSrc from './profileImages/aceSwap.jpg';
 import createXSrc from './profileImages/alienSwap.jpg';
 import altsomeSrc from './profileImages/altsome.jpg';
 import auroraSrc from './profileImages/aurora.jpg';
@@ -77,7 +81,9 @@ import oasisGallerySrc from './profileImages/oasisGallery.png';
 import oneClickCryptoSrc from './profileImages/oneClickCrypto.jpg';
 import raveSrc from './profileImages/rave.jpg';
 import revoltSrc from './profileImages/revolt.jpg';
+import sendtokensSrc from './profileImages/sendtokens.jpg';
 import sleekWalletSrc from './profileImages/sleekWallet.jpg';
+import smartDeployerSrc from './profileImages/smartDeployer.jpg';
 import snipaSrc from './profileImages/snipa.png';
 import staxSrc from './profileImages/stax.jpg';
 import tvmSrc from './profileImages/tvm.png';
@@ -167,6 +173,9 @@ export enum CommunityId {
 	EDDY_FINANCE = 'eddyFinance',
 	HOMINIDS = 'hominids',
 	SLEEK_WALLET = 'sleekWallet',
+	ACE_SWAP = 'ace_swap',
+	SENDTOKENS = 'sendtokens',
+	SMART_DEPLOYER = 'smart_deployer',
 
 	// OTHERS
 
@@ -787,6 +796,52 @@ export const communities: Community[] = [
 		profileImage: sleekWalletSrc,
 		bannerImage: sleekWalletBannerSrc,
 		website: 'https://sleekwallet.io/',
+		tags: [CommunityTag.ZETACHAIN_ECOSYSTEM],
+		allowedChains: [BlockchainName.ZETA],
+		attachmentMode: CommunityAttachmentMode.ADMINS,
+	},
+	{
+		id: CommunityId.ACE_SWAP,
+		feedId: {
+			official: '2000000000000000000000000000000000000000000000000000000000000058' as Uint256,
+			discussion: '2000000000000000000000000000000000000000000000000000000000000059' as Uint256,
+		},
+		name: 'AceSwap',
+		description: 'The ace of decentralized exchanges on Zetachain.',
+		profileImage: aceSwapSrc,
+		bannerImage: aceSwapBannerSrc,
+		website: 'https://aceswap.io/',
+		tags: [CommunityTag.ZETACHAIN_ECOSYSTEM],
+		allowedChains: [BlockchainName.ZETA],
+		attachmentMode: CommunityAttachmentMode.ADMINS,
+	},
+	{
+		id: CommunityId.SENDTOKENS,
+		feedId: {
+			official: '200000000000000000000000000000000000000000000000000000000000005a' as Uint256,
+			discussion: '200000000000000000000000000000000000000000000000000000000000005b' as Uint256,
+		},
+		name: 'Sendtokens',
+		description: 'Welcome to the Sendtokens Community Hub! Explore the world of decentralized finance with us 🚀',
+		profileImage: sendtokensSrc,
+		bannerImage: sendtokensBannerSrc,
+		website: 'https://www.sendtokens.xyz/',
+		tags: [CommunityTag.ZETACHAIN_ECOSYSTEM],
+		allowedChains: [BlockchainName.ZETA],
+		attachmentMode: CommunityAttachmentMode.ADMINS,
+	},
+	{
+		id: CommunityId.SMART_DEPLOYER,
+		feedId: {
+			official: '200000000000000000000000000000000000000000000000000000000000005c' as Uint256,
+			discussion: '200000000000000000000000000000000000000000000000000000000000005d' as Uint256,
+		},
+		name: 'SmartDeployer',
+		description:
+			'SmartDeployer is a No-Code platform that simplifies the process of creating and managing custom tokens for Web3 projects.',
+		profileImage: smartDeployerSrc,
+		bannerImage: smartDeployerBannerSrc,
+		website: 'https://www.smartdeployer.xyz/',
 		tags: [CommunityTag.ZETACHAIN_ECOSYSTEM],
 		allowedChains: [BlockchainName.ZETA],
 		attachmentMode: CommunityAttachmentMode.ADMINS,
