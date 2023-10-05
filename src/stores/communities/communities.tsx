@@ -28,6 +28,7 @@ import gnosisBuildersBannerSrc from './bannerImages/gnosisBuilders.jpg';
 import gravixBannerSrc from './bannerImages/gravix.jpg';
 import hanmadiBannerSrc from './bannerImages/hanmadi.jpg';
 import hominidsBannerSrc from './bannerImages/hominids.jpg';
+import jeriqoSocialFiBannerSrc from './bannerImages/jeriqoSocialFi.jpg';
 import mainViewBannerSrc from './bannerImages/mainView.jpg';
 import oasisGalleryBannerSrc from './bannerImages/oasisGallery.jpg';
 import oneClickCryptoBannerSrc from './bannerImages/oneClickCrypto.jpg';
@@ -76,6 +77,7 @@ import gnosisBuildersSrc from './profileImages/gnosisBuilders.jpg';
 import gravixSrc from './profileImages/gravix.jpg';
 import hanmadiSrc from './profileImages/hanmadi.jpg';
 import hominidsSrc from './profileImages/hominids.jpg';
+import jeriqoSocialFiSrc from './profileImages/jeriqoSocialFi.jpg';
 import mainViewSrc from './profileImages/mainView.jpg';
 import oasisGallerySrc from './profileImages/oasisGallery.png';
 import oneClickCryptoSrc from './profileImages/oneClickCrypto.jpg';
@@ -98,6 +100,8 @@ import weaverSrc from './profileImages/weaver.jpg';
 import web3WorldSrc from './profileImages/web3World.png';
 import ylideSrc from './profileImages/ylide.png';
 import znsConnectSrc from './profileImages/znsConnect.jpg';
+
+// AI: import banner and profile for XXX
 
 export function getCommunityById(id: CommunityId) {
 	return communities.find(p => p.id === id)!;
@@ -176,6 +180,7 @@ export enum CommunityId {
 	ACE_SWAP = 'ace_swap',
 	SENDTOKENS = 'sendtokens',
 	SMART_DEPLOYER = 'smart_deployer',
+	JERIQO_SOCIAL_FI = 'jeriqo_social_fi',
 
 	// OTHERS
 
@@ -842,6 +847,22 @@ export const communities: Community[] = [
 		profileImage: smartDeployerSrc,
 		bannerImage: smartDeployerBannerSrc,
 		website: 'https://www.smartdeployer.xyz/',
+		tags: [CommunityTag.ZETACHAIN_ECOSYSTEM],
+		allowedChains: [BlockchainName.ZETA],
+		attachmentMode: CommunityAttachmentMode.ADMINS,
+	},
+	{
+		id: CommunityId.JERIQO_SOCIAL_FI,
+		feedId: {
+			official: '200000000000000000000000000000000000000000000000000000000000005e' as Uint256,
+			discussion: '200000000000000000000000000000000000000000000000000000000000005f' as Uint256,
+		},
+		name: 'Jeriqo SocialFi',
+		description:
+			'First SocialFi on #Zetachain, Live Stream, Music, Earn. You found us early, follow and turn on the notification.',
+		profileImage: jeriqoSocialFiSrc,
+		bannerImage: jeriqoSocialFiBannerSrc,
+		website: 'https://twitter.com/Jeriqohq',
 		tags: [CommunityTag.ZETACHAIN_ECOSYSTEM],
 		allowedChains: [BlockchainName.ZETA],
 		attachmentMode: CommunityAttachmentMode.ADMINS,
