@@ -18,7 +18,7 @@ import { LoadingModal } from '../loadingModal/loadingModal';
 import { SelectNetworkModal } from '../selectNetworkModal/selectNetworkModal';
 import { showStaticComponent } from '../staticComponentManager/staticComponentManager';
 import { TextField, TextFieldLook } from '../textField/textField';
-import { toast } from '../toast/toast';
+import { toast, toastWithErrorId } from '../toast/toast';
 import { WalletTag } from '../walletTag/walletTag';
 import { YlideLoader } from '../ylideLoader/ylideLoader';
 
@@ -88,7 +88,7 @@ export function NewPasswordModal({
 	function exitUnsuccessfully(error?: { message: string; e?: any }) {
 		if (error) {
 			console.error(error.message, error.e);
-			toast(error.message);
+			toastWithErrorId(error.message, error.message);
 		}
 
 		if (domainAccountRef.current) {

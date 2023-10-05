@@ -3,6 +3,7 @@ import { observable } from 'mobx';
 import { observer } from 'mobx-react';
 import { PropsWithChildren, ReactNode } from 'react';
 
+import { captureSentryExceptionWithId } from '../../utils/sentry';
 import { Popup } from '../popup/popup';
 import { PopupManagerPortalLevel } from '../popup/popupManager/popupManager';
 import css from './toast.module.scss';
@@ -70,6 +71,15 @@ export function toast(content: ReactNode) {
 	);
 
 	setTimeout(() => toasts.replace(toasts.filter(it => it.id !== id)), Toast.DISPLAY_TIME + Toast.HIDING_TIME);
+}
+
+export function toastWithErrorId(content: ReactNode, error: string) {
+	toast(
+		<>
+			{content}
+			<div className={css.errorId}>error · {captureSentryExceptionWithId(error)}</div>
+		</>,
+	);
 }
 
 export const ToastManager = observer(() => (
