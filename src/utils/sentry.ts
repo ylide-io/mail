@@ -36,10 +36,12 @@ export function initSentry() {
 	});
 }
 
+const errorIdNanoid = customAlphabet('ABCDEFGHIJKLMNOPQRSTUVWXYZ');
+
 export function captureSentryExceptionWithId(message: unknown, cause?: unknown) {
 	cause != null && console.error(cause);
 
-	const id = customAlphabet('ABCDEFGHIJKLMNOPQRSTUVWXYZ', 8);
+	const id = errorIdNanoid(8);
 	const error = new Error(`${id}: ${message}`);
 	console.error(error);
 	Sentry.captureException(error);
