@@ -4,15 +4,18 @@ import { useEffect, useMemo, useState } from 'react';
 import { InView } from 'react-intersection-observer';
 import { generatePath, useParams } from 'react-router-dom';
 
+import { FeedManagerApi } from '../../../api/feedManagerApi';
 import { FeedServerApi } from '../../../api/feedServerApi';
 import { ActionButton, ActionButtonLook, ActionButtonSize } from '../../../components/ActionButton/ActionButton';
 import { CoverageModal } from '../../../components/coverageModal/coverageModal';
 import { ErrorMessage, ErrorMessageLook } from '../../../components/errorMessage/errorMessage';
 import { NarrowContent } from '../../../components/genericLayout/content/narrowContent/narrowContent';
 import { GenericLayout, useGenericLayoutApi } from '../../../components/genericLayout/genericLayout';
+import { SimpleLoader } from '../../../components/simpleLoader/simpleLoader';
 import { AppMode, REACT_APP__APP_MODE, VAPID_PUBLIC_KEY } from '../../../env';
 import { ReactComponent as ArrowUpSvg } from '../../../icons/ic20/arrowUp.svg';
 import { ReactComponent as CrossSvg } from '../../../icons/ic20/cross.svg';
+import { analytics } from '../../../stores/Analytics';
 import domain from '../../../stores/Domain';
 import { FeedStore } from '../../../stores/Feed';
 import { feedSettings } from '../../../stores/FeedSettings';
@@ -23,9 +26,7 @@ import { truncateInMiddle } from '../../../utils/string';
 import { useNav } from '../../../utils/url';
 import { FeedPostItem } from '../_common/feedPostItem/feedPostItem';
 import css from './feedPage.module.scss';
-import { FeedManagerApi } from '../../../api/feedManagerApi';
-import { SimpleLoader } from '../../../components/simpleLoader/simpleLoader';
-import { analytics } from '../../../stores/Analytics';
+import { DomainAccount } from '../../../stores/models/DomainAccount';
 import ErrorCode = FeedServerApi.ErrorCode;
 
 const reloadFeedCounter = observable.box(0);
@@ -34,13 +35,8 @@ export function reloadFeed() {
 	reloadFeedCounter.set(reloadFeedCounter.get() + 1);
 }
 
-function enableNotifications() {
-	console.log('NOTIFICATIONS enabling...');
-	const accounts = domain.accounts.activeAccounts;
-
+function enableNotifications(accounts: DomainAccount[]) {
 	function grantPushForAll() {
-		console.log('NOTIFICATIONS grantPushForAll');
-
 		function urlBase64ToUint8Array(base64String: string) {
 			const padding = '='.repeat((4 - (base64String.length % 4)) % 4);
 			const base64 = (base64String + padding).replace(/\-/g, '+').replace(/_/g, '/');
@@ -53,39 +49,26 @@ function enableNotifications() {
 		}
 
 		if (accounts.every(a => a.mainViewKey)) {
-			console.log('NOTIFICATIONS grantPushForAll getRegistration');
-
 			navigator.serviceWorker
 				.getRegistration()
-				.then(registration => {
-					console.log('NOTIFICATIONS grantPushForAll getRegistration then1', registration);
-
-					return registration?.pushManager.subscribe({
+				.then(registration =>
+					registration?.pushManager.subscribe({
 						applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY!),
 						userVisibleOnly: true,
-					});
-				})
-				.then(subscription => {
-					console.log('NOTIFICATIONS grantPushForAll getRegistration then2', subscription);
-
-					return (
+					}),
+				)
+				.then(
+					subscription =>
 						subscription &&
-						Promise.all(accounts.map(a => FeedManagerApi.subscribe(a.mainViewKey, subscription)))
-					);
-				});
+						Promise.all(accounts.map(a => FeedManagerApi.subscribe(a.mainViewKey, subscription))),
+				);
 		}
 	}
 
 	if (accounts.length >= 1 && accounts.every(a => a.mainViewKey)) {
-		console.log('NOTIFICATIONS query permissions');
-
 		navigator?.permissions?.query({ name: 'notifications' }).then(r => {
-			console.log('NOTIFICATIONS state', r.state, r);
-
 			if (r.state === 'prompt') {
 				Notification.requestPermission().then(result => {
-					console.log('NOTIFICATIONS requestPermission', result);
-
 					if (result === 'granted') {
 						grantPushForAll();
 					}
@@ -123,20 +106,20 @@ const FeedPageContent = observer(() => {
 	}, [coverage]);
 
 	useEffect(() => {
-		const timer = setTimeout(() => {
-			console.log('NOTIFICATIONS timer');
-			enableNotifications();
-		}, 2000);
+		// Check notifications on page load.
+		// This will work on any device except iOS Safari,
+		// where it's required to check notifications on user interaction.
+
+		enableNotifications(accounts);
 
 		const clickListener = () => {
-			console.log('NOTIFICATIONS click');
-			enableNotifications();
+			document.body.removeEventListener('click', clickListener);
+			enableNotifications(accounts);
 		};
 
 		document.body.addEventListener('click', clickListener);
 
 		return () => {
-			clearTimeout(timer);
 			document.body.removeEventListener('click', clickListener);
 		};
 	}, [accounts]);
