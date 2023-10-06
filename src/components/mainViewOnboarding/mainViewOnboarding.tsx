@@ -14,6 +14,9 @@ import { ActionModal } from '../actionModal/actionModal';
 import { CoverageModal } from '../coverageModal/coverageModal';
 import { toast } from '../toast/toast';
 import { IosInstallPwaPopup } from '../iosInstallPwaPopup/iosInstallPwaPopup';
+import { observable } from 'mobx';
+
+export const isOnboardingInProgress = observable.box(false);
 
 enum Step {
 	CONNECT_ACCOUNT_INFO = 'CONNECT_ACCOUNT_INFO',
@@ -27,6 +30,10 @@ export const MainViewOnboarding = observer(() => {
 	const coverage = freshAccount ? feedSettings.coverages.get(freshAccount) : null;
 
 	const [step, setStep] = useState<Step>();
+
+	useEffect(() => {
+		isOnboardingInProgress.set(!!step);
+	}, [step]);
 
 	const enforceMainViewOnboarding = domain.enforceMainViewOnboarding;
 

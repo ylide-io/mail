@@ -80,6 +80,10 @@ export class Accounts {
 		return this.accounts.filter(a => a.isAnyLocalPrivateKeyRegistered);
 	}
 
+	@computed get mainViewAccounts() {
+		return this.activeAccounts.filter(a => a.mainViewKey);
+	}
+
 	@computed get hasActiveAccounts() {
 		return !!this.activeAccounts.length;
 	}

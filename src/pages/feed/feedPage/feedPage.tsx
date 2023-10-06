@@ -27,6 +27,7 @@ import { useNav } from '../../../utils/url';
 import { FeedPostItem } from '../_common/feedPostItem/feedPostItem';
 import css from './feedPage.module.scss';
 import { DomainAccount } from '../../../stores/models/DomainAccount';
+import { isOnboardingInProgress } from '../../../components/mainViewOnboarding/mainViewOnboarding';
 import ErrorCode = FeedServerApi.ErrorCode;
 
 const reloadFeedCounter = observable.box(0);
@@ -36,66 +37,69 @@ export function reloadFeed() {
 }
 
 function enableNotifications(accounts: DomainAccount[]) {
-	function grantPushForAll() {
-		function urlBase64ToUint8Array(base64String: string) {
-			const padding = '='.repeat((4 - (base64String.length % 4)) % 4);
-			const base64 = (base64String + padding).replace(/\-/g, '+').replace(/_/g, '/');
-			const rawData = atob(base64);
-			const outputArray = new Uint8Array(rawData.length);
-			for (let i = 0; i < rawData.length; ++i) {
-				outputArray[i] = rawData.charCodeAt(i);
-			}
-			return outputArray;
-		}
-
-		if (accounts.every(a => a.mainViewKey)) {
-			navigator.serviceWorker
-				.getRegistration()
-				.then(registration =>
-					registration?.pushManager.subscribe({
-						applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY!),
-						userVisibleOnly: true,
-					}),
-				)
-				.then(
-					subscription =>
-						subscription &&
-						Promise.all(accounts.map(a => FeedManagerApi.subscribe(a.mainViewKey, subscription))),
-				);
-		}
-	}
-
-	if (accounts.length >= 1 && accounts.every(a => a.mainViewKey)) {
-		navigator?.permissions?.query({ name: 'notifications' }).then(r => {
-			if (r.state === 'prompt') {
-				Notification.requestPermission().then(result => {
-					if (result === 'granted') {
-						grantPushForAll();
+	function subscribe() {
+		navigator.serviceWorker
+			.getRegistration()
+			.then(registration => {
+				function urlBase64ToUint8Array(base64String: string) {
+					const padding = '='.repeat((4 - (base64String.length % 4)) % 4);
+					const base64 = (base64String + padding).replace(/\-/g, '+').replace(/_/g, '/');
+					const rawData = atob(base64);
+					const outputArray = new Uint8Array(rawData.length);
+					for (let i = 0; i < rawData.length; ++i) {
+						outputArray[i] = rawData.charCodeAt(i);
 					}
+					return outputArray;
+				}
+
+				return registration?.pushManager.subscribe({
+					applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY!),
+					userVisibleOnly: true,
 				});
-			} else if (r.state === 'granted') {
-				grantPushForAll();
-			}
-		});
+			})
+			.then(
+				subscription =>
+					subscription &&
+					Promise.all(accounts.map(a => FeedManagerApi.subscribe(a.mainViewKey, subscription))),
+			);
 	}
+
+	navigator?.permissions?.query({ name: 'notifications' }).then(r => {
+		if (r.state === 'prompt') {
+			Notification.requestPermission().then(result => {
+				if (result === 'granted') {
+					subscribe();
+				}
+			});
+		} else if (r.state === 'granted') {
+			subscribe();
+		}
+	});
 }
 
 //
 
 const FeedPageContent = observer(() => {
+	const { tag, source, address } = useParams<{ tag: string; source: string; address: string }>();
+
 	const navigate = useNav();
-	const accounts = domain.accounts.activeAccounts;
 	const genericLayoutApi = useGenericLayoutApi();
 	const tags = feedSettings.tags;
 
-	const [showCoverageModal, setShowCoverageModal] = useState(false);
-
-	const { tag, source, address } = useParams<{ tag: string; source: string; address: string }>();
-
+	const accounts = domain.accounts.activeAccounts;
+	const mvAccounts = domain.accounts.mainViewAccounts;
 	const selectedAccounts = useMemo(
-		() => (address ? accounts.filter(a => a.account.address === address) : !tag && !source ? accounts : []),
-		[accounts, address, tag, source],
+		() => (address ? mvAccounts.filter(a => a.account.address === address) : !tag && !source ? mvAccounts : []),
+		[mvAccounts, address, tag, source],
 	);
+
+	const onboarding = isOnboardingInProgress.get();
+
+	useEffect(() => {
+		if (address && !selectedAccounts.length) {
+			navigate(generatePath(RoutePath.FEED));
+		}
+	}, [address, navigate, selectedAccounts]);
 
 	const coverage = feedSettings.coverages.get(selectedAccounts[0]);
 	const totalCoverage = useMemo(() => {
@@ -104,36 +108,32 @@ const FeedPageContent = observer(() => {
 		}
 		return coverage.totalCoverage;
 	}, [coverage]);
+	const [showCoverageModal, setShowCoverageModal] = useState(false);
 
 	useEffect(() => {
 		// Check notifications on page load.
 		// This will work on any device except iOS Safari,
 		// where it's required to check notifications on user interaction.
 
-		enableNotifications(accounts);
-
 		const clickListener = () => {
 			document.body.removeEventListener('click', clickListener);
-			enableNotifications(accounts);
+			enableNotifications(mvAccounts);
 		};
 
-		document.body.addEventListener('click', clickListener);
+		if (mvAccounts.length && !onboarding) {
+			enableNotifications(mvAccounts);
+			document.body.addEventListener('click', clickListener);
+		}
 
 		return () => {
 			document.body.removeEventListener('click', clickListener);
 		};
-	}, [accounts]);
-
-	useEffect(() => {
-		if (address && !selectedAccounts.length) {
-			navigate(generatePath(RoutePath.FEED));
-		}
-	}, [address, navigate, selectedAccounts]);
+	}, [mvAccounts, onboarding]);
 
 	// We can NOT load smart feed if no suitable account connected
 	const canLoadFeed =
 		!!tag ||
-		(!!accounts.length && (REACT_APP__APP_MODE !== AppMode.MAIN_VIEW || accounts.every(a => a.mainViewKey)));
+		(!!mvAccounts.length && (REACT_APP__APP_MODE !== AppMode.MAIN_VIEW || mvAccounts.length === accounts.length));
 
 	const reloadCounter = reloadFeedCounter.get();
 
@@ -144,7 +144,7 @@ const FeedPageContent = observer(() => {
 			// TODO: KONST
 			tags: tags !== 'error' && tags !== 'loading' ? tags.filter(t => t.id === Number(tag)) : [],
 			sourceId: source,
-			addressTokens: selectedAccounts.map(a => a.mainViewKey),
+			addressTokens: mvAccounts.map(a => a.mainViewKey),
 		});
 
 		genericLayoutApi.scrollToTop();
@@ -154,7 +154,7 @@ const FeedPageContent = observer(() => {
 		}
 
 		return feed;
-	}, [canLoadFeed, tags, tag, genericLayoutApi, selectedAccounts, source, reloadCounter]);
+	}, [canLoadFeed, tags, tag, genericLayoutApi, mvAccounts, source, reloadCounter]);
 
 	useEffect(() => {
 		return () => {

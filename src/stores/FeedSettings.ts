@@ -180,8 +180,8 @@ export class FeedSettings {
 			.catch(() => (this.isError = true));
 
 		autorun(() => {
-			domain.accounts.activeAccounts
-				.filter(account => account.mainViewKey && !this.configs.has(account))
+			domain.accounts.mainViewAccounts
+				.filter(account => !this.configs.has(account))
 				.forEach(async account => {
 					try {
 						this.configs.set(account, 'loading');

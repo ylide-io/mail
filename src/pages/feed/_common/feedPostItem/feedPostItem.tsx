@@ -142,8 +142,7 @@ interface AddToMyFeedButtonProps {
 }
 
 export const AddToMyFeedButton = observer(({ post }: AddToMyFeedButtonProps) => {
-	const accounts = domain.accounts.activeAccounts;
-	const mvAccounts = useMemo(() => accounts.filter(a => a.mainViewKey), [accounts]);
+	const mvAccounts = domain.accounts.mainViewAccounts;
 
 	const buttonRef = useRef(null);
 	const [isListOpen, setListOpen] = useState(false);
