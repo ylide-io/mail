@@ -34,6 +34,69 @@ export function reloadFeed() {
 	reloadFeedCounter.set(reloadFeedCounter.get() + 1);
 }
 
+function enableNotifications() {
+	console.log('NOTIFICATIONS enabling...');
+	const accounts = domain.accounts.activeAccounts;
+
+	function grantPushForAll() {
+		console.log('NOTIFICATIONS grantPushForAll');
+
+		function urlBase64ToUint8Array(base64String: string) {
+			const padding = '='.repeat((4 - (base64String.length % 4)) % 4);
+			const base64 = (base64String + padding).replace(/\-/g, '+').replace(/_/g, '/');
+			const rawData = atob(base64);
+			const outputArray = new Uint8Array(rawData.length);
+			for (let i = 0; i < rawData.length; ++i) {
+				outputArray[i] = rawData.charCodeAt(i);
+			}
+			return outputArray;
+		}
+
+		if (accounts.every(a => a.mainViewKey)) {
+			console.log('NOTIFICATIONS grantPushForAll getRegistration');
+
+			navigator.serviceWorker
+				.getRegistration()
+				.then(registration => {
+					console.log('NOTIFICATIONS grantPushForAll getRegistration then1', registration);
+
+					return registration?.pushManager.subscribe({
+						applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY!),
+						userVisibleOnly: true,
+					});
+				})
+				.then(subscription => {
+					console.log('NOTIFICATIONS grantPushForAll getRegistration then2', subscription);
+
+					return (
+						subscription &&
+						Promise.all(accounts.map(a => FeedManagerApi.subscribe(a.mainViewKey, subscription)))
+					);
+				});
+		}
+	}
+
+	if (accounts.length >= 1 && accounts.every(a => a.mainViewKey)) {
+		console.log('NOTIFICATIONS query permissions');
+
+		navigator?.permissions?.query({ name: 'notifications' }).then(r => {
+			console.log('NOTIFICATIONS state', r.state, r);
+
+			if (r.state === 'prompt') {
+				Notification.requestPermission().then(result => {
+					console.log('NOTIFICATIONS requestPermission', result);
+
+					if (result === 'granted') {
+						grantPushForAll();
+					}
+				});
+			} else if (r.state === 'granted') {
+				grantPushForAll();
+			}
+		});
+	}
+}
+
 //
 
 const FeedPageContent = observer(() => {
@@ -60,65 +123,22 @@ const FeedPageContent = observer(() => {
 	}, [coverage]);
 
 	useEffect(() => {
-		console.log('NOTIFICATIONS');
+		const timer = setTimeout(() => {
+			console.log('NOTIFICATIONS timer');
+			enableNotifications();
+		}, 2000);
 
-		function grantPushForAll() {
-			console.log('NOTIFICATIONS grantPushForAll');
+		const clickListener = () => {
+			console.log('NOTIFICATIONS click');
+			enableNotifications();
+		};
 
-			function urlBase64ToUint8Array(base64String: string) {
-				const padding = '='.repeat((4 - (base64String.length % 4)) % 4);
-				const base64 = (base64String + padding).replace(/\-/g, '+').replace(/_/g, '/');
-				const rawData = atob(base64);
-				const outputArray = new Uint8Array(rawData.length);
-				for (let i = 0; i < rawData.length; ++i) {
-					outputArray[i] = rawData.charCodeAt(i);
-				}
-				return outputArray;
-			}
+		document.body.addEventListener('click', clickListener);
 
-			if (accounts.every(a => a.mainViewKey)) {
-				console.log('NOTIFICATIONS grantPushForAll getRegistration');
-
-				navigator.serviceWorker
-					.getRegistration()
-					.then(registration => {
-						console.log('NOTIFICATIONS grantPushForAll getRegistration then1', registration);
-
-						return registration?.pushManager.subscribe({
-							applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY!),
-							userVisibleOnly: true,
-						});
-					})
-					.then(subscription => {
-						console.log('NOTIFICATIONS grantPushForAll getRegistration then2', subscription);
-
-						return (
-							subscription &&
-							Promise.all(accounts.map(a => FeedManagerApi.subscribe(a.mainViewKey, subscription)))
-						);
-					});
-			}
-		}
-
-		if (accounts.length >= 1 && accounts.every(a => a.mainViewKey)) {
-			console.log('NOTIFICATIONS query permissions');
-
-			navigator?.permissions?.query({ name: 'notifications' }).then(r => {
-				console.log('NOTIFICATIONS state', r.state, r);
-
-				if (r.state === 'prompt') {
-					Notification.requestPermission().then(result => {
-						console.log('NOTIFICATIONS requestPermission', result);
-
-						if (result === 'granted') {
-							grantPushForAll();
-						}
-					});
-				} else if (r.state === 'granted') {
-					grantPushForAll();
-				}
-			});
-		}
+		return () => {
+			clearTimeout(timer);
+			document.body.removeEventListener('click', clickListener);
+		};
 	}, [accounts]);
 
 	useEffect(() => {
