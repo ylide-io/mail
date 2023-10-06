@@ -11,6 +11,7 @@ import { CoverageModal } from '../../../components/coverageModal/coverageModal';
 import { ErrorMessage, ErrorMessageLook } from '../../../components/errorMessage/errorMessage';
 import { NarrowContent } from '../../../components/genericLayout/content/narrowContent/narrowContent';
 import { GenericLayout, useGenericLayoutApi } from '../../../components/genericLayout/genericLayout';
+import { isOnboardingInProgress } from '../../../components/mainViewOnboarding/mainViewOnboarding';
 import { SimpleLoader } from '../../../components/simpleLoader/simpleLoader';
 import { AppMode, REACT_APP__APP_MODE, VAPID_PUBLIC_KEY } from '../../../env';
 import { ReactComponent as ArrowUpSvg } from '../../../icons/ic20/arrowUp.svg';
@@ -19,6 +20,7 @@ import { analytics } from '../../../stores/Analytics';
 import domain from '../../../stores/Domain';
 import { FeedStore } from '../../../stores/Feed';
 import { feedSettings } from '../../../stores/FeedSettings';
+import { DomainAccount } from '../../../stores/models/DomainAccount';
 import { RoutePath } from '../../../stores/routePath';
 import { connectAccount } from '../../../utils/account';
 import { hookDependency } from '../../../utils/react';
@@ -26,8 +28,6 @@ import { truncateInMiddle } from '../../../utils/string';
 import { useNav } from '../../../utils/url';
 import { FeedPostItem } from '../_common/feedPostItem/feedPostItem';
 import css from './feedPage.module.scss';
-import { DomainAccount } from '../../../stores/models/DomainAccount';
-import { isOnboardingInProgress } from '../../../components/mainViewOnboarding/mainViewOnboarding';
 import ErrorCode = FeedServerApi.ErrorCode;
 
 const reloadFeedCounter = observable.box(0);
@@ -43,7 +43,7 @@ function enableNotifications(accounts: DomainAccount[]) {
 			.then(registration => {
 				function urlBase64ToUint8Array(base64String: string) {
 					const padding = '='.repeat((4 - (base64String.length % 4)) % 4);
-					const base64 = (base64String + padding).replace(/\-/g, '+').replace(/_/g, '/');
+					const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
 					const rawData = atob(base64);
 					const outputArray = new Uint8Array(rawData.length);
 					for (let i = 0; i < rawData.length; ++i) {
