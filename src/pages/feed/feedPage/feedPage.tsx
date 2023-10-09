@@ -13,7 +13,7 @@ import { NarrowContent } from '../../../components/genericLayout/content/narrowC
 import { GenericLayout, useGenericLayoutApi } from '../../../components/genericLayout/genericLayout';
 import { isOnboardingInProgress } from '../../../components/mainViewOnboarding/mainViewOnboarding';
 import { SimpleLoader } from '../../../components/simpleLoader/simpleLoader';
-import { AppMode, REACT_APP__APP_MODE, VAPID_PUBLIC_KEY } from '../../../env';
+import { AppMode, REACT_APP__APP_MODE, REACT_APP__VAPID_PUBLIC_KEY } from '../../../env';
 import { ReactComponent as ArrowUpSvg } from '../../../icons/ic20/arrowUp.svg';
 import { ReactComponent as CrossSvg } from '../../../icons/ic20/cross.svg';
 import { analytics } from '../../../stores/Analytics';
@@ -53,7 +53,7 @@ function enableNotifications(accounts: DomainAccount[]) {
 				}
 
 				return registration?.pushManager.subscribe({
-					applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY!),
+					applicationServerKey: urlBase64ToUint8Array(REACT_APP__VAPID_PUBLIC_KEY!),
 					userVisibleOnly: true,
 				});
 			})
