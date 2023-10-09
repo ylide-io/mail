@@ -302,6 +302,30 @@ export namespace BlockchainFeedApi {
 			},
 		});
 	}
+
+	export async function saveNotificationSubscription({
+		address,
+		subscription,
+		authKey,
+	}: {
+		address: string;
+		subscription: PushSubscription;
+		authKey: string;
+	}) {
+		return await request('/subscription', {
+			query: {
+				userAddress: address,
+			},
+			params: {
+				headers: {
+					'Content-Type': 'application/json',
+					'Authorization': `Bearer ${authKey}`,
+				},
+				body: JSON.stringify({ subscription }),
+				method: 'POST',
+			},
+		});
+	}
 }
 
 export function useCommunityAdminsQuery(community: Community) {

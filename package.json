@@ -92,7 +92,12 @@
 		"react-window": "1.8.9",
 		"sass": "1.65.1",
 		"typescript": "5.1.6",
-		"ua-parser-js": "^1.0.36"
+		"ua-parser-js": "^1.0.36",
+		"workbox-core": "^7.0.0",
+		"workbox-expiration": "^7.0.0",
+		"workbox-precaching": "^7.0.0",
+		"workbox-routing": "^7.0.0",
+		"workbox-strategies": "^7.0.0"
 	},
 	"devDependencies": {
 		"@types/editorjs__header": "2.6.0",
