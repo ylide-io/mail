@@ -1,3 +1,5 @@
+import { NODE_ENV } from '../../env';
+
 export const SCANNERS: Record<string, string> = {
 	cro: 'https://cronoscan.com',
 	eth: 'https://etherscan.io',
@@ -17,7 +19,7 @@ export const SCANNERS: Record<string, string> = {
 	astar: 'https://astar.subscan.io',
 };
 
-export const BASE_URL = process.env.NODE_ENV === 'development' ? 'http://localhost:8271' : 'https://fm-api.ylide.io';
+export const BASE_URL = NODE_ENV === 'development' ? 'http://localhost:8271' : 'https://fm-api.ylide.io';
 
 export const DEFAULT_PAGINATOR = {
 	items: [],
