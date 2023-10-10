@@ -15,7 +15,6 @@ import { registerRoute } from 'workbox-routing';
 import { StaleWhileRevalidate } from 'workbox-strategies';
 
 import { REACT_APP__HUB_PUBLIC_URL } from './env';
-import { RoutePath } from './stores/routePath';
 
 declare const self: ServiceWorkerGlobalScope;
 
@@ -96,24 +95,47 @@ self.addEventListener('push', async event => {
 	}
 });
 
-interface PostReplyData {
-	feedId: string;
-	author: {
-		address: string;
-		content: string;
-		postId: string;
+enum NotificationType {
+	INCOMING_MAIL = 'INCOMING_MAIL',
+	POST_REPLY = 'POST_REPLY',
+}
+
+interface IncomingMailData {
+	type: NotificationType.INCOMING_MAIL;
+	body: {
+		senderAddress: string;
+		recipientAddress: string;
+		msgId: string;
 	};
-	reply: {
-		address: string;
-		content: string;
-		postId: string;
+}
+
+interface PostReplyData {
+	type: NotificationType.POST_REPLY;
+	body: {
+		feedId: string;
+		author: {
+			address: string;
+			postId: string;
+		};
+		reply: {
+			address: string;
+			postId: string;
+		};
 	};
 }
 
 self.addEventListener('notificationclick', event => {
 	event.notification.close();
 
-	const data = event.notification.data as PostReplyData;
-	const url = RoutePath.POST_ID.replace(':postId', data.reply.postId);
-	event.waitUntil(self.clients.openWindow(url));
+	const data = event.notification.data as IncomingMailData | PostReplyData;
+
+	if (data.type === NotificationType.INCOMING_MAIL) {
+		const url = `/mail/inbox/${data.body.msgId}`;
+		event.waitUntil(self.clients.openWindow(url));
+	}
+
+	if (data.type === NotificationType.POST_REPLY) {
+		const url = `/post/${data.body.reply.postId}`;
+		event.waitUntil(self.clients.openWindow(url));
+	}
 });
