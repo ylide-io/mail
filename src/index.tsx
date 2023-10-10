@@ -49,7 +49,9 @@ function migrateLocation() {
 		// old addresses were starting from /feed
 		rule(/\/feed\/project\/(.+)/i, (_, match) => `/project/${match[1]}`) ||
 		// first descussion feed
-		rule('/project/tvm_discussion', () => '/project/tvm/discussion')
+		rule('/project/tvm_discussion', () => '/project/tvm/discussion') ||
+		// old post URLs
+		rule(/\/project\/(.+?)\/(discussion|announcements)\/post\/(.+)/, (_, match) => `/post/${match[3]}`)
 	);
 }
 

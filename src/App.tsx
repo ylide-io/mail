@@ -246,10 +246,7 @@ export const App = observer(() => {
 
 						{redirect({
 							from: RoutePath.FEED,
-							to:
-								REACT_APP__APP_MODE === AppMode.MAIN_VIEW
-									? generatePath(RoutePath.FEED_SMART)
-									: generatePath(RoutePath.PROJECT),
+							to: REACT_APP__APP_MODE === AppMode.MAIN_VIEW ? RoutePath.FEED_SMART : RoutePath.PROJECT,
 						})}
 
 						<Route path={RoutePath.FEED_ALL} element={<FeedPage />} />
@@ -263,16 +260,14 @@ export const App = observer(() => {
 
 						{redirect({
 							from: RoutePath.PROJECT,
-							to: generatePath(RoutePath.ROOT),
+							to: RoutePath.ROOT,
 						})}
 
 						<Route path={RoutePath.PROJECT_ID} element={<CommunityPage />} />
 						<Route path={RoutePath.PROJECT_ID_OFFICIAL} element={<CommunityPage />} />
-						<Route path={RoutePath.PROJECT_ID_OFFICIAL_POST_ID} element={<CommunityPage />} />
 						<Route path={RoutePath.PROJECT_ID_OFFICIAL_ADMIN} element={<CommunityPostPage />} />
 						<Route path={RoutePath.PROJECT_ID_DISCUSSION} element={<CommunityPage />} />
 						<Route path={RoutePath.PROJECT_ID_DISCUSSION_ADMIN} element={<CommunityPage />} />
-						<Route path={RoutePath.PROJECT_ID_DISCUSSION_POST_ID} element={<CommunityPostPage />} />
 						<Route path={RoutePath.POST_ID} element={<CommunityPostPage />} />
 
 						{/* MAIL */}
@@ -295,7 +290,7 @@ export const App = observer(() => {
 
 						{redirect({
 							from: RoutePath.OTC,
-							to: generatePath(RoutePath.OTC_ASSETS),
+							to: RoutePath.OTC_ASSETS,
 						})}
 
 						<Route path={RoutePath.OTC_ASSETS} element={<OtcAssetsPage />} />
@@ -314,10 +309,10 @@ export const App = observer(() => {
 							from: RoutePath.ANY,
 							to:
 								REACT_APP__APP_MODE === AppMode.OTC
-									? generatePath(RoutePath.OTC_ASSETS)
+									? RoutePath.OTC_ASSETS
 									: REACT_APP__APP_MODE === AppMode.MAIN_VIEW
-									? generatePath(RoutePath.FEED)
-									: generatePath(RoutePath.ROOT),
+									? RoutePath.FEED
+									: RoutePath.ROOT,
 						})}
 					</Routes>
 

@@ -30,10 +30,8 @@ export enum RoutePath {
 	PROJECT = '/project',
 	PROJECT_ID = '/project/:projectId',
 	PROJECT_ID_OFFICIAL = '/project/:projectId/announcements',
-	PROJECT_ID_OFFICIAL_POST_ID = '/project/:projectId/announcements/post/:postId',
 	PROJECT_ID_OFFICIAL_ADMIN = '/project/:projectId/announcements/admin',
 	PROJECT_ID_DISCUSSION = '/project/:projectId/discussion',
-	PROJECT_ID_DISCUSSION_POST_ID = '/project/:projectId/discussion/post/:postId',
 	PROJECT_ID_DISCUSSION_ADMIN = '/project/:projectId/discussion/admin',
 	POST_ID = '/post/:postId',
 
