@@ -82,14 +82,14 @@ self.addEventListener('message', event => {
 // Any other custom service worker logic can go here.
 self.addEventListener('push', async event => {
 	if (event.data) {
-		const { title, body, data, image, icon } = await event.data.json();
+		const rawData = event.data.text();
+		const data = JSON.parse(rawData) as IncomingMailData | PostReplyData;
+
 		event.waitUntil(
-			self.registration.showNotification(title, {
-				body,
-				icon,
-				image,
+			self.registration.showNotification(data.type, {
+				body: 'Something happened :))',
 				badge: '/badge-96x96.png',
-				data,
+				data: rawData,
 			}),
 		);
 	}
