@@ -7,6 +7,7 @@ import { createRoot } from 'react-dom/client';
 import { BrowserRouter } from 'react-router-dom';
 
 import { App } from './App';
+import { registerServiceWorker } from './serviceWorkerRegistration';
 import { initSentry } from './utils/sentry';
 import { buildUrl, UseNavParameters } from './utils/url';
 
@@ -63,4 +64,6 @@ if (!migrateLocation()) {
 			<App />
 		</BrowserRouter>,
 	);
+
+	registerServiceWorker();
 }
