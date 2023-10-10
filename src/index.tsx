@@ -8,6 +8,7 @@ import { BrowserRouter } from 'react-router-dom';
 
 import { App } from './App';
 import { initSentry } from './utils/sentry';
+import { buildUrl, UseNavParameters } from './utils/url';
 
 initSentry();
 
@@ -15,10 +16,49 @@ configure({
 	enforceActions: 'never',
 });
 
-const root = createRoot(document.getElementById('root')!);
+function migrateLocation() {
+	function navigate(params: UseNavParameters) {
+		location.replace(
+			buildUrl({
+				path: location.pathname,
+				search: location.search,
+				hash: location.hash,
+				...params,
+			}),
+		);
+	}
 
-root.render(
-	<BrowserRouter>
-		<App />
-	</BrowserRouter>,
-);
+	function rule(regex: string | RegExp, transform: (pathname: string, match: RegExpMatchArray) => string) {
+		const match = location.pathname.match(regex);
+		if (match) {
+			navigate({
+				path: transform(location.pathname, match),
+			});
+
+			return true;
+		}
+	}
+
+	return (
+		// remove trailing slash
+		rule(/.+\/+$/, pathname => pathname.replace(/\/+$/, '')) ||
+		// venom communities
+		rule(/\/feed\/venom\/(.+)/i, (_, match) => `/feed/project/${match[1]}`) ||
+		// TVM project
+		rule(/\/feed\/tvm\/(.+)/i, () => '/feed/project/tvm') ||
+		// old addresses were starting from /feed
+		rule(/\/feed\/project\/(.+)/i, (_, match) => `/project/${match[1]}`) ||
+		// first descussion feed
+		rule('/project/tvm_discussion', () => '/project/tvm/discussion')
+	);
+}
+
+if (!migrateLocation()) {
+	const root = createRoot(document.getElementById('root')!);
+
+	root.render(
+		<BrowserRouter>
+			<App />
+		</BrowserRouter>,
+	);
+}

@@ -49,62 +49,6 @@ export enum AppTheme {
 	V2 = 'v2',
 }
 
-const RemoveTrailingSlash = () => {
-	const location = useLocation();
-	const [searchParams] = useSearchParams();
-	const navigate = useNav();
-
-	useEffect(() => {
-		if (location.pathname.match('/.*/$')) {
-			return navigate(
-				{
-					path: location.pathname.replace(/\/+$/, ''),
-					search: location.search,
-					hash: location.hash,
-				},
-				{
-					replace: true,
-				},
-			);
-		}
-
-		const adminParam = searchParams.get('admin');
-		if (adminParam) {
-			browserStorage.adminPassword = adminParam.startsWith('yldpwd') ? adminParam : undefined;
-			searchParams.delete('admin');
-			return navigate(
-				{
-					path: location.pathname,
-					search: searchParams,
-					hash: location.hash,
-				},
-				{
-					replace: true,
-				},
-			);
-		}
-
-		const consoleReParam = searchParams.get('cre');
-		if (consoleReParam != null) {
-			enableRemoteConsole();
-
-			searchParams.delete('cre');
-			return navigate(
-				{
-					path: location.pathname,
-					search: searchParams,
-					hash: location.hash,
-				},
-				{
-					replace: true,
-				},
-			);
-		}
-	});
-
-	return <></>;
-};
-
 //
 
 interface RedirectProps {
@@ -120,6 +64,8 @@ function redirect({ from, to }: RedirectProps) {
 
 export const App = observer(() => {
 	const location = useLocation();
+	const [searchParams] = useSearchParams();
+	const navigate = useNav();
 
 	const [queryClient] = useState(
 		new QueryClient({
@@ -158,6 +104,43 @@ export const App = observer(() => {
 	useEffect(() => {
 		analytics.pageView(location.pathname);
 	}, [location.pathname]);
+
+	useEffect(() => {
+		// enable admin mode
+		const adminParam = searchParams.get('admin');
+		if (adminParam) {
+			browserStorage.adminPassword = adminParam.startsWith('yldpwd') ? adminParam : undefined;
+			searchParams.delete('admin');
+			return navigate(
+				{
+					path: location.pathname,
+					search: searchParams,
+					hash: location.hash,
+				},
+				{
+					replace: true,
+				},
+			);
+		}
+
+		// enable remote console
+		const consoleReParam = searchParams.get('cre');
+		if (consoleReParam != null) {
+			enableRemoteConsole();
+
+			searchParams.delete('cre');
+			return navigate(
+				{
+					path: location.pathname,
+					search: searchParams,
+					hash: location.hash,
+				},
+				{
+					replace: true,
+				},
+			);
+		}
+	});
 
 	if (initErrorId) {
 		return (
@@ -248,31 +231,7 @@ export const App = observer(() => {
 
 			<QueryClientProvider client={queryClient}>
 				<PopupManager>
-					<RemoveTrailingSlash />
-
 					<Routes>
-						{/* MIGRATIONS */}
-
-						{redirect({
-							from: '/feed/venom/*',
-							to: location.pathname.replace('/feed/venom', '/feed/project'),
-						})}
-
-						{redirect({
-							from: '/feed/tvm/*',
-							to: location.pathname.replace('/feed/tvm', '/feed/project/tvm'),
-						})}
-
-						{redirect({
-							from: '/feed/project/*',
-							to: location.pathname.replace('/feed/project', '/project'),
-						})}
-
-						{redirect({
-							from: '/project/tvm_discussion',
-							to: location.pathname.replace('/project/tvm_discussion', '/project/tvm/discussion'),
-						})}
-
 						{/* GENERAL */}
 
 						<Route path={RoutePath.ROOT} element={<ExplorePage />} />
