@@ -16,6 +16,10 @@
 	color: var(--secondary-text-color);
 }
 
+.recipientWrapper {
+	@include flex-row-with-gap(4px);
+}
+
 .content {
 	flex-grow: 1;
 	padding: 20px 0 0;

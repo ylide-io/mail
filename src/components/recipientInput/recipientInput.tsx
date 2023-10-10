@@ -10,7 +10,6 @@ import { constrain } from '../../utils/number';
 import { AdaptiveText } from '../adaptiveText/adaptiveText';
 import { DropDown, DropDownItem, DropDownItemMode } from '../dropDown/dropDown';
 import { TagInput, TagInputItem, TagInputItemLook } from '../tagInput/tagInput';
-import { CSVInput } from './csvInput';
 
 function splitSearchValue(search: string) {
 	// 0x52e316e323c35e5b222ba63311433f91d80545ee
@@ -54,6 +53,22 @@ export class Recipients {
 
 		if (initialItems?.length) {
 			this.items = initialItems?.map(it => Recipients.createItem(it));
+		}
+	}
+
+	addItems(terms: string[]) {
+		const cleanTerms = terms.map(it => it.trim()).filter(Boolean);
+
+		const items = cleanTerms
+			// filter out duplicates
+			.filter((term, i) => cleanTerms.indexOf(term) === i)
+			// filter out already selected items
+			.filter(item => !this.items.some(it => it.name === item || it.routing?.address === item))
+			// create items
+			.map(item => Recipients.createItem(item));
+
+		if (items.length) {
+			this.items = [...this.items, ...items];
 		}
 	}
 
@@ -117,7 +132,6 @@ interface RecipientInputProps {
 
 export const RecipientInput = observer(({ isReadOnly, value }: RecipientInputProps) => {
 	const tagInputRef = useRef(null);
-	const csv = window.location.search.includes('csv');
 
 	const [search, setSearch] = useState('');
 	const [options, setOptions] = useState<DropDownOption[]>([]);
@@ -157,23 +171,10 @@ export const RecipientInput = observer(({ isReadOnly, value }: RecipientInputPro
 
 	//
 
-	const addItems = (rawTerms: string[]) => {
-		const cleanTerms = rawTerms.map(it => it.trim()).filter(Boolean);
-
-		const items = cleanTerms
-			.filter((term, i) => cleanTerms.indexOf(term) === i)
-			.filter(item => !value.items.some(it => it.name === item || it.routing?.address === item))
-			.map(item => Recipients.createItem(item));
-
-		if (items.length) {
-			value.items = [...value.items, ...items];
-		}
-	};
-
 	const onSearchChange = (newSearch: string) => {
 		const items = splitSearchValue(newSearch);
 		if (items.length > 1) {
-			addItems(items);
+			value.addItems(items);
 			setSearch('');
 		} else {
 			setSearch(newSearch);
@@ -185,7 +186,7 @@ export const RecipientInput = observer(({ isReadOnly, value }: RecipientInputPro
 	};
 
 	const onBlur = () => {
-		addItems(splitSearchValue(search));
+		value.addItems(splitSearchValue(search));
 		setFocused(false);
 		setSearch('');
 	};
@@ -236,7 +237,7 @@ export const RecipientInput = observer(({ isReadOnly, value }: RecipientInputPro
 	};
 
 	return (
-		<div>
+		<>
 			<TagInput
 				ref={tagInputRef}
 				isReadOnly={isReadOnly}
@@ -292,7 +293,6 @@ export const RecipientInput = observer(({ isReadOnly, value }: RecipientInputPro
 					))}
 				</DropDown>
 			)}
-			{csv && <CSVInput addItems={addItems} />}
-		</div>
+		</>
 	);
 });

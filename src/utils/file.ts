@@ -11,33 +11,35 @@ export function openFilePicker(props?: { multiple?: boolean; accept?: string }):
 	});
 }
 
-export function readFileAsArrayBuffer(file: File): Promise<ArrayBuffer> {
+//
+
+function readFile<T>(readAs: (reader: FileReader) => void): Promise<T> {
 	return new Promise((resolve, reject) => {
 		const reader = new FileReader();
 
 		reader.onloadend = () => {
-			resolve(reader.result as ArrayBuffer);
+			resolve(reader.result as T);
 		};
 
 		reader.onerror = e => reject(e);
 
-		reader.readAsArrayBuffer(file);
+		readAs(reader);
 	});
+}
+
+export function readFileAsArrayBuffer(file: File): Promise<ArrayBuffer> {
+	return readFile(reader => reader.readAsArrayBuffer(file));
+}
+
+export function readFileAsText(file: File): Promise<string> {
+	return readFile(reader => reader.readAsText(file));
 }
 
 export function readFileAsDataURL(file: File): Promise<string> {
-	return new Promise((resolve, reject) => {
-		const reader = new FileReader();
-
-		reader.onloadend = () => {
-			resolve(reader.result!.toString());
-		};
-
-		reader.onerror = e => reject(e);
-
-		reader.readAsDataURL(file);
-	});
+	return readFile(reader => reader.readAsDataURL(file));
 }
+
+//
 
 export function formatFileSize(
 	size: number,
