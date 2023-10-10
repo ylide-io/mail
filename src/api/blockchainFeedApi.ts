@@ -1,5 +1,5 @@
 import { ITVMMessage } from '@ylide/everscale';
-import { IMessage, IMessageContent, IMessageCorruptedContent } from '@ylide/sdk';
+import { IMessage, IMessageContent, IMessageCorruptedContent, Uint256 } from '@ylide/sdk';
 import { useQuery } from 'react-query';
 
 import { REACT_APP__BLOCKCHAIN_FEED } from '../env';
@@ -13,6 +13,7 @@ import { createCleanSerachParams } from '../utils/url';
 
 export interface BlockchainFeedPost {
 	id: string;
+	feedId: Uint256;
 	createTimestamp: number;
 	sender: string;
 	meta: Exclude<ITVMMessage, 'key'> & { key: number[] };

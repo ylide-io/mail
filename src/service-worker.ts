@@ -15,9 +15,7 @@ import { registerRoute } from 'workbox-routing';
 import { StaleWhileRevalidate } from 'workbox-strategies';
 
 import { REACT_APP__HUB_PUBLIC_URL } from './env';
-import { communities } from './stores/communities/communities';
 import { RoutePath } from './stores/routePath';
-import { invariant } from './utils/assert';
 
 declare const self: ServiceWorkerGlobalScope;
 
@@ -116,16 +114,6 @@ self.addEventListener('notificationclick', event => {
 	event.notification.close();
 
 	const data = event.notification.data as PostReplyData;
-	const feedId = data.feedId;
-	const community = communities.find(
-		community => community.feedId.official === feedId || community.feedId.discussion === feedId,
-	);
-
-	invariant(community);
-
-	const isOfficial = community.feedId.official === feedId;
-	const routePath = isOfficial ? RoutePath.PROJECT_ID_OFFICIAL_POST_ID : RoutePath.PROJECT_ID_DISCUSSION_POST_ID;
-	const url = routePath.replace(':projectId', community.id).replace(':postId', data.reply.postId);
-
+	const url = RoutePath.POST_ID.replace(':postId', data.reply.postId);
 	event.waitUntil(self.clients.openWindow(url));
 });

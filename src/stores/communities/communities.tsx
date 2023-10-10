@@ -107,6 +107,10 @@ export function getCommunityById(id: CommunityId) {
 	return communities.find(p => p.id === id)!;
 }
 
+export function getCommunityByFeedId(feedId: Uint256) {
+	return communities.find(p => p.feedId.official === feedId || p.feedId.discussion === feedId)!;
+}
+
 //
 
 export interface Community {

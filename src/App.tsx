@@ -310,16 +310,11 @@ export const App = observer(() => {
 						<Route path={RoutePath.PROJECT_ID} element={<CommunityPage />} />
 						<Route path={RoutePath.PROJECT_ID_OFFICIAL} element={<CommunityPage />} />
 						<Route path={RoutePath.PROJECT_ID_OFFICIAL_POST_ID} element={<CommunityPage />} />
-						<Route
-							path={RoutePath.PROJECT_ID_OFFICIAL_ADMIN}
-							element={<CommunityPostPage isOfficial={true} />}
-						/>
+						<Route path={RoutePath.PROJECT_ID_OFFICIAL_ADMIN} element={<CommunityPostPage />} />
 						<Route path={RoutePath.PROJECT_ID_DISCUSSION} element={<CommunityPage />} />
 						<Route path={RoutePath.PROJECT_ID_DISCUSSION_ADMIN} element={<CommunityPage />} />
-						<Route
-							path={RoutePath.PROJECT_ID_DISCUSSION_POST_ID}
-							element={<CommunityPostPage isOfficial={false} />}
-						/>
+						<Route path={RoutePath.PROJECT_ID_DISCUSSION_POST_ID} element={<CommunityPostPage />} />
+						<Route path={RoutePath.POST_ID} element={<CommunityPostPage />} />
 
 						{/* MAIL */}
 

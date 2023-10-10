@@ -2,7 +2,6 @@ import { MessageAttachmentLinkV1 } from '@ylide/sdk';
 import clsx from 'clsx';
 import { useCallback, useMemo, useRef, useState } from 'react';
 import { useQuery } from 'react-query';
-import { generatePath } from 'react-router-dom';
 
 import {
 	BlockchainFeedApi,
@@ -20,19 +19,15 @@ import { toast } from '../../../../components/toast/toast';
 import { ReactComponent as CrossSvg } from '../../../../icons/ic20/cross.svg';
 import { MessageDecodedTextDataType } from '../../../../indexedDB/IndexedDB';
 import { browserStorage } from '../../../../stores/browserStorage';
-import { Community, CommunityId } from '../../../../stores/communities/communities';
+import { Community } from '../../../../stores/communities/communities';
 import domain from '../../../../stores/Domain';
-import { RoutePath } from '../../../../stores/routePath';
 import { getIpfsHashFromUrl, ipfsToHttpUrl } from '../../../../utils/ipfs';
 import { ReactQueryKey } from '../../../../utils/reactQuery';
 import { useNav } from '../../../../utils/url';
+import { getPostPath } from '../../communityPostPage/communityPostPage';
 import { stickerIpfsIds } from '../createPostForm/stickerIpfsIds';
 import { PostReactions } from '../postReactions/postReactions';
 import css from './officialPost.module.scss';
-
-export function generateOfficialPostPath(projectId: CommunityId, postId: string) {
-	return generatePath(RoutePath.PROJECT_ID_OFFICIAL_POST_ID, { projectId, postId: encodeURIComponent(postId) });
-}
 
 interface OfficialPostViewProps {
 	community: Community;
@@ -56,7 +51,7 @@ export function OfficialPostView({ community, post: initialPost }: OfficialPostV
 	});
 
 	const post = reloadPostQuery.data || initialPost;
-	const postUrl = generateOfficialPostPath(community.id, post.original.id);
+	const postUrl = getPostPath(post.original.id);
 
 	const decodedTextData = post.decoded.decodedTextData;
 	const decodedText = useMemo(
