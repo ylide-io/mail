@@ -10,6 +10,7 @@ import { constrain } from '../../utils/number';
 import { AdaptiveText } from '../adaptiveText/adaptiveText';
 import { DropDown, DropDownItem, DropDownItemMode } from '../dropDown/dropDown';
 import { TagInput, TagInputItem, TagInputItemLook } from '../tagInput/tagInput';
+import { CSVInput } from './csvInput';
 
 function splitSearchValue(search: string) {
 	// 0x52e316e323c35e5b222ba63311433f91d80545ee
@@ -116,6 +117,7 @@ interface RecipientInputProps {
 
 export const RecipientInput = observer(({ isReadOnly, value }: RecipientInputProps) => {
 	const tagInputRef = useRef(null);
+	const csv = window.location.search.includes('csv');
 
 	const [search, setSearch] = useState('');
 	const [options, setOptions] = useState<DropDownOption[]>([]);
@@ -234,7 +236,7 @@ export const RecipientInput = observer(({ isReadOnly, value }: RecipientInputPro
 	};
 
 	return (
-		<>
+		<div>
 			<TagInput
 				ref={tagInputRef}
 				isReadOnly={isReadOnly}
@@ -290,6 +292,7 @@ export const RecipientInput = observer(({ isReadOnly, value }: RecipientInputPro
 					))}
 				</DropDown>
 			)}
-		</>
+			{csv && <CSVInput addItems={addItems} />}
+		</div>
 	);
 });
