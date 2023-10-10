@@ -16,7 +16,6 @@ import { browserStorage } from '../../../stores/browserStorage';
 import domain from '../../../stores/Domain';
 import { FolderId, ILinkedMessage, MailList, mailStore } from '../../../stores/MailList';
 import { RoutePath } from '../../../stores/routePath';
-import { useEnablePushNotifications } from '../../../utils/pushNotifications';
 import { useIsMatchesPattern, useNav } from '../../../utils/url';
 import { useWindowSize } from '../../../utils/useWindowSize';
 import MailboxEmpty from './mailboxEmpty/mailboxEmpty';
@@ -64,8 +63,6 @@ export function MailboxListItem({ index, style, data }: ListChildComponentProps<
 }
 
 export const MailboxPage = observer(() => {
-	useEnablePushNotifications();
-
 	const navigate = useNav();
 
 	const params = useParams<{ folderId: FolderId }>();

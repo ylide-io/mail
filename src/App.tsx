@@ -41,6 +41,7 @@ import { FolderId } from './stores/MailList';
 import { RoutePath } from './stores/routePath';
 import { enableRemoteConsole, remoteConsoleChannel } from './utils/dev';
 import { openInNewWidnow } from './utils/misc';
+import { PushNotificationsEnabler } from './utils/pushNotifications';
 import { captureSentryExceptionWithId } from './utils/sentry';
 import { useIsMatchesPattern, useNav } from './utils/url';
 
@@ -186,6 +187,8 @@ export const App = observer(() => {
 
 	return (
 		<>
+			<PushNotificationsEnabler />
+
 			<PageMeta
 				title={
 					{

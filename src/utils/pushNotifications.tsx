@@ -42,6 +42,7 @@ function enableNotifications(accounts: DomainAccount[]) {
 	}
 
 	navigator?.permissions?.query({ name: 'notifications' }).then(r => {
+		console.log('state', r.state);
 		if (r.state === 'prompt') {
 			Notification.requestPermission().then(result => {
 				if (result === 'granted') {
@@ -54,7 +55,7 @@ function enableNotifications(accounts: DomainAccount[]) {
 	});
 }
 
-export function useEnablePushNotifications() {
+export function PushNotificationsEnabler() {
 	const accounts = domain.accounts.activeAccounts;
 
 	useEffect(() => {
@@ -76,4 +77,6 @@ export function useEnablePushNotifications() {
 			document.body.removeEventListener('click', clickListener);
 		};
 	}, [accounts]);
+
+	return <></>;
 }

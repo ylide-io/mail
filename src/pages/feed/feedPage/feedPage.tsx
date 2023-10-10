@@ -19,7 +19,6 @@ import { FeedStore } from '../../../stores/Feed';
 import { feedSettings } from '../../../stores/FeedSettings';
 import { RoutePath } from '../../../stores/routePath';
 import { connectAccount } from '../../../utils/account';
-import { useEnablePushNotifications } from '../../../utils/pushNotifications';
 import { hookDependency } from '../../../utils/react';
 import { truncateInMiddle } from '../../../utils/string';
 import { useNav } from '../../../utils/url';
@@ -217,12 +216,8 @@ const FeedPageContent = observer(() => {
 	);
 });
 
-export const FeedPage = observer(() => {
-	useEnablePushNotifications();
-
-	return (
-		<GenericLayout>
-			<FeedPageContent />
-		</GenericLayout>
-	);
-});
+export const FeedPage = observer(() => (
+	<GenericLayout>
+		<FeedPageContent />
+	</GenericLayout>
+));
