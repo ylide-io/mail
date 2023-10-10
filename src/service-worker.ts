@@ -83,6 +83,8 @@ self.addEventListener('message', event => {
 self.addEventListener('push', async event => {
 	if (event.data) {
 		const rawData = event.data.text();
+		console.log('push received', rawData);
+
 		const data = JSON.parse(rawData) as IncomingMailData | PostReplyData;
 
 		event.waitUntil(
