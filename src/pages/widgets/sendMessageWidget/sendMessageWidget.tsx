@@ -2,11 +2,10 @@ import { useEffect, useMemo } from 'react';
 import { useSearchParams } from 'react-router-dom';
 
 import { ActionButton, ActionButtonLook } from '../../../components/ActionButton/ActionButton';
-import { Recipients } from '../../../components/recipientInput/recipientInput';
 import { Toast, toast } from '../../../components/toast/toast';
 import { ReactComponent as CrossSvg } from '../../../icons/ic20/cross.svg';
 import { analytics } from '../../../stores/Analytics';
-import { OutgoingMailData } from '../../../stores/outgoingMailData';
+import { OutgoingMailData, Recipients } from '../../../stores/outgoingMailData';
 import { invariant } from '../../../utils/assert';
 import { ComposeMailForm } from '../../mail/_common/composeMailForm/composeMailForm';
 import { postWidgetMessage, WidgetMessageType } from '../widgets';

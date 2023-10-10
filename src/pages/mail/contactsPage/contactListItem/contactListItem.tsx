@@ -5,7 +5,6 @@ import { ActionButton, ActionButtonLook } from '../../../../components/ActionBut
 import { AdaptiveAddress } from '../../../../components/adaptiveAddress/adaptiveAddress';
 import { ContactAvatar } from '../../../../components/contactAvatar/contactAvatar';
 import { DropDownItem, DropDownItemMode } from '../../../../components/dropDown/dropDown';
-import { Recipients } from '../../../../components/recipientInput/recipientInput';
 import { Select } from '../../../../components/select/select';
 import { TextField } from '../../../../components/textField/textField';
 import { ReactComponent as EditSvg } from '../../../../icons/ic20/edit.svg';
@@ -16,7 +15,7 @@ import { IContact } from '../../../../indexedDB/IndexedDB';
 import { analytics } from '../../../../stores/Analytics';
 import contacts from '../../../../stores/Contacts';
 import domain from '../../../../stores/Domain';
-import { OutgoingMailData } from '../../../../stores/outgoingMailData';
+import { OutgoingMailData, Recipients } from '../../../../stores/outgoingMailData';
 import TagsStore from '../../../../stores/Tags';
 import { useOpenMailCompose } from '../../../../utils/mail';
 import css from './contactListItem.module.scss';

@@ -7,7 +7,6 @@ import { BlockchainFeedApi } from '../api/blockchainFeedApi';
 import { ActionButton, ActionButtonLook, ActionButtonSize } from '../components/ActionButton/ActionButton';
 import { ActionModal } from '../components/actionModal/actionModal';
 import { AdaptiveText } from '../components/adaptiveText/adaptiveText';
-import { Recipients } from '../components/recipientInput/recipientInput';
 import { SelectNetworkModal } from '../components/selectNetworkModal/selectNetworkModal';
 import { showStaticComponent } from '../components/staticComponentManager/staticComponentManager';
 import { toast } from '../components/toast/toast';
@@ -15,15 +14,121 @@ import { HUB_FEED_ID, OTC_FEED_ID } from '../constants';
 import { AppMode, REACT_APP__APP_MODE } from '../env';
 import { connectAccount } from '../utils/account';
 import { invariant } from '../utils/assert';
-import { blockchainMeta, getActiveBlockchainNameForAccount } from '../utils/blockchain';
+import { blockchainMeta, getActiveBlockchainNameForAccount, isAddress } from '../utils/blockchain';
 import { calcComissionDecimals, calcCommission } from '../utils/commission';
 import { broadcastMessage, editorJsToYMF, isEmptyEditorJsData, sendMessage } from '../utils/mail';
 import { truncateInMiddle } from '../utils/string';
 import { getEvmWalletNetwork, getWalletSupportedBlockchains, isWalletSupportsBlockchain } from '../utils/wallet';
+import contacts from './Contacts';
 import domain from './Domain';
 import { DomainAccount } from './models/DomainAccount';
 
 const DEFAULT_FEED_ID = REACT_APP__APP_MODE === AppMode.OTC ? OTC_FEED_ID : HUB_FEED_ID;
+
+//
+
+let recipientIdCounter = Date.now();
+
+export interface RecipientInputItem {
+	id: string;
+	name: string;
+	isLoading?: boolean;
+	routing?: {
+		address?: string;
+		details?: {
+			type: string;
+			blockchain: string | null;
+		} | null;
+	} | null;
+}
+
+export class Recipients {
+	items: RecipientInputItem[] = [];
+
+	constructor(initialItems?: string[]) {
+		makeAutoObservable(this);
+
+		autorun(() => {
+			this.items.forEach(item => {
+				if (item.isLoading) return;
+				if (item.routing === null || item.routing?.details || item.routing?.details === null) return;
+
+				item.isLoading = true;
+				Recipients.processItem(item).finally(() => {
+					item.isLoading = false;
+				});
+			});
+		});
+
+		if (initialItems?.length) {
+			this.items = initialItems?.map(it => Recipients.createItem(it));
+		}
+	}
+
+	addItems(terms: string[]) {
+		const cleanTerms = terms.map(it => it.trim()).filter(Boolean);
+
+		const items = cleanTerms
+			// filter out duplicates
+			.filter((term, i) => cleanTerms.indexOf(term) === i)
+			// filter out already selected items
+			.filter(item => !this.items.some(it => it.name === item || it.routing?.address === item))
+			// create items
+			.map(item => Recipients.createItem(item));
+
+		if (items.length) {
+			this.items = [...this.items, ...items];
+		}
+	}
+
+	static createItem(name: string, props: Partial<RecipientInputItem> = {}): RecipientInputItem {
+		return {
+			id: `${recipientIdCounter++}`,
+			name,
+			...props,
+		};
+	}
+
+	static async processItem(item: RecipientInputItem) {
+		if (!item.routing?.address) {
+			const contact = contacts.contacts.find(c => c.name === item.name || c.address === item.name);
+			if (contact) {
+				item.name = contact.name;
+				item.routing = { address: contact.address };
+			} else if (isAddress(item.name)) {
+				item.routing = { address: item.name };
+			} else {
+				const nss = domain.getNSBlockchainsForAddress(item.name);
+				for (const ns of nss) {
+					const address = (await ns.service.resolve(item.name)) || undefined;
+					if (address) {
+						item.routing = { address };
+						break;
+					}
+				}
+			}
+		}
+
+		if (!item.routing) {
+			item.routing = null;
+			return;
+		}
+
+		if (item.routing.address && !item.routing.details) {
+			const achievability = await domain.identifyAddressAchievability(item.routing.address);
+			if (achievability) {
+				item.routing.details = {
+					type: achievability.type,
+					blockchain: achievability.blockchain,
+				};
+			} else {
+				item.routing.details = null;
+			}
+		}
+	}
+}
+
+//
 
 export enum OutgoingMailDataMode {
 	MESSAGE = 'MESSAGE',

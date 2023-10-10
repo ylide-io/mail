@@ -10,14 +10,13 @@ import { ActionButton, ActionButtonLook, ActionButtonSize } from '../../../compo
 import { AdaptiveAddress } from '../../../components/adaptiveAddress/adaptiveAddress';
 import { AutoSizeTextArea } from '../../../components/autoSizeTextArea/autoSizeTextArea';
 import { ErrorMessage } from '../../../components/errorMessage/errorMessage';
-import { Recipients } from '../../../components/recipientInput/recipientInput';
 import { TextProcessor } from '../../../components/textProcessor/textProcessor';
 import { YlideLoader } from '../../../components/ylideLoader/ylideLoader';
 import { REACT_APP__OTC_PROVIDER } from '../../../env';
 import { ReactComponent as ContactSvg } from '../../../icons/ic20/contact.svg';
 import { IMessageDecodedContent } from '../../../indexedDB/IndexedDB';
 import domain from '../../../stores/Domain';
-import { OutgoingMailData } from '../../../stores/outgoingMailData';
+import { OutgoingMailData, Recipients } from '../../../stores/outgoingMailData';
 import { invariant } from '../../../utils/assert';
 import { decodeMessage, parseEditorJsJson } from '../../../utils/mail';
 import { SendMailButton } from '../../mail/_common/composeMailForm/sendMailButton/sendMailButton';

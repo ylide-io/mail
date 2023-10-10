@@ -8,7 +8,7 @@ import { ReactComponent as LinkSvg } from '../../../icons/ic20/link.svg';
 import { ReactComponent as MailSvg } from '../../../icons/ic20/mail.svg';
 import { ReactComponent as TagSvg } from '../../../icons/ic20/tag.svg';
 import { Community } from '../../../stores/communities/communities';
-import { OutgoingMailData } from '../../../stores/outgoingMailData';
+import { OutgoingMailData, Recipients } from '../../../stores/outgoingMailData';
 import { HorizontalAlignment } from '../../../utils/alignment';
 import { copyToClipboard } from '../../../utils/clipboard';
 import { useOpenMailCompose } from '../../../utils/mail';
@@ -19,7 +19,6 @@ import { AdaptiveAddress } from '../../adaptiveAddress/adaptiveAddress';
 import { CommunityAvatar } from '../../avatar/avatar';
 import { CommunityBanner } from '../../communityBanner/communityBanner';
 import { AnchoredPopup } from '../../popup/anchoredPopup/anchoredPopup';
-import { Recipients } from '../../recipientInput/recipientInput';
 import css from './primaryCommunityCard.module.scss';
 
 export interface PrimaryCommunityCardProps {
