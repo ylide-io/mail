@@ -7,10 +7,11 @@ import { AdaptiveAddress } from '../../components/adaptiveAddress/adaptiveAddres
 import { Avatar } from '../../components/avatar/avatar';
 import { CheckBox } from '../../components/checkBox/checkBox';
 import { Emoji } from '../../components/emoji/emoji';
-import { RecipientInput, Recipients } from '../../components/recipientInput/recipientInput';
+import { RecipientInput } from '../../components/recipientInput/recipientInput';
 import { TagInput, TagInputItem } from '../../components/tagInput/tagInput';
 import { TextField, TextFieldLook } from '../../components/textField/textField';
 import { ReactComponent as SettingsSvg } from '../../icons/ic20/settings.svg';
+import { Recipients } from '../../stores/outgoingMailData';
 import css from './testPage.module.scss';
 
 export function Row({ children }: PropsWithChildren) {

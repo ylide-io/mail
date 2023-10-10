@@ -17,7 +17,6 @@ import { BlockChainLabel } from '../../../../components/BlockChainLabel/BlockCha
 import { GridRowBox } from '../../../../components/boxes/boxes';
 import { GalleryModal } from '../../../../components/galleryModal/galleryModal';
 import { ReadableDate } from '../../../../components/readableDate/readableDate';
-import { Recipients } from '../../../../components/recipientInput/recipientInput';
 import { Spinner, SpinnerLook } from '../../../../components/spinner/spinner';
 import { TextProcessor } from '../../../../components/textProcessor/textProcessor';
 import { toast } from '../../../../components/toast/toast';
@@ -31,7 +30,7 @@ import { analytics } from '../../../../stores/Analytics';
 import { browserStorage } from '../../../../stores/browserStorage';
 import { Community, CommunityId } from '../../../../stores/communities/communities';
 import domain from '../../../../stores/Domain';
-import { OutgoingMailData } from '../../../../stores/outgoingMailData';
+import { OutgoingMailData, Recipients } from '../../../../stores/outgoingMailData';
 import { RoutePath } from '../../../../stores/routePath';
 import { generateBlockchainExplorerUrl } from '../../../../utils/blockchain';
 import { copyToClipboard } from '../../../../utils/clipboard';
