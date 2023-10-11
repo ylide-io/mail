@@ -154,11 +154,13 @@ self.addEventListener('notificationclick', event => {
 	const data = parseNotificationData(event.notification.data);
 
 	if (data.type === NotificationType.INCOMING_MAIL) {
+		console.log('Opening mail', data, data.body.msgId);
 		const url = data.body.msgId ? `/mail/inbox/${encodeURIComponent(data.body.msgId)}` : '/mail/inbox';
 		event.waitUntil(self.clients.openWindow(url));
 	}
 
 	if (data.type === NotificationType.POST_REPLY) {
+		console.log('Opening post', data, data.body.reply.postId);
 		const url = data.body.reply.postId ? `/post/${encodeURIComponent(data.body.reply.postId)}` : '/';
 		event.waitUntil(self.clients.openWindow(url));
 	}
