@@ -64,15 +64,16 @@ export function PushNotificationsEnabler() {
 		// This will work on any device except iOS Safari,
 		// where it's required to check notifications on user interaction.
 
+		if (!accounts.length) return;
+
+		enableNotifications(accounts);
+
 		const clickListener = () => {
 			document.body.removeEventListener('click', clickListener);
 			enableNotifications(accounts);
 		};
 
-		if (accounts.length) {
-			enableNotifications(accounts);
-			document.body.addEventListener('click', clickListener);
-		}
+		document.body.addEventListener('click', clickListener);
 
 		return () => {
 			document.body.removeEventListener('click', clickListener);
