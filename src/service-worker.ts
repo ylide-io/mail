@@ -15,7 +15,7 @@ import { registerRoute } from 'workbox-routing';
 import { StaleWhileRevalidate } from 'workbox-strategies';
 
 import { REACT_APP__HUB_PUBLIC_URL } from './env';
-import { truncateInMiddle } from './utils/string';
+import { truncateAddress } from './utils/string';
 
 declare const self: ServiceWorkerGlobalScope;
 
@@ -49,7 +49,7 @@ interface PostReplyData {
 }
 
 function parseNotificationData(data: unknown) {
-	console.log('Parsing push data', data);
+	console.debug('Parsing push data', data);
 	return JSON.parse(data as string) as IncomingMailData | PostReplyData;
 }
 
@@ -130,7 +130,7 @@ self.addEventListener('push', async event => {
 
 		if (data.type === NotificationType.INCOMING_MAIL) {
 			showNotification('New message', {
-				body: `FROM ${truncateInMiddle(data.body.senderAddress, 12, '..')}`,
+				body: `SENDER · ${truncateAddress(data.body.senderAddress)}`,
 				badge: '/badge-96x96.png',
 				data: rawData,
 			});
@@ -138,7 +138,7 @@ self.addEventListener('push', async event => {
 
 		if (data.type === NotificationType.POST_REPLY) {
 			showNotification('New reply to your post', {
-				body: `FROM ${truncateInMiddle(data.body.reply.address, 12, '..')}`,
+				body: `AUTHOR · ${truncateAddress(data.body.reply.address)}`,
 				badge: '/badge-96x96.png',
 				data: rawData,
 			});

@@ -42,7 +42,8 @@ function enableNotifications(accounts: DomainAccount[]) {
 	}
 
 	navigator?.permissions?.query({ name: 'notifications' }).then(r => {
-		console.log('state', r.state);
+		console.debug('Notification permissions:', r.state);
+
 		if (r.state === 'prompt') {
 			Notification.requestPermission().then(result => {
 				if (result === 'granted') {
