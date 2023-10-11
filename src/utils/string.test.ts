@@ -1,4 +1,4 @@
-import { htmlSelfClosingTagsToXHtml, transformMatches, truncateInMiddle } from './string';
+import { htmlSelfClosingTagsToXHtml, transformMatches, truncateAddress, truncateInMiddle } from './string';
 
 test('truncateInMiddle', () => {
 	expect(truncateInMiddle('1234567890', 10)).toBe('1234567890');
@@ -12,6 +12,12 @@ test('truncateInMiddle', () => {
 	expect(truncateInMiddle('1234567890', 2, '..')).toBe('1..0');
 	expect(truncateInMiddle('1234567890', 1, '..')).toBe('1..0');
 	expect(truncateInMiddle('1234567890', 0, '..')).toBe('1..0');
+});
+
+test('truncateAddress', () => {
+	expect(truncateAddress('1234567890', 4)).toBe('12..90');
+	expect(truncateAddress('0x1234567890', 4)).toBe('0x12..90');
+	expect(truncateAddress('0:1234567890', 4)).toBe('0:12..90');
 });
 
 test('htmlSelfClosingTagsToXHtml', () => {

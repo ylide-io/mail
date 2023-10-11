@@ -29,7 +29,7 @@ import {
 	useOpenMailCompose,
 } from '../../../utils/mail';
 import { ReactQueryKey } from '../../../utils/reactQuery';
-import { truncateInMiddle } from '../../../utils/string';
+import { truncateAddress } from '../../../utils/string';
 import { useNav } from '../../../utils/url';
 import css from './mailDetailsPage.module.scss';
 import { MailMessage } from './mailMessage/mailMessage';
@@ -66,7 +66,7 @@ export const MailDetailsPage = observer(() => {
 
 					const domainAccount = accounts.find(a => a.account.address === accountAddress);
 					invariant(domainAccount, () => {
-						toast(`Connect account ${truncateInMiddle(accountAddress, 12, '..')} to read this message 👍`);
+						toast(`Connect account ${truncateAddress(accountAddress)} to read this message 👍`);
 						return 'No account';
 					});
 

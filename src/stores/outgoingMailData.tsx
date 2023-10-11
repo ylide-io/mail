@@ -17,7 +17,7 @@ import { invariant } from '../utils/assert';
 import { blockchainMeta } from '../utils/blockchain';
 import { calcComissionDecimals, calcCommission } from '../utils/commission';
 import { broadcastMessage, editorJsToYMF, isEmptyEditorJsData, sendMessage } from '../utils/mail';
-import { truncateInMiddle } from '../utils/string';
+import { truncateAddress } from '../utils/string';
 import { getEvmWalletNetwork, getWalletSupportedBlockchains, isWalletSupportsBlockchain } from '../utils/wallet';
 import contacts from './Contacts';
 import domain from './Domain';
@@ -292,7 +292,7 @@ export class OutgoingMailData {
 								look={ActionButtonLook.PRIMARY}
 								onClick={() => resolve(true)}
 							>
-								Continue with {truncateInMiddle(this.from!.account.address, 8, '...')}
+								Continue with {truncateAddress(this.from!.account.address)}
 							</ActionButton>,
 							<ActionButton
 								size={ActionButtonSize.XLARGE}

@@ -13,6 +13,11 @@ export function truncateInMiddle(string: string, maxLength: number, separator?: 
 	}
 }
 
+export function truncateAddress(address: string, maxSignificantLength: number = 8, separator: string = '..') {
+	const prefix = address.match(/^(0[x:])/i)?.[1] || '';
+	return `${prefix}${truncateInMiddle(address.slice(prefix.length), maxSignificantLength, separator)}`;
+}
+
 export function htmlSelfClosingTagsToXHtml(html: string) {
 	return html.replace(
 		/<(area|base|br|col|embed|hr|img|input|link|meta|param|source|track|wbr|command|keygen|menuitem|frame)\b(.*?)[ /]*>/,

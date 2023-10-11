@@ -20,7 +20,7 @@ import { feedSettings } from '../../../stores/FeedSettings';
 import { RoutePath } from '../../../stores/routePath';
 import { connectAccount } from '../../../utils/account';
 import { hookDependency } from '../../../utils/react';
-import { truncateInMiddle } from '../../../utils/string';
+import { truncateAddress } from '../../../utils/string';
 import { useNav } from '../../../utils/url';
 import { FeedPostItem } from '../_common/feedPostItem/feedPostItem';
 import css from './feedPage.module.scss';
@@ -100,7 +100,7 @@ const FeedPageContent = observer(() => {
 			return `Feed for ${
 				selectedAccounts[0].name
 					? selectedAccounts[0].name
-					: truncateInMiddle(selectedAccounts[0].account.address, 8, '..')
+					: truncateAddress(selectedAccounts[0].account.address)
 			}`;
 		}
 		return 'Feed';
