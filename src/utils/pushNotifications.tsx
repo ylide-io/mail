@@ -1,3 +1,4 @@
+import { observer } from 'mobx-react';
 import { useEffect } from 'react';
 
 import { BlockchainFeedApi } from '../api/blockchainFeedApi';
@@ -56,8 +57,8 @@ function enableNotifications(accounts: DomainAccount[]) {
 	});
 }
 
-export function PushNotificationsEnabler() {
-	const accounts = domain.accounts.activeAccounts;
+export const PushNotificationsEnabler = observer(() => {
+	const accounts = domain.accounts.activeAccountsWithAuthKey;
 
 	useEffect(() => {
 		// Check notifications on page load.
@@ -81,4 +82,4 @@ export function PushNotificationsEnabler() {
 	}, [accounts]);
 
 	return <></>;
-}
+});
