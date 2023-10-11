@@ -154,7 +154,7 @@ self.addEventListener('notificationclick', event => {
 	const data = parseNotificationData(event.notification.data);
 
 	if (data.type === NotificationType.INCOMING_MAIL) {
-		const url = `/mail/inbox/${encodeURIComponent(data.body.msgId)}`;
+		const url = `/mail/inbox/${encodeURIComponent(`${data.body.msgId}:${data.body.recipientAddress}`)}`;
 		event.waitUntil(self.clients.openWindow(url));
 	}
 
