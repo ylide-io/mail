@@ -15,8 +15,45 @@ import { registerRoute } from 'workbox-routing';
 import { StaleWhileRevalidate } from 'workbox-strategies';
 
 import { REACT_APP__HUB_PUBLIC_URL } from './env';
+import { truncateInMiddle } from './utils/string';
 
 declare const self: ServiceWorkerGlobalScope;
+
+enum NotificationType {
+	INCOMING_MAIL = 'INCOMING_MAIL',
+	POST_REPLY = 'POST_REPLY',
+}
+
+interface IncomingMailData {
+	type: NotificationType.INCOMING_MAIL;
+	body: {
+		senderAddress: string;
+		recipientAddress: string;
+		msgId: string;
+	};
+}
+
+interface PostReplyData {
+	type: NotificationType.POST_REPLY;
+	body: {
+		feedId: string;
+		author: {
+			address: string;
+			postId: string;
+		};
+		reply: {
+			address: string;
+			postId: string;
+		};
+	};
+}
+
+function parseNotificationData(data: unknown) {
+	console.log('Parsing push data', data);
+	return JSON.parse(data as string) as IncomingMailData | PostReplyData;
+}
+
+//
 
 clientsClaim();
 
@@ -81,55 +118,36 @@ self.addEventListener('message', event => {
 
 // Any other custom service worker logic can go here.
 self.addEventListener('push', async event => {
+	function showNotification(title: string, options?: NotificationOptions) {
+		event.waitUntil(self.registration.showNotification(title, options));
+	}
+
 	if (event.data) {
 		const rawData = event.data.text();
-		console.log('push received', rawData);
+		const data = parseNotificationData(rawData);
 
-		const data = JSON.parse(rawData) as IncomingMailData | PostReplyData;
-
-		event.waitUntil(
-			self.registration.showNotification(data.type, {
-				body: 'Something happened :))',
+		if (data.type === NotificationType.INCOMING_MAIL) {
+			showNotification('New message', {
+				body: `FROM ${truncateInMiddle(data.body.senderAddress, 12, '..')}`,
 				badge: '/badge-96x96.png',
 				data: rawData,
-			}),
-		);
+			});
+		}
+
+		if (data.type === NotificationType.POST_REPLY) {
+			showNotification('New reply to your post', {
+				body: `FROM ${truncateInMiddle(data.body.reply.address, 12, '..')}`,
+				badge: '/badge-96x96.png',
+				data: rawData,
+			});
+		}
 	}
 });
-
-enum NotificationType {
-	INCOMING_MAIL = 'INCOMING_MAIL',
-	POST_REPLY = 'POST_REPLY',
-}
-
-interface IncomingMailData {
-	type: NotificationType.INCOMING_MAIL;
-	body: {
-		senderAddress: string;
-		recipientAddress: string;
-		msgId: string;
-	};
-}
-
-interface PostReplyData {
-	type: NotificationType.POST_REPLY;
-	body: {
-		feedId: string;
-		author: {
-			address: string;
-			postId: string;
-		};
-		reply: {
-			address: string;
-			postId: string;
-		};
-	};
-}
 
 self.addEventListener('notificationclick', event => {
 	event.notification.close();
 
-	const data = event.notification.data as IncomingMailData | PostReplyData;
+	const data = parseNotificationData(event.notification.data);
 
 	if (data.type === NotificationType.INCOMING_MAIL) {
 		const url = `/mail/inbox/${data.body.msgId}`;
