@@ -121,7 +121,13 @@ self.addEventListener('push', async event => {
 	console.log('Push received', event);
 
 	function showNotification(title: string, options?: NotificationOptions) {
-		event.waitUntil(self.registration.showNotification(title, options));
+		event.waitUntil(
+			self.registration.showNotification(title, {
+				icon: '/push-notification-icon.png',
+				badge: '/push-notification-badge.png',
+				...options,
+			}),
+		);
 	}
 
 	if (event.data) {
@@ -131,7 +137,6 @@ self.addEventListener('push', async event => {
 		if (data.type === NotificationType.INCOMING_MAIL) {
 			showNotification('New message', {
 				body: `SENDER · ${truncateAddress(data.body.senderAddress)}`,
-				badge: '/badge-96x96.png',
 				data: rawData,
 			});
 		}
@@ -139,7 +144,6 @@ self.addEventListener('push', async event => {
 		if (data.type === NotificationType.POST_REPLY) {
 			showNotification('New reply to your post', {
 				body: `AUTHOR · ${truncateAddress(data.body.reply.address)}`,
-				badge: '/badge-96x96.png',
 				data: rawData,
 			});
 		}
