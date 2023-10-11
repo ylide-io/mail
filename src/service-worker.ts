@@ -118,6 +118,8 @@ self.addEventListener('message', event => {
 
 // Any other custom service worker logic can go here.
 self.addEventListener('push', async event => {
+	console.log('Push received', event);
+
 	function showNotification(title: string, options?: NotificationOptions) {
 		event.waitUntil(self.registration.showNotification(title, options));
 	}
@@ -145,17 +147,19 @@ self.addEventListener('push', async event => {
 });
 
 self.addEventListener('notificationclick', event => {
+	console.log('Notification click received', event);
+
 	event.notification.close();
 
 	const data = parseNotificationData(event.notification.data);
 
 	if (data.type === NotificationType.INCOMING_MAIL) {
-		const url = `/mail/inbox/${data.body.msgId}`;
+		const url = data.body.msgId ? `/mail/inbox/${encodeURIComponent(data.body.msgId)}` : '/mail/inbox';
 		event.waitUntil(self.clients.openWindow(url));
 	}
 
 	if (data.type === NotificationType.POST_REPLY) {
-		const url = `/post/${data.body.reply.postId}`;
+		const url = data.body.reply.postId ? `/post/${encodeURIComponent(data.body.reply.postId)}` : '/';
 		event.waitUntil(self.clients.openWindow(url));
 	}
 });
