@@ -14,7 +14,7 @@ import { HUB_FEED_ID, OTC_FEED_ID } from '../constants';
 import { AppMode, REACT_APP__APP_MODE } from '../env';
 import { connectAccount } from '../utils/account';
 import { invariant } from '../utils/assert';
-import { blockchainMeta, getActiveBlockchainNameForAccount, isAddress } from '../utils/blockchain';
+import { blockchainMeta } from '../utils/blockchain';
 import { calcComissionDecimals, calcCommission } from '../utils/commission';
 import { broadcastMessage, editorJsToYMF, isEmptyEditorJsData, sendMessage } from '../utils/mail';
 import { truncateInMiddle } from '../utils/string';
@@ -95,7 +95,7 @@ export class Recipients {
 			if (contact) {
 				item.name = contact.name;
 				item.routing = { address: contact.address };
-			} else if (isAddress(item.name)) {
+			} else if (domain.isAddress(item.name)) {
 				item.routing = { address: item.name };
 			} else {
 				const nss = domain.getNSBlockchainsForAddress(item.name);
@@ -165,7 +165,7 @@ export class OutgoingMailData {
 			}
 
 			if (this.from) {
-				const newChain = await getActiveBlockchainNameForAccount(this.from);
+				const newChain = await this.from.getActiveBlockchain();
 				const supportedChains = getWalletSupportedBlockchains(this.from.wallet);
 
 				if (this.blockchain == null || !supportedChains.includes(this.blockchain)) {

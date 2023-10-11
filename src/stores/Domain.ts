@@ -204,6 +204,10 @@ export class Domain {
 			}));
 	}
 
+	isAddress(input: string): boolean {
+		return domain.getBlockchainsForAddress(input.toLowerCase()).length > 0;
+	}
+
 	async identifyRouteToAddresses(addresses: string[]) {
 		const actualRecipients = [];
 		for (const address of addresses) {

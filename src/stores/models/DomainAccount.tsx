@@ -8,6 +8,7 @@ import { AdaptiveAddress } from '../../components/adaptiveAddress/adaptiveAddres
 import { toast } from '../../components/toast/toast';
 import { REACT_APP__FEED_PUBLIC_KEY } from '../../env';
 import { invariant } from '../../utils/assert';
+import { BlockchainName } from '../../utils/blockchain';
 import { browserStorage } from '../browserStorage';
 import { Wallet } from './Wallet';
 
@@ -139,6 +140,22 @@ export class DomainAccount {
 
 	get isCurrentlySelected() {
 		return this.wallet.isItCurrentAccount(this);
+	}
+
+	async getActiveBlockchain() {
+		if (this.wallet.factory.blockchainGroup === 'evm') {
+			return await this.wallet.controller.getCurrentBlockchain();
+		}
+
+		if (this.wallet.wallet === 'everwallet') {
+			return BlockchainName.EVERSCALE;
+		}
+
+		if (this.wallet.wallet === 'venomwallet') {
+			return BlockchainName.VENOM_TESTNET;
+		}
+
+		throw new Error(`Unsupported wallet ${this.wallet.wallet}`);
 	}
 
 	async addNewLocalPrivateKey(key: YlidePrivateKey) {
