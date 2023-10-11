@@ -136,14 +136,14 @@ self.addEventListener('push', async event => {
 
 		if (data.type === NotificationType.INCOMING_MAIL) {
 			showNotification('New message', {
-				body: `SENDER · ${truncateAddress(data.body.senderAddress)}`,
+				body: `You've got a new encrypted message from ${truncateAddress(data.body.senderAddress)}`,
 				data: rawData,
 			});
 		}
 
 		if (data.type === NotificationType.POST_REPLY) {
-			showNotification('New reply to your post', {
-				body: `AUTHOR · ${truncateAddress(data.body.reply.address)}`,
+			showNotification('New reply', {
+				body: `You've got a new reply from ${truncateAddress(data.body.reply.address)}`,
 				data: rawData,
 			});
 		}
