@@ -324,7 +324,7 @@ export const SidebarMenu = observer(() => {
 				</SidebarSection>
 
 				<SidebarSection title="Newly Added">
-					{renderCommunities([CommunityId.MAIN_VIEW, CommunityId.DEXIFY, CommunityId.HANMADI])}
+					{renderCommunities([CommunityId.MAIN_VIEW, CommunityId.STAKE_N_BAKE, CommunityId.DE_GUARD])}
 				</SidebarSection>
 
 				<ActionButton
