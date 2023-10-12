@@ -34,12 +34,14 @@ export class BrowserStorage {
 		transform: (item: string) => T,
 		storage: Storage = localStorage,
 	): T | undefined {
-		const item = storage.getItem(key) || undefined;
-		return item ? transform(item) : undefined;
+		try {
+			const item = storage.getItem(key) || undefined;
+			return item ? transform(item) : undefined;
+		} catch (e) {}
 	}
 
 	static getJsonItem<T>(key: BrowserStorageKey, storage: Storage = localStorage) {
-		return BrowserStorage.getItemWithTransform(key, JSON.parse, storage);
+		return BrowserStorage.getItemWithTransform<T>(key, JSON.parse, storage);
 	}
 
 	static setItem(key: BrowserStorageKey, value: string | null | undefined, storage: Storage = localStorage) {
