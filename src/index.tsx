@@ -52,7 +52,11 @@ function migrateLocation() {
 		// first descussion feed
 		rule('/project/tvm_discussion', () => '/project/tvm/discussion') ||
 		// old post URLs
-		rule(/\/project\/(.+?)\/(discussion|announcements)\/post\/(.+)/, (_, match) => `/post/${match[3]}`)
+		rule(/\/project\/(.+?)\/(discussion|announcements)\/post\/(.+)/, (_, match) => `/post/${match[3]}`) ||
+		// incorrectly named communities
+		rule(/\/project\/cosmosChickenCoop(.*)/, (_, match) => `/project/cosmos_chicken_coop${match[1]}`) ||
+		rule(/\/project\/eddyFinance(.*)/, (_, match) => `/project/eddy_finance${match[1]}`) ||
+		rule(/\/project\/sleekWallet(.*)/, (_, match) => `/project/sleek_wallet${match[1]}`)
 	);
 }
 

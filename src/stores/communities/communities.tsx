@@ -177,10 +177,10 @@ export enum CommunityId {
 	// ZETACHAIN
 
 	ZNS_CONNECT = 'znsConnect',
-	COSMOS_CHICKEN_COOP = 'cosmosChickenCoop',
-	EDDY_FINANCE = 'eddyFinance',
+	COSMOS_CHICKEN_COOP = 'cosmos_chicken_coop',
+	EDDY_FINANCE = 'eddy_finance',
 	HOMINIDS = 'hominids',
-	SLEEK_WALLET = 'sleekWallet',
+	SLEEK_WALLET = 'sleek_wallet',
 	ACE_SWAP = 'ace_swap',
 	SENDTOKENS = 'sendtokens',
 	SMART_DEPLOYER = 'smart_deployer',
