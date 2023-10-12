@@ -68,6 +68,8 @@ commands:
                   command: |
                       wrangler pages publish build --project-name=<< parameters.project_name >>
 
+
+
 jobs:
     install: # this can be any name you choose
         docker:
@@ -105,8 +107,6 @@ jobs:
     deploy_hub_staging:
         docker:
             - image: node:16
-        environment:
-            REACT_APP__PUBLIC_URL: https://test.ylide.io
         steps:
             - restore_build_cache:
                   cache_key: hub
@@ -192,6 +192,26 @@ jobs:
                   cache_key: mainview
             - wrangler:
                   project_name: mainview
+    build_mainview-staging:
+        docker:
+            - image: node:16
+        steps:
+            - checkout
+            - restore_pnpm_cache
+            - install_pnpm
+            - ylide_build:
+                  build_cmd: build-mainview
+            - save_build_cache:
+                  cache_key: mainview-staging
+            - ylide_store_artifacts
+    deploy_mainview-staging:
+        docker:
+            - image: node:16
+        steps:
+            - restore_build_cache:
+                  cache_key: mainview-staging
+            - wrangler:
+                  project_name: mainview-staging
 
 workflows:
     build_and_test:
@@ -203,6 +223,7 @@ workflows:
                               - hub-release
                               - otc-release
                               - mainview-release
+                              - mainview-staging
                               - dev
             - build_hub:
                   requires:
@@ -282,3 +303,17 @@ workflows:
                       branches:
                           only:
                               - mainview-release
+            - build_mainview-staging:
+                  requires:
+                      - install
+                  filters:
+                      branches:
+                          only:
+                              - mainview-staging
+            - deploy_mainview-staging:
+                  requires:
+                      - build_mainview-staging
+                  filters:
+                      branches:
+                          only:
+                              - mainview-staging
