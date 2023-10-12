@@ -280,7 +280,7 @@ workflows:
                               - dev
             - deploy_hub_staging:
                   requires:
-                      - build_hub
+                      - build_hub_staging
                   filters:
                       branches:
                           only:
