@@ -397,7 +397,7 @@ export const CommunityPage = observer(() => {
 			<ActionButton
 				size={ActionButtonSize.MEDIUM}
 				look={look}
-				onClick={() => isActive || navigate(params.href, { preventScrollReset: true })}
+				onClick={() => isActive || navigate(params.href, { replace: true, preventScrollReset: true })}
 			>
 				{params.name}
 			</ActionButton>
