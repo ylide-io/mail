@@ -1,7 +1,7 @@
 import clsx from 'clsx';
-import { observable, reaction } from 'mobx';
+import { observable } from 'mobx';
 import { observer } from 'mobx-react';
-import { AnchorHTMLAttributes, PropsWithChildren, ReactNode, useEffect, useState } from 'react';
+import { AnchorHTMLAttributes, PropsWithChildren, ReactNode, useState } from 'react';
 import { generatePath, useLocation } from 'react-router-dom';
 
 import { AppMode, REACT_APP__APP_MODE } from '../../../env';
@@ -20,12 +20,12 @@ import { ReactComponent as TwitterSvg } from '../../../icons/social/twitter.svg'
 import { sideFeedIcon } from '../../../icons/static/sideFeedIcon';
 import { FeedSettingsPopup } from '../../../pages/feed/_common/feedSettingsPopup/feedSettingsPopup';
 import { analytics } from '../../../stores/Analytics';
-import { browserStorage } from '../../../stores/browserStorage';
 import { Community, CommunityId, getCommunityById } from '../../../stores/communities/communities';
 import domain from '../../../stores/Domain';
 import { feedSettings } from '../../../stores/FeedSettings';
-import { FolderId, getFolderName, MailList } from '../../../stores/MailList';
+import { FolderId, getFolderName } from '../../../stores/MailList';
 import { DomainAccount } from '../../../stores/models/DomainAccount';
+import { newMailChecker } from '../../../stores/newMailChecker';
 import { RoutePath } from '../../../stores/routePath';
 import { useOpenMailCompose } from '../../../utils/mail';
 import { openCreateCommunityForm } from '../../../utils/misc';
@@ -194,51 +194,7 @@ export function SidebarBlock({ children, look }: SidebarBlockProps) {
 
 export const SidebarMailSection = observer(() => {
 	const openMailCompose = useOpenMailCompose();
-
-	const accounts = domain.accounts.activeAccounts;
-
-	const [hasNewMessages, setHasNewMessages] = useState(false);
-
-	useEffect(() => {
-		const mailList = new MailList();
-
-		mailList.init({
-			mailbox: {
-				accounts,
-				folderId: FolderId.Inbox,
-			},
-		});
-
-		const key = accounts
-			.map(a => a.account.address)
-			.sort()
-			.join(',');
-
-		const dispose = reaction(
-			() => ({
-				newMessagesCount: mailList.newMessagesCount,
-				messagesData: mailList.messagesData,
-				lastMailboxCheckDate: browserStorage.lastMailboxCheckDate,
-			}),
-			({ newMessagesCount, messagesData, lastMailboxCheckDate }) => {
-				if (newMessagesCount) {
-					mailList.drainNewMessages();
-				}
-
-				const lastMessage = messagesData[0];
-				const lastCheckedDate = lastMailboxCheckDate[key];
-
-				setHasNewMessages(
-					!!lastMessage && (!lastCheckedDate || lastMessage.raw.msg.createdAt > lastCheckedDate),
-				);
-			},
-		);
-
-		return () => {
-			dispose();
-			mailList.destroy();
-		};
-	}, [accounts]);
+	const hasNewMessages = newMailChecker.hasNewMessages;
 
 	return (
 		<SidebarBlock look={SidebarBlockLook.PRETTY}>
@@ -368,7 +324,7 @@ export const SidebarMenu = observer(() => {
 				</SidebarSection>
 
 				<SidebarSection title="Newly Added">
-					{renderCommunities([CommunityId.MAIN_VIEW, CommunityId.DEXIFY, CommunityId.HANMADI])}
+					{renderCommunities([CommunityId.MAIN_VIEW, CommunityId.STAKE_N_BAKE, CommunityId.DE_GUARD])}
 				</SidebarSection>
 
 				<ActionButton

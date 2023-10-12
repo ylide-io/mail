@@ -41,6 +41,7 @@ import { FolderId } from './stores/MailList';
 import { RoutePath } from './stores/routePath';
 import { enableRemoteConsole, remoteConsoleChannel } from './utils/dev';
 import { openInNewWidnow } from './utils/misc';
+import { PushNotificationsEnabler } from './utils/pushNotifications';
 import { captureSentryExceptionWithId } from './utils/sentry';
 import { useIsMatchesPattern, useNav } from './utils/url';
 
@@ -48,62 +49,6 @@ export enum AppTheme {
 	V1 = 'v1',
 	V2 = 'v2',
 }
-
-const RemoveTrailingSlash = () => {
-	const location = useLocation();
-	const [searchParams] = useSearchParams();
-	const navigate = useNav();
-
-	useEffect(() => {
-		if (location.pathname.match('/.*/$')) {
-			return navigate(
-				{
-					path: location.pathname.replace(/\/+$/, ''),
-					search: location.search,
-					hash: location.hash,
-				},
-				{
-					replace: true,
-				},
-			);
-		}
-
-		const adminParam = searchParams.get('admin');
-		if (adminParam) {
-			browserStorage.adminPassword = adminParam.startsWith('yldpwd') ? adminParam : undefined;
-			searchParams.delete('admin');
-			return navigate(
-				{
-					path: location.pathname,
-					search: searchParams,
-					hash: location.hash,
-				},
-				{
-					replace: true,
-				},
-			);
-		}
-
-		const consoleReParam = searchParams.get('cre');
-		if (consoleReParam != null) {
-			enableRemoteConsole();
-
-			searchParams.delete('cre');
-			return navigate(
-				{
-					path: location.pathname,
-					search: searchParams,
-					hash: location.hash,
-				},
-				{
-					replace: true,
-				},
-			);
-		}
-	});
-
-	return <></>;
-};
 
 //
 
@@ -120,6 +65,8 @@ function redirect({ from, to }: RedirectProps) {
 
 export const App = observer(() => {
 	const location = useLocation();
+	const [searchParams] = useSearchParams();
+	const navigate = useNav();
 
 	const [queryClient] = useState(
 		new QueryClient({
@@ -158,6 +105,43 @@ export const App = observer(() => {
 	useEffect(() => {
 		analytics.pageView(location.pathname);
 	}, [location.pathname]);
+
+	useEffect(() => {
+		// enable admin mode
+		const adminParam = searchParams.get('admin');
+		if (adminParam) {
+			browserStorage.adminPassword = adminParam.startsWith('yldpwd') ? adminParam : undefined;
+			searchParams.delete('admin');
+			return navigate(
+				{
+					path: location.pathname,
+					search: searchParams,
+					hash: location.hash,
+				},
+				{
+					replace: true,
+				},
+			);
+		}
+
+		// enable remote console
+		const consoleReParam = searchParams.get('cre');
+		if (consoleReParam != null) {
+			enableRemoteConsole();
+
+			searchParams.delete('cre');
+			return navigate(
+				{
+					path: location.pathname,
+					search: searchParams,
+					hash: location.hash,
+				},
+				{
+					replace: true,
+				},
+			);
+		}
+	});
 
 	if (initErrorId) {
 		return (
@@ -203,6 +187,8 @@ export const App = observer(() => {
 
 	return (
 		<>
+			<PushNotificationsEnabler />
+
 			<PageMeta
 				title={
 					{
@@ -248,31 +234,7 @@ export const App = observer(() => {
 
 			<QueryClientProvider client={queryClient}>
 				<PopupManager>
-					<RemoveTrailingSlash />
-
 					<Routes>
-						{/* MIGRATIONS */}
-
-						{redirect({
-							from: '/feed/venom/*',
-							to: location.pathname.replace('/feed/venom', '/feed/project'),
-						})}
-
-						{redirect({
-							from: '/feed/tvm/*',
-							to: location.pathname.replace('/feed/tvm', '/feed/project/tvm'),
-						})}
-
-						{redirect({
-							from: '/feed/project/*',
-							to: location.pathname.replace('/feed/project', '/project'),
-						})}
-
-						{redirect({
-							from: '/project/tvm_discussion',
-							to: location.pathname.replace('/project/tvm_discussion', '/project/tvm/discussion'),
-						})}
-
 						{/* GENERAL */}
 
 						<Route path={RoutePath.ROOT} element={<ExplorePage />} />
@@ -287,10 +249,7 @@ export const App = observer(() => {
 
 						{redirect({
 							from: RoutePath.FEED,
-							to:
-								REACT_APP__APP_MODE === AppMode.MAIN_VIEW
-									? generatePath(RoutePath.FEED_SMART)
-									: generatePath(RoutePath.PROJECT),
+							to: REACT_APP__APP_MODE === AppMode.MAIN_VIEW ? RoutePath.FEED_SMART : RoutePath.PROJECT,
 						})}
 
 						<Route path={RoutePath.FEED_ALL} element={<FeedPage />} />
@@ -304,22 +263,15 @@ export const App = observer(() => {
 
 						{redirect({
 							from: RoutePath.PROJECT,
-							to: generatePath(RoutePath.ROOT),
+							to: RoutePath.ROOT,
 						})}
 
 						<Route path={RoutePath.PROJECT_ID} element={<CommunityPage />} />
 						<Route path={RoutePath.PROJECT_ID_OFFICIAL} element={<CommunityPage />} />
-						<Route path={RoutePath.PROJECT_ID_OFFICIAL_POST_ID} element={<CommunityPage />} />
-						<Route
-							path={RoutePath.PROJECT_ID_OFFICIAL_ADMIN}
-							element={<CommunityPostPage isOfficial={true} />}
-						/>
+						<Route path={RoutePath.PROJECT_ID_OFFICIAL_ADMIN} element={<CommunityPostPage />} />
 						<Route path={RoutePath.PROJECT_ID_DISCUSSION} element={<CommunityPage />} />
 						<Route path={RoutePath.PROJECT_ID_DISCUSSION_ADMIN} element={<CommunityPage />} />
-						<Route
-							path={RoutePath.PROJECT_ID_DISCUSSION_POST_ID}
-							element={<CommunityPostPage isOfficial={false} />}
-						/>
+						<Route path={RoutePath.POST_ID} element={<CommunityPostPage />} />
 
 						{/* MAIL */}
 
@@ -341,7 +293,7 @@ export const App = observer(() => {
 
 						{redirect({
 							from: RoutePath.OTC,
-							to: generatePath(RoutePath.OTC_ASSETS),
+							to: RoutePath.OTC_ASSETS,
 						})}
 
 						<Route path={RoutePath.OTC_ASSETS} element={<OtcAssetsPage />} />
@@ -360,10 +312,10 @@ export const App = observer(() => {
 							from: RoutePath.ANY,
 							to:
 								REACT_APP__APP_MODE === AppMode.OTC
-									? generatePath(RoutePath.OTC_ASSETS)
+									? RoutePath.OTC_ASSETS
 									: REACT_APP__APP_MODE === AppMode.MAIN_VIEW
-									? generatePath(RoutePath.FEED)
-									: generatePath(RoutePath.ROOT),
+									? RoutePath.FEED
+									: RoutePath.ROOT,
 						})}
 					</Routes>
 

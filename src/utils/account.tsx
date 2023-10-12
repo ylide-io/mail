@@ -15,15 +15,15 @@ import domain from '../stores/Domain';
 import { DomainAccount } from '../stores/models/DomainAccount';
 import { Wallet } from '../stores/models/Wallet';
 import { getQueryString } from './getQueryString';
-import { truncateInMiddle } from './string';
+import { truncateAddress } from './string';
 import { isWalletSupportsBlockchain, walletsMeta } from './wallet';
 
 export function formatAccountName(account: DomainAccount) {
 	const walletName = walletsMeta[account.wallet.wallet].title;
 
 	return account.name
-		? `${account.name} (${truncateInMiddle(account.account.address, 8, '..')}, ${walletName})`
-		: `${truncateInMiddle(account.account.address, 12, '..')} (${walletName})`;
+		? `${account.name} (${truncateAddress(account.account.address)}, ${walletName})`
+		: `${truncateAddress(account.account.address, 12)} (${walletName})`;
 }
 
 //
@@ -71,8 +71,7 @@ export async function connectAccount(params?: { place?: string }): Promise<Domai
 				>
 					<div>
 						We noticed that you're using Ylide within another application. You can connect the same account
-						as the parent application uses –{' '}
-						<b>{truncateInMiddle(proxyAccount.account.address, 8, '...')}</b>
+						as the parent application uses – <b>{truncateAddress(proxyAccount.account.address)}</b>
 					</div>
 
 					<div>We recommend connecting the same account to get seamless user experience.</div>

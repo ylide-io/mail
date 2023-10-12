@@ -2,109 +2,117 @@ import { Uint256 } from '@ylide/sdk';
 
 import { VENOM_FEED_ID } from '../../constants';
 import { BlockchainName } from '../../utils/blockchain';
-import aceSwapBannerSrc from './bannerImages/aceSwap.jpg';
-import createXBannerSrc from './bannerImages/alienSwap.jpg';
+import aceSwapBannerSrc from './bannerImages/ace_swap.jpg';
+import createXBannerSrc from './bannerImages/alien_swap.jpg';
 import altsomeBannerSrc from './bannerImages/altsome.jpg';
 import auroraBannerSrc from './bannerImages/aurora.jpg';
-import auroraAfricaBannerSrc from './bannerImages/auroraAfrica.jpg';
-import auroraBrazilBannerSrc from './bannerImages/auroraBrazil.jpg';
-import auroraChinaBannerSrc from './bannerImages/auroraChina.jpg';
-import auroraEastEuropeBannerSrc from './bannerImages/auroraEastEurope.jpg';
-import auroraHuntersBannerSrc from './bannerImages/auroraHunters.jpg';
-import auroraIndiaBannerSrc from './bannerImages/auroraIndia.jpg';
-import auroraIndonesiaBannerSrc from './bannerImages/auroraIndonesia.jpg';
-import auroraLatamBannerSrc from './bannerImages/auroraLatam.jpg';
-import auroraTurkeyBannerSrc from './bannerImages/auroraTurkey.jpg';
-import auroraVenezuelaBannerSrc from './bannerImages/auroraVenezuela.jpg';
-import auroraVietnamBannerSrc from './bannerImages/auroraVietnam.jpg';
+import auroraAfricaBannerSrc from './bannerImages/aurora_africa.jpg';
+import auroraBrazilBannerSrc from './bannerImages/aurora_brazil.jpg';
+import auroraChinaBannerSrc from './bannerImages/aurora_china.jpg';
+import auroraEastEuropeBannerSrc from './bannerImages/aurora_east_europe.jpg';
+import auroraHuntersBannerSrc from './bannerImages/aurora_hunters.jpg';
+import auroraIndiaBannerSrc from './bannerImages/aurora_india.jpg';
+import auroraIndonesiaBannerSrc from './bannerImages/aurora_indonesia.jpg';
+import auroraLatamBannerSrc from './bannerImages/aurora_latam.jpg';
+import auroraTurkeyBannerSrc from './bannerImages/aurora_turkey.jpg';
+import auroraVenezuelaBannerSrc from './bannerImages/aurora_venezuela.jpg';
+import auroraVietnamBannerSrc from './bannerImages/aurora_vietnam.jpg';
 import aurorityBannerSrc from './bannerImages/aurority.jpg';
-import betFuryBannerSrc from './bannerImages/betFury.jpg';
-import chepeGamesBannerSrc from './bannerImages/chepeGames.jpg';
-import cosmosChickenCoopBannerSrc from './bannerImages/cosmosChickenCoop.jpg';
+import betFuryBannerSrc from './bannerImages/bet_fury.jpg';
+import chepeGamesBannerSrc from './bannerImages/chepe_games.jpg';
+import cosmosChickenCoopBannerSrc from './bannerImages/cosmos_chicken_coop.jpg';
+import deGuardBannerSrc from './bannerImages/de_guard.jpg';
 import dexifyBannerSrc from './bannerImages/dexify.jpg';
 import dittoBannerSrc from './bannerImages/ditto.jpg';
-import eddyFinanceBannerSrc from './bannerImages/eddyFinance.jpg';
-import gnosisBuildersBannerSrc from './bannerImages/gnosisBuilders.jpg';
+import eddyFinanceBannerSrc from './bannerImages/eddy_finance.jpg';
+import gnosisBuildersBannerSrc from './bannerImages/gnosis_builders.jpg';
 import gravixBannerSrc from './bannerImages/gravix.jpg';
 import hanmadiBannerSrc from './bannerImages/hanmadi.jpg';
 import hominidsBannerSrc from './bannerImages/hominids.jpg';
-import jeriqoSocialFiBannerSrc from './bannerImages/jeriqoSocialFi.jpg';
-import mainViewBannerSrc from './bannerImages/mainView.jpg';
-import oasisGalleryBannerSrc from './bannerImages/oasisGallery.jpg';
-import oneClickCryptoBannerSrc from './bannerImages/oneClickCrypto.jpg';
+import jeriqoSocialFiBannerSrc from './bannerImages/jeriqo_social_fi.jpg';
+import mainViewBannerSrc from './bannerImages/main_view.jpg';
+import oasisGalleryBannerSrc from './bannerImages/oasis_gallery.jpg';
+import oneClickCryptoBannerSrc from './bannerImages/one_click_crypto.jpg';
 import raveBannerSrc from './bannerImages/rave.jpg';
 import revoltBannerSrc from './bannerImages/revolt.jpg';
 import sendtokensBannerSrc from './bannerImages/sendtokens.jpg';
-import sleekWalletBannerSrc from './bannerImages/sleekWallet.jpg';
-import smartDeployerBannerSrc from './bannerImages/smartDeployer.jpg';
+import sleekWalletBannerSrc from './bannerImages/sleek_wallet.jpg';
+import smartDeployerBannerSrc from './bannerImages/smart_deployer.jpg';
 import snipaBannerSrc from './bannerImages/snipa.jpg';
+import stakenbakeBannerSrc from './bannerImages/stakenbake.jpg';
 import staxBannerSrc from './bannerImages/stax.jpg';
 import tvmBannerSrc from './bannerImages/tvm.jpg';
-import venomApeClubBannerSrc from './bannerImages/venomApeClub.jpg';
+import venomApeClubBannerSrc from './bannerImages/venom_ape_club.jpg';
+import venomBlockchainBannerSrc from './bannerImages/venom_blockchain.jpg';
+import venomBridgeBannerSrc from './bannerImages/venom_bridge.jpg';
+import venomIdBannerSrc from './bannerImages/venom_id.jpg';
+import venomRecapBannerSrc from './bannerImages/venom_recap.jpg';
 import venomartBannerSrc from './bannerImages/venomart.jpg';
-import venomBlockchainBannerSrc from './bannerImages/venomBlockchain.jpg';
-import venomBridgeBannerSrc from './bannerImages/venomBridge.jpg';
-import venomIdBannerSrc from './bannerImages/venomId.jpg';
-import venomRecapBannerSrc from './bannerImages/venomRecap.jpg';
 import ventoryBannerSrc from './bannerImages/ventory.jpg';
-import web3WorldBannerSrc from './bannerImages/web3World.jpg';
-import znsConnectBannerSrc from './bannerImages/znsConnect.jpg';
-import aceSwapSrc from './profileImages/aceSwap.jpg';
-import createXSrc from './profileImages/alienSwap.jpg';
+import web3WorldBannerSrc from './bannerImages/web3_world.jpg';
+import znsConnectBannerSrc from './bannerImages/zns_connect.jpg';
+import aceSwapSrc from './profileImages/ace_swap.jpg';
+import createXSrc from './profileImages/alien_swap.jpg';
 import altsomeSrc from './profileImages/altsome.jpg';
 import auroraSrc from './profileImages/aurora.jpg';
-import auroraAfricaSrc from './profileImages/auroraAfrica.jpg';
-import auroraBrazilSrc from './profileImages/auroraBrazil.jpg';
-import auroraChinaSrc from './profileImages/auroraChina.jpg';
-import auroraEastEuropeSrc from './profileImages/auroraEastEurope.jpg';
-import auroraHuntersSrc from './profileImages/auroraHunters.jpg';
-import auroraIndiaSrc from './profileImages/auroraIndia.jpg';
-import auroraIndonesiaSrc from './profileImages/auroraIndonesia.jpg';
-import auroraLatamSrc from './profileImages/auroraLatam.jpg';
-import auroraTurkeySrc from './profileImages/auroraTurkey.jpg';
-import auroraVenezuelaSrc from './profileImages/auroraVenezuela.jpg';
-import auroraVietnamSrc from './profileImages/auroraVietnam.jpg';
+import auroraAfricaSrc from './profileImages/aurora_africa.jpg';
+import auroraBrazilSrc from './profileImages/aurora_brazil.jpg';
+import auroraChinaSrc from './profileImages/aurora_china.jpg';
+import auroraEastEuropeSrc from './profileImages/aurora_east_europe.jpg';
+import auroraHuntersSrc from './profileImages/aurora_hunters.jpg';
+import auroraIndiaSrc from './profileImages/aurora_india.jpg';
+import auroraIndonesiaSrc from './profileImages/aurora_indonesia.jpg';
+import auroraLatamSrc from './profileImages/aurora_latam.jpg';
+import auroraTurkeySrc from './profileImages/aurora_turkey.jpg';
+import auroraVenezuelaSrc from './profileImages/aurora_venezuela.jpg';
+import auroraVietnamSrc from './profileImages/aurora_vietnam.jpg';
 import auroritySrc from './profileImages/aurority.jpg';
-import betFurySrc from './profileImages/betFury.jpg';
-import chepeGamesSrc from './profileImages/chepeGames.jpg';
-import cosmosChickenCoopSrc from './profileImages/cosmosChickenCoop.jpg';
+import betFurySrc from './profileImages/bet_fury.jpg';
+import chepeGamesSrc from './profileImages/chepe_games.jpg';
+import cosmosChickenCoopSrc from './profileImages/cosmos_chicken_coop.jpg';
+import deGuardSrc from './profileImages/de_guard.jpg';
 import dexifySrc from './profileImages/dexify.jpg';
 import dittoSrc from './profileImages/ditto.jpg';
-import eddyFinanceSrc from './profileImages/eddyFinance.jpg';
-import ethWhalesSrc from './profileImages/ethWhales.png';
+import eddyFinanceSrc from './profileImages/eddy_finance.jpg';
+import ethWhalesSrc from './profileImages/eth_whales.png';
 import generalSrc from './profileImages/general.png';
-import gnosisBuildersSrc from './profileImages/gnosisBuilders.jpg';
+import gnosisBuildersSrc from './profileImages/gnosis_builders.jpg';
 import gravixSrc from './profileImages/gravix.jpg';
 import hanmadiSrc from './profileImages/hanmadi.jpg';
 import hominidsSrc from './profileImages/hominids.jpg';
-import jeriqoSocialFiSrc from './profileImages/jeriqoSocialFi.jpg';
-import mainViewSrc from './profileImages/mainView.jpg';
-import oasisGallerySrc from './profileImages/oasisGallery.png';
-import oneClickCryptoSrc from './profileImages/oneClickCrypto.jpg';
+import jeriqoSocialFiSrc from './profileImages/jeriqo_social_fi.jpg';
+import mainViewSrc from './profileImages/main_view.jpg';
+import oasisGallerySrc from './profileImages/oasis_gallery.png';
+import oneClickCryptoSrc from './profileImages/one_click_crypto.jpg';
 import raveSrc from './profileImages/rave.jpg';
 import revoltSrc from './profileImages/revolt.jpg';
 import sendtokensSrc from './profileImages/sendtokens.jpg';
-import sleekWalletSrc from './profileImages/sleekWallet.jpg';
-import smartDeployerSrc from './profileImages/smartDeployer.jpg';
+import sleekWalletSrc from './profileImages/sleek_wallet.jpg';
+import smartDeployerSrc from './profileImages/smart_deployer.jpg';
 import snipaSrc from './profileImages/snipa.png';
+import stakenbakeSrc from './profileImages/stakenbake.jpg';
 import staxSrc from './profileImages/stax.jpg';
 import tvmSrc from './profileImages/tvm.png';
-import venomApeClubSrc from './profileImages/venomApeClub.jpg';
+import venomApeClubSrc from './profileImages/venom_ape_club.jpg';
+import venomBlockchainSrc from './profileImages/venom_blockchain.png';
+import venomBridgeSrc from './profileImages/venom_bridge.png';
+import venomIdSrc from './profileImages/venom_id.jpg';
+import venomRecapSrc from './profileImages/venom_recap.jpg';
 import venomartSrc from './profileImages/venomart.jpg';
-import venomBlockchainSrc from './profileImages/venomBlockchain.png';
-import venomBridgeSrc from './profileImages/venomBridge.png';
-import venomIdSrc from './profileImages/venomId.jpg';
-import venomRecapSrc from './profileImages/venomRecap.jpg';
 import ventorySrc from './profileImages/ventory.png';
 import weaverSrc from './profileImages/weaver.jpg';
-import web3WorldSrc from './profileImages/web3World.png';
+import web3WorldSrc from './profileImages/web3_world.png';
 import ylideSrc from './profileImages/ylide.png';
-import znsConnectSrc from './profileImages/znsConnect.jpg';
+import znsConnectSrc from './profileImages/zns_connect.jpg';
 
 // AI: import banner and profile for XXX
 
 export function getCommunityById(id: CommunityId) {
 	return communities.find(p => p.id === id)!;
+}
+
+export function getCommunityByFeedId(feedId: Uint256) {
+	return communities.find(p => p.feedId.official === feedId || p.feedId.discussion === feedId)!;
 }
 
 //
@@ -172,15 +180,16 @@ export enum CommunityId {
 
 	// ZETACHAIN
 
-	ZNS_CONNECT = 'znsConnect',
-	COSMOS_CHICKEN_COOP = 'cosmosChickenCoop',
-	EDDY_FINANCE = 'eddyFinance',
+	ZNS_CONNECT = 'zns_connect',
+	COSMOS_CHICKEN_COOP = 'cosmos_chicken_coop',
+	EDDY_FINANCE = 'eddy_finance',
 	HOMINIDS = 'hominids',
-	SLEEK_WALLET = 'sleekWallet',
+	SLEEK_WALLET = 'sleek_wallet',
 	ACE_SWAP = 'ace_swap',
 	SENDTOKENS = 'sendtokens',
 	SMART_DEPLOYER = 'smart_deployer',
 	JERIQO_SOCIAL_FI = 'jeriqo_social_fi',
+	STAKE_N_BAKE = 'stakenbake',
 
 	// OTHERS
 
@@ -193,6 +202,7 @@ export enum CommunityId {
 	DITTO_NETWORK = 'ditto_network',
 	ALTSOME = 'altsome',
 	ALIEN_SWAP = 'alien_swap',
+	DE_GUARD = 'de_guard',
 
 	// TEST
 
@@ -211,6 +221,7 @@ export enum CommunityTag {
 	AURORA_ECOSYSTEM = 'Aurora Ecosystem',
 	RESEARCH = 'Research',
 	ZETACHAIN_ECOSYSTEM = 'ZetaChain Ecosystem',
+	PRIVACY = 'Privacy',
 }
 
 export enum CommunityAttachmentMode {
@@ -867,6 +878,21 @@ export const communities: Community[] = [
 		allowedChains: [BlockchainName.ZETA],
 		attachmentMode: CommunityAttachmentMode.ADMINS,
 	},
+	{
+		id: CommunityId.STAKE_N_BAKE,
+		feedId: {
+			official: '2000000000000000000000000000000000000000000000000000000000000060' as Uint256,
+			discussion: '2000000000000000000000000000000000000000000000000000000000000061' as Uint256,
+		},
+		name: "Stake n' Bake",
+		description: 'Harnessing the power of omni-chain interoperability to redefine Game-Fi.',
+		profileImage: stakenbakeSrc,
+		bannerImage: stakenbakeBannerSrc,
+		website: 'https://www.stakenbake.xyz/',
+		tags: [CommunityTag.ZETACHAIN_ECOSYSTEM],
+		allowedChains: [BlockchainName.ZETA],
+		attachmentMode: CommunityAttachmentMode.ADMINS,
+	},
 
 	// OTHERS
 
@@ -1003,6 +1029,23 @@ export const communities: Community[] = [
 		tags: [CommunityTag.NFT],
 		hidden: true,
 		allowedChains: allChainsExceptTest,
+		attachmentMode: CommunityAttachmentMode.ADMINS,
+	},
+	{
+		id: CommunityId.DE_GUARD,
+		feedId: {
+			official: '2000000000000000000000000000000000000000000000000000000000000062' as Uint256,
+			discussion: '2000000000000000000000000000000000000000000000000000000000000063' as Uint256,
+		},
+		name: 'DeGuard',
+		description: '🚀 VPN for web3 & DeFi community.',
+		profileImage: deGuardSrc,
+		bannerImage: deGuardBannerSrc,
+		website: 'https://deguard.io/',
+		tags: [CommunityTag.NFT, CommunityTag.PRIVACY],
+		allowedChains: allChainsExceptTest.filter(
+			chain => chain !== BlockchainName.VENOM_TESTNET && chain !== BlockchainName.EVERSCALE,
+		),
 		attachmentMode: CommunityAttachmentMode.ADMINS,
 	},
 

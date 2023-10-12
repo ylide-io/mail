@@ -8,7 +8,6 @@ import { ActionButton } from '../../../components/ActionButton/ActionButton';
 import { ContactName } from '../../../components/contactName/contactName';
 import { ErrorMessage } from '../../../components/errorMessage/errorMessage';
 import { OverlappingLoader } from '../../../components/overlappingLoader/overlappingLoader';
-import { Recipients } from '../../../components/recipientInput/recipientInput';
 import { Spinner } from '../../../components/spinner/spinner';
 import { toast } from '../../../components/toast/toast';
 import { ReactComponent as ArrowLeftSvg } from '../../../icons/ic20/arrowLeft.svg';
@@ -19,7 +18,7 @@ import { IMessageDecodedContent } from '../../../indexedDB/IndexedDB';
 import { analytics } from '../../../stores/Analytics';
 import domain from '../../../stores/Domain';
 import { FolderId, getFolderName, ILinkedMessage, MailList, mailStore } from '../../../stores/MailList';
-import { OutgoingMailData } from '../../../stores/outgoingMailData';
+import { OutgoingMailData, Recipients } from '../../../stores/outgoingMailData';
 import { RoutePath } from '../../../stores/routePath';
 import { invariant } from '../../../utils/assert';
 import { DateFormatStyle, formatDate } from '../../../utils/date';
@@ -30,7 +29,7 @@ import {
 	useOpenMailCompose,
 } from '../../../utils/mail';
 import { ReactQueryKey } from '../../../utils/reactQuery';
-import { truncateInMiddle } from '../../../utils/string';
+import { truncateAddress } from '../../../utils/string';
 import { useNav } from '../../../utils/url';
 import css from './mailDetailsPage.module.scss';
 import { MailMessage } from './mailMessage/mailMessage';
@@ -67,7 +66,7 @@ export const MailDetailsPage = observer(() => {
 
 					const domainAccount = accounts.find(a => a.account.address === accountAddress);
 					invariant(domainAccount, () => {
-						toast(`Connect account ${truncateInMiddle(accountAddress, 12, '..')} to read this message 👍`);
+						toast(`Connect account ${truncateAddress(accountAddress)} to read this message 👍`);
 						return 'No account';
 					});
 

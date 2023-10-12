@@ -1,5 +1,5 @@
 import { ITVMMessage } from '@ylide/everscale';
-import { IMessage, IMessageContent, IMessageCorruptedContent } from '@ylide/sdk';
+import { IMessage, IMessageContent, IMessageCorruptedContent, Uint256 } from '@ylide/sdk';
 import { useQuery } from 'react-query';
 
 import { REACT_APP__BLOCKCHAIN_FEED } from '../env';
@@ -13,6 +13,7 @@ import { createCleanSerachParams } from '../utils/url';
 
 export interface BlockchainFeedPost {
 	id: string;
+	feedId: Uint256;
 	createTimestamp: number;
 	sender: string;
 	meta: Exclude<ITVMMessage, 'key'> & { key: number[] };
@@ -298,6 +299,30 @@ export namespace BlockchainFeedApi {
 					'Authorization': `Bearer ${authKey}`,
 				},
 				body: JSON.stringify({ postId, reaction }),
+				method: 'POST',
+			},
+		});
+	}
+
+	export async function saveNotificationSubscription({
+		address,
+		subscription,
+		authKey,
+	}: {
+		address: string;
+		subscription: PushSubscription;
+		authKey: string;
+	}) {
+		return await request('/subscription', {
+			query: {
+				userAddress: address,
+			},
+			params: {
+				headers: {
+					'Content-Type': 'application/json',
+					'Authorization': `Bearer ${authKey}`,
+				},
+				body: JSON.stringify({ subscription }),
 				method: 'POST',
 			},
 		});

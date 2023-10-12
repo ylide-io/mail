@@ -3,7 +3,6 @@ import clsx from 'clsx';
 import { observer } from 'mobx-react';
 import { useCallback, useMemo, useState } from 'react';
 import { useQuery } from 'react-query';
-import { generatePath } from 'react-router-dom';
 
 import {
 	BlockchainFeedApi,
@@ -17,7 +16,6 @@ import { BlockChainLabel } from '../../../../components/BlockChainLabel/BlockCha
 import { GridRowBox } from '../../../../components/boxes/boxes';
 import { GalleryModal } from '../../../../components/galleryModal/galleryModal';
 import { ReadableDate } from '../../../../components/readableDate/readableDate';
-import { Recipients } from '../../../../components/recipientInput/recipientInput';
 import { Spinner, SpinnerLook } from '../../../../components/spinner/spinner';
 import { TextProcessor } from '../../../../components/textProcessor/textProcessor';
 import { toast } from '../../../../components/toast/toast';
@@ -29,26 +27,20 @@ import { ReactComponent as TickSvg } from '../../../../icons/ic20/tick.svg';
 import { MessageDecodedTextDataType } from '../../../../indexedDB/IndexedDB';
 import { analytics } from '../../../../stores/Analytics';
 import { browserStorage } from '../../../../stores/browserStorage';
-import { Community, CommunityId } from '../../../../stores/communities/communities';
+import { Community } from '../../../../stores/communities/communities';
 import domain from '../../../../stores/Domain';
-import { OutgoingMailData } from '../../../../stores/outgoingMailData';
-import { RoutePath } from '../../../../stores/routePath';
+import { OutgoingMailData, Recipients } from '../../../../stores/outgoingMailData';
 import { generateBlockchainExplorerUrl } from '../../../../utils/blockchain';
 import { copyToClipboard } from '../../../../utils/clipboard';
 import { getIpfsHashFromUrl, ipfsToHttpUrl } from '../../../../utils/ipfs';
 import { useOpenMailCompose } from '../../../../utils/mail';
 import { ReactQueryKey } from '../../../../utils/reactQuery';
 import { useNav } from '../../../../utils/url';
+import { getPostPath } from '../../communityPostPage/communityPostPage';
 import { stickerIpfsIds } from '../createPostForm/stickerIpfsIds';
 import { PostReactions } from '../postReactions/postReactions';
 import { RepliedDiscussionPost } from '../repliedDiscussionPost/repliedDiscussionPost';
 import css from './discussionPost.module.scss';
-
-export function generateDiscussionPostPath(projectId: CommunityId, postId: string) {
-	return generatePath(RoutePath.PROJECT_ID_DISCUSSION_POST_ID, { projectId, postId: encodeURIComponent(postId) });
-}
-
-//
 
 interface DiscussionPostProps {
 	post: DecodedBlockchainFeedPost;
@@ -77,7 +69,7 @@ export const DiscussionPost = observer(({ post: initialPost, community, onReplyC
 	const isAuthorAdmin = !!post.original.isAdmin;
 	const blockchain = post.original.blockchain;
 	const txId = post.msg.$$meta.tx?.hash || post.msg.$$meta.id;
-	const postUrl = generateDiscussionPostPath(community.id, post.original.id);
+	const postUrl = getPostPath(post.original.id);
 	const explorerUrl = generateBlockchainExplorerUrl(blockchain, txId);
 
 	const openMailCompose = useOpenMailCompose();

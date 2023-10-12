@@ -42,6 +42,7 @@ import { feedSettings } from './FeedSettings';
 import { mailStore } from './MailList';
 import { DomainAccount } from './models/DomainAccount';
 import { Wallet } from './models/Wallet';
+import { newMailChecker } from './newMailChecker';
 import { OTCStore } from './OTC';
 import tags from './Tags';
 import { WalletConnectState } from './WalletConnect';
@@ -202,6 +203,10 @@ export class Domain {
 				service: ns.service,
 				reader: this.blockchains[ns.blockchain],
 			}));
+	}
+
+	isAddress(input: string): boolean {
+		return domain.getBlockchainsForAddress(input.toLowerCase()).length > 0;
 	}
 
 	async identifyRouteToAddresses(addresses: string[]) {
@@ -573,6 +578,7 @@ export class Domain {
 		tags.init();
 		mailStore.init();
 		feedSettings.init();
+		newMailChecker.init();
 		tick('rest ...');
 
 		// hacks for VenomWallet again :(

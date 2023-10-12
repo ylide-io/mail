@@ -1,15 +1,18 @@
-$vPadding: 6px;
-$hPadding: 8px;
-$borderWidth: 1px;
+$field_vPadding: 6px;
+$field_hPadding: 8px;
+$field_borderWidth: 1px;
+$tag_height: 20px;
 
 .root {
 	display: flex;
 	align-items: center;
 	flex-wrap: wrap;
-	padding: ($vPadding - $borderWidth) ($hPadding - $borderWidth) 0;
+	padding: ($field_vPadding - $field_borderWidth) ($field_hPadding - $field_borderWidth) 0;
 	width: 100%;
 	min-height: $interactive-elem-size;
+	max-height: $tag_height * 2.5 + $field_vPadding * 3;
 	font-weight: $font-weight_light;
+	overflow-y: auto;
 	background: var(--surface-color);
 	border: 1px solid var(--border-color);
 	border-radius: 4px;
@@ -22,7 +25,7 @@ $borderWidth: 1px;
 
 .input {
 	flex: 1 1 120px;
-	margin: (-$vPadding + $borderWidth) 0 0;
+	margin: (-$field_vPadding + $field_borderWidth) 0 0;
 	min-width: 0;
 	height: $interactive-elem-size - 2;
 }
@@ -34,10 +37,10 @@ $borderWidth: 1px;
 	grid-auto-flow: column;
 	align-items: center;
 	grid-gap: 4px;
-	margin: 0 8px ($vPadding - $borderWidth) 0;
+	margin: 0 $field_vPadding ($field_vPadding - $field_borderWidth) 0;
 	padding: 0 8px;
 	max-width: 200px;
-	height: 20px;
+	height: $tag_height;
 	border-radius: 4px;
 }
 

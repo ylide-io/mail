@@ -46,7 +46,7 @@ import { VENOM_SERVICE_CODE } from '../constants';
 import { useCallback } from 'react';
 import { hashToIpfsUrl } from './ipfs';
 import { ILinkedMessage } from '../stores/MailList';
-import { evmNameToNetwork, formatAddress, getActiveBlockchainNameForAccount, isEvmBlockchain } from './blockchain';
+import { evmNameToNetwork, formatAddress, isEvmBlockchain } from './blockchain';
 import { htmlSelfClosingTagsToXHtml } from './string';
 import { toJS } from 'mobx';
 import { BigNumber } from '@ethersproject/bignumber';
@@ -114,7 +114,7 @@ export async function sendMessage({
 	});
 
 	if (!blockchain && sender.wallet.factory.blockchainGroup === 'evm') {
-		blockchain = await getActiveBlockchainNameForAccount(sender);
+		blockchain = await sender.getActiveBlockchain();
 		invariant(blockchain, 'Cannot get active EVM chain');
 	}
 
@@ -201,7 +201,7 @@ export async function broadcastMessage({
 	});
 
 	if (!blockchain && sender.wallet.factory.blockchainGroup === 'evm') {
-		blockchain = await getActiveBlockchainNameForAccount(sender);
+		blockchain = await sender.getActiveBlockchain();
 		invariant(blockchain, 'Cannot get active EVM chain');
 	}
 

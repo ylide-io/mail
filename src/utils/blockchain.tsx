@@ -23,12 +23,6 @@ import { PolygonLogo } from '../icons/network/PolygonLogo';
 import { SolanaLogo } from '../icons/network/SolanaLogo';
 import { VenomLogo } from '../icons/network/VenomLogo';
 import { ZetaLogo } from '../icons/network/ZetaLogo';
-import domain from '../stores/Domain';
-import { DomainAccount } from '../stores/models/DomainAccount';
-
-export function isAddress(input: string): boolean {
-	return domain.getBlockchainsForAddress(input.toLowerCase()).length > 0;
-}
 
 export function formatAddress(address: string) {
 	return (
@@ -533,22 +527,6 @@ export const blockchainMeta: Record<
 		},
 	},
 };
-
-export async function getActiveBlockchainNameForAccount(account: DomainAccount): Promise<string> {
-	if (account.wallet.factory.blockchainGroup === 'evm') {
-		return await account.wallet.controller.getCurrentBlockchain();
-	}
-
-	if (account.wallet.wallet === 'everwallet') {
-		return BlockchainName.EVERSCALE;
-	}
-
-	if (account.wallet.wallet === 'venomwallet') {
-		return BlockchainName.VENOM_TESTNET;
-	}
-
-	throw new Error(`Unsupported wallet ${account.wallet.wallet}`);
-}
 
 export function generateBlockchainExplorerUrl(blockchain: string, txId: string | undefined) {
 	if (!txId) return;

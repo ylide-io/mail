@@ -20,6 +20,10 @@
 	height: 52px;
 	background: var(--secondary-surface-color);
 	border-radius: 16px 16px 0 0;
+
+	@include lessThan768w {
+		border-radius: 0;
+	}
 }
 
 .headerSpinner {

@@ -1,6 +1,7 @@
 import clsx from 'clsx';
 import { observer } from 'mobx-react';
 import { useRef, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 
 import { AccountSelect } from '../../../../components/accountSelect/accountSelect';
 import { ActionButton, ActionButtonLook, ActionButtonSize } from '../../../../components/ActionButton/ActionButton';
@@ -13,7 +14,7 @@ import { ReactComponent as AttachmentSvg } from '../../../../icons/ic28/attachme
 import domain from '../../../../stores/Domain';
 import { OutgoingMailData } from '../../../../stores/outgoingMailData';
 import { AlignmentDirection } from '../../../../utils/alignment';
-import { formatFileSize, openFilePicker } from '../../../../utils/file';
+import { formatFileSize, openFilePicker, readFileAsText } from '../../../../utils/file';
 import { formatSubject } from '../../../../utils/mail';
 import { MailboxEditor, MailboxEditorApi } from '../../composePage/mailboxEditor/mailboxEditor';
 import css from './composeMailForm.module.scss';
@@ -28,6 +29,9 @@ export interface ComposeMailFormProps extends PropsWithClassName {
 
 export const ComposeMailForm = observer(
 	({ className, isRecipientInputDisabled, displayConnectAccountButton, mailData, onSent }: ComposeMailFormProps) => {
+		const [searchParams] = useSearchParams();
+		const enableCsv = searchParams.has('csv');
+
 		const editorRef = useRef<MailboxEditorApi>(null);
 
 		const attachButtonRef = useRef(null);
@@ -59,7 +63,32 @@ export const ComposeMailForm = observer(
 					)}
 
 					<div className={css.metaLabel}>To</div>
-					<RecipientInput isReadOnly={isRecipientInputDisabled} value={mailData.to} />
+					<div className={css.recipientWrapper}>
+						<RecipientInput isReadOnly={isRecipientInputDisabled} value={mailData.to} />
+
+						{enableCsv && (
+							<ActionButton
+								size={ActionButtonSize.SMALL}
+								look={ActionButtonLook.LITE}
+								icon={<AttachmentSvg />}
+								onClick={async () => {
+									const files = await openFilePicker({ accept: '.txt, .csv' });
+									const file = files[0];
+									if (file) {
+										const rawCsv = await readFileAsText(file);
+										const addresses = rawCsv
+											.split('\n')
+											.map(l => l.trim().toLowerCase())
+											.filter(Boolean);
+
+										mailData.to.addItems(addresses);
+									}
+								}}
+							>
+								CSV
+							</ActionButton>
+						)}
+					</div>
 
 					<div className={css.metaLabel}>Subject</div>
 					<TextField

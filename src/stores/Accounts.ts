@@ -127,6 +127,10 @@ export class Accounts {
 		return this.accounts.filter(a => a.isAnyLocalPrivateKeyRegistered);
 	}
 
+	@computed get activeAccountsWithAuthKey() {
+		return this.activeAccounts.filter(a => a.authKey);
+	}
+
 	@computed get hasActiveAccounts() {
 		return !!this.activeAccounts.length;
 	}

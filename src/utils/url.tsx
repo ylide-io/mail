@@ -37,7 +37,7 @@ export function isExternalUrl(url: string) {
 
 //
 
-interface UseNavParameters {
+export interface UseNavParameters {
 	path?: string;
 	search?: URLSearchParamsInit;
 	hash?: string;
