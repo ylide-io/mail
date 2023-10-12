@@ -96,6 +96,20 @@ jobs:
             - save_build_cache:
                   cache_key: hub
             - ylide_store_artifacts
+    build_hub_staging:
+        docker:
+            - image: node:16
+        environment:
+            REACT_APP__PUBLIC_URL: https://staging.ylide.io
+        steps:
+            - checkout
+            - restore_pnpm_cache
+            - install_pnpm
+            - ylide_build:
+                  build_cmd: build-hub
+            - save_build_cache:
+                  cache_key: hub
+            - ylide_store_artifacts
     deploy_hub:
         docker:
             - image: node:16
@@ -232,7 +246,6 @@ workflows:
                       branches:
                           only:
                               - hub-release
-                              - dev
             - deploy_hub:
                   requires:
                       - build_hub
@@ -240,6 +253,13 @@ workflows:
                       branches:
                           only:
                               - hub-release
+            - build_hub_staging:
+                  requires:
+                      - install
+                  filters:
+                      branches:
+                          only:
+                              - dev
             - deploy_hub_staging:
                   requires:
                       - build_hub
