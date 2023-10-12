@@ -106,7 +106,7 @@ jobs:
         docker:
             - image: node:16
         environment:
-            REACT_APP__PUBLIC_URL: https://staging.ylide.io
+            REACT_APP__PUBLIC_URL: https://test.ylide.io
         steps:
             - restore_build_cache:
                   cache_key: hub

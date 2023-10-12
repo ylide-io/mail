@@ -7,6 +7,7 @@ import { createRoot } from 'react-dom/client';
 import { BrowserRouter } from 'react-router-dom';
 
 import { App } from './App';
+import { REACT_APP__PUBLIC_URL } from './env';
 import { registerServiceWorker } from './serviceWorkerRegistration';
 import { initSentry } from './utils/sentry';
 import { buildUrl, UseNavParameters } from './utils/url';
@@ -62,6 +63,8 @@ function migrateLocation() {
 }
 
 if (!migrateLocation()) {
+	console.log('REACT_APP__PUBLIC_URL', REACT_APP__PUBLIC_URL);
+
 	const root = createRoot(document.getElementById('root')!);
 
 	root.render(
