@@ -6,7 +6,7 @@ export const REACT_APP__FEED_SERVER = process.env.REACT_APP__FEED_SERVER as stri
 export const REACT_APP__FEED_MANAGER = process.env.REACT_APP__FEED_MANAGER as string | undefined;
 export const REACT_APP__BLOCKCHAIN_FEED = process.env.REACT_APP__BLOCKCHAIN_FEED as string | undefined;
 export const REACT_APP__HUB_VAPID_PUBLIC_KEY = process.env.REACT_APP__HUB_VAPID_PUBLIC_KEY as string | undefined;
-export const REACT_APP__HUB_PUBLIC_URL = process.env.REACT_APP__HUB_PUBLIC_URL as string | undefined;
+export const REACT_APP__PUBLIC_URL = process.env.REACT_APP__PUBLIC_URL as string | undefined;
 export const REACT_APP__FEED_PUBLIC_KEY = process.env.REACT_APP__FEED_PUBLIC_KEY as string | undefined;
 
 export enum AppMode {

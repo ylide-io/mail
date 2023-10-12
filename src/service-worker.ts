@@ -14,7 +14,7 @@ import { createHandlerBoundToURL, precacheAndRoute } from 'workbox-precaching';
 import { registerRoute } from 'workbox-routing';
 import { StaleWhileRevalidate } from 'workbox-strategies';
 
-import { REACT_APP__HUB_PUBLIC_URL } from './env';
+import { REACT_APP__PUBLIC_URL } from './env';
 import { truncateAddress } from './utils/string';
 
 declare const self: ServiceWorkerGlobalScope;
@@ -89,7 +89,7 @@ registerRoute(
 		// Return true to signal that we want to use the handler.
 		return true;
 	},
-	createHandlerBoundToURL(REACT_APP__HUB_PUBLIC_URL + '/index.html'),
+	createHandlerBoundToURL(REACT_APP__PUBLIC_URL + '/index.html'),
 );
 
 // An example runtime caching route for requests that aren't handled by the
