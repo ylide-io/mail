@@ -155,6 +155,8 @@ jobs:
     build_mainview_staging:
         docker:
             - image: node:16
+        environment:
+            REACT_APP__PUBLIC_URL: https://staging.mainview.io
         steps:
             - checkout
             - restore_pnpm_cache

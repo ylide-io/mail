@@ -63,7 +63,7 @@ function migrateLocation() {
 }
 
 if (!migrateLocation()) {
-	console.log('REACT_APP__PUBLIC_URL 2', REACT_APP__PUBLIC_URL);
+	console.log('REACT_APP__PUBLIC_URL 3', REACT_APP__PUBLIC_URL);
 
 	const root = createRoot(document.getElementById('root')!);
 
