@@ -180,7 +180,7 @@ export enum CommunityId {
 
 	// ZETACHAIN
 
-	ZNS_CONNECT = 'znsConnect',
+	ZNS_CONNECT = 'zns_connect',
 	COSMOS_CHICKEN_COOP = 'cosmos_chicken_coop',
 	EDDY_FINANCE = 'eddy_finance',
 	HOMINIDS = 'hominids',

@@ -54,6 +54,7 @@ function migrateLocation() {
 		// old post URLs
 		rule(/\/project\/(.+?)\/(discussion|announcements)\/post\/(.+)/, (_, match) => `/post/${match[3]}`) ||
 		// incorrectly named communities
+		rule(/\/project\/znsConnect(.*)/, (_, match) => `/project/zns_connect${match[1]}`) ||
 		rule(/\/project\/cosmosChickenCoop(.*)/, (_, match) => `/project/cosmos_chicken_coop${match[1]}`) ||
 		rule(/\/project\/eddyFinance(.*)/, (_, match) => `/project/eddy_finance${match[1]}`) ||
 		rule(/\/project\/sleekWallet(.*)/, (_, match) => `/project/sleek_wallet${match[1]}`)
