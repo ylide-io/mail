@@ -21,6 +21,7 @@ import aurorityBannerSrc from './bannerImages/aurority.jpg';
 import betFuryBannerSrc from './bannerImages/bet_fury.jpg';
 import chepeGamesBannerSrc from './bannerImages/chepe_games.jpg';
 import cosmosChickenCoopBannerSrc from './bannerImages/cosmos_chicken_coop.jpg';
+import deGuardBannerSrc from './bannerImages/de_guard.jpg';
 import dexifyBannerSrc from './bannerImages/dexify.jpg';
 import dittoBannerSrc from './bannerImages/ditto.jpg';
 import eddyFinanceBannerSrc from './bannerImages/eddy_finance.jpg';
@@ -38,6 +39,7 @@ import sendtokensBannerSrc from './bannerImages/sendtokens.jpg';
 import sleekWalletBannerSrc from './bannerImages/sleek_wallet.jpg';
 import smartDeployerBannerSrc from './bannerImages/smart_deployer.jpg';
 import snipaBannerSrc from './bannerImages/snipa.jpg';
+import stakenbakeBannerSrc from './bannerImages/stakenbake.jpg';
 import staxBannerSrc from './bannerImages/stax.jpg';
 import tvmBannerSrc from './bannerImages/tvm.jpg';
 import venomApeClubBannerSrc from './bannerImages/venom_ape_club.jpg';
@@ -68,6 +70,7 @@ import auroritySrc from './profileImages/aurority.jpg';
 import betFurySrc from './profileImages/bet_fury.jpg';
 import chepeGamesSrc from './profileImages/chepe_games.jpg';
 import cosmosChickenCoopSrc from './profileImages/cosmos_chicken_coop.jpg';
+import deGuardSrc from './profileImages/de_guard.jpg';
 import dexifySrc from './profileImages/dexify.jpg';
 import dittoSrc from './profileImages/ditto.jpg';
 import eddyFinanceSrc from './profileImages/eddy_finance.jpg';
@@ -87,6 +90,7 @@ import sendtokensSrc from './profileImages/sendtokens.jpg';
 import sleekWalletSrc from './profileImages/sleek_wallet.jpg';
 import smartDeployerSrc from './profileImages/smart_deployer.jpg';
 import snipaSrc from './profileImages/snipa.png';
+import stakenbakeSrc from './profileImages/stakenbake.jpg';
 import staxSrc from './profileImages/stax.jpg';
 import tvmSrc from './profileImages/tvm.png';
 import venomApeClubSrc from './profileImages/venom_ape_club.jpg';
@@ -185,6 +189,7 @@ export enum CommunityId {
 	SENDTOKENS = 'sendtokens',
 	SMART_DEPLOYER = 'smart_deployer',
 	JERIQO_SOCIAL_FI = 'jeriqo_social_fi',
+	STAKE_N_BAKE = 'stakenbake',
 
 	// OTHERS
 
@@ -197,6 +202,7 @@ export enum CommunityId {
 	DITTO_NETWORK = 'ditto_network',
 	ALTSOME = 'altsome',
 	ALIEN_SWAP = 'alien_swap',
+	DE_GUARD = 'de_guard',
 
 	// TEST
 
@@ -215,6 +221,7 @@ export enum CommunityTag {
 	AURORA_ECOSYSTEM = 'Aurora Ecosystem',
 	RESEARCH = 'Research',
 	ZETACHAIN_ECOSYSTEM = 'ZetaChain Ecosystem',
+	PRIVACY = 'Privacy',
 }
 
 export enum CommunityAttachmentMode {
@@ -871,6 +878,21 @@ export const communities: Community[] = [
 		allowedChains: [BlockchainName.ZETA],
 		attachmentMode: CommunityAttachmentMode.ADMINS,
 	},
+	{
+		id: CommunityId.STAKE_N_BAKE,
+		feedId: {
+			official: '2000000000000000000000000000000000000000000000000000000000000060' as Uint256,
+			discussion: '2000000000000000000000000000000000000000000000000000000000000061' as Uint256,
+		},
+		name: "Stake n' Bake",
+		description: 'Harnessing the power of omni-chain interoperability to redefine Game-Fi.',
+		profileImage: stakenbakeSrc,
+		bannerImage: stakenbakeBannerSrc,
+		website: 'https://www.stakenbake.xyz/',
+		tags: [CommunityTag.ZETACHAIN_ECOSYSTEM],
+		allowedChains: [BlockchainName.ZETA],
+		attachmentMode: CommunityAttachmentMode.ADMINS,
+	},
 
 	// OTHERS
 
@@ -1007,6 +1029,23 @@ export const communities: Community[] = [
 		tags: [CommunityTag.NFT],
 		hidden: true,
 		allowedChains: allChainsExceptTest,
+		attachmentMode: CommunityAttachmentMode.ADMINS,
+	},
+	{
+		id: CommunityId.DE_GUARD,
+		feedId: {
+			official: '2000000000000000000000000000000000000000000000000000000000000062' as Uint256,
+			discussion: '2000000000000000000000000000000000000000000000000000000000000063' as Uint256,
+		},
+		name: 'DeGuard',
+		description: '🚀 VPN for web3 & DeFi community.',
+		profileImage: deGuardSrc,
+		bannerImage: deGuardBannerSrc,
+		website: 'https://deguard.io/',
+		tags: [CommunityTag.NFT, CommunityTag.PRIVACY],
+		allowedChains: allChainsExceptTest.filter(
+			chain => chain !== BlockchainName.VENOM_TESTNET && chain !== BlockchainName.EVERSCALE,
+		),
 		attachmentMode: CommunityAttachmentMode.ADMINS,
 	},
 
