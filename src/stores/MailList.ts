@@ -139,7 +139,7 @@ export class MailList<M = ILinkedMessage> {
 	@observable isLoading = true;
 	@observable isError = false;
 
-	@observable.shallow public messagesData: { raw: IMessageWithSource; handled: M | typeof FILTERED_OUT }[] = [];
+	@observable.shallow messagesData: { raw: IMessageWithSource; handled: M | typeof FILTERED_OUT }[] = [];
 	@observable newMessagesCount = 0;
 
 	private stream: ListSourceDrainer | undefined;

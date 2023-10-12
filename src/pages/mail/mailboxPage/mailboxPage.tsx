@@ -12,9 +12,9 @@ import { GenericLayout } from '../../../components/genericLayout/genericLayout';
 import { PageMeta } from '../../../components/pageMeta/pageMeta';
 import { YlideLoader } from '../../../components/ylideLoader/ylideLoader';
 import { analytics } from '../../../stores/Analytics';
-import { browserStorage } from '../../../stores/browserStorage';
 import domain from '../../../stores/Domain';
 import { FolderId, ILinkedMessage, MailList, mailStore } from '../../../stores/MailList';
+import { newMailChecker } from '../../../stores/newMailChecker';
 import { RoutePath } from '../../../stores/routePath';
 import { useIsMatchesPattern, useNav } from '../../../utils/url';
 import { useWindowSize } from '../../../utils/useWindowSize';
@@ -136,17 +136,9 @@ export const MailboxPage = observer(() => {
 
 	useEffect(() => {
 		if (folderId === FolderId.Inbox) {
-			const key = accounts
-				.map(a => a.account.address)
-				.sort()
-				.join(',');
-
-			browserStorage.lastMailboxCheckDate = {
-				...browserStorage.lastMailboxCheckDate,
-				[key]: Math.floor(Date.now() / 1000),
-			};
+			newMailChecker.inboxOpened();
 		}
-	}, [folderId, accounts]);
+	}, [folderId]);
 
 	return (
 		<GenericLayout>

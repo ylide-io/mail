@@ -124,20 +124,6 @@ export class BrowserStorage {
 		BrowserStorage.setJsonItem(BrowserStorageKey.AUTH_KEYS, value);
 		this._authKeys = value;
 	}
-
-	//
-
-	private _lastMailboxCheckDate: Record<string, number> =
-		BrowserStorage.getJsonItem(BrowserStorageKey.LAST_MAILBOX_INCOMING_DATE) || {};
-
-	get lastMailboxCheckDate() {
-		return this._lastMailboxCheckDate;
-	}
-
-	set lastMailboxCheckDate(value: Record<string, number>) {
-		BrowserStorage.setJsonItem(BrowserStorageKey.LAST_MAILBOX_INCOMING_DATE, value);
-		this._lastMailboxCheckDate = value;
-	}
 }
 
 export const browserStorage = new BrowserStorage();
