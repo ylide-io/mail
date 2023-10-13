@@ -1,4 +1,4 @@
-import { EVMNetwork } from '@ylide/ethereum';
+import { EVMBlockchainController, EVMMailerV9Wrapper, EVMNetwork, EVMWalletController } from '@ylide/ethereum';
 import { RemotePublicKey, ServiceCode, WalletAccount, YlideCore, YlideKeysRegistry, YlidePrivateKey } from '@ylide/sdk';
 import { SmartBuffer } from '@ylide/smart-buffer';
 import { computed, makeAutoObservable, observable } from 'mobx';
@@ -9,6 +9,7 @@ import { toast } from '../../components/toast/toast';
 import { REACT_APP__FEED_PUBLIC_KEY } from '../../env';
 import { invariant } from '../../utils/assert';
 import { BlockchainName } from '../../utils/blockchain';
+import { getMailerContractsLink, GLOBAL_FEED_ID } from '../../utils/globalFeed';
 import { browserStorage } from '../browserStorage';
 import { Wallet } from './Wallet';
 
@@ -16,6 +17,8 @@ export class DomainAccount {
 	@observable private _localPrivateKeys: YlidePrivateKey[] = [];
 	@observable private _remotePublicKeys: RemotePublicKey[] = [];
 	@observable private _freshestRemotePublicKey: RemotePublicKey | undefined;
+
+	@observable isGlobalFeedWriter = false;
 
 	private _name: string;
 
@@ -44,6 +47,29 @@ export class DomainAccount {
 			} catch (e) {
 				console.error(e);
 			}
+		}
+	}
+
+	public async loadFeedWriter() {
+		try {
+			const walletController = this.wallet.controller as EVMWalletController;
+			const link = getMailerContractsLink();
+			if (!link) {
+				return;
+			}
+			const wrapper = new EVMBlockchainController.mailerWrappers[link.type](
+				walletController.blockchainReader,
+			) as EVMMailerV9Wrapper;
+			const isFeedWriter = await wrapper.broadcast.isBroadcastFeedWriter(
+				link,
+				GLOBAL_FEED_ID,
+				this.account.address,
+			);
+			if (isFeedWriter) {
+				this.isGlobalFeedWriter = true;
+			}
+		} catch (error) {
+			console.debug(`Failed to load feed writer for ${this.account.address}, ${error}`);
 		}
 	}
 

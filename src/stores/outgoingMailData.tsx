@@ -16,6 +16,7 @@ import { connectAccount } from '../utils/account';
 import { invariant } from '../utils/assert';
 import { blockchainMeta } from '../utils/blockchain';
 import { calcComissionDecimals, calcCommission } from '../utils/commission';
+import { GLOBAL_FEED_ID } from '../utils/globalFeed';
 import { broadcastMessage, editorJsToYMF, isEmptyEditorJsData, sendMessage } from '../utils/mail';
 import { truncateAddress } from '../utils/string';
 import { getEvmWalletNetwork, getWalletSupportedBlockchains, isWalletSupportsBlockchain } from '../utils/wallet';
@@ -175,6 +176,20 @@ export class OutgoingMailData {
 		});
 	}
 
+	get globalFeed() {
+		return this.feedId === GLOBAL_FEED_ID;
+	}
+
+	set globalFeed(value: boolean) {
+		if (value) {
+			this.feedId = GLOBAL_FEED_ID;
+			this.mode = OutgoingMailDataMode.BROADCAST;
+		} else {
+			this.feedId = DEFAULT_FEED_ID;
+			this.mode = OutgoingMailDataMode.MESSAGE;
+		}
+	}
+
 	get from() {
 		return this._from;
 	}
@@ -261,6 +276,10 @@ export class OutgoingMailData {
 			invariant(this.readyForSending, 'Not ready for sending');
 
 			if (this.validator?.() === false) return false;
+
+			if (this.feedId === GLOBAL_FEED_ID) {
+				this.to.items = [];
+			}
 
 			this.sending = true;
 

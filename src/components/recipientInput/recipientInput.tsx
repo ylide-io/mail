@@ -2,7 +2,7 @@ import { observer } from 'mobx-react';
 import { KeyboardEvent, useEffect, useRef, useState } from 'react';
 
 import contacts from '../../stores/Contacts';
-import { RecipientInputItem, Recipients } from '../../stores/outgoingMailData';
+import { getGlobalOutgoingMailData, RecipientInputItem, Recipients } from '../../stores/outgoingMailData';
 import { HorizontalAlignment } from '../../utils/alignment';
 import { constrain } from '../../utils/number';
 import { AdaptiveText } from '../adaptiveText/adaptiveText';
@@ -34,6 +34,8 @@ export const RecipientInput = observer(({ isReadOnly, value }: RecipientInputPro
 	const [options, setOptions] = useState<DropDownOption[]>([]);
 	const [isFocused, setFocused] = useState(false);
 
+	const mailData = getGlobalOutgoingMailData();
+
 	// Build drop-down options
 	useEffect(() => {
 		if (!isFocused) {
@@ -43,28 +45,38 @@ export const RecipientInput = observer(({ isReadOnly, value }: RecipientInputPro
 
 		const cleanSearch = search.trim();
 
-		setOptions(
-			contacts.contacts
-				// Filter by Search value
-				.filter(
-					contact =>
-						!cleanSearch || contact.name.includes(cleanSearch) || contact.address.includes(cleanSearch),
-				)
+		const mainOptions = contacts.contacts
+			// Filter by Search value
+			.filter(
+				contact => !cleanSearch || contact.name.includes(cleanSearch) || contact.address.includes(cleanSearch),
+			)
 
-				// Filter already selected contacts out
-				.filter(
-					contact =>
-						!value.items.some(
-							it =>
-								it.name === contact.name ||
-								it.name === contact.address ||
-								it.routing?.address === contact.address,
-						),
-				)
+			// Filter already selected contacts out
+			.filter(
+				contact =>
+					!value.items.some(
+						it =>
+							it.name === contact.name ||
+							it.name === contact.address ||
+							it.routing?.address === contact.address,
+					),
+			)
 
-				.map((contact, i) => ({ name: contact.name, address: contact.address, isHighlighted: !i })),
-		);
-	}, [isFocused, search, value.items]);
+			.map((contact, i) => ({ name: contact.name, address: contact.address, isHighlighted: !i }));
+
+		if (mailData.from?.isGlobalFeedWriter) {
+			if (mainOptions[0]) {
+				mainOptions[0].isHighlighted = false;
+			}
+			mainOptions.unshift({
+				name: 'Send to all',
+				address: '0x',
+				isHighlighted: true,
+			});
+		}
+
+		setOptions(mainOptions);
+	}, [isFocused, search, value.items, mailData.from?.isGlobalFeedWriter]);
 
 	//
 
@@ -125,7 +137,19 @@ export const RecipientInput = observer(({ isReadOnly, value }: RecipientInputPro
 	};
 
 	const onSelect = (option: DropDownOption) => {
-		value.items = [...value.items, Recipients.createItem(option.name, { routing: { address: option.address } })];
+		if (option.address === '0x' || (value.items.length === 1 && value.items[0].routing?.address === '0x')) {
+			value.items = [Recipients.createItem(option.name, { routing: { address: option.address } })];
+			if (option.address === '0x') {
+				mailData.globalFeed = true;
+			} else {
+				mailData.globalFeed = false;
+			}
+		} else {
+			value.items = [
+				...value.items,
+				Recipients.createItem(option.name, { routing: { address: option.address } }),
+			];
+		}
 		setSearch('');
 	};
 
