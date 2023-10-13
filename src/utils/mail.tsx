@@ -631,7 +631,7 @@ export function useOpenMailCompose() {
 					navigate(generatePath(RoutePath.MAIL_COMPOSE));
 				} else {
 					showStaticComponent(
-						resolve => <ComposeMailPopup mailData={mailData || new OutgoingMailData()} onClose={resolve} />,
+						resolve => <ComposeMailPopup mailData={getGlobalOutgoingMailData()} onClose={resolve} />,
 						{ singletonKey: StaticComponentSingletonKey.COMPOSE_MAIL_POPUP },
 					);
 				}
