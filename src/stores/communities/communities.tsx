@@ -29,6 +29,7 @@ import gnosisBuildersBannerSrc from './bannerImages/gnosis_builders.jpg';
 import gravixBannerSrc from './bannerImages/gravix.jpg';
 import hanmadiBannerSrc from './bannerImages/hanmadi.jpg';
 import hominidsBannerSrc from './bannerImages/hominids.jpg';
+import innovazBannerSrc from './bannerImages/innovaz.jpg';
 import jeriqoSocialFiBannerSrc from './bannerImages/jeriqo_social_fi.jpg';
 import mainViewBannerSrc from './bannerImages/main_view.jpg';
 import oasisGalleryBannerSrc from './bannerImages/oasis_gallery.jpg';
@@ -80,6 +81,7 @@ import gnosisBuildersSrc from './profileImages/gnosis_builders.jpg';
 import gravixSrc from './profileImages/gravix.jpg';
 import hanmadiSrc from './profileImages/hanmadi.jpg';
 import hominidsSrc from './profileImages/hominids.jpg';
+import innovazSrc from './profileImages/innovaz.jpg';
 import jeriqoSocialFiSrc from './profileImages/jeriqo_social_fi.jpg';
 import mainViewSrc from './profileImages/main_view.jpg';
 import oasisGallerySrc from './profileImages/oasis_gallery.png';
@@ -190,6 +192,7 @@ export enum CommunityId {
 	SMART_DEPLOYER = 'smart_deployer',
 	JERIQO_SOCIAL_FI = 'jeriqo_social_fi',
 	STAKE_N_BAKE = 'stakenbake',
+	INNOVAZ = 'innovaz',
 
 	// OTHERS
 
@@ -889,6 +892,21 @@ export const communities: Community[] = [
 		profileImage: stakenbakeSrc,
 		bannerImage: stakenbakeBannerSrc,
 		website: 'https://www.stakenbake.xyz/',
+		tags: [CommunityTag.ZETACHAIN_ECOSYSTEM],
+		allowedChains: [BlockchainName.ZETA],
+		attachmentMode: CommunityAttachmentMode.ADMINS,
+	},
+	{
+		id: CommunityId.INNOVAZ,
+		feedId: {
+			official: '2000000000000000000000000000000000000000000000000000000000000064' as Uint256,
+			discussion: '2000000000000000000000000000000000000000000000000000000000000065' as Uint256,
+		},
+		name: 'Innovaz',
+		description: 'One-stop platform for NFT mass adoption.',
+		profileImage: innovazSrc,
+		bannerImage: innovazBannerSrc,
+		website: 'https://innovaz.io/',
 		tags: [CommunityTag.ZETACHAIN_ECOSYSTEM],
 		allowedChains: [BlockchainName.ZETA],
 		attachmentMode: CommunityAttachmentMode.ADMINS,
