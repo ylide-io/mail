@@ -30,14 +30,13 @@ export class DomainAccount {
 		this._name = name;
 
 		this.reloadKeys();
-
-		this.reloadAuthKey();
 	}
 
-	public async reloadAuthKey() {
-		if (!this.authKey) {
+	private async reloadAuthKey() {
+		// @ts-ignore
+		if (!this.authKey && this._localPrivateKeys[0]?.privateKey) {
 			try {
-				const key = await this.createAuthKey();
+				const key = await this.createAuthKey(this._localPrivateKeys[0]);
 				invariant(key, 'Auth key not created');
 
 				const { token } = await BlockchainFeedApi.auth(key);
@@ -52,6 +51,7 @@ export class DomainAccount {
 		this._localPrivateKeys = this.keysRegistry.getLocalPrivateKeys(this.account.address);
 		this._remotePublicKeys = this.keysRegistry.getRemotePublicKeys(this.account.address);
 		this._freshestRemotePublicKey = this.keysRegistry.getFreshestRemotePublicKey(this.account.address) || undefined;
+		this.reloadAuthKey();
 	}
 
 	@computed get localPrivateKeys() {
@@ -190,29 +190,18 @@ export class DomainAccount {
 		};
 	}
 
-	async createAuthKey() {
-		if (this._localPrivateKeys[0]) {
-			const mvPublicKey = SmartBuffer.ofHexString(REACT_APP__FEED_PUBLIC_KEY!).bytes;
+	async createAuthKey(ylidePrivateKey: YlidePrivateKey) {
+		const mvPublicKey = SmartBuffer.ofHexString(REACT_APP__FEED_PUBLIC_KEY!).bytes;
 
-			const messageBytes = SmartBuffer.ofUTF8String(
-				JSON.stringify({ address: this.account.address, timestamp: Date.now() }),
-			).bytes;
+		const messageBytes = SmartBuffer.ofUTF8String(
+			JSON.stringify({ address: this.account.address, timestamp: Date.now() }),
+		).bytes;
 
-			return this._localPrivateKeys[0].execute(
-				async privateKey => ({
-					messageEncrypted: new SmartBuffer(privateKey.encrypt(messageBytes, mvPublicKey)).toHexString(),
-					publicKey: new SmartBuffer(privateKey.publicKey).toHexString(),
-					address: this.account.address,
-				}),
-				// TODO: handle users with password
-				// {
-				// 	onPrivateKeyRequest: async (address: string, magicString: string) =>
-				// 		await this.wallet.controller.signMagicString(this.account, magicString),
-				// 	onYlidePasswordRequest: async _ => password,
-				// },
-			);
-		}
-		return null;
+		return ylidePrivateKey.execute(async privateKey => ({
+			messageEncrypted: new SmartBuffer(privateKey.encrypt(messageBytes, mvPublicKey)).toHexString(),
+			publicKey: new SmartBuffer(privateKey.publicKey).toHexString(),
+			address: this.account.address,
+		}));
 	}
 
 	get authKey() {
