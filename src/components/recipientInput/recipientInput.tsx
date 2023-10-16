@@ -2,7 +2,7 @@ import { observer } from 'mobx-react';
 import { KeyboardEvent, useEffect, useRef, useState } from 'react';
 
 import contacts from '../../stores/Contacts';
-import { getGlobalOutgoingMailData, RecipientInputItem, Recipients } from '../../stores/outgoingMailData';
+import { RecipientInputItem, Recipients, SEND_TO_ALL_ADDRESS } from '../../stores/outgoingMailData';
 import { HorizontalAlignment } from '../../utils/alignment';
 import { constrain } from '../../utils/number';
 import { AdaptiveText } from '../adaptiveText/adaptiveText';
@@ -24,17 +24,16 @@ interface DropDownOption {
 
 interface RecipientInputProps {
 	isReadOnly?: boolean;
+	allowSendingToAll?: boolean;
 	value: Recipients;
 }
 
-export const RecipientInput = observer(({ isReadOnly, value }: RecipientInputProps) => {
+export const RecipientInput = observer(({ isReadOnly, allowSendingToAll, value }: RecipientInputProps) => {
 	const tagInputRef = useRef(null);
 
 	const [search, setSearch] = useState('');
 	const [options, setOptions] = useState<DropDownOption[]>([]);
 	const [isFocused, setFocused] = useState(false);
-
-	const mailData = getGlobalOutgoingMailData();
 
 	// Build drop-down options
 	useEffect(() => {
@@ -45,7 +44,7 @@ export const RecipientInput = observer(({ isReadOnly, value }: RecipientInputPro
 
 		const cleanSearch = search.trim();
 
-		const mainOptions = contacts.contacts
+		const newOptions = contacts.contacts
 			// Filter by Search value
 			.filter(
 				contact => !cleanSearch || contact.name.includes(cleanSearch) || contact.address.includes(cleanSearch),
@@ -64,19 +63,18 @@ export const RecipientInput = observer(({ isReadOnly, value }: RecipientInputPro
 
 			.map((contact, i) => ({ name: contact.name, address: contact.address, isHighlighted: !i }));
 
-		if (mailData.from?.isGlobalFeedWriter) {
-			if (mainOptions[0]) {
-				mainOptions[0].isHighlighted = false;
-			}
-			mainOptions.unshift({
+		if (allowSendingToAll && !value.isSendingToAll) {
+			newOptions.unshift({
 				name: 'Send to all',
-				address: '0x',
+				address: SEND_TO_ALL_ADDRESS,
 				isHighlighted: true,
 			});
+
+			newOptions.map((it, i) => (it.isHighlighted = !i));
 		}
 
-		setOptions(mainOptions);
-	}, [isFocused, search, value.items, mailData.from?.isGlobalFeedWriter]);
+		setOptions(newOptions);
+	}, [isFocused, allowSendingToAll, search, value.items, value.isSendingToAll]);
 
 	//
 
@@ -137,13 +135,8 @@ export const RecipientInput = observer(({ isReadOnly, value }: RecipientInputPro
 	};
 
 	const onSelect = (option: DropDownOption) => {
-		if (option.address === '0x' || (value.items.length === 1 && value.items[0].routing?.address === '0x')) {
+		if (option.address === SEND_TO_ALL_ADDRESS || value.isSendingToAll) {
 			value.items = [Recipients.createItem(option.name, { routing: { address: option.address } })];
-			if (option.address === '0x') {
-				mailData.globalFeed = true;
-			} else {
-				mailData.globalFeed = false;
-			}
 		} else {
 			value.items = [
 				...value.items,
@@ -176,6 +169,8 @@ export const RecipientInput = observer(({ isReadOnly, value }: RecipientInputPro
 						? `We found ${
 								routing.details.type === 'ylide' ? 'Ylide' : routing.details.type
 						  } key suitable for receiving messages`
+						: routing?.address === SEND_TO_ALL_ADDRESS
+						? 'Message will be sent to all users'
 						: !routing || routing.details === null
 						? 'Public key of the recipient was not found'
 						: undefined;
@@ -188,7 +183,7 @@ export const RecipientInput = observer(({ isReadOnly, value }: RecipientInputPro
 									? TagInputItemLook.DEFAULT
 									: item.isLoading
 									? TagInputItemLook.LOADING
-									: routing?.details
+									: routing?.details || item.routing?.address === SEND_TO_ALL_ADDRESS
 									? TagInputItemLook.SUCCESS
 									: TagInputItemLook.ERROR
 							}

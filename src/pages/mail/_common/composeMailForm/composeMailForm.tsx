@@ -64,7 +64,11 @@ export const ComposeMailForm = observer(
 
 					<div className={css.metaLabel}>To</div>
 					<div className={css.recipientWrapper}>
-						<RecipientInput isReadOnly={isRecipientInputDisabled} value={mailData.to} />
+						<RecipientInput
+							isReadOnly={isRecipientInputDisabled}
+							allowSendingToAll={mailData.from?.isGlobalFeedWriter}
+							value={mailData.to}
+						/>
 
 						{enableCsv && (
 							<ActionButton

@@ -321,10 +321,9 @@ export function getMessageSenders(message: ILinkedMessage) {
 }
 
 export function getMessageReceivers(message: ILinkedMessage, decoded?: IMessageDecodedContent) {
-	if (message.msg.feedId === REACT_APP__GLOBAL_FEED_ID) {
-		return ['All'];
-	}
-	return decoded?.recipientInfos.length
+	return message.msg.feedId === REACT_APP__GLOBAL_FEED_ID
+		? ['All']
+		: decoded?.recipientInfos.length
 		? decoded.recipientInfos.map(r => r.address)
 		: !isEvmBlockchain(message.msg.blockchain)
 		? []
@@ -631,7 +630,7 @@ export function useOpenMailCompose() {
 					navigate(generatePath(RoutePath.MAIL_COMPOSE));
 				} else {
 					showStaticComponent(
-						resolve => <ComposeMailPopup mailData={getGlobalOutgoingMailData()} onClose={resolve} />,
+						resolve => <ComposeMailPopup mailData={mailData || new OutgoingMailData()} onClose={resolve} />,
 						{ singletonKey: StaticComponentSingletonKey.COMPOSE_MAIL_POPUP },
 					);
 				}

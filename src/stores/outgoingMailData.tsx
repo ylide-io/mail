@@ -81,6 +81,10 @@ export class Recipients {
 		}
 	}
 
+	get isSendingToAll() {
+		return this.items.length === 1 && this.items[0].routing?.address === SEND_TO_ALL_ADDRESS;
+	}
+
 	static createItem(name: string, props: Partial<RecipientInputItem> = {}): RecipientInputItem {
 		return {
 			id: `${recipientIdCounter++}`,
@@ -128,6 +132,8 @@ export class Recipients {
 	}
 }
 
+export const SEND_TO_ALL_ADDRESS = '0x';
+
 //
 
 export enum OutgoingMailDataMode {
@@ -173,20 +179,6 @@ export class OutgoingMailData {
 				}
 			}
 		});
-	}
-
-	get globalFeed() {
-		return this.feedId === REACT_APP__GLOBAL_FEED_ID;
-	}
-
-	set globalFeed(value: boolean) {
-		if (value) {
-			this.feedId = REACT_APP__GLOBAL_FEED_ID;
-			this.mode = OutgoingMailDataMode.BROADCAST;
-		} else {
-			this.feedId = DEFAULT_FEED_ID;
-			this.mode = OutgoingMailDataMode.MESSAGE;
-		}
 	}
 
 	get from() {
@@ -256,12 +248,20 @@ export class OutgoingMailData {
 
 	get readyForSending() {
 		return !!(
-			!this.sending &&
-			(this.mode === OutgoingMailDataMode.BROADCAST ||
-				(this.to.items.length &&
-					!this.to.items.some(r => r.isLoading) &&
-					!this.to.items.some(r => !r.routing?.details))) &&
-			(this.hasEditorData || this.hasPlainTextData || this.attachments.length || this.attachmentFiles.length)
+			// shouldn't be sending already
+			(
+				!this.sending &&
+				// should either broadcasting or have recipients
+				(this.mode === OutgoingMailDataMode.BROADCAST ||
+					// should have recipients
+					(this.to.items.length &&
+						// all recipients should be loaded
+						!this.to.items.some(r => r.isLoading) &&
+						// all recipients should have routing, or it should be sending to all
+						(!this.to.items.some(r => !r.routing?.details) || this.to.isSendingToAll))) &&
+				// need to have content
+				(this.hasEditorData || this.hasPlainTextData || this.attachments.length || this.attachmentFiles.length)
+			)
 		);
 	}
 
@@ -276,11 +276,9 @@ export class OutgoingMailData {
 
 			if (this.validator?.() === false) return false;
 
-			if (this.feedId === REACT_APP__GLOBAL_FEED_ID) {
-				this.to.items = [];
-			}
-
 			this.sending = true;
+
+			// CHECK 'FROM' ACCOUNT
 
 			const proxyAccount = domain.availableProxyAccounts[0];
 
@@ -361,6 +359,8 @@ export class OutgoingMailData {
 				await domain.handleSwitchRequest(this.from.wallet.factory.wallet, curr, this.from.account);
 			}
 
+			// PREPARE CONTENT
+
 			let content: YMF;
 			if (this.hasEditorData) {
 				content = editorJsToYMF(this.editorData);
@@ -372,7 +372,12 @@ export class OutgoingMailData {
 				content = this.processContent(content);
 			}
 
-			if (this.mode === OutgoingMailDataMode.MESSAGE) {
+			// SEND
+
+			const isSendingToAll = this.to.isSendingToAll;
+			const feedId = isSendingToAll ? REACT_APP__GLOBAL_FEED_ID : this.feedId;
+
+			if (this.mode === OutgoingMailDataMode.MESSAGE && !isSendingToAll) {
 				const result = await sendMessage({
 					sender: this.from,
 					subject: this.subject,
@@ -381,7 +386,7 @@ export class OutgoingMailData {
 					attachmentFiles: this.attachmentFiles,
 					recipients: this.to.items.map(r => r.routing?.address!),
 					blockchain: this.blockchain,
-					feedId: this.feedId,
+					feedId,
 				});
 
 				console.log('Sending result: ', result);
@@ -390,7 +395,7 @@ export class OutgoingMailData {
 				invariant(blockchain, 'Chain not defined');
 
 				if (this.isGenericFeed) {
-					const commissions = await BlockchainFeedApi.getCommissions({ feedId: this.feedId });
+					const commissions = await BlockchainFeedApi.getCommissions({ feedId: feedId });
 					const commission = calcCommission(blockchain, commissions);
 					invariant(commission === this.extraPayment, 'Commissions mismatch');
 				}
@@ -401,7 +406,7 @@ export class OutgoingMailData {
 					text: content,
 					attachments: this.attachments,
 					attachmentFiles: this.attachmentFiles,
-					feedId: this.feedId,
+					feedId,
 					isGenericFeed: this.isGenericFeed,
 					extraPayment: this.isGenericFeed
 						? blockchain === 'everscale' || blockchain === 'venom-testnet'
