@@ -21,15 +21,11 @@ import { isWalletSupportsBlockchain, walletsMeta } from './wallet';
 export function formatAccountName(account: DomainAccount) {
 	const walletName = walletsMeta[account.wallet.wallet].title;
 
-	let accountName = account.name
-		? `${account.name} (${truncateAddress(account.account.address)}, ${walletName})`
-		: `${truncateAddress(account.account.address, 12)} (${walletName})`;
+	const globalFeedMark = account.isGlobalFeedWriter ? '🌎 ' : '';
 
-	if (account.isGlobalFeedWriter) {
-		accountName += ' (Global Feed Writer)';
-	}
-
-	return accountName;
+	return account.name
+		? `${account.name} ${globalFeedMark}(${truncateAddress(account.account.address)}, ${walletName})`
+		: `${truncateAddress(account.account.address, 12)} ${globalFeedMark}(${walletName})`;
 }
 
 //
