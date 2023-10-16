@@ -11,12 +11,11 @@ import { SelectNetworkModal } from '../components/selectNetworkModal/selectNetwo
 import { showStaticComponent } from '../components/staticComponentManager/staticComponentManager';
 import { toast } from '../components/toast/toast';
 import { HUB_FEED_ID, OTC_FEED_ID } from '../constants';
-import { AppMode, REACT_APP__APP_MODE } from '../env';
+import { AppMode, REACT_APP__APP_MODE, REACT_APP__GLOBAL_FEED_ID } from '../env';
 import { connectAccount } from '../utils/account';
 import { invariant } from '../utils/assert';
 import { blockchainMeta } from '../utils/blockchain';
 import { calcComissionDecimals, calcCommission } from '../utils/commission';
-import { GLOBAL_FEED_ID } from '../utils/globalFeed';
 import { broadcastMessage, editorJsToYMF, isEmptyEditorJsData, sendMessage } from '../utils/mail';
 import { truncateAddress } from '../utils/string';
 import { getEvmWalletNetwork, getWalletSupportedBlockchains, isWalletSupportsBlockchain } from '../utils/wallet';
@@ -177,12 +176,12 @@ export class OutgoingMailData {
 	}
 
 	get globalFeed() {
-		return this.feedId === GLOBAL_FEED_ID;
+		return this.feedId === REACT_APP__GLOBAL_FEED_ID;
 	}
 
 	set globalFeed(value: boolean) {
 		if (value) {
-			this.feedId = GLOBAL_FEED_ID;
+			this.feedId = REACT_APP__GLOBAL_FEED_ID;
 			this.mode = OutgoingMailDataMode.BROADCAST;
 		} else {
 			this.feedId = DEFAULT_FEED_ID;
@@ -277,7 +276,7 @@ export class OutgoingMailData {
 
 			if (this.validator?.() === false) return false;
 
-			if (this.feedId === GLOBAL_FEED_ID) {
+			if (this.feedId === REACT_APP__GLOBAL_FEED_ID) {
 				this.to.items = [];
 			}
 

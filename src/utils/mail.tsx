@@ -50,7 +50,7 @@ import { evmNameToNetwork, formatAddress, isEvmBlockchain } from './blockchain';
 import { htmlSelfClosingTagsToXHtml } from './string';
 import { toJS } from 'mobx';
 import { BigNumber } from '@ethersproject/bignumber';
-import { GLOBAL_FEED_ID } from './globalFeed';
+import { REACT_APP__GLOBAL_FEED_ID } from '../env';
 
 // SENDING
 
@@ -321,7 +321,7 @@ export function getMessageSenders(message: ILinkedMessage) {
 }
 
 export function getMessageReceivers(message: ILinkedMessage, decoded?: IMessageDecodedContent) {
-	if (message.msg.feedId === GLOBAL_FEED_ID) {
+	if (message.msg.feedId === REACT_APP__GLOBAL_FEED_ID) {
 		return ['All'];
 	}
 	return decoded?.recipientInfos.length

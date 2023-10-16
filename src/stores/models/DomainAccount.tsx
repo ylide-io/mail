@@ -6,10 +6,10 @@ import { computed, makeAutoObservable, observable } from 'mobx';
 import { BlockchainFeedApi } from '../../api/blockchainFeedApi';
 import { AdaptiveAddress } from '../../components/adaptiveAddress/adaptiveAddress';
 import { toast } from '../../components/toast/toast';
-import { REACT_APP__FEED_PUBLIC_KEY } from '../../env';
+import { REACT_APP__FEED_PUBLIC_KEY, REACT_APP__GLOBAL_FEED_ID } from '../../env';
 import { invariant } from '../../utils/assert';
 import { BlockchainName } from '../../utils/blockchain';
-import { getMailerContractsLink, GLOBAL_FEED_ID } from '../../utils/globalFeed';
+import { getMailerContractsLink } from '../../utils/globalFeed';
 import { browserStorage } from '../browserStorage';
 import { Wallet } from './Wallet';
 
@@ -62,7 +62,7 @@ export class DomainAccount {
 			) as EVMMailerV9Wrapper;
 			const isFeedWriter = await wrapper.broadcast.isBroadcastFeedWriter(
 				link,
-				GLOBAL_FEED_ID,
+				REACT_APP__GLOBAL_FEED_ID,
 				this.account.address,
 			);
 			if (isFeedWriter) {
