@@ -187,7 +187,9 @@ export const MailDetailsPage = observer(() => {
 					`Date: ${formatDate(message.msg.createdAt * 1000, DateFormatStyle.LONG)}`,
 					`Subject: ${formatSubject(decodedContent.decodedSubject)}`,
 					`To: ${message.recipient?.account.address || message.msg.recipientAddress}`,
-				].join('<br>')}\n`,
+				]
+					.map(l => `<div>${l}</div>`)
+					.join('')}\n`,
 			);
 
 			editorData.blocks = [...forwardedData.blocks, ...editorData.blocks];

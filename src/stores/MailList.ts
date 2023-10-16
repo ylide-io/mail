@@ -4,6 +4,7 @@ import {
 	AbstractBlockchainController,
 	BlockchainSourceType,
 	IBlockchainSourceSubject,
+	IListSource,
 	IMessage,
 	IMessageWithSource,
 	ISourceWithMeta,
@@ -24,6 +25,7 @@ import messagesDB, { MessagesDB } from '../indexedDB/impl/MessagesDB';
 import { IMessageDecodedContent } from '../indexedDB/IndexedDB';
 import { invariant } from '../utils/assert';
 import { formatAddress } from '../utils/blockchain';
+import { getGlobalFeedSubject } from '../utils/globalFeed';
 import { decodeMessage } from '../utils/mail';
 import { analytics } from './Analytics';
 import { browserStorage } from './browserStorage';
@@ -179,6 +181,24 @@ export class MailList<M = ILinkedMessage> {
 			function buildMailboxSources(): ISourceWithMeta[] {
 				invariant(mailbox);
 
+				const enrichWithGlobalSubject = (data: ISourceWithMeta[], account?: DomainAccount, sent = false) => {
+					if (!account) return data;
+
+					const globalSubject = getGlobalFeedSubject(sent ? account.account.address : null);
+
+					const blockchainController = domain.blockchains[
+						globalSubject.blockchain
+					] as EVMBlockchainController;
+
+					const listSource = new ListSource(
+						mailStore.readingSession,
+						globalSubject,
+						blockchainController.ininiateMessagesSource(globalSubject),
+					) as IListSource;
+
+					return [{ source: listSource, meta: { account } } as ISourceWithMeta].concat(data);
+				};
+
 				function getDirectWithMeta(
 					recipient: Uint256,
 					sender: string | null,
@@ -194,15 +214,19 @@ export class MailList<M = ILinkedMessage> {
 							},
 						])
 						.map(source => ({ source, meta: { account } }));
-					// .filter(s => s.source.subject.id === 'tvm-venom-testnet-mailer-13');
 				}
 
 				if (mailbox.folderId === FolderId.Inbox || mailbox.folderId === FolderId.Archive) {
-					return mailbox.accounts
+					const mailboxData = mailbox.accounts
 						.map(acc => getDirectWithMeta(acc.uint256Address, mailbox.sender || null, acc))
 						.flat();
+					return enrichWithGlobalSubject(mailboxData, mailbox.accounts[0]);
 				} else if (mailbox.folderId === FolderId.Sent) {
-					return mailbox.accounts.map(acc => getDirectWithMeta(acc.sentAddress, null, acc)).flat();
+					const mailboxData = mailbox.accounts
+						.map(acc => getDirectWithMeta(acc.sentAddress, null, acc))
+						.flat();
+					const globalFeedWriter = mailbox.accounts.find(acc => acc.isGlobalFeedWriter);
+					return enrichWithGlobalSubject(mailboxData, globalFeedWriter, true);
 				} else {
 					const tag = tags.tags.find(t => String(t.id) === mailbox.folderId);
 					if (!tag) {
