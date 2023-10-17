@@ -2,8 +2,9 @@ import { observer } from 'mobx-react';
 import { KeyboardEvent, useEffect, useRef, useState } from 'react';
 
 import contacts from '../../stores/Contacts';
-import { RecipientInputItem, Recipients, SEND_TO_ALL_ADDRESS } from '../../stores/outgoingMailData';
+import { RecipientInputItem, Recipients } from '../../stores/outgoingMailData';
 import { HorizontalAlignment } from '../../utils/alignment';
+import { SEND_TO_ALL_ADDRESS } from '../../utils/globalFeed';
 import { constrain } from '../../utils/number';
 import { AdaptiveText } from '../adaptiveText/adaptiveText';
 import { DropDown, DropDownItem, DropDownItemMode } from '../dropDown/dropDown';

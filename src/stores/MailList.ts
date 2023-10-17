@@ -25,7 +25,7 @@ import messagesDB, { MessagesDB } from '../indexedDB/impl/MessagesDB';
 import { IMessageDecodedContent } from '../indexedDB/IndexedDB';
 import { invariant } from '../utils/assert';
 import { formatAddress } from '../utils/blockchain';
-import { getGlobalFeedSubject } from '../utils/globalFeed';
+import { getGlobalFeedSubject, isGlobalMessage, SEND_TO_ALL_ADDRESS } from '../utils/globalFeed';
 import { decodeMessage } from '../utils/mail';
 import { analytics } from './Analytics';
 import { browserStorage } from './browserStorage';
@@ -57,11 +57,6 @@ export function getFolderName(folderId: FolderId) {
 
 const FILTERED_OUT = {};
 
-function wrapMessageId(p: IMessageWithSource) {
-	const acc = p.meta?.account as DomainAccount | undefined;
-	return `${p.msg.msgId}${acc ? `:${acc.account.address}` : ''}`;
-}
-
 export interface ILinkedMessage {
 	id: string;
 	msgId: string;
@@ -73,6 +68,10 @@ export interface ILinkedMessage {
 
 export namespace ILinkedMessage {
 	export function idFromIMessage(message: IMessage, account: DomainAccount) {
+		if (isGlobalMessage(message)) {
+			return `${message.msgId}:${SEND_TO_ALL_ADDRESS}`;
+		}
+
 		return `${message.msgId}:${account.account.address}`;
 	}
 
@@ -246,7 +245,7 @@ export class MailList<M = ILinkedMessage> {
 			console.debug('MailList init', this.id, Date.now() - start);
 			this.streamDisposer = dispose;
 			await newStream.resetFilter(m => {
-				return mailbox.filter ? mailbox.filter(wrapMessageId(m)) : true;
+				return mailbox.filter ? mailbox.filter(ILinkedMessage.idFromIMessageWithSource(m)) : true;
 			});
 			this.stream = newStream;
 			await this.reloadMessages();

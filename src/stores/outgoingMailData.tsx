@@ -16,6 +16,7 @@ import { connectAccount } from '../utils/account';
 import { invariant } from '../utils/assert';
 import { blockchainMeta } from '../utils/blockchain';
 import { calcComissionDecimals, calcCommission } from '../utils/commission';
+import { SEND_TO_ALL_ADDRESS } from '../utils/globalFeed';
 import { broadcastMessage, editorJsToYMF, isEmptyEditorJsData, sendMessage } from '../utils/mail';
 import { truncateAddress } from '../utils/string';
 import { getEvmWalletNetwork, getWalletSupportedBlockchains, isWalletSupportsBlockchain } from '../utils/wallet';
@@ -131,8 +132,6 @@ export class Recipients {
 		}
 	}
 }
-
-export const SEND_TO_ALL_ADDRESS = '0x';
 
 //
 

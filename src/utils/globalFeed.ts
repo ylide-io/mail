@@ -7,6 +7,8 @@ import { evmNameToNetwork } from './blockchain';
 const evmNetwork = evmNameToNetwork(REACT_APP__GLOBAL_FEED_NETWORK)!;
 const contracts = EVM_CONTRACTS[evmNetwork];
 
+export const SEND_TO_ALL_ADDRESS = '0x0000000000000000000000000000000000000000';
+
 export function getGlobalFeedSubject(sender: string | null = null): IBlockchainSourceSubject {
 	return {
 		feedId: REACT_APP__GLOBAL_FEED_ID,
