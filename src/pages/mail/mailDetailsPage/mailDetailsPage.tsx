@@ -59,19 +59,16 @@ export const MailDetailsPage = observer(() => {
 				let message = mailStore.lastMessagesList.find(m => m.id === id!);
 
 				if (!message) {
-					const [msgId, ...rest] = id.split(':');
-					const accountAddress = rest.join(':');
-					invariant(msgId, 'No msgId');
-					invariant(accountAddress, 'No account address');
+					const { msgId, address } = ILinkedMessage.parseId(id);
 
-					const domainAccount = accounts.find(a => a.account.address === accountAddress);
+					const domainAccount = accounts.find(a => a.account.address === address);
 					invariant(domainAccount, () => {
-						toast(`Connect account ${truncateAddress(accountAddress)} to read this message 👍`);
+						toast(`Connect account ${truncateAddress(address)} to read this message 👍`);
 						return 'No account';
 					});
 
 					const msg = await domain.getMessageByMsgId(msgId);
-					invariant(msg);
+					invariant(msg, `Could not find message ${msgId}`);
 
 					message = await ILinkedMessage.fromIMessage(folderId, msg, domainAccount);
 				}

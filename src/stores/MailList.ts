@@ -130,6 +130,21 @@ export namespace ILinkedMessage {
 	): Promise<ILinkedMessage[]> {
 		return await Promise.all(p.map(m => fromIMessageWithSource(folderId, m)));
 	}
+
+	//
+
+	export function parseId(id: string) {
+		// id could look like 'IRLwHRdNAAUB9Q==:0:6bf6da64c5f3da47d125d8b1d39bb9097ab5b047'
+		// (address contains ':' too)
+
+		const [msgId, ...rest] = id.split(':');
+		const address = rest.join(':');
+		invariant(msgId && address, `Invalid LinkedMessage ID: ${id}`);
+		return {
+			msgId,
+			address,
+		};
+	}
 }
 
 export class MailList<M = ILinkedMessage> {
