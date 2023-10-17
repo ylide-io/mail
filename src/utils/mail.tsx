@@ -322,7 +322,7 @@ export function getMessageSenders(message: ILinkedMessage) {
 
 export function getMessageReceivers(message: ILinkedMessage, decoded?: IMessageDecodedContent) {
 	return message.msg.feedId === REACT_APP__GLOBAL_FEED_ID
-		? ['All']
+		? domain.accounts.activeAccounts.map(a => a.account.address)
 		: decoded?.recipientInfos.length
 		? decoded.recipientInfos.map(r => r.address)
 		: !isEvmBlockchain(message.msg.blockchain)
