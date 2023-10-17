@@ -13,6 +13,7 @@ import contacts from '../../../../stores/Contacts';
 import domain from '../../../../stores/Domain';
 import { FolderId, ILinkedMessage, mailStore } from '../../../../stores/MailList';
 import { RoutePath } from '../../../../stores/routePath';
+import { isGlobalMessage } from '../../../../utils/globalFeed';
 import {
 	decodedTextDataToPlainText,
 	formatSubject,
@@ -39,9 +40,12 @@ const MailboxListRow: React.FC<MailboxListRowProps> = observer(
 
 		const decoded = mailStore.decodedMessagesById[message.msgId];
 		const isRead = mailStore.readMessageIds.has(message.id);
+		const isGlobal = isGlobalMessage(message.msg);
 
-		const recipients =
-			folderId === FolderId.Sent ? getMessageReceivers(message, decoded) : getMessageSenders(message);
+		const recipients = useMemo(
+			() => (folderId === FolderId.Sent ? getMessageReceivers(message, decoded) : getMessageSenders(message)),
+			[decoded, folderId, message],
+		);
 
 		const messageClickHandler = async () => {
 			if (decoded) {
@@ -97,7 +101,9 @@ const MailboxListRow: React.FC<MailboxListRowProps> = observer(
 				</div>
 
 				<div className={css.contact}>
-					{recipients.length ? (
+					{folderId === FolderId.Sent && isGlobal ? (
+						'Everyone'
+					) : recipients.length ? (
 						<>
 							<ContactName className={css.contactValue} address={recipients[0]} />
 
