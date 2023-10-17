@@ -1,17 +1,41 @@
-import { htmlSelfClosingTagsToXHtml, transformMatches, truncateAddress, truncateInMiddle } from './string';
+import { htmlSelfClosingTagsToXHtml, transformMatches, truncate, truncateAddress, TruncatePoint } from './string';
 
-test('truncateInMiddle', () => {
-	expect(truncateInMiddle('1234567890', 10)).toBe('1234567890');
-	expect(truncateInMiddle('1234567890', 5)).toBe('12390');
-	expect(truncateInMiddle('1234567890', 2)).toBe('10');
-	expect(truncateInMiddle('1234567890', 1)).toBe('1');
-	expect(truncateInMiddle('1234567890', 0)).toBe('1');
+test('truncate', () => {
+	expect(truncate('1234567890', { maxLength: 10 })).toBe('1234567890');
+	expect(truncate('1234567890', { maxLength: 5 })).toBe('12390');
+	expect(truncate('1234567890', { maxLength: 2 })).toBe('10');
+	expect(truncate('1234567890', { maxLength: 1 })).toBe('1');
+	expect(truncate('1234567890', { maxLength: 0 })).toBe('1');
 
-	expect(truncateInMiddle('1234567890', 10, '..')).toBe('1234567890');
-	expect(truncateInMiddle('1234567890', 5, '..')).toBe('123..90');
-	expect(truncateInMiddle('1234567890', 2, '..')).toBe('1..0');
-	expect(truncateInMiddle('1234567890', 1, '..')).toBe('1..0');
-	expect(truncateInMiddle('1234567890', 0, '..')).toBe('1..0');
+	expect(truncate('1234567890', { maxLength: 10, separator: '..' })).toBe('1234567890');
+	expect(truncate('1234567890', { maxLength: 5, separator: '..' })).toBe('123..90');
+	expect(truncate('1234567890', { maxLength: 2, separator: '..' })).toBe('1..0');
+	expect(truncate('1234567890', { maxLength: 1, separator: '..' })).toBe('1..0');
+	expect(truncate('1234567890', { maxLength: 0, separator: '..' })).toBe('1..0');
+
+	expect(truncate('1234567890', { maxLength: 10, point: TruncatePoint.END })).toBe('1234567890');
+	expect(truncate('1234567890', { maxLength: 5, point: TruncatePoint.END })).toBe('12345');
+	expect(truncate('1234567890', { maxLength: 2, point: TruncatePoint.END })).toBe('12');
+	expect(truncate('1234567890', { maxLength: 1, point: TruncatePoint.END })).toBe('1');
+	expect(truncate('1234567890', { maxLength: 0, point: TruncatePoint.END })).toBe('1');
+
+	expect(truncate('1234567890', { maxLength: 10, point: TruncatePoint.END, separator: '..' })).toBe('1234567890');
+	expect(truncate('1234567890', { maxLength: 5, point: TruncatePoint.END, separator: '..' })).toBe('12345..');
+	expect(truncate('1234567890', { maxLength: 2, point: TruncatePoint.END, separator: '..' })).toBe('12..');
+	expect(truncate('1234567890', { maxLength: 1, point: TruncatePoint.END, separator: '..' })).toBe('1..');
+	expect(truncate('1234567890', { maxLength: 0, point: TruncatePoint.END, separator: '..' })).toBe('1..');
+
+	expect(truncate('1234567890', { maxLength: 10, point: TruncatePoint.START })).toBe('1234567890');
+	expect(truncate('1234567890', { maxLength: 5, point: TruncatePoint.START })).toBe('67890');
+	expect(truncate('1234567890', { maxLength: 2, point: TruncatePoint.START })).toBe('90');
+	expect(truncate('1234567890', { maxLength: 1, point: TruncatePoint.START })).toBe('0');
+	expect(truncate('1234567890', { maxLength: 0, point: TruncatePoint.START })).toBe('0');
+
+	expect(truncate('1234567890', { maxLength: 10, point: TruncatePoint.START, separator: '..' })).toBe('1234567890');
+	expect(truncate('1234567890', { maxLength: 5, point: TruncatePoint.START, separator: '..' })).toBe('..67890');
+	expect(truncate('1234567890', { maxLength: 2, point: TruncatePoint.START, separator: '..' })).toBe('..90');
+	expect(truncate('1234567890', { maxLength: 1, point: TruncatePoint.START, separator: '..' })).toBe('..0');
+	expect(truncate('1234567890', { maxLength: 0, point: TruncatePoint.START, separator: '..' })).toBe('..0');
 });
 
 test('truncateAddress', () => {
