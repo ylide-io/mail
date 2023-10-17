@@ -15,7 +15,7 @@ import domain from '../../../../../stores/Domain';
 import { OutgoingMailData } from '../../../../../stores/outgoingMailData';
 import { AlignmentDirection, HorizontalAlignment } from '../../../../../utils/alignment';
 import { invariant } from '../../../../../utils/assert';
-import { blockchainMeta } from '../../../../../utils/blockchain';
+import { blockchainMeta, evmNameToNetwork, isEvmBlockchain } from '../../../../../utils/blockchain';
 import { getWalletSupportedBlockchains } from '../../../../../utils/wallet';
 import css from './sendMailButton.module.scss';
 
@@ -143,8 +143,21 @@ export const SendMailButton = observer(
 											}
 											onSelect={async () => {
 												invariant(mailData.from);
-												mailData.blockchain = chain;
 												setMenuVisible(false);
+
+												try {
+													if (isEvmBlockchain(chain)) {
+														await domain.switchEVMChain(
+															mailData.from.wallet,
+															evmNameToNetwork(chain)!,
+														);
+													}
+
+													mailData.blockchain = chain;
+												} catch (e) {
+													console.error('Failed to switch network', e);
+													toast('Failed to switch network');
+												}
 											}}
 										>
 											<GridRowBox>
