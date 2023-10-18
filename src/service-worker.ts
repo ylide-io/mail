@@ -19,6 +19,10 @@ import { truncateAddress } from './utils/string';
 
 declare const self: ServiceWorkerGlobalScope;
 
+console.log('Service worker version', 2);
+
+//
+
 function formatAddress(address: string) {
 	return (
 		address
