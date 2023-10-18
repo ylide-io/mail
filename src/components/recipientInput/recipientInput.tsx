@@ -64,7 +64,7 @@ export const RecipientInput = observer(({ isReadOnly, allowSendingToAll, value }
 
 			.map((contact, i) => ({ name: contact.name, address: contact.address, isHighlighted: !i }));
 
-		if (allowSendingToAll && !value.isSendingToAll) {
+		if (allowSendingToAll && !value.isSendingToAll && !cleanSearch) {
 			newOptions.unshift({
 				name: 'Send to all',
 				address: SEND_TO_ALL_ADDRESS,
