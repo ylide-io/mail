@@ -5,6 +5,7 @@ import { CoinbaseWalletLogo } from '../icons/wallets/CoinbaseWalletLogo';
 import { EverscaleLogo } from '../icons/wallets/EverscaleLogo';
 import { FrontierLogo } from '../icons/wallets/FrontierLogo';
 import { MetaMaskLogo } from '../icons/wallets/MetaMaskLogo';
+import { OkxLogo } from '../icons/wallets/OkxLogo';
 import { TrustWalletLogo } from '../icons/wallets/TrustWalletLogo';
 import { VenomLogo } from '../icons/wallets/VenomLogo';
 import { WalletConnectLogo } from '../icons/wallets/WalletConnectLogo';
@@ -68,6 +69,11 @@ export const walletsMeta: Record<string, WalletMeta> = {
 		title: 'Venom Wallet',
 		logo: (s = 30) => <VenomLogo size={s} />,
 		link: 'https://venom.foundation/wallet',
+	},
+	'okx': {
+		title: 'OKX',
+		logo: (s = 30) => <OkxLogo size={s} />,
+		link: 'https://www.okx.com/web3',
 	},
 };
 
