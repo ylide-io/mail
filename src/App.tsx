@@ -329,9 +329,6 @@ export const App = observer(() => {
 					<IosInstallPwaPopup />
 				</PopupManager>
 			</QueryClientProvider>
-
-			<div>111</div>
-			<button onClick={() => window.location.reload()}>RELOAD</button>
 		</>
 	);
 });
