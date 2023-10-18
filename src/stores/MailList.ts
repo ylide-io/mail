@@ -25,7 +25,7 @@ import messagesDB, { MessagesDB } from '../indexedDB/impl/MessagesDB';
 import { IMessageDecodedContent } from '../indexedDB/IndexedDB';
 import { invariant } from '../utils/assert';
 import { formatAddress } from '../utils/blockchain';
-import { getGlobalFeedSubject, isGlobalMessage, SEND_TO_ALL_ADDRESS } from '../utils/globalFeed';
+import { getGlobalFeedSubject } from '../utils/globalFeed';
 import { decodeMessage } from '../utils/mail';
 import { analytics } from './Analytics';
 import { browserStorage } from './browserStorage';
@@ -68,10 +68,6 @@ export interface ILinkedMessage {
 
 export namespace ILinkedMessage {
 	export function idFromIMessage(message: IMessage, account: DomainAccount) {
-		if (isGlobalMessage(message)) {
-			return `${message.msgId}:${SEND_TO_ALL_ADDRESS}`;
-		}
-
 		return `${message.msgId}:${account.account.address}`;
 	}
 
