@@ -19,6 +19,30 @@ import { truncateAddress } from './utils/string';
 
 declare const self: ServiceWorkerGlobalScope;
 
+function formatAddress(address: string) {
+	return (
+		address
+			.toLowerCase()
+			// 000000000000000000000000d3c2b7b1ebcd6949abcf1041cc629b2648ad2329 -> 0xd3c2b7b1ebcd6949abcf1041cc629b2648ad2329
+			.replace(/^0{24}/, '0x')
+			// 3f4dcce76d4760fb23879fee1a28f278b0739f99c13911094418c042fb7fbc45 -> 0:3f4dcce76d4760fb23879fee1a28f278b0739f99c13911094418c042fb7fbc45
+			.replace(/^([a-f0-9]{64})$/i, '0:$1')
+	);
+}
+
+function compareAddresses(a: string, b: string) {
+	return formatAddress(a) === formatAddress(b);
+}
+
+const ylideContacts = {
+	'team.ylide': '0x9Eb187e2b5280c41b1e6723b0F215331a099dc65',
+	'ignat.ylide': '0x9B44ed2A5de91f4E9109453434825a32FF2fD6e7',
+	'danila.ylide': '0x15a33D60283e3D20751D6740162D1212c1ad2a2d',
+	'kirill.ylide': '0x0962C57d9e451df7905d40cb1b33F179d75f6Af0',
+};
+
+//
+
 enum NotificationType {
 	INCOMING_MAIL = 'INCOMING_MAIL',
 	POST_REPLY = 'POST_REPLY',
@@ -135,8 +159,15 @@ self.addEventListener('push', async event => {
 		const data = parseNotificationData(rawData);
 
 		if (data.type === NotificationType.INCOMING_MAIL) {
+			const senderAddress = data.body.senderAddress;
+			const contact = Object.entries(ylideContacts).find(([, address]) =>
+				compareAddresses(address, senderAddress),
+			);
+
 			showNotification('New message', {
-				body: `You've got a new encrypted message from ${truncateAddress(data.body.senderAddress)}`,
+				body: `You've got a new encrypted message from ${
+					contact ? contact[0] : truncateAddress(senderAddress)
+				}`,
 				data: rawData,
 			});
 		}
