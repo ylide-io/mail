@@ -86,7 +86,7 @@ export const MailMessage = observer(
 									const contact = contacts.find({ address });
 
 									return (
-										<div className={css.recipientsRow}>
+										<div key={address} className={css.recipientsRow}>
 											{myAccount ? (
 												<AdaptiveText
 													text={formatAccountName(myAccount)}

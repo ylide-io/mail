@@ -26,7 +26,7 @@ export function ExplorePage() {
 					{communities
 						.filter(c => c.tags?.includes(tag) && !c.hidden)
 						.map(community => (
-							<RegularCommunityCard community={community} />
+							<RegularCommunityCard key={community.id} community={community} />
 						))}
 				</div>
 			</div>
