@@ -87,6 +87,9 @@ jobs:
     build_hub:
         docker:
             - image: node:16
+        environment:
+            REACT_APP__PUBLIC_URL: https://hub.ylide.io
+            REACT_APP__GLOBAL_FEED_ID: cb844d96631b3c96f668fff792e70a800ae93e6d724c3ba1eff090dab5b8d78a
         steps:
             - checkout
             - restore_pnpm_cache
@@ -109,8 +112,6 @@ jobs:
     build_hub_staging:
         docker:
             - image: node:16
-        environment:
-            REACT_APP__PUBLIC_URL: https://staging.ylide.io
         steps:
             - checkout
             - restore_pnpm_cache
@@ -133,6 +134,8 @@ jobs:
     build_mainview:
         docker:
             - image: node:16
+        environment:
+            REACT_APP__PUBLIC_URL: https://app.mainview.io
         steps:
             - checkout
             - restore_pnpm_cache
@@ -155,8 +158,6 @@ jobs:
     build_mainview_staging:
         docker:
             - image: node:16
-        environment:
-            REACT_APP__PUBLIC_URL: https://staging.mainview.io
         steps:
             - checkout
             - restore_pnpm_cache

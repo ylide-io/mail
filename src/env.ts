@@ -1,8 +1,22 @@
 // noinspection JSUnresolvedReference
 
-export const NODE_ENV = process.env.NODE_ENV as string | undefined;
+import { invariant } from './utils/assert';
 
-export const REACT_APP__PUBLIC_URL = process.env.REACT_APP__PUBLIC_URL as string | undefined;
+function env(name: string, params?: { optional: boolean }) {
+	const value = (process.env[name] as string) || '';
+
+	if (!params?.optional) {
+		invariant(value, `ENV var ${name} not provided`);
+	}
+
+	return value;
+}
+
+//
+
+export const NODE_ENV = env('NODE_ENV');
+
+export const REACT_APP__PUBLIC_URL = env('REACT_APP__PUBLIC_URL');
 
 export enum AppMode {
 	HUB = 'HUB',
@@ -10,14 +24,14 @@ export enum AppMode {
 	MAIN_VIEW = 'MAIN_VIEW',
 }
 
-export const REACT_APP__APP_MODE = (process.env.REACT_APP__APP_MODE || AppMode.HUB) as AppMode;
+export const REACT_APP__APP_MODE = env('REACT_APP__APP_MODE') as AppMode;
 
-export const REACT_APP__FEED_SERVER = process.env.REACT_APP__FEED_SERVER as string | undefined;
-export const REACT_APP__FEED_MANAGER = process.env.REACT_APP__FEED_MANAGER as string | undefined;
-export const REACT_APP__BLOCKCHAIN_FEED = process.env.REACT_APP__BLOCKCHAIN_FEED as string | undefined;
+export const REACT_APP__FEED_SERVER = env('REACT_APP__FEED_SERVER', { optional: true });
+export const REACT_APP__FEED_MANAGER = env('REACT_APP__FEED_MANAGER');
+export const REACT_APP__BLOCKCHAIN_FEED = env('REACT_APP__BLOCKCHAIN_FEED', { optional: true });
 
-export const REACT_APP__VAPID_PUBLIC_KEY = process.env.REACT_APP__VAPID_PUBLIC_KEY as string | undefined;
-export const REACT_APP__MV_PUBLIC_KEY = process.env.REACT_APP__MV_PUBLIC_KEY as string | undefined;
+export const REACT_APP__MV_PUBLIC_KEY = env('REACT_APP__MV_PUBLIC_KEY');
+export const REACT_APP__VAPID_PUBLIC_KEY = env('REACT_APP__VAPID_PUBLIC_KEY', { optional: true });
 
 export enum OtcProvider {
 	AIRSWAP = 'AIRSWAP',
@@ -25,4 +39,4 @@ export enum OtcProvider {
 	PARASWAP = 'PARASWAP',
 }
 
-export const REACT_APP__OTC_PROVIDER = (process.env.REACT_APP__OTC_PROVIDER || OtcProvider.AIRSWAP) as OtcProvider;
+export const REACT_APP__OTC_PROVIDER = env('REACT_APP__OTC_PROVIDER') as OtcProvider;
