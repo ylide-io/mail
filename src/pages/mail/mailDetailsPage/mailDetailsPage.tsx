@@ -21,7 +21,9 @@ import { FolderId, getFolderName, ILinkedMessage, MailList, mailStore } from '..
 import { OutgoingMailData, Recipients } from '../../../stores/outgoingMailData';
 import { RoutePath } from '../../../stores/routePath';
 import { invariant } from '../../../utils/assert';
+import { formatAddress } from '../../../utils/blockchain';
 import { DateFormatStyle, formatDate } from '../../../utils/date';
+import { isGlobalMessage } from '../../../utils/globalFeed';
 import {
 	decodedTextDataToEditorJsData,
 	formatSubject,
@@ -61,16 +63,23 @@ export const MailDetailsPage = observer(() => {
 				if (!message) {
 					const { msgId, address } = ILinkedMessage.parseId(id);
 
-					const domainAccount = accounts.find(a => a.account.address === address);
-					invariant(domainAccount, () => {
+					const msg = await domain.getMessageByMsgId(msgId);
+					invariant(msg, `Could not find message ${msgId}`);
+
+					const isGlobal = isGlobalMessage(msg);
+
+					const account = isGlobal
+						? folderId === FolderId.Sent
+							? accounts.find(a => formatAddress(a.account.address) === formatAddress(msg.senderAddress))
+							: accounts[0]
+						: accounts.find(a => formatAddress(a.account.address) === formatAddress(address));
+
+					invariant(account, () => {
 						toast(`Connect account ${truncateAddress(address)} to read this message 👍`);
 						return 'No account';
 					});
 
-					const msg = await domain.getMessageByMsgId(msgId);
-					invariant(msg, `Could not find message ${msgId}`);
-
-					message = await ILinkedMessage.fromIMessage(folderId, msg, domainAccount);
+					message = await ILinkedMessage.fromIMessage(folderId, msg, account);
 				}
 
 				let decoded = mailStore.decodedMessagesById[message.msgId];
