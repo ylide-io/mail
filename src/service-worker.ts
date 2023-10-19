@@ -10,6 +10,8 @@
 
 import { clientsClaim } from 'workbox-core';
 import { precacheAndRoute } from 'workbox-precaching';
+import { registerRoute } from 'workbox-routing';
+import { NetworkFirst, StaleWhileRevalidate } from 'workbox-strategies';
 
 import { truncateAddress } from './utils/string';
 
@@ -87,48 +89,15 @@ clientsClaim();
 // even if you decide not to use precaching. See https://cra.link/PWA
 precacheAndRoute(self.__WB_MANIFEST);
 
-const CACHE_NAME = 'MAIN';
+registerRoute(({ url }) => {
+	console.debug('Getting strategy for', 1, url.pathname);
+	return url.pathname.match(/^\/index\.html/i);
+}, new NetworkFirst());
 
-const indexHtmlRegexp = /^\/index\.html/i;
-const fileExtensionRegexp = /[^/?]+\\.[^/]+$/;
-
-async function networkFirst(request: Request) {
-	const cache = await caches.open(CACHE_NAME);
-
-	const fetchResult = await fetch(request);
-	if (fetchResult.ok) {
-		cache.put(request, fetchResult.clone());
-		return fetchResult;
-	}
-
-	return (await cache.match(request)) || Response.error();
-}
-
-async function cacheFirst(request: Request) {
-	const cache = await caches.open(CACHE_NAME);
-	const cacheResult = await cache.match(request);
-	if (cacheResult) return cacheResult;
-
-	const fetchResult = await fetch(request);
-	if (fetchResult.ok) {
-		cache.put(request, fetchResult.clone());
-		return fetchResult;
-	}
-
-	return Response.error();
-}
-
-self.addEventListener('fetch', event => {
-	const url = new URL(event.request.url);
-
-	if (url.pathname.match(indexHtmlRegexp)) {
-		return event.respondWith(networkFirst(event.request));
-	}
-
-	if (url.pathname.match(fileExtensionRegexp)) {
-		return event.respondWith(cacheFirst(event.request));
-	}
-});
+registerRoute(({ url }) => {
+	console.debug('Getting strategy for', 2, url.pathname);
+	return url.pathname.match(/[^/?]+\\.[^/]+$/);
+}, new StaleWhileRevalidate());
 
 // This allows the web app to trigger skipWaiting via
 // registration.waiting.postMessage({type: 'SKIP_WAITING'})
