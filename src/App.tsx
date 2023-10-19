@@ -330,7 +330,7 @@ export const App = observer(() => {
 				</PopupManager>
 			</QueryClientProvider>
 
-			<button onClick={() => window.location.reload()}>RELOAD 444</button>
+			<button onClick={() => window.location.reload()}>RELOAD 555</button>
 		</>
 	);
 });
