@@ -9,15 +9,15 @@
 // service worker, and the Workbox build step will be skipped.
 
 import { clientsClaim } from 'workbox-core';
-import { precacheAndRoute } from 'workbox-precaching';
+import { ExpirationPlugin } from 'workbox-expiration';
+import { createHandlerBoundToURL, precacheAndRoute } from 'workbox-precaching';
+import { registerRoute } from 'workbox-routing';
+import { StaleWhileRevalidate } from 'workbox-strategies';
 
+import { REACT_APP__PUBLIC_URL } from './env';
 import { truncateAddress } from './utils/string';
 
 declare const self: ServiceWorkerGlobalScope;
-
-setInterval(() => {
-	console.log('Service worker version', 5);
-}, 5000);
 
 //
 
@@ -91,48 +91,50 @@ clientsClaim();
 // even if you decide not to use precaching. See https://cra.link/PWA
 precacheAndRoute(self.__WB_MANIFEST);
 
-const CACHE_NAME = 'MAIN';
+// Set up App Shell-style routing, so that all navigation requests
+// are fulfilled with your index.html shell. Learn more at
+// https://developers.google.com/web/fundamentals/architecture/app-shell
+const fileExtensionRegexp = new RegExp('/[^/?]+\\.[^/]+$');
+registerRoute(
+	// Return false to exempt requests from being fulfilled by index.html.
+	({ request, url }: { request: Request; url: URL }) => {
+		// If this isn't a navigation, skip.
+		if (request.mode !== 'navigate') {
+			return false;
+		}
 
-const indexHtmlRegexp = /^\/index\.html/i;
-const fileExtensionRegexp = /[^/?]+\\.[^/]+$/;
+		// If this is a URL that starts with /_, skip.
+		if (url.pathname.startsWith('/_')) {
+			return false;
+		}
 
-async function networkFirst(request: Request) {
-	const cache = await caches.open(CACHE_NAME);
+		// If this looks like a URL for a resource, because it contains
+		// a file extension, skip.
+		if (url.pathname.match(fileExtensionRegexp)) {
+			return false;
+		}
 
-	const fetchResult = await fetch(request);
-	if (fetchResult.ok) {
-		cache.put(request, fetchResult.clone());
-		return fetchResult;
-	}
+		// Return true to signal that we want to use the handler.
+		return true;
+	},
+	createHandlerBoundToURL(REACT_APP__PUBLIC_URL + '/index.html'),
+);
 
-	return (await cache.match(request)) || Response.error();
-}
-
-async function cacheFirst(request: Request) {
-	const cache = await caches.open(CACHE_NAME);
-	const cacheResult = await cache.match(request);
-	if (cacheResult) return cacheResult;
-
-	const fetchResult = await fetch(request);
-	if (fetchResult.ok) {
-		cache.put(request, fetchResult.clone());
-		return fetchResult;
-	}
-
-	return Response.error();
-}
-
-self.addEventListener('fetch', event => {
-	const url = new URL(event.request.url);
-
-	if (url.pathname.match(indexHtmlRegexp)) {
-		return event.respondWith(networkFirst(event.request));
-	}
-
-	if (url.pathname.match(fileExtensionRegexp)) {
-		return event.respondWith(cacheFirst(event.request));
-	}
-});
+// An example runtime caching route for requests that aren't handled by the
+// precache, in this case same-origin .png requests like those from in public/
+registerRoute(
+	// Add in any other file extensions or routing criteria as needed.
+	({ url }) => url.origin === self.location.origin && !!url.pathname.match(/\.(je?pg|png)/i),
+	// Customize this strategy as needed, e.g., by changing to CacheFirst.
+	new StaleWhileRevalidate({
+		cacheName: 'images',
+		plugins: [
+			// Ensure that once this runtime cache reaches a maximum size the
+			// least-recently used images are removed.
+			new ExpirationPlugin({ maxEntries: 50 }),
+		],
+	}),
+);
 
 //
 
