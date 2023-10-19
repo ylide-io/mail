@@ -21,6 +21,7 @@ import { FolderId, getFolderName, ILinkedMessage, MailList, mailStore } from '..
 import { OutgoingMailData, Recipients } from '../../../stores/outgoingMailData';
 import { RoutePath } from '../../../stores/routePath';
 import { invariant } from '../../../utils/assert';
+import { formatAddress } from '../../../utils/blockchain';
 import { DateFormatStyle, formatDate } from '../../../utils/date';
 import {
 	decodedTextDataToEditorJsData,
@@ -59,21 +60,18 @@ export const MailDetailsPage = observer(() => {
 				let message = mailStore.lastMessagesList.find(m => m.id === id!);
 
 				if (!message) {
-					const [msgId, ...rest] = id.split(':');
-					const accountAddress = rest.join(':');
-					invariant(msgId, 'No msgId');
-					invariant(accountAddress, 'No account address');
+					const { msgId, address } = ILinkedMessage.parseId(id);
 
-					const domainAccount = accounts.find(a => a.account.address === accountAddress);
-					invariant(domainAccount, () => {
-						toast(`Connect account ${truncateAddress(accountAddress)} to read this message 👍`);
+					const account = accounts.find(a => formatAddress(a.account.address) === formatAddress(address));
+					invariant(account, () => {
+						toast(`Connect account ${truncateAddress(address)} to read this message 👍`);
 						return 'No account';
 					});
 
 					const msg = await domain.getMessageByMsgId(msgId);
-					invariant(msg);
+					invariant(msg, `Could not find message ${msgId}`);
 
-					message = await ILinkedMessage.fromIMessage(folderId, msg, domainAccount);
+					message = await ILinkedMessage.fromIMessage(folderId, msg, account);
 				}
 
 				let decoded = mailStore.decodedMessagesById[message.msgId];
@@ -187,7 +185,9 @@ export const MailDetailsPage = observer(() => {
 					`Date: ${formatDate(message.msg.createdAt * 1000, DateFormatStyle.LONG)}`,
 					`Subject: ${formatSubject(decodedContent.decodedSubject)}`,
 					`To: ${message.recipient?.account.address || message.msg.recipientAddress}`,
-				].join('<br>')}\n`,
+				]
+					.map(l => `<div>${l}</div>`)
+					.join('')}\n`,
 			);
 
 			editorData.blocks = [...forwardedData.blocks, ...editorData.blocks];

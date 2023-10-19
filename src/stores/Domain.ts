@@ -434,6 +434,8 @@ export class Domain {
 								needNetwork,
 							);
 						} catch (err) {
+							console.error("Couldn't switch network", err);
+
 							alert(
 								'Wrong network (' +
 									(currentNetwork ? EVM_NAMES[currentNetwork] : 'undefined') +

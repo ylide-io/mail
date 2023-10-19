@@ -1,9 +1,10 @@
 import { MessageAttachment, MessageAttachmentLinkV1, YlideIpfsStorage } from '@ylide/sdk';
 import { observer } from 'mobx-react';
-import { ReactNode, useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { createReactEditorJS } from 'react-editor-js';
 
 import { ActionButton, ActionButtonLook } from '../../../../components/ActionButton/ActionButton';
+import { AdaptiveText } from '../../../../components/adaptiveText/adaptiveText';
 import { Avatar } from '../../../../components/avatar/avatar';
 import { ContactName } from '../../../../components/contactName/contactName';
 import { ReadableDate } from '../../../../components/readableDate/readableDate';
@@ -17,10 +18,14 @@ import { ReactComponent as TrashSvg } from '../../../../icons/ic20/trash.svg';
 import { IContact, IMessageDecodedContent } from '../../../../indexedDB/IndexedDB';
 import { analytics } from '../../../../stores/Analytics';
 import contacts from '../../../../stores/Contacts';
+import domain from '../../../../stores/Domain';
 import { FolderId, ILinkedMessage, mailStore } from '../../../../stores/MailList';
+import { formatAccountName } from '../../../../utils/account';
 import { invariant } from '../../../../utils/assert';
+import { formatAddress } from '../../../../utils/blockchain';
 import { DateFormatStyle } from '../../../../utils/date';
 import { downloadFile, formatFileSize } from '../../../../utils/file';
+import { isGlobalMessage } from '../../../../utils/globalFeed';
 import { getIpfsHashFromUrl } from '../../../../utils/ipfs';
 import {
 	decodeAttachment,
@@ -60,49 +65,71 @@ export const MailMessage = observer(
 			}
 		}, [isEditorReady, onReady]);
 
-		function renderRecipients(label: ReactNode, addresses: string[]) {
+		const senders = useMemo(() => getMessageSenders(message), [message]);
+		const receivers = useMemo(() => getMessageReceivers(message, decoded), [message, decoded]);
+		const isGlobal = isGlobalMessage(message.msg);
+
+		function renderRecipients(mode: 'from' | 'to', addresses: string[]) {
 			return (
-				!!addresses.length && (
+				(!!addresses.length || (mode === 'to' && isGlobal)) && (
 					<>
-						<div className={css.recipientsLabel}>{label}</div>
+						<div className={css.recipientsLabel}>{mode === 'from' ? 'From:' : 'To:'}</div>
 
 						<div className={css.recipientsList}>
-							{addresses.map(address => {
-								const contact = contacts.find({ address });
+							{mode === 'to' && isGlobal ? (
+								<div className={css.recipientsRow}>Everyone</div>
+							) : (
+								addresses.map(address => {
+									const myAccount = domain.accounts.accounts.find(
+										a => formatAddress(a.account.address) === formatAddress(address),
+									);
+									const contact = contacts.find({ address });
 
-								return (
-									<div className={css.recipientsRow}>
-										<ContactName address={address} />
+									return (
+										<div key={address} className={css.recipientsRow}>
+											{myAccount ? (
+												<AdaptiveText
+													text={formatAccountName(myAccount)}
+													title={myAccount.account.address}
+												/>
+											) : (
+												<>
+													<ContactName address={address} />
 
-										{!contact && (
-											<button
-												className={css.recipientsButton}
-												title="Create contact"
-												onClick={() => {
-													analytics.startCreatingContact('mail-details');
+													{!contact && (
+														<button
+															className={css.recipientsButton}
+															title="Create contact"
+															onClick={() => {
+																analytics.startCreatingContact('mail-details');
 
-													const name = prompt('Enter contact name:')?.trim();
-													if (!name) return;
+																const name = prompt('Enter contact name:')?.trim();
+																if (!name) return;
 
-													const contact: IContact = {
-														name,
-														description: '',
-														address,
-														tags: [],
-													};
+																const contact: IContact = {
+																	name,
+																	description: '',
+																	address,
+																	tags: [],
+																};
 
-													contacts
-														.createContact(contact)
-														.then(() => analytics.finishCreatingContact('mail-details'))
-														.catch(() => toast("Couldn't save 😒"));
-												}}
-											>
-												<AddContactSvg />
-											</button>
-										)}
-									</div>
-								);
-							})}
+																contacts
+																	.createContact(contact)
+																	.then(() =>
+																		analytics.finishCreatingContact('mail-details'),
+																	)
+																	.catch(() => toast("Couldn't save 😒"));
+															}}
+														>
+															<AddContactSvg />
+														</button>
+													)}
+												</>
+											)}
+										</div>
+									);
+								})
+							)}
 						</div>
 					</>
 				)
@@ -139,9 +166,9 @@ export const MailMessage = observer(
 				</div>
 
 				<div className={css.recipients}>
-					{renderRecipients('From:', getMessageSenders(message))}
+					{renderRecipients('from', senders)}
 
-					{renderRecipients('To:', getMessageReceivers(message, decoded))}
+					{renderRecipients('to', receivers)}
 				</div>
 
 				<ReadableDate className={css.date} style={DateFormatStyle.LONG} value={message.msg.createdAt * 1000} />

@@ -70,6 +70,7 @@ export class Accounts {
 
 	async createNewDomainAccount(wallet: Wallet, account: WalletAccount) {
 		const domainAccount = new DomainAccount(this.domain.keysRegistry, wallet, account, '');
+		await domainAccount.loadFeedWriter();
 		this.accounts.push(domainAccount);
 		wallet.accounts.push(domainAccount);
 		this.save();
@@ -98,6 +99,7 @@ export class Accounts {
 				domainAccount.backgroundCheckForNewRemoteKeys();
 				domainAccount.backgroundReadKeysHistory();
 			}
+			await domainAccount.loadFeedWriter();
 
 			this.accounts.push(domainAccount);
 			wallet.accounts.push(domainAccount);

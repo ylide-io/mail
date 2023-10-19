@@ -4,6 +4,7 @@ import {
 	AbstractBlockchainController,
 	BlockchainSourceType,
 	IBlockchainSourceSubject,
+	IListSource,
 	IMessage,
 	IMessageWithSource,
 	ISourceWithMeta,
@@ -24,6 +25,7 @@ import messagesDB, { MessagesDB } from '../indexedDB/impl/MessagesDB';
 import { IMessageDecodedContent } from '../indexedDB/IndexedDB';
 import { invariant } from '../utils/assert';
 import { formatAddress } from '../utils/blockchain';
+import { getGlobalFeedSubject } from '../utils/globalFeed';
 import { decodeMessage } from '../utils/mail';
 import { analytics } from './Analytics';
 import { browserStorage } from './browserStorage';
@@ -54,11 +56,6 @@ export function getFolderName(folderId: FolderId) {
 //
 
 const FILTERED_OUT = {};
-
-function wrapMessageId(p: IMessageWithSource) {
-	const acc = p.meta?.account as DomainAccount | undefined;
-	return `${p.msg.msgId}${acc ? `:${acc.account.address}` : ''}`;
-}
 
 export interface ILinkedMessage {
 	id: string;
@@ -129,6 +126,21 @@ export namespace ILinkedMessage {
 	): Promise<ILinkedMessage[]> {
 		return await Promise.all(p.map(m => fromIMessageWithSource(folderId, m)));
 	}
+
+	//
+
+	export function parseId(id: string) {
+		// id could look like 'IRLwHRdNAAUB9Q==:0:6bf6da64c5f3da47d125d8b1d39bb9097ab5b047'
+		// (address contains ':' too)
+
+		const [msgId, ...rest] = id.split(':');
+		const address = rest.join(':');
+		invariant(msgId && address, `Invalid LinkedMessage ID: ${id}`);
+		return {
+			msgId,
+			address,
+		};
+	}
 }
 
 export class MailList<M = ILinkedMessage> {
@@ -179,6 +191,24 @@ export class MailList<M = ILinkedMessage> {
 			function buildMailboxSources(): ISourceWithMeta[] {
 				invariant(mailbox);
 
+				const enrichWithGlobalSubject = (data: ISourceWithMeta[], account?: DomainAccount, sent = false) => {
+					if (!account) return data;
+
+					const globalSubject = getGlobalFeedSubject(sent ? account.account.address : null);
+
+					const blockchainController = domain.blockchains[
+						globalSubject.blockchain
+					] as EVMBlockchainController;
+
+					const listSource = new ListSource(
+						mailStore.readingSession,
+						globalSubject,
+						blockchainController.ininiateMessagesSource(globalSubject),
+					) as IListSource;
+
+					return [{ source: listSource, meta: { account } } as ISourceWithMeta].concat(data);
+				};
+
 				function getDirectWithMeta(
 					recipient: Uint256,
 					sender: string | null,
@@ -194,15 +224,19 @@ export class MailList<M = ILinkedMessage> {
 							},
 						])
 						.map(source => ({ source, meta: { account } }));
-					// .filter(s => s.source.subject.id === 'tvm-venom-testnet-mailer-13');
 				}
 
 				if (mailbox.folderId === FolderId.Inbox || mailbox.folderId === FolderId.Archive) {
-					return mailbox.accounts
+					const mailboxData = mailbox.accounts
 						.map(acc => getDirectWithMeta(acc.uint256Address, mailbox.sender || null, acc))
 						.flat();
+					return enrichWithGlobalSubject(mailboxData, mailbox.accounts[0]);
 				} else if (mailbox.folderId === FolderId.Sent) {
-					return mailbox.accounts.map(acc => getDirectWithMeta(acc.sentAddress, null, acc)).flat();
+					const mailboxData = mailbox.accounts
+						.map(acc => getDirectWithMeta(acc.sentAddress, null, acc))
+						.flat();
+					const globalFeedWriter = mailbox.accounts.find(acc => acc.isGlobalFeedWriter);
+					return enrichWithGlobalSubject(mailboxData, globalFeedWriter, true);
 				} else {
 					const tag = tags.tags.find(t => String(t.id) === mailbox.folderId);
 					if (!tag) {
@@ -222,7 +256,7 @@ export class MailList<M = ILinkedMessage> {
 			console.debug('MailList init', this.id, Date.now() - start);
 			this.streamDisposer = dispose;
 			await newStream.resetFilter(m => {
-				return mailbox.filter ? mailbox.filter(wrapMessageId(m)) : true;
+				return mailbox.filter ? mailbox.filter(ILinkedMessage.idFromIMessageWithSource(m)) : true;
 			});
 			this.stream = newStream;
 			await this.reloadMessages();

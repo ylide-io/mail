@@ -50,6 +50,7 @@ import { evmNameToNetwork, formatAddress, isEvmBlockchain } from './blockchain';
 import { htmlSelfClosingTagsToXHtml } from './string';
 import { toJS } from 'mobx';
 import { BigNumber } from '@ethersproject/bignumber';
+import { isGlobalMessage } from './globalFeed';
 
 // SENDING
 
@@ -320,13 +321,17 @@ export function getMessageSenders(message: ILinkedMessage) {
 }
 
 export function getMessageReceivers(message: ILinkedMessage, decoded?: IMessageDecodedContent) {
-	return decoded?.recipientInfos.length
+	return isGlobalMessage(message.msg)
+		? []
+		: decoded?.recipientInfos.length
 		? decoded.recipientInfos.map(r => r.address)
 		: !isEvmBlockchain(message.msg.blockchain)
 		? []
 		: message.recipients.length
 		? message.recipients
-		: [formatAddress(message.msg.recipientAddress)];
+		: message.msg.recipientAddress !== '0000000000000000000000000000000000000000000000000000000000000000'
+		? [formatAddress(message.msg.recipientAddress)]
+		: [];
 }
 
 // TEXT

@@ -4,6 +4,7 @@ import { KeyboardEvent, useEffect, useRef, useState } from 'react';
 import contacts from '../../stores/Contacts';
 import { RecipientInputItem, Recipients } from '../../stores/outgoingMailData';
 import { HorizontalAlignment } from '../../utils/alignment';
+import { SEND_TO_ALL_ADDRESS } from '../../utils/globalFeed';
 import { constrain } from '../../utils/number';
 import { AdaptiveText } from '../adaptiveText/adaptiveText';
 import { DropDown, DropDownItem, DropDownItemMode } from '../dropDown/dropDown';
@@ -24,10 +25,11 @@ interface DropDownOption {
 
 interface RecipientInputProps {
 	isReadOnly?: boolean;
+	allowSendingToAll?: boolean;
 	value: Recipients;
 }
 
-export const RecipientInput = observer(({ isReadOnly, value }: RecipientInputProps) => {
+export const RecipientInput = observer(({ isReadOnly, allowSendingToAll, value }: RecipientInputProps) => {
 	const tagInputRef = useRef(null);
 
 	const [search, setSearch] = useState('');
@@ -43,28 +45,37 @@ export const RecipientInput = observer(({ isReadOnly, value }: RecipientInputPro
 
 		const cleanSearch = search.trim();
 
-		setOptions(
-			contacts.contacts
-				// Filter by Search value
-				.filter(
-					contact =>
-						!cleanSearch || contact.name.includes(cleanSearch) || contact.address.includes(cleanSearch),
-				)
+		const newOptions = contacts.contacts
+			// Filter by Search value
+			.filter(
+				contact => !cleanSearch || contact.name.includes(cleanSearch) || contact.address.includes(cleanSearch),
+			)
 
-				// Filter already selected contacts out
-				.filter(
-					contact =>
-						!value.items.some(
-							it =>
-								it.name === contact.name ||
-								it.name === contact.address ||
-								it.routing?.address === contact.address,
-						),
-				)
+			// Filter already selected contacts out
+			.filter(
+				contact =>
+					!value.items.some(
+						it =>
+							it.name === contact.name ||
+							it.name === contact.address ||
+							it.routing?.address === contact.address,
+					),
+			)
 
-				.map((contact, i) => ({ name: contact.name, address: contact.address, isHighlighted: !i })),
-		);
-	}, [isFocused, search, value.items]);
+			.map((contact, i) => ({ name: contact.name, address: contact.address, isHighlighted: !i }));
+
+		if (allowSendingToAll && !value.isSendingToAll && !cleanSearch) {
+			newOptions.unshift({
+				name: 'Send to all',
+				address: SEND_TO_ALL_ADDRESS,
+				isHighlighted: true,
+			});
+
+			newOptions.map((it, i) => (it.isHighlighted = !i));
+		}
+
+		setOptions(newOptions);
+	}, [isFocused, allowSendingToAll, search, value.items, value.isSendingToAll]);
 
 	//
 
@@ -125,7 +136,14 @@ export const RecipientInput = observer(({ isReadOnly, value }: RecipientInputPro
 	};
 
 	const onSelect = (option: DropDownOption) => {
-		value.items = [...value.items, Recipients.createItem(option.name, { routing: { address: option.address } })];
+		if (option.address === SEND_TO_ALL_ADDRESS || value.isSendingToAll) {
+			value.items = [Recipients.createItem(option.name, { routing: { address: option.address } })];
+		} else {
+			value.items = [
+				...value.items,
+				Recipients.createItem(option.name, { routing: { address: option.address } }),
+			];
+		}
 		setSearch('');
 	};
 
@@ -152,6 +170,8 @@ export const RecipientInput = observer(({ isReadOnly, value }: RecipientInputPro
 						? `We found ${
 								routing.details.type === 'ylide' ? 'Ylide' : routing.details.type
 						  } key suitable for receiving messages`
+						: routing?.address === SEND_TO_ALL_ADDRESS
+						? 'Message will be sent to all users'
 						: !routing || routing.details === null
 						? 'Public key of the recipient was not found'
 						: undefined;
@@ -164,7 +184,7 @@ export const RecipientInput = observer(({ isReadOnly, value }: RecipientInputPro
 									? TagInputItemLook.DEFAULT
 									: item.isLoading
 									? TagInputItemLook.LOADING
-									: routing?.details
+									: routing?.details || item.routing?.address === SEND_TO_ALL_ADDRESS
 									? TagInputItemLook.SUCCESS
 									: TagInputItemLook.ERROR
 							}

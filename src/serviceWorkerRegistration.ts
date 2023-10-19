@@ -37,7 +37,7 @@ export function registerServiceWorker(config?: Config) {
 		}
 
 		window.addEventListener('load', () => {
-			const swUrl = `${REACT_APP__PUBLIC_URL}/service-worker.js?v8`;
+			const swUrl = `${REACT_APP__PUBLIC_URL}/service-worker.js`;
 
 			if (isLocalhost) {
 				// This is running on localhost. Let's check if a service worker still exists or not.

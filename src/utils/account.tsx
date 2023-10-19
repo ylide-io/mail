@@ -21,9 +21,11 @@ import { isWalletSupportsBlockchain, walletsMeta } from './wallet';
 export function formatAccountName(account: DomainAccount) {
 	const walletName = walletsMeta[account.wallet.wallet].title;
 
+	const globalFeedMark = account.isGlobalFeedWriter ? '🌎 ' : '';
+
 	return account.name
-		? `${account.name} (${truncateAddress(account.account.address)}, ${walletName})`
-		: `${truncateAddress(account.account.address, 12)} (${walletName})`;
+		? `${account.name} ${globalFeedMark}(${truncateAddress(account.account.address)}, ${walletName})`
+		: `${truncateAddress(account.account.address, 12)} ${globalFeedMark}(${walletName})`;
 }
 
 //
