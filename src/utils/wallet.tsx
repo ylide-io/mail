@@ -21,6 +21,13 @@ export interface WalletMeta {
 }
 
 export const walletsMeta: Record<string, WalletMeta> = {
+	// IMPORTANT
+	'okx': {
+		title: 'OKX',
+		logo: (s = 30) => <OkxLogo size={s} />,
+		link: 'https://www.okx.com/web3',
+	},
+
 	// EVM
 	'metamask': {
 		title: 'MetaMask',
@@ -69,11 +76,6 @@ export const walletsMeta: Record<string, WalletMeta> = {
 		title: 'Venom Wallet',
 		logo: (s = 30) => <VenomLogo size={s} />,
 		link: 'https://venom.foundation/wallet',
-	},
-	'okx': {
-		title: 'OKX',
-		logo: (s = 30) => <OkxLogo size={s} />,
-		link: 'https://www.okx.com/web3',
 	},
 };
 
