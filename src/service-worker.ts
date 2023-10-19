@@ -17,7 +17,7 @@ import { truncateAddress } from './utils/string';
 
 declare const self: ServiceWorkerGlobalScope;
 
-console.log('Service worker version', 3);
+console.log('Service worker version', 4);
 
 //
 
