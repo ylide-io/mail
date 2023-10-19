@@ -16,6 +16,7 @@ import { Modal } from '../modal/modal';
 import { TextField, TextFieldLook } from '../textField/textField';
 import { YlideLoader } from '../ylideLoader/ylideLoader';
 import css from './selectWalletModal.module.scss';
+import { WalletIcon } from './walletIcon/walletIcon';
 
 enum Tab {
 	QR = 'qr',
@@ -130,44 +131,39 @@ export const SelectWalletModal = observer(({ onClose }: SelectWalletModalProps) 
 					) : (
 						links
 							.filter(d => d.name.toLowerCase().includes(search.toLowerCase()))
-							.map(w => {
-								return (
-									<div
-										className={css.walletIcon}
-										onClick={() => {
-											const href = browserUtils.formatIOSMobile(
-												!domain.walletConnectState.loading &&
-													!domain.walletConnectState.connection
-													? domain.walletConnectState.url
-													: '',
-												w,
-											);
+							.map(w => (
+								<WalletIcon
+									key={w.shortName}
+									className={css.walletIcon}
+									icon={
+										<img
+											src={w.logo}
+											alt="Wallet Logo"
+											style={{
+												width: 32,
+												height: 32,
+												borderRadius: 6,
+											}}
+										/>
+									}
+									name={w.shortName}
+									onClick={() => {
+										const href = browserUtils.formatIOSMobile(
+											!domain.walletConnectState.loading && !domain.walletConnectState.connection
+												? domain.walletConnectState.url
+												: '',
+											w,
+										);
 
-											browserUtils.saveMobileLinkInfo({
-												name: w.name,
-												href: href,
-											});
+										browserUtils.saveMobileLinkInfo({
+											name: w.name,
+											href: href,
+										});
 
-											openInNewWidnow(href);
-										}}
-									>
-										<div className={css.walletIconBlock}>
-											<div className={css.walletIconImage}>
-												<img
-													src={w.logo}
-													alt="Wallet Logo"
-													style={{
-														width: 32,
-														height: 32,
-														borderRadius: 6,
-													}}
-												/>
-											</div>
-										</div>
-										<div className={css.walletIconTitle}>{w.shortName}</div>
-									</div>
-								);
-							})
+										openInNewWidnow(href);
+									}}
+								/>
+							))
 					)}
 				</div>
 			</>
@@ -183,16 +179,13 @@ export const SelectWalletModal = observer(({ onClose }: SelectWalletModalProps) 
 					<div className={css.awTitle}>Available browser extensions</div>
 					<div className={css.walletsContainer}>
 						{availableBrowserWallets.map(w => (
-							<div
-								className={css.walletIcon}
+							<WalletIcon
 								key={w}
+								className={css.walletIcon}
+								icon={walletsMeta[w].logo(32)}
+								name={walletsMeta[w].title}
 								onClick={() => onClose?.(domain.wallets.find(it => it.wallet === w))}
-							>
-								<div className={css.walletIconBlock}>
-									<div className={css.walletIconImage}>{walletsMeta[w].logo(32)}</div>
-								</div>
-								<div className={css.walletIconTitle}>{walletsMeta[w].title}</div>
-							</div>
+							/>
 						))}
 					</div>
 				</div>
@@ -361,18 +354,15 @@ export const SelectWalletModal = observer(({ onClose }: SelectWalletModalProps) 
 										.map(w => {
 											const wData = walletsMeta[w];
 											return (
-												<div
-													className={css.walletIcon}
+												<WalletIcon
 													key={w}
+													className={css.walletIcon}
+													icon={wData.logo(32)}
+													name={wData.title}
 													onClick={() => {
 														openInNewWidnow(wData.link);
 													}}
-												>
-													<div className={css.walletIconBlock}>
-														<div className={css.walletIconImage}>{wData.logo(32)}</div>
-													</div>
-													<div className={css.walletIconTitle}>{wData.title}</div>
-												</div>
+												/>
 											);
 										})}
 								</div>

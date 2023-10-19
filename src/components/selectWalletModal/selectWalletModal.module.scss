@@ -4,41 +4,6 @@
 
 //
 
-.walletIcon {
-	border-radius: 10px;
-	padding: 6px 0;
-	cursor: pointer;
-
-	&:hover {
-		background: var(--secondary-surface-color);
-	}
-}
-
-.walletIconBlock {
-	@include flex-row(center, center);
-	margin: 0 auto 8px;
-	width: 48px;
-	height: 48px;
-	padding: 8px;
-
-	background: var(--tertiary-surface-color);
-	border-radius: 12px;
-}
-
-.walletIconImage {
-	@include flex-row(center, center);
-	width: 32px;
-	height: 32px;
-}
-
-.walletIconTitle {
-	@include truncate-text;
-	font-size: 12px;
-	text-align: center;
-}
-
-//
-
 .title {
 	font-size: 24px;
 	text-align: center;
