@@ -4,46 +4,6 @@
 
 //
 
-.walletIcon {
-	@include flex-column(center, flex-start);
-
-	border-radius: 10px;
-	padding-top: 6px;
-	padding-bottom: 6px;
-
-	&:hover {
-		cursor: pointer;
-		background: var(--secondary-surface-color);
-	}
-}
-
-.walletIconBlock {
-	@include flex-row(center, center);
-	width: 48px;
-	height: 48px;
-	padding: 8px;
-
-	background: var(--tertiary-surface-color);
-	border-radius: 12px;
-	margin-bottom: 8px;
-}
-
-.walletIconImage {
-	@include flex-row(center, center);
-	width: 32px;
-	height: 32px;
-}
-
-.walletIconTitle {
-	font-style: normal;
-	font-weight: 300;
-	font-size: 12px;
-	line-height: 16px;
-	text-align: center;
-}
-
-//
-
 .title {
 	font-size: 24px;
 	text-align: center;
@@ -119,12 +79,12 @@
 	cursor: pointer;
 
 	&::after {
-		position: absolute;
-		bottom: 0;
 		content: ' ';
-		width: 100%;
-		height: 1px;
-		background: var(--border-color);
+		position: absolute;
+		right: 0;
+		bottom: 0;
+		left: 0;
+		border-bottom: 1px solid var(--border-color);
 	}
 }
 
@@ -145,8 +105,6 @@
 }
 
 .wmTabContent {
-	@include flex-column(stretch, flex-start);
-	position: relative;
 	margin-top: 16px;
 	min-height: 0;
 }
@@ -187,20 +145,17 @@
 }
 
 .walletsList {
-	@include flex-row(center, space-evenly);
-	flex-wrap: wrap;
-
-	padding-top: 8px;
-	margin-top: 8px;
+	display: grid;
+	grid-template-columns: repeat(4, minmax(48px, 1fr));
+	padding: 8px 0 0;
+	margin: 8px 0 0;
 	width: 100%;
 	min-height: 160px;
 	max-height: 260px;
 	overflow-y: auto;
 
 	.walletIcon {
-		margin-bottom: 12px;
-		width: 94px;
-		flex-basis: 94px;
+		margin: 0 0 12px;
 	}
 }
 

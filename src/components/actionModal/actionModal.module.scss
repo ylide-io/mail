@@ -6,16 +6,18 @@ https://trello.com/c/i9GAsOaF
 .root {
 	--action-modal_padding: 32px;
 
+	@include flex-column-with-gap(24px);
 	padding: var(--action-modal_padding);
 
-	> :not(:last-child) {
-		margin: 0 0 24px;
+	@include lessThan480w {
+		--action-modal_padding: 24px;
 	}
 }
 
 .title {
 	min-width: 0;
 	font-size: 24px;
+	font-weight: $font-weight_medium;
 }
 
 .content {

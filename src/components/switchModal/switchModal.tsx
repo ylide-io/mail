@@ -23,21 +23,24 @@ type SwitchModalPayload =
 interface SwitchModalProps {
 	wallet: Wallet;
 	payload: SwitchModalPayload;
-	needAccount?: WalletAccount;
+	currentAccount?: WalletAccount;
 	onConfirm: (result: boolean) => void;
 }
 
-export function SwitchModal({ wallet, payload, needAccount, onConfirm }: SwitchModalProps) {
+export function SwitchModal({ wallet, payload, currentAccount, onConfirm }: SwitchModalProps) {
 	const [error, setError] = useState('');
 
 	useEffect(() => {
 		function handleAccountUpdate(account: WalletAccount | null) {
 			if (!account) return;
 
-			if (!needAccount || account.address === needAccount.address) {
+			if (
+				payload.mode !== SwitchModalMode.SPECIFIC_ACCOUNT_REQUIRED ||
+				account.address === payload.needAccount.address
+			) {
 				onConfirm(true);
 			} else {
-				setError('Wrong account 😒 Please try again.');
+				setError('Wrong account selected in wallet 😟');
 			}
 		}
 
@@ -48,12 +51,15 @@ export function SwitchModal({ wallet, payload, needAccount, onConfirm }: SwitchM
 		return () => {
 			wallet.off('accountUpdate', handleAccountUpdate);
 		};
-	}, [needAccount, onConfirm, wallet]);
+	}, [onConfirm, payload, wallet]);
 
 	return (
 		<>
 			{wallet.wallet !== 'everwallet' && (
-				<ActionModal title="Switch account" onClose={() => onConfirm(false)}>
+				<ActionModal
+					title={currentAccount ? 'Switch account' : 'Activate account'}
+					onClose={() => onConfirm(false)}
+				>
 					{payload.mode === SwitchModalMode.CURRENT_ACCOUNT_ALREADY_CONNECTED && (
 						<>
 							<WalletTag wallet={wallet.wallet} address={payload.account.address} />
@@ -84,9 +90,9 @@ export function SwitchModal({ wallet, payload, needAccount, onConfirm }: SwitchM
 }
 
 export namespace SwitchModal {
-	export function show(wallet: Wallet, payload: SwitchModalPayload) {
+	export function show(wallet: Wallet, payload: SwitchModalPayload, currentAccount?: WalletAccount) {
 		return showStaticComponent<boolean>(resolve => (
-			<SwitchModal wallet={wallet} payload={payload} onConfirm={resolve} />
+			<SwitchModal wallet={wallet} payload={payload} currentAccount={currentAccount} onConfirm={resolve} />
 		));
 	}
 }

@@ -1,3 +1,8 @@
+/*
+"display: grid" somehow doesn't work in Venom browser on iOS:
+https://trello.com/c/i9GAsOaF
+ */
+
 .root {
 	// To make .body fit .root and not overflow
 	display: flex;
@@ -7,7 +12,9 @@
 	padding: 8px;
 	max-width: 100%;
 	max-height: 100%;
-	transition: top 200ms, left 200ms;
+	transition:
+		top 200ms,
+		left 200ms;
 }
 
 .root_hidden {

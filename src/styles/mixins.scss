@@ -134,6 +134,15 @@ $mediaHeight768: 768px;
 	}
 }
 
+@mixin flex-column-with-gap($gap) {
+	display: flex;
+	flex-direction: column;
+
+	> :not(:last-child) {
+		margin-bottom: $gap;
+	}
+}
+
 @mixin flex-row($align-items, $justify-content) {
 	display: flex;
 	flex-direction: row;
