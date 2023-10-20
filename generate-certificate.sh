@@ -1,1 +1,1 @@
-openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout key2.pem -out cert2.pem -config openssl.cnf
+openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout key.pem -out cert.pem -config openssl.cnf
