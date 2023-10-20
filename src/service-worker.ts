@@ -205,13 +205,20 @@ self.addEventListener('notificationclick', event => {
 	}
 });
 
+let isFirstInstallation = true;
 // TODO: remove after patch
-self.addEventListener('install', () => {
-	self.skipWaiting();
+self.addEventListener('install', function (event) {
+	isFirstInstallation = !self.registration.active;
+	if (!isFirstInstallation) {
+		self.skipWaiting();
+	}
 });
 
 // TODO: remove after patch
 self.addEventListener('activate', event => {
+	if (isFirstInstallation) {
+		return;
+	}
 	event.waitUntil(
 		// This promise won't settle until we've taken control of all clients,
 		// ensuring they see the updated service worker immediately upon reloading.
