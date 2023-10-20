@@ -2,12 +2,12 @@ import 'normalize.css';
 import 'minireset.css';
 import './styles/index.scss';
 
-import { configure } from 'mobx';
+import { configure, observable } from 'mobx';
 import { createRoot } from 'react-dom/client';
 import { BrowserRouter } from 'react-router-dom';
 
 import { App } from './App';
-import { registerServiceWorker } from './serviceWorkerRegistration';
+import { registerServiceWorker, ServiceWorkerUpdateCallback } from './serviceWorkerRegistration';
 import { initSentry } from './utils/sentry';
 import { buildUrl, UseNavParameters } from './utils/url';
 
@@ -63,12 +63,13 @@ function migrateLocation() {
 
 if (!migrateLocation()) {
 	const root = createRoot(document.getElementById('root')!);
+	const serviceWorkerUpdateCallback = observable.box<ServiceWorkerUpdateCallback | undefined>(undefined);
 
 	root.render(
 		<BrowserRouter>
-			<App />
+			<App serviceWorkerUpdateCallback={serviceWorkerUpdateCallback} />
 		</BrowserRouter>,
 	);
 
-	registerServiceWorker();
+	registerServiceWorker({ onUpdateAvailable: sw => serviceWorkerUpdateCallback.set(sw) });
 }

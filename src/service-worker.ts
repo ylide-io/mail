@@ -206,7 +206,7 @@ self.addEventListener('notificationclick', event => {
 });
 
 // TODO: remove after patch
-self.addEventListener('install', function (event) {
+self.addEventListener('install', () => {
 	self.skipWaiting();
 });
 
@@ -217,16 +217,16 @@ self.addEventListener('activate', event => {
 		// ensuring they see the updated service worker immediately upon reloading.
 		self.clients
 			.claim()
-			.then(() => {
-				// Get all the service worker clients
-				return self.clients.matchAll({
+			// Get all the service worker clients
+			.then(() =>
+				self.clients.matchAll({
 					type: 'window',
 					includeUncontrolled: true,
-				});
-			})
+				}),
+			)
+			// Force a reload on each client.
 			.then(clients => {
 				clients.forEach(client => {
-					// Force a reload on each client.
 					client.navigate(client.url);
 				});
 			}),

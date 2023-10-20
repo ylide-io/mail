@@ -1,8 +1,10 @@
+import { IObservableValue } from 'mobx';
 import { observer } from 'mobx-react';
 import { useEffect, useState } from 'react';
 import { QueryClient, QueryClientProvider } from 'react-query';
 import { generatePath, Navigate, Route, Routes, useLocation, useSearchParams } from 'react-router-dom';
 
+import css from './app.module.scss';
 import { ActionButton, ActionButtonLook, ActionButtonSize } from './components/ActionButton/ActionButton';
 import { IosInstallPwaPopup } from './components/iosInstallPwaPopup/iosInstallPwaPopup';
 import { MainViewOnboarding } from './components/mainViewOnboarding/mainViewOnboarding';
@@ -12,6 +14,7 @@ import { StaticComponentManager } from './components/staticComponentManager/stat
 import { ToastManager } from './components/toast/toast';
 import { TransactionPopup } from './components/TransactionPopup/TransactionPopup';
 import { YlideLoader } from './components/ylideLoader/ylideLoader';
+import { APP_NAME } from './constants';
 import { AppMode, REACT_APP__APP_MODE } from './env';
 import { AdminFeedPage } from './pages/AdminFeedPage';
 import { AdminPage } from './pages/AdminPage';
@@ -34,6 +37,7 @@ import { TestPage } from './pages/test/testPage';
 import { WalletsPage } from './pages/wallets/walletsPage';
 import { MailboxWidget } from './pages/widgets/mailboxWidget/mailboxWidget';
 import { SendMessageWidget } from './pages/widgets/sendMessageWidget/sendMessageWidget';
+import { ServiceWorkerUpdateCallback } from './serviceWorkerRegistration';
 import { analytics } from './stores/Analytics';
 import { browserStorage } from './stores/browserStorage';
 import domain from './stores/Domain';
@@ -63,10 +67,16 @@ function redirect({ from, to }: RedirectProps) {
 
 //
 
-export const App = observer(() => {
+interface AppProps {
+	serviceWorkerUpdateCallback: IObservableValue<ServiceWorkerUpdateCallback | undefined>;
+}
+
+export const App = observer(({ serviceWorkerUpdateCallback }: AppProps) => {
 	const location = useLocation();
 	const [searchParams] = useSearchParams();
 	const navigate = useNav();
+
+	const swUpdateCallback = serviceWorkerUpdateCallback.get();
 
 	const [queryClient] = useState(
 		new QueryClient({
@@ -207,6 +217,20 @@ export const App = observer(() => {
 					}[REACT_APP__APP_MODE]
 				}
 			/>
+
+			{swUpdateCallback && (
+				<div className={css.updateAppBanner}>
+					<div>
+						<b>A new version of {APP_NAME} is available!</b>
+						<br />
+						Please refresh the page to apply changes.
+					</div>
+
+					<ActionButton look={ActionButtonLook.HEAVY} onClick={() => swUpdateCallback()}>
+						Update app 🚀
+					</ActionButton>
+				</div>
+			)}
 
 			{!!remoteConsoleChannel.get() && (
 				<div
