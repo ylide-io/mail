@@ -1,0 +1,20 @@
+.updateAppBanner {
+	display: grid;
+	grid-template-columns: 1fr auto;
+	align-items: center;
+	grid-gap: 8px;
+	position: sticky;
+	top: 0;
+	z-index: 1;
+	padding: 4px 16px;
+	min-height: 48px;
+	color: var(--on-accent2-color);
+	background: var(--accent2-color);
+
+	@include lessThan480w {
+		grid-template-columns: 1fr;
+		justify-items: center;
+		padding: 8px 8px;
+		text-align: center;
+	}
+}
