@@ -3,6 +3,7 @@
 	"version": "0.1.0",
 	"private": true,
 	"scripts": {
+		"hub": "npm run build-hub && npm run start-hub-local",
 		"start": "react-app-rewired start",
 		"start-mainview": "cross-env REACT_APP__APP_MODE=MAIN_VIEW react-app-rewired start",
 		"start-hub": "cross-env REACT_APP__APP_MODE=HUB react-app-rewired start",

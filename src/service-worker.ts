@@ -204,3 +204,31 @@ self.addEventListener('notificationclick', event => {
 		event.waitUntil(self.clients.openWindow(url));
 	}
 });
+
+// TODO: remove after patch
+self.addEventListener('install', function (event) {
+	self.skipWaiting();
+});
+
+// TODO: remove after patch
+self.addEventListener('activate', event => {
+	event.waitUntil(
+		// This promise won't settle until we've taken control of all clients,
+		// ensuring they see the updated service worker immediately upon reloading.
+		self.clients
+			.claim()
+			.then(() => {
+				// Get all the service worker clients
+				return self.clients.matchAll({
+					type: 'window',
+					includeUncontrolled: true,
+				});
+			})
+			.then(clients => {
+				clients.forEach(client => {
+					// Force a reload on each client.
+					client.navigate(client.url);
+				});
+			}),
+	);
+});

@@ -20,13 +20,15 @@ const isLocalhost = Boolean(
 		window.location.hostname.match(/^127(?:\.(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)){3}$/),
 );
 
-type Config = {
-	onSuccess?: (registration: ServiceWorkerRegistration) => void;
-	onUpdate?: (registration: ServiceWorkerRegistration) => void;
-};
-
-export function registerServiceWorker(config?: Config) {
+let refreshing = false;
+let intervalId: NodeJS.Timeout | null = null;
+export function registerServiceWorker() {
 	if (NODE_ENV === 'production' && 'serviceWorker' in navigator) {
+		navigator.serviceWorker.addEventListener('controllerchange', function () {
+			if (refreshing) return;
+			refreshing = true;
+			window.location.reload();
+		});
 		// The URL constructor is available in all browsers that support SW.
 		const publicUrl = new URL(REACT_APP__PUBLIC_URL!, window.location.href);
 		if (publicUrl.origin !== window.location.origin) {
@@ -41,7 +43,7 @@ export function registerServiceWorker(config?: Config) {
 
 			if (isLocalhost) {
 				// This is running on localhost. Let's check if a service worker still exists or not.
-				checkValidServiceWorker(swUrl, config);
+				checkValidServiceWorker(swUrl);
 
 				// Add some additional logging to localhost, pointing developers to the
 				// service worker/PWA documentation.
@@ -53,13 +55,13 @@ export function registerServiceWorker(config?: Config) {
 				});
 			} else {
 				// Is not localhost. Just register service worker
-				registerValidSW(swUrl, config);
+				registerValidSW(swUrl);
 			}
 		});
 	}
 }
 
-function registerValidSW(swUrl: string, config?: Config) {
+function registerValidSW(swUrl: string) {
 	navigator.serviceWorker
 		.register(swUrl)
 		.then(registration => {
@@ -79,31 +81,41 @@ function registerValidSW(swUrl: string, config?: Config) {
 									'tabs for this page are closed. See https://cra.link/PWA.',
 							);
 
-							// Execute callback
-							if (config && config.onUpdate) {
-								config.onUpdate(registration);
+							// TODO: Show notification
+							const userResponse = window.prompt(
+								'A new version of the app is available. Do you want to update now?',
+								'yes/no',
+							);
+
+							if (userResponse === 'yes') {
+								installingWorker.postMessage({ type: 'SKIP_WAITING' });
 							}
 						} else {
 							// At this point, everything has been precached.
 							// It's the perfect time to display a
 							// "Content is cached for offline use." message.
 							console.log('Content is cached for offline use.');
-
-							// Execute callback
-							if (config && config.onSuccess) {
-								config.onSuccess(registration);
-							}
 						}
 					}
 				};
 			};
+
+			// check for new service worker version every hour (in production), or every minute (in development)
+			const interval = REACT_APP__PUBLIC_URL === 'https://hub.ylide.io' ? 60 * 60 * 1000 : 60 * 1000;
+			intervalId = setInterval(async () => {
+				try {
+					await registration.update();
+				} catch (error) {
+					console.error('Error while checking new service worker version:', error);
+				}
+			}, interval);
 		})
 		.catch(error => {
 			console.error('Error during service worker registration:', error);
 		});
 }
 
-function checkValidServiceWorker(swUrl: string, config?: Config) {
+function checkValidServiceWorker(swUrl: string) {
 	// Check if the service worker can be found. If it can't reload the page.
 	fetch(swUrl, {
 		headers: { 'Service-Worker': 'script' },
@@ -120,7 +132,7 @@ function checkValidServiceWorker(swUrl: string, config?: Config) {
 				});
 			} else {
 				// Service worker found. Proceed as normal.
-				registerValidSW(swUrl, config);
+				registerValidSW(swUrl);
 			}
 		})
 		.catch(() => {
@@ -132,6 +144,9 @@ export function unregisterServiceWorker() {
 	if ('serviceWorker' in navigator) {
 		navigator.serviceWorker.ready
 			.then(registration => {
+				if (intervalId) {
+					clearInterval(intervalId);
+				}
 				registration.unregister();
 			})
 			.catch(error => {
