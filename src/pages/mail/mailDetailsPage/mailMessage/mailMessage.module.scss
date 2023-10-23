@@ -122,6 +122,7 @@ $recipientRowHeight: 20px;
 }
 
 .content {
+	isolation: isolate;
 	font-size: 16px;
 	line-height: $line-height_text;
 }
