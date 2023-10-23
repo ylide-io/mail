@@ -450,7 +450,7 @@ export const CommunityPage = observer(() => {
 								})}
 						</div>
 
-						{tabsAsideContent && <div className={css.tabsAsideContent}>{tabsAsideContent}</div>}
+						{tabsAsideContent && <div>{tabsAsideContent}</div>}
 					</div>
 
 					{part === CommunityPagePart.OFFICIAL ? (

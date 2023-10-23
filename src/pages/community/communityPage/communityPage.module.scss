@@ -19,8 +19,11 @@
 }
 
 .tabsWrapper {
-	display: flex;
+	display: grid;
+	grid-auto-flow: column;
 	align-items: center;
+	justify-content: space-between;
+	grid-gap: 8px;
 }
 
 .tabs {
@@ -30,12 +33,16 @@
 	margin: 0 auto 0 0;
 }
 
-.tabsAsideContent {
-	margin: -99px 0;
-}
-
 .newPostsButton {
 	animation: new-posts-button-kf 5s linear infinite;
+
+	@include lessThan480w {
+		position: fixed;
+		z-index: 1;
+		bottom: 12px;
+		left: 50%;
+		transform: translate(-50%, 0);
+	}
 }
 
 @keyframes new-posts-button-kf {
