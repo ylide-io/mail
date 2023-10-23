@@ -49,6 +49,12 @@ $mediaHeight768: 768px;
 	}
 }
 
+@mixin lessThan1152x768() {
+	@include lessThan($mediaWidth1152, $mediaHeight768) {
+		@content;
+	}
+}
+
 @mixin lessThan1152w() {
 	@include lessThan($mediaWidth1152) {
 		@content;

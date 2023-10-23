@@ -10,8 +10,12 @@
 .main {
 	display: grid;
 	grid-gap: 20px;
-	margin: 40px 0 0;
+	margin: 32px 0 0;
 	padding: 0 0 80px;
+
+	@include lessThan1152x768 {
+		margin: 20px 0 0;
+	}
 }
 
 .tabsWrapper {
@@ -50,4 +54,8 @@
 	display: grid;
 	grid-gap: 32px;
 	padding: 0 0 120px;
+
+	@include lessThan1152x768 {
+		grid-gap: 20px;
+	}
 }
