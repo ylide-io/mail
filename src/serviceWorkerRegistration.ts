@@ -24,22 +24,28 @@ let intervalId: NodeJS.Timeout | null = null;
 
 export type ServiceWorkerUpdateCallback = () => void;
 
-export function registerServiceWorker({
+const handleUpdate = (
+	worker: ServiceWorker,
+	onUpdateAvailable: (updateCallback: ServiceWorkerUpdateCallback) => void,
+) => {
+	navigator.serviceWorker.addEventListener('controllerchange', () => {
+		window.location.reload();
+	});
+	onUpdateAvailable(() => worker.postMessage({ type: 'SKIP_WAITING' }));
+};
+
+export async function registerServiceWorker({
 	onUpdateAvailable,
 }: {
-	onUpdateAvailable?: (updateCallback: ServiceWorkerUpdateCallback) => void;
+	onUpdateAvailable: (updateCallback: ServiceWorkerUpdateCallback) => void;
 }) {
-	let isActive = false;
-	let wasNotifiedAboutUpdate = false;
-
-	navigator.serviceWorker.ready.then(() => {
-		isActive = true;
-	});
-
 	function registerValidSW(swUrl: string) {
 		navigator.serviceWorker
 			.register(swUrl)
 			.then(registration => {
+				if (registration.waiting) {
+					handleUpdate(registration.waiting, onUpdateAvailable);
+				}
 				registration.onupdatefound = () => {
 					const installingWorker = registration.installing;
 					if (installingWorker == null) return;
@@ -55,18 +61,7 @@ export function registerServiceWorker({
 										'tabs for this page are closed. See https://cra.link/PWA.',
 								);
 
-								// If we already have an active service worker,
-								// this means that we have a new version.
-								// So we should notify the user about the update.
-								if (isActive && !wasNotifiedAboutUpdate) {
-									wasNotifiedAboutUpdate = true;
-
-									navigator.serviceWorker.addEventListener('controllerchange', () => {
-										window.location.reload();
-									});
-
-									onUpdateAvailable?.(() => installingWorker.postMessage({ type: 'SKIP_WAITING' }));
-								}
+								handleUpdate(installingWorker, onUpdateAvailable);
 							} else {
 								// At this point, everything has been precached.
 								// It's the perfect time to display a
