@@ -46,6 +46,9 @@ class NewMailChecker {
 
 	private listWrapper: MailListWrapper | undefined;
 
+	// Hotfix for not-working MailList.onNewMessages callback
+	private recreateCounter = 0;
+
 	constructor() {
 		makeAutoObservable(this);
 	}
@@ -53,17 +56,17 @@ class NewMailChecker {
 	init() {
 		// Re-create MailListWrapper when accounts change
 		reaction(
-			() => domain.accounts.activeAccounts,
-			accounts => {
+			() => domain.accounts.activeAccounts && this.recreateCounter,
+			() => {
 				if (this.listWrapper) {
 					this.listWrapper?.destroy();
 					this.listWrapper = undefined;
-
-					this.lastIncomingDateSec = 0;
 				}
 
-				if (accounts.length) {
+				if (domain.accounts.activeAccounts.length) {
 					this.listWrapper = new MailListWrapper(domain.accounts.activeAccounts);
+				} else {
+					this.lastIncomingDateSec = 0;
 				}
 			},
 			{
@@ -80,6 +83,11 @@ class NewMailChecker {
 				}
 			},
 		);
+
+		// Hotfix for not-working MailList.onNewMessages callback
+		setInterval(() => {
+			this.recreateCounter++;
+		}, 1000 * 10);
 	}
 
 	private get lastIncomingDateSec() {
