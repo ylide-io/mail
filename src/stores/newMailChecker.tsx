@@ -87,7 +87,7 @@ class NewMailChecker {
 		// Hotfix for not-working MailList.onNewMessages callback
 		setInterval(() => {
 			this.recreateCounter++;
-		}, 1000 * 10);
+		}, 1000 * 60);
 	}
 
 	private get lastIncomingDateSec() {
