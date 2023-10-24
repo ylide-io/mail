@@ -1,14 +1,23 @@
-.tag {
+.link {
 	font-weight: $font-weight_medium;
-	color: var(--accent-color);
+	color: var(--accent2-color);
 	background: linear-gradient(90deg, var(--accent-color), var(--accent2-color), var(--accent-color));
 	background-clip: text;
 	background-size: 400% auto;
 	-webkit-text-fill-color: transparent;
-	animation: tag 10s linear infinite;
+	animation: link $duration-ambient linear infinite;
 }
 
-@keyframes tag {
+.link_clickable {
+	&:hover {
+		//color: var(--accent2-color);
+		//text-decoration: underline;
+		background: none;
+		-webkit-text-fill-color: currentColor;
+	}
+}
+
+@keyframes link {
 	to {
 		background-position: 400% center;
 	}
