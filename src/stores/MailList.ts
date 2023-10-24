@@ -185,6 +185,9 @@ export class MailList<M = ILinkedMessage> {
 
 		this.folderId = undefined;
 
+		// TODO: Hotfix. Inbox won't update if not creating SourceReadingSession every time.
+		const readingSession = new SourceReadingSession();
+
 		if (mailbox) {
 			this.folderId = mailbox.folderId;
 
@@ -201,7 +204,7 @@ export class MailList<M = ILinkedMessage> {
 					] as EVMBlockchainController;
 
 					const listSource = new ListSource(
-						mailStore.readingSession,
+						readingSession,
 						globalSubject,
 						blockchainController.ininiateMessagesSource(globalSubject),
 					) as IListSource;
@@ -215,7 +218,7 @@ export class MailList<M = ILinkedMessage> {
 					account: DomainAccount,
 				): ISourceWithMeta[] {
 					return domain.ylide.core
-						.getListSources(mailStore.readingSession, [
+						.getListSources(readingSession, [
 							{
 								feedId: YLIDE_MAIN_FEED_ID,
 								type: BlockchainSourceType.DIRECT,
@@ -274,7 +277,7 @@ export class MailList<M = ILinkedMessage> {
 					id: 'tvm-venom-testnet-broadcaster-14',
 				};
 				const originalSource = blockchainController.ininiateMessagesSource(blockchainSubject);
-				const listSource = new ListSource(mailStore.readingSession, blockchainSubject, originalSource);
+				const listSource = new ListSource(readingSession, blockchainSubject, originalSource);
 
 				return [
 					{
@@ -400,8 +403,6 @@ export class MailList<M = ILinkedMessage> {
 //
 
 class MailStore {
-	readingSession = new SourceReadingSession();
-
 	lastActiveFolderId: FolderId = FolderId.Inbox;
 	lastMessagesList: ILinkedMessage[] = [];
 
