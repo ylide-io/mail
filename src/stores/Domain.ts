@@ -29,7 +29,7 @@ import { makeObservable, observable } from 'mobx';
 import { NFT3NameService } from '../api/nft3DID';
 import { PasswordRequestModal } from '../components/passwordRequestModal/passwordRequestModal';
 import { SwitchModal, SwitchModalMode } from '../components/switchModal/switchModal';
-import { toastWithErrorId } from '../components/toast/toast';
+import { toast } from '../components/toast/toast';
 import { AppMode, REACT_APP__APP_MODE } from '../env';
 import { blockchainMeta } from '../utils/blockchain';
 import { timePoint } from '../utils/dev';
@@ -273,10 +273,9 @@ export class Domain {
 				}
 			} catch (err: any) {
 				console.error(`Something went wrong with key publishing: ${err.message}`, err.stack);
-				toastWithErrorId(
-					'Something went wrong with key publishing :( Please, try again',
-					'Failed to publish key',
-				);
+				toast('Something went wrong with key publishing :( Please, try again', {
+					error: 'Failed to publish key',
+				});
 				domain.isTxPublishing = false;
 				domain.txPlateVisible = false;
 			}

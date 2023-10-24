@@ -7,7 +7,7 @@ import { DropDown, DropDownItem, DropDownItemMode } from '../../../../../compone
 import { notificationsAlert } from '../../../../../components/genericLayout/header/header';
 import { PropsWithClassName } from '../../../../../components/props';
 import { Spinner } from '../../../../../components/spinner/spinner';
-import { toast, toastWithErrorId } from '../../../../../components/toast/toast';
+import { toast } from '../../../../../components/toast/toast';
 import { ReactComponent as ArrowDownSvg } from '../../../../../icons/ic20/arrowDown.svg';
 import { ReactComponent as ReplySvg } from '../../../../../icons/ic20/reply.svg';
 import { BalancesStore } from '../../../../../stores/balancesStore';
@@ -62,7 +62,7 @@ export const SendMailButton = observer(
 					onSent?.();
 				}
 			} catch (e) {
-				toastWithErrorId("Couldn't send your message 😒", 'Failed to send message');
+				toast("Couldn't send your message 😒", { error: 'Failed to send message' });
 			}
 		};
 

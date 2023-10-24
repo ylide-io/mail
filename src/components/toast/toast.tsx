@@ -4,6 +4,7 @@ import { observer } from 'mobx-react';
 import { PropsWithChildren, ReactNode } from 'react';
 
 import { captureSentryExceptionWithId } from '../../utils/sentry';
+import { ActionButton, ActionButtonLook } from '../ActionButton/ActionButton';
 import { Popup } from '../popup/popup';
 import { PopupManagerPortalLevel } from '../popup/popupManager/popupManager';
 import css from './toast.module.scss';
@@ -44,7 +45,7 @@ let toastId = 0;
 
 const toasts = observable<{ id: number; content: ReactNode; state: ToastState }>([]);
 
-export function toast(content: ReactNode) {
+function toastInternal(content: ReactNode) {
 	const id = ++toastId;
 
 	toasts.replace(toasts.map(it => ({ ...it, state: ToastState.HIDING })));
@@ -73,11 +74,33 @@ export function toast(content: ReactNode) {
 	setTimeout(() => toasts.replace(toasts.filter(it => it.id !== id)), Toast.DISPLAY_TIME + Toast.HIDING_TIME);
 }
 
-export function toastWithErrorId(content: ReactNode, error: string) {
-	toast(
+export function toast(
+	content: ReactNode,
+	params?: {
+		actionButton?: {
+			text: ReactNode;
+			onClick: () => void;
+		};
+		error?: string;
+	},
+) {
+	toastInternal(
 		<>
-			{content}
-			<div className={css.errorId}>error · {captureSentryExceptionWithId(error)}</div>
+			{params?.actionButton ? (
+				<div className={css.actionContent}>
+					<div>{content}</div>
+
+					<ActionButton look={ActionButtonLook.HEAVY} onClick={() => params.actionButton!.onClick()}>
+						{params.actionButton.text}
+					</ActionButton>
+				</div>
+			) : (
+				<div>{content}</div>
+			)}
+
+			{params?.error != null && (
+				<div className={css.errorId}>error · {captureSentryExceptionWithId(params.error)}</div>
+			)}
 		</>,
 	);
 }

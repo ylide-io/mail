@@ -30,6 +30,15 @@
 
 //
 
+.actionContent {
+	display: grid;
+	grid-template-columns: 1fr auto;
+	grid-gap: 4px;
+	align-items: center;
+}
+
+//
+
 .errorId {
 	opacity: 0.5;
 }
