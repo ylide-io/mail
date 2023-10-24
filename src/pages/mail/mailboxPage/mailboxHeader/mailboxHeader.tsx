@@ -3,6 +3,7 @@ import { CheckBox } from '../../../../components/checkBox/checkBox';
 import { ContactName } from '../../../../components/contactName/contactName';
 import { ReactComponent as CrossSvg } from '../../../../icons/ic20/cross.svg';
 import { ReactComponent as MerkReadSvg } from '../../../../icons/ic20/markRead.svg';
+import { ReactComponent as RefreshSvg } from '../../../../icons/ic20/refresh.svg';
 import { ReactComponent as RestoreSvg } from '../../../../icons/ic20/restore.svg';
 import { ReactComponent as TrashSvg } from '../../../../icons/ic20/trash.svg';
 import { FolderId, getFolderName, ILinkedMessage } from '../../../../stores/MailList';
@@ -15,6 +16,10 @@ interface MailboxHeaderProps {
 	filterBySender?: string;
 	isAllSelected: boolean;
 	onSelectAllCheckBoxClick: (isChecked: boolean) => void;
+	refreshButton: {
+		disabled: boolean;
+		onClick: () => void;
+	};
 	onMarkReadClick: () => void;
 	onDeleteClick: () => void;
 	onRestoreClick: () => void;
@@ -27,6 +32,7 @@ export function MailboxHeader({
 	filterBySender,
 	isAllSelected,
 	onSelectAllCheckBoxClick,
+	refreshButton,
 	onMarkReadClick,
 	onDeleteClick,
 	onRestoreClick,
@@ -56,6 +62,13 @@ export function MailboxHeader({
 						onChange={onSelectAllCheckBoxClick}
 					/>
 				</div>
+
+				<ActionButton
+					isDisabled={refreshButton.disabled}
+					icon={<RefreshSvg />}
+					title="Refresh"
+					onClick={() => refreshButton.onClick()}
+				/>
 
 				<ActionButton
 					isDisabled={isActionButtonsDisabled}

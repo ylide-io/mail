@@ -16,6 +16,7 @@ import domain from '../../../stores/Domain';
 import { FolderId, ILinkedMessage, MailList, mailStore } from '../../../stores/MailList';
 import { newMailChecker } from '../../../stores/newMailChecker';
 import { RoutePath } from '../../../stores/routePath';
+import { hookDependency } from '../../../utils/react';
 import { useIsMatchesPattern, useNav } from '../../../utils/url';
 import { useWindowSize } from '../../../utils/useWindowSize';
 import MailboxEmpty from './mailboxEmpty/mailboxEmpty';
@@ -75,6 +76,8 @@ export const MailboxPage = observer(() => {
 
 	const accounts = domain.accounts.activeAccounts;
 
+	const [refreshCounter, setRefreshCounter] = useState(0);
+
 	useEffect(() => {
 		mailStore.lastActiveFolderId = folderId;
 		analytics.mailFolderOpened(folderId);
@@ -82,7 +85,9 @@ export const MailboxPage = observer(() => {
 
 	const deletedMessageIds = mailStore.deletedMessageIds;
 
-	const mailList: MailList = useMemo(() => {
+	const mailList = useMemo(() => {
+		hookDependency(refreshCounter);
+
 		const list = new MailList();
 
 		list.init({
@@ -97,8 +102,12 @@ export const MailboxPage = observer(() => {
 			},
 		});
 
+		if (folderId === FolderId.Inbox) {
+			newMailChecker.inboxOpened();
+		}
+
 		return list;
-	}, [accounts, deletedMessageIds, filterBySender, folderId]);
+	}, [accounts, deletedMessageIds, filterBySender, folderId, refreshCounter]);
 
 	useEffect(() => () => mailList.destroy(), [mailList]);
 
@@ -134,12 +143,6 @@ export const MailboxPage = observer(() => {
 		[itemSize, mailList, scrollParams],
 	);
 
-	useEffect(() => {
-		if (folderId === FolderId.Inbox) {
-			newMailChecker.inboxOpened();
-		}
-	}, [folderId]);
-
 	return (
 		<GenericLayout>
 			<PageMeta
@@ -160,6 +163,10 @@ export const MailboxPage = observer(() => {
 								setSelectedMessageIds(
 									isChecked ? new Set(mailList.messages.map(it => it.id)) : new Set(),
 								);
+							}}
+							refreshButton={{
+								disabled: mailList.isLoading,
+								onClick: () => setRefreshCounter(refreshCounter + 1),
 							}}
 							onMarkReadClick={() => {
 								analytics.markMailAsRead(selectedMessageIds.size);
