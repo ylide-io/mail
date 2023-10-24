@@ -6,7 +6,7 @@ import { configure, observable } from 'mobx';
 import { createRoot } from 'react-dom/client';
 import { BrowserRouter } from 'react-router-dom';
 
-import { App } from './AppX';
+import { App } from './app';
 import { registerServiceWorker, ServiceWorkerUpdateCallback } from './serviceWorkerRegistration';
 import { initSentry } from './utils/sentry';
 import { buildUrl, UseNavParameters } from './utils/url';
