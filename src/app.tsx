@@ -42,6 +42,7 @@ import { analytics } from './stores/Analytics';
 import { browserStorage } from './stores/browserStorage';
 import domain from './stores/Domain';
 import { FolderId } from './stores/MailList';
+import { NewMailNotifier } from './stores/newMailChecker';
 import { RoutePath } from './stores/routePath';
 import { enableRemoteConsole, remoteConsoleChannel } from './utils/dev';
 import { openInNewWidnow } from './utils/misc';
@@ -351,6 +352,7 @@ export const App = observer(({ serviceWorkerUpdateCallback }: AppProps) => {
 					{REACT_APP__APP_MODE === AppMode.MAIN_VIEW && <MainViewOnboarding />}
 
 					<IosInstallPwaPopup />
+					<NewMailNotifier />
 				</PopupManager>
 			</QueryClientProvider>
 		</>

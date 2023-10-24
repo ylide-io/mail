@@ -1,9 +1,15 @@
 import { autorun, IReactionDisposer, makeAutoObservable, makeObservable, observable, reaction } from 'mobx';
+import { observer } from 'mobx-react';
+import { useEffect } from 'react';
+import { generatePath } from 'react-router-dom';
 
+import { toast } from '../components/toast/toast';
+import { useNav } from '../utils/url';
 import { BrowserStorage, BrowserStorageKey } from './browserStorage';
 import domain from './Domain';
 import { FolderId, ILinkedMessage, MailList } from './MailList';
 import { DomainAccount } from './models/DomainAccount';
+import { RoutePath } from './routePath';
 
 class MailListWrapper {
 	@observable.ref private readonly mailList: MailList;
@@ -112,3 +118,27 @@ class NewMailChecker {
 }
 
 export const newMailChecker = new NewMailChecker();
+
+//
+
+export const NewMailNotifier = observer(() => {
+	const navigate = useNav();
+
+	useEffect(() =>
+		reaction(
+			() => newMailChecker.hasNewMessages,
+			hasNewMessages => {
+				if (hasNewMessages) {
+					toast('You have a new message 🔥', {
+						actionButton: {
+							text: 'Open Inbox',
+							onClick: () => navigate(generatePath(RoutePath.MAIL_FOLDER, { folderId: FolderId.Inbox })),
+						},
+					});
+				}
+			},
+		),
+	);
+
+	return <></>;
+});
