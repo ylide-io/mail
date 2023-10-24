@@ -1,4 +1,15 @@
 .tag {
 	font-weight: $font-weight_medium;
 	color: var(--accent-color);
+	background: linear-gradient(90deg, var(--accent-color), var(--accent2-color), var(--accent-color));
+	background-clip: text;
+	background-size: 400% auto;
+	-webkit-text-fill-color: transparent;
+	animation: tag 10s linear infinite;
+}
+
+@keyframes tag {
+	to {
+		background-position: 400% center;
+	}
 }
