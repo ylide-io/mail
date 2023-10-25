@@ -3,7 +3,7 @@ import { observer } from 'mobx-react';
 import { generatePath } from 'react-router-dom';
 
 import { AccountConnectedModal } from '../../components/accountConnectedModal/accountConnectedModal';
-import { ActionButton, ActionButtonLook, ActionButtonSize } from '../../components/ActionButtonX/ActionButton';
+import { ActionButton, ActionButtonLook, ActionButtonSize } from '../../components/actionButton/actionButton';
 import { AdaptiveAddress } from '../../components/adaptiveAddress/adaptiveAddress';
 import { AppLogo } from '../../components/appLogo/appLogo';
 import { showStaticComponent } from '../../components/staticComponentManager/staticComponentManager';

@@ -1,6 +1,6 @@
 import { useState } from 'react';
 
-import { ActionButton, ActionButtonLook, ActionButtonSize } from '../ActionButtonX/ActionButton';
+import { ActionButton, ActionButtonLook, ActionButtonSize } from '../actionButton/actionButton';
 import { ActionModal } from '../actionModal/actionModal';
 import { ForgotPasswordModal } from '../forgotPasswordModal/forgotPasswordModal';
 import { showStaticComponent } from '../staticComponentManager/staticComponentManager';

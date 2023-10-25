@@ -5,14 +5,14 @@ import { QueryClient, QueryClientProvider } from 'react-query';
 import { generatePath, Navigate, Route, Routes, useLocation, useSearchParams } from 'react-router-dom';
 
 import css from './app.module.scss';
-import { ActionButton, ActionButtonLook, ActionButtonSize } from './components/ActionButtonX/ActionButton';
+import { ActionButton, ActionButtonLook, ActionButtonSize } from './components/actionButton/actionButton';
 import { IosInstallPwaPopup } from './components/iosInstallPwaPopup/iosInstallPwaPopup';
 import { MainViewOnboarding } from './components/mainViewOnboarding/mainViewOnboarding';
 import { PageMeta } from './components/pageMeta/pageMeta';
 import { PopupManager } from './components/popup/popupManager/popupManager';
 import { StaticComponentManager } from './components/staticComponentManager/staticComponentManager';
 import { ToastManager } from './components/toast/toast';
-import { TransactionPopup } from './components/TransactionPopupX/TransactionPopup';
+import { TransactionPopup } from './components/transactionPopup/transactionPopup';
 import { YlideLoader } from './components/ylideLoader/ylideLoader';
 import { APP_NAME } from './constants';
 import { AppMode, REACT_APP__APP_MODE } from './env';

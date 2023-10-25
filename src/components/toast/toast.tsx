@@ -4,7 +4,7 @@ import { observer } from 'mobx-react';
 import { PropsWithChildren, ReactNode } from 'react';
 
 import { captureSentryExceptionWithId } from '../../utils/sentry';
-import { ActionButton, ActionButtonLook } from '../ActionButtonX/ActionButton';
+import { ActionButton, ActionButtonLook } from '../actionButton/actionButton';
 import { Popup } from '../popup/popup';
 import { PopupManagerPortalLevel } from '../popup/popupManager/popupManager';
 import css from './toast.module.scss';

@@ -5,7 +5,7 @@ import { useQuery } from 'react-query';
 import { generatePath, useParams } from 'react-router-dom';
 
 import { BlockchainFeedApi, decodeBlockchainFeedPost, DecodedBlockchainFeedPost } from '../../../api/blockchainFeedApi';
-import { ActionButton, ActionButtonLook } from '../../../components/ActionButtonX/ActionButton';
+import { ActionButton, ActionButtonLook } from '../../../components/actionButton/actionButton';
 import { ErrorMessage } from '../../../components/errorMessage/errorMessage';
 import { RegularPageContent } from '../../../components/genericLayout/content/regularPageContent/regularPageContent';
 import { GenericLayout } from '../../../components/genericLayout/genericLayout';

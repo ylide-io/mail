@@ -5,7 +5,7 @@ import { InView } from 'react-intersection-observer';
 import { generatePath, useParams } from 'react-router-dom';
 
 import { FeedServerApi } from '../../../api/feedServerApi';
-import { ActionButton, ActionButtonLook, ActionButtonSize } from '../../../components/ActionButtonX/ActionButton';
+import { ActionButton, ActionButtonLook, ActionButtonSize } from '../../../components/actionButton/actionButton';
 import { CoverageModal } from '../../../components/coverageModal/coverageModal';
 import { ErrorMessage, ErrorMessageLook } from '../../../components/errorMessage/errorMessage';
 import { NarrowContent } from '../../../components/genericLayout/content/narrowContent/narrowContent';

@@ -1,4 +1,4 @@
-import { ActionButton, ActionButtonLook, ActionButtonSize } from '../../components/ActionButtonX/ActionButton';
+import { ActionButton, ActionButtonLook, ActionButtonSize } from '../../components/actionButton/actionButton';
 import { RegularCommunityCard } from '../../components/communityCards/regularCommunityCard/regularCommunityCard';
 import { RichCommunityCard } from '../../components/communityCards/richCommunityCard/richCommunityCard';
 import { RegularPageContent } from '../../components/genericLayout/content/regularPageContent/regularPageContent';

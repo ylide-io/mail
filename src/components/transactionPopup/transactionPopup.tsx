@@ -5,8 +5,8 @@ import { useEffect, useState } from 'react';
 
 import domain from '../../stores/Domain';
 import { openInNewWidnow } from '../../utils/misc';
-import { ActionButton } from '../ActionButtonX/ActionButton';
-import css from './TransactionPopup.module.scss';
+import { ActionButton } from '../actionButton/actionButton';
+import css from './transactionPopup.module.scss';
 
 const cross = (
 	<svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">

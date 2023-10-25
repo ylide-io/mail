@@ -14,7 +14,7 @@ import { copyToClipboard } from '../../../utils/clipboard';
 import { useOpenMailCompose } from '../../../utils/mail';
 import { truncateInMiddle } from '../../../utils/string';
 import { beautifyUrl } from '../../../utils/url';
-import { ActionButton, ActionButtonLook, ActionButtonSize } from '../../ActionButtonX/ActionButton';
+import { ActionButton, ActionButtonLook, ActionButtonSize } from '../../actionButton/actionButton';
 import { AdaptiveAddress } from '../../adaptiveAddress/adaptiveAddress';
 import { CommunityAvatar } from '../../avatar/avatar';
 import { CommunityBanner } from '../../communityBanner/communityBanner';

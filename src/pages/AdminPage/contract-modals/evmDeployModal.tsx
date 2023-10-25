@@ -9,7 +9,7 @@ import clsx from 'clsx';
 import { FC, useCallback, useState } from 'react';
 
 import { AccountSelect } from '../../../components/accountSelect/accountSelect';
-import { ActionButton } from '../../../components/ActionButtonX/ActionButton';
+import { ActionButton } from '../../../components/actionButton/actionButton';
 import { Modal } from '../../../components/modal/modal';
 import { YlideLoader } from '../../../components/ylideLoader/ylideLoader';
 import domain from '../../../stores/Domain';

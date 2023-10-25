@@ -30,7 +30,7 @@ import { RoutePath } from '../../../stores/routePath';
 import { useOpenMailCompose } from '../../../utils/mail';
 import { openCreateCommunityForm } from '../../../utils/misc';
 import { useIsMatchesPath, useNav } from '../../../utils/url';
-import { ActionButton, ActionButtonLook, ActionButtonSize } from '../../ActionButtonX/ActionButton';
+import { ActionButton, ActionButtonLook, ActionButtonSize } from '../../actionButton/actionButton';
 import { AdaptiveText } from '../../adaptiveText/adaptiveText';
 import { MiniCommunityCard } from '../../communityCards/miniCommunityCard/miniCommunityCard';
 import { PropsWithClassName } from '../../props';

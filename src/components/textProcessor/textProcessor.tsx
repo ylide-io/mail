@@ -4,7 +4,7 @@ import { ReactNode, useMemo, useState } from 'react';
 import { APP_NAME } from '../../constants';
 import { transformMatches, truncateInMiddle } from '../../utils/string';
 import { isExternalUrl } from '../../utils/url';
-import { ActionButton, ActionButtonLook, ActionButtonSize } from '../ActionButtonX/ActionButton';
+import { ActionButton, ActionButtonLook, ActionButtonSize } from '../actionButton/actionButton';
 import { ActionModal } from '../actionModal/actionModal';
 import { PropsWithClassName } from '../props';
 import css from './textProcessor.module.scss';

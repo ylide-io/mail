@@ -7,7 +7,7 @@ import domain from '../../stores/Domain';
 import { DomainAccount } from '../../stores/models/DomainAccount';
 import { connectAccount, disconnectAccount } from '../../utils/account';
 import { invariant } from '../../utils/assert';
-import { ActionButton, ActionButtonLook, ActionButtonSize } from '../ActionButtonX/ActionButton';
+import { ActionButton, ActionButtonLook, ActionButtonSize } from '../actionButton/actionButton';
 import { ActionModal } from '../actionModal/actionModal';
 import { AdaptiveAddress } from '../adaptiveAddress/adaptiveAddress';
 import { CoverageModal } from '../coverageModal/coverageModal';

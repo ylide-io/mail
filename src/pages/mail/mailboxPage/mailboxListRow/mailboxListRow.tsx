@@ -3,7 +3,7 @@ import { observer } from 'mobx-react';
 import React, { CSSProperties, useEffect, useMemo, useState } from 'react';
 import { generatePath, useParams } from 'react-router-dom';
 
-import { BlockChainLabel } from '../../../../components/BlockChainLabelX/BlockChainLabel';
+import { BlockChainLabel } from '../../../../components/blockChainLabel/blockChainLabel';
 import { CheckBox } from '../../../../components/checkBox/checkBox';
 import { ContactName } from '../../../../components/contactName/contactName';
 import { ReadableDate } from '../../../../components/readableDate/readableDate';

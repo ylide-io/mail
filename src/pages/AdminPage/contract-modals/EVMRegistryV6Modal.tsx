@@ -11,7 +11,7 @@ import clsx from 'clsx';
 import { FC, useCallback, useEffect, useState } from 'react';
 
 import { AccountSelect } from '../../../components/accountSelect/accountSelect';
-import { ActionButton, ActionButtonSize } from '../../../components/ActionButtonX/ActionButton';
+import { ActionButton, ActionButtonSize } from '../../../components/actionButton/actionButton';
 import { Modal } from '../../../components/modal/modal';
 import { Spinner } from '../../../components/spinner/spinner';
 import { TextField } from '../../../components/textField/textField';

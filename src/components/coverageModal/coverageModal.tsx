@@ -5,7 +5,7 @@ import { useMemo } from 'react';
 import { FeedManagerApi } from '../../api/feedManagerApi';
 import { feedSettings } from '../../stores/FeedSettings';
 import { DomainAccount } from '../../stores/models/DomainAccount';
-import { ActionButton, ActionButtonLook, ActionButtonSize } from '../ActionButtonX/ActionButton';
+import { ActionButton, ActionButtonLook, ActionButtonSize } from '../actionButton/actionButton';
 import { ActionModal } from '../actionModal/actionModal';
 import { CheckBox } from '../checkBox/checkBox';
 import css from './coverageModal.module.scss';

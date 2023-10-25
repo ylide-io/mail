@@ -3,7 +3,7 @@ import { ReactNode } from 'react';
 
 import { ReactComponent as ArrowLeftSvg } from '../../icons/ic20/arrowLeft.svg';
 import { useNav } from '../../utils/url';
-import { ActionButton } from '../ActionButtonX/ActionButton';
+import { ActionButton } from '../actionButton/actionButton';
 import css from './pageContentHeader.module.scss';
 
 export interface PageContentHeaderProps {

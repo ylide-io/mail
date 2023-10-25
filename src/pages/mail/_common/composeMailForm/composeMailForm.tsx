@@ -4,7 +4,7 @@ import { useRef, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 
 import { AccountSelect } from '../../../../components/accountSelect/accountSelect';
-import { ActionButton, ActionButtonLook, ActionButtonSize } from '../../../../components/ActionButtonX/ActionButton';
+import { ActionButton, ActionButtonLook, ActionButtonSize } from '../../../../components/actionButton/actionButton';
 import { DropDown } from '../../../../components/dropDown/dropDown';
 import { PropsWithClassName } from '../../../../components/props';
 import { RecipientInput } from '../../../../components/recipientInput/recipientInput';

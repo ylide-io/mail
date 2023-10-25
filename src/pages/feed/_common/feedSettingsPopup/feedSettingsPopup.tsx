@@ -4,7 +4,7 @@ import React, { useMemo, useState } from 'react';
 import { useMutation } from 'react-query';
 
 import { FeedReason, FeedSource } from '../../../../api/feedServerApi';
-import { ActionButton, ActionButtonLook } from '../../../../components/ActionButtonX/ActionButton';
+import { ActionButton, ActionButtonLook } from '../../../../components/actionButton/actionButton';
 import { Avatar } from '../../../../components/avatar/avatar';
 import { CheckBox } from '../../../../components/checkBox/checkBox';
 import { ErrorMessage } from '../../../../components/errorMessage/errorMessage';
