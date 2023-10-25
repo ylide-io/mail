@@ -4,7 +4,7 @@ import { MessageAttachment, Uint256, YMF } from '@ylide/sdk';
 import { autorun, makeAutoObservable, transaction } from 'mobx';
 
 import { BlockchainFeedApi } from '../api/blockchainFeedApi';
-import { ActionButton, ActionButtonLook, ActionButtonSize } from '../components/ActionButton/ActionButton';
+import { ActionButton, ActionButtonLook, ActionButtonSize } from '../components/ActionButtonX/ActionButton';
 import { ActionModal } from '../components/actionModal/actionModal';
 import { AdaptiveText } from '../components/adaptiveText/adaptiveText';
 import { SelectNetworkModal } from '../components/selectNetworkModal/selectNetworkModal';

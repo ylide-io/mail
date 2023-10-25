@@ -2,7 +2,7 @@ import clsx from 'clsx';
 import { observer } from 'mobx-react';
 import { PropsWithChildren, useMemo } from 'react';
 
-import { ActionButton, ActionButtonLook, ActionButtonSize } from '../../components/ActionButton/ActionButton';
+import { ActionButton, ActionButtonLook, ActionButtonSize } from '../../components/ActionButtonX/ActionButton';
 import { AdaptiveAddress } from '../../components/adaptiveAddress/adaptiveAddress';
 import { Avatar } from '../../components/avatar/avatar';
 import { CheckBox } from '../../components/checkBox/checkBox';

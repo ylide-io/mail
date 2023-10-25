@@ -1,4 +1,4 @@
-import { ActionButton, ActionButtonLook } from '../../../../components/ActionButton/ActionButton';
+import { ActionButton, ActionButtonLook } from '../../../../components/ActionButtonX/ActionButton';
 import { CheckBox } from '../../../../components/checkBox/checkBox';
 import { ContactName } from '../../../../components/contactName/contactName';
 import { ReactComponent as CrossSvg } from '../../../../icons/ic20/cross.svg';

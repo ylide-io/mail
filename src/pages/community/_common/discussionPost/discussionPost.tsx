@@ -9,10 +9,10 @@ import {
 	decodeBlockchainFeedPost,
 	DecodedBlockchainFeedPost,
 } from '../../../../api/blockchainFeedApi';
-import { ActionButton, ActionButtonLook, ActionButtonSize } from '../../../../components/ActionButton/ActionButton';
+import { ActionButton, ActionButtonLook, ActionButtonSize } from '../../../../components/ActionButtonX/ActionButton';
 import { AdaptiveAddress } from '../../../../components/adaptiveAddress/adaptiveAddress';
 import { Avatar } from '../../../../components/avatar/avatar';
-import { BlockChainLabel } from '../../../../components/BlockChainLabel/BlockChainLabel';
+import { BlockChainLabel } from '../../../../components/BlockChainLabelX/BlockChainLabel';
 import { GridRowBox } from '../../../../components/boxes/boxes';
 import { GalleryModal } from '../../../../components/galleryModal/galleryModal';
 import { ReadableDate } from '../../../../components/readableDate/readableDate';

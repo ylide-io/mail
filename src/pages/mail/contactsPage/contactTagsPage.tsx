@@ -1,6 +1,6 @@
 import { observer } from 'mobx-react';
 
-import { ActionButton, ActionButtonLook, ActionButtonSize } from '../../../components/ActionButton/ActionButton';
+import { ActionButton, ActionButtonLook, ActionButtonSize } from '../../../components/ActionButtonX/ActionButton';
 import { ReactComponent as PlusSvg } from '../../../icons/ic20/plus.svg';
 import tags from '../../../stores/Tags';
 import { ContactsLayout, ContactsTab } from './contactsLayout/contactsLayout';

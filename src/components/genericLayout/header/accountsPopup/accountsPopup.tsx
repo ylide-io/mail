@@ -10,7 +10,7 @@ import domain from '../../../../stores/Domain';
 import { activateAccount, connectAccount, disconnectAccount } from '../../../../utils/account';
 import { HorizontalAlignment } from '../../../../utils/alignment';
 import { walletsMeta } from '../../../../utils/wallet';
-import { ActionButton, ActionButtonLook, ActionButtonSize } from '../../../ActionButton/ActionButton';
+import { ActionButton, ActionButtonLook, ActionButtonSize } from '../../../ActionButtonX/ActionButton';
 import { AdaptiveAddress } from '../../../adaptiveAddress/adaptiveAddress';
 import { AdaptiveText } from '../../../adaptiveText/adaptiveText';
 import { Avatar } from '../../../avatar/avatar';

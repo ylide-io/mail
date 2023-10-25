@@ -8,7 +8,7 @@ import {
 	decodeBlockchainFeedPost,
 	DecodedBlockchainFeedPost,
 } from '../../../../api/blockchainFeedApi';
-import { ActionButton, ActionButtonLook, ActionButtonSize } from '../../../../components/ActionButton/ActionButton';
+import { ActionButton, ActionButtonLook, ActionButtonSize } from '../../../../components/ActionButtonX/ActionButton';
 import { CommunityAvatar } from '../../../../components/avatar/avatar';
 import { GridRowBox } from '../../../../components/boxes/boxes';
 import { GalleryModal } from '../../../../components/galleryModal/galleryModal';

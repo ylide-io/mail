@@ -3,7 +3,7 @@ import { useQuery } from 'react-query';
 import { generatePath, useParams } from 'react-router-dom';
 
 import { FeedServerApi } from '../../../api/feedServerApi';
-import { ActionButton, ActionButtonLook } from '../../../components/ActionButton/ActionButton';
+import { ActionButton, ActionButtonLook } from '../../../components/ActionButtonX/ActionButton';
 import { ErrorMessage } from '../../../components/errorMessage/errorMessage';
 import { NarrowContent } from '../../../components/genericLayout/content/narrowContent/narrowContent';
 import { GenericLayout } from '../../../components/genericLayout/genericLayout';

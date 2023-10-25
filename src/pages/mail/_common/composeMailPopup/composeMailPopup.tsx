@@ -3,7 +3,7 @@ import { observer } from 'mobx-react';
 import { useEffect } from 'react';
 import { generatePath } from 'react-router-dom';
 
-import { ActionButton, ActionButtonLook } from '../../../../components/ActionButton/ActionButton';
+import { ActionButton, ActionButtonLook } from '../../../../components/ActionButtonX/ActionButton';
 import { OverlappingLoader } from '../../../../components/overlappingLoader/overlappingLoader';
 import { Popup } from '../../../../components/popup/popup';
 import { ReactComponent as CrossSvg } from '../../../../icons/ic20/cross.svg';

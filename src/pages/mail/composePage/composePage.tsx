@@ -2,7 +2,7 @@ import { observer } from 'mobx-react';
 import { useEffect } from 'react';
 import { generatePath } from 'react-router-dom';
 
-import { ActionButton, ActionButtonLook } from '../../../components/ActionButton/ActionButton';
+import { ActionButton, ActionButtonLook } from '../../../components/ActionButtonX/ActionButton';
 import { FullPageContent } from '../../../components/genericLayout/content/fullPageContent/fullPageContent';
 import { GenericLayout } from '../../../components/genericLayout/genericLayout';
 import { OverlappingLoader } from '../../../components/overlappingLoader/overlappingLoader';

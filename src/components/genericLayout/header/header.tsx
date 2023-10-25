@@ -23,7 +23,7 @@ import { invariant } from '../../../utils/assert';
 import { openInNewWidnow } from '../../../utils/misc';
 import { useIsMatchesPath, useNav } from '../../../utils/url';
 import { useWindowSize } from '../../../utils/useWindowSize';
-import { ActionButton, ActionButtonLook, ActionButtonSize } from '../../ActionButton/ActionButton';
+import { ActionButton, ActionButtonLook, ActionButtonSize } from '../../ActionButtonX/ActionButton';
 import { AppLogo } from '../../appLogo/appLogo';
 import { Avatar } from '../../avatar/avatar';
 import { AnchoredPopup } from '../../popup/anchoredPopup/anchoredPopup';

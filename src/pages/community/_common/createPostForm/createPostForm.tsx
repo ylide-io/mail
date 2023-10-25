@@ -6,7 +6,7 @@ import { useQuery } from 'react-query';
 
 import { BlockchainFeedApi, DecodedBlockchainFeedPost } from '../../../../api/blockchainFeedApi';
 import { AccountSelect } from '../../../../components/accountSelect/accountSelect';
-import { ActionButton, ActionButtonLook, ActionButtonSize } from '../../../../components/ActionButton/ActionButton';
+import { ActionButton, ActionButtonLook, ActionButtonSize } from '../../../../components/ActionButtonX/ActionButton';
 import { AutoSizeTextArea, AutoSizeTextAreaApi } from '../../../../components/autoSizeTextArea/autoSizeTextArea';
 import { AnchoredPopup } from '../../../../components/popup/anchoredPopup/anchoredPopup';
 import { PropsWithClassName } from '../../../../components/props';

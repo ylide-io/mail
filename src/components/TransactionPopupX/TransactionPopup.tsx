@@ -5,7 +5,7 @@ import { useEffect, useState } from 'react';
 
 import domain from '../../stores/Domain';
 import { openInNewWidnow } from '../../utils/misc';
-import { ActionButton } from '../ActionButton/ActionButton';
+import { ActionButton } from '../ActionButtonX/ActionButton';
 import css from './TransactionPopup.module.scss';
 
 const cross = (

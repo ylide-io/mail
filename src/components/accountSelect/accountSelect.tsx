@@ -4,7 +4,7 @@ import { ReactComponent as PlusSvg } from '../../icons/ic20/plus.svg';
 import domain from '../../stores/Domain';
 import { DomainAccount } from '../../stores/models/DomainAccount';
 import { connectAccount, formatAccountName } from '../../utils/account';
-import { ActionButton, ActionButtonLook } from '../ActionButton/ActionButton';
+import { ActionButton, ActionButtonLook } from '../ActionButtonX/ActionButton';
 import { DropDownItem, DropDownItemMode } from '../dropDown/dropDown';
 import { PropsWithClassName } from '../props';
 import { Select } from '../select/select';

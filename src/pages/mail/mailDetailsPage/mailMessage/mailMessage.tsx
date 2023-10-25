@@ -3,7 +3,7 @@ import { observer } from 'mobx-react';
 import { useEffect, useMemo, useState } from 'react';
 import { createReactEditorJS } from 'react-editor-js';
 
-import { ActionButton, ActionButtonLook } from '../../../../components/ActionButton/ActionButton';
+import { ActionButton, ActionButtonLook } from '../../../../components/ActionButtonX/ActionButton';
 import { AdaptiveText } from '../../../../components/adaptiveText/adaptiveText';
 import { Avatar } from '../../../../components/avatar/avatar';
 import { ContactName } from '../../../../components/contactName/contactName';

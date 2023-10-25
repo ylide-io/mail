@@ -3,7 +3,7 @@ import clsx from 'clsx';
 import { FC, useCallback, useState } from 'react';
 
 import { AccountSelect } from '../../../components/accountSelect/accountSelect';
-import { ActionButton, ActionButtonSize } from '../../../components/ActionButton/ActionButton';
+import { ActionButton, ActionButtonSize } from '../../../components/ActionButtonX/ActionButton';
 import { Modal } from '../../../components/modal/modal';
 import { YlideLoader } from '../../../components/ylideLoader/ylideLoader';
 import domain from '../../../stores/Domain';

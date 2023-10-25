@@ -1,7 +1,7 @@
 import { useEffect, useMemo } from 'react';
 import { useSearchParams } from 'react-router-dom';
 
-import { ActionButton, ActionButtonLook } from '../../../components/ActionButton/ActionButton';
+import { ActionButton, ActionButtonLook } from '../../../components/ActionButtonX/ActionButton';
 import { Toast, toast } from '../../../components/toast/toast';
 import { ReactComponent as CrossSvg } from '../../../icons/ic20/cross.svg';
 import { analytics } from '../../../stores/Analytics';

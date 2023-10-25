@@ -11,7 +11,7 @@ import { walletConnectRegistry } from '../../stores/WalletConnect';
 import { copyToClipboard } from '../../utils/clipboard';
 import { openInNewWidnow } from '../../utils/misc';
 import { walletsMeta } from '../../utils/wallet';
-import { ActionButton, ActionButtonLook, ActionButtonSize } from '../ActionButton/ActionButton';
+import { ActionButton, ActionButtonLook, ActionButtonSize } from '../ActionButtonX/ActionButton';
 import { Modal } from '../modal/modal';
 import { TextField, TextFieldLook } from '../textField/textField';
 import { YlideLoader } from '../ylideLoader/ylideLoader';

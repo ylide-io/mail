@@ -1,6 +1,6 @@
 import { observer } from 'mobx-react';
 
-import { ActionButton, ActionButtonLook, ActionButtonSize } from '../../../../components/ActionButton/ActionButton';
+import { ActionButton, ActionButtonLook, ActionButtonSize } from '../../../../components/ActionButtonX/ActionButton';
 import { AdaptiveAddress } from '../../../../components/adaptiveAddress/adaptiveAddress';
 import { ReactComponent as ClipboardSvg } from '../../../../icons/ic20/clipboard.svg';
 import { ReactComponent as PlusSvg } from '../../../../icons/ic20/plus.svg';

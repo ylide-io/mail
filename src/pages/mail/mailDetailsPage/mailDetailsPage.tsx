@@ -4,7 +4,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { useQuery } from 'react-query';
 import { generatePath, useParams } from 'react-router-dom';
 
-import { ActionButton } from '../../../components/ActionButton/ActionButton';
+import { ActionButton } from '../../../components/ActionButtonX/ActionButton';
 import { ContactName } from '../../../components/contactName/contactName';
 import { ErrorMessage } from '../../../components/errorMessage/errorMessage';
 import { OverlappingLoader } from '../../../components/overlappingLoader/overlappingLoader';
