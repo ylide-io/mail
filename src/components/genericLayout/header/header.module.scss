@@ -140,18 +140,20 @@
 
 //
 
-.notificationsPopup {
+.headerPopup {
 	@include popup-root;
 	max-width: 320px;
 }
 
-.notificationsPopupInner {
+.headerPopupInner {
 	@include popup-inner;
 	display: grid;
 	justify-content: center;
 	grid-gap: 16px;
 	padding: 20px;
 }
+
+//
 
 .notificationIcon_animated {
 	transform-origin: 50% 8px;

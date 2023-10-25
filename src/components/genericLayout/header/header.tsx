@@ -1,7 +1,8 @@
+import { EVMNetwork } from '@ylide/ethereum';
 import clsx from 'clsx';
 import { makeAutoObservable } from 'mobx';
 import { observer } from 'mobx-react';
-import { PropsWithChildren, useEffect, useRef, useState } from 'react';
+import { PropsWithChildren, RefObject, useEffect, useRef, useState } from 'react';
 import { useMutation } from 'react-query';
 import { createSearchParams, generatePath } from 'react-router-dom';
 
@@ -9,6 +10,7 @@ import { AppMode, REACT_APP__APP_MODE } from '../../../env';
 import { ReactComponent as ArrowDownSvg } from '../../../icons/ic20/arrowDown.svg';
 import { ReactComponent as CrossSvg } from '../../../icons/ic20/cross.svg';
 import { ReactComponent as PlusSvg } from '../../../icons/ic20/plus.svg';
+import { ReactComponent as TickSvg } from '../../../icons/ic20/tick.svg';
 import { ReactComponent as ContactsSvg } from '../../../icons/ic28/contacts.svg';
 import { ReactComponent as NotificationsSvg } from '../../../icons/ic28/notifications.svg';
 import { postWidgetMessage, WidgetId, WidgetMessageType } from '../../../pages/widgets/widgets';
@@ -28,6 +30,7 @@ import { AppLogo } from '../../appLogo/appLogo';
 import { Avatar } from '../../avatar/avatar';
 import { AnchoredPopup } from '../../popup/anchoredPopup/anchoredPopup';
 import { PropsWithClassName } from '../../props';
+import { Spinner } from '../../spinner/spinner';
 import { toast } from '../../toast/toast';
 import { SidebarBurger } from '../sidebar/sidebarMenu';
 import { AccountsPopup } from './accountsPopup/accountsPopup';
@@ -55,6 +58,123 @@ const NavButton = ({ children, href }: NavButtonProps) => {
 		</a>
 	);
 };
+
+//
+
+interface HeaderPopupProps extends PropsWithChildren {
+	anchorRef: RefObject<HTMLElement>;
+	onClose?: () => void;
+}
+
+const HeaderPopup = observer(({ children, anchorRef, onClose }: HeaderPopupProps) => {
+	const { windowWidth } = useWindowSize();
+
+	return (
+		<AnchoredPopup
+			className={css.headerPopup}
+			anchorRef={anchorRef}
+			horizontalAlign={windowWidth > 640 ? HorizontalAlignment.END : HorizontalAlignment.MIDDLE}
+			alignerOptions={{
+				fitLeftToViewport: true,
+			}}
+			onCloseRequest={onClose}
+		>
+			<div className={css.headerPopupInner}>{children}</div>
+		</AnchoredPopup>
+	);
+});
+
+//
+
+const TransactionButton = observer(() => {
+	const buttonRef = useRef(null);
+	const [popupOpen, setPopupOpen] = useState(false);
+
+	const txHash = domain.publishingTxHash;
+
+	// Open popup
+	useEffect(() => setPopupOpen(true), []);
+
+	// Hide button after 5 seconds of inactivity
+	useEffect(() => {
+		if (!txHash || popupOpen) return;
+
+		const timer = setTimeout(() => {
+			domain.txPlateVisible = false;
+		}, 5000);
+
+		return () => {
+			clearInterval(timer);
+		};
+	}, [popupOpen, txHash]);
+
+	return (
+		<>
+			<ActionButton
+				ref={buttonRef}
+				size={ActionButtonSize.LARGE}
+				look={ActionButtonLook.LITE}
+				icon={txHash ? <TickSvg /> : <Spinner />}
+				title={txHash ? 'Transaction complete' : 'Transaction in progress'}
+				onClick={() => setPopupOpen(!popupOpen)}
+			/>
+
+			{popupOpen && (
+				<HeaderPopup anchorRef={buttonRef} onClose={() => setPopupOpen(false)}>
+					{txHash ? (
+						<>
+							<div className={css.central}>
+								{domain.txWithBonus
+									? `Your ${
+											domain.txChain === EVMNetwork.FANTOM
+												? '$FTM'
+												: domain.txChain === EVMNetwork.GNOSIS
+												? '$xDAI'
+												: domain.txChain === EVMNetwork.POLYGON
+												? '$MATIC'
+												: 'tokens'
+									  } has been sent`
+									: 'Transaction successfully processed 👍'}
+							</div>
+
+							<ActionButton
+								onClick={() => {
+									if (domain.txChain === EVMNetwork.FANTOM) {
+										openInNewWidnow(`https://ftmscan.com/tx/${txHash}`);
+									} else if (domain.txChain === EVMNetwork.GNOSIS) {
+										openInNewWidnow(`https://gnosisscan.io/tx/${txHash}`);
+									} else if (domain.txChain === EVMNetwork.POLYGON) {
+										openInNewWidnow(`https://polygonscan.com/tx/${txHash}`);
+									}
+								}}
+							>
+								Link to the transaction
+							</ActionButton>
+						</>
+					) : (
+						<>
+							<b>
+								{domain.txWithBonus
+									? `Your ${
+											domain.txChain === EVMNetwork.FANTOM
+												? '$FTM'
+												: domain.txChain === EVMNetwork.GNOSIS
+												? '$xDAI'
+												: domain.txChain === EVMNetwork.POLYGON
+												? '$MATIC'
+												: 'tokens'
+									  } are on the way`
+									: 'Transaction in progress'}
+							</b>
+
+							<div>Transaction is in queue. Please wait 10-15 seconds for it to be mined.</div>
+						</>
+					)}
+				</HeaderPopup>
+			)}
+		</>
+	);
+});
 
 //
 
@@ -128,8 +248,6 @@ export const notificationsAlert = new NotificationsAlert();
 const NotificationsButton = observer(() => {
 	const buttonRef = useRef(null);
 
-	const { windowWidth } = useWindowSize();
-
 	const openTgMutation = useMutation(async () => {
 		const accounts = domain.accounts.activeAccounts;
 		invariant(accounts.length, 'No accounts');
@@ -182,31 +300,21 @@ const NotificationsButton = observer(() => {
 			/>
 
 			{popupOpen && (
-				<AnchoredPopup
-					className={css.notificationsPopup}
-					anchorRef={buttonRef}
-					horizontalAlign={windowWidth > 640 ? HorizontalAlignment.END : HorizontalAlignment.MIDDLE}
-					alignerOptions={{
-						fitLeftToViewport: true,
-					}}
-					onCloseRequest={() => setPopupOpen(false)}
-				>
-					<div className={css.notificationsPopupInner}>
-						<div>
-							Enable notifications on Telegram to get notified of new emails or when someone replies to
-							your post.
-						</div>
-
-						<ActionButton
-							size={ActionButtonSize.MEDIUM}
-							look={ActionButtonLook.PRIMARY}
-							isLoading={openTgMutation.isLoading}
-							onClick={() => openTgMutation.mutate()}
-						>
-							Enable Notifications
-						</ActionButton>
+				<HeaderPopup anchorRef={buttonRef} onClose={() => setPopupOpen(false)}>
+					<div>
+						Enable notifications on Telegram to get notified of new emails or when someone replies to your
+						post.
 					</div>
-				</AnchoredPopup>
+
+					<ActionButton
+						size={ActionButtonSize.MEDIUM}
+						look={ActionButtonLook.PRIMARY}
+						isLoading={openTgMutation.isLoading}
+						onClick={() => openTgMutation.mutate()}
+					>
+						Enable Notifications
+					</ActionButton>
+				</HeaderPopup>
 			)}
 		</>
 	);
@@ -249,6 +357,8 @@ export const Header = observer(({ className }: PropsWithClassName) => {
 
 			<div className={css.right}>
 				<div className={css.rightButtons}>
+					{domain.txPlateVisible && REACT_APP__APP_MODE !== AppMode.MAIN_VIEW && <TransactionButton />}
+
 					{REACT_APP__APP_MODE === AppMode.HUB && domain.accounts.hasActiveAccounts && (
 						<NotificationsButton />
 					)}

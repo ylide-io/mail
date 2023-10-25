@@ -14,7 +14,6 @@ import { PageMeta } from './components/pageMeta/pageMeta';
 import { PopupManager } from './components/popup/popupManager/popupManager';
 import { StaticComponentManager } from './components/staticComponentManager/staticComponentManager';
 import { ToastManager } from './components/toast/toast';
-import { TransactionPopup } from './components/transactionPopup/transactionPopup';
 import { YlideLoader } from './components/ylideLoader/ylideLoader';
 import { APP_NAME } from './constants';
 import { AppMode, REACT_APP__APP_MODE } from './env';
@@ -344,8 +343,6 @@ export const App = observer(({ serviceWorkerUpdateCallback }: AppProps) => {
 									: RoutePath.ROOT,
 						})}
 					</Routes>
-
-					{domain.txPlateVisible && REACT_APP__APP_MODE !== AppMode.MAIN_VIEW && <TransactionPopup />}
 
 					<StaticComponentManager />
 					<ToastManager />
