@@ -114,7 +114,7 @@ export const TransactionPopup = observer(() => {
 								: `Transaction in progress`}
 						</h4>
 						<div className={css.text}>
-							Transaction is in queue. Please, wait 2-3 minutes for it to be mined.
+							Transaction is in queue. Please wait 10-15 seconds for it to be mined.
 						</div>
 						<div className={css.subtext}>Don’t close this page to get notified.</div>
 					</>
