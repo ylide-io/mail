@@ -1,0 +1,57 @@
+$width: 280px;
+$margin: 32px;
+
+.root {
+	position: fixed;
+	top: 48px;
+	right: $margin;
+	width: $width;
+	max-width: 100%;
+	transform: translateX(20%);
+	opacity: 0;
+	transition: all 200ms;
+
+	@include lessThan($width + $margin * 2) {
+		right: 50%;
+		transform: translateX(70%);
+	}
+}
+
+.root_visible {
+	transform: translateX(0);
+	opacity: 1;
+
+	@include lessThan($width + $margin * 2) {
+		transform: translateX(50%);
+	}
+}
+
+.root_hidden {
+	transform: translateX(50%);
+	opacity: 0;
+	pointer-events: none;
+
+	@include lessThan($width + $margin * 2) {
+		transform: translateX(100%);
+	}
+}
+
+//
+
+.content {
+	@include popup-inner;
+	@include colored-popup-shadow;
+	display: grid;
+	grid-gap: 8px;
+	padding: 20px;
+	will-change: transform;
+}
+
+.content_clickable {
+	cursor: pointer;
+	transition: all 200ms;
+
+	&:hover {
+		transform: scale(1.03);
+	}
+}

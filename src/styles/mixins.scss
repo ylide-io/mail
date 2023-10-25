@@ -208,3 +208,9 @@ $mediaHeight768: 768px;
 	border-radius: $borderRadius;
 	box-shadow: var(--popup-shadow);
 }
+
+@mixin colored-popup-shadow {
+	box-shadow:
+		4px 4px 24px rgba(var(--accent2-rgb-color), 0.4),
+		-16px -8px 64px rgba(var(--accent-rgb-color), 0.25);
+}

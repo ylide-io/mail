@@ -51,20 +51,22 @@ export class UiStack<Data = ReactNode> {
 		);
 
 		// Hide after timeout
-		setTimeout(
-			() =>
-				stack.forEach(it => {
-					if (it.id === id && it.state === UiStackItemState.SHOWN) {
-						it.state = UiStackItemState.HIDING;
-					}
-				}),
-			this.options.displayTime,
-		);
+		setTimeout(() => this.hide(id), this.options.displayTime);
 
 		// Remove item
 		setTimeout(() => {
 			const idx = stack.findIndex(it => it.id === id);
 			idx >= 0 && stack.splice(idx, 1);
 		}, this.options.displayTime + this.options.hidingTime);
+
+		return id;
+	}
+
+	hide(id: number) {
+		this.stack.forEach(it => {
+			if (it.id === id && it.state === UiStackItemState.SHOWN) {
+				it.state = UiStackItemState.HIDING;
+			}
+		});
 	}
 }

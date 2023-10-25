@@ -6,8 +6,10 @@ import { generatePath, Navigate, Route, Routes, useLocation, useSearchParams } f
 
 import css from './app.module.scss';
 import { ActionButton, ActionButtonLook, ActionButtonSize } from './components/actionButton/actionButton';
+import { InAppNotificationManager } from './components/inAppNotification/inAppNotification';
 import { IosInstallPwaPopup } from './components/iosInstallPwaPopup/iosInstallPwaPopup';
 import { MainViewOnboarding } from './components/mainViewOnboarding/mainViewOnboarding';
+import { NewMailNotifier } from './components/newMailNotifier/newMailNotifier';
 import { PageMeta } from './components/pageMeta/pageMeta';
 import { PopupManager } from './components/popup/popupManager/popupManager';
 import { StaticComponentManager } from './components/staticComponentManager/staticComponentManager';
@@ -42,7 +44,6 @@ import { analytics } from './stores/Analytics';
 import { browserStorage } from './stores/browserStorage';
 import domain from './stores/Domain';
 import { FolderId } from './stores/MailList';
-import { NewMailNotifier } from './stores/newMailChecker';
 import { RoutePath } from './stores/routePath';
 import { enableRemoteConsole, remoteConsoleChannel } from './utils/dev';
 import { openInNewWidnow } from './utils/misc';
@@ -348,6 +349,7 @@ export const App = observer(({ serviceWorkerUpdateCallback }: AppProps) => {
 
 					<StaticComponentManager />
 					<ToastManager />
+					<InAppNotificationManager />
 
 					{REACT_APP__APP_MODE === AppMode.MAIN_VIEW && <MainViewOnboarding />}
 
