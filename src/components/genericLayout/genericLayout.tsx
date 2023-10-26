@@ -16,7 +16,7 @@ export const useGenericLayoutApi = () => useContext(GenericLayoutApiContext)!;
 
 //
 
-interface GenericLayoutProps extends PropsWithChildren<{}> {}
+interface GenericLayoutProps extends PropsWithChildren {}
 
 export const GenericLayout = observer(({ children }: GenericLayoutProps) => {
 	useEffect(() => {

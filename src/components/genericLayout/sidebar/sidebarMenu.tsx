@@ -16,7 +16,6 @@ import { ReactComponent as InboxSvg } from '../../../icons/inbox.svg';
 import { ReactComponent as SentSvg } from '../../../icons/sent.svg';
 import { ReactComponent as TwitterSvg } from '../../../icons/social/twitter.svg';
 import { sideFeedIcon } from '../../../icons/static/sideFeedIcon';
-import { FeedSettingsPopup } from '../../../pages/feed/_common/feedSettingsPopup/feedSettingsPopup';
 import { analytics } from '../../../stores/Analytics';
 import {
 	activeTvmProjects,
@@ -28,7 +27,6 @@ import { browserStorage } from '../../../stores/browserStorage';
 import domain from '../../../stores/Domain';
 import { feedSettings } from '../../../stores/FeedSettings';
 import { FolderId, getFolderName, MailList } from '../../../stores/MailList';
-import { DomainAccount } from '../../../stores/models/DomainAccount';
 import { RoutePath } from '../../../stores/routePath';
 import { useOpenMailCompose } from '../../../utils/mail';
 import { useNav } from '../../../utils/url';
@@ -261,7 +259,6 @@ export const SidebarMailSection = observer(() => {
 //
 
 export const SidebarMenu = observer(() => {
-	const [feedSettingsAccount, setFeedSettingsAccount] = useState<DomainAccount>();
 	const tags = feedSettings.tags;
 	const navigate = useNav();
 
@@ -309,7 +306,7 @@ export const SidebarMenu = observer(() => {
 							REACT_APP__APP_MODE === AppMode.MAIN_VIEW
 								? {
 										icon: <SettingsSvg />,
-										title: 'Feed Settings',
+										title: 'Account Settings',
 										onClick: () => {
 											if (!account.mainViewKey) {
 												return toast('Please complete the onboarding first ❤');
@@ -318,20 +315,17 @@ export const SidebarMenu = observer(() => {
 											analytics.mainviewFeedSettingsClick(account.account.address);
 
 											isSidebarOpen.set(false);
-											setFeedSettingsAccount(account);
+											navigate(
+												generatePath(RoutePath.SETTINGS_ADDRESS, {
+													address: account.account.address,
+												}),
+											);
 										},
 								  }
 								: undefined
 						}
 					/>
 				))}
-
-				{feedSettingsAccount && (
-					<FeedSettingsPopup
-						account={feedSettingsAccount}
-						onClose={() => setFeedSettingsAccount(undefined)}
-					/>
-				)}
 			</SidebarSection>
 		);
 	}

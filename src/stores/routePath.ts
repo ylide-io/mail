@@ -8,8 +8,6 @@ export enum RoutePath {
 
 	// APP
 
-	SETTINGS = '/settings',
-
 	WALLETS = '/wallets',
 	WALLETS_CONNECT = '/connect-wallets',
 
@@ -31,6 +29,9 @@ export enum RoutePath {
 	FEED_PROJECT_POSTS = '/feed/project/:projectId',
 	FEED_PROJECT_POSTS_ADMIN = '/feed/project/:projectId/admin',
 	FEED_PROJECT_POST = '/feed/project/:projectId/:postId',
+
+	SETTINGS_ADDRESS = '/settings/:address',
+	SETTINGS_ADDRESS_SECTION = '/settings/:address/:section',
 
 	OTC_ASSETS = '/otc/assets',
 	OTC_WALLETS = '/otc/wallets',

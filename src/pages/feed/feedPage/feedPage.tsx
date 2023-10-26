@@ -36,6 +36,8 @@ export function reloadFeed() {
 	reloadFeedCounter.set(reloadFeedCounter.get() + 1);
 }
 
+//
+
 function enableNotifications(accounts: DomainAccount[]) {
 	function subscribe() {
 		navigator.serviceWorker

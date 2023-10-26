@@ -29,7 +29,7 @@
 		width: 130px;
 	}
 
-	@include less720px {
+	@include less480px {
 		display: none;
 	}
 

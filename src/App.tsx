@@ -278,7 +278,6 @@ export const App = observer(({ serviceWorkerUpdateCallback }: AppProps) => {
 					<Routes>
 						<Route path={RoutePath.TEST} element={<TestPage />} />
 						<Route path={RoutePath.WALLETS} element={<WalletsPage />} />
-						<Route path={RoutePath.SETTINGS} element={<SettingsPage />} />
 						<Route path={RoutePath.ADMIN} element={<AdminPage />} />
 						<Route path={RoutePath.ADMIN_FEED} element={<AdminFeedPage />} />
 
@@ -302,6 +301,9 @@ export const App = observer(({ serviceWorkerUpdateCallback }: AppProps) => {
 						<Route path={RoutePath.FEED_SMART} element={<FeedPage />} />
 						<Route path={RoutePath.FEED_SMART_ADDRESS} element={<FeedPage />} />
 
+						<Route path={RoutePath.SETTINGS_ADDRESS} element={<SettingsPage />} />
+						<Route path={RoutePath.SETTINGS_ADDRESS_SECTION} element={<SettingsPage />} />
+
 						<Route
 							path={RoutePath.FEED_PROJECT}
 							element={
@@ -316,6 +318,8 @@ export const App = observer(({ serviceWorkerUpdateCallback }: AppProps) => {
 						<Route path={RoutePath.FEED_PROJECT_POSTS} element={<BlockchainProjectFeedPage />} />
 						<Route path={RoutePath.FEED_PROJECT_POSTS_ADMIN} element={<BlockchainProjectFeedPage />} />
 						<Route path={RoutePath.FEED_PROJECT_POST} element={<BlockchainProjectFeedPostPage />} />
+
+						<Route path={RoutePath.SETTINGS_ADDRESS} element={<BlockchainProjectFeedPostPage />} />
 
 						<Route
 							path="/feed/venom/*"
