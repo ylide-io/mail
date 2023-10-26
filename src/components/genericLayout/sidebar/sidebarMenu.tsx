@@ -2,7 +2,7 @@ import clsx from 'clsx';
 import { observable, reaction } from 'mobx';
 import { observer } from 'mobx-react';
 import { AnchorHTMLAttributes, PropsWithChildren, ReactNode, useEffect, useState } from 'react';
-import { generatePath, useLocation } from 'react-router-dom';
+import { generatePath, matchPath, useLocation } from 'react-router-dom';
 
 import { AppMode, REACT_APP__APP_MODE } from '../../../env';
 import { ReactComponent as ArchiveSvg } from '../../../icons/archive.svg';
@@ -102,6 +102,7 @@ enum SidebarButtonLook {
 interface SidebarButtonProps {
 	look?: SidebarButtonLook;
 	href: string;
+	isActiveChecker?: (pathname: string) => boolean;
 	icon?: ReactNode;
 	name: ReactNode;
 	onClick?: () => void;
@@ -112,60 +113,62 @@ interface SidebarButtonProps {
 	};
 }
 
-export const SidebarButton = observer(({ look, href, icon, name, rightButton, onClick }: SidebarButtonProps) => {
-	const location = useLocation();
-	const navigate = useNav();
+export const SidebarButton = observer(
+	({ look, href, isActiveChecker, icon, name, rightButton, onClick }: SidebarButtonProps) => {
+		const location = useLocation();
+		const navigate = useNav();
 
-	const isActive = location.pathname === href;
+		const isActive = location.pathname === href || isActiveChecker?.(location.pathname);
 
-	const isExternal = !href.startsWith('/');
-	const externalProps: AnchorHTMLAttributes<HTMLAnchorElement> = isExternal
-		? {
-				target: '_blank',
-				rel: 'noreferrer',
-		  }
-		: {};
+		const isExternal = !href.startsWith('/');
+		const externalProps: AnchorHTMLAttributes<HTMLAnchorElement> = isExternal
+			? {
+					target: '_blank',
+					rel: 'noreferrer',
+			  }
+			: {};
 
-	const lookClass =
-		look &&
-		{
-			[SidebarButtonLook.SUBMENU]: css.sectionLink_submenu,
-			[SidebarButtonLook.SECTION]: css.sectionLink_section,
-		}[look];
+		const lookClass =
+			look &&
+			{
+				[SidebarButtonLook.SUBMENU]: css.sectionLink_submenu,
+				[SidebarButtonLook.SECTION]: css.sectionLink_section,
+			}[look];
 
-	return (
-		<a
-			{...externalProps}
-			className={clsx(css.sectionLink, lookClass, isActive && css.sectionLink_active)}
-			href={href}
-			onClick={e => {
-				if (!isExternal) {
-					e.preventDefault();
-					isSidebarOpen.set(false);
-					navigate(href);
-					onClick?.();
-				}
-			}}
-		>
-			{icon && <div className={css.sectionLinkIconLeft}>{icon}</div>}
-			<div className={css.sectionLinkTitle}>{name}</div>
-
-			{rightButton && (
-				<ActionButton
-					className={css.sectionRightButton}
-					look={ActionButtonLook.LITE}
-					icon={rightButton.icon}
-					title={rightButton.title}
-					onClick={e => {
+		return (
+			<a
+				{...externalProps}
+				className={clsx(css.sectionLink, lookClass, isActive && css.sectionLink_active)}
+				href={href}
+				onClick={e => {
+					if (!isExternal) {
 						e.preventDefault();
-						e.stopPropagation();
-						rightButton?.onClick();
-					}}
-				/>
-			)}
-		</a>
-	);
-});
+						isSidebarOpen.set(false);
+						navigate(href);
+						onClick?.();
+					}
+				}}
+			>
+				{icon && <div className={css.sectionLinkIconLeft}>{icon}</div>}
+				<div className={css.sectionLinkTitle}>{name}</div>
+
+				{rightButton && (
+					<ActionButton
+						className={css.sectionRightButton}
+						look={ActionButtonLook.LITE}
+						icon={rightButton.icon}
+						title={rightButton.title}
+						onClick={e => {
+							e.preventDefault();
+							e.stopPropagation();
+							rightButton?.onClick();
+						}}
+					/>
+				)}
+			</a>
+		);
+	},
+);
 
 //
 
@@ -295,6 +298,11 @@ export const SidebarMenu = observer(() => {
 						key={i}
 						look={SidebarButtonLook.SUBMENU}
 						href={generatePath(RoutePath.FEED_SMART_ADDRESS, { address: account.account.address })}
+						isActiveChecker={pathname =>
+							[RoutePath.SETTINGS_ADDRESS, RoutePath.SETTINGS_ADDRESS_SECTION].some(r =>
+								matchPath(r, pathname),
+							)
+						}
 						icon={<ContactSvg />}
 						name={<AdaptiveText text={account.name || account.account.address} />}
 						onClick={() => {
