@@ -1,9 +1,9 @@
 import {
 	createSearchParams,
+	matchPath,
 	NavigateOptions,
 	URLSearchParamsInit,
 	useLocation,
-	useMatch,
 	useNavigate,
 } from 'react-router-dom';
 
@@ -30,7 +30,7 @@ export function buildUrl(params: string | UseNavParameters) {
 	return typeof params === 'string'
 		? params
 		: `${params.path || ''}${params.search ? `?${createSearchParams(params.search).toString()}` : ''}${
-				params.hash || ''
+				params.hash ? `#${params.hash}` : ''
 		  }`;
 }
 
@@ -75,5 +75,11 @@ export const usePreviousUrl = () => {
 //
 
 export function useIsMatchesPattern(...routes: RoutePath[]) {
-	return routes.map(useMatch).some(Boolean);
+	const location = useLocation();
+	return routes.some(route => matchPath(route, location.pathname));
+}
+
+export function useIsMatchesPath(...paths: string[]) {
+	const location = useLocation();
+	return paths.includes(location.pathname);
 }
