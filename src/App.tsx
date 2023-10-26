@@ -1,3 +1,4 @@
+import { IObservableValue } from 'mobx';
 import { observer } from 'mobx-react';
 import { nanoid } from 'nanoid';
 import { useEffect, useState } from 'react';
@@ -5,6 +6,7 @@ import { Helmet } from 'react-helmet';
 import { QueryClient, QueryClientProvider } from 'react-query';
 import { generatePath, Navigate, Route, Routes, useLocation, useSearchParams } from 'react-router-dom';
 
+import css from './app.module.scss';
 import { ActionButton, ActionButtonLook, ActionButtonSize } from './components/ActionButton/ActionButton';
 import { Faq } from './components/faq/faq';
 import { MainviewLoader } from './components/mainviewLoader/mainviewLoader';
@@ -14,6 +16,7 @@ import { StaticComponentManager } from './components/staticComponentManager/stat
 import { ToastManager } from './components/toast/toast';
 import { TransactionPopup } from './components/TransactionPopup/TransactionPopup';
 import { YlideLoader } from './components/ylideLoader/ylideLoader';
+import { APP_NAME } from './constants';
 import { AppMode, REACT_APP__APP_MODE } from './env';
 import { ReactComponent as CrossSvg } from './icons/ic20/cross.svg';
 import { AdminFeedPage } from './pages/AdminFeedPage';
@@ -36,6 +39,7 @@ import { TestPage } from './pages/test/testPage';
 import { WalletsPage } from './pages/wallets/walletsPage';
 import { MailboxWidget } from './pages/widgets/mailboxWidget/mailboxWidget';
 import { SendMessageWidget } from './pages/widgets/sendMessageWidget/sendMessageWidget';
+import { ServiceWorkerUpdateCallback } from './serviceWorkerRegistration';
 import { analytics } from './stores/Analytics';
 import { BlockchainProjectId } from './stores/blockchainProjects/blockchainProjects';
 import { browserStorage } from './stores/browserStorage';
@@ -87,8 +91,14 @@ const RemoveTrailingSlash = () => {
 	return <></>;
 };
 
-export const App = observer(() => {
+interface AppProps {
+	serviceWorkerUpdateCallback: IObservableValue<ServiceWorkerUpdateCallback | undefined>;
+}
+
+export const App = observer(({ serviceWorkerUpdateCallback }: AppProps) => {
 	const location = useLocation();
+
+	const swUpdateCallback = serviceWorkerUpdateCallback.get();
 
 	const [queryClient] = useState(
 		new QueryClient({
@@ -244,6 +254,20 @@ export const App = observer(() => {
 							browserStorage.isMainViewBannerHidden = true;
 						}}
 					/>
+				</div>
+			)}
+
+			{swUpdateCallback && (
+				<div className={css.updateAppBanner}>
+					<div>
+						<b>A new version of {APP_NAME} is available!</b>
+						<br />
+						Please refresh the page to apply changes.
+					</div>
+
+					<ActionButton look={ActionButtonLook.HEAVY} onClick={() => swUpdateCallback()}>
+						Update app 🚀
+					</ActionButton>
 				</div>
 			)}
 

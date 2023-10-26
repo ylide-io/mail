@@ -2,12 +2,12 @@ import 'minireset.css';
 import 'normalize.css';
 import './styles/index.scss';
 
-import { configure } from 'mobx';
+import { configure, observable } from 'mobx';
 import { createRoot } from 'react-dom/client';
 import { BrowserRouter } from 'react-router-dom';
 
 import { App } from './App';
-import * as serviceWorkerRegistration from './serviceWorkerRegistration';
+import { registerServiceWorker, ServiceWorkerUpdateCallback } from './serviceWorkerRegistration';
 import { initSentry } from './utils/sentry';
 
 initSentry();
@@ -17,11 +17,12 @@ configure({
 });
 
 const root = createRoot(document.getElementById('root')!);
+const serviceWorkerUpdateCallback = observable.box<ServiceWorkerUpdateCallback | undefined>(undefined);
 
 root.render(
 	<BrowserRouter>
-		<App />
+		<App serviceWorkerUpdateCallback={serviceWorkerUpdateCallback} />
 	</BrowserRouter>,
 );
 
-serviceWorkerRegistration.register();
+registerServiceWorker({ onUpdateAvailable: sw => serviceWorkerUpdateCallback.set(sw) });
