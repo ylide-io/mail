@@ -90,25 +90,18 @@ const TransactionButton = observer(() => {
 	const buttonRef = useRef(null);
 	const [popupOpen, setPopupOpen] = useState(false);
 
+	const txPlate = domain.txPlateVisible;
 	const txHash = domain.publishingTxHash;
 
 	// Open popup
 	useEffect(() => setPopupOpen(true), []);
 
-	// Hide button after 5 seconds of inactivity
+	// Open popup when finished
 	useEffect(() => {
-		if (!txHash || popupOpen) return;
+		txHash && setPopupOpen(true);
+	}, [txHash]);
 
-		const timer = setTimeout(() => {
-			domain.txPlateVisible = false;
-		}, 5000);
-
-		return () => {
-			clearInterval(timer);
-		};
-	}, [popupOpen, txHash]);
-
-	return (
+	return txPlate ? (
 		<>
 			<ActionButton
 				ref={buttonRef}
@@ -120,7 +113,18 @@ const TransactionButton = observer(() => {
 			/>
 
 			{popupOpen && (
-				<HeaderPopup anchorRef={buttonRef} onClose={() => setPopupOpen(false)}>
+				<HeaderPopup
+					anchorRef={buttonRef}
+					onClose={() => {
+						setPopupOpen(false);
+
+						// Hide everything if hash published
+						if (txHash) {
+							domain.txPlateVisible = false;
+							domain.publishingTxHash = '';
+						}
+					}}
+				>
 					{txHash ? (
 						<>
 							<div className={css.central}>
@@ -173,6 +177,8 @@ const TransactionButton = observer(() => {
 				</HeaderPopup>
 			)}
 		</>
+	) : (
+		<></>
 	);
 });
 
@@ -271,7 +277,7 @@ const NotificationsButton = observer(() => {
 	const [animationNeeded, setAnimationNeeded] = useState(false);
 	const [popupOpen, setPopupOpen] = useState(false);
 
-	const alertNeeded = notificationsAlert.value.alertNeeded;
+	const alertNeeded = notificationsAlert.value.alertNeeded && !domain.txPlateVisible;
 
 	useEffect(() => {
 		if (alertNeeded) {
