@@ -204,38 +204,3 @@ self.addEventListener('notificationclick', event => {
 		event.waitUntil(self.clients.openWindow(url));
 	}
 });
-
-let isFirstInstallation = true;
-// TODO: remove after patch
-self.addEventListener('install', function (event) {
-	isFirstInstallation = !self.registration.active;
-	if (!isFirstInstallation) {
-		self.skipWaiting();
-	}
-});
-
-// TODO: remove after patch
-self.addEventListener('activate', event => {
-	if (isFirstInstallation) {
-		return;
-	}
-	event.waitUntil(
-		// This promise won't settle until we've taken control of all clients,
-		// ensuring they see the updated service worker immediately upon reloading.
-		self.clients
-			.claim()
-			// Get all the service worker clients
-			.then(() =>
-				self.clients.matchAll({
-					type: 'window',
-					includeUncontrolled: true,
-				}),
-			)
-			// Force a reload on each client.
-			.then(clients => {
-				clients.forEach(client => {
-					client.navigate(client.url);
-				});
-			}),
-	);
-});
