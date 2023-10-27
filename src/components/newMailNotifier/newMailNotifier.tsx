@@ -33,7 +33,7 @@ export const NewMailNotifier = observer(() => {
 								navigate(
 									generatePath(RoutePath.MAIL_FOLDER_DETAILS, {
 										folderId: FolderId.Inbox,
-										id: newMessage.id,
+										id: encodeURIComponent(newMessage.id),
 									}),
 								),
 						},
