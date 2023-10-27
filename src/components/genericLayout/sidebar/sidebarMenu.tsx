@@ -16,6 +16,7 @@ import { ReactComponent as InboxSvg } from '../../../icons/inbox.svg';
 import { ReactComponent as SentSvg } from '../../../icons/sent.svg';
 import { ReactComponent as TwitterSvg } from '../../../icons/social/twitter.svg';
 import { sideFeedIcon } from '../../../icons/static/sideFeedIcon';
+import { SettingsSection } from '../../../pages/settings/settingsPage';
 import { analytics } from '../../../stores/Analytics';
 import {
 	activeTvmProjects,
@@ -324,8 +325,9 @@ export const SidebarMenu = observer(() => {
 
 											isSidebarOpen.set(false);
 											navigate(
-												generatePath(RoutePath.SETTINGS_ADDRESS, {
+												generatePath(RoutePath.SETTINGS_ADDRESS_SECTION, {
 													address: account.account.address,
+													section: SettingsSection.SOURCES,
 												}),
 											);
 										},
