@@ -170,7 +170,10 @@ export class DomainAccount {
 
 	async getActiveBlockchain() {
 		if (this.wallet.factory.blockchainGroup === 'evm') {
-			return await this.wallet.controller.getCurrentBlockchain();
+			return await this.wallet.controller.getCurrentBlockchain().catch(e => {
+				console.error('Cannot get active blockchain', e);
+				return undefined;
+			});
 		}
 
 		if (this.wallet.wallet === 'everwallet') {
