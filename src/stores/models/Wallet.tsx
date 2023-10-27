@@ -20,11 +20,11 @@ export class Wallet extends EventEmitter {
 	factory: WalletControllerFactory;
 	controller: AbstractWalletController;
 
-	@observable private _isAvailable: boolean = false;
+	@observable private _isAvailable = false;
 	@observable private _accounts: DomainAccount[] = [];
 
 	@observable currentWalletAccount: WalletAccount | null = null;
-	@observable currentBlockchain: string = 'unknown';
+	@observable currentBlockchain = '';
 
 	constructor(
 		public readonly domain: Domain,
@@ -45,7 +45,7 @@ export class Wallet extends EventEmitter {
 		try {
 			this.currentBlockchain = await this.controller.getCurrentBlockchain();
 		} catch (err) {
-			this.currentBlockchain = 'unknown';
+			this.currentBlockchain = '';
 		}
 		this.currentWalletAccount = await this.controller.getAuthenticatedAccount();
 
