@@ -35,6 +35,15 @@ import { useNav } from '../../../utils/url';
 import css from './mailDetailsPage.module.scss';
 import { MailMessage } from './mailMessage/mailMessage';
 
+export function generateMailDetailsPageUrl(folderId: FolderId, msgId: string) {
+	return generatePath(RoutePath.MAIL_FOLDER_DETAILS, {
+		folderId,
+		id: encodeURIComponent(msgId),
+	});
+}
+
+//
+
 interface WrappedThreadMessage {
 	message: ILinkedMessage;
 	isDeleted: boolean;

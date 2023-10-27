@@ -1,11 +1,10 @@
 import { reaction } from 'mobx';
 import { observer } from 'mobx-react';
 import { useEffect, useRef } from 'react';
-import { generatePath } from 'react-router-dom';
 
+import { generateMailDetailsPageUrl } from '../../pages/mail/mailDetailsPage/mailDetailsPage';
 import { FolderId } from '../../stores/MailList';
 import { newMailChecker } from '../../stores/newMailChecker';
-import { RoutePath } from '../../stores/routePath';
 import { useNav } from '../../utils/url';
 import { inAppNotification } from '../inAppNotification/inAppNotification';
 import css from './newMailNotifier.module.scss';
@@ -29,13 +28,7 @@ export const NewMailNotifier = observer(() => {
 							<div className={css.subtext}>Click to open</div>
 						</>,
 						{
-							onClick: () =>
-								navigate(
-									generatePath(RoutePath.MAIL_FOLDER_DETAILS, {
-										folderId: FolderId.Inbox,
-										id: encodeURIComponent(newMessage.id),
-									}),
-								),
+							onClick: () => navigate(generateMailDetailsPageUrl(FolderId.Inbox, newMessage.id)),
 						},
 					);
 				}

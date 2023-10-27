@@ -27,7 +27,7 @@ import { DiscussionPost } from '../_common/discussionPost/discussionPost';
 import { OfficialPostView } from '../_common/officialPost/officialPost';
 import css from './communityPostPage.module.scss';
 
-export function getPostPath(postId: string) {
+export function generateCommunityPostUrl(postId: string) {
 	return generatePath(RoutePath.POST_ID, { postId: encodeURIComponent(postId) });
 }
 
@@ -74,7 +74,7 @@ const CommunityPostContent = observer(({ post }: CommunityPostContentProps) => {
 								horizontalAlign={HorizontalAlignment.END}
 								onClose={() => setSharePopupOpen(false)}
 								subject="Check out this post on Ylide!"
-								url={toAbsoluteUrl(getPostPath(post.original.id))}
+								url={toAbsoluteUrl(generateCommunityPostUrl(post.original.id))}
 							/>
 						)}
 					</>

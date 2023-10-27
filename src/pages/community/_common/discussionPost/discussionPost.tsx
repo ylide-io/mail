@@ -36,7 +36,7 @@ import { getIpfsHashFromUrl, ipfsToHttpUrl } from '../../../../utils/ipfs';
 import { useOpenMailCompose } from '../../../../utils/mail';
 import { ReactQueryKey } from '../../../../utils/reactQuery';
 import { useNav } from '../../../../utils/url';
-import { getPostPath } from '../../communityPostPage/communityPostPage';
+import { generateCommunityPostUrl } from '../../communityPostPage/communityPostPage';
 import { stickerIpfsIds } from '../createPostForm/stickerIpfsIds';
 import { PostReactions } from '../postReactions/postReactions';
 import { RepliedDiscussionPost } from '../repliedDiscussionPost/repliedDiscussionPost';
@@ -69,7 +69,7 @@ export const DiscussionPost = observer(({ post: initialPost, community, onReplyC
 	const isAuthorAdmin = !!post.original.isAdmin;
 	const blockchain = post.original.blockchain;
 	const txId = post.msg.$$meta.tx?.hash || post.msg.$$meta.id;
-	const postUrl = getPostPath(post.original.id);
+	const postUrl = generateCommunityPostUrl(post.original.id);
 	const explorerUrl = generateBlockchainExplorerUrl(blockchain, txId);
 
 	const openMailCompose = useOpenMailCompose();

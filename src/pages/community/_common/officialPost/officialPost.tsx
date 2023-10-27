@@ -24,7 +24,7 @@ import domain from '../../../../stores/Domain';
 import { getIpfsHashFromUrl, ipfsToHttpUrl } from '../../../../utils/ipfs';
 import { ReactQueryKey } from '../../../../utils/reactQuery';
 import { useNav } from '../../../../utils/url';
-import { getPostPath } from '../../communityPostPage/communityPostPage';
+import { generateCommunityPostUrl } from '../../communityPostPage/communityPostPage';
 import { stickerIpfsIds } from '../createPostForm/stickerIpfsIds';
 import { PostReactions } from '../postReactions/postReactions';
 import css from './officialPost.module.scss';
@@ -51,7 +51,7 @@ export function OfficialPostView({ community, post: initialPost }: OfficialPostV
 	});
 
 	const post = reloadPostQuery.data || initialPost;
-	const postUrl = getPostPath(post.original.id);
+	const postUrl = generateCommunityPostUrl(post.original.id);
 
 	const decodedTextData = post.decoded.decodedTextData;
 	const decodedText = useMemo(
