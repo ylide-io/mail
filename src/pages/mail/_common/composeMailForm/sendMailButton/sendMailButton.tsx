@@ -10,7 +10,6 @@ import { Spinner } from '../../../../../components/spinner/spinner';
 import { toast } from '../../../../../components/toast/toast';
 import { ReactComponent as ArrowDownSvg } from '../../../../../icons/ic20/arrowDown.svg';
 import { ReactComponent as ReplySvg } from '../../../../../icons/ic20/reply.svg';
-import { BalancesStore } from '../../../../../stores/balancesStore';
 import domain from '../../../../../stores/Domain';
 import { OutgoingMailData } from '../../../../../stores/outgoingMailData';
 import { AlignmentDirection, HorizontalAlignment } from '../../../../../utils/alignment';
@@ -40,9 +39,7 @@ export const SendMailButton = observer(
 			}
 		}, [mailData.blockchain]);
 
-		const balances = useMemo(() => {
-			return mailData.from?.wallet.getBalancesOf(mailData.from.account.address) || new BalancesStore();
-		}, [mailData.from]);
+		const balances = mailData.from?.wallet.currentBalances;
 
 		const allowedChainsForAccount = useMemo(() => {
 			return mailData.from ? getWalletSupportedBlockchains(mailData.from.wallet, allowedChains) : [];
@@ -131,7 +128,7 @@ export const SendMailButton = observer(
 										<DropDownItem
 											key={chain}
 											mode={
-												!Number(balances.getBalance(chain).toFixed(4))
+												!Number(balances?.getBalance(chain).toFixed(4))
 													? DropDownItemMode.DISABLED
 													: undefined
 											}
@@ -158,7 +155,7 @@ export const SendMailButton = observer(
 												{bData.logo()}
 
 												<TruncateTextBox>
-													{bData.title} [{Number(balances.getBalance(chain).toFixed(4))}{' '}
+													{bData.title} [{Number(balances?.getBalance(chain).toFixed(4))}{' '}
 													{bData.ethNetwork!.nativeCurrency.symbol}]
 												</TruncateTextBox>
 											</GridRowBox>

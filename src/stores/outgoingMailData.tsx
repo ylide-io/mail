@@ -174,7 +174,10 @@ export class OutgoingMailData {
 				const supportedChains = getWalletSupportedBlockchains(this.from.wallet);
 
 				if (this.blockchain == null || !supportedChains.includes(this.blockchain)) {
-					this.blockchain = newChain && supportedChains.includes(newChain) ? newChain : supportedChains[0];
+					this.blockchain =
+						newChain && supportedChains.includes(newChain)
+							? newChain
+							: this.from.wallet.currentBalances.getFirstNonZeroChain() || supportedChains[0];
 				}
 			}
 		});
