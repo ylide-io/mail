@@ -9,17 +9,16 @@ import { ActionModal } from '../components/actionModal/actionModal';
 import { AdaptiveText } from '../components/adaptiveText/adaptiveText';
 import { SelectNetworkModal } from '../components/selectNetworkModal/selectNetworkModal';
 import { showStaticComponent } from '../components/staticComponentManager/staticComponentManager';
-import { toast } from '../components/toast/toast';
 import { HUB_FEED_ID, OTC_FEED_ID } from '../constants';
 import { AppMode, REACT_APP__APP_MODE, REACT_APP__GLOBAL_FEED_ID } from '../env';
 import { connectAccount } from '../utils/account';
 import { invariant } from '../utils/assert';
-import { blockchainMeta } from '../utils/blockchain';
+import { blockchainMeta, evmNameToNetwork, isEvmBlockchain } from '../utils/blockchain';
 import { calcComissionDecimals, calcCommission } from '../utils/commission';
 import { SEND_TO_ALL_ADDRESS } from '../utils/globalFeed';
 import { broadcastMessage, editorJsToYMF, isEmptyEditorJsData, sendMessage } from '../utils/mail';
 import { truncateAddress } from '../utils/string';
-import { getEvmWalletNetwork, getWalletSupportedBlockchains, isWalletSupportsBlockchain } from '../utils/wallet';
+import { getWalletSupportedBlockchains, isWalletSupportsBlockchain } from '../utils/wallet';
 import contacts from './Contacts';
 import domain from './Domain';
 import { DomainAccount } from './models/DomainAccount';
@@ -280,7 +279,7 @@ export class OutgoingMailData {
 
 			this.sending = true;
 
-			// CHECK 'FROM' ACCOUNT
+			// CHECK 'FROM'
 
 			const proxyAccount = domain.availableProxyAccounts[0];
 
@@ -343,19 +342,26 @@ export class OutgoingMailData {
 
 			invariant(this.from);
 
-			if (
-				this.from.wallet.factory.blockchainGroup === 'evm' &&
-				(await getEvmWalletNetwork(this.from.wallet)) == null
-			) {
-				toast(
-					<>
-						<b>Unsupported EVM network 😒</b>
-						<div>Please select another one and try again.</div>
-					</>,
+			// Ensure that chain is selected correctly,
+			// or request to switch it.
+			if (this.from.wallet.currentBlockchain !== this.blockchain) {
+				invariant(
+					isEvmBlockchain(this.blockchain),
+					`Cannot change change chain for non-EVM wallet: '${this.from.wallet.wallet}' / Required chain: '${this.blockchain}'`,
 				);
-				return false;
+
+				await domain.switchEVMChain(this.from.wallet, evmNameToNetwork(this.blockchain)!);
+
+				const newChain = await this.from.wallet.controller.getCurrentBlockchain();
+				invariant(
+					newChain === this.blockchain,
+					`Chain is still incorrect after programmatical switching: '${newChain}' / Required: '${this.blockchain}'`,
+				);
 			}
 
+			// Ensure that account is selected correctly.
+			// Do it after switching the chain, because chain switching opens wallet app,
+			// and asking for chaing account - doesn't.
 			const curr = await this.from.wallet.getCurrentAccount();
 			if (curr?.address !== this.from.account.address) {
 				await domain.handleSwitchRequest(this.from.wallet.factory.wallet, curr, this.from.account);
