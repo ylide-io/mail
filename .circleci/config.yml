@@ -141,7 +141,7 @@ jobs:
             - restore_pnpm_cache
             - install_pnpm
             - ylide_build:
-                  build_cmd: build-mainview
+                  build_cmd: build
             - save_build_cache:
                   cache_key: mainview
             - ylide_store_artifacts
@@ -163,7 +163,7 @@ jobs:
             - restore_pnpm_cache
             - install_pnpm
             - ylide_build:
-                  build_cmd: build-mainview
+                  build_cmd: build
             - save_build_cache:
                   cache_key: mainview-staging
             - ylide_store_artifacts
