@@ -112,10 +112,6 @@ jobs:
     build_hub_staging:
         docker:
             - image: node:16
-        environment:
-            REACT_APP__TESTCISHA: ${CIRCLE_SHA1}
-            REACT_APP__TESTCISHA2: "{{ .Environment.CIRCLE_SHA1 }}"
-            REACT_APP__TESTCISHA3: -{{ .Environment.CIRCLE_SHA1 }}
         steps:
             - checkout
             - restore_pnpm_cache
