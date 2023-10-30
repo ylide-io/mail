@@ -1,6 +1,6 @@
 import { jitsuClient } from '@jitsu/sdk-js';
 
-import { REACT_APP__APP_MODE } from '../env';
+import { REACT_APP__APP_MODE, REACT_APP__CIRCLE_SHA1 } from '../env';
 import domain from './Domain';
 
 const jitsu = jitsuClient({
@@ -12,6 +12,7 @@ function track(name: string, payload?: Record<string, any>) {
 	jitsu.track(name, {
 		host: location.hostname,
 		appMode: REACT_APP__APP_MODE,
+		circleSha1: REACT_APP__CIRCLE_SHA1,
 		numberOfAccounts: domain.accounts.accounts.length,
 		...payload,
 	});
