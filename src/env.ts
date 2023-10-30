@@ -45,3 +45,7 @@ export enum OtcProvider {
 }
 
 export const REACT_APP__OTC_PROVIDER = env('REACT_APP__OTC_PROVIDER') as OtcProvider;
+
+console.log('process.env', process.env);
+console.log('CIRCLE_SHA1', process.env.CIRCLE_SHA1);
+console.log('REACT_APP__TESTCISHA3', process.env.REACT_APP__TESTCISHA3);
