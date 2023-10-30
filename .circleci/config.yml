@@ -113,11 +113,9 @@ jobs:
         docker:
             - image: node:16
         environment:
-            TESTCIVAR: 123
-            REACT_APP__TESTCIVAR2: 456
-            TESTCISHA: $CIRCLE_SHA1
-            REACT_APP__TESTCISHA2: $CIRCLE_SHA1
-            REACT_APP__TESTCISHA3: $CIRCLE_SHA1
+            REACT_APP__TESTCISHA: ${CIRCLE_SHA1}
+            REACT_APP__TESTCISHA2: "{{ .Environment.CIRCLE_SHA1 }}"
+            REACT_APP__TESTCISHA3: -{{ .Environment.CIRCLE_SHA1 }}
         steps:
             - checkout
             - restore_pnpm_cache
