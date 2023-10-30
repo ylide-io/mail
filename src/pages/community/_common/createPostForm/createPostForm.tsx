@@ -6,12 +6,12 @@ import { useQuery } from 'react-query';
 
 import { BlockchainFeedApi, DecodedBlockchainFeedPost } from '../../../../api/blockchainFeedApi';
 import { AccountSelect } from '../../../../components/accountSelect/accountSelect';
-import { ActionButton, ActionButtonLook, ActionButtonSize } from '../../../../components/ActionButton/ActionButton';
+import { ActionButton, ActionButtonLook, ActionButtonSize } from '../../../../components/actionButton/actionButton';
 import { AutoSizeTextArea, AutoSizeTextAreaApi } from '../../../../components/autoSizeTextArea/autoSizeTextArea';
 import { AnchoredPopup } from '../../../../components/popup/anchoredPopup/anchoredPopup';
 import { PropsWithClassName } from '../../../../components/props';
 import { Spinner } from '../../../../components/spinner/spinner';
-import { toast, toastWithErrorId } from '../../../../components/toast/toast';
+import { toast } from '../../../../components/toast/toast';
 import { ReactComponent as TrashSvg } from '../../../../icons/ic20/trash.svg';
 import { ReactComponent as ImageSvg } from '../../../../icons/ic28/image.svg';
 import { ReactComponent as StickerSvg } from '../../../../icons/ic28/sticker.svg';
@@ -147,7 +147,7 @@ export const CreatePostForm = observer(
 
 					function error() {
 						setPreviewLoading(false);
-						toastWithErrorId("Couldn't load the image 😒", 'Failed to load image');
+						toast("Couldn't load the image 😒", { error: 'Failed to load image' });
 					}
 
 					try {

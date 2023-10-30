@@ -4,7 +4,7 @@ import { forwardRef, HTMLAttributes, PropsWithChildren, ReactNode, Ref } from 'r
 import { isExternalUrl, useNav } from '../../utils/url';
 import { PropsWithClassName } from '../props';
 import { Spinner } from '../spinner/spinner';
-import css from './ActionButton.module.scss';
+import css from './actionButton.module.scss';
 
 export enum ActionButtonSize {
 	XSMALL = 'XSMALL',

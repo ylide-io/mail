@@ -5,7 +5,7 @@ import { APP_NAME } from '../../constants';
 import { RoutePath } from '../../stores/routePath';
 import { connectAccount } from '../../utils/account';
 import { useNav } from '../../utils/url';
-import { ActionButton, ActionButtonLook, ActionButtonSize } from '../ActionButton/ActionButton';
+import { ActionButton, ActionButtonLook, ActionButtonSize } from '../actionButton/actionButton';
 import { ActionModal } from '../actionModal/actionModal';
 import css from './accountConnectedModal.module.scss';
 

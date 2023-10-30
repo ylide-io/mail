@@ -2,7 +2,9 @@ import * as Sentry from '@sentry/react';
 import { customAlphabet } from 'nanoid';
 
 import packageJson from '../../package.json';
-import { AppMode, REACT_APP__APP_MODE } from '../env';
+import { AppMode, REACT_APP__APP_MODE, REACT_APP__CIRCLE_SHA1 } from '../env';
+
+Sentry.setTag('CIRCLE_SHA1', REACT_APP__CIRCLE_SHA1);
 
 export function initSentry() {
 	const dsn = {

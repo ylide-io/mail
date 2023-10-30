@@ -10,15 +10,15 @@ import { Wallet } from '../../stores/models/Wallet';
 import { disconnectAccount } from '../../utils/account';
 import { assertUnreachable, invariant } from '../../utils/assert';
 import { getEvmWalletNetwork } from '../../utils/wallet';
-import { ActionButton, ActionButtonLook, ActionButtonSize } from '../ActionButton/ActionButton';
+import { ActionButton, ActionButtonLook, ActionButtonSize } from '../actionButton/actionButton';
 import { ActionModal } from '../actionModal/actionModal';
-import { BlockChainLabel } from '../BlockChainLabel/BlockChainLabel';
+import { BlockChainLabel } from '../blockChainLabel/blockChainLabel';
 import { ForgotPasswordModal } from '../forgotPasswordModal/forgotPasswordModal';
 import { LoadingModal } from '../loadingModal/loadingModal';
 import { SelectNetworkModal } from '../selectNetworkModal/selectNetworkModal';
 import { showStaticComponent } from '../staticComponentManager/staticComponentManager';
 import { TextField, TextFieldLook } from '../textField/textField';
-import { toast, toastWithErrorId } from '../toast/toast';
+import { toast } from '../toast/toast';
 import { WalletTag } from '../walletTag/walletTag';
 import { YlideLoader } from '../ylideLoader/ylideLoader';
 
@@ -88,7 +88,7 @@ export function NewPasswordModal({
 	function exitUnsuccessfully(error?: { message: string; e?: any }) {
 		if (error) {
 			console.error(error.message, error.e);
-			toastWithErrorId(error.message, error.message);
+			toast(error.message, { error: error.message });
 		}
 
 		if (domainAccountRef.current) {

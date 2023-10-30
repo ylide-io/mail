@@ -46,6 +46,12 @@ class NewMailChecker {
 
 	private listWrapper: MailListWrapper | undefined;
 
+	// Hotfix for not-working MailList.onNewMessages callback
+	private lastMessage: ILinkedMessage | undefined;
+
+	// Hotfix for not-working MailList.onNewMessages callback
+	private recreateCounter = 0;
+
 	constructor() {
 		makeAutoObservable(this);
 	}
@@ -53,17 +59,18 @@ class NewMailChecker {
 	init() {
 		// Re-create MailListWrapper when accounts change
 		reaction(
-			() => domain.accounts.activeAccounts,
-			accounts => {
+			() => domain.accounts.activeAccounts && this.recreateCounter,
+			() => {
 				if (this.listWrapper) {
 					this.listWrapper?.destroy();
 					this.listWrapper = undefined;
-
-					this.lastIncomingDateSec = 0;
 				}
 
-				if (accounts.length) {
+				if (domain.accounts.activeAccounts.length) {
 					this.listWrapper = new MailListWrapper(domain.accounts.activeAccounts);
+				} else {
+					this.lastMessage = undefined;
+					this.lastIncomingDateSec = 0;
 				}
 			},
 			{
@@ -71,15 +78,24 @@ class NewMailChecker {
 			},
 		);
 
-		// Set lastIncomingDateSec if it's not set yet
 		reaction(
 			() => this.listWrapper?.lastMessage,
 			lastMessage => {
-				if (lastMessage && !this.lastIncomingDateSec) {
-					this.lastIncomingDateSec = lastMessage.msg.createdAt;
+				if (lastMessage) {
+					this.lastMessage = lastMessage;
+
+					// Set lastIncomingDateSec if it's not set yet
+					if (!this.lastIncomingDateSec) {
+						this.lastIncomingDateSec = lastMessage.msg.createdAt;
+					}
 				}
 			},
 		);
+
+		// Hotfix for not-working MailList.onNewMessages callback
+		setInterval(() => {
+			this.recreateCounter++;
+		}, 1000 * 60);
 	}
 
 	private get lastIncomingDateSec() {
@@ -91,11 +107,19 @@ class NewMailChecker {
 		this._lastIncomingDateSec = value;
 	}
 
-	get hasNewMessages() {
-		const lastMessage = this.listWrapper?.lastMessage;
+	get newMessage() {
+		const lastMessage = this.lastMessage;
 		const lastIncomingDateSec = this.lastIncomingDateSec;
 
-		return !!lastMessage && !!lastIncomingDateSec && lastMessage.msg.createdAt > lastIncomingDateSec;
+		if (lastMessage && lastIncomingDateSec && lastMessage.msg.createdAt > lastIncomingDateSec) {
+			return lastMessage;
+		}
+
+		return undefined;
+	}
+
+	get hasNewMessages() {
+		return !!this.newMessage;
 	}
 
 	inboxOpened() {

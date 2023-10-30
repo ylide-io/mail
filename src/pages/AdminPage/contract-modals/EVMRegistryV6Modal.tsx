@@ -1,17 +1,17 @@
 import {
-	EVMBlockchainController,
-	EVMRegistryV6Wrapper,
-	EVMWalletController,
 	EVM_CONTRACTS,
 	EVM_NAMES,
+	EVMBlockchainController,
 	EVMNetwork,
+	EVMRegistryV6Wrapper,
+	EVMWalletController,
 	IEVMRegistryContractLink,
 } from '@ylide/ethereum';
 import clsx from 'clsx';
 import { FC, useCallback, useEffect, useState } from 'react';
 
 import { AccountSelect } from '../../../components/accountSelect/accountSelect';
-import { ActionButton, ActionButtonSize } from '../../../components/ActionButton/ActionButton';
+import { ActionButton, ActionButtonSize } from '../../../components/actionButton/actionButton';
 import { Modal } from '../../../components/modal/modal';
 import { Spinner } from '../../../components/spinner/spinner';
 import { TextField } from '../../../components/textField/textField';
@@ -184,9 +184,9 @@ export const EVMRegistryV6Modal: FC<EVMRegistryV6ModalProps> = ({ contract, isMo
 												const link = EVM_CONTRACTS[network].registryContracts.find(
 													r => r.id === contract.contract?.id,
 												)!;
-												const wrapper = new EVMBlockchainController.registryWrappers[
-													link.type
-												](walletController.blockchainReader) as EVMRegistryV6Wrapper;
+												const wrapper = new EVMBlockchainController.registryWrappers[link.type](
+													walletController.blockchainReader,
+												) as EVMRegistryV6Wrapper;
 												await wrapper.removeBonucer(
 													link,
 													walletController.signer,
@@ -214,9 +214,9 @@ export const EVMRegistryV6Modal: FC<EVMRegistryV6ModalProps> = ({ contract, isMo
 												const link = EVM_CONTRACTS[network].registryContracts.find(
 													r => r.id === contract.contract?.id,
 												)!;
-												const wrapper = new EVMBlockchainController.registryWrappers[
-													link.type
-												](walletController.blockchainReader) as EVMRegistryV6Wrapper;
+												const wrapper = new EVMBlockchainController.registryWrappers[link.type](
+													walletController.blockchainReader,
+												) as EVMRegistryV6Wrapper;
 												await wrapper.addBonucer(
 													link,
 													walletController.signer,

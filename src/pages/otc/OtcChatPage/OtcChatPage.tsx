@@ -6,7 +6,7 @@ import { useParams } from 'react-router-dom';
 
 import { OtcApi } from '../../../api/otcApi';
 import { AccountSelect } from '../../../components/accountSelect/accountSelect';
-import { ActionButton, ActionButtonLook, ActionButtonSize } from '../../../components/ActionButton/ActionButton';
+import { ActionButton, ActionButtonLook, ActionButtonSize } from '../../../components/actionButton/actionButton';
 import { AdaptiveAddress } from '../../../components/adaptiveAddress/adaptiveAddress';
 import { AutoSizeTextArea } from '../../../components/autoSizeTextArea/autoSizeTextArea';
 import { ErrorMessage } from '../../../components/errorMessage/errorMessage';

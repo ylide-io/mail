@@ -1,7 +1,7 @@
 import clsx from 'clsx';
 import { useState } from 'react';
 
-import { ActionButton, ActionButtonLook } from '../../../../components/ActionButton/ActionButton';
+import { ActionButton, ActionButtonLook } from '../../../../components/actionButton/actionButton';
 import { TextField } from '../../../../components/textField/textField';
 import { toast } from '../../../../components/toast/toast';
 import { ReactComponent as EditSvg } from '../../../../icons/ic20/edit.svg';

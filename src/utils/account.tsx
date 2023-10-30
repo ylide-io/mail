@@ -1,6 +1,6 @@
 import { EVMNetwork } from '@ylide/ethereum';
 
-import { ActionButton, ActionButtonLook, ActionButtonSize } from '../components/ActionButton/ActionButton';
+import { ActionButton, ActionButtonLook, ActionButtonSize } from '../components/actionButton/actionButton';
 import { ActionModal } from '../components/actionModal/actionModal';
 import { notificationsAlert } from '../components/genericLayout/header/header';
 import { showLoadingModal } from '../components/loadingModal/loadingModal';

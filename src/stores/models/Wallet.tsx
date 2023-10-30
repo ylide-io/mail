@@ -9,7 +9,7 @@ import {
 } from '@ylide/sdk';
 import { autobind } from 'core-decorators';
 import EventEmitter from 'eventemitter3';
-import { computed, makeObservable, observable } from 'mobx';
+import { autorun, computed, makeObservable, observable } from 'mobx';
 
 import { BalancesStore } from '../balancesStore';
 import { Domain } from '../Domain';
@@ -20,11 +20,12 @@ export class Wallet extends EventEmitter {
 	factory: WalletControllerFactory;
 	controller: AbstractWalletController;
 
-	@observable private _isAvailable: boolean = false;
+	@observable private _isAvailable = false;
 	@observable private _accounts: DomainAccount[] = [];
 
 	@observable currentWalletAccount: WalletAccount | null = null;
-	@observable currentBlockchain: string = 'unknown';
+	@observable currentBlockchain = '';
+	@observable currentBalances = new BalancesStore();
 
 	constructor(
 		public readonly domain: Domain,
@@ -45,9 +46,14 @@ export class Wallet extends EventEmitter {
 		try {
 			this.currentBlockchain = await this.controller.getCurrentBlockchain();
 		} catch (err) {
-			this.currentBlockchain = 'unknown';
+			this.currentBlockchain = '';
 		}
 		this.currentWalletAccount = await this.controller.getAuthenticatedAccount();
+
+		autorun(() => {
+			const address = this.currentWalletAccount?.address;
+			this.currentBalances = address ? this.getBalancesOf(address) : new BalancesStore();
+		});
 
 		this.controller.on(WalletEvent.ACCOUNT_CHANGED, this.handleAccountChanged);
 		this.controller.on(WalletEvent.LOGIN, this.handleAccountLogin);

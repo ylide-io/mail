@@ -5,7 +5,7 @@ import { useQuery } from 'react-query';
 import { generatePath, useParams } from 'react-router-dom';
 
 import { BlockchainFeedApi, decodeBlockchainFeedPost, DecodedBlockchainFeedPost } from '../../../api/blockchainFeedApi';
-import { ActionButton, ActionButtonLook } from '../../../components/ActionButton/ActionButton';
+import { ActionButton, ActionButtonLook } from '../../../components/actionButton/actionButton';
 import { ErrorMessage } from '../../../components/errorMessage/errorMessage';
 import { RegularPageContent } from '../../../components/genericLayout/content/regularPageContent/regularPageContent';
 import { GenericLayout } from '../../../components/genericLayout/genericLayout';
@@ -27,7 +27,7 @@ import { DiscussionPost } from '../_common/discussionPost/discussionPost';
 import { OfficialPostView } from '../_common/officialPost/officialPost';
 import css from './communityPostPage.module.scss';
 
-export function getPostPath(postId: string) {
+export function generateCommunityPostUrl(postId: string) {
 	return generatePath(RoutePath.POST_ID, { postId: encodeURIComponent(postId) });
 }
 
@@ -74,7 +74,7 @@ const CommunityPostContent = observer(({ post }: CommunityPostContentProps) => {
 								horizontalAlign={HorizontalAlignment.END}
 								onClose={() => setSharePopupOpen(false)}
 								subject="Check out this post on Ylide!"
-								url={toAbsoluteUrl(getPostPath(post.original.id))}
+								url={toAbsoluteUrl(generateCommunityPostUrl(post.original.id))}
 							/>
 						)}
 					</>

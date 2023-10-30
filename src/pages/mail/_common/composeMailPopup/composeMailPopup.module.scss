@@ -1,4 +1,5 @@
 .root {
+	@include colored-popup-shadow;
 	display: flex;
 	flex-direction: column;
 	position: fixed;
@@ -10,9 +11,6 @@
 	max-height: 100%;
 	background: var(--surface-color);
 	border-radius: 10px 10px 0 0;
-	box-shadow:
-		4px 4px 24px rgba(var(--accent2-rgb-color), 0.4),
-		-16px -8px 64px rgba(var(--accent-rgb-color), 0.25);
 	opacity: 0;
 	transition: all 200ms;
 

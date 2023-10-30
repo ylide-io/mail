@@ -1,23 +1,26 @@
+import clsx from 'clsx';
 import { ReactNode, useMemo, useState } from 'react';
 
 import { APP_NAME } from '../../constants';
 import { transformMatches, truncateInMiddle } from '../../utils/string';
 import { isExternalUrl } from '../../utils/url';
-import { ActionButton, ActionButtonLook, ActionButtonSize } from '../ActionButton/ActionButton';
+import { ActionButton, ActionButtonLook, ActionButtonSize } from '../actionButton/actionButton';
 import { ActionModal } from '../actionModal/actionModal';
+import { PropsWithClassName } from '../props';
 import css from './textProcessor.module.scss';
 
-interface UnsafeAnchorProps {
+interface UnsafeAnchorProps extends PropsWithClassName {
 	url: string;
 }
 
-export function UnsafeAnchor({ url }: UnsafeAnchorProps) {
+export function UnsafeAnchor({ className, url }: UnsafeAnchorProps) {
 	const [blurred, setBlurred] = useState(true);
 	const [popupOpen, setPopupOpen] = useState(false);
 
 	return (
 		<>
 			<a
+				className={className}
 				style={{
 					filter: blurred ? 'blur(5px)' : undefined,
 				}}
@@ -105,9 +108,19 @@ export function TextProcessor({ text, nlToBr, linksToAnchors, unsafeLinks, highl
 						// https://regexr.com/7kc9g
 						...transformMatches(curr, /((https?:\/\/)\S{3,1024})/gi, (item, j) =>
 							unsafeLinks && isExternalUrl(item) ? (
-								<UnsafeAnchor key={`linksToAnchors ${i} ${j}`} url={item} />
+								<UnsafeAnchor
+									key={`linksToAnchors ${i} ${j}`}
+									className={clsx(css.link, css.link_clickable)}
+									url={item}
+								/>
 							) : (
-								<a key={`linksToAnchors ${i} ${j}`} href={item} target="_blank" rel="noreferrer">
+								<a
+									key={`linksToAnchors ${i} ${j}`}
+									className={css.link}
+									href={item}
+									target="_blank"
+									rel="noreferrer"
+								>
 									{item}
 								</a>
 							),
@@ -126,7 +139,7 @@ export function TextProcessor({ text, nlToBr, linksToAnchors, unsafeLinks, highl
 				if (typeof curr === 'string') {
 					res.push(
 						...transformMatches(curr, /#\w+/g, (item, j) => (
-							<span key={`highlightHashtags ${i} ${j}`} className={css.tag}>
+							<span key={`highlightHashtags ${i} ${j}`} className={css.link}>
 								{item}
 							</span>
 						)),

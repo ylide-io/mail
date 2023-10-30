@@ -1,9 +1,9 @@
 import clsx from 'clsx';
 import { observer } from 'mobx-react';
 import React, { CSSProperties, useEffect, useMemo, useState } from 'react';
-import { generatePath, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 
-import { BlockChainLabel } from '../../../../components/BlockChainLabel/BlockChainLabel';
+import { BlockChainLabel } from '../../../../components/blockChainLabel/blockChainLabel';
 import { CheckBox } from '../../../../components/checkBox/checkBox';
 import { ContactName } from '../../../../components/contactName/contactName';
 import { ReadableDate } from '../../../../components/readableDate/readableDate';
@@ -12,7 +12,6 @@ import { ReactComponent as FilterSvg } from '../../../../icons/ic20/filter.svg';
 import contacts from '../../../../stores/Contacts';
 import domain from '../../../../stores/Domain';
 import { FolderId, ILinkedMessage, mailStore } from '../../../../stores/MailList';
-import { RoutePath } from '../../../../stores/routePath';
 import { isGlobalMessage } from '../../../../utils/globalFeed';
 import {
 	decodedTextDataToPlainText,
@@ -21,6 +20,7 @@ import {
 	getMessageSenders,
 } from '../../../../utils/mail';
 import { useNav } from '../../../../utils/url';
+import { generateMailDetailsPageUrl } from '../../mailDetailsPage/mailDetailsPage';
 import css from './mailboxListRow.module.scss';
 
 interface MailboxListRowProps {
@@ -49,12 +49,7 @@ const MailboxListRow: React.FC<MailboxListRowProps> = observer(
 
 		const messageClickHandler = async () => {
 			if (decoded) {
-				navigate(
-					generatePath(RoutePath.MAIL_FOLDER_DETAILS, {
-						folderId: folderId!,
-						id: encodeURIComponent(message.id),
-					}),
-				);
+				navigate(generateMailDetailsPageUrl(folderId!, message.id));
 			} else {
 				setLoading(true);
 				try {
@@ -65,12 +60,7 @@ const MailboxListRow: React.FC<MailboxListRowProps> = observer(
 				} finally {
 					setLoading(false);
 				}
-				navigate(
-					generatePath(RoutePath.MAIL_FOLDER_DETAILS, {
-						folderId: folderId!,
-						id: encodeURIComponent(message.id),
-					}),
-				);
+				navigate(generateMailDetailsPageUrl(folderId!, message.id));
 			}
 		};
 

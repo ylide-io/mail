@@ -1,4 +1,4 @@
-import { ActionButton, ActionButtonLook, ActionButtonSize } from '../../components/ActionButton/ActionButton';
+import { ActionButton, ActionButtonLook, ActionButtonSize } from '../../components/actionButton/actionButton';
 import { RegularCommunityCard } from '../../components/communityCards/regularCommunityCard/regularCommunityCard';
 import { RichCommunityCard } from '../../components/communityCards/richCommunityCard/richCommunityCard';
 import { RegularPageContent } from '../../components/genericLayout/content/regularPageContent/regularPageContent';
@@ -61,6 +61,7 @@ export function ExplorePage() {
 					{renderTagBlock(CommunityTag.TVM)}
 					{renderTagBlock(CommunityTag.SOCIAL)}
 					{renderTagBlock(CommunityTag.ECOSYSTEM)}
+					{renderTagBlock(CommunityTag.RESEARCH)}
 					{renderTagBlock(CommunityTag.GAMING)}
 					{renderTagBlock(CommunityTag.TRADING)}
 

@@ -2,7 +2,7 @@ import clsx from 'clsx';
 
 import { blockchainMeta } from '../../utils/blockchain';
 import { PropsWithClassName } from '../props';
-import css from './BlockChainLabel.module.scss';
+import css from './blockChainLabel.module.scss';
 
 export interface BlockChainLabelProps extends PropsWithClassName {
 	blockchain: string;

@@ -30,7 +30,7 @@ import { RoutePath } from '../../../stores/routePath';
 import { useOpenMailCompose } from '../../../utils/mail';
 import { openCreateCommunityForm } from '../../../utils/misc';
 import { useIsMatchesPath, useNav } from '../../../utils/url';
-import { ActionButton, ActionButtonLook, ActionButtonSize } from '../../ActionButton/ActionButton';
+import { ActionButton, ActionButtonLook, ActionButtonSize } from '../../actionButton/actionButton';
 import { AdaptiveText } from '../../adaptiveText/adaptiveText';
 import { MiniCommunityCard } from '../../communityCards/miniCommunityCard/miniCommunityCard';
 import { PropsWithClassName } from '../../props';
@@ -324,7 +324,7 @@ export const SidebarMenu = observer(() => {
 				</SidebarSection>
 
 				<SidebarSection title="Newly Added">
-					{renderCommunities([CommunityId.MAIN_VIEW, CommunityId.STAKE_N_BAKE, CommunityId.DE_GUARD])}
+					{renderCommunities([CommunityId.MAIN_VIEW, CommunityId.DECENTRALISED_CO, CommunityId.DE_GUARD])}
 				</SidebarSection>
 
 				<ActionButton

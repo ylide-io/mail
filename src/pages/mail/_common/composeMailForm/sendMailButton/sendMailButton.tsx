@@ -1,21 +1,19 @@
 import clsx from 'clsx';
 import { observer } from 'mobx-react';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
 
 import { GridRowBox, TruncateTextBox } from '../../../../../components/boxes/boxes';
 import { DropDown, DropDownItem, DropDownItemMode } from '../../../../../components/dropDown/dropDown';
 import { notificationsAlert } from '../../../../../components/genericLayout/header/header';
 import { PropsWithClassName } from '../../../../../components/props';
 import { Spinner } from '../../../../../components/spinner/spinner';
-import { toast, toastWithErrorId } from '../../../../../components/toast/toast';
+import { toast } from '../../../../../components/toast/toast';
 import { ReactComponent as ArrowDownSvg } from '../../../../../icons/ic20/arrowDown.svg';
 import { ReactComponent as ReplySvg } from '../../../../../icons/ic20/reply.svg';
-import { BalancesStore } from '../../../../../stores/balancesStore';
 import domain from '../../../../../stores/Domain';
 import { OutgoingMailData } from '../../../../../stores/outgoingMailData';
 import { AlignmentDirection, HorizontalAlignment } from '../../../../../utils/alignment';
-import { invariant } from '../../../../../utils/assert';
-import { blockchainMeta, evmNameToNetwork, isEvmBlockchain } from '../../../../../utils/blockchain';
+import { blockchainMeta } from '../../../../../utils/blockchain';
 import { getWalletSupportedBlockchains } from '../../../../../utils/wallet';
 import css from './sendMailButton.module.scss';
 
@@ -40,19 +38,11 @@ export const SendMailButton = observer(
 			}
 		}, [mailData.blockchain]);
 
-		const balances = useMemo(() => {
-			return mailData.from?.wallet.getBalancesOf(mailData.from.account.address) || new BalancesStore();
-		}, [mailData.from]);
+		const balances = mailData.from?.wallet.currentBalances;
 
 		const allowedChainsForAccount = useMemo(() => {
 			return mailData.from ? getWalletSupportedBlockchains(mailData.from.wallet, allowedChains) : [];
 		}, [allowedChains, mailData.from]);
-
-		useEffect(() => {
-			if (mailData.blockchain && !allowedChainsForAccount.includes(mailData.blockchain)) {
-				mailData.blockchain = allowedChainsForAccount[0];
-			}
-		}, [allowedChainsForAccount, mailData, mailData.blockchain]);
 
 		const sendMail = async () => {
 			try {
@@ -62,7 +52,7 @@ export const SendMailButton = observer(
 					onSent?.();
 				}
 			} catch (e) {
-				toastWithErrorId("Couldn't send your message 😒", 'Failed to send message');
+				toast("Couldn't send your message 😒", { error: 'Failed to send message' });
 			}
 		};
 
@@ -137,34 +127,20 @@ export const SendMailButton = observer(
 										<DropDownItem
 											key={chain}
 											mode={
-												!Number(balances.getBalance(chain).toFixed(4))
+												!Number(balances?.getBalance(chain).toFixed(4))
 													? DropDownItemMode.DISABLED
 													: undefined
 											}
-											onSelect={async () => {
-												invariant(mailData.from);
+											onSelect={() => {
 												setMenuVisible(false);
-
-												try {
-													if (isEvmBlockchain(chain)) {
-														await domain.switchEVMChain(
-															mailData.from.wallet,
-															evmNameToNetwork(chain)!,
-														);
-													}
-
-													mailData.blockchain = chain;
-												} catch (e) {
-													console.error('Failed to switch network', e);
-													toast('Failed to switch network');
-												}
+												mailData.blockchain = chain;
 											}}
 										>
 											<GridRowBox>
 												{bData.logo()}
 
 												<TruncateTextBox>
-													{bData.title} [{Number(balances.getBalance(chain).toFixed(4))}{' '}
+													{bData.title} [{Number(balances?.getBalance(chain).toFixed(4))}{' '}
 													{bData.ethNetwork!.nativeCurrency.symbol}]
 												</TruncateTextBox>
 											</GridRowBox>

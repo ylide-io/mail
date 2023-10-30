@@ -4,7 +4,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { useQuery } from 'react-query';
 import { generatePath, useParams } from 'react-router-dom';
 
-import { ActionButton } from '../../../components/ActionButton/ActionButton';
+import { ActionButton } from '../../../components/actionButton/actionButton';
 import { ContactName } from '../../../components/contactName/contactName';
 import { ErrorMessage } from '../../../components/errorMessage/errorMessage';
 import { OverlappingLoader } from '../../../components/overlappingLoader/overlappingLoader';
@@ -34,6 +34,15 @@ import { truncateAddress } from '../../../utils/string';
 import { useNav } from '../../../utils/url';
 import css from './mailDetailsPage.module.scss';
 import { MailMessage } from './mailMessage/mailMessage';
+
+export function generateMailDetailsPageUrl(folderId: FolderId, msgId: string) {
+	return generatePath(RoutePath.MAIL_FOLDER_DETAILS, {
+		folderId,
+		id: encodeURIComponent(msgId),
+	});
+}
+
+//
 
 interface WrappedThreadMessage {
 	message: ILinkedMessage;

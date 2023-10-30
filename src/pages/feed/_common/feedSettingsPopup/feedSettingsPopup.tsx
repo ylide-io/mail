@@ -4,7 +4,7 @@ import React, { useMemo, useState } from 'react';
 import { useMutation } from 'react-query';
 
 import { FeedReason, FeedSource } from '../../../../api/feedServerApi';
-import { ActionButton, ActionButtonLook } from '../../../../components/ActionButton/ActionButton';
+import { ActionButton, ActionButtonLook } from '../../../../components/actionButton/actionButton';
 import { Avatar } from '../../../../components/avatar/avatar';
 import { CheckBox } from '../../../../components/checkBox/checkBox';
 import { ErrorMessage } from '../../../../components/errorMessage/errorMessage';
@@ -87,17 +87,21 @@ export const FeedSettingsPopup = observer(({ account, onClose }: FeedSettingsPop
 			return source.name.toLowerCase().includes(term) || source.origin?.toLowerCase().includes(term);
 		});
 
-		const grouped = filteredSources.reduce((res, s) => {
-			const cryptoProjectId = s.cryptoProject?.id;
-			const cryptoProject =
-				(cryptoProjectId && config?.defaultProjects.find(p => p.projectId === cryptoProjectId)) || undefined;
-			const reasons = cryptoProject?.reasons || [''];
-			for (const reason of reasons) {
-				const list = (res[reason] = res[reason] || []);
-				list.push(s);
-			}
-			return res;
-		}, {} as Record<FeedReasonOrEmpty, FeedSource[]>);
+		const grouped = filteredSources.reduce(
+			(res, s) => {
+				const cryptoProjectId = s.cryptoProject?.id;
+				const cryptoProject =
+					(cryptoProjectId && config?.defaultProjects.find(p => p.projectId === cryptoProjectId)) ||
+					undefined;
+				const reasons = cryptoProject?.reasons || [''];
+				for (const reason of reasons) {
+					const list = (res[reason] = res[reason] || []);
+					list.push(s);
+				}
+				return res;
+			},
+			{} as Record<FeedReasonOrEmpty, FeedSource[]>,
+		);
 
 		return (Object.keys(grouped) as FeedReasonOrEmpty[])
 			.sort((a: FeedReasonOrEmpty, b: FeedReasonOrEmpty) => {

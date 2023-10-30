@@ -10,7 +10,7 @@ import {
 	DecodedBlockchainFeedPost,
 	useCommunityAdminsQuery,
 } from '../../../api/blockchainFeedApi';
-import { ActionButton, ActionButtonLook, ActionButtonSize } from '../../../components/ActionButton/ActionButton';
+import { ActionButton, ActionButtonLook, ActionButtonSize } from '../../../components/actionButton/actionButton';
 import { PrimaryCommunityCard } from '../../../components/communityCards/primaryCommunityCard/primaryCommunityCard';
 import { ErrorMessage, ErrorMessageLook } from '../../../components/errorMessage/errorMessage';
 import { RegularPageContent } from '../../../components/genericLayout/content/regularPageContent/regularPageContent';
@@ -450,7 +450,7 @@ export const CommunityPage = observer(() => {
 								})}
 						</div>
 
-						{tabsAsideContent && <div className={css.tabsAsideContent}>{tabsAsideContent}</div>}
+						{tabsAsideContent && <div>{tabsAsideContent}</div>}
 					</div>
 
 					{part === CommunityPagePart.OFFICIAL ? (

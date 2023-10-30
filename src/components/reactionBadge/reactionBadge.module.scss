@@ -6,10 +6,35 @@
 	height: 22px;
 	font-size: 12px;
 	font-weight: $font-weight_semi-bold;
-	color: var(--accent2-color);
-	background: var(--accent2-surface-color);
+	color: var(--accent-color);
+	background-image: linear-gradient(
+		90deg,
+		var(--accent-surface-color),
+		var(--accent2-surface-color),
+		var(--accent-surface-color)
+	);
+	background-size: 400% auto;
 	border-radius: 99px;
 	cursor: default;
+	animation:
+		root-bg $duration-ambient linear infinite,
+		root-text ($duration-ambient/3) linear infinite;
+}
+
+@keyframes root-bg {
+	100% {
+		background-position: 400% center;
+	}
+}
+
+@keyframes root-text {
+	20% {
+		color: var(--accent2-color);
+	}
+
+	70% {
+		color: var(--accent-color);
+	}
 }
 
 .root_hasCounter {
@@ -21,13 +46,19 @@
 	cursor: pointer;
 
 	&:hover {
-		background: var(--accent2-surface-hover-color);
+		background-image: linear-gradient(
+			90deg,
+			var(--accent-surface-hover-color),
+			var(--accent2-surface-hover-color),
+			var(--accent-surface-hover-color)
+		);
 	}
 }
 
 .root_active {
 	color: var(--on-accent2-color);
 	background: var(--accent2-color);
+	animation: none;
 
 	&.root_clickable:hover {
 		background: var(--accent2-hover-color);

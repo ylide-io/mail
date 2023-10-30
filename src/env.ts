@@ -19,6 +19,7 @@ function env(name: string, params?: { optional: boolean }) {
 export const NODE_ENV = env('NODE_ENV');
 
 export const REACT_APP__PUBLIC_URL = env('REACT_APP__PUBLIC_URL');
+export const REACT_APP__CIRCLE_SHA1 = env('REACT_APP__CIRCLE_SHA1');
 
 export enum AppMode {
 	HUB = 'HUB',
@@ -45,3 +46,5 @@ export enum OtcProvider {
 }
 
 export const REACT_APP__OTC_PROVIDER = env('REACT_APP__OTC_PROVIDER') as OtcProvider;
+
+console.log('App version', REACT_APP__CIRCLE_SHA1);

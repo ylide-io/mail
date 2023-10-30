@@ -1,6 +1,6 @@
 import { useRef, useState } from 'react';
 
-import { ActionButton, ActionButtonLook, ActionButtonSize } from '../ActionButton/ActionButton';
+import { ActionButton, ActionButtonLook, ActionButtonSize } from '../actionButton/actionButton';
 import { ActionModal } from '../actionModal/actionModal';
 import { CheckBox } from '../checkBox/checkBox';
 import { TextField } from '../textField/textField';

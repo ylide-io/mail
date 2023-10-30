@@ -5,14 +5,15 @@ import { QueryClient, QueryClientProvider } from 'react-query';
 import { generatePath, Navigate, Route, Routes, useLocation, useSearchParams } from 'react-router-dom';
 
 import css from './app.module.scss';
-import { ActionButton, ActionButtonLook, ActionButtonSize } from './components/ActionButton/ActionButton';
+import { ActionButton, ActionButtonLook, ActionButtonSize } from './components/actionButton/actionButton';
+import { InAppNotificationManager } from './components/inAppNotification/inAppNotification';
 import { IosInstallPwaPopup } from './components/iosInstallPwaPopup/iosInstallPwaPopup';
 import { MainViewOnboarding } from './components/mainViewOnboarding/mainViewOnboarding';
+import { NewMailNotifier } from './components/newMailNotifier/newMailNotifier';
 import { PageMeta } from './components/pageMeta/pageMeta';
 import { PopupManager } from './components/popup/popupManager/popupManager';
 import { StaticComponentManager } from './components/staticComponentManager/staticComponentManager';
 import { ToastManager } from './components/toast/toast';
-import { TransactionPopup } from './components/TransactionPopup/TransactionPopup';
 import { YlideLoader } from './components/ylideLoader/ylideLoader';
 import { APP_NAME } from './constants';
 import { AppMode, REACT_APP__APP_MODE } from './env';
@@ -343,14 +344,14 @@ export const App = observer(({ serviceWorkerUpdateCallback }: AppProps) => {
 						})}
 					</Routes>
 
-					{domain.txPlateVisible && REACT_APP__APP_MODE !== AppMode.MAIN_VIEW && <TransactionPopup />}
-
 					<StaticComponentManager />
 					<ToastManager />
+					<InAppNotificationManager />
 
 					{REACT_APP__APP_MODE === AppMode.MAIN_VIEW && <MainViewOnboarding />}
 
 					<IosInstallPwaPopup />
+					<NewMailNotifier />
 				</PopupManager>
 			</QueryClientProvider>
 		</>

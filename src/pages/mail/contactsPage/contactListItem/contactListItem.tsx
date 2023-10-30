@@ -1,7 +1,7 @@
 import { observer } from 'mobx-react';
 import { useState } from 'react';
 
-import { ActionButton, ActionButtonLook } from '../../../../components/ActionButton/ActionButton';
+import { ActionButton, ActionButtonLook } from '../../../../components/actionButton/actionButton';
 import { AdaptiveAddress } from '../../../../components/adaptiveAddress/adaptiveAddress';
 import { ContactAvatar } from '../../../../components/contactAvatar/contactAvatar';
 import { DropDownItem, DropDownItemMode } from '../../../../components/dropDown/dropDown';
