@@ -61,6 +61,7 @@ export function ExplorePage() {
 					{renderTagBlock(CommunityTag.TVM)}
 					{renderTagBlock(CommunityTag.SOCIAL)}
 					{renderTagBlock(CommunityTag.ECOSYSTEM)}
+					{renderTagBlock(CommunityTag.RESEARCH)}
 					{renderTagBlock(CommunityTag.GAMING)}
 					{renderTagBlock(CommunityTag.TRADING)}
 

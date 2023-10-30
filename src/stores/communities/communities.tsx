@@ -22,6 +22,7 @@ import betFuryBannerSrc from './bannerImages/bet_fury.jpg';
 import chepeGamesBannerSrc from './bannerImages/chepe_games.jpg';
 import cosmosChickenCoopBannerSrc from './bannerImages/cosmos_chicken_coop.jpg';
 import deGuardBannerSrc from './bannerImages/de_guard.jpg';
+import decentralisedCoBannerSrc from './bannerImages/decentralised_co.jpg';
 import dexifyBannerSrc from './bannerImages/dexify.jpg';
 import dittoBannerSrc from './bannerImages/ditto.jpg';
 import eddyFinanceBannerSrc from './bannerImages/eddy_finance.jpg';
@@ -72,6 +73,7 @@ import betFurySrc from './profileImages/bet_fury.jpg';
 import chepeGamesSrc from './profileImages/chepe_games.jpg';
 import cosmosChickenCoopSrc from './profileImages/cosmos_chicken_coop.jpg';
 import deGuardSrc from './profileImages/de_guard.jpg';
+import decentralisedCoSrc from './profileImages/decentralised_co.jpg';
 import dexifySrc from './profileImages/dexify.jpg';
 import dittoSrc from './profileImages/ditto.jpg';
 import eddyFinanceSrc from './profileImages/eddy_finance.jpg';
@@ -108,6 +110,8 @@ import ylideSrc from './profileImages/ylide.png';
 import znsConnectSrc from './profileImages/zns_connect.jpg';
 
 // AI: import banner and profile for XXX
+// import xxxBannerSrc from './bannerImages/xxx.jpg';
+// import xxxSrc from './profileImages/xxx.jpg';
 
 export function getCommunityById(id: CommunityId) {
 	return communities.find(p => p.id === id)!;
@@ -206,6 +210,7 @@ export enum CommunityId {
 	ALTSOME = 'altsome',
 	ALIEN_SWAP = 'alien_swap',
 	DE_GUARD = 'de_guard',
+	DECENTRALISED_CO = 'decentralised_co',
 
 	// TEST
 
@@ -1063,6 +1068,26 @@ export const communities: Community[] = [
 		tags: [CommunityTag.NFT, CommunityTag.PRIVACY],
 		allowedChains: allChainsExceptTest.filter(
 			chain => chain !== BlockchainName.VENOM_TESTNET && chain !== BlockchainName.EVERSCALE,
+		),
+		attachmentMode: CommunityAttachmentMode.ADMINS,
+	},
+	{
+		id: CommunityId.DECENTRALISED_CO,
+		feedId: {
+			official: '2000000000000000000000000000000000000000000000000000000000000066' as Uint256,
+			discussion: '2000000000000000000000000000000000000000000000000000000000000067' as Uint256,
+		},
+		name: 'Decentralised.co',
+		description: 'Stories with depth, insight & data covering all things Web3. For builders. By builders.',
+		profileImage: decentralisedCoSrc,
+		bannerImage: decentralisedCoBannerSrc,
+		website: 'https://www.decentralised.co/',
+		tags: [CommunityTag.RESEARCH],
+		allowedChains: allChainsExceptTest.filter(
+			chain =>
+				chain !== BlockchainName.VENOM_TESTNET &&
+				chain !== BlockchainName.EVERSCALE &&
+				chain !== BlockchainName.ZETA,
 		),
 		attachmentMode: CommunityAttachmentMode.ADMINS,
 	},
