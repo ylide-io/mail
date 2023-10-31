@@ -15,9 +15,15 @@ import { registerRoute } from 'workbox-routing';
 import { StaleWhileRevalidate } from 'workbox-strategies';
 
 import { REACT_APP__PUBLIC_URL } from './env';
+import { analytics } from './stores/Analytics';
 import { truncateAddress } from './utils/string';
 
 declare const self: ServiceWorkerGlobalScope;
+
+analytics.init(() => ({
+	host: self.location.hostname,
+	numberOfAccounts: 0,
+}));
 
 //
 
@@ -184,6 +190,8 @@ self.addEventListener('push', async event => {
 				data: rawData,
 			});
 		}
+
+		analytics.pushReceived(data.type);
 	}
 });
 
@@ -203,4 +211,6 @@ self.addEventListener('notificationclick', event => {
 		const url = `/post/${encodeURIComponent(data.body.reply.postId)}`;
 		event.waitUntil(self.clients.openWindow(url));
 	}
+
+	analytics.pushClicked(data.type);
 });

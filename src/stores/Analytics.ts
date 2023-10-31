@@ -175,6 +175,16 @@ class Analytics {
 	blockchainFeedComposeMail(postId: string, address: string) {
 		this.track('blockchain_feed___compose_mail', { postId, address });
 	}
+
+	// PWA
+
+	pushReceived(type: string) {
+		this.track('push__received', { type });
+	}
+
+	pushClicked(type: string) {
+		this.track('push__clicked', { type });
+	}
 }
 
 export const analytics = new Analytics();
