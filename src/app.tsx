@@ -68,6 +68,16 @@ function redirect({ from, to }: RedirectProps) {
 
 //
 
+function AnalyticsPageViewTracker() {
+	useEffect(() => {
+		analytics.pageView(location.pathname);
+	}, [location.pathname]);
+
+	return <></>;
+}
+
+//
+
 interface AppProps {
 	serviceWorkerUpdateCallback: IObservableValue<ServiceWorkerUpdateCallback | undefined>;
 }
@@ -112,10 +122,6 @@ export const App = observer(({ serviceWorkerUpdateCallback }: AppProps) => {
 				.finally(() => console.debug(`Initialization took ${Date.now() - start}ms`));
 		}
 	}, [isTestPage]);
-
-	useEffect(() => {
-		analytics.pageView(location.pathname);
-	}, [location.pathname]);
 
 	useEffect(() => {
 		// enable admin mode
@@ -198,6 +204,7 @@ export const App = observer(({ serviceWorkerUpdateCallback }: AppProps) => {
 
 	return (
 		<>
+			<AnalyticsPageViewTracker />
 			<PushNotificationsEnabler />
 
 			<PageMeta
