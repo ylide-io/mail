@@ -36,6 +36,7 @@ import { timePoint } from '../utils/dev';
 import { ensurePageLoaded } from '../utils/ensurePageLoaded';
 import { walletsMeta } from '../utils/wallet';
 import { Accounts } from './Accounts';
+import { analytics } from './Analytics';
 import contacts from './Contacts';
 import { EverwalletProxy } from './EverwalletProxy';
 import { feedSettings } from './FeedSettings';
@@ -580,6 +581,10 @@ export class Domain {
 		mailStore.init();
 		feedSettings.init();
 		newMailChecker.init();
+		analytics.init(() => ({
+			host: location.hostname,
+			numberOfAccounts: this.accounts.accounts.length,
+		}));
 		tick('rest ...');
 
 		// hacks for VenomWallet again :(
