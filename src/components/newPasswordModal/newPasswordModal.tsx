@@ -13,7 +13,6 @@ import { assertUnreachable, invariant } from '../../utils/assert';
 import { getEvmWalletNetwork } from '../../utils/wallet';
 import { ActionButton, ActionButtonLook, ActionButtonSize } from '../ActionButton/ActionButton';
 import { ActionModal } from '../actionModal/actionModal';
-import { BlockChainLabel } from '../BlockChainLabel/BlockChainLabel';
 import { ForgotPasswordModal } from '../forgotPasswordModal/forgotPasswordModal';
 import { LoadingModal } from '../loadingModal/loadingModal';
 import { SelectNetworkModal } from '../selectNetworkModal/selectNetworkModal';
@@ -60,7 +59,6 @@ export function NewPasswordModal({ faucetType, bonus, wallet, account, remoteKey
 	const [step, setStep] = useState(Step.ENTER_PASSWORD);
 
 	const [password, setPassword] = useState('');
-	const [forceSecond, setForceSecond] = useState(false);
 
 	const [network, setNetwork] = useState<EVMNetwork>();
 	useEffect(() => {
@@ -99,7 +97,7 @@ export function NewPasswordModal({ faucetType, bonus, wallet, account, remoteKey
 			const account = domainAccountRef.current;
 			invariant(account);
 
-			const justPublishedKey = await new Promise<RemotePublicKey | null>((resolve, reject) => {
+			const justPublishedKey = await new Promise<RemotePublicKey | null>(resolve => {
 				let isDone = false;
 
 				asyncDelay(3000).then(() => (!isDone ? setStep(Step.LOADING) : null));
@@ -181,23 +179,11 @@ export function NewPasswordModal({ faucetType, bonus, wallet, account, remoteKey
 				tempLocalKey = await wallet.constructLocalKeyV2(account, password);
 			} else if (freshestKey?.key.publicKey.keyVersion === YlideKeyVersion.INSECURE_KEY_V1) {
 				if (freshestKey.blockchain === 'venom-testnet') {
-					// strange... I'm not sure Qamon keys work here
-					if (forceSecond) {
-						console.log('createLocalKey', 'INSECURE_KEY_V1 venom-testnet');
-						tempLocalKey = await wallet.constructLocalKeyV1(account, password);
-					} else {
-						console.log('createLocalKey', 'INSECURE_KEY_V1 venom-testnet');
-						tempLocalKey = await wallet.constructLocalKeyV2(account, password);
-					}
+					console.log('createLocalKey', 'INSECURE_KEY_V1 venom-testnet');
+					tempLocalKey = await wallet.constructLocalKeyV2(account, password);
 				} else {
-					// strange... I'm not sure Qamon keys work here
-					if (forceSecond) {
-						console.log('createLocalKey', 'INSECURE_KEY_V2 non-venom');
-						tempLocalKey = await wallet.constructLocalKeyV2(account, password);
-					} else {
-						console.log('createLocalKey', 'INSECURE_KEY_V1 non-venom');
-						tempLocalKey = await wallet.constructLocalKeyV1(account, password);
-					}
+					console.log('createLocalKey', 'INSECURE_KEY_V1 non-venom');
+					tempLocalKey = await wallet.constructLocalKeyV1(account, password);
 				}
 			} else if (freshestKey?.key.publicKey.keyVersion === YlideKeyVersion.KEY_V2) {
 				// if user already using password - we should use it too
@@ -312,12 +298,9 @@ export function NewPasswordModal({ faucetType, bonus, wallet, account, remoteKey
 					{freshestKey ? (
 						<>
 							<div>
-								We found your <span onDoubleClick={() => setForceSecond(true)}>key</span> in{' '}
-								<BlockChainLabel blockchain={freshestKey.blockchain} /> blockchain.{' '}
 								{isPasswordNeeded
 									? 'Please, enter your Ylide Password to access it.'
 									: 'Please, sign authroization message to access it.'}
-								{forceSecond ? ' Magic may happen.' : ''}
 							</div>
 
 							{isPasswordNeeded && (
