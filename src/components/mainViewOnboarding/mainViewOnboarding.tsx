@@ -20,31 +20,40 @@ import { LoadingModal } from '../loadingModal/loadingModal';
 import { toast } from '../toast/toast';
 
 export interface ConnectAccountFlowProps {
-	onClose: (account: ConnectAccountResult | undefined) => void;
+	onClose: (result: ConnectAccountResult | undefined) => void;
 }
 
 export const ConnectAccountFlow = observer(({ onClose }: ConnectAccountFlowProps) => {
 	const onCloseRef = useLatest(onClose);
 
 	useEffect(() => {
-		connectAccount({ place: 'mv_onboarding' })
-			.then(res => onCloseRef.current(res))
-			.catch(() => onCloseRef.current(undefined));
+		(async () => {
+			try {
+				const caResult = await connectAccount({ place: 'mv_onboarding' });
+				onCloseRef.current(caResult);
+			} catch (e) {
+				onCloseRef.current(undefined);
+			}
+		})();
 	}, [onCloseRef]);
 
-	return <></>;
+	return (
+		<>
+			<LoadingModal reason="Connecting account ..." />
+		</>
+	);
 });
 
 //
 
-export interface BuildFeedFlowProps {
+export interface AuthorizeAccountFlowProps {
 	account: DomainAccount;
 	password: string;
-	onClose: (result: boolean) => void;
+	onClose: (account?: DomainAccount) => void;
 }
 
-export const BuildFeedFlow = observer(({ account, password, onClose }: BuildFeedFlowProps) => {
-	const coverage = feedSettings.coverages.get(account);
+export const AuthorizeAccountFlow = observer(({ account, password, onClose }: AuthorizeAccountFlowProps) => {
+	const onCloseRef = useLatest(onClose);
 
 	useEffect(() => {
 		(async () => {
@@ -52,6 +61,37 @@ export const BuildFeedFlow = observer(({ account, password, onClose }: BuildFeed
 				const payload = await account.makeMainViewKey(password);
 				invariant(payload);
 				const { token } = await FeedManagerApi.authAddress(payload);
+				account.mainViewKey = token;
+
+				onCloseRef.current(account);
+			} catch (e) {
+				onCloseRef.current(undefined);
+			}
+		})();
+	}, [account, onCloseRef, password]);
+
+	return (
+		<>
+			<LoadingModal reason="Authorization ..." />
+		</>
+	);
+});
+
+//
+
+export interface BuildFeedFlowProps {
+	account: DomainAccount;
+	onClose: (result: boolean) => void;
+}
+
+export const BuildFeedFlow = observer(({ account, onClose }: BuildFeedFlowProps) => {
+	const coverage = feedSettings.coverages.get(account);
+
+	useEffect(() => {
+		(async () => {
+			try {
+				const token = account.mainViewKey;
+				invariant(token, 'No main view key');
 
 				const res = await FeedManagerApi.init(
 					token,
@@ -69,14 +109,12 @@ export const BuildFeedFlow = observer(({ account, password, onClose }: BuildFeed
 
 					await checkInit();
 				}
-
-				account.mainViewKey = token;
 			} catch (e) {
 				console.error(e);
 				onClose(false);
 			}
 		})();
-	}, [account, onClose, password]);
+	}, [account, onClose]);
 
 	return (
 		<>
@@ -102,6 +140,7 @@ export const isOnboardingInProgress = observable.box(false);
 enum StepType {
 	CONNECT_ACCOUNT = 'CONNECT_ACCOUNT',
 	CONNECT_ACCOUNT_WARNING = 'CONNECT_ACCOUNT_WARNING',
+	AUTHORIZATION = 'AUTHORIZATION',
 	BUILDING_FEED = 'BUILDING_FEED',
 }
 
@@ -113,13 +152,18 @@ interface ConnectAccountWarningStep {
 	type: StepType.CONNECT_ACCOUNT_WARNING;
 }
 
-interface BuildingFeedStep {
-	type: StepType.BUILDING_FEED;
+interface AuthorizationStep {
+	type: StepType.AUTHORIZATION;
 	account: DomainAccount;
 	password: string;
 }
 
-type Step = ConnectAccountStep | ConnectAccountWarningStep | BuildingFeedStep;
+interface BuildingFeedStep {
+	type: StepType.BUILDING_FEED;
+	account: DomainAccount;
+}
+
+type Step = ConnectAccountStep | ConnectAccountWarningStep | AuthorizationStep | BuildingFeedStep;
 
 export const MainViewOnboarding = observer(() => {
 	const [step, setStep] = useState<Step>();
@@ -161,7 +205,7 @@ export const MainViewOnboarding = observer(() => {
 					onClose={res => {
 						if (res?.account) {
 							setStep({
-								type: StepType.BUILDING_FEED,
+								type: StepType.AUTHORIZATION,
 								account: res.account,
 								password: res.password || '',
 							});
@@ -189,10 +233,25 @@ export const MainViewOnboarding = observer(() => {
 				</ActionModal>
 			)}
 
+			{step?.type === StepType.AUTHORIZATION && (
+				<AuthorizeAccountFlow
+					account={step.account}
+					password={step.password}
+					onClose={account => {
+						if (account) {
+							setStep({ type: StepType.BUILDING_FEED, account });
+						} else {
+							toast('Unexpected error 🤷‍♂️');
+							disconnect(step.account);
+							reset();
+						}
+					}}
+				/>
+			)}
+
 			{step?.type === StepType.BUILDING_FEED && (
 				<BuildFeedFlow
 					account={step.account}
-					password={step.password}
 					onClose={result => {
 						if (result) {
 							toast(`Welcome to ${APP_NAME} 🔥`);

@@ -23,8 +23,8 @@ import { WalletTag } from '../walletTag/walletTag';
 import { YlideLoader } from '../ylideLoader/ylideLoader';
 
 export interface NewPasswordModalResult {
-	account?: DomainAccount;
-	password?: string;
+	account: DomainAccount;
+	password: string;
 }
 
 enum Step {
