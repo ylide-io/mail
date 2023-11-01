@@ -19,33 +19,6 @@ import { IosInstallPwaPopup } from '../iosInstallPwaPopup/iosInstallPwaPopup';
 import { LoadingModal } from '../loadingModal/loadingModal';
 import { toast } from '../toast/toast';
 
-export interface BuildFeedFlowProps {
-	account: DomainAccount;
-	onClose: () => void;
-}
-
-export const BuildFeedFlow = observer(({ account, onClose }: BuildFeedFlowProps) => {
-	const coverage = feedSettings.coverages.get(account);
-
-	return (
-		<>
-			{!coverage || coverage === 'loading' || coverage === 'error' ? (
-				<ActionModal
-					title="We're setting up your personalized feed"
-					buttons={<ActionButton isLoading size={ActionButtonSize.XLARGE} look={ActionButtonLook.PRIMARY} />}
-				>
-					We're currently fetching data about your tokens and transactions to create a tailored experience
-					just for you. This may take a few moments. Thank you for your patience.
-				</ActionModal>
-			) : (
-				<CoverageModal coverage={coverage} onClose={onClose} />
-			)}
-		</>
-	);
-});
-
-//
-
 export interface ConnectAccountFlowProps {
 	onClose: (account: ConnectAccountResult | undefined) => void;
 }
@@ -64,43 +37,18 @@ export const ConnectAccountFlow = observer(({ onClose }: ConnectAccountFlowProps
 
 //
 
-export const isOnboardingInProgress = observable.box(false);
-
-enum Step {
-	CONNECT_ACCOUNT = 'CONNECT_ACCOUNT',
-	CONNECT_ACCOUNT_WARNING = 'CONNECT_ACCOUNT_WARNING',
-	BUILDING_FEED = 'BUILDING_FEED',
+export interface BuildFeedFlowProps {
+	account: DomainAccount;
+	password: string;
+	onClose: (result: boolean) => void;
 }
 
-export const MainViewOnboarding = observer(() => {
-	const [step, setStep] = useState<Step>();
+export const BuildFeedFlow = observer(({ account, password, onClose }: BuildFeedFlowProps) => {
+	const coverage = feedSettings.coverages.get(account);
 
 	useEffect(() => {
-		isOnboardingInProgress.set(!!step);
-	}, [step]);
-
-	const accounts = domain.accounts.accounts;
-	const [freshAccount, setFreshAccount] = useState<DomainAccount>();
-
-	// Disconnect inactive accounts before begin
-	useEffect(() => {
-		domain.accounts.accounts
-			.filter(a => !a.isAnyLocalPrivateKeyRegistered)
-			.forEach(a => disconnectAccount({ account: a }));
-	}, []);
-
-	const reset = useCallback(() => {
-		setFreshAccount(undefined);
-		setStep(undefined);
-	}, []);
-
-	const disconnect = useCallback((account: DomainAccount) => disconnectAccount({ account }).then(reset), [reset]);
-
-	const authorize = useCallback(
-		async ({ account, password }: { account: DomainAccount; password: string }) => {
+		(async () => {
 			try {
-				setStep(Step.BUILDING_FEED);
-
 				const payload = await account.makeMainViewKey(password);
 				invariant(payload);
 				const { token } = await FeedManagerApi.authAddress(payload);
@@ -123,22 +71,84 @@ export const MainViewOnboarding = observer(() => {
 				}
 
 				account.mainViewKey = token;
-				setFreshAccount(account);
 			} catch (e) {
 				console.error(e);
-				toast('Unexpected error 🤷‍♂️');
-				disconnect(account);
+				onClose(false);
 			}
-		},
-		[disconnect],
+		})();
+	}, [account, onClose, password]);
+
+	return (
+		<>
+			{!coverage || coverage === 'loading' || coverage === 'error' ? (
+				<ActionModal
+					title="We're setting up your personalized feed"
+					buttons={<ActionButton isLoading size={ActionButtonSize.XLARGE} look={ActionButtonLook.PRIMARY} />}
+				>
+					We're currently fetching data about your tokens and transactions to create a tailored experience
+					just for you. This may take a few moments. Thank you for your patience.
+				</ActionModal>
+			) : (
+				<CoverageModal coverage={coverage} onClose={() => onClose(true)} />
+			)}
+		</>
 	);
+});
+
+//
+
+export const isOnboardingInProgress = observable.box(false);
+
+enum StepType {
+	CONNECT_ACCOUNT = 'CONNECT_ACCOUNT',
+	CONNECT_ACCOUNT_WARNING = 'CONNECT_ACCOUNT_WARNING',
+	BUILDING_FEED = 'BUILDING_FEED',
+}
+
+interface ConnectAccountStep {
+	type: StepType.CONNECT_ACCOUNT;
+}
+
+interface ConnectAccountWarningStep {
+	type: StepType.CONNECT_ACCOUNT_WARNING;
+}
+
+interface BuildingFeedStep {
+	type: StepType.BUILDING_FEED;
+	account: DomainAccount;
+	password: string;
+}
+
+type Step = ConnectAccountStep | ConnectAccountWarningStep | BuildingFeedStep;
+
+export const MainViewOnboarding = observer(() => {
+	const [step, setStep] = useState<Step>();
+
+	const accounts = domain.accounts.accounts;
+
+	const reset = useCallback(() => {
+		setStep(undefined);
+	}, []);
+
+	const disconnect = useCallback((account: DomainAccount) => disconnectAccount({ account }).then(reset), [reset]);
+
+	useEffect(() => {
+		isOnboardingInProgress.set(!!step);
+	}, [step]);
+
+	// Disconnect inactive accounts before begin
+	useEffect(() => {
+		domain.accounts.accounts
+			.filter(a => !a.isAnyLocalPrivateKeyRegistered)
+			.forEach(a => disconnectAccount({ account: a }));
+	}, []);
 
 	useEffect(() => {
 		// Do nothing if something is happening already
 		if (step) return;
 
 		if (!accounts.length) {
-			setStep(Step.CONNECT_ACCOUNT);
+			setStep({ type: StepType.CONNECT_ACCOUNT });
 		}
 	}, [accounts.length, step]);
 
@@ -146,29 +156,30 @@ export const MainViewOnboarding = observer(() => {
 		<>
 			{step && <LoadingModal />}
 
-			{step === Step.CONNECT_ACCOUNT && (
+			{step?.type === StepType.CONNECT_ACCOUNT && (
 				<ConnectAccountFlow
 					onClose={res => {
-						if (res?.account && res.password) {
-							authorize({
+						if (res?.account) {
+							setStep({
+								type: StepType.BUILDING_FEED,
 								account: res.account,
-								password: res.password,
+								password: res.password || '',
 							});
 						} else {
-							setStep(Step.CONNECT_ACCOUNT_WARNING);
+							setStep({ type: StepType.CONNECT_ACCOUNT_WARNING });
 						}
 					}}
 				/>
 			)}
 
-			{step === Step.CONNECT_ACCOUNT_WARNING && (
+			{step?.type === StepType.CONNECT_ACCOUNT_WARNING && (
 				<ActionModal
 					title="Connect Account"
 					buttons={
 						<ActionButton
 							size={ActionButtonSize.XLARGE}
 							look={ActionButtonLook.PRIMARY}
-							onClick={() => setStep(Step.CONNECT_ACCOUNT)}
+							onClick={() => setStep({ type: StepType.CONNECT_ACCOUNT })}
 						>
 							Proceed
 						</ActionButton>
@@ -178,11 +189,18 @@ export const MainViewOnboarding = observer(() => {
 				</ActionModal>
 			)}
 
-			{step === Step.BUILDING_FEED && (
+			{step?.type === StepType.BUILDING_FEED && (
 				<BuildFeedFlow
-					account={freshAccount!}
-					onClose={() => {
-						toast(`Welcome to ${APP_NAME} 🔥`);
+					account={step.account}
+					password={step.password}
+					onClose={result => {
+						if (result) {
+							toast(`Welcome to ${APP_NAME} 🔥`);
+						} else {
+							toast('Unexpected error 🤷‍♂️');
+							disconnect(step.account);
+						}
+
 						reset();
 					}}
 				/>
