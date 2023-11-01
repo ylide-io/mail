@@ -1,4 +1,6 @@
 import { TVMWalletController } from '@ylide/everscale';
+import { asyncDelay } from '@ylide/sdk';
+import { observable } from 'mobx';
 import { observer } from 'mobx-react';
 import { useCallback, useEffect, useState } from 'react';
 
@@ -12,30 +14,54 @@ import { invariant } from '../../utils/assert';
 import { ActionButton, ActionButtonLook, ActionButtonSize } from '../ActionButton/ActionButton';
 import { ActionModal } from '../actionModal/actionModal';
 import { CoverageModal } from '../coverageModal/coverageModal';
-import { toast } from '../toast/toast';
 import { IosInstallPwaPopup } from '../iosInstallPwaPopup/iosInstallPwaPopup';
-import { observable } from 'mobx';
+import { toast } from '../toast/toast';
 
 export const isOnboardingInProgress = observable.box(false);
 
+//
+
+export interface BuildFeedFlowProps {
+	account: DomainAccount;
+	onClose: () => void;
+}
+
+export const BuildFeedFlow = observer(({ account, onClose }: BuildFeedFlowProps) => {
+	const coverage = feedSettings.coverages.get(account);
+
+	return (
+		<>
+			{!coverage || coverage === 'loading' || coverage === 'error' ? (
+				<ActionModal
+					title="We're setting up your personalized feed"
+					buttons={<ActionButton isLoading size={ActionButtonSize.XLARGE} look={ActionButtonLook.PRIMARY} />}
+				>
+					We're currently fetching data about your tokens and transactions to create a tailored experience
+					just for you. This may take a few moments. Thank you for your patience.
+				</ActionModal>
+			) : (
+				<CoverageModal coverage={coverage} onClose={onClose} />
+			)}
+		</>
+	);
+});
+
+//
+
 enum Step {
-	CONNECT_ACCOUNT_INFO = 'CONNECT_ACCOUNT_INFO',
+	CONNECT_ACCOUNT_WARNING = 'CONNECT_ACCOUNT_WARNING',
 	BUILDING_FEED = 'BUILDING_FEED',
 }
 
 export const MainViewOnboarding = observer(() => {
-	const accounts = domain.accounts.accounts;
-
-	const [freshAccount, setFreshAccount] = useState<DomainAccount | null>(null);
-	const coverage = freshAccount ? feedSettings.coverages.get(freshAccount) : null;
-
 	const [step, setStep] = useState<Step>();
 
 	useEffect(() => {
 		isOnboardingInProgress.set(!!step);
 	}, [step]);
 
-	const enforceMainViewOnboarding = domain.enforceMainViewOnboarding;
+	const accounts = domain.accounts.accounts;
+	const [freshAccount, setFreshAccount] = useState<DomainAccount>();
 
 	// Disconnect inactive accounts before begin
 	useEffect(() => {
@@ -44,7 +70,10 @@ export const MainViewOnboarding = observer(() => {
 			.forEach(a => disconnectAccount({ account: a }));
 	}, []);
 
-	const reset = useCallback(() => setStep(undefined), []);
+	const reset = useCallback(() => {
+		setFreshAccount(undefined);
+		setStep(undefined);
+	}, []);
 
 	const disconnect = useCallback((account: DomainAccount) => disconnectAccount({ account }).then(reset), [reset]);
 
@@ -63,14 +92,16 @@ export const MainViewOnboarding = observer(() => {
 						? domainAccount.wallet.wallet
 						: undefined,
 				);
-				const checkInit = async (): Promise<any> => {
-					await new Promise(r => setTimeout(() => r(1), 5000));
-					const initiated = await FeedManagerApi.checkInit(token);
-					if (!initiated) {
-						return checkInit();
-					}
-				};
+
 				if (res?.inLine) {
+					async function checkInit() {
+						await asyncDelay(5000);
+						const initiated = await FeedManagerApi.checkInit(token);
+						if (!initiated) {
+							await checkInit();
+						}
+					}
+
 					await checkInit();
 				}
 
@@ -85,6 +116,8 @@ export const MainViewOnboarding = observer(() => {
 		[disconnect],
 	);
 
+	const enforceMainViewOnboarding = domain.enforceMainViewOnboarding;
+
 	useEffect(() => {
 		if (enforceMainViewOnboarding) {
 			authorize(enforceMainViewOnboarding);
@@ -94,7 +127,7 @@ export const MainViewOnboarding = observer(() => {
 	const connect = useCallback(async () => {
 		const newAccount = await connectAccount({ place: 'mv_onboarding' });
 		if (!newAccount && !accounts.length) {
-			setStep(Step.CONNECT_ACCOUNT_INFO);
+			setStep(Step.CONNECT_ACCOUNT_WARNING);
 		}
 	}, [accounts]);
 
@@ -109,7 +142,7 @@ export const MainViewOnboarding = observer(() => {
 
 	return (
 		<>
-			{step === Step.CONNECT_ACCOUNT_INFO && (
+			{step === Step.CONNECT_ACCOUNT_WARNING && (
 				<ActionModal
 					title="Connect Account"
 					buttons={
@@ -127,32 +160,13 @@ export const MainViewOnboarding = observer(() => {
 			)}
 
 			{step === Step.BUILDING_FEED && (
-				<>
-					{!coverage || coverage === 'loading' || coverage === 'error' ? (
-						<ActionModal
-							title="We're setting up your personalized feed"
-							buttons={
-								<ActionButton
-									isLoading
-									size={ActionButtonSize.XLARGE}
-									look={ActionButtonLook.PRIMARY}
-								/>
-							}
-						>
-							We're currently fetching data about your tokens and transactions to create a tailored
-							experience just for you. This may take a few moments. Thank you for your patience.
-						</ActionModal>
-					) : (
-						<CoverageModal
-							onClose={() => {
-								setFreshAccount(null);
-								toast(`Welcome to ${APP_NAME} 🔥`);
-								reset();
-							}}
-							coverage={coverage}
-						/>
-					)}
-				</>
+				<BuildFeedFlow
+					account={freshAccount!}
+					onClose={() => {
+						toast(`Welcome to ${APP_NAME} 🔥`);
+						reset();
+					}}
+				/>
 			)}
 
 			{!step && <IosInstallPwaPopup />}

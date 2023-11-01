@@ -9,8 +9,8 @@ import { CheckBox } from '../checkBox/checkBox';
 import css from './coverageModal.module.scss';
 
 type Props = {
-	onClose?: () => void;
 	coverage: FeedManagerApi.Coverage;
+	onClose?: () => void;
 };
 
 export const CoverageModal = observer(({ onClose, coverage }: Props) => {
