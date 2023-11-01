@@ -9,17 +9,15 @@ import { APP_NAME } from '../../constants';
 import domain from '../../stores/Domain';
 import { feedSettings } from '../../stores/FeedSettings';
 import { DomainAccount } from '../../stores/models/DomainAccount';
-import { connectAccount, disconnectAccount } from '../../utils/account';
+import { connectAccount, ConnectAccountResult, disconnectAccount } from '../../utils/account';
 import { invariant } from '../../utils/assert';
+import { useLatest } from '../../utils/useLatest';
 import { ActionButton, ActionButtonLook, ActionButtonSize } from '../ActionButton/ActionButton';
 import { ActionModal } from '../actionModal/actionModal';
 import { CoverageModal } from '../coverageModal/coverageModal';
 import { IosInstallPwaPopup } from '../iosInstallPwaPopup/iosInstallPwaPopup';
+import { LoadingModal } from '../loadingModal/loadingModal';
 import { toast } from '../toast/toast';
-
-export const isOnboardingInProgress = observable.box(false);
-
-//
 
 export interface BuildFeedFlowProps {
 	account: DomainAccount;
@@ -48,7 +46,28 @@ export const BuildFeedFlow = observer(({ account, onClose }: BuildFeedFlowProps)
 
 //
 
+export interface ConnectAccountFlowProps {
+	onClose: (account: ConnectAccountResult | undefined) => void;
+}
+
+export const ConnectAccountFlow = observer(({ onClose }: ConnectAccountFlowProps) => {
+	const onCloseRef = useLatest(onClose);
+
+	useEffect(() => {
+		connectAccount({ place: 'mv_onboarding' })
+			.then(res => onCloseRef.current(res))
+			.catch(() => onCloseRef.current(undefined));
+	}, [onCloseRef]);
+
+	return <></>;
+});
+
+//
+
+export const isOnboardingInProgress = observable.box(false);
+
 enum Step {
+	CONNECT_ACCOUNT = 'CONNECT_ACCOUNT',
 	CONNECT_ACCOUNT_WARNING = 'CONNECT_ACCOUNT_WARNING',
 	BUILDING_FEED = 'BUILDING_FEED',
 }
@@ -78,19 +97,17 @@ export const MainViewOnboarding = observer(() => {
 	const disconnect = useCallback((account: DomainAccount) => disconnectAccount({ account }).then(reset), [reset]);
 
 	const authorize = useCallback(
-		async ({ domainAccount, password }: { domainAccount: DomainAccount; password: string }) => {
+		async ({ account, password }: { account: DomainAccount; password: string }) => {
 			try {
 				setStep(Step.BUILDING_FEED);
 
-				const payload = await domainAccount.makeMainViewKey(password);
+				const payload = await account.makeMainViewKey(password);
 				invariant(payload);
 				const { token } = await FeedManagerApi.authAddress(payload);
 
 				const res = await FeedManagerApi.init(
 					token,
-					domainAccount.wallet.controller instanceof TVMWalletController
-						? domainAccount.wallet.wallet
-						: undefined,
+					account.wallet.controller instanceof TVMWalletController ? account.wallet.wallet : undefined,
 				);
 
 				if (res?.inLine) {
@@ -105,43 +122,45 @@ export const MainViewOnboarding = observer(() => {
 					await checkInit();
 				}
 
-				domainAccount.mainViewKey = token;
-				setFreshAccount(domainAccount);
+				account.mainViewKey = token;
+				setFreshAccount(account);
 			} catch (e) {
-				console.log(e);
+				console.error(e);
 				toast('Unexpected error 🤷‍♂️');
-				disconnect(domainAccount);
+				disconnect(account);
 			}
 		},
 		[disconnect],
 	);
-
-	const enforceMainViewOnboarding = domain.enforceMainViewOnboarding;
-
-	useEffect(() => {
-		if (enforceMainViewOnboarding) {
-			authorize(enforceMainViewOnboarding);
-		}
-	}, [enforceMainViewOnboarding, authorize]);
-
-	const connect = useCallback(async () => {
-		const newAccount = await connectAccount({ place: 'mv_onboarding' });
-		if (!newAccount && !accounts.length) {
-			setStep(Step.CONNECT_ACCOUNT_WARNING);
-		}
-	}, [accounts]);
 
 	useEffect(() => {
 		// Do nothing if something is happening already
 		if (step) return;
 
 		if (!accounts.length) {
-			connect();
+			setStep(Step.CONNECT_ACCOUNT);
 		}
-	}, [accounts, connect, step]);
+	}, [accounts.length, step]);
 
 	return (
 		<>
+			{step && <LoadingModal />}
+
+			{step === Step.CONNECT_ACCOUNT && (
+				<ConnectAccountFlow
+					onClose={res => {
+						if (res?.account && res.password) {
+							authorize({
+								account: res.account,
+								password: res.password,
+							});
+						} else {
+							setStep(Step.CONNECT_ACCOUNT_WARNING);
+						}
+					}}
+				/>
+			)}
+
 			{step === Step.CONNECT_ACCOUNT_WARNING && (
 				<ActionModal
 					title="Connect Account"
@@ -149,13 +168,13 @@ export const MainViewOnboarding = observer(() => {
 						<ActionButton
 							size={ActionButtonSize.XLARGE}
 							look={ActionButtonLook.PRIMARY}
-							onClick={() => connect()}
+							onClick={() => setStep(Step.CONNECT_ACCOUNT)}
 						>
 							Proceed
 						</ActionButton>
 					}
 				>
-					You need to connect a crypto wallet in order to use {APP_NAME}
+					You need to connect a crypto wallet in order to use {APP_NAME} 👍
 				</ActionModal>
 			)}
 

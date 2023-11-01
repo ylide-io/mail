@@ -64,7 +64,6 @@ export class Domain {
 	@observable txWithBonus: boolean = false;
 	@observable txPlateVisible: boolean = false;
 	@observable isTxPublishing: boolean = false;
-	@observable enforceMainViewOnboarding: { domainAccount: DomainAccount; password: string } | null = null;
 	@observable publishingTxHash: string = '';
 
 	@observable devMode = false; //document.location.href.includes('localhost');

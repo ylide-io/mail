@@ -22,6 +22,11 @@ import { toast } from '../toast/toast';
 import { WalletTag } from '../walletTag/walletTag';
 import { YlideLoader } from '../ylideLoader/ylideLoader';
 
+export interface NewPasswordModalResult {
+	account?: DomainAccount;
+	password?: string;
+}
+
 enum Step {
 	LOADING,
 	ENTER_PASSWORD,
@@ -37,7 +42,7 @@ interface NewPasswordModalProps {
 	wallet: Wallet;
 	account: WalletAccount;
 	remoteKeys: Record<string, RemotePublicKey | null>;
-	onClose?: (account?: DomainAccount) => void;
+	onClose: (result?: NewPasswordModalResult) => void;
 }
 
 export function NewPasswordModal({ faucetType, bonus, wallet, account, remoteKeys, onClose }: NewPasswordModalProps) {
@@ -86,7 +91,7 @@ export function NewPasswordModal({ faucetType, bonus, wallet, account, remoteKey
 			disconnectAccount({ account: domainAccountRef.current }).catch();
 		}
 
-		onClose?.();
+		onClose();
 	}
 
 	async function publishLocalKey(key: YlidePrivateKey, network: EVMNetwork | undefined) {
@@ -149,10 +154,8 @@ export function NewPasswordModal({ faucetType, bonus, wallet, account, remoteKey
 			}
 
 			analytics.walletRegistered(wallet.wallet, account.account.address);
-			onClose?.(account);
 			return true;
 		} catch (e) {
-			exitUnsuccessfully({ message: 'Transaction was not published. Please, try again', e });
 			return false;
 		}
 	}
@@ -228,19 +231,20 @@ export function NewPasswordModal({ faucetType, bonus, wallet, account, remoteKey
 				domain.txWithBonus = bonus;
 
 				const success = await domain.publishThroughFaucet(faucetData);
-
 				if (success) {
-					domain.enforceMainViewOnboarding = { domainAccount, password };
+					onClose({ account: domainAccount, password });
+				} else {
+					exitUnsuccessfully({ message: 'Failed to publish key 😟' });
 				}
-
-				onClose?.(domainAccount);
 			} else {
 				if (wallet.factory.blockchainGroup === 'evm') {
 					setStep(Step.SELECT_NETWORK);
 				} else {
 					const success = await publishLocalKey(tempLocalKey, network);
 					if (success) {
-						domain.enforceMainViewOnboarding = { domainAccount, password };
+						onClose({ account: domainAccount, password });
+					} else {
+						exitUnsuccessfully({ message: 'Transaction was not published. Please try again 🙏' });
 					}
 				}
 			}
@@ -250,13 +254,14 @@ export function NewPasswordModal({ faucetType, bonus, wallet, account, remoteKey
 			);
 			const domainAccount = await createDomainAccount(wallet, account, tempLocalKey);
 			analytics.walletConnected(wallet.wallet, account.address);
-			domain.enforceMainViewOnboarding = { domainAccount, password };
-			onClose?.(domainAccount);
+			onClose({ account: domainAccount, password });
 		} else if (forceNew || withoutPassword) {
 			const domainAccount = await createDomainAccount(wallet, account, tempLocalKey);
 			const success = await publishLocalKey(tempLocalKey, network);
 			if (success) {
-				domain.enforceMainViewOnboarding = { domainAccount, password };
+				onClose({ account: domainAccount, password });
+			} else {
+				exitUnsuccessfully({ message: 'Failed to publish key 😟' });
 			}
 		} else {
 			toast('Password is wrong. Please try again ❤');
@@ -266,7 +271,6 @@ export function NewPasswordModal({ faucetType, bonus, wallet, account, remoteKey
 
 	async function networkSelect(network: EVMNetwork) {
 		setNetwork(network);
-		setStep(Step.PUBLISH_KEY);
 		await publishLocalKey(domainAccountRef.current!.localPrivateKeys[0], network);
 	}
 

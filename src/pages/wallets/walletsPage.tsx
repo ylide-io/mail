@@ -96,9 +96,8 @@ export const WalletsPage = observer(() => {
 					<div
 						className="cw-block emphaized"
 						onClick={async () => {
-							const account = await connectAccount({ place: 'wallets' });
-
-							if (account) {
+							const res = await connectAccount({ place: 'wallets' });
+							if (res?.account) {
 								await showStaticComponent(resolve => <AccountConnectedModal onClose={resolve} />);
 							}
 						}}
