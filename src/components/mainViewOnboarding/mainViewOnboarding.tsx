@@ -75,11 +75,7 @@ export const AuthorizeAccountFlow = observer(({ account, password, onClose }: Au
 		})();
 	}, [account, onCloseRef, password]);
 
-	return (
-		<>
-			<LoadingModal reason="Authorization ..." />
-		</>
-	);
+	return <LoadingModal reason="Authorization ..." />;
 });
 
 //
@@ -90,53 +86,91 @@ export interface PaymentFlowProps {
 
 export const PaymentFlow = observer(({ account }: PaymentFlowProps) => {
 	const paymentInfoQuery = useQuery(['payment', 'info', account.account.address], {
-		queryFn: () => FeedManagerApi.getPaymentInfo({ token: account.mainViewKey }),
+		queryFn: async () => {
+			const data = await FeedManagerApi.getPaymentInfo({ token: account.mainViewKey });
+			return {
+				...data,
+				isTrialAvailable: !data.subscriptions.length && !data.charges.length,
+			};
+		},
 	});
 
 	return (
 		<>
-			<LoadingModal reason="Loading payment details ..." />
+			{paymentInfoQuery.isLoading ? (
+				<LoadingModal reason="Loading payment details ..." />
+			) : paymentInfoQuery.data ? (
+				<Modal className={css.payModal}>
+					<div className={css.payModalTitle}>Save 50% for 12 months</div>
 
-			<Modal className={css.payModal}>
-				<div className={css.payModalTitle}>Save 50% for 12 months</div>
+					{paymentInfoQuery.data.isTrialAvailable ? (
+						<div className={css.payModalDescription}>
+							Pick your subscription. Use the special offer to purchase the annual subscription and save
+							50%. Or start a free 7-day trial period and continue with a monthly subscription. You can
+							cancel the monthly subscription at any time.
+						</div>
+					) : (
+						<div className={css.payModalDescription}>
+							Pick your subscription. Use the special offer to purchase the annual subscription and save
+							50%. Or start a monthly subscription. You can cancel the monthly subscription at any time.
+						</div>
+					)}
 
-				<div className={css.payModalDescription}>
-					Pick your subscription. Use the special offer to purchase the annual subscription and save 50%. Or
-					start a free 7-day trial period and continue with a monthly subscription. You can cancel the monthly
-					subscription at any time.
-				</div>
+					<div className={css.payModalPlans}>
+						<div className={css.payModalPlan}>
+							<div className={css.payModalPlanTitle}>Monthly subscription</div>
+							<div className={css.payModalPrice}>$14/month</div>
+							<div className={clsx(css.payModalSubtle, css.payModalAboveCra)}>Cancel anytime</div>
+							{paymentInfoQuery.data.isTrialAvailable ? (
+								<ActionButton
+									className={css.payModalCra}
+									size={ActionButtonSize.XLARGE}
+									look={ActionButtonLook.PRIMARY}
+								>
+									Start 7-Day Trial
+								</ActionButton>
+							) : (
+								<ActionButton
+									className={css.payModalCra}
+									size={ActionButtonSize.XLARGE}
+									look={ActionButtonLook.PRIMARY}
+								>
+									Start Now
+								</ActionButton>
+							)}
+						</div>
 
-				<div className={css.payModalPlans}>
-					<div className={css.payModalPlan}>
-						<div className={css.payModalPlanTitle}>Monthly subscription</div>
-						<div className={css.payModalPrice}>$14/month</div>
-						<div className={clsx(css.payModalSubtle, css.payModalAboveCra)}>Cancel anytime</div>
-						<ActionButton
-							className={css.payModalCra}
-							size={ActionButtonSize.XLARGE}
-							look={ActionButtonLook.PRIMARY}
-						>
-							Start 7-Day Trial
-						</ActionButton>
+						<div className={css.payModalPlan}>
+							<div className={css.payModalPlanTitle}>One time payment</div>
+							<GridRowBox>
+								<div className={clsx(css.payModalPrice, css.payModalPrice_old)}>$168</div>
+								<div className={css.payModalBadge}>50% OFF</div>
+							</GridRowBox>
+							<div className={clsx(css.payModalPrice, css.payModalAboveCra)}>$84/year</div>
+							<ActionButton
+								className={css.payModalCra}
+								size={ActionButtonSize.XLARGE}
+								look={ActionButtonLook.HEAVY}
+							>
+								Pay Now
+							</ActionButton>
+						</div>
 					</div>
-
-					<div className={css.payModalPlan}>
-						<div className={css.payModalPlanTitle}>One time payment</div>
-						<GridRowBox>
-							<div className={clsx(css.payModalPrice, css.payModalPrice_old)}>$168</div>
-							<div className={css.payModalBadge}>50% OFF</div>
-						</GridRowBox>
-						<div className={clsx(css.payModalPrice, css.payModalAboveCra)}>$84/year</div>
+				</Modal>
+			) : (
+				<ActionModal
+					title="Failed to fetch payment details 😟"
+					buttons={
 						<ActionButton
-							className={css.payModalCra}
-							size={ActionButtonSize.XLARGE}
+							size={ActionButtonSize.LARGE}
 							look={ActionButtonLook.HEAVY}
+							onClick={() => paymentInfoQuery.refetch()}
 						>
-							Pay Now
+							Try Again
 						</ActionButton>
-					</div>
-				</div>
-			</Modal>
+					}
+				/>
+			)}
 		</>
 	);
 });
@@ -262,10 +296,8 @@ export const MainViewOnboarding = observer(() => {
 		if (step) return;
 
 		if (!accounts.length) {
-			return setStep({ type: StepType.CONNECT_ACCOUNT });
+			setStep({ type: StepType.CONNECT_ACCOUNT });
 		}
-
-		setStep({ type: StepType.PAYMENT, account: accounts[0] });
 	}, [accounts, step]);
 
 	return (
