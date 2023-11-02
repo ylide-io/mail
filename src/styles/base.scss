@@ -117,8 +117,8 @@ input,
 textarea,
 select,
 optgroup {
-	// 1.25 - default Figma line-height for Lexend font
-	font: 13px/1.25 $font-family_main;
+	font: 13px $font-family_main;
+	line-height: $line-height_normal;
 	color: var(--primary-text-color);
 	-webkit-font-smoothing: antialiased;
 	-moz-osx-font-smoothing: grayscale;

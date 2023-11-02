@@ -1,5 +1,6 @@
 import { TVMWalletController } from '@ylide/everscale';
 import { asyncDelay } from '@ylide/sdk';
+import clsx from 'clsx';
 import { observable } from 'mobx';
 import { observer } from 'mobx-react';
 import { useCallback, useEffect, useState } from 'react';
@@ -14,10 +15,13 @@ import { invariant } from '../../utils/assert';
 import { useLatest } from '../../utils/useLatest';
 import { ActionButton, ActionButtonLook, ActionButtonSize } from '../ActionButton/ActionButton';
 import { ActionModal } from '../actionModal/actionModal';
+import { GridRowBox } from '../boxes/boxes';
 import { CoverageModal } from '../coverageModal/coverageModal';
 import { IosInstallPwaPopup } from '../iosInstallPwaPopup/iosInstallPwaPopup';
 import { LoadingModal } from '../loadingModal/loadingModal';
+import { Modal } from '../modal/modal';
 import { toast } from '../toast/toast';
+import css from './mainViewOnboarding.module.scss';
 
 export interface ConnectAccountFlowProps {
 	onClose: (result: ConnectAccountResult | undefined) => void;
@@ -73,6 +77,61 @@ export const AuthorizeAccountFlow = observer(({ account, password, onClose }: Au
 	return (
 		<>
 			<LoadingModal reason="Authorization ..." />
+		</>
+	);
+});
+
+//
+
+export interface PaymentFlowProps {
+	account: DomainAccount;
+}
+
+export const PaymentFlow = observer(({ account }: PaymentFlowProps) => {
+	return (
+		<>
+			<LoadingModal reason="Loading payment details ..." />
+
+			<Modal className={css.payModal}>
+				<div className={css.payModalTitle}>Save 50% for 12 months</div>
+
+				<div className={css.payModalDescription}>
+					Pick your subscription. Use the special offer to purchase the annual subscription and save 50%. Or
+					start a free 7-day trial period and continue with a monthly subscription. You can cancel the monthly
+					subscription at any time.
+				</div>
+
+				<div className={css.payModalPlans}>
+					<div className={css.payModalPlan}>
+						<div className={css.payModalPlanTitle}>Monthly subscription</div>
+						<div className={css.payModalPrice}>$14/month</div>
+						<div className={clsx(css.payModalSubtle, css.payModalAboveCra)}>Cancel anytime</div>
+						<ActionButton
+							className={css.payModalCra}
+							size={ActionButtonSize.XLARGE}
+							look={ActionButtonLook.PRIMARY}
+						>
+							Start 7-Day Trial
+						</ActionButton>
+					</div>
+
+					<div className={css.payModalPlan}>
+						<div className={css.payModalPlanTitle}>One time payment</div>
+						<GridRowBox>
+							<div className={clsx(css.payModalPrice, css.payModalPrice_old)}>$168</div>
+							<div className={css.payModalBadge}>50% OFF</div>
+						</GridRowBox>
+						<div className={clsx(css.payModalPrice, css.payModalAboveCra)}>$84/year</div>
+						<ActionButton
+							className={css.payModalCra}
+							size={ActionButtonSize.XLARGE}
+							look={ActionButtonLook.HEAVY}
+						>
+							Pay Now
+						</ActionButton>
+					</div>
+				</div>
+			</Modal>
 		</>
 	);
 });
@@ -141,6 +200,7 @@ enum StepType {
 	CONNECT_ACCOUNT = 'CONNECT_ACCOUNT',
 	CONNECT_ACCOUNT_WARNING = 'CONNECT_ACCOUNT_WARNING',
 	AUTHORIZATION = 'AUTHORIZATION',
+	PAYMENT = 'PAYMENT',
 	BUILDING_FEED = 'BUILDING_FEED',
 }
 
@@ -158,12 +218,17 @@ interface AuthorizationStep {
 	password: string;
 }
 
+interface PaymentStep {
+	type: StepType.PAYMENT;
+	account: DomainAccount;
+}
+
 interface BuildingFeedStep {
 	type: StepType.BUILDING_FEED;
 	account: DomainAccount;
 }
 
-type Step = ConnectAccountStep | ConnectAccountWarningStep | AuthorizationStep | BuildingFeedStep;
+type Step = ConnectAccountStep | ConnectAccountWarningStep | AuthorizationStep | PaymentStep | BuildingFeedStep;
 
 export const MainViewOnboarding = observer(() => {
 	const [step, setStep] = useState<Step>();
@@ -192,9 +257,11 @@ export const MainViewOnboarding = observer(() => {
 		if (step) return;
 
 		if (!accounts.length) {
-			setStep({ type: StepType.CONNECT_ACCOUNT });
+			return setStep({ type: StepType.CONNECT_ACCOUNT });
 		}
-	}, [accounts.length, step]);
+
+		setStep({ type: StepType.PAYMENT, account: accounts[0] });
+	}, [accounts, step]);
 
 	return (
 		<>
@@ -239,7 +306,7 @@ export const MainViewOnboarding = observer(() => {
 					password={step.password}
 					onClose={account => {
 						if (account) {
-							setStep({ type: StepType.BUILDING_FEED, account });
+							setStep({ type: StepType.PAYMENT, account });
 						} else {
 							toast('Unexpected error 🤷‍♂️');
 							disconnect(step.account);
@@ -248,6 +315,8 @@ export const MainViewOnboarding = observer(() => {
 					}}
 				/>
 			)}
+
+			{step?.type === StepType.PAYMENT && <PaymentFlow account={step.account} />}
 
 			{step?.type === StepType.BUILDING_FEED && (
 				<BuildFeedFlow
