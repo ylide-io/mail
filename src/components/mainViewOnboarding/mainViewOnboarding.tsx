@@ -240,6 +240,8 @@ enum StepType {
 	CONNECT_ACCOUNT_WARNING = 'CONNECT_ACCOUNT_WARNING',
 	AUTHORIZATION = 'AUTHORIZATION',
 	PAYMENT = 'PAYMENT',
+	PAYMENT_SUCCESS = 'PAYMENT_SUCCESS',
+	PAYMENT_FAILURE = 'PAYMENT_FAILURE',
 	BUILDING_FEED = 'BUILDING_FEED',
 }
 
@@ -262,12 +264,29 @@ interface PaymentStep {
 	account: DomainAccount;
 }
 
+interface PaymentSuccessStep {
+	type: StepType.PAYMENT_SUCCESS;
+	account: DomainAccount;
+}
+
+interface PaymentFailureStep {
+	type: StepType.PAYMENT_FAILURE;
+	account: DomainAccount;
+}
+
 interface BuildingFeedStep {
 	type: StepType.BUILDING_FEED;
 	account: DomainAccount;
 }
 
-type Step = ConnectAccountStep | ConnectAccountWarningStep | AuthorizationStep | PaymentStep | BuildingFeedStep;
+type Step =
+	| ConnectAccountStep
+	| ConnectAccountWarningStep
+	| AuthorizationStep
+	| PaymentStep
+	| PaymentSuccessStep
+	| PaymentFailureStep
+	| BuildingFeedStep;
 
 export const MainViewOnboarding = observer(() => {
 	const [step, setStep] = useState<Step>();
@@ -296,8 +315,10 @@ export const MainViewOnboarding = observer(() => {
 		if (step) return;
 
 		if (!accounts.length) {
-			setStep({ type: StepType.CONNECT_ACCOUNT });
+			return setStep({ type: StepType.CONNECT_ACCOUNT });
 		}
+
+		setStep({ type: StepType.PAYMENT_FAILURE, account: accounts[0] });
 	}, [accounts, step]);
 
 	return (
@@ -354,6 +375,40 @@ export const MainViewOnboarding = observer(() => {
 			)}
 
 			{step?.type === StepType.PAYMENT && <PaymentFlow account={step.account} />}
+
+			{step?.type === StepType.PAYMENT_SUCCESS && (
+				<ActionModal
+					title="Payment Successful"
+					buttons={
+						<ActionButton
+							size={ActionButtonSize.XLARGE}
+							look={ActionButtonLook.PRIMARY}
+							onClick={() => setStep({ type: StepType.BUILDING_FEED, account: step.account })}
+						>
+							Continue
+						</ActionButton>
+					}
+				>
+					Your payment has been successfully processed.
+				</ActionModal>
+			)}
+
+			{step?.type === StepType.PAYMENT_FAILURE && (
+				<ActionModal
+					title="Payment Failed"
+					buttons={
+						<ActionButton
+							size={ActionButtonSize.XLARGE}
+							look={ActionButtonLook.HEAVY}
+							onClick={() => setStep({ type: StepType.PAYMENT, account: step.account })}
+						>
+							Go Back
+						</ActionButton>
+					}
+				>
+					Your payment was not processed.
+				</ActionModal>
+			)}
 
 			{step?.type === StepType.BUILDING_FEED && (
 				<BuildFeedFlow
