@@ -4,6 +4,7 @@ import clsx from 'clsx';
 import { observable } from 'mobx';
 import { observer } from 'mobx-react';
 import { useCallback, useEffect, useState } from 'react';
+import { useQuery } from 'react-query';
 
 import { FeedManagerApi } from '../../api/feedManagerApi';
 import { APP_NAME } from '../../constants';
@@ -88,6 +89,10 @@ export interface PaymentFlowProps {
 }
 
 export const PaymentFlow = observer(({ account }: PaymentFlowProps) => {
+	const paymentInfoQuery = useQuery(['payment', 'info', account.account.address], {
+		queryFn: () => FeedManagerApi.getPaymentInfo({ token: account.mainViewKey }),
+	});
+
 	return (
 		<>
 			<LoadingModal reason="Loading payment details ..." />
