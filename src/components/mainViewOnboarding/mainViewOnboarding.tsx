@@ -141,7 +141,7 @@ export const PaymentFlow = observer(({ account }: PaymentFlowProps) => {
 						</div>
 
 						<div className={css.payModalPlan}>
-							<div className={css.payModalPlanTitle}>One time payment</div>
+							<div className={css.payModalPlanTitle}>Annual Plan</div>
 							<GridRowBox>
 								<div className={clsx(css.payModalPrice, css.payModalPrice_old)}>$168</div>
 								<div className={css.payModalBadge}>50% OFF</div>
