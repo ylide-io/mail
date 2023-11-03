@@ -68,3 +68,16 @@ export async function checkout(account: DomainAccount, type: FeedManagerApi.Paym
 
 	return true;
 }
+
+//
+
+export function getActiveSubscription(paymentInfo?: FeedManagerApi.PaymentInfo) {
+	return paymentInfo?.subscriptions.find(sub => sub.status === FeedManagerApi.PaymentSubscriptionStatus.ACTIVE);
+}
+
+export function getActiveCharge(paymentInfo?: FeedManagerApi.PaymentInfo) {
+	return paymentInfo?.charges.find(
+		charge =>
+			charge.status === FeedManagerApi.PaymentChargeStatus.SUCCEEDED && charge.endOfPeriod > Date.now() / 1000,
+	);
+}

@@ -14,7 +14,13 @@ import { DomainAccount } from '../../stores/models/DomainAccount';
 import { connectAccount, ConnectAccountResult, disconnectAccount } from '../../utils/account';
 import { invariant } from '../../utils/assert';
 import { addressesEqual } from '../../utils/blockchain';
-import { checkout, CheckoutResult, useCheckoutSearchParams } from '../../utils/payments';
+import {
+	checkout,
+	CheckoutResult,
+	getActiveCharge,
+	getActiveSubscription,
+	useCheckoutSearchParams,
+} from '../../utils/payments';
 import { truncateAddress } from '../../utils/string';
 import { useLatest } from '../../utils/useLatest';
 import { ActionButton, ActionButtonLook, ActionButtonSize } from '../ActionButton/ActionButton';
@@ -299,6 +305,26 @@ export const MainViewOnboarding = observer(() => {
 	const accounts = domain.accounts.accounts;
 	const checkoutSearchParams = useCheckoutSearchParams();
 
+	const paymentInfoQuery = useQuery(['payments', 'status', accounts.map(a => a.mainViewKey).join(',')], () =>
+		Promise.all(
+			accounts.map(a =>
+				FeedManagerApi.getPaymentInfo({ token: a.mainViewKey })
+					.then(info => ({
+						address: a.account.address,
+						info: info,
+						activeSubscription: getActiveSubscription(info),
+						activeCharge: getActiveCharge(info),
+					}))
+					.catch(e => {
+						console.error('Failed to load payment info', e);
+
+						// Skip failed requests. Do nothing about it
+						return undefined;
+					}),
+			),
+		),
+	);
+
 	const reset = useCallback(() => {
 		setStep(undefined);
 	}, []);
@@ -343,7 +369,20 @@ export const MainViewOnboarding = observer(() => {
 				return setStep({ type: StepType.PAYMENT_FAILURE, account });
 			}
 		}
-	}, [accounts, checkoutSearchParams, reset, step]);
+
+		const unpaidAccount = accounts.find(a =>
+			paymentInfoQuery.data?.some(
+				info =>
+					info &&
+					addressesEqual(info.address, a.account.address) &&
+					!info.activeSubscription &&
+					!info.activeCharge,
+			),
+		);
+		if (unpaidAccount) {
+			return setStep({ type: StepType.PAYMENT, account: unpaidAccount });
+		}
+	}, [accounts, checkoutSearchParams, paymentInfoQuery.data, reset, step]);
 
 	return (
 		<>

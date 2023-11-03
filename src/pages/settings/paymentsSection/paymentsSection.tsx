@@ -6,6 +6,7 @@ import { ErrorMessage, ErrorMessageLook } from '../../../components/errorMessage
 import { YlideLoader } from '../../../components/ylideLoader/ylideLoader';
 import { DomainAccount } from '../../../stores/models/DomainAccount';
 import { DateFormatStyle, formatDate } from '../../../utils/date';
+import { getActiveCharge, getActiveSubscription } from '../../../utils/payments';
 import css from './paymentsSection.module.scss';
 
 export interface PaymentsSectionProps {
@@ -17,14 +18,8 @@ export const PaymentsSection = observer(({ account }: PaymentsSectionProps) => {
 		queryFn: () => FeedManagerApi.getPaymentInfo({ token: account.mainViewKey }),
 	});
 
-	const activeSubscription = paymentInfoQuery.data?.subscriptions.find(
-		sub => sub.status === FeedManagerApi.PaymentSubscriptionStatus.ACTIVE,
-	);
-
-	const activeCharge = paymentInfoQuery.data?.charges.find(
-		charge =>
-			charge.status === FeedManagerApi.PaymentChargeStatus.SUCCEEDED && charge.endOfPeriod > Date.now() / 1000,
-	);
+	const activeSubscription = getActiveSubscription(paymentInfoQuery.data);
+	const activeCharge = getActiveCharge(paymentInfoQuery.data);
 
 	return (
 		<div className={css.root}>
