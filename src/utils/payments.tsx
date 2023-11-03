@@ -1,13 +1,36 @@
+import { useMemo } from 'react';
+import { useSearchParams } from 'react-router-dom';
+
 import { FeedManagerApi } from '../api/feedManagerApi';
 import { DomainAccount } from '../stores/models/DomainAccount';
 import { invariant } from './assert';
+import { useNav } from './url';
 
+const PAYMENT_ADDRESS_PARAM = 'payment_address';
 const PAYMENT_RESULT_PARAM = 'payment_result';
-const PAYMENT_ACCOUNT_PARAM = 'payment_account';
 
-export enum PaymentResult {
+export enum CheckoutResult {
 	SUCCESS = 'success',
 	CANCEL = 'cancel',
+}
+
+export function useCheckoutSearchParams() {
+	const [searchParams] = useSearchParams();
+	const navigate = useNav();
+
+	return useMemo(
+		() => ({
+			address: searchParams.get(PAYMENT_ADDRESS_PARAM) || '',
+			result: searchParams.get(PAYMENT_RESULT_PARAM) || '',
+			reset: () => {
+				const url = new URL(window.location.href);
+				url.searchParams.delete(PAYMENT_ADDRESS_PARAM);
+				url.searchParams.delete(PAYMENT_RESULT_PARAM);
+				navigate(url.href, { replace: true });
+			},
+		}),
+		[navigate, searchParams],
+	);
 }
 
 function buildUrlWithGetParams(params: Record<string, string>) {
@@ -22,8 +45,8 @@ function buildUrlWithGetParams(params: Record<string, string>) {
 
 function buildReturnUrl(account: DomainAccount, isSuccess: boolean) {
 	return buildUrlWithGetParams({
-		[PAYMENT_ACCOUNT_PARAM]: account.account.address,
-		[PAYMENT_RESULT_PARAM]: isSuccess ? PaymentResult.SUCCESS : PaymentResult.CANCEL,
+		[PAYMENT_ADDRESS_PARAM]: account.account.address,
+		[PAYMENT_RESULT_PARAM]: isSuccess ? CheckoutResult.SUCCESS : CheckoutResult.CANCEL,
 	});
 }
 

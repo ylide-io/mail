@@ -13,7 +13,9 @@ import { feedSettings } from '../../stores/FeedSettings';
 import { DomainAccount } from '../../stores/models/DomainAccount';
 import { connectAccount, ConnectAccountResult, disconnectAccount } from '../../utils/account';
 import { invariant } from '../../utils/assert';
-import { checkout } from '../../utils/payments';
+import { addressesEqual } from '../../utils/blockchain';
+import { checkout, CheckoutResult, useCheckoutSearchParams } from '../../utils/payments';
+import { truncateAddress } from '../../utils/string';
 import { useLatest } from '../../utils/useLatest';
 import { ActionButton, ActionButtonLook, ActionButtonSize } from '../ActionButton/ActionButton';
 import { ActionModal } from '../actionModal/actionModal';
@@ -295,6 +297,7 @@ export const MainViewOnboarding = observer(() => {
 	const [step, setStep] = useState<Step>();
 
 	const accounts = domain.accounts.accounts;
+	const checkoutSearchParams = useCheckoutSearchParams();
 
 	const reset = useCallback(() => {
 		setStep(undefined);
@@ -321,8 +324,26 @@ export const MainViewOnboarding = observer(() => {
 			return setStep({ type: StepType.CONNECT_ACCOUNT });
 		}
 
-		setStep({ type: StepType.PAYMENT, account: accounts[0] });
-	}, [accounts, step]);
+		if (checkoutSearchParams.result) {
+			checkoutSearchParams.reset();
+
+			const account = accounts.find(a => addressesEqual(a.account.address, checkoutSearchParams.address));
+			if (!account) {
+				toast(
+					`Account ${truncateAddress(
+						checkoutSearchParams.address,
+					)} not connected. Please connect it to proceed.`,
+				);
+				return reset();
+			}
+
+			if (checkoutSearchParams.result === CheckoutResult.SUCCESS) {
+				return setStep({ type: StepType.PAYMENT_SUCCESS, account });
+			} else {
+				return setStep({ type: StepType.PAYMENT_FAILURE, account });
+			}
+		}
+	}, [accounts, checkoutSearchParams, reset, step]);
 
 	return (
 		<>
