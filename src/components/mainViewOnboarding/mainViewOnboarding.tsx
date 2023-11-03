@@ -254,6 +254,7 @@ enum StepType {
 	PAYMENT_SUCCESS = 'PAYMENT_SUCCESS',
 	PAYMENT_FAILURE = 'PAYMENT_FAILURE',
 	BUILDING_FEED = 'BUILDING_FEED',
+	FATAL_ERROR = 'FATAL_ERROR',
 }
 
 interface ConnectAccountStep {
@@ -290,6 +291,10 @@ interface BuildingFeedStep {
 	account: DomainAccount;
 }
 
+interface FatalErrorStep {
+	type: StepType.FATAL_ERROR;
+}
+
 type Step =
 	| ConnectAccountStep
 	| ConnectAccountWarningStep
@@ -297,7 +302,8 @@ type Step =
 	| PaymentStep
 	| PaymentSuccessStep
 	| PaymentFailureStep
-	| BuildingFeedStep;
+	| BuildingFeedStep
+	| FatalErrorStep;
 
 export const MainViewOnboarding = observer(() => {
 	const [step, setStep] = useState<Step>();
@@ -328,8 +334,6 @@ export const MainViewOnboarding = observer(() => {
 	const reset = useCallback(() => {
 		setStep(undefined);
 	}, []);
-
-	const disconnect = useCallback((account: DomainAccount) => disconnectAccount({ account }).then(reset), [reset]);
 
 	useEffect(() => {
 		isOnboardingInProgress.set(!!step);
@@ -429,9 +433,7 @@ export const MainViewOnboarding = observer(() => {
 						if (account) {
 							setStep({ type: StepType.PAYMENT, account });
 						} else {
-							toast('Unexpected error 🤷‍♂️');
-							disconnect(step.account);
-							reset();
+							setStep({ type: StepType.FATAL_ERROR });
 						}
 					}}
 				/>
@@ -480,13 +482,29 @@ export const MainViewOnboarding = observer(() => {
 						if (result) {
 							toast(`Welcome to ${APP_NAME} 🔥`);
 						} else {
-							toast('Unexpected error 🤷‍♂️');
-							disconnect(step.account);
+							setStep({ type: StepType.FATAL_ERROR });
 						}
 
 						reset();
 					}}
 				/>
+			)}
+
+			{step?.type === StepType.FATAL_ERROR && (
+				<ActionModal
+					title="Oops!"
+					buttons={
+						<ActionButton
+							size={ActionButtonSize.XLARGE}
+							look={ActionButtonLook.HEAVY}
+							onClick={() => location.reload()}
+						>
+							Reload
+						</ActionButton>
+					}
+				>
+					Unexpected error occured. We really don't know what to do 🤷‍♂️ Please try to reload the page.
+				</ActionModal>
 			)}
 
 			{!step && <IosInstallPwaPopup />}
