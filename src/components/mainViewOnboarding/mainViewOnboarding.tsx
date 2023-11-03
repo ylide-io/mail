@@ -4,7 +4,7 @@ import clsx from 'clsx';
 import { observable } from 'mobx';
 import { observer } from 'mobx-react';
 import { useCallback, useEffect, useState } from 'react';
-import { useQuery } from 'react-query';
+import { useMutation, useQuery } from 'react-query';
 
 import { FeedManagerApi } from '../../api/feedManagerApi';
 import { APP_NAME } from '../../constants';
@@ -13,6 +13,7 @@ import { feedSettings } from '../../stores/FeedSettings';
 import { DomainAccount } from '../../stores/models/DomainAccount';
 import { connectAccount, ConnectAccountResult, disconnectAccount } from '../../utils/account';
 import { invariant } from '../../utils/assert';
+import { checkout } from '../../utils/payments';
 import { useLatest } from '../../utils/useLatest';
 import { ActionButton, ActionButtonLook, ActionButtonSize } from '../ActionButton/ActionButton';
 import { ActionModal } from '../actionModal/actionModal';
@@ -95,6 +96,14 @@ export const PaymentFlow = observer(({ account }: PaymentFlowProps) => {
 		},
 	});
 
+	const checkoutMutation = useMutation({
+		mutationFn: (variables: { type: FeedManagerApi.PaymentType }) => checkout(account, variables.type),
+		onError: e => {
+			console.error(e);
+			toast('Failed to open payments page 😟');
+		},
+	});
+
 	return (
 		<>
 			{paymentInfoQuery.isLoading ? (
@@ -121,23 +130,16 @@ export const PaymentFlow = observer(({ account }: PaymentFlowProps) => {
 							<div className={css.payModalPlanTitle}>Monthly subscription</div>
 							<div className={css.payModalPrice}>$14/month</div>
 							<div className={clsx(css.payModalSubtle, css.payModalAboveCra)}>Cancel anytime</div>
-							{paymentInfoQuery.data.isTrialAvailable ? (
-								<ActionButton
-									className={css.payModalCra}
-									size={ActionButtonSize.XLARGE}
-									look={ActionButtonLook.PRIMARY}
-								>
-									Start 7-Day Trial
-								</ActionButton>
-							) : (
-								<ActionButton
-									className={css.payModalCra}
-									size={ActionButtonSize.XLARGE}
-									look={ActionButtonLook.PRIMARY}
-								>
-									Start Now
-								</ActionButton>
-							)}
+							<ActionButton
+								className={css.payModalCra}
+								size={ActionButtonSize.XLARGE}
+								look={ActionButtonLook.PRIMARY}
+								onClick={() =>
+									checkoutMutation.mutate({ type: FeedManagerApi.PaymentType.SUBSCRIPTION })
+								}
+							>
+								{paymentInfoQuery.data.isTrialAvailable ? 'Start 7-Day Trial' : 'Start Now'}
+							</ActionButton>
 						</div>
 
 						<div className={css.payModalPlan}>
@@ -151,6 +153,7 @@ export const PaymentFlow = observer(({ account }: PaymentFlowProps) => {
 								className={css.payModalCra}
 								size={ActionButtonSize.XLARGE}
 								look={ActionButtonLook.HEAVY}
+								onClick={() => checkoutMutation.mutate({ type: FeedManagerApi.PaymentType.PAYMENT })}
 							>
 								Pay Now
 							</ActionButton>
@@ -318,7 +321,7 @@ export const MainViewOnboarding = observer(() => {
 			return setStep({ type: StepType.CONNECT_ACCOUNT });
 		}
 
-		setStep({ type: StepType.PAYMENT_FAILURE, account: accounts[0] });
+		setStep({ type: StepType.PAYMENT, account: accounts[0] });
 	}, [accounts, step]);
 
 	return (
