@@ -315,6 +315,7 @@ type Step =
 
 export const MainViewOnboarding = observer(() => {
 	const [step, setStep] = useState<Step>();
+	isOnboardingInProgress.set(!!step);
 
 	const accounts = domain.accounts.accounts;
 	const checkoutSearchParams = useCheckoutSearchParams();
@@ -343,10 +344,6 @@ export const MainViewOnboarding = observer(() => {
 		setStep(undefined);
 	}, []);
 
-	useEffect(() => {
-		isOnboardingInProgress.set(!!step);
-	}, [step]);
-
 	// Disconnect inactive accounts before begin
 	useEffect(() => {
 		domain.accounts.accounts
@@ -354,6 +351,7 @@ export const MainViewOnboarding = observer(() => {
 			.forEach(a => disconnectAccount({ account: a }));
 	}, []);
 
+	// Launch onboarding
 	useEffect(() => {
 		// Do nothing if something is happening already
 		if (step) return;
