@@ -91,10 +91,11 @@ export const AuthorizeAccountFlow = observer(({ account, password, onClose }: Au
 
 export interface PaymentFlowProps {
 	account: DomainAccount;
+	onCancel: () => void;
 }
 
-export const PaymentFlow = observer(({ account }: PaymentFlowProps) => {
-	const paymentInfoQuery = useQuery(['payment', 'info', account.account.address], {
+export const PaymentFlow = observer(({ account, onCancel }: PaymentFlowProps) => {
+	const paymentInfoQuery = useQuery(['payment', 'info', account.mainViewKey], {
 		queryFn: async () => {
 			const data = await FeedManagerApi.getPaymentInfo({ token: account.mainViewKey });
 			return {
@@ -175,6 +176,15 @@ export const PaymentFlow = observer(({ account }: PaymentFlowProps) => {
 							</ActionButton>
 						</div>
 					</div>
+
+					<ActionButton
+						className={css.payModalDisconnectButton}
+						size={ActionButtonSize.MEDIUM}
+						look={ActionButtonLook.LITE}
+						onClick={onCancel}
+					>
+						Use another account
+					</ActionButton>
 				</Modal>
 			) : (
 				<ActionModal
@@ -445,7 +455,15 @@ export const MainViewOnboarding = observer(() => {
 				/>
 			)}
 
-			{step?.type === StepType.PAYMENT && <PaymentFlow account={step.account} />}
+			{step?.type === StepType.PAYMENT && (
+				<PaymentFlow
+					account={step.account}
+					onCancel={() => {
+						disconnectAccount({ account: step.account, place: 'mv-onboarding_payments' });
+						reset();
+					}}
+				/>
+			)}
 
 			{step?.type === StepType.PAYMENT_SUCCESS && (
 				<ActionModal

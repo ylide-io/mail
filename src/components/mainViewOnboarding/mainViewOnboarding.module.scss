@@ -1,9 +1,11 @@
 .payModal {
+	display: flex;
+	flex-direction: column;
 	padding: 32px;
 	width: 520px;
 
 	> :not(:last-child) {
-		margin: 0 0 24px;
+		margin: 0 0 20px;
 	}
 
 	@include less480px {
@@ -83,4 +85,10 @@
 .payModalCra {
 	align-self: stretch;
 	margin: auto 0 0;
+}
+
+.payModalDisconnectButton {
+	align-self: center;
+	margin-bottom: -8px;
+	opacity: .8;
 }
