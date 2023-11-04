@@ -140,6 +140,10 @@ export const PaymentFlow = observer(({ account }: PaymentFlowProps) => {
 							<div className={clsx(css.payModalSubtle, css.payModalAboveCra)}>Cancel anytime</div>
 							<ActionButton
 								className={css.payModalCra}
+								isLoading={
+									checkoutMutation.isLoading &&
+									checkoutMutation.variables?.type === FeedManagerApi.PaymentType.SUBSCRIPTION
+								}
 								size={ActionButtonSize.XLARGE}
 								look={ActionButtonLook.PRIMARY}
 								onClick={() =>
@@ -159,6 +163,10 @@ export const PaymentFlow = observer(({ account }: PaymentFlowProps) => {
 							<div className={clsx(css.payModalPrice, css.payModalAboveCra)}>$84/year</div>
 							<ActionButton
 								className={css.payModalCra}
+								isLoading={
+									checkoutMutation.isLoading &&
+									checkoutMutation.variables?.type === FeedManagerApi.PaymentType.PAYMENT
+								}
 								size={ActionButtonSize.XLARGE}
 								look={ActionButtonLook.HEAVY}
 								onClick={() => checkoutMutation.mutate({ type: FeedManagerApi.PaymentType.PAYMENT })}

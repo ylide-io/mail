@@ -66,7 +66,8 @@ export async function checkout(account: DomainAccount, type: FeedManagerApi.Paym
 
 	location.href = checkoutUrl;
 
-	return true;
+	// Don't resolve this function since we're going another URL
+	return new Promise(() => {});
 }
 
 //
