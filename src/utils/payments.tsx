@@ -73,7 +73,11 @@ export async function checkout(account: DomainAccount, type: FeedManagerApi.Paym
 //
 
 export function getActiveSubscription(paymentInfo?: FeedManagerApi.PaymentInfo) {
-	return paymentInfo?.subscriptions.find(sub => sub.status === FeedManagerApi.PaymentSubscriptionStatus.ACTIVE);
+	return paymentInfo?.subscriptions.find(
+		sub =>
+			sub.status === FeedManagerApi.PaymentSubscriptionStatus.ACTIVE ||
+			sub.status === FeedManagerApi.PaymentSubscriptionStatus.WAITING,
+	);
 }
 
 export function getActiveCharge(paymentInfo?: FeedManagerApi.PaymentInfo) {
