@@ -63,7 +63,13 @@ export const AccountsPopup = observer(({ anchorRef, onClose }: AccountsPopupProp
 									/>
 								</div>
 							) : (
-								<div className={css.itemInactiveBadge} onClick={() => activateAccount({ account })}>
+								<div
+									className={css.itemInactiveBadge}
+									onClick={() => {
+										onClose();
+										activateAccount({ account });
+									}}
+								>
 									INACTIVE
 								</div>
 							)}
@@ -83,7 +89,7 @@ export const AccountsPopup = observer(({ anchorRef, onClose }: AccountsPopupProp
 							onClick={async () => {
 								await disconnectAccount({ account, place: 'accounts-popup' });
 
-								if (!accounts.length) {
+								if (!accounts.some(a => a !== account)) {
 									onClose();
 								}
 							}}
