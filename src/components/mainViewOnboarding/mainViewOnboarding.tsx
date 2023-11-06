@@ -8,10 +8,11 @@ import { useMutation, useQuery } from 'react-query';
 
 import { FeedManagerApi } from '../../api/feedManagerApi';
 import { APP_NAME } from '../../constants';
+import { ENV_TYPE, EnvType } from '../../env';
 import domain from '../../stores/Domain';
 import { feedSettings } from '../../stores/FeedSettings';
 import { DomainAccount } from '../../stores/models/DomainAccount';
-import { connectAccount, ConnectAccountResult, disconnectAccount } from '../../utils/account';
+import { connectAccount, ConnectAccountResult, disconnectAccount, formatAccountName } from '../../utils/account';
 import { invariant } from '../../utils/assert';
 import { addressesEqual } from '../../utils/blockchain';
 import {
@@ -183,7 +184,9 @@ export const PaymentFlow = observer(({ account, onCancel }: PaymentFlowProps) =>
 						look={ActionButtonLook.LITE}
 						onClick={onCancel}
 					>
-						Use another account
+						{`Use another account${
+							ENV_TYPE !== EnvType.PRODUCTION ? ` | ${formatAccountName(account)}` : ''
+						}`}
 					</ActionButton>
 				</Modal>
 			) : (
