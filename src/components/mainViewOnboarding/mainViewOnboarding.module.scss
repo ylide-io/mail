@@ -5,7 +5,7 @@
 	width: 520px;
 
 	> :not(:last-child) {
-		margin: 0 0 20px;
+		margin: 0 0 12px;
 	}
 
 	@include less480px {
@@ -34,6 +34,7 @@
 
 	@include lessThan480w {
 		grid-template-columns: 1fr;
+		grid-gap: 12px;
 	}
 }
 
@@ -55,6 +56,11 @@
 	font-size: 24px;
 	font-weight: $font-weight_bold;
 	text-align: center;
+
+	@include lessThan480w {
+		margin: 0 0 12px !important;
+		font-size: 20px;
+	}
 }
 
 .payModalPrice {
@@ -80,6 +86,10 @@
 
 .payModalAboveCra {
 	margin: 0 0 24px !important;
+
+	@include lessThan480w {
+		margin: 0 0 12px !important;
+	}
 }
 
 .payModalCra {
