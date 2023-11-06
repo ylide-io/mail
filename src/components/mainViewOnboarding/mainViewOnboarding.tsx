@@ -380,6 +380,11 @@ export const MainViewOnboarding = observer(() => {
 			return setStep({ type: StepType.CONNECT_ACCOUNT });
 		}
 
+		const unauthAccount = accounts.find(a => !a.mainViewKey);
+		if (unauthAccount) {
+			setStep({ type: StepType.AUTHORIZATION, account: unauthAccount, password: '' });
+		}
+
 		if (checkoutSearchParams.result) {
 			checkoutSearchParams.reset();
 
