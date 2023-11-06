@@ -91,16 +91,18 @@ export const AuthorizeAccountFlow = observer(({ account, password, onClose }: Au
 
 export interface PaymentFlowProps {
 	account: DomainAccount;
+	onPaid: () => void;
 	onCancel: () => void;
 }
 
-export const PaymentFlow = observer(({ account, onCancel }: PaymentFlowProps) => {
-	const paymentInfoQuery = useQuery(['payment', 'info', account.mainViewKey], {
+export const PaymentFlow = observer(({ account, onPaid, onCancel }: PaymentFlowProps) => {
+	const paymentInfoQuery = useQuery(['payments', 'info', account.mainViewKey], {
 		queryFn: async () => {
 			const data = await FeedManagerApi.getPaymentInfo({ token: account.mainViewKey });
 			return {
 				...data,
 				isTrialAvailable: !data.subscriptions.length && !data.charges.length,
+				isPaid: !!getActiveSubscription(data) || !!getActiveCharge(data),
 			};
 		},
 	});
@@ -113,9 +115,15 @@ export const PaymentFlow = observer(({ account, onCancel }: PaymentFlowProps) =>
 		},
 	});
 
+	useEffect(() => {
+		if (paymentInfoQuery.data?.isPaid) {
+			onPaid();
+		}
+	}, [onPaid, paymentInfoQuery.data?.isPaid]);
+
 	return (
 		<>
-			{paymentInfoQuery.isLoading ? (
+			{paymentInfoQuery.isLoading || paymentInfoQuery.data?.isPaid ? (
 				<LoadingModal reason="Loading payment details ..." />
 			) : paymentInfoQuery.data ? (
 				<Modal className={css.payModal}>
@@ -330,7 +338,7 @@ export const MainViewOnboarding = observer(() => {
 	const accounts = domain.accounts.accounts;
 	const checkoutSearchParams = useCheckoutSearchParams();
 
-	const paymentInfoQuery = useQuery(['payments', 'status', accounts.map(a => a.mainViewKey).join(',')], () =>
+	const paymentInfoQuery = useQuery(['payments', 'info', accounts.map(a => a.mainViewKey).join(',')], () =>
 		Promise.all(
 			accounts.map(a =>
 				FeedManagerApi.getPaymentInfo({ token: a.mainViewKey })
@@ -458,6 +466,7 @@ export const MainViewOnboarding = observer(() => {
 			{step?.type === StepType.PAYMENT && (
 				<PaymentFlow
 					account={step.account}
+					onPaid={() => setStep({ type: StepType.BUILDING_FEED, account: step.account })}
 					onCancel={() => {
 						disconnectAccount({ account: step.account, place: 'mv-onboarding_payments' });
 						reset();
