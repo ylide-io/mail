@@ -132,10 +132,11 @@ const FeedPageContent = observer(() => {
 		};
 	}, [mvAccounts, onboarding]);
 
-	// We can NOT load smart feed if no suitable account connected
 	const canLoadFeed =
-		!!tag ||
-		(!!mvAccounts.length && (REACT_APP__APP_MODE !== AppMode.MAIN_VIEW || mvAccounts.length === accounts.length));
+		!onboarding &&
+		(!!tag ||
+			(!!mvAccounts.length &&
+				(REACT_APP__APP_MODE !== AppMode.MAIN_VIEW || mvAccounts.length === accounts.length)));
 
 	const reloadCounter = reloadFeedCounter.get();
 
