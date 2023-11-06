@@ -1,7 +1,7 @@
 import * as Sentry from '@sentry/react';
 
 import packageJson from '../../package.json';
-import { AppMode, REACT_APP__APP_MODE, REACT_APP__CIRCLE_SHA1 } from '../env';
+import { AppMode, ENV_TYPE, EnvType, REACT_APP__APP_MODE, REACT_APP__CIRCLE_SHA1 } from '../env';
 
 Sentry.setTag('CIRCLE_SHA1', REACT_APP__CIRCLE_SHA1);
 
@@ -13,22 +13,13 @@ export function initSentry() {
 		[AppMode.OTC]: '',
 	}[REACT_APP__APP_MODE];
 
-	if (!dsn) return;
-
-	const hostname = document.location.hostname;
-	const environment = ['hub.ylide.io', 'app.mainview.io'].includes(hostname)
-		? 'production'
-		: ['staging.ylide.io', 'staging.mainview.io'].includes(hostname)
-		? 'staging'
-		: 'local';
-
-	if (environment === 'local') return;
+	if (!dsn || ENV_TYPE === EnvType.LOCAL) return;
 
 	Sentry.init({
 		dsn,
 		integrations: [new Sentry.BrowserTracing()],
 		release: packageJson.version,
-		environment,
+		environment: ENV_TYPE,
 
 		// Set tracesSampleRate to 1.0 to capture 100%
 		// of transactions for performance monitoring.

@@ -19,6 +19,18 @@ export const NODE_ENV = env('NODE_ENV');
 export const REACT_APP__PUBLIC_URL = env('REACT_APP__PUBLIC_URL');
 export const REACT_APP__CIRCLE_SHA1 = env('REACT_APP__CIRCLE_SHA1', { optional: true });
 
+export enum EnvType {
+	PRODUCTION = 'production',
+	STAGING = 'staging',
+	LOCAL = 'local',
+}
+
+export const ENV_TYPE = ['hub.ylide.io', 'app.mainview.io'].includes(REACT_APP__PUBLIC_URL)
+	? EnvType.PRODUCTION
+	: ['staging.ylide.io', 'staging.mainview.io'].includes(REACT_APP__PUBLIC_URL)
+	? EnvType.STAGING
+	: EnvType.LOCAL;
+
 export enum AppMode {
 	HUB = 'HUB',
 	OTC = 'OTC',
