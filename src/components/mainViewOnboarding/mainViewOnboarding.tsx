@@ -96,7 +96,7 @@ export interface PaymentFlowProps {
 }
 
 export const PaymentFlow = observer(({ account, onPaid, onCancel }: PaymentFlowProps) => {
-	const paymentInfoQuery = useQuery(['payments', 'info', account.mainViewKey], {
+	const paymentInfoQuery = useQuery(['payments', 'info', 'account', account.mainViewKey], {
 		queryFn: async () => {
 			const data = await FeedManagerApi.getPaymentInfo({ token: account.mainViewKey });
 			return {
@@ -338,24 +338,26 @@ export const MainViewOnboarding = observer(() => {
 	const accounts = domain.accounts.accounts;
 	const checkoutSearchParams = useCheckoutSearchParams();
 
-	const paymentInfoQuery = useQuery(['payments', 'info', accounts.map(a => a.mainViewKey).join(',')], () =>
-		Promise.all(
-			accounts.map(a =>
-				FeedManagerApi.getPaymentInfo({ token: a.mainViewKey })
-					.then(info => ({
-						address: a.account.address,
-						info: info,
-						activeSubscription: getActiveSubscription(info),
-						activeCharge: getActiveCharge(info),
-					}))
-					.catch(e => {
-						console.error('Failed to load payment info', e);
+	const paymentInfoQuery = useQuery(
+		['payments', 'info', 'all-accounts', accounts.map(a => a.mainViewKey).join(',')],
+		() =>
+			Promise.all(
+				accounts.map(a =>
+					FeedManagerApi.getPaymentInfo({ token: a.mainViewKey })
+						.then(info => ({
+							address: a.account.address,
+							info: info,
+							activeSubscription: getActiveSubscription(info),
+							activeCharge: getActiveCharge(info),
+						}))
+						.catch(e => {
+							console.error('Failed to load payment info', e);
 
-						// Skip failed requests. Do nothing about it
-						return undefined;
-					}),
+							// Skip failed requests. Do nothing about it
+							return undefined;
+						}),
+				),
 			),
-		),
 	);
 
 	const reset = useCallback(() => {
