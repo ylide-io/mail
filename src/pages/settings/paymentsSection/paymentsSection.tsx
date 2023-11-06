@@ -30,17 +30,19 @@ export const PaymentsSection = observer(({ account }: PaymentsSectionProps) => {
 
 						<div className={css.detailsRow}>
 							<div>Start date</div>
-							<div>{formatDate(Date.now(), DateFormatStyle.LONG)}</div>
+							<div>{formatDate(activeSubscription.created * 1000, DateFormatStyle.LONG)}</div>
 						</div>
 
 						<div className={css.detailsRow}>
 							<div>Next charge</div>
-							<div>{formatDate(Date.now(), DateFormatStyle.LONG)}</div>
+							<div>{formatDate(activeSubscription.next_charge * 1000, DateFormatStyle.LONG)}</div>
 						</div>
 
 						<div className={css.detailsRow}>
 							<div>Amount</div>
-							<div>14 USDT</div>
+							<div>
+								{activeSubscription.amount} {activeSubscription.token}
+							</div>
 						</div>
 					</div>
 				) : activeCharge ? (
@@ -49,17 +51,19 @@ export const PaymentsSection = observer(({ account }: PaymentsSectionProps) => {
 
 						<div className={css.detailsRow}>
 							<div>Start date</div>
-							<div>{formatDate(Date.now(), DateFormatStyle.LONG)}</div>
+							<div>{formatDate(activeCharge.created * 1000, DateFormatStyle.LONG)}</div>
 						</div>
 
 						<div className={css.detailsRow}>
 							<div>End date</div>
-							<div>{formatDate(Date.now(), DateFormatStyle.LONG)}</div>
+							<div>{formatDate(activeCharge.endOfPeriod * 1000, DateFormatStyle.LONG)}</div>
 						</div>
 
 						<div className={css.detailsRow}>
 							<div>Amount</div>
-							<div>84 USDT</div>
+							<div>
+								{activeCharge.amount} {activeCharge.token}
+							</div>
 						</div>
 					</div>
 				) : (
