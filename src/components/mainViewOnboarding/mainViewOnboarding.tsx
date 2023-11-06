@@ -8,7 +8,6 @@ import { useMutation, useQuery } from 'react-query';
 
 import { FeedManagerApi } from '../../api/feedManagerApi';
 import { APP_NAME } from '../../constants';
-import { ENV_TYPE, EnvType } from '../../env';
 import domain from '../../stores/Domain';
 import { feedSettings } from '../../stores/FeedSettings';
 import { DomainAccount } from '../../stores/models/DomainAccount';
@@ -184,9 +183,7 @@ export const PaymentFlow = observer(({ account, onCancel }: PaymentFlowProps) =>
 						look={ActionButtonLook.LITE}
 						onClick={onCancel}
 					>
-						{`Use another account${
-							ENV_TYPE !== EnvType.PRODUCTION ? ` | ${formatAccountName(account)}` : ''
-						}`}
+						Use another account · {formatAccountName(account)}
 					</ActionButton>
 				</Modal>
 			) : (
