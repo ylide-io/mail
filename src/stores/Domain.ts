@@ -399,6 +399,7 @@ export class Domain {
 			await (domain.walletControllers.evm.walletconnect as any).signer.provider.provider.disconnect();
 			// TODO: pizdec
 			document.location.reload();
+			return new Promise(() => {});
 		}
 	}
 
