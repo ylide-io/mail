@@ -40,6 +40,10 @@ export function formatAddress(address: string) {
 	);
 }
 
+export function addressesEqual(a: string, b: string) {
+	return formatAddress(a) === formatAddress(b);
+}
+
 //
 
 export const BlockchainName = {

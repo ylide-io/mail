@@ -1,0 +1,30 @@
+.loader {
+    margin: 40px 0;
+}
+
+.details {
+    padding: 20px;
+    background: var(--surface-color);
+    border: 1px solid var(--border-color);
+    border-radius: 16px;
+
+    > :last-child {
+        margin: 0;
+    }
+}
+
+.detailsTitle {
+    margin: 0 0 12px;
+    font-size: 20px;
+}
+
+.detailsRow {
+    display: grid;
+    grid-template-columns: 25% 1fr;
+    grid-gap: 8px;
+    margin: 0 0 8px;
+
+    > :last-child {
+        font-weight: $font-weight_bold;
+    }
+}

@@ -1,8 +1,10 @@
 import { TVMWalletController } from '@ylide/everscale';
 import { asyncDelay } from '@ylide/sdk';
+import clsx from 'clsx';
 import { observable } from 'mobx';
 import { observer } from 'mobx-react';
 import { useCallback, useEffect, useState } from 'react';
+import { useMutation, useQuery } from 'react-query';
 
 import { FeedManagerApi } from '../../api/feedManagerApi';
 import { APP_NAME } from '../../constants';
@@ -11,13 +13,25 @@ import { feedSettings } from '../../stores/FeedSettings';
 import { DomainAccount } from '../../stores/models/DomainAccount';
 import { connectAccount, ConnectAccountResult, disconnectAccount } from '../../utils/account';
 import { invariant } from '../../utils/assert';
+import { addressesEqual } from '../../utils/blockchain';
+import {
+	checkout,
+	CheckoutResult,
+	getActiveCharge,
+	getActiveSubscription,
+	useCheckoutSearchParams,
+} from '../../utils/payments';
+import { truncateAddress } from '../../utils/string';
 import { useLatest } from '../../utils/useLatest';
 import { ActionButton, ActionButtonLook, ActionButtonSize } from '../ActionButton/ActionButton';
 import { ActionModal } from '../actionModal/actionModal';
+import { GridRowBox } from '../boxes/boxes';
 import { CoverageModal } from '../coverageModal/coverageModal';
 import { IosInstallPwaPopup } from '../iosInstallPwaPopup/iosInstallPwaPopup';
 import { LoadingModal } from '../loadingModal/loadingModal';
+import { Modal } from '../modal/modal';
 import { toast } from '../toast/toast';
+import css from './mainViewOnboarding.module.scss';
 
 export interface ConnectAccountFlowProps {
 	onClose: (result: ConnectAccountResult | undefined) => void;
@@ -70,9 +84,122 @@ export const AuthorizeAccountFlow = observer(({ account, password, onClose }: Au
 		})();
 	}, [account, onCloseRef, password]);
 
+	return <LoadingModal reason="Authorization ..." />;
+});
+
+//
+
+export interface PaymentFlowProps {
+	account: DomainAccount;
+	onCancel: () => void;
+}
+
+export const PaymentFlow = observer(({ account, onCancel }: PaymentFlowProps) => {
+	const paymentInfoQuery = useQuery(['payment', 'info', account.mainViewKey], {
+		queryFn: async () => {
+			const data = await FeedManagerApi.getPaymentInfo({ token: account.mainViewKey });
+			return {
+				...data,
+				isTrialAvailable: !data.subscriptions.length && !data.charges.length,
+			};
+		},
+	});
+
+	const checkoutMutation = useMutation({
+		mutationFn: (variables: { type: FeedManagerApi.PaymentType }) => checkout(account, variables.type),
+		onError: e => {
+			console.error(e);
+			toast('Failed to open payments page 😟');
+		},
+	});
+
 	return (
 		<>
-			<LoadingModal reason="Authorization ..." />
+			{paymentInfoQuery.isLoading ? (
+				<LoadingModal reason="Loading payment details ..." />
+			) : paymentInfoQuery.data ? (
+				<Modal className={css.payModal}>
+					<div className={css.payModalTitle}>Save 50% for 12 months</div>
+
+					{paymentInfoQuery.data.isTrialAvailable ? (
+						<div className={css.payModalDescription}>
+							Pick your subscription. Use the special offer to purchase the annual subscription and save
+							50%. Or start a free 7-day trial period and continue with a monthly subscription. You can
+							cancel the monthly subscription at any time.
+						</div>
+					) : (
+						<div className={css.payModalDescription}>
+							Pick your subscription. Use the special offer to purchase the annual subscription and save
+							50%. Or start a monthly subscription. You can cancel the monthly subscription at any time.
+						</div>
+					)}
+
+					<div className={css.payModalPlans}>
+						<div className={css.payModalPlan}>
+							<div className={css.payModalPlanTitle}>Monthly subscription</div>
+							<div className={css.payModalPrice}>$14/month</div>
+							<div className={clsx(css.payModalSubtle, css.payModalAboveCra)}>Cancel anytime</div>
+							<ActionButton
+								className={css.payModalCra}
+								isLoading={
+									checkoutMutation.isLoading &&
+									checkoutMutation.variables?.type === FeedManagerApi.PaymentType.SUBSCRIPTION
+								}
+								size={ActionButtonSize.XLARGE}
+								look={ActionButtonLook.PRIMARY}
+								onClick={() =>
+									checkoutMutation.mutate({ type: FeedManagerApi.PaymentType.SUBSCRIPTION })
+								}
+							>
+								{paymentInfoQuery.data.isTrialAvailable ? 'Start 7-Day Trial' : 'Start Now'}
+							</ActionButton>
+						</div>
+
+						<div className={css.payModalPlan}>
+							<div className={css.payModalPlanTitle}>Annual Plan</div>
+							<GridRowBox>
+								<div className={clsx(css.payModalPrice, css.payModalPrice_old)}>$168</div>
+								<div className={css.payModalBadge}>50% OFF</div>
+							</GridRowBox>
+							<div className={clsx(css.payModalPrice, css.payModalAboveCra)}>$84/year</div>
+							<ActionButton
+								className={css.payModalCra}
+								isLoading={
+									checkoutMutation.isLoading &&
+									checkoutMutation.variables?.type === FeedManagerApi.PaymentType.PAYMENT
+								}
+								size={ActionButtonSize.XLARGE}
+								look={ActionButtonLook.HEAVY}
+								onClick={() => checkoutMutation.mutate({ type: FeedManagerApi.PaymentType.PAYMENT })}
+							>
+								Pay Now
+							</ActionButton>
+						</div>
+					</div>
+
+					<ActionButton
+						className={css.payModalDisconnectButton}
+						size={ActionButtonSize.MEDIUM}
+						look={ActionButtonLook.LITE}
+						onClick={onCancel}
+					>
+						Use another account
+					</ActionButton>
+				</Modal>
+			) : (
+				<ActionModal
+					title="Failed to fetch payment details 😟"
+					buttons={
+						<ActionButton
+							size={ActionButtonSize.LARGE}
+							look={ActionButtonLook.HEAVY}
+							onClick={() => paymentInfoQuery.refetch()}
+						>
+							Try Again
+						</ActionButton>
+					}
+				/>
+			)}
 		</>
 	);
 });
@@ -141,7 +268,11 @@ enum StepType {
 	CONNECT_ACCOUNT = 'CONNECT_ACCOUNT',
 	CONNECT_ACCOUNT_WARNING = 'CONNECT_ACCOUNT_WARNING',
 	AUTHORIZATION = 'AUTHORIZATION',
+	PAYMENT = 'PAYMENT',
+	PAYMENT_SUCCESS = 'PAYMENT_SUCCESS',
+	PAYMENT_FAILURE = 'PAYMENT_FAILURE',
 	BUILDING_FEED = 'BUILDING_FEED',
+	FATAL_ERROR = 'FATAL_ERROR',
 }
 
 interface ConnectAccountStep {
@@ -158,27 +289,70 @@ interface AuthorizationStep {
 	password: string;
 }
 
+interface PaymentStep {
+	type: StepType.PAYMENT;
+	account: DomainAccount;
+}
+
+interface PaymentSuccessStep {
+	type: StepType.PAYMENT_SUCCESS;
+	account: DomainAccount;
+}
+
+interface PaymentFailureStep {
+	type: StepType.PAYMENT_FAILURE;
+	account: DomainAccount;
+}
+
 interface BuildingFeedStep {
 	type: StepType.BUILDING_FEED;
 	account: DomainAccount;
 }
 
-type Step = ConnectAccountStep | ConnectAccountWarningStep | AuthorizationStep | BuildingFeedStep;
+interface FatalErrorStep {
+	type: StepType.FATAL_ERROR;
+}
+
+type Step =
+	| ConnectAccountStep
+	| ConnectAccountWarningStep
+	| AuthorizationStep
+	| PaymentStep
+	| PaymentSuccessStep
+	| PaymentFailureStep
+	| BuildingFeedStep
+	| FatalErrorStep;
 
 export const MainViewOnboarding = observer(() => {
 	const [step, setStep] = useState<Step>();
+	isOnboardingInProgress.set(!!step);
 
 	const accounts = domain.accounts.accounts;
+	const checkoutSearchParams = useCheckoutSearchParams();
+
+	const paymentInfoQuery = useQuery(['payments', 'status', accounts.map(a => a.mainViewKey).join(',')], () =>
+		Promise.all(
+			accounts.map(a =>
+				FeedManagerApi.getPaymentInfo({ token: a.mainViewKey })
+					.then(info => ({
+						address: a.account.address,
+						info: info,
+						activeSubscription: getActiveSubscription(info),
+						activeCharge: getActiveCharge(info),
+					}))
+					.catch(e => {
+						console.error('Failed to load payment info', e);
+
+						// Skip failed requests. Do nothing about it
+						return undefined;
+					}),
+			),
+		),
+	);
 
 	const reset = useCallback(() => {
 		setStep(undefined);
 	}, []);
-
-	const disconnect = useCallback((account: DomainAccount) => disconnectAccount({ account }).then(reset), [reset]);
-
-	useEffect(() => {
-		isOnboardingInProgress.set(!!step);
-	}, [step]);
 
 	// Disconnect inactive accounts before begin
 	useEffect(() => {
@@ -187,14 +361,48 @@ export const MainViewOnboarding = observer(() => {
 			.forEach(a => disconnectAccount({ account: a }));
 	}, []);
 
+	// Launch onboarding
 	useEffect(() => {
 		// Do nothing if something is happening already
 		if (step) return;
 
 		if (!accounts.length) {
-			setStep({ type: StepType.CONNECT_ACCOUNT });
+			return setStep({ type: StepType.CONNECT_ACCOUNT });
 		}
-	}, [accounts.length, step]);
+
+		if (checkoutSearchParams.result) {
+			checkoutSearchParams.reset();
+
+			const account = accounts.find(a => addressesEqual(a.account.address, checkoutSearchParams.address));
+			if (!account) {
+				toast(
+					`Account ${truncateAddress(
+						checkoutSearchParams.address,
+					)} not connected. Please connect it to proceed.`,
+				);
+				return reset();
+			}
+
+			if (checkoutSearchParams.result === CheckoutResult.SUCCESS) {
+				return setStep({ type: StepType.PAYMENT_SUCCESS, account });
+			} else {
+				return setStep({ type: StepType.PAYMENT_FAILURE, account });
+			}
+		}
+
+		const unpaidAccount = accounts.find(a =>
+			paymentInfoQuery.data?.some(
+				info =>
+					info &&
+					addressesEqual(info.address, a.account.address) &&
+					!info.activeSubscription &&
+					!info.activeCharge,
+			),
+		);
+		if (unpaidAccount) {
+			return setStep({ type: StepType.PAYMENT, account: unpaidAccount });
+		}
+	}, [accounts, checkoutSearchParams, paymentInfoQuery.data, reset, step]);
 
 	return (
 		<>
@@ -239,14 +447,56 @@ export const MainViewOnboarding = observer(() => {
 					password={step.password}
 					onClose={account => {
 						if (account) {
-							setStep({ type: StepType.BUILDING_FEED, account });
+							setStep({ type: StepType.PAYMENT, account });
 						} else {
-							toast('Unexpected error 🤷‍♂️');
-							disconnect(step.account);
-							reset();
+							setStep({ type: StepType.FATAL_ERROR });
 						}
 					}}
 				/>
+			)}
+
+			{step?.type === StepType.PAYMENT && (
+				<PaymentFlow
+					account={step.account}
+					onCancel={() => {
+						disconnectAccount({ account: step.account, place: 'mv-onboarding_payments' });
+						reset();
+					}}
+				/>
+			)}
+
+			{step?.type === StepType.PAYMENT_SUCCESS && (
+				<ActionModal
+					title="Payment Successful"
+					buttons={
+						<ActionButton
+							size={ActionButtonSize.XLARGE}
+							look={ActionButtonLook.PRIMARY}
+							onClick={() => setStep({ type: StepType.BUILDING_FEED, account: step.account })}
+						>
+							Continue
+						</ActionButton>
+					}
+				>
+					Your payment has been successfully processed.
+				</ActionModal>
+			)}
+
+			{step?.type === StepType.PAYMENT_FAILURE && (
+				<ActionModal
+					title="Payment Failed"
+					buttons={
+						<ActionButton
+							size={ActionButtonSize.XLARGE}
+							look={ActionButtonLook.HEAVY}
+							onClick={() => setStep({ type: StepType.PAYMENT, account: step.account })}
+						>
+							Go Back
+						</ActionButton>
+					}
+				>
+					Your payment was not processed.
+				</ActionModal>
 			)}
 
 			{step?.type === StepType.BUILDING_FEED && (
@@ -256,13 +506,29 @@ export const MainViewOnboarding = observer(() => {
 						if (result) {
 							toast(`Welcome to ${APP_NAME} 🔥`);
 						} else {
-							toast('Unexpected error 🤷‍♂️');
-							disconnect(step.account);
+							setStep({ type: StepType.FATAL_ERROR });
 						}
 
 						reset();
 					}}
 				/>
+			)}
+
+			{step?.type === StepType.FATAL_ERROR && (
+				<ActionModal
+					title="Oops!"
+					buttons={
+						<ActionButton
+							size={ActionButtonSize.XLARGE}
+							look={ActionButtonLook.HEAVY}
+							onClick={() => location.reload()}
+						>
+							Reload
+						</ActionButton>
+					}
+				>
+					Unexpected error occured. We really don't know what to do 🤷‍♂️ Please try to reload the page.
+				</ActionModal>
 			)}
 
 			{!step && <IosInstallPwaPopup />}

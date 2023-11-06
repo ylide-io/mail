@@ -1,5 +1,3 @@
-$hPadding: 20px;
-
 .root {
     flex-grow: 1;
     display: flex;
@@ -130,7 +128,7 @@ $hPadding: 20px;
 }
 
 .error {
-    margin: $hPadding;
+    margin: 20px 0;
 }
 
 .footer {

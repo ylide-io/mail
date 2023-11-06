@@ -224,11 +224,11 @@ export namespace FeedManagerApi {
 		defaultProjects: UserProject[];
 	}
 
-	export async function getConfig(data: { token: string }) {
-		return await request<GetConfigResponse>({ path: `/v3/get-config`, token: data.token });
+	export async function getConfig(params: { token: string }) {
+		return await request<GetConfigResponse>({ path: '/v3/get-config', token: params.token });
 	}
 
-	export async function setConfig(data: {
+	export async function setConfig(params: {
 		token: string;
 		config: {
 			mode: ConfigMode;
@@ -236,6 +236,96 @@ export namespace FeedManagerApi {
 			excludedSourceIds: string[];
 		};
 	}) {
-		return await request({ path: `/v3/set-config`, data: data.config, token: data.token });
+		return await request({ path: `/v3/set-config`, data: params.config, token: params.token });
+	}
+
+	//
+
+	// https://github.com/ylide-io/mainview-api/blob/main/src/entities/mainview/FanspaySubscription.entity.ts
+	// https://fanspayio.readme.io/reference/subscription
+	export enum PaymentSubscriptionStatus {
+		ACTIVE = 'active',
+		CANCELED = 'canceled',
+		FAILED = 'failed',
+		WAITING = 'waiting',
+	}
+
+	export interface PaymentSubscription {
+		id: string;
+		status: PaymentSubscriptionStatus;
+		amount: number;
+		token: string; // USDT, USDC, DAI, BUSD
+		blockchain: string;
+		created: number;
+		duration: number;
+		next_charge: number;
+		from: string;
+		to: string;
+		transaction_hash: string;
+	}
+
+	// https://github.com/ylide-io/mainview-api/blob/main/src/entities/mainview/FanspayYearCharge.entity.ts
+	// https://fanspayio.readme.io/reference/charge
+	export enum PaymentChargeStatus {
+		SUCCEEDED = 'succeeded',
+		FAILED = 'failed',
+	}
+
+	export interface PaymentCharge {
+		id: string;
+		status: PaymentChargeStatus;
+		amount: number;
+		token: string; // USDT, USDC, DAI, BUSD
+		blockchain: string;
+		created: number;
+		endOfPeriod: number;
+		from: string;
+		to: string;
+		transaction_hash: string;
+	}
+
+	export interface PaymentInfo {
+		subscriptions: PaymentSubscription[];
+		charges: PaymentCharge[];
+	}
+
+	export async function getPaymentInfo(params: { token: string }) {
+		return await request<PaymentInfo>({ path: '/payment/info', token: params.token });
+	}
+
+	//
+
+	export enum PaymentType {
+		SUBSCRIPTION = 'subscription',
+		PAYMENT = 'payment',
+	}
+
+	// https://github.com/ylide-io/mainview-api/blob/main/src/server/fanspay.ts
+	export interface CheckoutResponse {
+		id: unknown;
+		account: unknown;
+		amount_total: unknown;
+		created: unknown;
+		expires_at: unknown;
+		items: unknown;
+		object: unknown;
+		status: unknown;
+		success_url: unknown;
+		transaction_status: unknown;
+		type: unknown;
+		url: string;
+	}
+
+	export async function checkout(params: {
+		token: string;
+		type: PaymentType;
+		success_url: string;
+		cancel_url: string;
+	}) {
+		return await request<CheckoutResponse>({
+			path: '/payment/checkout',
+			token: params.token,
+			data: { type: params.type, success_url: params.success_url, cancel_url: params.cancel_url },
+		});
 	}
 }

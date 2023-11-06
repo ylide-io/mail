@@ -1,7 +1,94 @@
-.root {
-	visibility: visible;
+.payModal {
+	display: flex;
+	flex-direction: column;
+	padding: 32px;
+	width: 520px;
+
+	> :not(:last-child) {
+		margin: 0 0 20px;
+	}
+
+	@include less480px {
+		padding: 20px;
+	}
 }
 
-.modalWide {
-	width: 500px;
+.payModalSubtle {
+	color: var(--secondary-text-color);
+}
+
+.payModalTitle {
+	font-size: 24px;
+	font-weight: $font-weight_bold;
+}
+
+.payModalDescription {
+	font-size: 14px;
+	line-height: $line-height_text;
+}
+
+.payModalPlans {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	grid-gap: 20px;
+
+	@include lessThan480w {
+		grid-template-columns: 1fr;
+	}
+}
+
+.payModalPlan {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	padding: 16px 20px 20px;
+	background: var(--secondary-surface-color);
+	border-radius: 12px;
+
+	> :not(:last-child) {
+		margin: 0 0 8px;
+	}
+}
+
+.payModalPlanTitle {
+	margin: 0 0 24px !important;
+	font-size: 24px;
+	font-weight: $font-weight_bold;
+	text-align: center;
+}
+
+.payModalPrice {
+	color: var(--accent-color);
+	font-size: 16px;
+	font-weight: $font-weight_bold;
+}
+
+.payModalPrice_old {
+	color: var(--secondary-text-color);
+	font-weight: $font-weight_normal;
+	text-decoration: line-through;
+}
+
+.payModalBadge {
+	padding: 4px 8px;
+	color: var(--primary-text-color);
+	font-size: 12px;
+	font-weight: $font-weight_normal;
+	background: var(--success-surface-color);
+	border-radius: 4px;
+}
+
+.payModalAboveCra {
+	margin: 0 0 24px !important;
+}
+
+.payModalCra {
+	align-self: stretch;
+	margin: auto 0 0;
+}
+
+.payModalDisconnectButton {
+	align-self: center;
+	margin-bottom: -8px;
+	opacity: .8;
 }

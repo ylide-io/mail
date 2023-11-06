@@ -11,6 +11,7 @@ import { assertUnreachable, invariant } from '../../utils/assert';
 import { truncateAddress } from '../../utils/string';
 import { useNav } from '../../utils/url';
 import { FeedSourcesSection } from './feedSourcesSection/feedSourcesSection';
+import { PaymentsSection } from './paymentsSection/paymentsSection';
 import css from './settingsPage.module.scss';
 
 export enum SettingsSection {
@@ -61,7 +62,7 @@ export const SettingsPage = observer(() => {
 					{currentSection === SettingsSection.SOURCES ? (
 						<FeedSourcesSection account={currentAccount} />
 					) : currentSection === SettingsSection.PAYMENTS ? (
-						'paymetns'
+						<PaymentsSection account={currentAccount} />
 					) : (
 						assertUnreachable(currentSection)
 					)}
