@@ -1,9 +1,17 @@
 import * as Sentry from '@sentry/react';
 
 import packageJson from '../../package.json';
-import { AppMode, ENV_TYPE, EnvType, REACT_APP__APP_MODE, REACT_APP__CIRCLE_SHA1 } from '../env';
+import {
+	AppMode,
+	ENV_TYPE,
+	EnvType,
+	REACT_APP__APP_MODE,
+	REACT_APP__CIRCLE_BUILD_NUM,
+	REACT_APP__CIRCLE_SHA1,
+} from '../env';
 
 Sentry.setTag('CIRCLE_SHA1', REACT_APP__CIRCLE_SHA1);
+Sentry.setTag('CIRCLE_BUILD_NUM', REACT_APP__CIRCLE_BUILD_NUM);
 
 export function initSentry() {
 	const dsn = {

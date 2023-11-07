@@ -18,6 +18,7 @@ export const NODE_ENV = env('NODE_ENV');
 
 export const REACT_APP__PUBLIC_URL = env('REACT_APP__PUBLIC_URL');
 export const REACT_APP__CIRCLE_SHA1 = env('REACT_APP__CIRCLE_SHA1', { optional: true });
+export const REACT_APP__CIRCLE_BUILD_NUM = env('REACT_APP__CIRCLE_BUILD_NUM', { optional: true });
 
 export enum EnvType {
 	PRODUCTION = 'production',
@@ -54,4 +55,5 @@ export enum OtcProvider {
 
 export const REACT_APP__OTC_PROVIDER = env('REACT_APP__OTC_PROVIDER') as OtcProvider;
 
-console.log('App version', REACT_APP__CIRCLE_SHA1);
+console.log('Build ID', REACT_APP__CIRCLE_BUILD_NUM);
+console.log('SHA1', REACT_APP__CIRCLE_SHA1);

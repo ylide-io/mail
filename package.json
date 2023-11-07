@@ -5,7 +5,7 @@
 	"scripts": {
 		"mainview": "npm run build && npm run start-local",
 		"start": "cross-env REACT_APP__APP_MODE=MAIN_VIEW react-app-rewired start",
-		"build": "cross-env REACT_APP__APP_MODE=MAIN_VIEW REACT_APP__CIRCLE_SHA1=$CIRCLE_SHA1 react-app-rewired build",
+		"build": "cross-env REACT_APP__APP_MODE=MAIN_VIEW REACT_APP__CIRCLE_SHA1=$CIRCLE_SHA1 REACT_APP__CIRCLE_BUILD_NUM=$CIRCLE_BUILD_NUM react-app-rewired build",
 		"start-local": "http-server ./build -S -C cert.pem -o -a localhost -p 8080",
 		"check": "tsc && eslint --max-warnings 0 . && prettier --list-different .",
 		"test": "react-app-rewired test",
