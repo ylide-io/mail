@@ -145,7 +145,7 @@ export const PaymentFlow = observer(({ account, onPaid, onCancel }: PaymentFlowP
 					<div className={css.payModalPlans}>
 						<div className={css.payModalPlan}>
 							<div className={css.payModalPlanTitle}>Monthly subscription</div>
-							<div className={css.payModalPrice}>$14/month</div>
+							<div className={css.payModalPrice}>$9/month</div>
 							<div className={clsx(css.payModalSubtle, css.payModalAboveCra)}>Cancel anytime</div>
 							<ActionButton
 								className={css.payModalCra}
@@ -166,10 +166,14 @@ export const PaymentFlow = observer(({ account, onPaid, onCancel }: PaymentFlowP
 						<div className={css.payModalPlan}>
 							<div className={css.payModalPlanTitle}>Annual Plan</div>
 							<GridRowBox>
-								<div className={clsx(css.payModalPrice, css.payModalPrice_old)}>$168</div>
+								<div className={clsx(css.payModalPrice, css.payModalPrice_old)}>
+									${paymentInfoQuery.data.isTrialAvailable ? '108' : '130'}
+								</div>
 								<div className={css.payModalBadge}>50% OFF</div>
 							</GridRowBox>
-							<div className={clsx(css.payModalPrice, css.payModalAboveCra)}>$84/year</div>
+							<div className={clsx(css.payModalPrice, css.payModalAboveCra)}>
+								${paymentInfoQuery.data.isTrialAvailable ? '54' : '65'}/year
+							</div>
 							<ActionButton
 								className={css.payModalCra}
 								isLoading={
