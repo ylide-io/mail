@@ -476,7 +476,7 @@ export const MainViewOnboarding = observer(() => {
 					onPaid={() => setStep({ type: StepType.BUILDING_FEED, account: step.account })}
 					onCancel={async () => {
 						await disconnectAccount({ account: step.account, place: 'mv-onboarding_payments' });
-						reset();
+						setStep({ type: StepType.CONNECT_ACCOUNT });
 					}}
 				/>
 			)}
