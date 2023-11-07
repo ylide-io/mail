@@ -72,17 +72,22 @@ export async function checkout(account: DomainAccount, type: FeedManagerApi.Paym
 
 //
 
-export function getActiveSubscription(paymentInfo?: FeedManagerApi.PaymentInfo) {
-	return paymentInfo?.subscriptions.find(
-		sub =>
-			sub.status === FeedManagerApi.PaymentSubscriptionStatus.ACTIVE ||
-			sub.status === FeedManagerApi.PaymentSubscriptionStatus.WAITING,
+export function getActiveSubscriptions(paymentInfo?: FeedManagerApi.PaymentInfo) {
+	return (
+		paymentInfo?.subscriptions.filter(
+			sub =>
+				sub.status === FeedManagerApi.PaymentSubscriptionStatus.ACTIVE ||
+				sub.status === FeedManagerApi.PaymentSubscriptionStatus.WAITING,
+		) || []
 	);
 }
 
-export function getActiveCharge(paymentInfo?: FeedManagerApi.PaymentInfo) {
-	return paymentInfo?.charges.find(
-		charge =>
-			charge.status === FeedManagerApi.PaymentChargeStatus.SUCCEEDED && charge.endOfPeriod > Date.now() / 1000,
+export function getActiveCharges(paymentInfo?: FeedManagerApi.PaymentInfo) {
+	return (
+		paymentInfo?.charges.filter(
+			charge =>
+				charge.status === FeedManagerApi.PaymentChargeStatus.SUCCEEDED &&
+				charge.endOfPeriod > Date.now() / 1000,
+		) || []
 	);
 }

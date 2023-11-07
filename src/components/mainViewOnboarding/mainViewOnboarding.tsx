@@ -17,8 +17,8 @@ import { addressesEqual } from '../../utils/blockchain';
 import {
 	checkout,
 	CheckoutResult,
-	getActiveCharge,
-	getActiveSubscription,
+	getActiveCharges,
+	getActiveSubscriptions,
 	useCheckoutSearchParams,
 } from '../../utils/payments';
 import { truncateAddress } from '../../utils/string';
@@ -102,7 +102,7 @@ export const PaymentFlow = observer(({ account, onPaid, onCancel }: PaymentFlowP
 			return {
 				...data,
 				isTrialAvailable: !data.subscriptions.length && !data.charges.length,
-				isPaid: !!getActiveSubscription(data) || !!getActiveCharge(data),
+				isPaid: !!getActiveSubscriptions(data).length || !!getActiveCharges(data).length,
 			};
 		},
 	});
@@ -347,8 +347,7 @@ export const MainViewOnboarding = observer(() => {
 						.then(info => ({
 							address: a.account.address,
 							info: info,
-							activeSubscription: getActiveSubscription(info),
-							activeCharge: getActiveCharge(info),
+							isPaid: !!getActiveSubscriptions(info).length || !!getActiveCharges(info).length,
 						}))
 						.catch(e => {
 							console.error('Failed to load payment info', e);
@@ -407,11 +406,7 @@ export const MainViewOnboarding = observer(() => {
 
 		const unpaidAccount = accounts.find(a =>
 			paymentInfoQuery.data?.some(
-				info =>
-					info &&
-					addressesEqual(info.address, a.account.address) &&
-					!info.activeSubscription &&
-					!info.activeCharge,
+				info => info && addressesEqual(info.address, a.account.address) && !info.isPaid,
 			),
 		);
 		if (unpaidAccount) {
