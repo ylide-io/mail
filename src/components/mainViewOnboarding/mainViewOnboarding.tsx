@@ -432,8 +432,10 @@ export const MainViewOnboarding = observer(() => {
 								account: res.account,
 								password: res.password || '',
 							});
-						} else {
+						} else if (!accounts.length) {
 							setStep({ type: StepType.CONNECT_ACCOUNT_WARNING });
+						} else {
+							reset();
 						}
 					}}
 				/>
