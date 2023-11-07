@@ -2,7 +2,7 @@ import clsx from 'clsx';
 import { observable, reaction } from 'mobx';
 import { observer } from 'mobx-react';
 import { AnchorHTMLAttributes, PropsWithChildren, ReactNode, useEffect, useState } from 'react';
-import { generatePath, matchPath, useLocation } from 'react-router-dom';
+import { generatePath, useLocation } from 'react-router-dom';
 
 import { AppMode, REACT_APP__APP_MODE } from '../../../env';
 import { ReactComponent as ArchiveSvg } from '../../../icons/archive.svg';
@@ -299,11 +299,6 @@ export const SidebarMenu = observer(() => {
 						key={i}
 						look={SidebarButtonLook.SUBMENU}
 						href={generatePath(RoutePath.FEED_SMART_ADDRESS, { address: account.account.address })}
-						isActiveChecker={pathname =>
-							[RoutePath.SETTINGS_ADDRESS, RoutePath.SETTINGS_ADDRESS_SECTION].some(r =>
-								matchPath(r, pathname),
-							)
-						}
 						icon={<ContactSvg />}
 						name={<AdaptiveText text={account.name || account.account.address} />}
 						onClick={() => {
