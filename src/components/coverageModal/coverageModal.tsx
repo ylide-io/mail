@@ -14,10 +14,6 @@ type Props = {
 };
 
 export const CoverageModal = observer(({ onClose, coverage }: Props) => {
-	const onClick = () => {
-		onClose?.();
-	};
-
 	const uniq = (items: FeedManagerApi.CoverageItem[]) => {
 		const unique: FeedManagerApi.CoverageItem[] = [];
 		const seenValues = new Set();
@@ -71,10 +67,17 @@ export const CoverageModal = observer(({ onClose, coverage }: Props) => {
 		<ActionModal
 			title="Current coverage of your blockchain activity"
 			buttons={
-				<ActionButton size={ActionButtonSize.XLARGE} look={ActionButtonLook.PRIMARY} onClick={onClick}>
+				<ActionButton
+					size={ActionButtonSize.XLARGE}
+					look={ActionButtonLook.PRIMARY}
+					onClick={() => {
+						onClose?.();
+					}}
+				>
 					Close
 				</ActionButton>
 			}
+			onClose={onClose}
 		>
 			<div>
 				<div className={css.disclaimer}>
