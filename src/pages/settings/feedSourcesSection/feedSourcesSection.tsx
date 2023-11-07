@@ -148,7 +148,6 @@ export const FeedSourcesSection = observer(({ account }: FeedSourcesSectionProps
 				style={style}
 			>
 				<CheckBox
-					className={css.sourceCheckBox}
 					isChecked={selectedSourceIds.includes(source.id)}
 					onChange={isSelected => setSelectedSourceIds(prev => toggleArrayItem(prev, source.id, isSelected))}
 				/>

@@ -29,6 +29,7 @@
     align-items: center;
     padding: 8px 12px 8px 20px;
     height: 40px;
+    min-width: 480px;
     font-weight: $font-weight_bold;
     background: var(--tertiary-surface-color);
 }
@@ -41,16 +42,13 @@
     @include truncate-text;
     text-align: right;
     margin-right: 24px;
-
-    @include less480px {
-        display: none;
-    }
 }
 
 .row {
     display: flex;
     align-items: center;
     padding: 0 20px;
+    min-width: 480px;
 
     > :not(:first-child) {
         margin: 0 0 0 12px;
@@ -66,12 +64,6 @@
 }
 
 //
-
-.sourceCheckBox {
-    @include less480px {
-        grid-row: 1/4;
-    }
-}
 
 .sourceName {
     flex: 0.8 1;
@@ -111,10 +103,6 @@
     flex: 0.5 1;
     text-align: center;
     font-weight: $font-weight_bold;
-
-    @include less480px {
-        display: none;
-    }
 }
 
 //
