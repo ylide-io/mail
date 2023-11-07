@@ -10,7 +10,7 @@ import { ReactComponent as ArrowLeftSvg } from '../../icons/ic20/arrowLeft.svg';
 import domain from '../../stores/Domain';
 import { RoutePath } from '../../stores/routePath';
 import { formatAccountName } from '../../utils/account';
-import { assertUnreachable, invariant } from '../../utils/assert';
+import { assertUnreachable } from '../../utils/assert';
 import { useNav } from '../../utils/url';
 import { FeedSourcesSection } from './feedSourcesSection/feedSourcesSection';
 import { PaymentsSection } from './paymentsSection/paymentsSection';
@@ -27,10 +27,8 @@ export const SettingsPage = observer(() => {
 		address: string;
 		section?: SettingsSection;
 	}>();
-	invariant(currentAddress);
 
 	const currentAccount = domain.accounts.activeAccounts.find(a => a.account.address === currentAddress);
-	invariant(currentAccount);
 
 	function renderTab(section: SettingsSection, name: ReactNode) {
 		const isActive = section === currentSection;
@@ -52,7 +50,17 @@ export const SettingsPage = observer(() => {
 		);
 	}
 
-	return currentSection ? (
+	return !currentAddress || !currentAccount ? (
+		<Navigate to={generatePath(RoutePath.ROOT)} replace />
+	) : !currentSection ? (
+		<Navigate
+			replace
+			to={generatePath(RoutePath.SETTINGS_ADDRESS_SECTION, {
+				address: currentAddress,
+				section: SettingsSection.SOURCES,
+			})}
+		/>
+	) : (
 		<GenericLayout>
 			<NarrowContent
 				contentClassName={css.root}
@@ -84,13 +92,5 @@ export const SettingsPage = observer(() => {
 				</div>
 			</NarrowContent>
 		</GenericLayout>
-	) : (
-		<Navigate
-			replace
-			to={generatePath(RoutePath.SETTINGS_ADDRESS_SECTION, {
-				address: currentAddress,
-				section: SettingsSection.SOURCES,
-			})}
-		/>
 	);
 });
