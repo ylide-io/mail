@@ -3,12 +3,14 @@ import { ReactNode } from 'react';
 import { generatePath, Navigate, useParams } from 'react-router-dom';
 
 import { ActionButton, ActionButtonLook, ActionButtonSize } from '../../components/ActionButton/ActionButton';
+import { GridRowBox } from '../../components/boxes/boxes';
 import { NarrowContent } from '../../components/genericLayout/content/narrowContent/narrowContent';
 import { GenericLayout } from '../../components/genericLayout/genericLayout';
+import { ReactComponent as ArrowLeftSvg } from '../../icons/ic20/arrowLeft.svg';
 import domain from '../../stores/Domain';
 import { RoutePath } from '../../stores/routePath';
+import { formatAccountName } from '../../utils/account';
 import { assertUnreachable, invariant } from '../../utils/assert';
-import { truncateAddress } from '../../utils/string';
 import { useNav } from '../../utils/url';
 import { FeedSourcesSection } from './feedSourcesSection/feedSourcesSection';
 import { PaymentsSection } from './paymentsSection/paymentsSection';
@@ -52,7 +54,20 @@ export const SettingsPage = observer(() => {
 
 	return currentSection ? (
 		<GenericLayout>
-			<NarrowContent contentClassName={css.root} title={`Settings for ${truncateAddress(currentAddress)}`}>
+			<NarrowContent
+				contentClassName={css.root}
+				title={
+					<GridRowBox>
+						<ActionButton
+							icon={<ArrowLeftSvg />}
+							onClick={() =>
+								navigate(generatePath(RoutePath.FEED_SMART_ADDRESS, { address: currentAddress }))
+							}
+						/>{' '}
+						Settings for {formatAccountName(currentAccount)}
+					</GridRowBox>
+				}
+			>
 				<div className={css.tabs}>
 					{renderTab(SettingsSection.SOURCES, 'Sources')}
 					{renderTab(SettingsSection.PAYMENTS, 'Payments')}
