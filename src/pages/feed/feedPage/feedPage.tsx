@@ -23,6 +23,7 @@ import { feedSettings } from '../../../stores/FeedSettings';
 import { DomainAccount } from '../../../stores/models/DomainAccount';
 import { RoutePath } from '../../../stores/routePath';
 import { connectAccount } from '../../../utils/account';
+import { addressesEqual } from '../../../utils/blockchain';
 import { hookDependency } from '../../../utils/react';
 import { truncateInMiddle } from '../../../utils/string';
 import { useNav } from '../../../utils/url';
@@ -91,7 +92,12 @@ const FeedPageContent = observer(() => {
 	const accounts = domain.accounts.activeAccounts;
 	const mvAccounts = domain.accounts.mainViewAccounts;
 	const selectedAccounts = useMemo(
-		() => (address ? mvAccounts.filter(a => a.account.address === address) : !tag && !source ? mvAccounts : []),
+		() =>
+			address
+				? mvAccounts.filter(a => addressesEqual(a.account.address, address))
+				: !tag && !source
+				? mvAccounts
+				: [],
 		[mvAccounts, address, tag, source],
 	);
 
@@ -147,7 +153,7 @@ const FeedPageContent = observer(() => {
 			// TODO: KONST
 			tags: tags !== 'error' && tags !== 'loading' ? tags.filter(t => t.id === Number(tag)) : [],
 			sourceId: source,
-			addressTokens: mvAccounts.map(a => a.mainViewKey),
+			addressTokens: selectedAccounts.map(a => a.mainViewKey),
 		});
 
 		genericLayoutApi.scrollToTop();
@@ -157,7 +163,7 @@ const FeedPageContent = observer(() => {
 		}
 
 		return feed;
-	}, [canLoadFeed, tags, tag, genericLayoutApi, mvAccounts, source, reloadCounter]);
+	}, [canLoadFeed, tags, tag, genericLayoutApi, selectedAccounts, source, reloadCounter]);
 
 	useEffect(() => {
 		return () => {
