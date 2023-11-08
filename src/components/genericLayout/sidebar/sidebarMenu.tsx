@@ -1,9 +1,11 @@
 import clsx from 'clsx';
 import { observable, reaction } from 'mobx';
 import { observer } from 'mobx-react';
-import { AnchorHTMLAttributes, PropsWithChildren, ReactNode, useEffect, useState } from 'react';
+import { AnchorHTMLAttributes, Fragment, PropsWithChildren, ReactNode, useEffect, useState } from 'react';
+import { useQuery } from 'react-query';
 import { generatePath, useLocation } from 'react-router-dom';
 
+import { FeedManagerApi } from '../../../api/feedManagerApi';
 import { AppMode, REACT_APP__APP_MODE } from '../../../env';
 import { ReactComponent as ArchiveSvg } from '../../../icons/archive.svg';
 import { ReactComponent as ArrowDownSvg } from '../../../icons/ic20/arrowDown.svg';
@@ -30,8 +32,10 @@ import { feedSettings } from '../../../stores/FeedSettings';
 import { FolderId, getFolderName, MailList } from '../../../stores/MailList';
 import { RoutePath } from '../../../stores/routePath';
 import { useOpenMailCompose } from '../../../utils/mail';
+import { constrain } from '../../../utils/number';
 import { useNav } from '../../../utils/url';
 import { ActionButton, ActionButtonLook, ActionButtonSize } from '../../ActionButton/ActionButton';
+import { AdaptiveAddress } from '../../adaptiveAddress/adaptiveAddress';
 import { AdaptiveText } from '../../adaptiveText/adaptiveText';
 import { PropsWithClassName } from '../../props';
 import { toast } from '../../toast/toast';
@@ -173,6 +177,122 @@ export const SidebarButton = observer(
 
 //
 
+export const SidebarSmartFeedSection = observer(() => {
+	const navigate = useNav();
+	const accounts = domain.accounts.activeAccounts;
+
+	return (
+		<SidebarSection section={Section.FEED} title="Feed">
+			<SidebarButton
+				href={generatePath(RoutePath.FEED_SMART)}
+				icon={sideFeedIcon(14)}
+				onClick={() => {
+					if (REACT_APP__APP_MODE === AppMode.MAIN_VIEW) {
+						analytics.mainviewSmartFeedClick();
+					}
+				}}
+				name="Smart feed"
+			/>
+
+			{accounts.map((account, i) => (
+				<SidebarButton
+					key={i}
+					look={SidebarButtonLook.SUBMENU}
+					href={generatePath(RoutePath.FEED_SMART_ADDRESS, { address: account.account.address })}
+					icon={<ContactSvg />}
+					name={<AdaptiveText text={account.name || account.account.address} />}
+					onClick={() => {
+						if (REACT_APP__APP_MODE === AppMode.MAIN_VIEW) {
+							analytics.mainviewPersonalFeedClick(account.account.address);
+						}
+					}}
+					rightButton={
+						REACT_APP__APP_MODE === AppMode.MAIN_VIEW
+							? {
+									icon: <SettingsSvg />,
+									title: 'Account Settings',
+									onClick: () => {
+										if (!account.mainViewKey) {
+											return toast('Please complete the onboarding first ❤');
+										}
+
+										analytics.mainviewFeedSettingsClick(account.account.address);
+
+										isSidebarOpen.set(false);
+										navigate(
+											generatePath(RoutePath.SETTINGS_ADDRESS_SECTION, {
+												address: account.account.address,
+												section: SettingsSection.SOURCES,
+											}),
+										);
+									},
+							  }
+							: undefined
+					}
+				/>
+			))}
+		</SidebarSection>
+	);
+});
+
+//
+
+export const TrialPeriodSection = observer(() => {
+	const accounts = domain.accounts.activeAccounts;
+
+	const paymentInfoQuery = useQuery(['sidebar', 'trials', accounts.map(a => a.mainViewKey).join(',')], () =>
+		Promise.all(
+			accounts.map(account =>
+				FeedManagerApi.getPaymentInfo({ token: account.mainViewKey })
+					.then(info => ({
+						...info,
+						account,
+					}))
+					.catch(() => undefined),
+			),
+		),
+	);
+
+	const trials = paymentInfoQuery.data?.filter(info => info?.status.active);
+
+	return (
+		<>
+			{!!trials?.length && <div className={css.divider} />}
+
+			{trials?.map((info, i) => (
+				<Fragment key={i}>
+					{info?.status.active && (
+						<div className={css.trial}>
+							<b>7-day trial period</b>
+							<div className={css.trialProgress}>
+								<div
+									className={css.trialProgressValue}
+									style={{
+										width: `${
+											constrain(
+												1 - (info.status.until - Date.now() / 1000) / (60 * 60 * 24 * 7),
+												0,
+												1,
+											) * 100
+										}%`,
+									}}
+								/>
+							</div>
+							<AdaptiveAddress
+								className={css.trialAddress}
+								address={info.account.account.address}
+								maxLength={12}
+							/>
+						</div>
+					)}
+				</Fragment>
+			))}
+		</>
+	);
+});
+
+//
+
 export const SidebarMailSection = observer(() => {
 	const openMailCompose = useOpenMailCompose();
 
@@ -266,177 +386,111 @@ export const SidebarMenu = observer(() => {
 	const tags = feedSettings.tags;
 	const navigate = useNav();
 
-	function renderOtcSection() {
-		if (REACT_APP__APP_MODE !== AppMode.OTC) return;
+	function renderProjects(projects: BlockchainProjectId[]) {
+		return projects.map(id => {
+			const meta = blockchainProjectsMeta[id];
 
-		return (
-			<SidebarSection section={Section.OTC} title="OTC Trading">
-				<SidebarButton href={generatePath(RoutePath.OTC_ASSETS)} icon={<InboxSvg />} name="Asset Explorer" />
-
-				<SidebarButton href={generatePath(RoutePath.OTC_CHATS)} icon={<SentSvg />} name="Chats" />
-			</SidebarSection>
-		);
-	}
-
-	function renderSmartFeedSection() {
-		if (REACT_APP__APP_MODE !== AppMode.MAIN_VIEW) return;
-
-		return (
-			<SidebarSection section={Section.FEED} title="Feed">
+			return (
 				<SidebarButton
-					href={generatePath(RoutePath.FEED_SMART)}
-					icon={sideFeedIcon(14)}
-					onClick={() => {
-						if (REACT_APP__APP_MODE === AppMode.MAIN_VIEW) {
-							analytics.mainviewSmartFeedClick();
-						}
-					}}
-					name="Smart feed"
+					key={id}
+					href={generatePath(RoutePath.FEED_PROJECT_POSTS, { projectId: meta.id })}
+					name={meta.name}
+					icon={meta.logo}
 				/>
-
-				{domain.accounts.activeAccounts.map((account, i) => (
-					<SidebarButton
-						key={i}
-						look={SidebarButtonLook.SUBMENU}
-						href={generatePath(RoutePath.FEED_SMART_ADDRESS, { address: account.account.address })}
-						icon={<ContactSvg />}
-						name={<AdaptiveText text={account.name || account.account.address} />}
-						onClick={() => {
-							if (REACT_APP__APP_MODE === AppMode.MAIN_VIEW) {
-								analytics.mainviewPersonalFeedClick(account.account.address);
-							}
-						}}
-						rightButton={
-							REACT_APP__APP_MODE === AppMode.MAIN_VIEW
-								? {
-										icon: <SettingsSvg />,
-										title: 'Account Settings',
-										onClick: () => {
-											if (!account.mainViewKey) {
-												return toast('Please complete the onboarding first ❤');
-											}
-
-											analytics.mainviewFeedSettingsClick(account.account.address);
-
-											isSidebarOpen.set(false);
-											navigate(
-												generatePath(RoutePath.SETTINGS_ADDRESS_SECTION, {
-													address: account.account.address,
-													section: SettingsSection.SOURCES,
-												}),
-											);
-										},
-								  }
-								: undefined
-						}
-					/>
-				))}
-			</SidebarSection>
-		);
-	}
-
-	function renderBlockchainProjectsSection() {
-		if (REACT_APP__APP_MODE !== AppMode.HUB) return;
-
-		function renderProjects(projects: BlockchainProjectId[]) {
-			return projects.map(id => {
-				const meta = blockchainProjectsMeta[id];
-
-				return (
-					<SidebarButton
-						key={id}
-						href={generatePath(RoutePath.FEED_PROJECT_POSTS, { projectId: meta.id })}
-						name={meta.name}
-						icon={meta.logo}
-					/>
-				);
-			});
-		}
-
-		return (
-			<>
-				<div>
-					<SidebarButton
-						look={SidebarButtonLook.SECTION}
-						href={generatePath(RoutePath.FEED_PROJECT_POSTS, { projectId: BlockchainProjectId.GENERAL })}
-						name={blockchainProjectsMeta[BlockchainProjectId.GENERAL].name}
-						icon={blockchainProjectsMeta[BlockchainProjectId.GENERAL].logo}
-					/>
-
-					<SidebarButton
-						look={SidebarButtonLook.SECTION}
-						href={generatePath(RoutePath.FEED_PROJECT_POSTS, { projectId: BlockchainProjectId.ETH_WHALES })}
-						name={blockchainProjectsMeta[BlockchainProjectId.ETH_WHALES].name}
-						icon={blockchainProjectsMeta[BlockchainProjectId.ETH_WHALES].logo}
-					/>
-				</div>
-
-				<SidebarSection section={Section.VENOM_PROJECTS} title="Venom Projects">
-					{renderProjects(activeVenomProjects)}
-				</SidebarSection>
-
-				<SidebarSection section={Section.TVM_PROJECTS} title="TVM 주요정보">
-					{renderProjects(activeTvmProjects)}
-				</SidebarSection>
-
-				<ActionButton
-					className={css.sectionButton}
-					onClick={() => {
-						analytics.openCreateCommunityForm();
-						window.open('https://forms.gle/p9141gy5wn7DCjZA8', '_blank')?.focus();
-					}}
-				>
-					Create community
-				</ActionButton>
-			</>
-		);
-	}
-
-	function renderFeedDiscoverySection() {
-		if (REACT_APP__APP_MODE !== AppMode.MAIN_VIEW) return;
-
-		return (
-			<SidebarSection
-				section={Section.FEED_DISCOVERY}
-				title={REACT_APP__APP_MODE === AppMode.MAIN_VIEW ? 'Discovery' : 'Feed'}
-			>
-				{/* TODO: KONST */}
-				{tags === 'error' ? (
-					<></>
-				) : tags === 'loading' ? (
-					<div>Loading</div>
-				) : (
-					tags.map(t => (
-						<SidebarButton
-							key={t.id}
-							href={generatePath(RoutePath.FEED_CATEGORY, { tag: t.id.toString() })}
-							name={t.name}
-							onClick={() => {
-								if (REACT_APP__APP_MODE === AppMode.MAIN_VIEW) {
-									analytics.mainviewTagFeedClick(t.id);
-								}
-							}}
-						/>
-					))
-				)}
-			</SidebarSection>
-		);
-	}
-
-	function renderMailSection() {
-		if (REACT_APP__APP_MODE !== AppMode.HUB) return;
-
-		return <SidebarMailSection />;
+			);
+		});
 	}
 
 	return (
 		<div className={css.root}>
-			{renderOtcSection()}
-			{renderSmartFeedSection()}
-			{renderBlockchainProjectsSection()}
-			{renderFeedDiscoverySection()}
-			{renderMailSection()}
+			{REACT_APP__APP_MODE === AppMode.OTC && (
+				<SidebarSection section={Section.OTC} title="OTC Trading">
+					<SidebarButton
+						href={generatePath(RoutePath.OTC_ASSETS)}
+						icon={<InboxSvg />}
+						name="Asset Explorer"
+					/>
 
+					<SidebarButton href={generatePath(RoutePath.OTC_CHATS)} icon={<SentSvg />} name="Chats" />
+				</SidebarSection>
+			)}
+
+			{REACT_APP__APP_MODE === AppMode.MAIN_VIEW && <SidebarSmartFeedSection />}
+
+			{REACT_APP__APP_MODE === AppMode.HUB && (
+				<>
+					<div>
+						<SidebarButton
+							look={SidebarButtonLook.SECTION}
+							href={generatePath(RoutePath.FEED_PROJECT_POSTS, {
+								projectId: BlockchainProjectId.GENERAL,
+							})}
+							name={blockchainProjectsMeta[BlockchainProjectId.GENERAL].name}
+							icon={blockchainProjectsMeta[BlockchainProjectId.GENERAL].logo}
+						/>
+
+						<SidebarButton
+							look={SidebarButtonLook.SECTION}
+							href={generatePath(RoutePath.FEED_PROJECT_POSTS, {
+								projectId: BlockchainProjectId.ETH_WHALES,
+							})}
+							name={blockchainProjectsMeta[BlockchainProjectId.ETH_WHALES].name}
+							icon={blockchainProjectsMeta[BlockchainProjectId.ETH_WHALES].logo}
+						/>
+					</div>
+
+					<SidebarSection section={Section.VENOM_PROJECTS} title="Venom Projects">
+						{renderProjects(activeVenomProjects)}
+					</SidebarSection>
+
+					<SidebarSection section={Section.TVM_PROJECTS} title="TVM 주요정보">
+						{renderProjects(activeTvmProjects)}
+					</SidebarSection>
+
+					<ActionButton
+						className={css.sectionButton}
+						onClick={() => {
+							analytics.openCreateCommunityForm();
+							window.open('https://forms.gle/p9141gy5wn7DCjZA8', '_blank')?.focus();
+						}}
+					>
+						Create community
+					</ActionButton>
+				</>
+			)}
+
+			{REACT_APP__APP_MODE === AppMode.MAIN_VIEW && (
+				<SidebarSection
+					section={Section.FEED_DISCOVERY}
+					title={REACT_APP__APP_MODE === AppMode.MAIN_VIEW ? 'Discovery' : 'Feed'}
+				>
+					{/* TODO: KONST */}
+					{tags === 'error' ? (
+						<></>
+					) : tags === 'loading' ? (
+						<div>Loading</div>
+					) : (
+						tags.map(t => (
+							<SidebarButton
+								key={t.id}
+								href={generatePath(RoutePath.FEED_CATEGORY, { tag: t.id.toString() })}
+								name={t.name}
+								onClick={() => {
+									if (REACT_APP__APP_MODE === AppMode.MAIN_VIEW) {
+										analytics.mainviewTagFeedClick(t.id);
+									}
+								}}
+							/>
+						))
+					)}
+				</SidebarSection>
+			)}
+
+			{REACT_APP__APP_MODE === AppMode.HUB && <SidebarMailSection />}
+
+			{REACT_APP__APP_MODE === AppMode.MAIN_VIEW && <TrialPeriodSection />}
+
+			<div className={css.divider} />
 			<div className={css.socials}>
 				<div className={css.socialItem}>
 					<a

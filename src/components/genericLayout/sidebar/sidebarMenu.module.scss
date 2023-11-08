@@ -4,6 +4,10 @@
 	padding: 0 16px;
 }
 
+.divider {
+	border-top: 1px solid var(--border-color);
+}
+
 .section {
 	min-width: 0;
 }
@@ -98,23 +102,10 @@
 }
 
 .socials {
-	padding: 24px 0 0 8px;
-
+	padding: 4px 0 0 8px;
 	display: flex;
 	align-items: center;
 	justify-content: space-between;
-
-	position: relative;
-
-	&:before {
-		content: '';
-		position: absolute;
-		top: 0;
-		right: 0;
-		left: 0;
-		height: 1px;
-		background: var(--border-color);
-	}
 
 	a {
 		display: flex;
@@ -147,6 +138,34 @@
 	@include less920px {
 		display: block;
 	}
+}
+
+//
+
+.trial {
+	display: grid;
+	grid-gap: 8px;
+	padding: 8px 10px;
+	background: var(--surface-color);
+	border: 1px solid var(--border-color);
+	border-radius: 8px;
+}
+
+.trialProgress {
+	height: 4px;
+	background: rgba(var(--accent-rgb-color),.1);
+	border-radius: 2px;
+}
+
+.trialProgressValue {
+	min-width: 5px;
+	height: 4px;
+	background: var(--accent-color);
+	border-radius: 2px;
+}
+
+.trialAddress {
+	color: var(--secondary-text-color);
 }
 
 //

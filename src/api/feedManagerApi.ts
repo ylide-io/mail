@@ -294,6 +294,14 @@ export namespace FeedManagerApi {
 	}
 
 	export async function getPaymentInfo(params: { token: string }) {
+		// return {
+		// 	status: {
+		// 		active: true,
+		// 		until: Date.now() / 1000 + 60 * 60 * 24 * 6,
+		// 	},
+		// 	subscriptions: [],
+		// 	charges: [],
+		// };
 		return await request<PaymentInfo>({ path: '/payment/info', token: params.token });
 	}
 
