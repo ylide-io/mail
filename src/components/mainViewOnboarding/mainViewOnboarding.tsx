@@ -101,7 +101,7 @@ export const PaymentFlow = observer(({ account, onPaid, onCancel }: PaymentFlowP
 			const data = await FeedManagerApi.getPaymentInfo({ token: account.mainViewKey });
 			return {
 				...data,
-				isTrialAvailable: !data.subscriptions.length && !data.charges.length,
+				isTrialActive: data.status.active,
 				isPaid: !!getActiveSubscriptions(data).length || !!getActiveCharges(data).length,
 			};
 		},
@@ -125,22 +125,31 @@ export const PaymentFlow = observer(({ account, onPaid, onCancel }: PaymentFlowP
 		<>
 			{paymentInfoQuery.isLoading || paymentInfoQuery.data?.isPaid ? (
 				<LoadingModal reason="Loading payment details ..." />
+			) : paymentInfoQuery.data?.isTrialActive ? (
+				<ActionModal
+					title="Welcome!"
+					buttons={
+						<ActionButton
+							size={ActionButtonSize.XLARGE}
+							look={ActionButtonLook.PRIMARY}
+							onClick={() => onPaid()}
+						>
+							Continue
+						</ActionButton>
+					}
+				>
+					You have <b>free 7-day full access</b> to smart newsfeeds that provide everything important about
+					your portfolio. Experience the full power of our product without any limitations and make better
+					decisions and deals. Good luck!
+				</ActionModal>
 			) : paymentInfoQuery.data ? (
 				<Modal className={css.payModal}>
 					<div className={css.payModalTitle}>Save 50% for 12 months</div>
 
-					{paymentInfoQuery.data.isTrialAvailable ? (
-						<div className={css.payModalDescription}>
-							Pick your subscription. Use the special offer to purchase the annual subscription and save
-							50%. Or start a free 7-day trial period and continue with a monthly subscription. You can
-							cancel the monthly subscription at any time.
-						</div>
-					) : (
-						<div className={css.payModalDescription}>
-							Pick your subscription. Use the special offer to purchase the annual subscription and save
-							50%. Or start a monthly subscription. You can cancel the monthly subscription at any time.
-						</div>
-					)}
+					<div className={css.payModalDescription}>
+						Pick your subscription. Use the special offer to purchase the annual subscription and save 50%.
+						Or start a monthly subscription. You can cancel the monthly subscription at any time.
+					</div>
 
 					<div className={css.payModalPlans}>
 						<div className={css.payModalPlan}>
@@ -159,21 +168,17 @@ export const PaymentFlow = observer(({ account, onPaid, onCancel }: PaymentFlowP
 									checkoutMutation.mutate({ type: FeedManagerApi.PaymentType.SUBSCRIPTION })
 								}
 							>
-								{paymentInfoQuery.data.isTrialAvailable ? 'Start 7-Day Trial' : 'Start Now'}
+								Subscribe
 							</ActionButton>
 						</div>
 
 						<div className={css.payModalPlan}>
 							<div className={css.payModalPlanTitle}>Annual Plan</div>
 							<GridRowBox>
-								<div className={clsx(css.payModalPrice, css.payModalPrice_old)}>
-									${paymentInfoQuery.data.isTrialAvailable ? '108' : '130'}
-								</div>
+								<div className={clsx(css.payModalPrice, css.payModalPrice_old)}>$108</div>
 								<div className={css.payModalBadge}>50% OFF</div>
 							</GridRowBox>
-							<div className={clsx(css.payModalPrice, css.payModalAboveCra)}>
-								${paymentInfoQuery.data.isTrialAvailable ? '54' : '65'}/year
-							</div>
+							<div className={clsx(css.payModalPrice, css.payModalAboveCra)}>$54/year</div>
 							<ActionButton
 								className={css.payModalCra}
 								isLoading={
@@ -350,7 +355,7 @@ export const MainViewOnboarding = observer(() => {
 					FeedManagerApi.getPaymentInfo({ token: a.mainViewKey })
 						.then(info => ({
 							address: a.account.address,
-							info: info,
+							isTrialActive: info.status.active,
 							isPaid: !!getActiveSubscriptions(info).length || !!getActiveCharges(info).length,
 						}))
 						.catch(e => {
@@ -410,7 +415,7 @@ export const MainViewOnboarding = observer(() => {
 
 		const unpaidAccount = accounts.find(a =>
 			paymentInfoQuery.data?.some(
-				info => info && addressesEqual(info.address, a.account.address) && !info.isPaid,
+				info => info && addressesEqual(info.address, a.account.address) && !info.isPaid && !info.isTrialActive,
 			),
 		);
 		if (unpaidAccount) {

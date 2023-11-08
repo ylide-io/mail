@@ -285,6 +285,10 @@ export namespace FeedManagerApi {
 	}
 
 	export interface PaymentInfo {
+		status: {
+			active: boolean;
+			until: number;
+		};
 		subscriptions: PaymentSubscription[];
 		charges: PaymentCharge[];
 	}
