@@ -91,3 +91,11 @@ export function getActiveCharges(paymentInfo?: FeedManagerApi.PaymentInfo) {
 		) || []
 	);
 }
+
+export function isPaid(paymentInfo?: FeedManagerApi.PaymentInfo) {
+	return !!getActiveSubscriptions(paymentInfo).length || !!getActiveCharges(paymentInfo).length;
+}
+
+export function isTrialActive(paymentInfo?: FeedManagerApi.PaymentInfo) {
+	return paymentInfo?.status.active && !isPaid(paymentInfo);
+}

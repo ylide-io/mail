@@ -14,13 +14,7 @@ import { DomainAccount } from '../../stores/models/DomainAccount';
 import { connectAccount, ConnectAccountResult, disconnectAccount, formatAccountName } from '../../utils/account';
 import { invariant } from '../../utils/assert';
 import { addressesEqual } from '../../utils/blockchain';
-import {
-	checkout,
-	CheckoutResult,
-	getActiveCharges,
-	getActiveSubscriptions,
-	useCheckoutSearchParams,
-} from '../../utils/payments';
+import { checkout, CheckoutResult, isPaid, isTrialActive, useCheckoutSearchParams } from '../../utils/payments';
 import { truncateAddress } from '../../utils/string';
 import { useLatest } from '../../utils/useLatest';
 import { ActionButton, ActionButtonLook, ActionButtonSize } from '../ActionButton/ActionButton';
@@ -101,8 +95,8 @@ export const PaymentFlow = observer(({ account, onPaid, onCancel }: PaymentFlowP
 			const data = await FeedManagerApi.getPaymentInfo({ token: account.mainViewKey });
 			return {
 				...data,
-				isTrialActive: data.status.active,
-				isPaid: !!getActiveSubscriptions(data).length || !!getActiveCharges(data).length,
+				isTrialActive: isTrialActive(data),
+				isPaid: isPaid(data),
 			};
 		},
 	});
@@ -355,8 +349,8 @@ export const MainViewOnboarding = observer(() => {
 					FeedManagerApi.getPaymentInfo({ token: a.mainViewKey })
 						.then(info => ({
 							address: a.account.address,
-							isTrialActive: info.status.active,
-							isPaid: !!getActiveSubscriptions(info).length || !!getActiveCharges(info).length,
+							isTrialActive: isTrialActive(info),
+							isPaid: isPaid(info),
 						}))
 						.catch(e => {
 							console.error('Failed to load payment info', e);

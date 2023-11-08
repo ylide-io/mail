@@ -31,8 +31,10 @@ import domain from '../../../stores/Domain';
 import { feedSettings } from '../../../stores/FeedSettings';
 import { FolderId, getFolderName, MailList } from '../../../stores/MailList';
 import { RoutePath } from '../../../stores/routePath';
+import { invariant } from '../../../utils/assert';
 import { useOpenMailCompose } from '../../../utils/mail';
 import { constrain } from '../../../utils/number';
+import { isTrialActive } from '../../../utils/payments';
 import { useNav } from '../../../utils/url';
 import { ActionButton, ActionButtonLook, ActionButtonSize } from '../../ActionButton/ActionButton';
 import { AdaptiveAddress } from '../../adaptiveAddress/adaptiveAddress';
@@ -253,40 +255,40 @@ export const TrialPeriodSection = observer(() => {
 		),
 	);
 
-	const trials = paymentInfoQuery.data?.filter(info => info?.status.active);
+	const trials = paymentInfoQuery.data?.filter(isTrialActive) || [];
 
 	return (
 		<>
 			{!!trials?.length && <div className={css.divider} />}
 
-			{trials?.map((info, i) => (
-				<Fragment key={i}>
-					{info?.status.active && (
-						<div className={css.trial}>
-							<b>7-day trial period</b>
-							<div className={css.trialProgress}>
-								<div
-									className={css.trialProgressValue}
-									style={{
-										width: `${
-											constrain(
-												1 - (info.status.until - Date.now() / 1000) / (60 * 60 * 24 * 7),
-												0,
-												1,
-											) * 100
-										}%`,
-									}}
-								/>
-							</div>
-							<AdaptiveAddress
-								className={css.trialAddress}
-								address={info.account.account.address}
-								maxLength={12}
+			{trials?.map((info, i) => {
+				invariant(info);
+
+				return (
+					<div key={i} className={css.trial}>
+						<b>7-day trial period</b>
+						<div className={css.trialProgress}>
+							<div
+								className={css.trialProgressValue}
+								style={{
+									width: `${
+										constrain(
+											1 - (info.status.until - Date.now() / 1000) / (60 * 60 * 24 * 7),
+											0,
+											1,
+										) * 100
+									}%`,
+								}}
 							/>
 						</div>
-					)}
-				</Fragment>
-			))}
+						<AdaptiveAddress
+							className={css.trialAddress}
+							address={info.account.account.address}
+							maxLength={12}
+						/>
+					</div>
+				);
+			})}
 		</>
 	);
 });
