@@ -28,7 +28,10 @@ export function formatAccountName(account: DomainAccount) {
 
 export type ConnectAccountResult = NewPasswordModalResult;
 
-export async function connectAccount(params?: { place?: string }): Promise<ConnectAccountResult | undefined> {
+export async function connectAccount(params?: {
+	noCloseButton?: boolean;
+	place?: string;
+}): Promise<ConnectAccountResult | undefined> {
 	if (params?.place) {
 		analytics.startConnectingWallet(params.place);
 	}
@@ -79,7 +82,9 @@ export async function connectAccount(params?: { place?: string }): Promise<Conne
 		}
 
 		if (!wallet) {
-			wallet = await showStaticComponent<Wallet>(resolve => <SelectWalletModal onClose={resolve} />);
+			wallet = await showStaticComponent<Wallet>(resolve => (
+				<SelectWalletModal noCloseButton={params?.noCloseButton} onClose={resolve} />
+			));
 		}
 
 		if (wallet) {

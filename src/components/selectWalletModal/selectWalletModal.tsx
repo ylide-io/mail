@@ -16,10 +16,11 @@ import { TextField, TextFieldLook } from '../textField/textField';
 import { YlideLoader } from '../ylideLoader/ylideLoader';
 
 interface SelectWalletModalProps {
+	noCloseButton?: boolean;
 	onClose?: (wallet?: Wallet) => void;
 }
 
-export const SelectWalletModal = observer(({ onClose }: SelectWalletModalProps) => {
+export const SelectWalletModal = observer(({ noCloseButton, onClose }: SelectWalletModalProps) => {
 	const isMobile = browserUtils.isMobile();
 	const isDesktop = !isMobile;
 
@@ -105,7 +106,7 @@ export const SelectWalletModal = observer(({ onClose }: SelectWalletModalProps) 
 	}
 
 	return (
-		<Modal className="wallet-modal" onClose={onClose}>
+		<Modal className="wallet-modal" onClose={noCloseButton ? undefined : onClose}>
 			<h3 className="wm-title">Select wallet</h3>
 
 			{!!availableBrowserWallets.length && (

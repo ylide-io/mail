@@ -32,18 +32,19 @@ export interface ConnectAccountFlowProps {
 }
 
 export const ConnectAccountFlow = observer(({ onClose }: ConnectAccountFlowProps) => {
+	const noCloseButton = !domain.accounts.accounts.length;
 	const onCloseRef = useLatest(onClose);
 
 	useEffect(() => {
 		(async () => {
 			try {
-				const caResult = await connectAccount({ place: 'mv_onboarding' });
+				const caResult = await connectAccount({ noCloseButton, place: 'mv_onboarding' });
 				onCloseRef.current(caResult);
 			} catch (e) {
 				onCloseRef.current(undefined);
 			}
 		})();
-	}, [onCloseRef]);
+	}, [noCloseButton, onCloseRef]);
 
 	return (
 		<>
