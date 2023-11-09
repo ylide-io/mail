@@ -235,6 +235,7 @@ export interface BuildFeedFlowProps {
 }
 
 export const BuildFeedFlow = observer(({ account, onClose }: BuildFeedFlowProps) => {
+	const onCloseRef = useLatest(onClose);
 	const coverage = feedSettings.coverages.get(account);
 
 	useEffect(() => {
@@ -264,10 +265,10 @@ export const BuildFeedFlow = observer(({ account, onClose }: BuildFeedFlowProps)
 			} catch (e) {
 				console.error(e);
 				analytics.mainviewOnboardingEvent('feed-initialization-error');
-				onClose(false);
+				onCloseRef.current(false);
 			}
 		})();
-	}, [account, onClose]);
+	}, [account, onCloseRef]);
 
 	return (
 		<>
