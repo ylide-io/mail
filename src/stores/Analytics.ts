@@ -198,6 +198,16 @@ class Analytics {
 	mainviewFaqClick() {
 		track('mainview___faq_click');
 	}
+
+	// PWA
+
+	pushReceived(type: string) {
+		track('push__received', { type });
+	}
+
+	pushClicked(type: string) {
+		track('push__clicked', { type });
+	}
 }
 
 export const analytics = new Analytics();
