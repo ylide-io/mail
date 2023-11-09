@@ -80,8 +80,7 @@ export function getActiveSubscriptions(paymentInfo?: FeedManagerApi.PaymentInfo)
 	return (
 		paymentInfo?.subscriptions.filter(
 			sub =>
-				sub.status === FeedManagerApi.PaymentSubscriptionStatus.ACTIVE ||
-				sub.status === FeedManagerApi.PaymentSubscriptionStatus.WAITING,
+				sub.status === FeedManagerApi.PaymentSubscriptionStatus.ACTIVE && sub.next_charge > Date.now() / 1000,
 		) || []
 	);
 }
