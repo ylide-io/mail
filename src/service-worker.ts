@@ -15,7 +15,6 @@ import { registerRoute } from 'workbox-routing';
 import { StaleWhileRevalidate } from 'workbox-strategies';
 
 import { REACT_APP__PUBLIC_URL } from './env';
-import { analytics } from './stores/Analytics';
 import { RoutePath } from './stores/routePath';
 
 declare const self: ServiceWorkerGlobalScope;
@@ -94,12 +93,10 @@ self.addEventListener('push', async event => {
 				data,
 			}),
 		);
-		analytics.pushReceived('unknown');
 	}
 });
 
 self.addEventListener('notificationclick', event => {
 	event.notification.close();
 	event.waitUntil(self.clients.openWindow(RoutePath.FEED_POST.replace(':postId', event.notification.data.postId)));
-	analytics.pushClicked('unknown');
 });

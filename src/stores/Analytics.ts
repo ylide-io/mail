@@ -202,16 +202,6 @@ class Analytics {
 	mainviewOnboardingEvent(type: string, payload?: Record<string, any>) {
 		track('mainview__onboarding_event', { type, ...payload });
 	}
-
-	// PWA
-
-	pushReceived(type: string) {
-		track('push__received', { type });
-	}
-
-	pushClicked(type: string) {
-		track('push__clicked', { type });
-	}
 }
 
 export const analytics = new Analytics();
