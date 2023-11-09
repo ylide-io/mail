@@ -121,7 +121,7 @@ export const PaymentFlow = observer(({ account, onPaid, onCancel }: PaymentFlowP
 				<LoadingModal reason="Loading payment details ..." />
 			) : paymentInfoQuery.data?.isTrialActive ? (
 				<ActionModal
-					title="Welcome!"
+					title="Welcome to Mainview!"
 					buttons={
 						<ActionButton
 							size={ActionButtonSize.XLARGE}
@@ -132,9 +132,9 @@ export const PaymentFlow = observer(({ account, onPaid, onCancel }: PaymentFlowP
 						</ActionButton>
 					}
 				>
-					You have <b>free 7-day full access</b> to smart newsfeeds that provide everything important about
-					your portfolio. Experience the full power of our product without any limitations and make better
-					decisions and deals. Good luck!
+					Your free 7-day trial period has started. Utilize full access to the smart news aggregator
+					personalized to your crypto holdings. Experience the full power of our product without any
+					limitations and master your portfolio to boost your returns.
 				</ActionModal>
 			) : paymentInfoQuery.data ? (
 				<Modal className={css.payModal}>
