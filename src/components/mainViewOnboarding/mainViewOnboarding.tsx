@@ -8,6 +8,7 @@ import { useMutation, useQuery } from 'react-query';
 
 import { FeedManagerApi } from '../../api/feedManagerApi';
 import { APP_NAME } from '../../constants';
+import { analytics } from '../../stores/Analytics';
 import domain from '../../stores/Domain';
 import { feedSettings } from '../../stores/FeedSettings';
 import { DomainAccount } from '../../stores/models/DomainAccount';
@@ -38,6 +39,7 @@ export const ConnectAccountFlow = observer(({ onClose }: ConnectAccountFlowProps
 	useEffect(() => {
 		(async () => {
 			try {
+				analytics.mainviewOnboardingEvent('start');
 				const caResult = await connectAccount({ noCloseButton, place: 'mv_onboarding' });
 				onCloseRef.current(caResult);
 			} catch (e) {
@@ -71,10 +73,11 @@ export const AuthorizeAccountFlow = observer(({ account, password, onClose }: Au
 				invariant(payload);
 				const { token } = await FeedManagerApi.authAddress(payload);
 				account.mainViewKey = token;
-
+				analytics.mainviewOnboardingEvent('account-authorized');
 				onCloseRef.current(account);
 			} catch (e) {
-				onCloseRef.current(undefined);
+				analytics.mainviewOnboardingEvent('authorization-error');
+				onCloseRef.current();
 			}
 		})();
 	}, [account, onCloseRef, password]);
@@ -103,9 +106,13 @@ export const PaymentFlow = observer(({ account, onPaid, onCancel }: PaymentFlowP
 	});
 
 	const checkoutMutation = useMutation({
-		mutationFn: (variables: { type: FeedManagerApi.PaymentType }) => checkout(account, variables.type),
-		onError: e => {
+		mutationFn: (variables: { type: FeedManagerApi.PaymentType }) => {
+			analytics.mainviewOnboardingEvent('payment-start', { payment_type: variables.type });
+			return checkout(account, variables.type);
+		},
+		onError: (e, variables) => {
 			console.error(e);
+			analytics.mainviewOnboardingEvent('payment-start-error', { payment_type: variables.type });
 			toast('Failed to open payments page 😟');
 		},
 	});
@@ -113,8 +120,12 @@ export const PaymentFlow = observer(({ account, onPaid, onCancel }: PaymentFlowP
 	useEffect(() => {
 		if (paymentInfoQuery.data?.isPaid) {
 			onPaid();
+		} else if (paymentInfoQuery.data?.isTrialActive) {
+			analytics.mainviewOnboardingEvent('trial-in-progress-dialog');
+		} else if (paymentInfoQuery.data) {
+			analytics.mainviewOnboardingEvent('payment-dialog');
 		}
-	}, [onPaid, paymentInfoQuery.data?.isPaid]);
+	}, [onPaid, paymentInfoQuery.data]);
 
 	return (
 		<>
@@ -248,8 +259,11 @@ export const BuildFeedFlow = observer(({ account, onClose }: BuildFeedFlowProps)
 
 					await checkInit();
 				}
+
+				analytics.mainviewOnboardingEvent('feed-initialized');
 			} catch (e) {
 				console.error(e);
+				analytics.mainviewOnboardingEvent('feed-initialization-error');
 				onClose(false);
 			}
 		})();
@@ -385,7 +399,7 @@ export const MainViewOnboarding = observer(() => {
 
 		const unauthAccount = accounts.find(a => !a.mainViewKey);
 		if (unauthAccount) {
-			setStep({ type: StepType.AUTHORIZATION, account: unauthAccount, password: '' });
+			return setStep({ type: StepType.AUTHORIZATION, account: unauthAccount, password: '' });
 		}
 
 		if (checkoutSearchParams.result) {
@@ -401,10 +415,21 @@ export const MainViewOnboarding = observer(() => {
 				return reset();
 			}
 
+			analytics.mainviewOnboardingEvent('payment-finish', {
+				payment_type: checkoutSearchParams.type,
+				payment_result: checkoutSearchParams.result,
+			});
+
 			if (checkoutSearchParams.result === CheckoutResult.SUCCESS) {
-				return setStep({ type: StepType.PAYMENT_SUCCESS, account });
+				return setStep({
+					type: StepType.PAYMENT_SUCCESS,
+					account,
+				});
 			} else {
-				return setStep({ type: StepType.PAYMENT_FAILURE, account });
+				return setStep({
+					type: StepType.PAYMENT_FAILURE,
+					account,
+				});
 			}
 		}
 

@@ -199,6 +199,10 @@ class Analytics {
 		track('mainview___faq_click');
 	}
 
+	mainviewOnboardingEvent(type: string, payload?: Record<string, any>) {
+		track('mainview__onboarding_event', { type, ...payload });
+	}
+
 	// PWA
 
 	pushReceived(type: string) {

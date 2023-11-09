@@ -8,6 +8,7 @@ import { useNav } from './url';
 
 const PAYMENT_ADDRESS_PARAM = 'payment_address';
 const PAYMENT_RESULT_PARAM = 'payment_result';
+const PAYMENT_TYPE_PARAM = 'payment_type';
 
 export enum CheckoutResult {
 	SUCCESS = 'success',
@@ -22,10 +23,12 @@ export function useCheckoutSearchParams() {
 		() => ({
 			address: searchParams.get(PAYMENT_ADDRESS_PARAM) || '',
 			result: searchParams.get(PAYMENT_RESULT_PARAM) || '',
+			type: searchParams.get(PAYMENT_TYPE_PARAM) || '',
 			reset: () => {
 				const url = new URL(window.location.href);
 				url.searchParams.delete(PAYMENT_ADDRESS_PARAM);
 				url.searchParams.delete(PAYMENT_RESULT_PARAM);
+				url.searchParams.delete(PAYMENT_TYPE_PARAM);
 				navigate(url.href, { replace: true });
 			},
 		}),
@@ -43,10 +46,11 @@ function buildUrlWithGetParams(params: Record<string, string>) {
 	return url.href;
 }
 
-function buildReturnUrl(account: DomainAccount, isSuccess: boolean) {
+function buildReturnUrl(account: DomainAccount, isSuccess: boolean, type: FeedManagerApi.PaymentType) {
 	return buildUrlWithGetParams({
 		[PAYMENT_ADDRESS_PARAM]: account.account.address,
 		[PAYMENT_RESULT_PARAM]: isSuccess ? CheckoutResult.SUCCESS : CheckoutResult.CANCEL,
+		[PAYMENT_TYPE_PARAM]: type,
 	});
 }
 
@@ -57,8 +61,8 @@ export async function checkout(account: DomainAccount, type: FeedManagerApi.Paym
 	const res = await FeedManagerApi.checkout({
 		token,
 		type,
-		success_url: buildReturnUrl(account, true),
-		cancel_url: buildReturnUrl(account, false),
+		success_url: buildReturnUrl(account, true, type),
+		cancel_url: buildReturnUrl(account, false, type),
 	});
 
 	const checkoutUrl = res.url;
