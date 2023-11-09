@@ -118,11 +118,9 @@ export class Domain {
 		} else {
 			this.ylide.add(evm);
 			this.ylide.registerWalletFactory(evmWalletFactories.walletconnect);
-			// const urlParams = new URLSearchParams(window.location.search);
-			// const tvmEnabled = urlParams.get('tvmEnabled');
-			// if (tvmEnabled === 'true') {
-			this.ylide.add(tvm);
-			// }
+			if (REACT_APP__APP_MODE !== AppMode.MAIN_VIEW) {
+				this.ylide.add(tvm);
+			}
 		}
 
 		window.addEventListener('keydown', e => {
