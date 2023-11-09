@@ -29,7 +29,7 @@ export const PaymentsSection = observer(({ account }: PaymentsSectionProps) => {
 				) : (
 					<>
 						{activeSubscriptions.map(sub => (
-							<div className={css.details}>
+							<div key={sub.id} className={css.details}>
 								<div className={css.detailsTitle}>You have active subscription</div>
 
 								<div className={css.detailsRow}>
@@ -52,7 +52,7 @@ export const PaymentsSection = observer(({ account }: PaymentsSectionProps) => {
 						))}
 
 						{activeCharges.map(charge => (
-							<div className={css.details}>
+							<div key={charge.id} className={css.details}>
 								<div className={css.detailsTitle}>You have active annual plan</div>
 
 								<div className={css.detailsRow}>
