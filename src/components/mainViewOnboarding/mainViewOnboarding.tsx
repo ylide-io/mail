@@ -41,6 +41,9 @@ export const ConnectAccountFlow = observer(({ onClose }: ConnectAccountFlowProps
 			try {
 				analytics.mainviewOnboardingEvent('start');
 				const caResult = await connectAccount({ noCloseButton, place: 'mv_onboarding' });
+				if (caResult?.account) {
+					analytics.mainviewOnboardingEvent('account-connected');
+				}
 				onCloseRef.current(caResult);
 			} catch (e) {
 				onCloseRef.current(undefined);
