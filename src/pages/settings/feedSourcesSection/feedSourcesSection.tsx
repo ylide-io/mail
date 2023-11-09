@@ -203,7 +203,7 @@ export const FeedSourcesSection = observer(({ account }: FeedSourcesSectionProps
 			<div className={css.footer}>
 				<div className={css.footerLeft}>
 					<ActionButton
-						isDisabled={saveConfigMutation.isLoading}
+						isLoading={saveConfigMutation.isLoading}
 						size={ActionButtonSize.MEDIUM}
 						look={ActionButtonLook.PRIMARY}
 						onClick={() => saveConfigMutation.mutate()}
