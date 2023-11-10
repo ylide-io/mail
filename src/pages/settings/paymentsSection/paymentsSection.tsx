@@ -25,33 +25,29 @@ export const PaymentsSection = observer(({ account }: PaymentsSectionProps) => {
 	return (
 		<div className={css.root}>
 			{paymentInfoQuery.data ? (
-				!activeSubscriptions.length && !activeCharges.length ? (
-					<ErrorMessage look={ErrorMessageLook.INFO}>No active plan.</ErrorMessage>
-				) : (
+				isTrialActive(paymentInfoQuery.data) ? (
+					<div className={css.details}>
+						<div className={css.detailsTitle}>7-day trial period</div>
+
+						<div className={css.trialProgress}>
+							<div
+								className={css.trialProgressValue}
+								style={{
+									width: `${
+										constrain(
+											1 -
+												(paymentInfoQuery.data.status.until - Date.now() / 1000) /
+													(60 * 60 * 24 * 7),
+											0,
+											1,
+										) * 100
+									}%`,
+								}}
+							/>
+						</div>
+					</div>
+				) : activeSubscriptions.length || activeCharges.length ? (
 					<>
-						{isTrialActive(paymentInfoQuery.data) && (
-							<div className={css.details}>
-								<div className={css.detailsTitle}>7-day trial period</div>
-
-								<div className={css.trialProgress}>
-									<div
-										className={css.trialProgressValue}
-										style={{
-											width: `${
-												constrain(
-													1 -
-														(paymentInfoQuery.data.status.until - Date.now() / 1000) /
-															(60 * 60 * 24 * 7),
-													0,
-													1,
-												) * 100
-											}%`,
-										}}
-									/>
-								</div>
-							</div>
-						)}
-
 						{activeSubscriptions.map(sub => (
 							<div key={sub.id} className={css.details}>
 								<div className={css.detailsTitle}>You have active subscription</div>
@@ -98,6 +94,8 @@ export const PaymentsSection = observer(({ account }: PaymentsSectionProps) => {
 							</div>
 						))}
 					</>
+				) : (
+					<ErrorMessage look={ErrorMessageLook.INFO}>No active plan.</ErrorMessage>
 				)
 			) : paymentInfoQuery.isLoading ? (
 				<YlideLoader className={css.loader} reason="Loading payment details ..." />
