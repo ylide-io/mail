@@ -33,3 +33,16 @@
         font-weight: $font-weight_bold;
     }
 }
+
+.trialProgress {
+    height: 4px;
+    background: rgba(var(--accent-rgb-color),.1);
+    border-radius: 2px;
+}
+
+.trialProgressValue {
+    min-width: 5px;
+    height: 4px;
+    background: var(--accent-color);
+    border-radius: 2px;
+}
