@@ -6,7 +6,8 @@ import { ErrorMessage, ErrorMessageLook } from '../../../components/errorMessage
 import { YlideLoader } from '../../../components/ylideLoader/ylideLoader';
 import { DomainAccount } from '../../../stores/models/DomainAccount';
 import { DateFormatStyle, formatDate } from '../../../utils/date';
-import { getActiveCharges, getActiveSubscriptions } from '../../../utils/payments';
+import { constrain } from '../../../utils/number';
+import { getActiveCharges, getActiveSubscriptions, isTrialActive } from '../../../utils/payments';
 import css from './paymentsSection.module.scss';
 
 export interface PaymentsSectionProps {
@@ -24,9 +25,28 @@ export const PaymentsSection = observer(({ account }: PaymentsSectionProps) => {
 	return (
 		<div className={css.root}>
 			{paymentInfoQuery.data ? (
-				!activeSubscriptions.length && !activeCharges.length ? (
-					<ErrorMessage look={ErrorMessageLook.INFO}>No active plan.</ErrorMessage>
-				) : (
+				isTrialActive(paymentInfoQuery.data) ? (
+					<div className={css.details}>
+						<div className={css.detailsTitle}>7-day trial period</div>
+
+						<div className={css.trialProgress}>
+							<div
+								className={css.trialProgressValue}
+								style={{
+									width: `${
+										constrain(
+											1 -
+												(paymentInfoQuery.data.status.until - Date.now() / 1000) /
+													(60 * 60 * 24 * 7),
+											0,
+											1,
+										) * 100
+									}%`,
+								}}
+							/>
+						</div>
+					</div>
+				) : activeSubscriptions.length || activeCharges.length ? (
 					<>
 						{activeSubscriptions.map(sub => (
 							<div key={sub.id} className={css.details}>
@@ -74,6 +94,8 @@ export const PaymentsSection = observer(({ account }: PaymentsSectionProps) => {
 							</div>
 						))}
 					</>
+				) : (
+					<ErrorMessage look={ErrorMessageLook.INFO}>No active plan.</ErrorMessage>
 				)
 			) : paymentInfoQuery.isLoading ? (
 				<YlideLoader className={css.loader} reason="Loading payment details ..." />
