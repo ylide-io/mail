@@ -7,33 +7,26 @@ import { alignAtViewportCenterBottom } from '../../utils/alignment';
 import { isIosSafariWithAddToHomeScreenFeature, isPwa } from '../../utils/environment';
 import { useOnMountAnimation } from '../../utils/useOnMountAnimation';
 import { Popup } from '../popup/popup';
+import { PopupManagerPortalLevel } from '../popup/popupManager/popupManager';
 import css from './iosInstallPwaPopup.module.scss';
 import { ReactComponent as IosShareIconSvg } from './iosShareIcon.svg';
 import { ReactComponent as PopupArrowSvg } from './popupArrow.svg';
-import domain from '../../stores/Domain';
 
 export const IosInstallPwaPopup = observer(() => {
 	const rootRef = useRef(null);
 	const isMount = useOnMountAnimation();
-	const [visible, setVisible] = useState(false);
+	const visible = isIosSafariWithAddToHomeScreenFeature() && !isPwa();
 	const [hiding, setHiding] = useState(false);
-	const hasActiveAccounts = domain.accounts.hasActiveAccounts && domain.accounts.accounts.every(a => a.mainViewKey);
 
 	useEffect(() => {
-		setVisible(isIosSafariWithAddToHomeScreenFeature() && !isPwa() && hasActiveAccounts);
-	}, [hasActiveAccounts]);
-
-	useEffect(() => {
-		if (visible) {
-			const timer = setTimeout(() => setHiding(true), 15000);
-
-			return () => clearTimeout(timer);
-		}
-	}, [visible]);
+		const timer = setTimeout(() => setHiding(true), 15000);
+		return () => clearTimeout(timer);
+	}, []);
 
 	return visible ? (
 		<Popup
 			className={clsx(css.root, isMount && css.root_animate, hiding && css.root_hiding)}
+			portalLevel={PopupManagerPortalLevel.UPPER}
 			align={alignAtViewportCenterBottom}
 		>
 			<div ref={rootRef} className={css.body}>

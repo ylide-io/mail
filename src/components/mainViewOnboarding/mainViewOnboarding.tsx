@@ -54,6 +54,8 @@ export const ConnectAccountFlow = observer(({ onClose }: ConnectAccountFlowProps
 	return (
 		<>
 			<LoadingModal reason="Connecting account ..." />
+
+			<IosInstallPwaPopup />
 		</>
 	);
 });
@@ -576,8 +578,6 @@ export const MainViewOnboarding = observer(() => {
 					Unexpected error occured. We really don't know what to do 🤷‍♂️ Please try to reload the page.
 				</ActionModal>
 			)}
-
-			{!step && <IosInstallPwaPopup />}
 		</>
 	);
 });
