@@ -24,7 +24,7 @@ import domain, { useEvmAccounts, useVenomAccounts } from '../../../stores/Domain
 import { RoutePath } from '../../../stores/routePath';
 import { connectAccount } from '../../../utils/account';
 import { invariant } from '../../../utils/assert';
-import { useIsMatchingRoute } from '../../../utils/url';
+import { useIsMatchesPattern } from '../../../utils/url';
 import { BlockchainProjectPost } from '../_common/blockchainProjectPost/blockchainProjectPost';
 import { CreatePostForm, CreatePostFormApi } from '../_common/createPostForm/createPostForm';
 import css from './blockchainProjectFeedPage.module.scss';
@@ -36,7 +36,7 @@ export const BlockchainProjectFeedPage = observer(() => {
 	const isVenomFeed = activeVenomProjects.includes(projectId);
 	const isEvmFeed = projectId === BlockchainProjectId.ETH_WHALES;
 
-	const isAdminMode = useIsMatchingRoute(RoutePath.FEED_PROJECT_POSTS_ADMIN) && browserStorage.isUserAdmin;
+	const isAdminMode = useIsMatchesPattern(RoutePath.FEED_PROJECT_POSTS_ADMIN) && browserStorage.isUserAdmin;
 
 	const allAccounts = domain.accounts.activeAccounts;
 	const evmAccounts = useEvmAccounts();

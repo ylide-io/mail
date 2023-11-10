@@ -3,12 +3,11 @@ import { EVMNetwork } from '@ylide/ethereum';
 import { ActionButton, ActionButtonLook, ActionButtonSize } from '../components/ActionButton/ActionButton';
 import { ActionModal } from '../components/actionModal/actionModal';
 import { showLoadingModal } from '../components/loadingModal/loadingModal';
-import { NewPasswordModal } from '../components/newPasswordModal/newPasswordModal';
+import { NewPasswordModal, NewPasswordModalResult } from '../components/newPasswordModal/newPasswordModal';
 import { SelectWalletModal } from '../components/selectWalletModal/selectWalletModal';
 import { showStaticComponent } from '../components/staticComponentManager/staticComponentManager';
 import { SwitchModal, SwitchModalMode } from '../components/switchModal/switchModal';
 import { toast } from '../components/toast/toast';
-import { AppMode, REACT_APP__APP_MODE } from '../env';
 import { analytics } from '../stores/Analytics';
 import domain from '../stores/Domain';
 import { DomainAccount } from '../stores/models/DomainAccount';
@@ -27,7 +26,12 @@ export function formatAccountName(account: DomainAccount) {
 
 //
 
-export async function connectAccount(params?: { place?: string }): Promise<DomainAccount | undefined> {
+export type ConnectAccountResult = NewPasswordModalResult;
+
+export async function connectAccount(params?: {
+	noCloseButton?: boolean;
+	place?: string;
+}): Promise<ConnectAccountResult | undefined> {
 	if (params?.place) {
 		analytics.startConnectingWallet(params.place);
 	}
@@ -78,7 +82,9 @@ export async function connectAccount(params?: { place?: string }): Promise<Domai
 		}
 
 		if (!wallet) {
-			wallet = await showStaticComponent<Wallet>(resolve => <SelectWalletModal onClose={resolve} />);
+			wallet = await showStaticComponent<Wallet>(resolve => (
+				<SelectWalletModal noCloseButton={params?.noCloseButton} onClose={resolve} />
+			));
 		}
 
 		if (wallet) {
@@ -130,23 +136,24 @@ export async function connectAccount(params?: { place?: string }): Promise<Domai
 			const remoteKeys = await domain.ylide.core.getAddressKeys(account.address);
 			const qqs = getQueryString();
 
-			const domainAccount = await showStaticComponent<DomainAccount>(resolve => (
+			return await showStaticComponent<NewPasswordModalResult>(resolve => (
 				<NewPasswordModal
-					faucetType={['polygon', 'fantom', 'gnosis'].includes(qqs.faucet) ? ({
-						'polygon': EVMNetwork.POLYGON as const,
-						'fantom': EVMNetwork.FANTOM as const,
-						'gnosis': EVMNetwork.GNOSIS as const,
-					}[qqs.faucet as ('polygon' | 'fantom' | 'gnosis')]) : EVMNetwork.GNOSIS}
+					faucetType={
+						['polygon', 'fantom', 'gnosis'].includes(qqs.faucet)
+							? {
+									polygon: EVMNetwork.POLYGON as const,
+									fantom: EVMNetwork.FANTOM as const,
+									gnosis: EVMNetwork.GNOSIS as const,
+							  }[qqs.faucet as 'polygon' | 'fantom' | 'gnosis']
+							: EVMNetwork.GNOSIS
+					}
 					bonus={qqs.bonus === 'true'}
 					wallet={wallet!}
 					account={account}
 					remoteKeys={remoteKeys.remoteKeys}
-					waitTxPublishing={REACT_APP__APP_MODE === AppMode.OTC}
 					onClose={resolve}
 				/>
 			));
-
-			return domainAccount;
 		}
 	} catch (e) {
 		console.error(e);
@@ -161,13 +168,17 @@ export async function activateAccount(params: { account: DomainAccount }) {
 	const remoteKeys = await domain.ylide.core.getAddressKeys(account.account.address);
 	const qqs = getQueryString();
 
-	await showStaticComponent<DomainAccount>(resolve => (
+	await showStaticComponent<NewPasswordModalResult>(resolve => (
 		<NewPasswordModal
-			faucetType={['polygon', 'fantom', 'gnosis'].includes(qqs.faucet) ? ({
-				'polygon': EVMNetwork.POLYGON as const,
-				'fantom': EVMNetwork.FANTOM as const,
-				'gnosis': EVMNetwork.GNOSIS as const,
-			}[qqs.faucet as ('polygon' | 'fantom' | 'gnosis')]) : EVMNetwork.GNOSIS}
+			faucetType={
+				['polygon', 'fantom', 'gnosis'].includes(qqs.faucet)
+					? {
+							polygon: EVMNetwork.POLYGON as const,
+							fantom: EVMNetwork.FANTOM as const,
+							gnosis: EVMNetwork.GNOSIS as const,
+					  }[qqs.faucet as 'polygon' | 'fantom' | 'gnosis']
+					: EVMNetwork.GNOSIS
+			}
 			bonus={qqs.bonus === 'true'}
 			wallet={wallet}
 			account={account.account}

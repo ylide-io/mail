@@ -29,13 +29,12 @@
 		width: 130px;
 	}
 
-	@include less720px {
+	@include less480px {
 		display: none;
 	}
 
 	> svg {
-		width: 100%;
-		height: 100%;
+		max-width: 100%;
 	}
 }
 

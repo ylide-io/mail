@@ -64,7 +64,6 @@ export class Domain {
 	@observable txWithBonus: boolean = false;
 	@observable txPlateVisible: boolean = false;
 	@observable isTxPublishing: boolean = false;
-	@observable enforceMainViewOnboarding: boolean = false;
 	@observable publishingTxHash: string = '';
 
 	@observable devMode = false; //document.location.href.includes('localhost');
@@ -119,9 +118,7 @@ export class Domain {
 		} else {
 			this.ylide.add(evm);
 			this.ylide.registerWalletFactory(evmWalletFactories.walletconnect);
-			const urlParams = new URLSearchParams(window.location.search);
-			const tvmEnabled = urlParams.get('tvmEnabled');
-			if (tvmEnabled === 'true') {
+			if (REACT_APP__APP_MODE !== AppMode.MAIN_VIEW) {
 				this.ylide.add(tvm);
 			}
 		}
@@ -255,7 +252,6 @@ export class Domain {
 
 	async publishThroughFaucet(faucetData: Awaited<ReturnType<Domain['getFaucetSignature']>>) {
 		try {
-			domain.enforceMainViewOnboarding = true;
 			try {
 				const result = await faucetData.faucet.attachPublicKey(faucetData.data);
 
@@ -269,20 +265,24 @@ export class Domain {
 					faucetData.account.reloadKeys();
 					domain.publishingTxHash = result.txHash;
 					domain.isTxPublishing = false;
+					return true;
 				} else {
 					domain.isTxPublishing = false;
 					console.log('Something went wrong with key publishing :(\n\n' + JSON.stringify(result, null, '\t'));
+					return false;
 				}
 			} catch (err: any) {
 				console.log(`Something went wrong with key publishing: ${err.message}`, err.stack);
 				toast('Something went wrong with key publishing :( Please, try again');
 				domain.isTxPublishing = false;
 				domain.txPlateVisible = false;
+				return false;
 			}
 		} catch (err) {
 			console.log('faucet publication error: ', err);
 			domain.isTxPublishing = false;
 			domain.txPlateVisible = false;
+			return false;
 		}
 	}
 
@@ -397,6 +397,7 @@ export class Domain {
 			await (domain.walletControllers.evm.walletconnect as any).signer.provider.provider.disconnect();
 			// TODO: pizdec
 			document.location.reload();
+			return new Promise(() => {});
 		}
 	}
 
@@ -458,9 +459,10 @@ export class Domain {
 				  };
 
 		const chains = Object.keys(rpcMap).map(Number);
+		const projectId = 'e9deead089b3383b2db777961e3fa244';
 		let isAvailable = true;
 		const wcTest = await EthereumProvider.init({
-			projectId: 'e9deead089b3383b2db777961e3fa244',
+			projectId,
 			chains,
 			// TODO: remove after fix by WalletConnect - https://github.com/WalletConnect/walletconnect-monorepo/issues/2641
 			// WalletConnect couldn't reproduce the issue, but we had it.
@@ -492,8 +494,7 @@ export class Domain {
 		} else {
 			const self = this;
 			const wcReal = await EthereumProvider.init({
-				// TODO: change to Ylide project id
-				projectId: 'd6c2e9408725b77204b9e628d482e980',
+				projectId,
 				chains,
 				// TODO: remove after fix by WalletConnect - https://github.com/WalletConnect/walletconnect-monorepo/issues/2641
 				// WalletConnect couldn't reproduce the issue, but we had it.
@@ -604,7 +605,13 @@ export class Domain {
 				!this.walletControllers[factory.blockchainGroup][factory.wallet]
 			) {
 				console.debug('Initing wallet: ', factory.wallet);
-				await this.initWallet(factory);
+
+				try {
+					await this.initWallet(factory);
+				} catch (e) {
+					console.error("Couldn't init wallet", factory.wallet, e);
+				}
+
 				tick('wallet ' + factory.wallet + ' inited');
 			}
 		}

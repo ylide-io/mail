@@ -1,5 +1,3 @@
-import { EVMWalletController } from '@ylide/ethereum';
-import { TVMWalletAccount, TVMWalletController } from '@ylide/everscale';
 import {
 	AbstractWalletController,
 	PrivateKeyAvailabilityState,
@@ -7,12 +5,15 @@ import {
 	WalletControllerFactory,
 	WalletEvent,
 	YlideKeyVersion,
+	YlidePrivateKey,
 } from '@ylide/sdk';
+import { SmartBuffer } from '@ylide/smart-buffer';
 import { autobind } from 'core-decorators';
 import EventEmitter from 'eventemitter3';
 import { computed, makeObservable, observable } from 'mobx';
 
-import { MainviewKeyPayload } from '../../types';
+import { REACT_APP__MV_PUBLIC_KEY } from '../../env';
+import { AuthorizationPayload } from '../../types';
 import { Domain } from '../Domain';
 import { DomainAccount } from './DomainAccount';
 
@@ -157,31 +158,29 @@ export class Wallet extends EventEmitter {
 		);
 	}
 
-	async constructMainViewKey(account: WalletAccount, invite: string): Promise<MainviewKeyPayload> {
-		const messageTimestamp = Math.floor(Date.now() / 1000);
-		const message = `Ylide authorization, ${account.address.toLowerCase()}, timestamp: ${messageTimestamp}`;
-		if (this.controller instanceof EVMWalletController) {
-			const sig = await this.controller.signString(account, message);
-			return {
-				signature: sig.r + sig.s.substring(2) + sig.v.toString(16),
-				messageTimestamp,
+	async constructMainViewKey(
+		account: WalletAccount,
+		accountPrivateKey: YlidePrivateKey,
+		password: string,
+	): Promise<AuthorizationPayload> {
+		const mvPublicKey = SmartBuffer.ofHexString(REACT_APP__MV_PUBLIC_KEY!).bytes;
+
+		const messageBytes = SmartBuffer.ofUTF8String(
+			JSON.stringify({ address: account.address.toLowerCase(), timestamp: Date.now() }),
+		).bytes;
+
+		return accountPrivateKey.execute(
+			async privateKey => ({
+				messageEncrypted: new SmartBuffer(privateKey.encrypt(messageBytes, mvPublicKey)).toHexString(),
+				publicKey: new SmartBuffer(privateKey.publicKey).toHexString(),
 				address: account.address,
-				invite,
-			};
-		}
-		if (this.controller instanceof TVMWalletController) {
-			const { signature, dataHash } = await this.controller.signString(account, message);
-			return {
-				address: account.address,
-				signature: signature,
-				messageTimestamp,
-				invite,
-				publicKeyHex: (account as TVMWalletAccount).$$meta.publicKeyHex,
-				signatureDataHash: dataHash,
-				tvmType: account.wallet as 'venomwallet' | 'everwallet',
-			};
-		}
-		throw new Error('Unknown wallet');
+			}),
+			{
+				onPrivateKeyRequest: async (address, magicString) =>
+					await this.controller.signMagicString(account, magicString),
+				onYlidePasswordRequest: async address => password,
+			},
+		);
 	}
 
 	async getCurrentAccount(): Promise<WalletAccount | null> {

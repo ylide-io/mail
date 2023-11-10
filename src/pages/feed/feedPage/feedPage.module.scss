@@ -8,6 +8,10 @@
 .posts {
 	display: grid;
 	grid-gap: 12px;
+
+	@include less720px {
+		margin: 0 calc(-1 * var(--narrow-content-padding));
+	}
 }
 
 .scrollToTop {

@@ -50,10 +50,9 @@ export const AccountSelect = observer(
 									onClick={async () => {
 										onSelect();
 
-										const newAccount = await connectAccount({ place: 'account-select' });
-
-										if (newAccount) {
-											onChange?.(newAccount);
+										const res = await connectAccount({ place: 'account-select' });
+										if (res?.account) {
+											onChange?.(res.account);
 										}
 									}}
 								>

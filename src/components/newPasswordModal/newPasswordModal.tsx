@@ -13,7 +13,6 @@ import { assertUnreachable, invariant } from '../../utils/assert';
 import { getEvmWalletNetwork } from '../../utils/wallet';
 import { ActionButton, ActionButtonLook, ActionButtonSize } from '../ActionButton/ActionButton';
 import { ActionModal } from '../actionModal/actionModal';
-import { BlockChainLabel } from '../BlockChainLabel/BlockChainLabel';
 import { ForgotPasswordModal } from '../forgotPasswordModal/forgotPasswordModal';
 import { LoadingModal } from '../loadingModal/loadingModal';
 import { SelectNetworkModal } from '../selectNetworkModal/selectNetworkModal';
@@ -22,6 +21,11 @@ import { TextField, TextFieldLook } from '../textField/textField';
 import { toast } from '../toast/toast';
 import { WalletTag } from '../walletTag/walletTag';
 import { YlideLoader } from '../ylideLoader/ylideLoader';
+
+export interface NewPasswordModalResult {
+	account: DomainAccount;
+	password: string;
+}
 
 enum Step {
 	LOADING,
@@ -38,19 +42,10 @@ interface NewPasswordModalProps {
 	wallet: Wallet;
 	account: WalletAccount;
 	remoteKeys: Record<string, RemotePublicKey | null>;
-	waitTxPublishing?: boolean;
-	onClose?: (account?: DomainAccount) => void;
+	onClose: (result?: NewPasswordModalResult) => void;
 }
 
-export function NewPasswordModal({
-	faucetType,
-	bonus,
-	wallet,
-	account,
-	remoteKeys,
-	waitTxPublishing,
-	onClose,
-}: NewPasswordModalProps) {
+export function NewPasswordModal({ faucetType, bonus, wallet, account, remoteKeys, onClose }: NewPasswordModalProps) {
 	const [searchParams] = useSearchParams();
 	const freshestKey: { key: RemotePublicKey; blockchain: string } | undefined = useMemo(
 		() =>
@@ -69,7 +64,6 @@ export function NewPasswordModal({
 	const [step, setStep] = useState(Step.ENTER_PASSWORD);
 
 	const [password, setPassword] = useState('');
-	const [forceSecond, setForceSecond] = useState(false);
 
 	const [network, setNetwork] = useState<EVMNetwork>();
 	useEffect(() => {
@@ -97,7 +91,7 @@ export function NewPasswordModal({
 			disconnectAccount({ account: domainAccountRef.current }).catch();
 		}
 
-		onClose?.();
+		onClose();
 	}
 
 	async function publishLocalKey(key: YlidePrivateKey, network: EVMNetwork | undefined) {
@@ -108,7 +102,7 @@ export function NewPasswordModal({
 			const account = domainAccountRef.current;
 			invariant(account);
 
-			const justPublishedKey = await new Promise<RemotePublicKey | null>((resolve, reject) => {
+			const justPublishedKey = await new Promise<RemotePublicKey | null>(resolve => {
 				let isDone = false;
 
 				asyncDelay(3000).then(() => (!isDone ? setStep(Step.LOADING) : null));
@@ -160,9 +154,9 @@ export function NewPasswordModal({
 			}
 
 			analytics.walletRegistered(wallet.wallet, account.account.address);
-			onClose?.(account);
+			return true;
 		} catch (e) {
-			exitUnsuccessfully({ message: 'Transaction was not published. Please, try again', e });
+			return false;
 		}
 	}
 
@@ -188,23 +182,11 @@ export function NewPasswordModal({
 				tempLocalKey = await wallet.constructLocalKeyV2(account, password);
 			} else if (freshestKey?.key.publicKey.keyVersion === YlideKeyVersion.INSECURE_KEY_V1) {
 				if (freshestKey.blockchain === 'venom-testnet') {
-					// strange... I'm not sure Qamon keys work here
-					if (forceSecond) {
-						console.log('createLocalKey', 'INSECURE_KEY_V1 venom-testnet');
-						tempLocalKey = await wallet.constructLocalKeyV1(account, password);
-					} else {
-						console.log('createLocalKey', 'INSECURE_KEY_V1 venom-testnet');
-						tempLocalKey = await wallet.constructLocalKeyV2(account, password);
-					}
+					console.log('createLocalKey', 'INSECURE_KEY_V1 venom-testnet');
+					tempLocalKey = await wallet.constructLocalKeyV2(account, password);
 				} else {
-					// strange... I'm not sure Qamon keys work here
-					if (forceSecond) {
-						console.log('createLocalKey', 'INSECURE_KEY_V2 non-venom');
-						tempLocalKey = await wallet.constructLocalKeyV2(account, password);
-					} else {
-						console.log('createLocalKey', 'INSECURE_KEY_V1 non-venom');
-						tempLocalKey = await wallet.constructLocalKeyV1(account, password);
-					}
+					console.log('createLocalKey', 'INSECURE_KEY_V1 non-venom');
+					tempLocalKey = await wallet.constructLocalKeyV1(account, password);
 				}
 			} else if (freshestKey?.key.publicKey.keyVersion === YlideKeyVersion.KEY_V2) {
 				// if user already using password - we should use it too
@@ -248,18 +230,22 @@ export function NewPasswordModal({
 				domain.txPlateVisible = true;
 				domain.txWithBonus = bonus;
 
-				const promise = domain.publishThroughFaucet(faucetData);
-
-				if (waitTxPublishing) {
-					await promise;
+				const success = await domain.publishThroughFaucet(faucetData);
+				if (success) {
+					onClose({ account: domainAccount, password });
+				} else {
+					exitUnsuccessfully({ message: 'Failed to publish key 😟' });
 				}
-
-				onClose?.(domainAccount);
 			} else {
 				if (wallet.factory.blockchainGroup === 'evm') {
 					setStep(Step.SELECT_NETWORK);
 				} else {
-					await publishLocalKey(tempLocalKey, network);
+					const success = await publishLocalKey(tempLocalKey, network);
+					if (success) {
+						onClose({ account: domainAccount, password });
+					} else {
+						exitUnsuccessfully({ message: 'Transaction was not published. Please try again 🙏' });
+					}
 				}
 			}
 		} else if (freshestKey.key.publicKey.equals(tempLocalKey.publicKey)) {
@@ -268,10 +254,15 @@ export function NewPasswordModal({
 			);
 			const domainAccount = await createDomainAccount(wallet, account, tempLocalKey);
 			analytics.walletConnected(wallet.wallet, account.address);
-			onClose?.(domainAccount);
+			onClose({ account: domainAccount, password });
 		} else if (forceNew || withoutPassword) {
-			await createDomainAccount(wallet, account, tempLocalKey);
-			await publishLocalKey(tempLocalKey, network);
+			const domainAccount = await createDomainAccount(wallet, account, tempLocalKey);
+			const success = await publishLocalKey(tempLocalKey, network);
+			if (success) {
+				onClose({ account: domainAccount, password });
+			} else {
+				exitUnsuccessfully({ message: 'Failed to publish key 😟' });
+			}
 		} else {
 			toast('Password is wrong. Please try again ❤');
 			setStep(Step.ENTER_PASSWORD);
@@ -280,7 +271,6 @@ export function NewPasswordModal({
 
 	async function networkSelect(network: EVMNetwork) {
 		setNetwork(network);
-		setStep(Step.PUBLISH_KEY);
 		await publishLocalKey(domainAccountRef.current!.localPrivateKeys[0], network);
 	}
 
@@ -312,12 +302,9 @@ export function NewPasswordModal({
 					{freshestKey ? (
 						<>
 							<div>
-								We found your <span onDoubleClick={() => setForceSecond(true)}>key</span> in{' '}
-								<BlockChainLabel blockchain={freshestKey.blockchain} /> blockchain.{' '}
 								{isPasswordNeeded
 									? 'Please, enter your Ylide Password to access it.'
 									: 'Please, sign authroization message to access it.'}
-								{forceSecond ? ' Magic may happen.' : ''}
 							</div>
 
 							{isPasswordNeeded && (

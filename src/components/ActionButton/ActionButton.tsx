@@ -18,6 +18,7 @@ export enum ActionButtonLook {
 	SECONDARY = 'SECONDARY',
 	DANGEROUS = 'DANGEROUS',
 	LITE = 'LITE',
+	HEAVY = 'HEAVY',
 }
 
 interface ActionButtonProps extends PropsWithChildren<{}>, PropsWithClassName, ButtonHTMLAttributes<HTMLButtonElement> {
@@ -47,6 +48,7 @@ export const ActionButton = forwardRef(
 			[ActionButtonLook.SECONDARY]: css.root_secondaryLook,
 			[ActionButtonLook.DANGEROUS]: css.root_dangerousLook,
 			[ActionButtonLook.LITE]: css.root_liteLook,
+			[ActionButtonLook.HEAVY]: css.root_heavyLook,
 		}[look || ActionButtonLook.DEFAULT];
 
 		return (

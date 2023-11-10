@@ -17,17 +17,17 @@ import {
 	MessageContentV4,
 	MessageContentV5,
 	MessageSecureContext,
+	RecipientInfo,
 	SendBroadcastResult,
 	SendMailResult,
 	ServiceCode,
 	Uint256,
+	WalletAccount,
 	YlideIpfsStorage,
 	YMF,
-	RecipientInfo,
-	WalletAccount,
 } from '@ylide/sdk';
 import { generatePath } from 'react-router-dom';
-import { useIsMatchingRoute, useNav } from './url';
+import { useIsMatchesPattern, useNav } from './url';
 import { getGlobalOutgoingMailData, OutgoingMailData } from '../stores/outgoingMailData';
 import { RoutePath } from '../stores/routePath';
 import { browserStorage } from '../stores/browserStorage';
@@ -607,7 +607,7 @@ export function isEmptyYMF(ymf: YMF) {
 
 export function useOpenMailCompose() {
 	const navigate = useNav();
-	const isComposePage = useIsMatchingRoute(RoutePath.MAIL_COMPOSE);
+	const isComposePage = useIsMatchesPattern(RoutePath.MAIL_COMPOSE);
 
 	return useCallback(
 		({

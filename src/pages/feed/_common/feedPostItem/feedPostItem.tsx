@@ -3,6 +3,7 @@ import { observer } from 'mobx-react';
 import { MouseEvent, useMemo, useRef, useState } from 'react';
 import { generatePath } from 'react-router-dom';
 
+import { FeedManagerApi } from '../../../../api/feedManagerApi';
 import { FeedPost, FeedReason, LinkType } from '../../../../api/feedServerApi';
 import { Avatar } from '../../../../components/avatar/avatar';
 import { GridRowBox, TruncateTextBox } from '../../../../components/boxes/boxes';
@@ -28,6 +29,7 @@ import { toAbsoluteUrl, useNav } from '../../../../utils/url';
 import { FeedLinkTypeIcon } from '../feedLinkTypeIcon/feedLinkTypeIcon';
 import { PostItemContainer } from '../postItemContainer/postItemContainer';
 import css from './feedPostItem.module.scss';
+import UserProject = FeedManagerApi.UserProject;
 
 interface FeedPostContentProps {
 	post: FeedPost;
@@ -142,8 +144,7 @@ interface AddToMyFeedButtonProps {
 }
 
 export const AddToMyFeedButton = observer(({ post }: AddToMyFeedButtonProps) => {
-	const accounts = domain.accounts.activeAccounts;
-	const mvAccounts = useMemo(() => accounts.filter(a => a.mainViewKey), [accounts]);
+	const mvAccounts = domain.accounts.mainViewAccounts;
 
 	const buttonRef = useRef(null);
 	const [isListOpen, setListOpen] = useState(false);
@@ -236,6 +237,20 @@ export function FeedPostItem({ isInFeed, realtedAccounts, post }: FeedPostItemPr
 		}
 	}, [post.cryptoProjectId, realtedAccounts]);
 
+	const renderReason = (userCryptoProject: UserProject) => (
+		<>
+			{
+				{
+					[FeedReason.BALANCE]: 'You hold tokens of ',
+					[FeedReason.PROTOCOL]: 'Current position in ',
+					[FeedReason.TRANSACTION]: 'Historical tx in ',
+				}[userCryptoProject.reasons[0]]
+			}
+
+			<b>{userCryptoProject.projectName}</b>
+		</>
+	);
+
 	return (
 		<>
 			{unfollowedState !== 'none' ? (
@@ -270,16 +285,12 @@ export function FeedPostItem({ isInFeed, realtedAccounts, post }: FeedPostItemPr
 								: userCryptoProject &&
 								  !!userCryptoProject.reasons.length &&
 								  !!userCryptoProject.projectName && (
-										<div className={css.reason} title="The reason why you see this post">
-											{
-												{
-													[FeedReason.BALANCE]: 'You hold tokens of ',
-													[FeedReason.PROTOCOL]: 'Current position in ',
-													[FeedReason.TRANSACTION]: 'Historical tx in ',
-												}[userCryptoProject.reasons[0]]
-											}
-
-											<b>{userCryptoProject.projectName}</b>
+										<div
+											className={css.reason}
+											title="The reason why you see this post"
+											onClick={() => toast(renderReason(userCryptoProject))}
+										>
+											{renderReason(userCryptoProject)}
 										</div>
 								  )}
 

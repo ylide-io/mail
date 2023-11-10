@@ -1,11 +1,17 @@
 .root {
-	padding: 24px 74px 24px 48px;
+	--narrow-content-padding: 0;
+
+	display: flex;
+	flex-direction: column;
+	padding: 24px 74px 20px 48px;
 
 	@include less920px {
-		padding: 16px 20px;
+		--narrow-content-padding: 20px;
+		padding: 16px 0;
 	}
 
 	@include less720px {
+		--narrow-content-padding: 12px;
 		padding: 16px 0;
 	}
 }
@@ -16,11 +22,7 @@
 	grid-gap: 8px;
 	align-items: center;
 	justify-content: space-between;
-	padding: 0 0 16px 12px;
-
-	@include less720px {
-		padding: 0 12px 16px;
-	}
+	padding: 0 var(--narrow-content-padding) 16px;
 }
 
 .title {
@@ -32,4 +34,12 @@
 
 .titleText {
 	font-size: 24px;
+
+	@include less480px {
+		font-size: 20px;
+	}
+}
+
+.content {
+	padding: 0 var(--narrow-content-padding);
 }

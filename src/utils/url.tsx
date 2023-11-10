@@ -1,4 +1,11 @@
-import { createSearchParams, NavigateOptions, URLSearchParamsInit, useMatch, useNavigate } from 'react-router-dom';
+import {
+	createSearchParams,
+	matchPath,
+	NavigateOptions,
+	URLSearchParamsInit,
+	useLocation,
+	useNavigate,
+} from 'react-router-dom';
 
 import { RoutePath } from '../stores/routePath';
 import { filterObjectEntries } from './object';
@@ -23,20 +30,56 @@ export function buildUrl(params: string | UseNavParameters) {
 	return typeof params === 'string'
 		? params
 		: `${params.path || ''}${params.search ? `?${createSearchParams(params.search).toString()}` : ''}${
-				params.hash || ''
+				params.hash ? `#${params.hash}` : ''
 		  }`;
+}
+
+export interface NavOptions extends NavigateOptions {
+	goBackIfPossible?: boolean;
 }
 
 export const useNav = () => {
 	const navigate = useNavigate();
+	const location = useLocation();
 
-	return (value: string | UseNavParameters, options?: NavigateOptions) => {
-		navigate(buildUrl(value), options);
+	return (value: string | UseNavParameters, options?: NavOptions) => {
+		const newUrl = buildUrl(value);
+
+		if (options?.goBackIfPossible) {
+			const previousUrl = location.state?.previousUrl;
+
+			if (previousUrl && previousUrl === newUrl) {
+				history.back();
+				return;
+			}
+		}
+
+		navigate(newUrl, {
+			...options,
+			state: {
+				previousUrl: buildUrl({
+					path: location.pathname,
+					search: location.search,
+					hash: location.hash,
+				}),
+				...options?.state,
+			},
+		});
 	};
+};
+
+export const usePreviousUrl = () => {
+	return useLocation().state?.previousUrl;
 };
 
 //
 
-export function useIsMatchingRoute(...routes: RoutePath[]) {
-	return routes.map(useMatch).some(Boolean);
+export function useIsMatchesPattern(...routes: RoutePath[]) {
+	const location = useLocation();
+	return routes.some(route => matchPath(route, location.pathname));
+}
+
+export function useIsMatchesPath(...paths: string[]) {
+	const location = useLocation();
+	return paths.includes(location.pathname);
 }

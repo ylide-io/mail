@@ -9,6 +9,10 @@ https://trello.com/c/i9GAsOaF
 	> :not(:last-child) {
 		margin: 0 0 24px;
 	}
+
+	@include less480px {
+		padding: 20px;
+	}
 }
 
 .title {

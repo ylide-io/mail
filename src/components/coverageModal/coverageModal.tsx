@@ -3,25 +3,17 @@ import { observer } from 'mobx-react';
 import { useMemo } from 'react';
 
 import { FeedManagerApi } from '../../api/feedManagerApi';
-import { feedSettings } from '../../stores/FeedSettings';
-import { DomainAccount } from '../../stores/models/DomainAccount';
 import { ActionButton, ActionButtonLook, ActionButtonSize } from '../ActionButton/ActionButton';
 import { ActionModal } from '../actionModal/actionModal';
 import { CheckBox } from '../checkBox/checkBox';
 import css from './coverageModal.module.scss';
 
 type Props = {
+	coverage: FeedManagerApi.Coverage;
 	onClose?: () => void;
-	account: DomainAccount;
 };
 
-export const CoverageModal = observer(({ onClose, account }: Props) => {
-	const coverage = feedSettings.coverages.get(account);
-
-	const onClick = () => {
-		onClose?.();
-	};
-
+export const CoverageModal = observer(({ onClose, coverage }: Props) => {
 	const uniq = (items: FeedManagerApi.CoverageItem[]) => {
 		const unique: FeedManagerApi.CoverageItem[] = [];
 		const seenValues = new Set();
@@ -36,16 +28,10 @@ export const CoverageModal = observer(({ onClose, account }: Props) => {
 	};
 
 	const uniqTokens = useMemo(() => {
-		if (!coverage || coverage === 'error' || coverage === 'loading') {
-			return [];
-		}
 		return uniq(coverage.tokens.items).sort((a, b) => Number(a.missing) - Number(b.missing));
 	}, [coverage]);
 
 	const uniqProtocols = useMemo(() => {
-		if (!coverage || coverage === 'error' || coverage === 'loading') {
-			return [];
-		}
 		return uniq(coverage.protocols.items).sort((a, b) => Number(a.missing) - Number(b.missing));
 	}, [coverage]);
 
@@ -77,23 +63,21 @@ export const CoverageModal = observer(({ onClose, account }: Props) => {
 		return row.projectName || row.tokenId;
 	};
 
-	// TODO: KONST
-	if (!coverage || coverage === 'loading') {
-		return <div>Loading</div>;
-	}
-
-	if (coverage === 'error') {
-		return <div>Error</div>;
-	}
-
 	return (
 		<ActionModal
 			title="Current coverage of your blockchain activity"
 			buttons={
-				<ActionButton size={ActionButtonSize.XLARGE} look={ActionButtonLook.PRIMARY} onClick={onClick}>
+				<ActionButton
+					size={ActionButtonSize.XLARGE}
+					look={ActionButtonLook.PRIMARY}
+					onClick={() => {
+						onClose?.();
+					}}
+				>
 					Close
 				</ActionButton>
 			}
+			onClose={onClose}
 		>
 			<div>
 				<div className={css.disclaimer}>

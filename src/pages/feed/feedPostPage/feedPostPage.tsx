@@ -15,11 +15,16 @@ import { ReactComponent as ShareSvg } from '../../../icons/ic20/share.svg';
 import { RoutePath } from '../../../stores/routePath';
 import { HorizontalAlignment } from '../../../utils/alignment';
 import { invariant } from '../../../utils/assert';
-import { toAbsoluteUrl } from '../../../utils/url';
+import { toAbsoluteUrl, useNav, usePreviousUrl } from '../../../utils/url';
 import { FeedPostItem } from '../_common/feedPostItem/feedPostItem';
 import css from './feedPostPage.module.scss';
+import { GridRowBox } from '../../../components/boxes/boxes';
+import { ReactComponent as ArrowLeftSvg } from '../../../icons/ic20/arrowLeft.svg';
 
 export function FeedPostPage() {
+	const navigate = useNav();
+	const previousUrl = usePreviousUrl();
+
 	const { postId } = useParams<{ postId: string }>();
 	invariant(postId);
 
@@ -45,7 +50,15 @@ export function FeedPostPage() {
 			)}
 
 			<NarrowContent
-				title="Post"
+				title={
+					<GridRowBox gap={8}>
+						<ActionButton
+							icon={<ArrowLeftSvg />}
+							onClick={() => navigate(previousUrl || generatePath(RoutePath.FEED_SMART))}
+						/>
+						Post
+					</GridRowBox>
+				}
 				titleRight={
 					data && (
 						<>

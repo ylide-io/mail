@@ -88,12 +88,17 @@ export class FeedStore {
 		if (data) {
 			this.posts = data.items;
 			this.moreAvailable = data.moreAvailable;
+			if (this.newPosts < data.newPosts) {
+				navigator.setAppBadge?.(data.newPosts);
+			} else {
+				navigator.clearAppBadge?.();
+			}
 			this.newPosts = data.newPosts;
 		}
 		if (!this.checkNewPostsProcess) {
 			this.checkNewPostsProcess = setInterval(() => {
 				this.checkNewPosts();
-			}, 30000);
+			}, 10000);
 		}
 	}
 
@@ -111,6 +116,11 @@ export class FeedStore {
 		if (data) {
 			this.posts.push(...data.items);
 			this.moreAvailable = data.moreAvailable;
+			if (this.newPosts < data.newPosts) {
+				navigator.setAppBadge?.(data.newPosts);
+			} else {
+				navigator.clearAppBadge?.();
+			}
 			this.newPosts = data.newPosts;
 		}
 	}
@@ -129,6 +139,11 @@ export class FeedStore {
 			});
 
 			if (data) {
+				if (this.newPosts < data.newPosts) {
+					navigator.setAppBadge?.(data.newPosts);
+				} else {
+					navigator.clearAppBadge?.();
+				}
 				this.newPosts = data.newPosts;
 			}
 		}
@@ -168,6 +183,7 @@ export class FeedStore {
 		if (data) {
 			this.posts.unshift(...data.items);
 			this.newPosts = 0;
+			navigator.clearAppBadge?.();
 		}
 	}
 }

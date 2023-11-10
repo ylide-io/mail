@@ -239,3 +239,14 @@
 		background: rgba(var(--shade-rgb-color), 0.05);
 	}
 }
+
+.root_heavyLook {
+	color: var(--on-inverted-surface-color);
+	background: var(--inverted-surface-color);
+	border-color: transparent;
+
+	&:hover,
+	&:focus-visible {
+		opacity: 0.8;
+	}
+}

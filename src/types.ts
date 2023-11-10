@@ -1,9 +1,5 @@
-export type MainviewKeyPayload = {
-	signature: string;
-	messageTimestamp: number;
-	invite: string;
+export type AuthorizationPayload = {
+	messageEncrypted: string;
+	publicKey: string;
 	address: string;
-	publicKeyHex?: string;
-	signatureDataHash?: string;
-	tvmType?: 'venomwallet' | 'everwallet';
 };

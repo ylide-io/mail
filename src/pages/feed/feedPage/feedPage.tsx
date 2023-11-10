@@ -4,28 +4,32 @@ import { useEffect, useMemo, useState } from 'react';
 import { InView } from 'react-intersection-observer';
 import { generatePath, useParams } from 'react-router-dom';
 
+import { FeedManagerApi } from '../../../api/feedManagerApi';
 import { FeedServerApi } from '../../../api/feedServerApi';
 import { ActionButton, ActionButtonLook, ActionButtonSize } from '../../../components/ActionButton/ActionButton';
 import { CoverageModal } from '../../../components/coverageModal/coverageModal';
 import { ErrorMessage, ErrorMessageLook } from '../../../components/errorMessage/errorMessage';
 import { NarrowContent } from '../../../components/genericLayout/content/narrowContent/narrowContent';
 import { GenericLayout, useGenericLayoutApi } from '../../../components/genericLayout/genericLayout';
-import { AppMode, REACT_APP__APP_MODE } from '../../../env';
+import { isOnboardingInProgress } from '../../../components/mainViewOnboarding/mainViewOnboarding';
+import { SimpleLoader } from '../../../components/simpleLoader/simpleLoader';
+import { AppMode, REACT_APP__APP_MODE, REACT_APP__VAPID_PUBLIC_KEY } from '../../../env';
 import { ReactComponent as ArrowUpSvg } from '../../../icons/ic20/arrowUp.svg';
 import { ReactComponent as CrossSvg } from '../../../icons/ic20/cross.svg';
+import { analytics } from '../../../stores/Analytics';
 import domain from '../../../stores/Domain';
 import { FeedStore } from '../../../stores/Feed';
 import { feedSettings } from '../../../stores/FeedSettings';
+import { DomainAccount } from '../../../stores/models/DomainAccount';
 import { RoutePath } from '../../../stores/routePath';
 import { connectAccount } from '../../../utils/account';
+import { addressesEqual } from '../../../utils/blockchain';
 import { hookDependency } from '../../../utils/react';
 import { truncateInMiddle } from '../../../utils/string';
 import { useNav } from '../../../utils/url';
 import { FeedPostItem } from '../_common/feedPostItem/feedPostItem';
 import css from './feedPage.module.scss';
 import ErrorCode = FeedServerApi.ErrorCode;
-import { SimpleLoader } from '../../../components/simpleLoader/simpleLoader';
-import { analytics } from '../../../stores/Analytics';
 
 const reloadFeedCounter = observable.box(0);
 
@@ -35,20 +39,75 @@ export function reloadFeed() {
 
 //
 
+function enableNotifications(accounts: DomainAccount[]) {
+	function subscribe() {
+		navigator.serviceWorker
+			.getRegistration()
+			.then(registration => {
+				function urlBase64ToUint8Array(base64String: string) {
+					const padding = '='.repeat((4 - (base64String.length % 4)) % 4);
+					const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
+					const rawData = atob(base64);
+					const outputArray = new Uint8Array(rawData.length);
+					for (let i = 0; i < rawData.length; ++i) {
+						outputArray[i] = rawData.charCodeAt(i);
+					}
+					return outputArray;
+				}
+
+				return registration?.pushManager.subscribe({
+					applicationServerKey: urlBase64ToUint8Array(REACT_APP__VAPID_PUBLIC_KEY!),
+					userVisibleOnly: true,
+				});
+			})
+			.then(
+				subscription =>
+					subscription &&
+					Promise.all(accounts.map(a => FeedManagerApi.subscribe(a.mainViewKey, subscription))),
+			);
+	}
+
+	navigator?.permissions?.query({ name: 'notifications' }).then(r => {
+		if (r.state === 'prompt') {
+			Notification.requestPermission().then(result => {
+				if (result === 'granted') {
+					subscribe();
+				}
+			});
+		} else if (r.state === 'granted') {
+			subscribe();
+		}
+	});
+}
+
+//
+
 const FeedPageContent = observer(() => {
+	const { tag, source, address } = useParams<{ tag: string; source: string; address: string }>();
+
 	const navigate = useNav();
-	const accounts = domain.accounts.activeAccounts;
 	const genericLayoutApi = useGenericLayoutApi();
 	const tags = feedSettings.tags;
 
-	const [showCoverageModal, setShowCoverageModal] = useState(false);
-
-	const { tag, source, address } = useParams<{ tag: string; source: string; address: string }>();
-
+	const accounts = domain.accounts.activeAccounts;
+	const mvAccounts = domain.accounts.mainViewAccounts;
 	const selectedAccounts = useMemo(
-		() => (address ? accounts.filter(a => a.account.address === address) : !tag && !source ? accounts : []),
-		[accounts, address, tag, source],
+		() =>
+			address
+				? mvAccounts.filter(a => addressesEqual(a.account.address, address))
+				: !tag && !source
+				? mvAccounts
+				: [],
+		[mvAccounts, address, tag, source],
 	);
+
+	const onboarding = isOnboardingInProgress.get();
+
+	useEffect(() => {
+		if (address && !selectedAccounts.length) {
+			navigate(generatePath(RoutePath.FEED));
+		}
+	}, [address, navigate, selectedAccounts]);
 
 	const coverage = feedSettings.coverages.get(selectedAccounts[0]);
 	const totalCoverage = useMemo(() => {
@@ -57,17 +116,33 @@ const FeedPageContent = observer(() => {
 		}
 		return coverage.totalCoverage;
 	}, [coverage]);
+	const [showCoverageModal, setShowCoverageModal] = useState(false);
 
 	useEffect(() => {
-		if (address && !selectedAccounts.length) {
-			navigate(generatePath(RoutePath.FEED));
-		}
-	}, [address, navigate, selectedAccounts]);
+		// Check notifications on page load.
+		// This will work on any device except iOS Safari,
+		// where it's required to check notifications on user interaction.
 
-	// We can NOT load smart feed if no suitable account connected
+		const clickListener = () => {
+			document.body.removeEventListener('click', clickListener);
+			enableNotifications(mvAccounts);
+		};
+
+		if (mvAccounts.length && !onboarding) {
+			enableNotifications(mvAccounts);
+			document.body.addEventListener('click', clickListener);
+		}
+
+		return () => {
+			document.body.removeEventListener('click', clickListener);
+		};
+	}, [mvAccounts, onboarding]);
+
 	const canLoadFeed =
-		!!tag ||
-		(!!accounts.length && (REACT_APP__APP_MODE !== AppMode.MAIN_VIEW || accounts.every(a => a.mainViewKey)));
+		!onboarding &&
+		(!!tag ||
+			(!!mvAccounts.length &&
+				(REACT_APP__APP_MODE !== AppMode.MAIN_VIEW || mvAccounts.length === accounts.length)));
 
 	const reloadCounter = reloadFeedCounter.get();
 
@@ -152,8 +227,8 @@ const FeedPageContent = observer(() => {
 				</div>
 			}
 		>
-			{showCoverageModal && (
-				<CoverageModal onClose={() => setShowCoverageModal(false)} account={selectedAccounts[0]} />
+			{showCoverageModal && coverage && coverage !== 'error' && coverage !== 'loading' && (
+				<CoverageModal onClose={() => setShowCoverageModal(false)} coverage={coverage} />
 			)}
 			{!!feed.posts.length && (
 				<ActionButton

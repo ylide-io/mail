@@ -1,39 +1,36 @@
 import clsx from 'clsx';
 import sortBy from 'lodash.sortby';
 import { observer } from 'mobx-react';
-import { useMemo, useState } from 'react';
+import { CSSProperties, useMemo, useState } from 'react';
 import { useMutation } from 'react-query';
 import AutoSizer from 'react-virtualized-auto-sizer';
-import { FixedSizeList as List } from 'react-window';
+import { FixedSizeList } from 'react-window';
 
-import { FeedReason, FeedSource } from '../../../../api/feedServerApi';
-import { ActionButton, ActionButtonLook } from '../../../../components/ActionButton/ActionButton';
-import { Avatar } from '../../../../components/avatar/avatar';
-import { CheckBox } from '../../../../components/checkBox/checkBox';
-import { ErrorMessage } from '../../../../components/errorMessage/errorMessage';
-import { Modal } from '../../../../components/modal/modal';
-import { OverlappingLoader } from '../../../../components/overlappingLoader/overlappingLoader';
-import { TextField, TextFieldLook } from '../../../../components/textField/textField';
-import { toast } from '../../../../components/toast/toast';
-import { DASH } from '../../../../constants';
-import { ReactComponent as ContactSvg } from '../../../../icons/ic20/contact.svg';
-import { ReactComponent as SearchSvg } from '../../../../icons/ic28/search.svg';
-import { feedSettings } from '../../../../stores/FeedSettings';
-import { DomainAccount } from '../../../../stores/models/DomainAccount';
-import { toggleArrayItem } from '../../../../utils/array';
-import { invariant } from '../../../../utils/assert';
-import { reloadFeed } from '../../feedPage/feedPage';
-import { FeedLinkTypeIcon } from '../feedLinkTypeIcon/feedLinkTypeIcon';
-import css from './feedSettingsPopup.module.scss';
+import { FeedReason, FeedReasonOrEmpty, FeedSource } from '../../../api/feedServerApi';
+import { ActionButton, ActionButtonLook, ActionButtonSize } from '../../../components/ActionButton/ActionButton';
+import { Avatar } from '../../../components/avatar/avatar';
+import { GridRowBox } from '../../../components/boxes/boxes';
+import { CheckBox } from '../../../components/checkBox/checkBox';
+import { ErrorMessage } from '../../../components/errorMessage/errorMessage';
+import { OverlappingLoader } from '../../../components/overlappingLoader/overlappingLoader';
+import { TextField, TextFieldLook } from '../../../components/textField/textField';
+import { toast } from '../../../components/toast/toast';
+import { DASH } from '../../../constants';
+import { ReactComponent as ContactSvg } from '../../../icons/ic20/contact.svg';
+import { ReactComponent as SearchSvg } from '../../../icons/ic28/search.svg';
+import { sideFeedIcon } from '../../../icons/static/sideFeedIcon';
+import { feedSettings, getReasonOrder } from '../../../stores/FeedSettings';
+import { DomainAccount } from '../../../stores/models/DomainAccount';
+import { toggleArrayItem } from '../../../utils/array';
+import { invariant } from '../../../utils/assert';
+import { FeedLinkTypeIcon } from '../../feed/_common/feedLinkTypeIcon/feedLinkTypeIcon';
+import css from './feedSourcesSection.module.scss';
 
-type FeedReasonOrEmpty = FeedReason | '';
-
-export interface FeedSettingsPopupProps {
+export interface FeedSourcesSectionProps {
 	account: DomainAccount;
-	onClose?: () => void;
 }
 
-export const FeedSettingsPopup = observer(({ account, onClose }: FeedSettingsPopupProps) => {
+export const FeedSourcesSection = observer(({ account }: FeedSourcesSectionProps) => {
 	invariant(account.mainViewKey, 'FeedSettings only supports MV accounts');
 
 	const config = feedSettings.getAccountConfig(account);
@@ -58,45 +55,39 @@ export const FeedSettingsPopup = observer(({ account, onClose }: FeedSettingsPop
 				(cryptoProjectId && config?.defaultProjects.find(p => p.projectId === cryptoProjectId)) || undefined;
 			const reasons = cryptoProject?.reasons || [''];
 			for (const reason of reasons) {
-				const list = (res[reason] = res[reason] || []);
-				list.push(s);
+				if (
+					reason === 'balance' ||
+					reason === 'protocol' ||
+					reason === '' ||
+					(reasons.length === 1 && reason === 'transaction')
+				) {
+					const list = (res[reason] = res[reason] || []);
+					list.push(s);
+				}
 			}
 			return res;
 		}, {} as Record<FeedReasonOrEmpty, FeedSource[]>);
 
-		const aggregated = (Object.keys(grouped) as FeedReasonOrEmpty[])
-			.sort((a: FeedReasonOrEmpty, b: FeedReasonOrEmpty) => {
-				const getOrder = (reason: FeedReasonOrEmpty) =>
-					reason
-						? {
-								[FeedReason.BALANCE]: 1,
-								[FeedReason.PROTOCOL]: 2,
-								[FeedReason.TRANSACTION]: 3,
-						  }[reason]
-						: 4;
-
-				return getOrder(a) - getOrder(b);
-			})
-			.reduce((res, reason) => {
-				const withoutProjects: FeedSource[] = [];
-				const withProjects: FeedSource[] = [];
-				for (const source of grouped[reason]) {
-					if (source.cryptoProject?.name) {
-						withProjects.push(source);
-					} else {
-						withoutProjects.push(source);
-					}
+		const aggregated = getReasonOrder(Object.keys(grouped) as FeedReasonOrEmpty[]).reduce((res, reason) => {
+			const withoutProjects: FeedSource[] = [];
+			const withProjects: FeedSource[] = [];
+			for (const source of grouped[reason]) {
+				if (source.cryptoProject?.name) {
+					withProjects.push(source);
+				} else {
+					withoutProjects.push(source);
 				}
-				return {
-					...res,
-					[reason]: sortBy(
-						withProjects
-							.sort((b, a) => b.cryptoProject!.name.localeCompare(a.cryptoProject!.name))
-							.concat(withoutProjects),
-						(s: FeedSource) => !selectedSourceIds.includes(s.id),
-					),
-				};
-			}, {} as Record<FeedReasonOrEmpty, FeedSource[]>);
+			}
+			return {
+				...res,
+				[reason]: sortBy(
+					withProjects
+						.sort((b, a) => b.cryptoProject!.name.localeCompare(a.cryptoProject!.name))
+						.concat(withoutProjects),
+					(s: FeedSource) => !selectedSourceIds.includes(s.id),
+				),
+			};
+		}, {} as Record<FeedReasonOrEmpty, FeedSource[]>);
 
 		return [aggregated, (Object.entries(aggregated) as [FeedReasonOrEmpty, FeedSource[]][]).flat(2)];
 		// do not include selectedSourceIds,
@@ -105,10 +96,6 @@ export const FeedSettingsPopup = observer(({ account, onClose }: FeedSettingsPop
 
 	const saveConfigMutation = useMutation({
 		mutationFn: () => feedSettings.updateFeedConfig(account, selectedSourceIds),
-		onSuccess: () => {
-			onClose?.();
-			reloadFeed();
-		},
 		onError: () => toast("Couldn't save your feed settings. Please try again."),
 	});
 
@@ -119,7 +106,7 @@ export const FeedSettingsPopup = observer(({ account, onClose }: FeedSettingsPop
 	}: {
 		index: number;
 		data: (FeedSource | FeedReasonOrEmpty)[];
-		style: React.CSSProperties;
+		style: CSSProperties;
 	}) => {
 		const source = data[index];
 		if (typeof source === 'string') {
@@ -161,7 +148,6 @@ export const FeedSettingsPopup = observer(({ account, onClose }: FeedSettingsPop
 				style={style}
 			>
 				<CheckBox
-					className={css.sourceCheckBox}
 					isChecked={selectedSourceIds.includes(source.id)}
 					onChange={isSelected => setSelectedSourceIds(prev => toggleArrayItem(prev, source.id, isSelected))}
 				/>
@@ -185,31 +171,40 @@ export const FeedSettingsPopup = observer(({ account, onClose }: FeedSettingsPop
 	};
 
 	return (
-		<Modal className={css.root} onClose={onClose}>
-			<div className={css.header}>
-				<div className={css.title}>Feed Settings</div>
-				<div className={css.description}>Select sources you want to see in your Feed</div>
+		<div className={css.root}>
+			<GridRowBox className={css.description}>
+				Select sources you want to see in your Feed {sideFeedIcon(14)}
+			</GridRowBox>
+
+			<div className={css.list}>
+				{config ? (
+					<div className={css.listInner}>
+						<AutoSizer>
+							{({ width, height }) => (
+								<FixedSizeList
+									width={width}
+									height={height}
+									itemSize={40}
+									itemCount={rows.length}
+									itemData={rows}
+								>
+									{Row}
+								</FixedSizeList>
+							)}
+						</AutoSizer>
+					</div>
+				) : feedSettings.isError ? (
+					<ErrorMessage className={css.error}>Couldn't load source list</ErrorMessage>
+				) : (
+					<OverlappingLoader text="Loading sources ..." />
+				)}
 			</div>
 
-			{config ? (
-				<div style={{ flex: '1 1 auto' }}>
-					<AutoSizer>
-						{({ width, height }) => (
-							<List width={width} height={height} itemSize={40} itemCount={rows.length} itemData={rows}>
-								{Row}
-							</List>
-						)}
-					</AutoSizer>
-				</div>
-			) : feedSettings.isError ? (
-				<ErrorMessage className={css.error}>Couldn't load source list</ErrorMessage>
-			) : (
-				<OverlappingLoader text="Loading sources ..." />
-			)}
 			<div className={css.footer}>
 				<div className={css.footerLeft}>
 					<ActionButton
-						isDisabled={saveConfigMutation.isLoading}
+						isLoading={saveConfigMutation.isLoading}
+						size={ActionButtonSize.MEDIUM}
 						look={ActionButtonLook.PRIMARY}
 						onClick={() => saveConfigMutation.mutate()}
 					>
@@ -237,6 +232,6 @@ export const FeedSettingsPopup = observer(({ account, onClose }: FeedSettingsPop
 						))}
 				</div>
 			</div>
-		</Modal>
+		</div>
 	);
 });

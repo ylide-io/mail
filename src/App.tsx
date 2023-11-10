@@ -1,3 +1,4 @@
+import { IObservableValue } from 'mobx';
 import { observer } from 'mobx-react';
 import { nanoid } from 'nanoid';
 import { useEffect, useState } from 'react';
@@ -5,6 +6,7 @@ import { Helmet } from 'react-helmet';
 import { QueryClient, QueryClientProvider } from 'react-query';
 import { generatePath, Navigate, Route, Routes, useLocation, useSearchParams } from 'react-router-dom';
 
+import css from './app.module.scss';
 import { ActionButton, ActionButtonLook, ActionButtonSize } from './components/ActionButton/ActionButton';
 import { Faq } from './components/faq/faq';
 import { MainviewLoader } from './components/mainviewLoader/mainviewLoader';
@@ -14,6 +16,7 @@ import { StaticComponentManager } from './components/staticComponentManager/stat
 import { ToastManager } from './components/toast/toast';
 import { TransactionPopup } from './components/TransactionPopup/TransactionPopup';
 import { YlideLoader } from './components/ylideLoader/ylideLoader';
+import { APP_NAME } from './constants';
 import { AppMode, REACT_APP__APP_MODE } from './env';
 import { ReactComponent as CrossSvg } from './icons/ic20/cross.svg';
 import { AdminFeedPage } from './pages/AdminFeedPage';
@@ -36,13 +39,14 @@ import { TestPage } from './pages/test/testPage';
 import { WalletsPage } from './pages/wallets/walletsPage';
 import { MailboxWidget } from './pages/widgets/mailboxWidget/mailboxWidget';
 import { SendMessageWidget } from './pages/widgets/sendMessageWidget/sendMessageWidget';
+import { ServiceWorkerUpdateCallback } from './serviceWorkerRegistration';
 import { analytics } from './stores/Analytics';
 import { BlockchainProjectId } from './stores/blockchainProjects/blockchainProjects';
 import { browserStorage } from './stores/browserStorage';
 import domain from './stores/Domain';
 import { RoutePath } from './stores/routePath';
 import walletConnect from './stores/WalletConnect';
-import { useIsMatchingRoute, useNav } from './utils/url';
+import { useIsMatchesPattern, useNav } from './utils/url';
 
 export enum AppTheme {
 	V1 = 'v1',
@@ -87,8 +91,14 @@ const RemoveTrailingSlash = () => {
 	return <></>;
 };
 
-export const App = observer(() => {
+interface AppProps {
+	serviceWorkerUpdateCallback: IObservableValue<ServiceWorkerUpdateCallback | undefined>;
+}
+
+export const App = observer(({ serviceWorkerUpdateCallback }: AppProps) => {
 	const location = useLocation();
+
+	const swUpdateCallback = serviceWorkerUpdateCallback.get();
 
 	const [queryClient] = useState(
 		new QueryClient({
@@ -108,7 +118,7 @@ export const App = observer(() => {
 
 	const [initErrorId, setInitErrorId] = useState('');
 
-	const isTestPage = useIsMatchingRoute(RoutePath.TEST);
+	const isTestPage = useIsMatchesPattern(RoutePath.TEST);
 
 	useEffect(() => {
 		if (!isTestPage) {
@@ -194,11 +204,10 @@ export const App = observer(() => {
 						{
 							[AppMode.HUB]: 'Ylide Social Hub: Web3 Community Chats Powered by Ylide Protocol',
 							[AppMode.OTC]: 'OTC Trading Powered by Ylide Protocol',
-							[AppMode.MAIN_VIEW]: 'MainView: Your Smart News Feed',
+							[AppMode.MAIN_VIEW]: 'Mainview: Your Smart News Feed',
 						}[REACT_APP__APP_MODE]
 					}
 				</title>
-
 				<meta
 					name="description"
 					content={
@@ -248,6 +257,20 @@ export const App = observer(() => {
 				</div>
 			)}
 
+			{swUpdateCallback && (
+				<div className={css.updateAppBanner}>
+					<div>
+						<b>A new version of {APP_NAME} is available!</b>
+						<br />
+						Please refresh the page to apply changes.
+					</div>
+
+					<ActionButton look={ActionButtonLook.HEAVY} onClick={() => swUpdateCallback()}>
+						Update app 🚀
+					</ActionButton>
+				</div>
+			)}
+
 			<QueryClientProvider client={queryClient}>
 				<PopupManager>
 					<RemoveTrailingSlash />
@@ -255,7 +278,6 @@ export const App = observer(() => {
 					<Routes>
 						<Route path={RoutePath.TEST} element={<TestPage />} />
 						<Route path={RoutePath.WALLETS} element={<WalletsPage />} />
-						<Route path={RoutePath.SETTINGS} element={<SettingsPage />} />
 						<Route path={RoutePath.ADMIN} element={<AdminPage />} />
 						<Route path={RoutePath.ADMIN_FEED} element={<AdminFeedPage />} />
 
@@ -279,6 +301,9 @@ export const App = observer(() => {
 						<Route path={RoutePath.FEED_SMART} element={<FeedPage />} />
 						<Route path={RoutePath.FEED_SMART_ADDRESS} element={<FeedPage />} />
 
+						<Route path={RoutePath.SETTINGS_ADDRESS} element={<SettingsPage />} />
+						<Route path={RoutePath.SETTINGS_ADDRESS_SECTION} element={<SettingsPage />} />
+
 						<Route
 							path={RoutePath.FEED_PROJECT}
 							element={
@@ -293,6 +318,8 @@ export const App = observer(() => {
 						<Route path={RoutePath.FEED_PROJECT_POSTS} element={<BlockchainProjectFeedPage />} />
 						<Route path={RoutePath.FEED_PROJECT_POSTS_ADMIN} element={<BlockchainProjectFeedPage />} />
 						<Route path={RoutePath.FEED_PROJECT_POST} element={<BlockchainProjectFeedPostPage />} />
+
+						<Route path={RoutePath.SETTINGS_ADDRESS} element={<BlockchainProjectFeedPostPage />} />
 
 						<Route
 							path="/feed/venom/*"

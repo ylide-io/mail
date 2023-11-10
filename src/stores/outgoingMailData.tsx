@@ -143,7 +143,8 @@ export class OutgoingMailData {
 			const proxyAccount = domain.availableProxyAccounts[0];
 
 			if (!this.from) {
-				this.from = await connectAccount({ place: 'sending-message' });
+				const caResult = await connectAccount({ place: 'sending-message' });
+				this.from = caResult?.account;
 				if (!this.from) return false;
 
 				if (this.from.wallet.factory.blockchainGroup === 'evm') {
