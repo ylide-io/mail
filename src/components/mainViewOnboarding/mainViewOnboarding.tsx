@@ -3,7 +3,7 @@ import { asyncDelay } from '@ylide/sdk';
 import clsx from 'clsx';
 import { observable } from 'mobx';
 import { observer } from 'mobx-react';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useMutation, useQuery } from 'react-query';
 
 import { FeedManagerApi } from '../../api/feedManagerApi';
@@ -231,6 +231,56 @@ export const PaymentFlow = observer(({ account, onPaid, onCancel }: PaymentFlowP
 		</>
 	);
 });
+
+interface PaymentSuccessFlowProps {
+	account: DomainAccount;
+	onClose: (isPaid: boolean) => void;
+}
+
+export function PaymentSuccessFlow({ account, onClose }: PaymentSuccessFlowProps) {
+	const startTime = useMemo(() => Date.now(), []);
+
+	const paymentInfo = useQuery(['payment-success', account.mainViewKey], {
+		queryFn: () => {
+			invariant(Date.now() - startTime < 1000 * 60);
+
+			return FeedManagerApi.getPaymentInfo({ token: account.mainViewKey });
+		},
+		onSuccess: info => {
+			if (isPaid(info)) {
+				analytics.mainviewOnboardingEvent('successful-payment-confirmed');
+			}
+		},
+		onError: () => {
+			analytics.mainviewOnboardingEvent('successful-payment-error');
+			onClose(false);
+		},
+		refetchInterval: 5000,
+	});
+
+	return (
+		<>
+			<LoadingModal reason="Processing payment ..." />
+
+			{paymentInfo.data && isPaid(paymentInfo.data) && (
+				<ActionModal
+					title="Payment Successful"
+					buttons={
+						<ActionButton
+							size={ActionButtonSize.XLARGE}
+							look={ActionButtonLook.PRIMARY}
+							onClick={() => onClose(true)}
+						>
+							Continue
+						</ActionButton>
+					}
+				>
+					Your payment has been successfully processed.
+				</ActionModal>
+			)}
+		</>
+	);
+}
 
 //
 
@@ -514,20 +564,16 @@ export const MainViewOnboarding = observer(() => {
 			)}
 
 			{step?.type === StepType.PAYMENT_SUCCESS && (
-				<ActionModal
-					title="Payment Successful"
-					buttons={
-						<ActionButton
-							size={ActionButtonSize.XLARGE}
-							look={ActionButtonLook.PRIMARY}
-							onClick={() => setStep({ type: StepType.BUILDING_FEED, account: step.account })}
-						>
-							Continue
-						</ActionButton>
-					}
-				>
-					Your payment has been successfully processed.
-				</ActionModal>
+				<PaymentSuccessFlow
+					account={step.account}
+					onClose={isPaid => {
+						if (isPaid) {
+							setStep({ type: StepType.BUILDING_FEED, account: step.account });
+						} else {
+							setStep({ type: StepType.FATAL_ERROR });
+						}
+					}}
+				/>
 			)}
 
 			{step?.type === StepType.PAYMENT_FAILURE && (
