@@ -294,7 +294,9 @@ export const communities: Community[] = [
 		bannerImage: mainViewBannerSrc,
 		website: 'https://mainview.io/',
 		tags: [CommunityTag.RESEARCH, CommunityTag.TRADING],
-		allowedChains: allChainsExceptTest,
+		allowedChains: allChainsExceptTest.filter(
+			chain => ![BlockchainName.VENOM_TESTNET, BlockchainName.EVERSCALE, BlockchainName.ZETA].includes(chain),
+		),
 		attachmentMode: CommunityAttachmentMode.ADMINS,
 	},
 
