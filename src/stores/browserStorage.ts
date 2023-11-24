@@ -13,6 +13,7 @@ enum BrowserStorageKey {
 	SAVE_DECODED_MESSAGES = 'ylide_saveDecodedMessages',
 	WIDGET_ID = 'ylide_widgetId',
 	MAIN_VIEW_KEYS = 'ylide_mainViewKeys',
+	REFERRER = 'ylide_referrer',
 	LAST_MAILBOX_INCOMING_DATE = 'ylide_lastMailboxCheckDate',
 	SAVED_ACCOUNTS = 'ylide_savedAccounts',
 }
@@ -169,6 +170,16 @@ class BrowserStorage {
 	set mainViewKeys(value: Record<string, string | undefined>) {
 		BrowserStorage.setItem(BrowserStorageKey.MAIN_VIEW_KEYS, JSON.stringify(value));
 		this._mainViewKeys = value;
+	}
+
+	//
+
+	get referrer() {
+		return BrowserStorage.getItem(BrowserStorageKey.REFERRER) || '';
+	}
+
+	set referrer(value: string) {
+		BrowserStorage.setItem(BrowserStorageKey.REFERRER, value);
 	}
 
 	//

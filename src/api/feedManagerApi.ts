@@ -84,8 +84,9 @@ export namespace FeedManagerApi {
 		token: string;
 	}
 
-	export async function authAddress(data: AuthorizationPayload) {
-		return await request<AuthAddressResponse>({ path: `/v3/auth-address`, data });
+	export async function authAddress(data: AuthorizationPayload, referrer?: string | null) {
+		const query = referrer ? { referrer } : undefined;
+		return await request<AuthAddressResponse>({ path: `/v3/auth-address`, data, query });
 	}
 
 	//

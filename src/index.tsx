@@ -1,5 +1,5 @@
-import 'minireset.css';
 import 'normalize.css';
+import 'minireset.css';
 import './styles/index.scss';
 
 import { configure, observable } from 'mobx';

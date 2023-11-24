@@ -5,10 +5,12 @@ import { observable } from 'mobx';
 import { observer } from 'mobx-react';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useMutation, useQuery } from 'react-query';
+import { useSearchParams } from 'react-router-dom';
 
 import { FeedManagerApi } from '../../api/feedManagerApi';
 import { APP_NAME } from '../../constants';
 import { analytics } from '../../stores/Analytics';
+import { browserStorage } from '../../stores/browserStorage';
 import domain from '../../stores/Domain';
 import { feedSettings } from '../../stores/FeedSettings';
 import { DomainAccount } from '../../stores/models/DomainAccount';
@@ -76,7 +78,7 @@ export const AuthorizeAccountFlow = observer(({ account, password, onClose }: Au
 			try {
 				const payload = await account.makeMainViewKey(password);
 				invariant(payload);
-				const { token } = await FeedManagerApi.authAddress(payload);
+				const { token } = await FeedManagerApi.authAddress(payload, browserStorage.referrer);
 				account.mainViewKey = token;
 				analytics.mainviewOnboardingEvent('account-authorized');
 				onCloseRef.current(account);
@@ -408,6 +410,7 @@ type Step =
 export const MainViewOnboarding = observer(() => {
 	const [step, setStep] = useState<Step>();
 	isOnboardingInProgress.set(!!step);
+	const [searchParams] = useSearchParams();
 
 	const accounts = domain.accounts.accounts;
 	const checkoutSearchParams = useCheckoutSearchParams();
@@ -439,6 +442,10 @@ export const MainViewOnboarding = observer(() => {
 
 	// Disconnect inactive accounts before begin
 	useEffect(() => {
+		const referrer = searchParams.get('referrer');
+		if (referrer) {
+			browserStorage.referrer = referrer;
+		}
 		domain.accounts.accounts
 			.filter(a => !a.isAnyLocalPrivateKeyRegistered)
 			.forEach(a => disconnectAccount({ account: a }));
