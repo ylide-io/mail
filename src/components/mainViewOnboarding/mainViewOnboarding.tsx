@@ -169,7 +169,9 @@ export const PaymentFlow = observer(({ account, onPaid, onCancel }: PaymentFlowP
 					<div className={css.payModalPlans}>
 						{paymentInfoQuery.data.prices.map(price => (
 							<div key={price.months} className={css.payModalPlan}>
-								<div className={css.payModalPlanTitle}>1 month</div>
+								<div className={css.payModalPlanTitle}>
+									{price.months} {price.months === 1 ? 'month' : 'months'}
+								</div>
 								<div className={css.payModalPrice}>{price.price} USD</div>
 								<div className={css.payModalSubtle}>One-time payment</div>
 								<ActionButton
