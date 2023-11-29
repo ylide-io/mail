@@ -1,6 +1,5 @@
 import { TVMWalletController } from '@ylide/everscale';
 import { asyncDelay } from '@ylide/sdk';
-import clsx from 'clsx';
 import { observable } from 'mobx';
 import { observer } from 'mobx-react';
 import { useCallback, useEffect, useMemo, useState } from 'react';
@@ -22,7 +21,6 @@ import { truncateAddress } from '../../utils/string';
 import { useLatest } from '../../utils/useLatest';
 import { ActionButton, ActionButtonLook, ActionButtonSize } from '../ActionButton/ActionButton';
 import { ActionModal } from '../actionModal/actionModal';
-import { GridRowBox } from '../boxes/boxes';
 import { CoverageModal } from '../coverageModal/coverageModal';
 import { IosInstallPwaPopup } from '../iosInstallPwaPopup/iosInstallPwaPopup';
 import { LoadingModal } from '../loadingModal/loadingModal';
@@ -103,23 +101,28 @@ export interface PaymentFlowProps {
 export const PaymentFlow = observer(({ account, onPaid, onCancel }: PaymentFlowProps) => {
 	const paymentInfoQuery = useQuery(['payments', 'info', 'account', account.mainViewKey], {
 		queryFn: async () => {
-			const data = await FeedManagerApi.getPaymentInfo({ token: account.mainViewKey });
+			const [paymentInfo, prices] = await Promise.all([
+				FeedManagerApi.getPaymentInfo({ token: account.mainViewKey }),
+				FeedManagerApi.getPrices(),
+			]);
+
 			return {
-				...data,
-				isTrialActive: isTrialActive(data),
-				isPaid: isPaid(data),
+				...paymentInfo,
+				isTrialActive: isTrialActive(paymentInfo),
+				isPaid: isPaid(paymentInfo),
+				prices,
 			};
 		},
 	});
 
 	const checkoutMutation = useMutation({
-		mutationFn: (variables: { type: FeedManagerApi.PaymentType }) => {
-			analytics.mainviewOnboardingEvent('payment-start', { payment_type: variables.type });
-			return checkout(account, variables.type);
+		mutationFn: (variables: { months: number }) => {
+			analytics.mainviewOnboardingEvent('payment-start', { payment_months: variables.months });
+			return checkout(account, variables.months);
 		},
 		onError: (e, variables) => {
 			console.error(e);
-			analytics.mainviewOnboardingEvent('payment-start-error', { payment_type: variables.type });
+			analytics.mainviewOnboardingEvent('payment-start-error', { payment_months: variables.months });
 			toast('Failed to open payments page 😟');
 		},
 	});
@@ -160,51 +163,31 @@ export const PaymentFlow = observer(({ account, onPaid, onCancel }: PaymentFlowP
 					<div className={css.payModalTitle}>Save 50% for 12 months</div>
 
 					<div className={css.payModalDescription}>
-						Pick your subscription. Use the special offer to purchase the annual subscription and save 50%.
-						Or start a monthly subscription. You can cancel the monthly subscription at any time.
+						Use the special offer to get annual access and save 50% 🔥
 					</div>
 
 					<div className={css.payModalPlans}>
-						<div className={css.payModalPlan}>
-							<div className={css.payModalPlanTitle}>Monthly subscription</div>
-							<div className={css.payModalPrice}>$9/month</div>
-							<div className={clsx(css.payModalSubtle, css.payModalAboveCra)}>Cancel anytime</div>
-							<ActionButton
-								className={css.payModalCra}
-								isLoading={
-									checkoutMutation.isLoading &&
-									checkoutMutation.variables?.type === FeedManagerApi.PaymentType.SUBSCRIPTION
-								}
-								size={ActionButtonSize.XLARGE}
-								look={ActionButtonLook.PRIMARY}
-								onClick={() =>
-									checkoutMutation.mutate({ type: FeedManagerApi.PaymentType.SUBSCRIPTION })
-								}
-							>
-								Subscribe
-							</ActionButton>
-						</div>
-
-						<div className={css.payModalPlan}>
-							<div className={css.payModalPlanTitle}>Annual Plan</div>
-							<GridRowBox>
-								<div className={clsx(css.payModalPrice, css.payModalPrice_old)}>$108</div>
-								<div className={css.payModalBadge}>50% OFF</div>
-							</GridRowBox>
-							<div className={clsx(css.payModalPrice, css.payModalAboveCra)}>$54/year</div>
-							<ActionButton
-								className={css.payModalCra}
-								isLoading={
-									checkoutMutation.isLoading &&
-									checkoutMutation.variables?.type === FeedManagerApi.PaymentType.PAYMENT
-								}
-								size={ActionButtonSize.XLARGE}
-								look={ActionButtonLook.HEAVY}
-								onClick={() => checkoutMutation.mutate({ type: FeedManagerApi.PaymentType.PAYMENT })}
-							>
-								Pay Now
-							</ActionButton>
-						</div>
+						{paymentInfoQuery.data.prices.map(price => (
+							<div key={price.months} className={css.payModalPlan}>
+								<div className={css.payModalPlanTitle}>
+									{price.months} {price.months === 1 ? 'month' : 'months'}
+								</div>
+								<div className={css.payModalPrice}>{price.price} USD</div>
+								<div className={css.payModalSubtle}>One-time payment</div>
+								<ActionButton
+									className={css.payModalCra}
+									isLoading={
+										checkoutMutation.isLoading &&
+										checkoutMutation.variables?.months === price.months
+									}
+									size={ActionButtonSize.XLARGE}
+									look={ActionButtonLook.PRIMARY}
+									onClick={() => checkoutMutation.mutate({ months: price.months })}
+								>
+									Pay Now
+								</ActionButton>
+							</div>
+						))}
 					</div>
 
 					<ActionButton
@@ -442,14 +425,18 @@ export const MainViewOnboarding = observer(() => {
 
 	// Disconnect inactive accounts before begin
 	useEffect(() => {
-		const referrer = searchParams.get('referrer');
-		if (referrer) {
-			browserStorage.referrer = referrer;
-		}
 		domain.accounts.accounts
 			.filter(a => !a.isAnyLocalPrivateKeyRegistered)
 			.forEach(a => disconnectAccount({ account: a }));
 	}, []);
+
+	// Save referrer
+	useEffect(() => {
+		const referrer = searchParams.get('referrer');
+		if (referrer) {
+			browserStorage.referrer = referrer;
+		}
+	}, [searchParams]);
 
 	// Launch onboarding
 	useEffect(() => {
@@ -479,7 +466,7 @@ export const MainViewOnboarding = observer(() => {
 			}
 
 			analytics.mainviewOnboardingEvent('payment-finish', {
-				payment_type: checkoutSearchParams.type,
+				payment_months: checkoutSearchParams.months,
 				payment_result: checkoutSearchParams.result,
 			});
 

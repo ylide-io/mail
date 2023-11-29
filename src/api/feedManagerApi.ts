@@ -297,8 +297,8 @@ export namespace FeedManagerApi {
 	export async function getPaymentInfo(params: { token: string }) {
 		// return {
 		// 	status: {
-		// 		active: true,
-		// 		until: Date.now() / 1000 + 60 * 60 * 24 * 6,
+		// 		active: false,
+		// 		until: 0,
 		// 	},
 		// 	subscriptions: [],
 		// 	charges: [],
@@ -308,10 +308,13 @@ export namespace FeedManagerApi {
 
 	//
 
-	export enum PaymentType {
-		SUBSCRIPTION = 'subscription',
-		PAYMENT = 'payment',
+	export type GetPricesResult = { months: number; price: string }[];
+
+	export async function getPrices() {
+		return await request<GetPricesResult>({ path: '/payment/prices' });
 	}
+
+	//
 
 	// https://github.com/ylide-io/mainview-api/blob/main/src/server/fanspay.ts
 	export interface CheckoutResponse {
@@ -329,16 +332,11 @@ export namespace FeedManagerApi {
 		url: string;
 	}
 
-	export async function checkout(params: {
-		token: string;
-		type: PaymentType;
-		success_url: string;
-		cancel_url: string;
-	}) {
+	export async function checkout(params: { token: string; months: number; success_url: string; cancel_url: string }) {
 		return await request<CheckoutResponse>({
-			path: '/payment/checkout',
+			path: '/payment/v2/checkout',
 			token: params.token,
-			data: { type: params.type, success_url: params.success_url, cancel_url: params.cancel_url },
+			data: { months: params.months, success_url: params.success_url, cancel_url: params.cancel_url },
 		});
 	}
 }

@@ -8,7 +8,7 @@ import { useNav } from './url';
 
 const PAYMENT_ADDRESS_PARAM = 'payment_address';
 const PAYMENT_RESULT_PARAM = 'payment_result';
-const PAYMENT_TYPE_PARAM = 'payment_type';
+const PAYMENT_MONTHS_PARAM = 'payment_months';
 
 export enum CheckoutResult {
 	SUCCESS = 'success',
@@ -23,12 +23,12 @@ export function useCheckoutSearchParams() {
 		() => ({
 			address: searchParams.get(PAYMENT_ADDRESS_PARAM) || '',
 			result: searchParams.get(PAYMENT_RESULT_PARAM) || '',
-			type: searchParams.get(PAYMENT_TYPE_PARAM) || '',
+			months: searchParams.get(PAYMENT_MONTHS_PARAM) || '',
 			reset: () => {
 				const url = new URL(window.location.href);
 				url.searchParams.delete(PAYMENT_ADDRESS_PARAM);
 				url.searchParams.delete(PAYMENT_RESULT_PARAM);
-				url.searchParams.delete(PAYMENT_TYPE_PARAM);
+				url.searchParams.delete(PAYMENT_MONTHS_PARAM);
 				navigate(url.href, { replace: true });
 			},
 		}),
@@ -46,23 +46,23 @@ function buildUrlWithGetParams(params: Record<string, string>) {
 	return url.href;
 }
 
-function buildReturnUrl(account: DomainAccount, isSuccess: boolean, type: FeedManagerApi.PaymentType) {
+function buildReturnUrl(account: DomainAccount, isSuccess: boolean, months: number) {
 	return buildUrlWithGetParams({
 		[PAYMENT_ADDRESS_PARAM]: account.account.address,
 		[PAYMENT_RESULT_PARAM]: isSuccess ? CheckoutResult.SUCCESS : CheckoutResult.CANCEL,
-		[PAYMENT_TYPE_PARAM]: type,
+		[PAYMENT_MONTHS_PARAM]: months.toString(),
 	});
 }
 
-export async function checkout(account: DomainAccount, type: FeedManagerApi.PaymentType) {
+export async function checkout(account: DomainAccount, months: number) {
 	const token = account.mainViewKey;
 	invariant(token, 'No MV key');
 
 	const res = await FeedManagerApi.checkout({
 		token,
-		type,
-		success_url: buildReturnUrl(account, true, type),
-		cancel_url: buildReturnUrl(account, false, type),
+		months,
+		success_url: buildReturnUrl(account, true, months),
+		cancel_url: buildReturnUrl(account, false, months),
 	});
 
 	const checkoutUrl = res.url;

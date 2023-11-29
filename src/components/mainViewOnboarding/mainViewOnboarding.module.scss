@@ -5,16 +5,12 @@
 	width: 520px;
 
 	> :not(:last-child) {
-		margin: 0 0 12px;
+		margin: 0 0 16px;
 	}
 
 	@include less480px {
 		padding: 20px;
 	}
-}
-
-.payModalSubtle {
-	color: var(--secondary-text-color);
 }
 
 .payModalTitle {
@@ -42,54 +38,33 @@
 	display: flex;
 	flex-direction: column;
 	align-items: center;
-	padding: 16px 20px 20px;
+	padding: 20px;
 	background: var(--secondary-surface-color);
 	border-radius: 12px;
-
-	> :not(:last-child) {
-		margin: 0 0 8px;
-	}
 }
 
 .payModalPlanTitle {
-	margin: 0 0 24px !important;
+	margin: 0 0 20px;
 	font-size: 24px;
 	font-weight: $font-weight_bold;
 	text-align: center;
 
 	@include lessThan480w {
-		margin: 0 0 12px !important;
+		margin: 0 0 12px;
 		font-size: 20px;
 	}
 }
 
 .payModalPrice {
+	margin: 0 0 20px;
 	color: var(--accent-color);
-	font-size: 16px;
+	font-size: 20px;
 	font-weight: $font-weight_bold;
 }
 
-.payModalPrice_old {
+.payModalSubtle {
+	margin: 0 0 12px;
 	color: var(--secondary-text-color);
-	font-weight: $font-weight_normal;
-	text-decoration: line-through;
-}
-
-.payModalBadge {
-	padding: 4px 8px;
-	color: var(--primary-text-color);
-	font-size: 12px;
-	font-weight: $font-weight_normal;
-	background: var(--success-surface-color);
-	border-radius: 4px;
-}
-
-.payModalAboveCra {
-	margin: 0 0 24px !important;
-
-	@include lessThan480w {
-		margin: 0 0 12px !important;
-	}
 }
 
 .payModalCra {
