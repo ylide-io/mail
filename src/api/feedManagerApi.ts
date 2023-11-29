@@ -336,7 +336,7 @@ export namespace FeedManagerApi {
 		return await request<CheckoutResponse>({
 			path: '/payment/v2/checkout',
 			token: params.token,
-			data: { months: params.months.toString(), success_url: params.success_url, cancel_url: params.cancel_url },
+			data: { months: params.months, success_url: params.success_url, cancel_url: params.cancel_url },
 		});
 	}
 }
