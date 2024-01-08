@@ -48,14 +48,14 @@ function buildUrlWithGetParams(params: Record<string, string>) {
 
 function buildReturnUrl(account: DomainAccount, isSuccess: boolean, months: number) {
 	return buildUrlWithGetParams({
-		[PAYMENT_ADDRESS_PARAM]: account.account.address,
+		[PAYMENT_ADDRESS_PARAM]: account.address,
 		[PAYMENT_RESULT_PARAM]: isSuccess ? CheckoutResult.SUCCESS : CheckoutResult.CANCEL,
 		[PAYMENT_MONTHS_PARAM]: months.toString(),
 	});
 }
 
 export async function checkout(account: DomainAccount, months: number) {
-	const token = account.mainViewKey;
+	const token = account.mainviewKey;
 	invariant(token, 'No MV key');
 
 	const res = await FeedManagerApi.checkout({

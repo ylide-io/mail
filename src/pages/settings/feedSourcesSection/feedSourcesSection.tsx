@@ -19,7 +19,8 @@ import { DASH } from '../../../constants';
 import { ReactComponent as ContactSvg } from '../../../icons/ic20/contact.svg';
 import { ReactComponent as SearchSvg } from '../../../icons/ic28/search.svg';
 import { sideFeedIcon } from '../../../icons/static/sideFeedIcon';
-import { feedSettings, getReasonOrder } from '../../../stores/FeedSettings';
+import domain from '../../../stores/Domain';
+import { getReasonOrder } from '../../../stores/FeedSettings';
 import { DomainAccount } from '../../../stores/models/DomainAccount';
 import { toggleArrayItem } from '../../../utils/array';
 import { invariant } from '../../../utils/assert';
@@ -31,18 +32,18 @@ export interface FeedSourcesSectionProps {
 }
 
 export const FeedSourcesSection = observer(({ account }: FeedSourcesSectionProps) => {
-	invariant(account.mainViewKey, 'FeedSettings only supports MV accounts');
+	invariant(account.mainviewKey, 'FeedSettings only supports MV accounts');
 
-	const config = feedSettings.getAccountConfig(account);
-	const [selectedSourceIds, setSelectedSourceIds] = useState(feedSettings.getSelectedSourceIds(account));
+	const config = domain.feedSettings.getAccountConfig(account);
+	const [selectedSourceIds, setSelectedSourceIds] = useState(domain.feedSettings.getSelectedSourceIds(account));
 
 	const [isSearchOpen, setSearchOpen] = useState(false);
 	const [searchTerm, setSearchTerm] = useState('');
 
 	const [sourcesByReason, rows] = useMemo(() => {
-		const config = feedSettings.getAccountConfig(account);
+		const config = domain.feedSettings.getAccountConfig(account);
 
-		const sources = feedSettings.sources.slice().filter(source => {
+		const sources = domain.feedSettings.sources.slice().filter(source => {
 			const term = searchTerm.trim().toLowerCase();
 			if (!term) return true;
 
@@ -92,10 +93,11 @@ export const FeedSourcesSection = observer(({ account }: FeedSourcesSectionProps
 		return [aggregated, (Object.entries(aggregated) as [FeedReasonOrEmpty, FeedSource[]][]).flat(2)];
 		// do not include selectedSourceIds,
 		// we don't want to sort during checkbox toggle
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [account, searchTerm]);
 
 	const saveConfigMutation = useMutation({
-		mutationFn: () => feedSettings.updateFeedConfig(account, selectedSourceIds),
+		mutationFn: () => domain.feedSettings.updateFeedConfig(account, selectedSourceIds),
 		onError: () => toast("Couldn't save your feed settings. Please try again."),
 	});
 
@@ -193,7 +195,7 @@ export const FeedSourcesSection = observer(({ account }: FeedSourcesSectionProps
 							)}
 						</AutoSizer>
 					</div>
-				) : feedSettings.isError ? (
+				) : domain.feedSettings.isError ? (
 					<ErrorMessage className={css.error}>Couldn't load source list</ErrorMessage>
 				) : (
 					<OverlappingLoader text="Loading sources ..." />

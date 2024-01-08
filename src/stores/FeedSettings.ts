@@ -4,7 +4,7 @@ import { autorun, makeObservable, observable } from 'mobx';
 import { FeedManagerApi } from '../api/feedManagerApi';
 import { FeedReason, FeedReasonOrEmpty, FeedServerApi, FeedSource } from '../api/feedServerApi';
 import { analytics } from './Analytics';
-import domain from './Domain';
+import type { Domain } from './Domain';
 import { DomainAccount } from './models/DomainAccount';
 
 export interface FeedSettingsData {
@@ -164,7 +164,7 @@ export class FeedSettings {
 	@observable
 	tags: { id: number; name: string }[] | 'loading' | 'error' = 'loading';
 
-	constructor() {
+	constructor(domain: Domain) {
 		makeObservable(this);
 
 		FeedManagerApi.getTags()
@@ -180,20 +180,22 @@ export class FeedSettings {
 			.catch(() => (this.isError = true));
 
 		autorun(() => {
-			domain.accounts.mainViewAccounts
-				.filter(account => !this.configs.has(account))
-				.forEach(async account => {
+			console.log('yay1: ', domain.account && this.configs.has(domain.account));
+			if (domain.account && !this.configs.has(domain.account)) {
+				const acc = domain.account;
+				console.log('yay2');
+				(async () => {
 					try {
-						this.configs.set(account, 'loading');
-						this.coverages.set(account, 'loading');
+						this.configs.set(acc, 'loading');
+						this.coverages.set(acc, 'loading');
 
 						const [configResponse, coverageResponse] = await Promise.allSettled([
-							FeedManagerApi.getConfig({ token: account.mainViewKey }),
-							FeedManagerApi.getCoverage(account.mainViewKey),
+							FeedManagerApi.getConfig({ token: acc.mainviewKey }),
+							FeedManagerApi.getCoverage(acc.mainviewKey),
 						]);
 						if (configResponse.status === 'fulfilled') {
 							const { config, defaultProjects } = configResponse.value;
-							this.configs.set(account, {
+							this.configs.set(acc, {
 								mode: config.mode,
 								includedSourceIds: config.includedSourceIds,
 								excludedSourceIds: config.excludedSourceIds,
@@ -209,15 +211,16 @@ export class FeedSettings {
 						}
 						if (coverageResponse.status === 'fulfilled') {
 							const coverage = calculateCoverage(coverageResponse.value);
-							this.coverages.set(account, coverage);
+							this.coverages.set(acc, coverage);
 						} else {
-							this.coverages.set(account, 'error');
+							this.coverages.set(acc, 'error');
 							console.log(`Failed to get coverage - ${coverageResponse.reason}`);
 						}
 					} catch (e) {
 						this.isError = true;
 					}
-				});
+				})();
+			}
 		});
 	}
 
@@ -254,10 +257,10 @@ export class FeedSettings {
 		const sourceIdsToAdd = difference(selectedSourceIds, initiallySelectedSourceIds);
 
 		if (sourceIdsToRemove.length) {
-			analytics.mainviewFeedSettingsRemoveSources(account.account.address, sourceIdsToRemove);
+			analytics.mainviewFeedSettingsRemoveSources(account.address, sourceIdsToRemove);
 		}
 		if (sourceIdsToAdd.length) {
-			analytics.mainviewFeedSettingsAddSources(account.account.address, sourceIdsToAdd);
+			analytics.mainviewFeedSettingsAddSources(account.address, sourceIdsToAdd);
 		}
 
 		const defaultProjectIds = config.defaultProjects.map(p => p.projectId);
@@ -280,7 +283,7 @@ export class FeedSettings {
 			.map(s => s.id);
 
 		await FeedManagerApi.setConfig({
-			token: account.mainViewKey,
+			token: account.mainviewKey,
 			config: {
 				mode: config.mode,
 				excludedSourceIds: config.excludedSourceIds,
@@ -289,5 +292,3 @@ export class FeedSettings {
 		});
 	}
 }
-
-export const feedSettings = new FeedSettings();

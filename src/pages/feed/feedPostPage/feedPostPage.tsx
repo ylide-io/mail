@@ -5,12 +5,14 @@ import { generatePath, useParams } from 'react-router-dom';
 
 import { FeedServerApi } from '../../../api/feedServerApi';
 import { ActionButton, ActionButtonLook } from '../../../components/ActionButton/ActionButton';
+import { GridRowBox } from '../../../components/boxes/boxes';
 import { ErrorMessage } from '../../../components/errorMessage/errorMessage';
 import { NarrowContent } from '../../../components/genericLayout/content/narrowContent/narrowContent';
 import { GenericLayout } from '../../../components/genericLayout/genericLayout';
 import { SharePopup } from '../../../components/sharePopup/sharePopup';
 import { YlideLoader } from '../../../components/ylideLoader/ylideLoader';
 import { APP_NAME } from '../../../constants';
+import { ReactComponent as ArrowLeftSvg } from '../../../icons/ic20/arrowLeft.svg';
 import { ReactComponent as ShareSvg } from '../../../icons/ic20/share.svg';
 import { RoutePath } from '../../../stores/routePath';
 import { HorizontalAlignment } from '../../../utils/alignment';
@@ -18,8 +20,6 @@ import { invariant } from '../../../utils/assert';
 import { toAbsoluteUrl, useNav, usePreviousUrl } from '../../../utils/url';
 import { FeedPostItem } from '../_common/feedPostItem/feedPostItem';
 import css from './feedPostPage.module.scss';
-import { GridRowBox } from '../../../components/boxes/boxes';
-import { ReactComponent as ArrowLeftSvg } from '../../../icons/ic20/arrowLeft.svg';
 
 export function FeedPostPage() {
 	const navigate = useNav();
@@ -85,7 +85,7 @@ export function FeedPostPage() {
 				}
 			>
 				{data ? (
-					<FeedPostItem post={data.post} />
+					<FeedPostItem feedType="generic" post={data.post} />
 				) : isLoading ? (
 					<YlideLoader className={css.loader} reason="Loading post ..." />
 				) : (

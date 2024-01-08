@@ -1,38 +1,23 @@
 import clsx from 'clsx';
-import { observable, reaction } from 'mobx';
+import { observable } from 'mobx';
 import { observer } from 'mobx-react';
-import { AnchorHTMLAttributes, Fragment, PropsWithChildren, ReactNode, useEffect, useState } from 'react';
-import { useQuery } from 'react-query';
+import { AnchorHTMLAttributes, Fragment, PropsWithChildren, ReactNode } from 'react';
 import { generatePath, useLocation } from 'react-router-dom';
 
-import { FeedManagerApi } from '../../../api/feedManagerApi';
-import { AppMode, REACT_APP__APP_MODE } from '../../../env';
-import { ReactComponent as ArchiveSvg } from '../../../icons/archive.svg';
+import { ReactComponent as AddContactSvg } from '../../../icons/ic20/addContact.svg';
 import { ReactComponent as ArrowDownSvg } from '../../../icons/ic20/arrowDown.svg';
 import { ReactComponent as ArrowUpSvg } from '../../../icons/ic20/arrowUp.svg';
 import { ReactComponent as ContactSvg } from '../../../icons/ic20/contact.svg';
 import { ReactComponent as SettingsSvg } from '../../../icons/ic20/settings.svg';
 import { ReactComponent as SidebarMenuSvg } from '../../../icons/ic28/sidebarMenu.svg';
 import { ReactComponent as SidebarMenuCloseSvg } from '../../../icons/ic28/sidebarMenu_close.svg';
-import { ReactComponent as InboxSvg } from '../../../icons/inbox.svg';
-import { ReactComponent as SentSvg } from '../../../icons/sent.svg';
 import { ReactComponent as TwitterSvg } from '../../../icons/social/twitter.svg';
 import { sideFeedIcon } from '../../../icons/static/sideFeedIcon';
 import { SettingsSection } from '../../../pages/settings/settingsPage';
 import { analytics } from '../../../stores/Analytics';
-import {
-	activeTvmProjects,
-	activeVenomProjects,
-	BlockchainProjectId,
-	blockchainProjectsMeta,
-} from '../../../stores/blockchainProjects/blockchainProjects';
 import { browserStorage } from '../../../stores/browserStorage';
 import domain from '../../../stores/Domain';
-import { feedSettings } from '../../../stores/FeedSettings';
-import { FolderId, getFolderName, MailList } from '../../../stores/MailList';
 import { RoutePath } from '../../../stores/routePath';
-import { invariant } from '../../../utils/assert';
-import { useOpenMailCompose } from '../../../utils/mail';
 import { constrain } from '../../../utils/number';
 import { isTrialActive } from '../../../utils/payments';
 import { useNav } from '../../../utils/url';
@@ -111,6 +96,7 @@ interface SidebarButtonProps {
 	href: string;
 	isActiveChecker?: (pathname: string) => boolean;
 	icon?: ReactNode;
+	disabled?: boolean;
 	name: ReactNode;
 	onClick?: () => void;
 	rightButton?: {
@@ -121,7 +107,7 @@ interface SidebarButtonProps {
 }
 
 export const SidebarButton = observer(
-	({ look, href, isActiveChecker, icon, name, rightButton, onClick }: SidebarButtonProps) => {
+	({ look, href, disabled, isActiveChecker, icon, name, rightButton, onClick }: SidebarButtonProps) => {
 		const location = useLocation();
 		const navigate = useNav();
 
@@ -145,7 +131,12 @@ export const SidebarButton = observer(
 		return (
 			<a
 				{...externalProps}
-				className={clsx(css.sectionLink, lookClass, isActive && css.sectionLink_active)}
+				className={clsx(
+					css.sectionLink,
+					lookClass,
+					isActive && css.sectionLink_active,
+					disabled && css.sectionLink_disabled,
+				)}
 				href={href}
 				onClick={e => {
 					if (!isExternal) {
@@ -181,7 +172,7 @@ export const SidebarButton = observer(
 
 export const SidebarSmartFeedSection = observer(() => {
 	const navigate = useNav();
-	const accounts = domain.accounts.activeAccounts;
+	const accounts = domain.account ? [domain.account] : [];
 
 	return (
 		<SidebarSection section={Section.FEED} title="Feed">
@@ -189,9 +180,7 @@ export const SidebarSmartFeedSection = observer(() => {
 				href={generatePath(RoutePath.FEED_SMART)}
 				icon={sideFeedIcon(14)}
 				onClick={() => {
-					if (REACT_APP__APP_MODE === AppMode.MAIN_VIEW) {
-						analytics.mainviewSmartFeedClick();
-					}
+					analytics.mainviewSmartFeedClick();
 				}}
 				name="Smart feed"
 			/>
@@ -200,39 +189,64 @@ export const SidebarSmartFeedSection = observer(() => {
 				<SidebarButton
 					key={i}
 					look={SidebarButtonLook.SUBMENU}
-					href={generatePath(RoutePath.FEED_SMART_ADDRESS, { address: account.account.address })}
+					href={generatePath(RoutePath.FEED_SMART_ADDRESS, { address: account.address })}
 					icon={<ContactSvg />}
-					name={<AdaptiveText text={account.name || account.account.address} />}
+					name={<AdaptiveText text={account.address} />}
 					onClick={() => {
-						if (REACT_APP__APP_MODE === AppMode.MAIN_VIEW) {
-							analytics.mainviewPersonalFeedClick(account.account.address);
-						}
+						analytics.mainviewPersonalFeedClick(account.address);
 					}}
-					rightButton={
-						REACT_APP__APP_MODE === AppMode.MAIN_VIEW
-							? {
-									icon: <SettingsSvg />,
-									title: 'Account Settings',
-									onClick: () => {
-										if (!account.mainViewKey) {
-											return toast('Please complete the onboarding first ❤');
-										}
+					rightButton={{
+						icon: <SettingsSvg />,
+						title: 'Account Settings',
+						onClick: () => {
+							if (!account.mainviewKey) {
+								return toast('Please complete the onboarding first ❤');
+							}
 
-										analytics.mainviewFeedSettingsClick(account.account.address);
+							analytics.mainviewFeedSettingsClick(account.address);
 
-										isSidebarOpen.set(false);
-										navigate(
-											generatePath(RoutePath.SETTINGS_ADDRESS_SECTION, {
-												address: account.account.address,
-												section: SettingsSection.SOURCES,
-											}),
-										);
-									},
-							  }
-							: undefined
-					}
+							isSidebarOpen.set(false);
+							navigate(
+								generatePath(RoutePath.SETTINGS_ADDRESS_SECTION, {
+									address: account.address,
+									section: SettingsSection.SOURCES,
+								}),
+							);
+						},
+					}}
 				/>
 			))}
+			<SidebarButton
+				look={SidebarButtonLook.SUBMENU}
+				href={'#'}
+				disabled
+				icon={<AddContactSvg />}
+				name={
+					<div
+						style={{
+							display: 'flex',
+							flexDirection: 'row',
+							alignItems: 'center',
+							justifyContent: 'space-between',
+						}}
+					>
+						<span>Add address</span>
+						<span
+							style={{
+								padding: '0px 2px',
+								background: 'rgba(0, 0, 0, 0.1)',
+								borderRadius: 3,
+								fontSize: 11,
+							}}
+						>
+							Soon
+						</span>
+					</div>
+				}
+				onClick={() => {
+					//
+				}}
+			/>
 		</SidebarSection>
 	);
 });
@@ -240,257 +254,68 @@ export const SidebarSmartFeedSection = observer(() => {
 //
 
 export const TrialPeriodSection = observer(() => {
-	const accounts = domain.accounts.activeAccounts;
+	const paymentInfo = domain.paymentInfo;
+	const trial = isTrialActive(paymentInfo);
 
-	const paymentInfoQuery = useQuery(['sidebar', 'trials', accounts.map(a => a.mainViewKey).join(',')], () =>
-		Promise.all(
-			accounts.map(account =>
-				FeedManagerApi.getPaymentInfo({ token: account.mainViewKey })
-					.then(info => ({
-						...info,
-						account,
-					}))
-					.catch(() => undefined),
-			),
-		),
-	);
-
-	const trials = paymentInfoQuery.data?.filter(isTrialActive) || [];
+	if (!paymentInfo || !trial || !domain.account) {
+		return null;
+	}
 
 	return (
 		<>
-			{!!trials?.length && <div className={css.divider} />}
+			<div className={css.divider} />
 
-			{trials?.map((info, i) => {
-				invariant(info);
-
-				return (
-					<div key={i} className={css.trial}>
-						<b>7-day trial period</b>
-						<div className={css.trialProgress}>
-							<div
-								className={css.trialProgressValue}
-								style={{
-									width: `${
-										constrain(
-											1 - (info.status.until - Date.now() / 1000) / (60 * 60 * 24 * 7),
-											0,
-											1,
-										) * 100
-									}%`,
-								}}
-							/>
-						</div>
-						<AdaptiveAddress
-							className={css.trialAddress}
-							address={info.account.account.address}
-							maxLength={12}
-						/>
-					</div>
-				);
-			})}
+			<div className={css.trial}>
+				<b>7-day trial period</b>
+				<div className={css.trialProgress}>
+					<div
+						className={css.trialProgressValue}
+						style={{
+							width: `${
+								constrain(
+									1 - (paymentInfo.status.until - Date.now() / 1000) / (60 * 60 * 24 * 7),
+									0,
+									1,
+								) * 100
+							}%`,
+						}}
+					/>
+				</div>
+				<AdaptiveAddress className={css.trialAddress} address={domain.account.address} maxLength={12} />
+			</div>
 		</>
 	);
 });
 
-//
-
-export const SidebarMailSection = observer(() => {
-	const openMailCompose = useOpenMailCompose();
-
-	const accounts = domain.accounts.activeAccounts;
-
-	const [hasNewMessages, setHasNewMessages] = useState(false);
-
-	useEffect(() => {
-		const mailList = new MailList();
-
-		mailList.init({
-			mailbox: {
-				accounts,
-				folderId: FolderId.Inbox,
-			},
-		});
-
-		const key = accounts
-			.map(a => a.account.address)
-			.sort()
-			.join(',');
-
-		const dispose = reaction(
-			() => ({
-				newMessagesCount: mailList.newMessagesCount,
-				messagesData: mailList.messagesData,
-				lastMailboxCheckDate: browserStorage.lastMailboxCheckDate,
-			}),
-			({ newMessagesCount, messagesData, lastMailboxCheckDate }) => {
-				if (newMessagesCount) {
-					mailList.drainNewMessages();
-				}
-
-				const lastMessage = messagesData[0];
-				const lastCheckedDate = lastMailboxCheckDate[key];
-
-				setHasNewMessages(
-					!!lastMessage && (!lastCheckedDate || lastMessage.raw.msg.createdAt > lastCheckedDate),
-				);
-			},
-		);
-
-		return () => {
-			dispose();
-			mailList.destroy();
-		};
-	}, [accounts]);
-
-	return (
-		<SidebarSection section={Section.MAIL} title="Mail">
-			<ActionButton
-				look={ActionButtonLook.PRIMARY}
-				className={css.sectionButton}
-				onClick={() => {
-					isSidebarOpen.set(false);
-					openMailCompose({ place: 'sidebar' });
-				}}
-			>
-				Compose mail
-			</ActionButton>
-
-			<SidebarButton
-				href={generatePath(RoutePath.MAIL_FOLDER, { folderId: FolderId.Inbox })}
-				icon={<InboxSvg />}
-				name={
-					<div className={css.inboxButton}>
-						{getFolderName(FolderId.Inbox)}
-						{hasNewMessages && <div className={css.inboxNotification} title="You have new messages" />}
-					</div>
-				}
-			/>
-
-			<SidebarButton
-				href={generatePath(RoutePath.MAIL_FOLDER, { folderId: FolderId.Sent })}
-				icon={<SentSvg />}
-				name={getFolderName(FolderId.Sent)}
-			/>
-
-			<SidebarButton
-				href={generatePath(RoutePath.MAIL_FOLDER, { folderId: FolderId.Archive })}
-				icon={<ArchiveSvg />}
-				name={getFolderName(FolderId.Archive)}
-			/>
-		</SidebarSection>
-	);
-});
-
-//
-
 export const SidebarMenu = observer(() => {
-	const tags = feedSettings.tags;
+	const tags = domain.feedSettings.tags;
 	const navigate = useNav();
-
-	function renderProjects(projects: BlockchainProjectId[]) {
-		return projects.map(id => {
-			const meta = blockchainProjectsMeta[id];
-
-			return (
-				<SidebarButton
-					key={id}
-					href={generatePath(RoutePath.FEED_PROJECT_POSTS, { projectId: meta.id })}
-					name={meta.name}
-					icon={meta.logo}
-				/>
-			);
-		});
-	}
 
 	return (
 		<div className={css.root}>
-			{REACT_APP__APP_MODE === AppMode.OTC && (
-				<SidebarSection section={Section.OTC} title="OTC Trading">
-					<SidebarButton
-						href={generatePath(RoutePath.OTC_ASSETS)}
-						icon={<InboxSvg />}
-						name="Asset Explorer"
-					/>
+			<SidebarSmartFeedSection />
 
-					<SidebarButton href={generatePath(RoutePath.OTC_CHATS)} icon={<SentSvg />} name="Chats" />
-				</SidebarSection>
-			)}
-
-			{REACT_APP__APP_MODE === AppMode.MAIN_VIEW && <SidebarSmartFeedSection />}
-
-			{REACT_APP__APP_MODE === AppMode.HUB && (
-				<>
-					<div>
+			<SidebarSection section={Section.FEED_DISCOVERY} title="Discovery">
+				{/* TODO: KONST */}
+				{tags === 'error' ? (
+					<></>
+				) : tags === 'loading' ? (
+					<div>Loading</div>
+				) : (
+					tags.map(t => (
 						<SidebarButton
-							look={SidebarButtonLook.SECTION}
-							href={generatePath(RoutePath.FEED_PROJECT_POSTS, {
-								projectId: BlockchainProjectId.GENERAL,
-							})}
-							name={blockchainProjectsMeta[BlockchainProjectId.GENERAL].name}
-							icon={blockchainProjectsMeta[BlockchainProjectId.GENERAL].logo}
+							key={t.id}
+							href={generatePath(RoutePath.FEED_CATEGORY, { tag: t.id.toString() })}
+							name={t.name}
+							onClick={() => {
+								analytics.mainviewTagFeedClick(t.id);
+							}}
 						/>
+					))
+				)}
+			</SidebarSection>
 
-						<SidebarButton
-							look={SidebarButtonLook.SECTION}
-							href={generatePath(RoutePath.FEED_PROJECT_POSTS, {
-								projectId: BlockchainProjectId.ETH_WHALES,
-							})}
-							name={blockchainProjectsMeta[BlockchainProjectId.ETH_WHALES].name}
-							icon={blockchainProjectsMeta[BlockchainProjectId.ETH_WHALES].logo}
-						/>
-					</div>
-
-					<SidebarSection section={Section.VENOM_PROJECTS} title="Venom Projects">
-						{renderProjects(activeVenomProjects)}
-					</SidebarSection>
-
-					<SidebarSection section={Section.TVM_PROJECTS} title="TVM 주요정보">
-						{renderProjects(activeTvmProjects)}
-					</SidebarSection>
-
-					<ActionButton
-						className={css.sectionButton}
-						onClick={() => {
-							analytics.openCreateCommunityForm();
-							window.open('https://forms.gle/p9141gy5wn7DCjZA8', '_blank')?.focus();
-						}}
-					>
-						Create community
-					</ActionButton>
-				</>
-			)}
-
-			{REACT_APP__APP_MODE === AppMode.MAIN_VIEW && (
-				<SidebarSection
-					section={Section.FEED_DISCOVERY}
-					title={REACT_APP__APP_MODE === AppMode.MAIN_VIEW ? 'Discovery' : 'Feed'}
-				>
-					{/* TODO: KONST */}
-					{tags === 'error' ? (
-						<></>
-					) : tags === 'loading' ? (
-						<div>Loading</div>
-					) : (
-						tags.map(t => (
-							<SidebarButton
-								key={t.id}
-								href={generatePath(RoutePath.FEED_CATEGORY, { tag: t.id.toString() })}
-								name={t.name}
-								onClick={() => {
-									if (REACT_APP__APP_MODE === AppMode.MAIN_VIEW) {
-										analytics.mainviewTagFeedClick(t.id);
-									}
-								}}
-							/>
-						))
-					)}
-				</SidebarSection>
-			)}
-
-			{REACT_APP__APP_MODE === AppMode.HUB && <SidebarMailSection />}
-
-			{REACT_APP__APP_MODE === AppMode.MAIN_VIEW && <TrialPeriodSection />}
+			<TrialPeriodSection />
 
 			<div className={css.divider} />
 			<div className={css.socials}>

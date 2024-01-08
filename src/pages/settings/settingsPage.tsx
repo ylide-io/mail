@@ -28,7 +28,7 @@ export const SettingsPage = observer(() => {
 		section?: SettingsSection;
 	}>();
 
-	const currentAccount = domain.accounts.activeAccounts.find(a => a.account.address === currentAddress);
+	const currentAccount = domain.account;
 
 	function renderTab(section: SettingsSection, name: ReactNode) {
 		const isActive = section === currentSection;

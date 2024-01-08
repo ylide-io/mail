@@ -1,8 +1,6 @@
-import { WalletAccount } from '@ylide/sdk';
 import { makeAutoObservable } from 'mobx';
 
 import { Section } from '../components/genericLayout/sidebar/sidebarMenu';
-import { WidgetId } from '../pages/widgets/widgets';
 import { toggleArrayItem } from '../utils/array';
 
 enum BrowserStorageKey {
@@ -14,14 +12,9 @@ enum BrowserStorageKey {
 	WIDGET_ID = 'ylide_widgetId',
 	MAIN_VIEW_KEYS = 'ylide_mainViewKeys',
 	REFERRER = 'ylide_referrer',
+	IS_AUTHORIZED = 'ylide_isAuthorized',
 	LAST_MAILBOX_INCOMING_DATE = 'ylide_lastMailboxCheckDate',
 	SAVED_ACCOUNTS = 'ylide_savedAccounts',
-}
-
-export interface SavedAccount {
-	name: string;
-	account: WalletAccount;
-	wallet: string;
 }
 
 class BrowserStorage {
@@ -50,66 +43,6 @@ class BrowserStorage {
 		}
 	}
 
-	private _savedAccounts =
-		BrowserStorage.getItemWithTransform<SavedAccount[]>(BrowserStorageKey.SAVED_ACCOUNTS, val => {
-			const parsed = JSON.parse(val);
-			if (!Array.isArray(parsed)) {
-				return [];
-			} else {
-				return parsed.map((acc: any) => ({
-					...acc,
-					account: WalletAccount.fromBase64(acc.account),
-				}));
-			}
-		}) || [];
-
-	get savedAccounts() {
-		return this._savedAccounts;
-	}
-
-	set savedAccounts(value: SavedAccount[]) {
-		BrowserStorage.setItem(
-			BrowserStorageKey.SAVED_ACCOUNTS,
-			JSON.stringify(
-				value.map(v => ({
-					...v,
-					account: v.account.toBase64(),
-				})),
-			),
-		);
-		this._savedAccounts = value;
-	}
-
-	//
-
-	private _adminPassword = BrowserStorage.getItem(BrowserStorageKey.ADMIN_PASSWORD, sessionStorage);
-
-	get adminPassword() {
-		return this._adminPassword;
-	}
-
-	set adminPassword(value: string | undefined) {
-		BrowserStorage.setItem(BrowserStorageKey.ADMIN_PASSWORD, value, sessionStorage);
-		this._adminPassword = value;
-	}
-
-	get isUserAdmin() {
-		return !!this.adminPassword;
-	}
-
-	//
-
-	private _isMainViewBannerHidden = BrowserStorage.getItem(BrowserStorageKey.IS_MAIN_VIEW_BANNER_HIDDEN) === 'true';
-
-	get isMainViewBannerHidden() {
-		return this._isMainViewBannerHidden;
-	}
-
-	set isMainViewBannerHidden(value: boolean) {
-		BrowserStorage.setItem(BrowserStorageKey.IS_MAIN_VIEW_BANNER_HIDDEN, value);
-		this._isMainViewBannerHidden = value;
-	}
-
 	private _sidebarFoldedSections =
 		BrowserStorage.getItemWithTransform(
 			BrowserStorageKey.SIDEBAR_FOLDED_SECTIONS,
@@ -127,32 +60,6 @@ class BrowserStorage {
 			newValue.length ? newValue.join(',') : undefined,
 		);
 		this._sidebarFoldedSections = newValue;
-	}
-
-	//
-
-	private _saveDecodedMessages = BrowserStorage.getItem(BrowserStorageKey.SAVE_DECODED_MESSAGES) !== 'false';
-
-	get saveDecodedMessages() {
-		return this._saveDecodedMessages;
-	}
-
-	set saveDecodedMessages(value: boolean) {
-		BrowserStorage.setItem(BrowserStorageKey.SAVE_DECODED_MESSAGES, value);
-		this._saveDecodedMessages = value;
-	}
-
-	//
-
-	private _widgetId = BrowserStorage.getItem<WidgetId>(BrowserStorageKey.WIDGET_ID, sessionStorage);
-
-	get widgetId() {
-		return this._widgetId;
-	}
-
-	set widgetId(value: WidgetId | undefined) {
-		BrowserStorage.setItem(BrowserStorageKey.WIDGET_ID, value, sessionStorage);
-		this._widgetId = value;
 	}
 
 	//
@@ -184,16 +91,12 @@ class BrowserStorage {
 
 	//
 
-	private _lastMailboxCheckDate: Record<string, number> =
-		BrowserStorage.getItemWithTransform(BrowserStorageKey.LAST_MAILBOX_INCOMING_DATE, JSON.parse) || {};
-
-	get lastMailboxCheckDate() {
-		return this._lastMailboxCheckDate;
+	get isAuthorized() {
+		return BrowserStorage.getItem(BrowserStorageKey.IS_AUTHORIZED) === 'true' || false;
 	}
 
-	set lastMailboxCheckDate(value: Record<string, number>) {
-		BrowserStorage.setItem(BrowserStorageKey.LAST_MAILBOX_INCOMING_DATE, JSON.stringify(value));
-		this._lastMailboxCheckDate = value;
+	set isAuthorized(value: boolean) {
+		BrowserStorage.setItem(BrowserStorageKey.IS_AUTHORIZED, value ? 'true' : 'false');
 	}
 }
 

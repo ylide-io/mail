@@ -1,6 +1,3 @@
-import { TVMWalletController } from '@ylide/everscale';
-import { asyncDelay } from '@ylide/sdk';
-import { observable } from 'mobx';
 import { observer } from 'mobx-react';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useMutation, useQuery } from 'react-query';
@@ -11,10 +8,10 @@ import { APP_NAME } from '../../constants';
 import { analytics } from '../../stores/Analytics';
 import { browserStorage } from '../../stores/browserStorage';
 import domain from '../../stores/Domain';
-import { feedSettings } from '../../stores/FeedSettings';
 import { DomainAccount } from '../../stores/models/DomainAccount';
-import { connectAccount, ConnectAccountResult, disconnectAccount, formatAccountName } from '../../utils/account';
+import { disconnectAccount, formatAccountName } from '../../utils/account';
 import { invariant } from '../../utils/assert';
+import { asyncDelay } from '../../utils/asyncDelay';
 import { addressesEqual } from '../../utils/blockchain';
 import { checkout, CheckoutResult, isPaid, isTrialActive, useCheckoutSearchParams } from '../../utils/payments';
 import { truncateAddress } from '../../utils/string';
@@ -22,70 +19,55 @@ import { useLatest } from '../../utils/useLatest';
 import { ActionButton, ActionButtonLook, ActionButtonSize } from '../ActionButton/ActionButton';
 import { ActionModal } from '../actionModal/actionModal';
 import { CoverageModal } from '../coverageModal/coverageModal';
-import { IosInstallPwaPopup } from '../iosInstallPwaPopup/iosInstallPwaPopup';
 import { LoadingModal } from '../loadingModal/loadingModal';
 import { Modal } from '../modal/modal';
 import { toast } from '../toast/toast';
 import css from './mainViewOnboarding.module.scss';
 
-export interface ConnectAccountFlowProps {
-	onClose: (result: ConnectAccountResult | undefined) => void;
-}
-
-export const ConnectAccountFlow = observer(({ onClose }: ConnectAccountFlowProps) => {
-	const noCloseButton = !domain.accounts.accounts.length;
-	const onCloseRef = useLatest(onClose);
-
-	useEffect(() => {
-		(async () => {
-			try {
-				analytics.mainviewOnboardingEvent('start');
-				const caResult = await connectAccount({ noCloseButton, place: 'mv_onboarding' });
-				if (caResult?.account) {
-					analytics.mainviewOnboardingEvent('account-connected');
-				}
-				onCloseRef.current(caResult);
-			} catch (e) {
-				onCloseRef.current(undefined);
-			}
-		})();
-	}, [noCloseButton, onCloseRef]);
-
-	return (
-		<>
-			<LoadingModal reason="Connecting account ..." />
-
-			<IosInstallPwaPopup />
-		</>
-	);
-});
-
-//
+// <IosInstallPwaPopup />
 
 export interface AuthorizeAccountFlowProps {
-	account: DomainAccount;
-	password: string;
+	address: string;
 	onClose: (account?: DomainAccount) => void;
 }
 
-export const AuthorizeAccountFlow = observer(({ account, password, onClose }: AuthorizeAccountFlowProps) => {
+export const AuthorizeAccountFlow = observer(({ address, onClose }: AuthorizeAccountFlowProps) => {
 	const onCloseRef = useLatest(onClose);
 
 	useEffect(() => {
 		(async () => {
 			try {
-				const payload = await account.makeMainViewKey(password);
-				invariant(payload);
-				const { token } = await FeedManagerApi.authAddress(payload, browserStorage.referrer);
-				account.mainViewKey = token;
-				analytics.mainviewOnboardingEvent('account-authorized');
-				onCloseRef.current(account);
+				const timestamp = Math.floor(Date.now() / 1000);
+				analytics.mainviewOnboardingEvent('request-signature');
+				let signature;
+				try {
+					signature = await domain._signMessageAsync({
+						message: `Mainview auth for address ${address}, timestamp: ${timestamp}`,
+					});
+				} catch (e) {
+					analytics.mainviewOnboardingEvent('signature-reject');
+					throw e;
+				}
+				const { token } = await FeedManagerApi.authAddress(
+					{ address, timestamp, signature },
+					browserStorage.referrer,
+				);
+				if (token) {
+					browserStorage.mainViewKeys = {
+						...browserStorage.mainViewKeys,
+						[address]: token,
+					};
+					analytics.mainviewOnboardingEvent('account-authorized');
+					onCloseRef.current(new DomainAccount(address, token));
+				} else {
+					onCloseRef.current();
+				}
 			} catch (e) {
 				analytics.mainviewOnboardingEvent('authorization-error');
 				onCloseRef.current();
 			}
 		})();
-	}, [account, onCloseRef, password]);
+	}, [address, onCloseRef]);
 
 	return <LoadingModal reason="Authorization ..." />;
 });
@@ -99,10 +81,10 @@ export interface PaymentFlowProps {
 }
 
 export const PaymentFlow = observer(({ account, onPaid, onCancel }: PaymentFlowProps) => {
-	const paymentInfoQuery = useQuery(['payments', 'info', 'account', account.mainViewKey], {
+	const paymentInfoQuery = useQuery(['payments', 'info', 'account', account.mainviewKey], {
 		queryFn: async () => {
 			const [paymentInfo, prices] = await Promise.all([
-				FeedManagerApi.getPaymentInfo({ token: account.mainViewKey }),
+				FeedManagerApi.getPaymentInfo({ token: account.mainviewKey }),
 				FeedManagerApi.getPrices(),
 			]);
 
@@ -225,11 +207,11 @@ interface PaymentSuccessFlowProps {
 export function PaymentSuccessFlow({ account, onClose }: PaymentSuccessFlowProps) {
 	const startTime = useMemo(() => Date.now(), []);
 
-	const paymentInfo = useQuery(['payment-success', account.mainViewKey], {
+	const paymentInfo = useQuery(['payment-success', account.mainviewKey], {
 		queryFn: () => {
 			invariant(Date.now() - startTime < 1000 * 60);
 
-			return FeedManagerApi.getPaymentInfo({ token: account.mainViewKey });
+			return FeedManagerApi.getPaymentInfo({ token: account.mainviewKey });
 		},
 		onSuccess: info => {
 			if (isPaid(info)) {
@@ -276,18 +258,17 @@ export interface BuildFeedFlowProps {
 
 export const BuildFeedFlow = observer(({ account, onClose }: BuildFeedFlowProps) => {
 	const onCloseRef = useLatest(onClose);
-	const coverage = feedSettings.coverages.get(account);
+	const coverage = domain.feedSettings.coverages.get(account);
 
 	useEffect(() => {
 		(async () => {
 			try {
-				const token = account.mainViewKey;
+				const token = account.mainviewKey;
+
+				console.log('account.mainviewKey: ', account.mainviewKey);
 				invariant(token, 'No main view key');
 
-				const res = await FeedManagerApi.init(
-					token,
-					account.wallet.controller instanceof TVMWalletController ? account.wallet.wallet : undefined,
-				);
+				const res = await FeedManagerApi.init(token, undefined);
 
 				if (res?.inLine) {
 					async function checkInit() {
@@ -327,33 +308,12 @@ export const BuildFeedFlow = observer(({ account, onClose }: BuildFeedFlowProps)
 	);
 });
 
-//
-
-export const isOnboardingInProgress = observable.box(false);
-
 enum StepType {
-	CONNECT_ACCOUNT = 'CONNECT_ACCOUNT',
-	CONNECT_ACCOUNT_WARNING = 'CONNECT_ACCOUNT_WARNING',
-	AUTHORIZATION = 'AUTHORIZATION',
 	PAYMENT = 'PAYMENT',
 	PAYMENT_SUCCESS = 'PAYMENT_SUCCESS',
 	PAYMENT_FAILURE = 'PAYMENT_FAILURE',
 	BUILDING_FEED = 'BUILDING_FEED',
 	FATAL_ERROR = 'FATAL_ERROR',
-}
-
-interface ConnectAccountStep {
-	type: StepType.CONNECT_ACCOUNT;
-}
-
-interface ConnectAccountWarningStep {
-	type: StepType.CONNECT_ACCOUNT_WARNING;
-}
-
-interface AuthorizationStep {
-	type: StepType.AUTHORIZATION;
-	account: DomainAccount;
-	password: string;
 }
 
 interface PaymentStep {
@@ -380,32 +340,24 @@ interface FatalErrorStep {
 	type: StepType.FATAL_ERROR;
 }
 
-type Step =
-	| ConnectAccountStep
-	| ConnectAccountWarningStep
-	| AuthorizationStep
-	| PaymentStep
-	| PaymentSuccessStep
-	| PaymentFailureStep
-	| BuildingFeedStep
-	| FatalErrorStep;
+type Step = PaymentStep | PaymentSuccessStep | PaymentFailureStep | BuildingFeedStep | FatalErrorStep;
 
-export const MainViewOnboarding = observer(() => {
+export const MainViewOnboarding = observer(({ onResolve }: { onResolve?: (account: DomainAccount) => void }) => {
 	const [step, setStep] = useState<Step>();
-	isOnboardingInProgress.set(!!step);
 	const [searchParams] = useSearchParams();
 
-	const accounts = domain.accounts.accounts;
+	// eslint-disable-next-line react-hooks/exhaustive-deps
+	const accounts = useMemo(() => (domain.account ? [domain.account] : []), [domain.account]);
 	const checkoutSearchParams = useCheckoutSearchParams();
 
 	const paymentInfoQuery = useQuery(
-		['payments', 'info', 'all-accounts', accounts.map(a => a.mainViewKey).join(',')],
+		['payments', 'info', 'all-accounts', accounts.map(a => a.mainviewKey).join(',')],
 		() =>
 			Promise.all(
 				accounts.map(a =>
-					FeedManagerApi.getPaymentInfo({ token: a.mainViewKey })
+					FeedManagerApi.getPaymentInfo({ token: a.mainviewKey })
 						.then(info => ({
-							address: a.account.address,
+							address: a.address,
 							isTrialActive: isTrialActive(info),
 							isPaid: isPaid(info),
 						}))
@@ -419,16 +371,15 @@ export const MainViewOnboarding = observer(() => {
 			),
 	);
 
-	const reset = useCallback(() => {
-		setStep(undefined);
-	}, []);
-
-	// Disconnect inactive accounts before begin
-	useEffect(() => {
-		domain.accounts.accounts
-			.filter(a => !a.isAnyLocalPrivateKeyRegistered)
-			.forEach(a => disconnectAccount({ account: a }));
-	}, []);
+	const reset = useCallback(
+		(acc: DomainAccount | undefined) => {
+			setStep(undefined);
+			if (acc && onResolve) {
+				onResolve(acc);
+			}
+		},
+		[onResolve],
+	);
 
 	// Save referrer
 	useEffect(() => {
@@ -443,26 +394,17 @@ export const MainViewOnboarding = observer(() => {
 		// Do nothing if something is happening already
 		if (step) return;
 
-		if (!accounts.length) {
-			return setStep({ type: StepType.CONNECT_ACCOUNT });
-		}
-
-		const unauthAccount = accounts.find(a => !a.mainViewKey);
-		if (unauthAccount) {
-			return setStep({ type: StepType.AUTHORIZATION, account: unauthAccount, password: '' });
-		}
-
 		if (checkoutSearchParams.result) {
 			checkoutSearchParams.reset();
 
-			const account = accounts.find(a => addressesEqual(a.account.address, checkoutSearchParams.address));
+			const account = accounts.find(a => addressesEqual(a.address, checkoutSearchParams.address));
 			if (!account) {
 				toast(
 					`Account ${truncateAddress(
 						checkoutSearchParams.address,
 					)} not connected. Please connect it to proceed.`,
 				);
-				return reset();
+				return reset(undefined);
 			}
 
 			analytics.mainviewOnboardingEvent('payment-finish', {
@@ -485,7 +427,7 @@ export const MainViewOnboarding = observer(() => {
 
 		const unpaidAccount = accounts.find(a =>
 			paymentInfoQuery.data?.some(
-				info => info && addressesEqual(info.address, a.account.address) && !info.isPaid && !info.isTrialActive,
+				info => info && addressesEqual(info.address, a.address) && !info.isPaid && !info.isTrialActive,
 			),
 		);
 		if (unpaidAccount) {
@@ -497,62 +439,12 @@ export const MainViewOnboarding = observer(() => {
 		<>
 			{step && <LoadingModal />}
 
-			{step?.type === StepType.CONNECT_ACCOUNT && (
-				<ConnectAccountFlow
-					onClose={res => {
-						if (res?.account) {
-							setStep({
-								type: StepType.AUTHORIZATION,
-								account: res.account,
-								password: res.password || '',
-							});
-						} else if (!accounts.length) {
-							setStep({ type: StepType.CONNECT_ACCOUNT_WARNING });
-						} else {
-							reset();
-						}
-					}}
-				/>
-			)}
-
-			{step?.type === StepType.CONNECT_ACCOUNT_WARNING && (
-				<ActionModal
-					title="Connect Account"
-					buttons={
-						<ActionButton
-							size={ActionButtonSize.XLARGE}
-							look={ActionButtonLook.PRIMARY}
-							onClick={() => setStep({ type: StepType.CONNECT_ACCOUNT })}
-						>
-							Proceed
-						</ActionButton>
-					}
-				>
-					You need to connect a crypto wallet in order to use {APP_NAME} 👍
-				</ActionModal>
-			)}
-
-			{step?.type === StepType.AUTHORIZATION && (
-				<AuthorizeAccountFlow
-					account={step.account}
-					password={step.password}
-					onClose={account => {
-						if (account) {
-							setStep({ type: StepType.PAYMENT, account });
-						} else {
-							setStep({ type: StepType.FATAL_ERROR });
-						}
-					}}
-				/>
-			)}
-
 			{step?.type === StepType.PAYMENT && (
 				<PaymentFlow
 					account={step.account}
 					onPaid={() => setStep({ type: StepType.BUILDING_FEED, account: step.account })}
 					onCancel={async () => {
-						await disconnectAccount({ account: step.account, place: 'mv-onboarding_payments' });
-						setStep({ type: StepType.CONNECT_ACCOUNT });
+						await disconnectAccount({ place: 'mv-onboarding_payments' });
 					}}
 				/>
 			)}
@@ -597,7 +489,7 @@ export const MainViewOnboarding = observer(() => {
 							setStep({ type: StepType.FATAL_ERROR });
 						}
 
-						reset();
+						reset(step.account);
 					}}
 				/>
 			)}

@@ -15,12 +15,9 @@ import { ReadableDate } from '../../../../components/readableDate/readableDate';
 import { SharePopup } from '../../../../components/sharePopup/sharePopup';
 import { Spinner } from '../../../../components/spinner/spinner';
 import { toast } from '../../../../components/toast/toast';
-import { AppMode, REACT_APP__APP_MODE } from '../../../../env';
 import { ReactComponent as ContactSvg } from '../../../../icons/ic20/contact.svg';
 import { ReactComponent as MenuSvg } from '../../../../icons/ic20/menu.svg';
 import domain from '../../../../stores/Domain';
-import { feedSettings } from '../../../../stores/FeedSettings';
-import { DomainAccount } from '../../../../stores/models/DomainAccount';
 import { RoutePath } from '../../../../stores/routePath';
 import { formatAccountName } from '../../../../utils/account';
 import { HorizontalAlignment } from '../../../../utils/alignment';
@@ -30,6 +27,7 @@ import { FeedLinkTypeIcon } from '../feedLinkTypeIcon/feedLinkTypeIcon';
 import { PostItemContainer } from '../postItemContainer/postItemContainer';
 import css from './feedPostItem.module.scss';
 import UserProject = FeedManagerApi.UserProject;
+import { DomainAccount } from '../../../../stores/models/DomainAccount';
 
 interface FeedPostContentProps {
 	post: FeedPost;
@@ -103,15 +101,15 @@ interface AddtoMyFeedItemProps {
 export const AddToMyFeedItem = observer(({ post, account }: AddtoMyFeedItemProps) => {
 	const [isUpdating, setUpdating] = useState(false);
 
-	const isSelected = feedSettings.isSourceSelected(account, post.sourceId);
+	const isSelected = domain.feedSettings.isSourceSelected(account, post.sourceId);
 
 	const toggle = async () => {
 		try {
 			setUpdating(true);
 
-			const selectedSourceIds = feedSettings.getSelectedSourceIds(account);
+			const selectedSourceIds = domain.feedSettings.getSelectedSourceIds(account);
 
-			await feedSettings.updateFeedConfig(
+			await domain.feedSettings.updateFeedConfig(
 				account,
 				isSelected
 					? selectedSourceIds.filter(id => id !== post.sourceId)
@@ -144,8 +142,6 @@ interface AddToMyFeedButtonProps {
 }
 
 export const AddToMyFeedButton = observer(({ post }: AddToMyFeedButtonProps) => {
-	const mvAccounts = domain.accounts.mainViewAccounts;
-
 	const buttonRef = useRef(null);
 	const [isListOpen, setListOpen] = useState(false);
 
@@ -165,9 +161,7 @@ export const AddToMyFeedButton = observer(({ post }: AddToMyFeedButtonProps) => 
 					horizontalAlign={HorizontalAlignment.END}
 					onCloseRequest={() => setListOpen(false)}
 				>
-					{mvAccounts.map(account => (
-						<AddToMyFeedItem post={post} account={account} />
-					))}
+					{domain.account ? <AddToMyFeedItem post={post} account={domain.account} /> : null}
 				</DropDown>
 			)}
 		</>
@@ -177,18 +171,19 @@ export const AddToMyFeedButton = observer(({ post }: AddToMyFeedButtonProps) => 
 //
 
 interface FeedPostItemProps {
-	isInFeed?: boolean;
-	realtedAccounts?: DomainAccount[];
+	feedType: 'personal' | 'generic';
 	post: FeedPost;
 }
 
-export function FeedPostItem({ isInFeed, realtedAccounts, post }: FeedPostItemProps) {
+export const FeedPostItem = observer(({ post, feedType }: FeedPostItemProps) => {
 	const navigate = useNav();
 	const postPath = generatePath(RoutePath.FEED_POST, { postId: post.id });
 
 	const menuButtonRef = useRef(null);
 	const [isMenuOpen, setMenuOpen] = useState(false);
 	const [isSharePopupOpen, setSharePopupOpen] = useState(false);
+
+	const account = domain.account;
 
 	const onSourceIdClick = () => {
 		navigate(generatePath(RoutePath.FEED_SOURCE, { source: post.sourceId }));
@@ -200,27 +195,19 @@ export function FeedPostItem({ isInFeed, realtedAccounts, post }: FeedPostItemPr
 		try {
 			setUnfollowState('unfollowing');
 
-			invariant(realtedAccounts?.length, 'No accounts');
-			invariant(
-				realtedAccounts.every(a => a.mainViewKey),
-				'Not all accounts have MV key',
-			);
+			invariant(account, 'No accounts');
 
 			const sourceIdsToExclude = projectId
-				? feedSettings.sources.filter(s => s.cryptoProject?.id === projectId).map(s => s.id)
+				? domain.feedSettings.sources.filter(s => s.cryptoProject?.id === projectId).map(s => s.id)
 				: [post.sourceId];
 
 			invariant(sourceIdsToExclude.length, 'No source ids to exclude');
 
-			await Promise.all(
-				realtedAccounts.map(async account => {
-					const selectedSourceIds = feedSettings
-						.getSelectedSourceIds(account)
-						.filter(id => !sourceIdsToExclude.includes(id));
+			const selectedSourceIds = domain.feedSettings
+				.getSelectedSourceIds(account)
+				.filter(id => !sourceIdsToExclude.includes(id));
 
-					await feedSettings.updateFeedConfig(account, selectedSourceIds);
-				}),
-			);
+			await domain.feedSettings.updateFeedConfig(account, selectedSourceIds);
 
 			setUnfollowState('unfollowed');
 		} catch (e) {
@@ -231,11 +218,11 @@ export function FeedPostItem({ isInFeed, realtedAccounts, post }: FeedPostItemPr
 	};
 
 	const userCryptoProject = useMemo(() => {
-		if (realtedAccounts?.length === 1 && post.cryptoProjectId) {
-			const config = feedSettings.getAccountConfig(realtedAccounts[0]);
+		if (account && post.cryptoProjectId) {
+			const config = domain.feedSettings.getAccountConfig(account);
 			return config?.defaultProjects.find(p => p.projectId === post.cryptoProjectId);
 		}
-	}, [post.cryptoProjectId, realtedAccounts]);
+	}, [post.cryptoProjectId, account]);
 
 	const renderReason = (userCryptoProject: UserProject) => (
 		<>
@@ -258,7 +245,7 @@ export function FeedPostItem({ isInFeed, realtedAccounts, post }: FeedPostItemPr
 					{unfollowedState === 'unfollowing' ? 'Unfollowing ...' : 'You unfollowed such posts 👌'}
 				</ErrorMessage>
 			) : (
-				<PostItemContainer className={css.root} isCollapsable={isInFeed}>
+				<PostItemContainer className={css.root} isCollapsable>
 					<div className={css.ava}>
 						<Avatar image={post.authorAvatar} placeholder={<ContactSvg width="100%" height="100%" />} />
 						<FeedLinkTypeIcon className={css.avaSource} linkType={post.sourceType} />
@@ -280,19 +267,21 @@ export function FeedPostItem({ isInFeed, realtedAccounts, post }: FeedPostItemPr
 						</div>
 
 						<div className={css.metaRight}>
-							{!realtedAccounts?.length
-								? REACT_APP__APP_MODE === AppMode.MAIN_VIEW && <AddToMyFeedButton post={post} />
-								: userCryptoProject &&
-								  !!userCryptoProject.reasons.length &&
-								  !!userCryptoProject.projectName && (
-										<div
-											className={css.reason}
-											title="The reason why you see this post"
-											onClick={() => toast(renderReason(userCryptoProject))}
-										>
-											{renderReason(userCryptoProject)}
-										</div>
-								  )}
+							{feedType === 'personal' ? (
+								userCryptoProject &&
+								!!userCryptoProject.reasons.length &&
+								!!userCryptoProject.projectName && (
+									<div
+										className={css.reason}
+										title="The reason why you see this post"
+										onClick={() => toast(renderReason(userCryptoProject))}
+									>
+										{renderReason(userCryptoProject)}
+									</div>
+								)
+							) : feedType === 'generic' && !userCryptoProject && account ? (
+								<AddToMyFeedButton post={post} />
+							) : null}
 
 							<a
 								className={css.date}
@@ -337,7 +326,7 @@ export function FeedPostItem({ isInFeed, realtedAccounts, post }: FeedPostItemPr
 										</a>
 									)}
 
-									{!!realtedAccounts?.length && (
+									{account && (
 										<>
 											<DropDownItem mode={DropDownItemMode.LITE} onSelect={() => unfollow()}>
 												Unfollow{' '}
@@ -385,4 +374,4 @@ export function FeedPostItem({ isInFeed, realtedAccounts, post }: FeedPostItemPr
 			)}
 		</>
 	);
-}
+});

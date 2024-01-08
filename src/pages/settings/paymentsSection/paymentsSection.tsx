@@ -15,8 +15,8 @@ export interface PaymentsSectionProps {
 }
 
 export const PaymentsSection = observer(({ account }: PaymentsSectionProps) => {
-	const paymentInfoQuery = useQuery(['payment', 'info', account.account.address], {
-		queryFn: () => FeedManagerApi.getPaymentInfo({ token: account.mainViewKey }),
+	const paymentInfoQuery = useQuery(['payment', 'info', account.address], {
+		queryFn: () => FeedManagerApi.getPaymentInfo({ token: account.mainviewKey }),
 	});
 
 	const activeSubscriptions = getActiveSubscriptions(paymentInfoQuery.data);

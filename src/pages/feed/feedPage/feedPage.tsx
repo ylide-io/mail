@@ -11,25 +11,23 @@ import { CoverageModal } from '../../../components/coverageModal/coverageModal';
 import { ErrorMessage, ErrorMessageLook } from '../../../components/errorMessage/errorMessage';
 import { NarrowContent } from '../../../components/genericLayout/content/narrowContent/narrowContent';
 import { GenericLayout, useGenericLayoutApi } from '../../../components/genericLayout/genericLayout';
-import { isOnboardingInProgress } from '../../../components/mainViewOnboarding/mainViewOnboarding';
 import { SimpleLoader } from '../../../components/simpleLoader/simpleLoader';
-import { AppMode, REACT_APP__APP_MODE, REACT_APP__VAPID_PUBLIC_KEY } from '../../../env';
+import { REACT_APP__VAPID_PUBLIC_KEY } from '../../../env';
 import { ReactComponent as ArrowUpSvg } from '../../../icons/ic20/arrowUp.svg';
 import { ReactComponent as CrossSvg } from '../../../icons/ic20/cross.svg';
 import { analytics } from '../../../stores/Analytics';
 import domain from '../../../stores/Domain';
 import { FeedStore } from '../../../stores/Feed';
-import { feedSettings } from '../../../stores/FeedSettings';
 import { DomainAccount } from '../../../stores/models/DomainAccount';
 import { RoutePath } from '../../../stores/routePath';
-import { connectAccount } from '../../../utils/account';
-import { addressesEqual } from '../../../utils/blockchain';
 import { hookDependency } from '../../../utils/react';
 import { truncateInMiddle } from '../../../utils/string';
 import { useNav } from '../../../utils/url';
 import { FeedPostItem } from '../_common/feedPostItem/feedPostItem';
 import css from './feedPage.module.scss';
 import ErrorCode = FeedServerApi.ErrorCode;
+import { invariant } from '../../../utils/assert';
+import { connectAccount, payAccount } from '../../../utils/account';
 
 const reloadFeedCounter = observable.box(0);
 
@@ -63,7 +61,7 @@ function enableNotifications(accounts: DomainAccount[]) {
 			.then(
 				subscription =>
 					subscription &&
-					Promise.all(accounts.map(a => FeedManagerApi.subscribe(a.mainViewKey, subscription))),
+					Promise.all(accounts.map(a => FeedManagerApi.subscribe(a.mainviewKey, subscription))),
 			);
 	}
 
@@ -80,6 +78,166 @@ function enableNotifications(accounts: DomainAccount[]) {
 	});
 }
 
+const PaywallRow = ({
+	title,
+	subtitle,
+	text,
+}: {
+	title: React.ReactNode;
+	subtitle: React.ReactNode;
+	text: React.ReactNode;
+}) => {
+	return (
+		<div
+			style={{
+				display: 'flex',
+				flexDirection: 'row',
+				alignItems: 'center',
+				justifyContent: 'flex-start',
+				marginBottom: 40,
+			}}
+		>
+			<div
+				style={{
+					display: 'flex',
+					flexDirection: 'column',
+					alignItems: 'center',
+					justifyContent: 'center',
+					marginRight: 52,
+					flexBasis: 135,
+					flexGrow: 0,
+					flexShrink: 0,
+				}}
+			>
+				<div
+					style={{
+						textAlign: 'center',
+						fontSize: '40px',
+						fontStyle: 'normal',
+						fontWeight: '400',
+						lineHeight: '22px',
+						marginBottom: 10,
+					}}
+				>
+					{title}
+				</div>
+				<div
+					style={{
+						textAlign: 'center',
+						fontSize: '15px',
+						fontStyle: 'normal',
+						fontWeight: '300',
+						lineHeight: '22px',
+					}}
+				>
+					{subtitle}
+				</div>
+			</div>
+			<div
+				style={{
+					flexGrow: 1,
+					flexShrink: 1,
+					fontSize: '15px',
+					fontStyle: 'normal',
+					fontWeight: '300',
+					lineHeight: '22px',
+				}}
+			>
+				{text}
+			</div>
+		</div>
+	);
+};
+
+const TrialHasEnded = observer(() => {
+	return (
+		<ErrorMessage look={ErrorMessageLook.INFO}>
+			<div>Your trial period has ended. You need to activate paid accout to keed reading Mainview.</div>
+			<ActionButton look={ActionButtonLook.PRIMARY} onClick={() => connectAccount({ place: 'feed_no-accounts' })}>
+				Activate paid account
+			</ActionButton>
+		</ErrorMessage>
+	);
+});
+
+const Paywall = observer(({ type = 'generic' }: { type?: 'generic' | 'smart-feed' }) => {
+	const toPay = !!domain.account;
+	return (
+		<div
+			style={{
+				borderRadius: type === 'generic' ? '0px 0px 10px 10px' : 10,
+				background:
+					type === 'generic'
+						? 'linear-gradient(180deg, rgba(220, 224, 226, 0.00) 0%, #DCE0E2 8.85%)'
+						: '#DCE0E2',
+				paddingTop: type === 'generic' ? 100 : 50,
+				paddingBottom: 20,
+				paddingLeft: 50,
+				paddingRight: 50,
+				display: 'flex',
+				flexDirection: 'column',
+				alignItems: 'center',
+				justifyContent: 'flex-start',
+				marginTop: type === 'generic' ? -70 : 0,
+				position: 'relative',
+				zIndex: 3,
+			}}
+		>
+			<PaywallRow
+				title="4,500+"
+				subtitle="news sources"
+				text={
+					<>
+						Mainview scans <b style={{ fontWeight: '700' }}>4,500+ news sources</b> in realtime: Twitter,
+						Telegram, Discord, Mirror, etc.
+					</>
+				}
+			/>
+			<PaywallRow
+				title="1 mln+"
+				subtitle="posts processed"
+				text={
+					<>
+						We've processed <b style={{ fontWeight: '700' }}>1 million+ posts</b> about crypto to learn how
+						to personalise and prioritise news for you
+					</>
+				}
+			/>
+			<PaywallRow
+				title="10,653"
+				subtitle="crypto projects"
+				text={
+					<>
+						We track <b style={{ fontWeight: '700' }}>10,000+ crypto projects</b>: from the largest to the
+						smallest - we've got you covered
+					</>
+				}
+			/>
+			<div
+				style={{
+					textAlign: 'center',
+					fontSize: '17px',
+					fontStyle: 'normal',
+					fontWeight: toPay ? '600' : '400',
+					lineHeight: '26px',
+					marginBottom: 26,
+				}}
+			>
+				{toPay
+					? `Your trial period has ended. You need to activate paid accout to keed reading Mainview.`
+					: `Login to access your personal feed and get unlimited access to prebuilt feeds`}
+			</div>
+			<ActionButton
+				size={ActionButtonSize.LARGE}
+				look={ActionButtonLook.PRIMARY}
+				onClick={() => (toPay ? payAccount({ place: 'paywall' }) : connectAccount({ place: 'paywall' }))}
+			>
+				{toPay ? `Activate paid account` : `Connect wallet`}
+			</ActionButton>
+		</div>
+	);
+});
+
 //
 
 const FeedPageContent = observer(() => {
@@ -87,29 +245,15 @@ const FeedPageContent = observer(() => {
 
 	const navigate = useNav();
 	const genericLayoutApi = useGenericLayoutApi();
-	const tags = feedSettings.tags;
-
-	const accounts = domain.accounts.activeAccounts;
-	const mvAccounts = domain.accounts.mainViewAccounts;
-	const selectedAccounts = useMemo(
-		() =>
-			address
-				? mvAccounts.filter(a => addressesEqual(a.account.address, address))
-				: !tag && !source
-				? mvAccounts
-				: [],
-		[mvAccounts, address, tag, source],
-	);
-
-	const onboarding = isOnboardingInProgress.get();
+	const tags = domain.feedSettings.tags;
 
 	useEffect(() => {
-		if (address && !selectedAccounts.length) {
+		if (address && domain.account && domain.account.address !== address) {
 			navigate(generatePath(RoutePath.FEED));
 		}
-	}, [address, navigate, selectedAccounts]);
+	}, [address, navigate, domain.account]);
 
-	const coverage = feedSettings.coverages.get(selectedAccounts[0]);
+	const coverage = domain.account ? domain.feedSettings.coverages.get(domain.account) : undefined;
 	const totalCoverage = useMemo(() => {
 		if (!coverage || coverage === 'error' || coverage === 'loading') {
 			return null;
@@ -125,26 +269,33 @@ const FeedPageContent = observer(() => {
 
 		const clickListener = () => {
 			document.body.removeEventListener('click', clickListener);
-			enableNotifications(mvAccounts);
+			enableNotifications([domain.account!]);
 		};
 
-		if (mvAccounts.length && !onboarding) {
-			enableNotifications(mvAccounts);
+		if (domain.account) {
+			enableNotifications([domain.account]);
 			document.body.addEventListener('click', clickListener);
 		}
 
 		return () => {
 			document.body.removeEventListener('click', clickListener);
 		};
-	}, [mvAccounts, onboarding]);
+	}, [domain.account]);
 
-	const canLoadFeed =
-		!onboarding &&
-		(!!tag ||
-			(!!mvAccounts.length &&
-				(REACT_APP__APP_MODE !== AppMode.MAIN_VIEW || mvAccounts.length === accounts.length)));
+	const canLoadFeed = Boolean(tag || domain.account);
 
 	const reloadCounter = reloadFeedCounter.get();
+
+	const feedType = useMemo(() => {
+		if (!tag && !address && !source) {
+			return 'personal';
+		} else {
+			if (!tag && !source && address === domain.account?.address) {
+				return 'personal';
+			}
+			return 'generic';
+		}
+	}, [tag, source, address, domain.account]);
 
 	const feed = useMemo(() => {
 		hookDependency(reloadCounter);
@@ -153,7 +304,7 @@ const FeedPageContent = observer(() => {
 			// TODO: KONST
 			tags: tags !== 'error' && tags !== 'loading' ? tags.filter(t => t.id === Number(tag)) : [],
 			sourceId: source,
-			addressTokens: selectedAccounts.map(a => a.mainViewKey),
+			addressTokens: domain.account ? [domain.account.mainviewKey] : [],
 		});
 
 		genericLayoutApi.scrollToTop();
@@ -163,7 +314,7 @@ const FeedPageContent = observer(() => {
 		}
 
 		return feed;
-	}, [canLoadFeed, tags, tag, genericLayoutApi, selectedAccounts, source, reloadCounter]);
+	}, [canLoadFeed, tags, tag, genericLayoutApi, domain.account, source, reloadCounter]);
 
 	useEffect(() => {
 		return () => {
@@ -178,15 +329,11 @@ const FeedPageContent = observer(() => {
 		if (feed.tags.length === 1 && feed.tags[0].name) {
 			return feed.sourceId;
 		}
-		if (selectedAccounts.length === 1 && address) {
-			return `Feed for ${
-				selectedAccounts[0].name
-					? selectedAccounts[0].name
-					: truncateInMiddle(selectedAccounts[0].account.address, 8, '..')
-			}`;
+		if (domain.account) {
+			return `Feed for ${truncateInMiddle(domain.account.address, 8, '..')}`;
 		}
 		return 'Smart feed';
-	}, [feed, selectedAccounts, address, tag]);
+	}, [feed, domain.account, tag]);
 
 	return (
 		<NarrowContent
@@ -209,21 +356,17 @@ const FeedPageContent = observer(() => {
 							Show {feed.newPosts} new posts
 						</ActionButton>
 					)}
-					{feed.tags.length === 0 &&
-						!feed.sourceId &&
-						selectedAccounts.length === 1 &&
-						address &&
-						totalCoverage && (
-							<ActionButton
-								look={ActionButtonLook.PRIMARY}
-								onClick={() => {
-									setShowCoverageModal(true);
-									analytics.mainviewCoverageClick(address);
-								}}
-							>
-								USD Coverage: {totalCoverage}
-							</ActionButton>
-						)}
+					{feed.tags.length === 0 && !feed.sourceId && domain.account && address && totalCoverage && (
+						<ActionButton
+							look={ActionButtonLook.PRIMARY}
+							onClick={() => {
+								setShowCoverageModal(true);
+								analytics.mainviewCoverageClick(address);
+							}}
+						>
+							USD Coverage: {totalCoverage}
+						</ActionButton>
+					)}
 				</div>
 			}
 		>
@@ -244,11 +387,18 @@ const FeedPageContent = observer(() => {
 				{feed.loaded ? (
 					<>
 						{feed.posts.length === 0 && <h2>No posts in this category.</h2>}
-						{feed.posts.map(post => (
-							<FeedPostItem key={post.id} isInFeed realtedAccounts={selectedAccounts} post={post} />
-						))}
+						{domain.isTooMuch ? (
+							<>
+								{feed.posts.slice(0, 15).map(post => (
+									<FeedPostItem feedType={feedType} key={post.id} post={post} />
+								))}
+								<Paywall />
+							</>
+						) : (
+							feed.posts.map(post => <FeedPostItem feedType={feedType} key={post.id} post={post} />)
+						)}
 
-						{feed.moreAvailable && (
+						{!domain.isTooMuch && feed.moreAvailable && (
 							<InView
 								className={css.loader}
 								rootMargin="100px"
@@ -259,27 +409,25 @@ const FeedPageContent = observer(() => {
 						)}
 					</>
 				) : feed.error ? (
-					<ErrorMessage
-						look={feed.error === ErrorCode.NO_POSTS_FOR_ADDRESS ? ErrorMessageLook.INFO : undefined}
-					>
-						{feed.error === ErrorCode.NO_POSTS_FOR_ADDRESS ? (
-							<>
-								<b>No posts for this account.</b>
-								<div>
-									Your crypto account doesn't have any tokens or transactions that we can use to build
-									the Feed for you. You can connect another account anytime.
-								</div>
-								<ActionButton
-									look={ActionButtonLook.PRIMARY}
-									onClick={() => connectAccount({ place: 'feed_no-posts-for-account' })}
-								>
-									Connect another account
-								</ActionButton>
-							</>
-						) : (
-							'Sorry, an error occured during feed loading. Please, try again later.'
-						)}
-					</ErrorMessage>
+					feed.error === ErrorCode.NO_POSTS_FOR_ADDRESS && !domain.isAccountActive ? (
+						<Paywall type="smart-feed" />
+					) : (
+						<ErrorMessage
+							look={feed.error === ErrorCode.NO_POSTS_FOR_ADDRESS ? ErrorMessageLook.INFO : undefined}
+						>
+							{feed.error === ErrorCode.NO_POSTS_FOR_ADDRESS ? (
+								<>
+									<b>No posts for this account.</b>
+									<div>
+										Your crypto account doesn't have any tokens or transactions that we can use to
+										build the Feed for you. You can connect another account anytime.
+									</div>
+								</>
+							) : (
+								'Sorry, an error occured during feed loading. Please, try again later.'
+							)}
+						</ErrorMessage>
+					)
 				) : feed.loading ? (
 					<div className={css.loader}>
 						<SimpleLoader />
@@ -294,7 +442,7 @@ const FeedPageContent = observer(() => {
 								look={ActionButtonLook.PRIMARY}
 								onClick={() => connectAccount({ place: 'feed_no-accounts' })}
 							>
-								Connect account
+								Connect wallet
 							</ActionButton>
 						</ErrorMessage>
 					)

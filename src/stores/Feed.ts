@@ -2,6 +2,7 @@ import { makeObservable, observable } from 'mobx';
 
 import { FeedPost, FeedServerApi } from '../api/feedServerApi';
 import { analytics } from './Analytics';
+import domain from './Domain';
 
 const FEED_PAGE_SIZE = 10;
 
@@ -77,6 +78,7 @@ export class FeedStore {
 	}
 
 	async load() {
+		domain.tooMuch = false;
 		this.abortCheckNewPosts();
 		if (this.loading) return;
 
@@ -115,6 +117,9 @@ export class FeedStore {
 
 		if (data) {
 			this.posts.push(...data.items);
+			if (this.posts.length >= 20) {
+				domain.tooMuch = true;
+			}
 			this.moreAvailable = data.moreAvailable;
 			if (this.newPosts < data.newPosts) {
 				navigator.setAppBadge?.(data.newPosts);

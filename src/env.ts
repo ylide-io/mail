@@ -32,13 +32,13 @@ export const ENV_TYPE = ['hub.ylide.io', 'app.mainview.io'].includes(REACT_APP__
 	? EnvType.STAGING
 	: EnvType.LOCAL;
 
-export enum AppMode {
-	HUB = 'HUB',
-	OTC = 'OTC',
-	MAIN_VIEW = 'MAIN_VIEW',
-}
+// export enum AppMode {
+// 	HUB = 'HUB',
+// 	OTC = 'OTC',
+// 	MAIN_VIEW = 'MAIN_VIEW',
+// }
 
-export const REACT_APP__APP_MODE = env('REACT_APP__APP_MODE') as AppMode;
+// export const REACT_APP__APP_MODE = env('REACT_APP__APP_MODE') as AppMode;
 
 export const REACT_APP__FEED_SERVER = env('REACT_APP__FEED_SERVER', { optional: true });
 export const REACT_APP__FEED_MANAGER = env('REACT_APP__FEED_MANAGER');

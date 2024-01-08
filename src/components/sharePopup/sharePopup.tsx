@@ -7,11 +7,8 @@ import {
 	WhatsappShareButton,
 } from 'react-share';
 
-import { AppMode, REACT_APP__APP_MODE } from '../../env';
-import { OutgoingMailData } from '../../stores/outgoingMailData';
 import { HorizontalAlignment } from '../../utils/alignment';
 import { copyToClipboard } from '../../utils/clipboard';
-import { plainTextToEditorJsData, useOpenMailCompose } from '../../utils/mail';
 import { AnchoredPopup } from '../popup/anchoredPopup/anchoredPopup';
 import { ReactComponent as ClipboardSvg } from './icons/clipboard.svg';
 import { ReactComponent as FacebookSvg } from './icons/facebook.svg';
@@ -19,7 +16,6 @@ import { ReactComponent as MailSvg } from './icons/mail.svg';
 import { ReactComponent as TelegramSvg } from './icons/telegram.svg';
 import { ReactComponent as TwitterSvg } from './icons/twitter.svg';
 import { ReactComponent as WhatsappSvg } from './icons/whatsapp.svg';
-import { ReactComponent as YlideSvg } from './icons/ylide.svg';
 import css from './sharePopup.module.scss';
 
 export interface SharePopupProps {
@@ -34,8 +30,6 @@ export interface SharePopupProps {
 export function SharePopup({ anchorRef, horizontalAlign, onClose, url, subject }: SharePopupProps) {
 	const realUrl = url || window.location.toString();
 
-	const openMailCompose = useOpenMailCompose();
-
 	return (
 		<AnchoredPopup
 			anchorRef={anchorRef}
@@ -48,24 +42,6 @@ export function SharePopup({ anchorRef, horizontalAlign, onClose, url, subject }
 		>
 			<div className={css.content}>
 				<div className={css.primaryButtons}>
-					{REACT_APP__APP_MODE !== AppMode.MAIN_VIEW && (
-						<button
-							className={css.primaryButton}
-							onClick={() => {
-								const mailData = new OutgoingMailData();
-								mailData.subject = subject;
-								mailData.editorData = plainTextToEditorJsData(realUrl);
-
-								openMailCompose({ mailData, place: 'share-popup' });
-
-								onClose();
-							}}
-						>
-							<YlideSvg className={css.icon} />
-							Share via Ylide Mail
-						</button>
-					)}
-
 					<button
 						className={css.primaryButton}
 						onClick={() => {
