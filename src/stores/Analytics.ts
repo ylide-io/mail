@@ -15,6 +15,7 @@ function _track(name: string, payload?: Record<string, any>) {
 		circleSha1: REACT_APP__CIRCLE_SHA1,
 		circleBuildNum: REACT_APP__CIRCLE_BUILD_NUM,
 		numberOfAccounts: domain.account ? 1 : 0,
+		address: domain.account ? domain.account.address : null,
 		...payload,
 	});
 }

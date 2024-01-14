@@ -20,12 +20,11 @@ import { FeedPostPage } from './pages/feed/feedPostPage/feedPostPage';
 import { SettingsPage } from './pages/settings/settingsPage';
 import { ServiceWorkerUpdateCallback } from './serviceWorkerRegistration';
 import { analytics } from './stores/Analytics';
+import { browserStorage } from './stores/browserStorage';
 import domain from './stores/Domain';
 import { RoutePath } from './stores/routePath';
 import { useIsMatchesPattern, useNav } from './utils/url';
 import { Web3ModalManager } from './utils/walletconnect';
-import { MainViewOnboarding } from './components/mainViewOnboarding/mainViewOnboarding';
-import { browserStorage } from './stores/browserStorage';
 
 export enum AppTheme {
 	V1 = 'v1',
@@ -33,7 +32,6 @@ export enum AppTheme {
 }
 
 const RemoveTrailingSlash = () => {
-	console.log('rts');
 	const location = useLocation();
 	const navigate = useNav();
 

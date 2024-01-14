@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { ActionButton, ActionButtonLook, ActionButtonSize } from '../components/ActionButton/ActionButton';
+import { ActionModal } from '../components/actionModal/actionModal';
 import {
 	AuthorizeAccountFlow,
 	BuildFeedFlow,
@@ -10,9 +11,6 @@ import { browserStorage } from '../stores/browserStorage';
 import domain from '../stores/Domain';
 import { DomainAccount } from '../stores/models/DomainAccount';
 import { truncateInMiddle } from './string';
-
-import { ActionButton, ActionButtonSize, ActionButtonLook } from '../components/ActionButton/ActionButton';
-import { ActionModal } from '../components/actionModal/actionModal';
 
 export function formatAccountName(account: DomainAccount) {
 	return truncateInMiddle(account.address, 8, '..');
