@@ -147,6 +147,8 @@ export const App = observer(({ serviceWorkerUpdateCallback }: AppProps) => {
 		);
 	}
 
+	console.log('swUpdateCallback: ', swUpdateCallback);
+
 	return (
 		<>
 			<Helmet>

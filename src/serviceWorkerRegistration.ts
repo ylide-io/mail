@@ -41,7 +41,9 @@ export async function registerServiceWorker({
 }) {
 	function registerValidSW(swUrl: string) {
 		navigator.serviceWorker
-			.register(swUrl)
+			.register(swUrl, {
+				updateViaCache: 'none',
+			})
 			.then(registration => {
 				if (registration.waiting) {
 					handleUpdate(registration.waiting, onUpdateAvailable);
