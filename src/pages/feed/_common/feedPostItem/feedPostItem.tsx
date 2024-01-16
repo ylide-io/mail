@@ -1,6 +1,6 @@
 import clsx from 'clsx';
 import { observer } from 'mobx-react';
-import { MouseEvent, useMemo, useRef, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
 import { generatePath } from 'react-router-dom';
 
 import { FeedManagerApi } from '../../../../api/feedManagerApi';
@@ -10,7 +10,6 @@ import { GridRowBox, TruncateTextBox } from '../../../../components/boxes/boxes'
 import { CheckBox } from '../../../../components/checkBox/checkBox';
 import { DropDown, DropDownItem, DropDownItemMode } from '../../../../components/dropDown/dropDown';
 import { ErrorMessage, ErrorMessageLook } from '../../../../components/errorMessage/errorMessage';
-import { GalleryModal } from '../../../../components/galleryModal/galleryModal';
 import { ReadableDate } from '../../../../components/readableDate/readableDate';
 import { SharePopup } from '../../../../components/sharePopup/sharePopup';
 import { Spinner } from '../../../../components/spinner/spinner';
@@ -28,68 +27,7 @@ import { PostItemContainer } from '../postItemContainer/postItemContainer';
 import css from './feedPostItem.module.scss';
 import UserProject = FeedManagerApi.UserProject;
 import { DomainAccount } from '../../../../stores/models/DomainAccount';
-
-interface FeedPostContentProps {
-	post: FeedPost;
-}
-
-export function FeedPostContent({ post }: FeedPostContentProps) {
-	const onPostTextClick = (e: MouseEvent) => {
-		if ((e.target as Element).tagName.toUpperCase() === 'IMG') {
-			GalleryModal.show([(e.target as HTMLImageElement).src]);
-		}
-	};
-
-	return (
-		<div className={css.content}>
-			{!!post.title && <div className={css.title}>{post.title}</div>}
-
-			{!!post.subtitle && <div className={css.subtitle}>{post.subtitle}</div>}
-
-			<div className={css.text} dangerouslySetInnerHTML={{ __html: post.content }} onClick={onPostTextClick} />
-
-			{!!post.picrel &&
-				post.sourceType !== LinkType.MIRROR &&
-				(post.picrel.endsWith('.mp4') ? (
-					<video loop className={css.picture} controls>
-						<source src={post.picrel} type="video/mp4" />
-					</video>
-				) : (
-					<div
-						style={{ backgroundImage: `url("${post.picrel}")` }}
-						className={css.picture}
-						onClick={() => GalleryModal.show([post.picrel])}
-					/>
-				))}
-
-			{!!post.embeds.length && (
-				<div className={css.embeds}>
-					{post.embeds.map((e, idx) => (
-						<a key={idx} className={css.embed} href={e.link} target="_blank" rel="noreferrer">
-							{!!e.previewImageUrl && (
-								<div
-									className={css.embedImage}
-									style={{
-										backgroundImage: `url("${e.previewImageUrl}")`,
-									}}
-								/>
-							)}
-
-							{!!e.link && (
-								<div className={css.embedLink}>
-									{e.link.length > 60 ? `${e.link.substring(0, 60)}...` : e.link}
-								</div>
-							)}
-							{e.title ? <div className={css.embedTitle}>{e.title}</div> : null}
-
-							{!!e.text && <div className={css.embedText} dangerouslySetInnerHTML={{ __html: e.text }} />}
-						</a>
-					))}
-				</div>
-			)}
-		</div>
-	);
-}
+import { FeedPostContent } from './feedPostContent';
 
 //
 

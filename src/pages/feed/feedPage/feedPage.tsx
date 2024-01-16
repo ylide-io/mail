@@ -26,7 +26,6 @@ import { useNav } from '../../../utils/url';
 import { FeedPostItem } from '../_common/feedPostItem/feedPostItem';
 import css from './feedPage.module.scss';
 import ErrorCode = FeedServerApi.ErrorCode;
-import { invariant } from '../../../utils/assert';
 import { connectAccount, payAccount } from '../../../utils/account';
 
 const reloadFeedCounter = observable.box(0);
@@ -148,17 +147,6 @@ const PaywallRow = ({
 		</div>
 	);
 };
-
-const TrialHasEnded = observer(() => {
-	return (
-		<ErrorMessage look={ErrorMessageLook.INFO}>
-			<div>Your trial period has ended. You need to activate paid accout to keed reading Mainview.</div>
-			<ActionButton look={ActionButtonLook.PRIMARY} onClick={() => connectAccount({ place: 'feed_no-accounts' })}>
-				Activate paid account
-			</ActionButton>
-		</ErrorMessage>
-	);
-});
 
 const Paywall = observer(({ type = 'generic' }: { type?: 'generic' | 'smart-feed' }) => {
 	const toPay = !!domain.account;
