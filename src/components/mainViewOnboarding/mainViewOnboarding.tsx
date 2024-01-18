@@ -1,6 +1,6 @@
 import { observer } from 'mobx-react';
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { useMutation, useQuery } from 'react-query';
+import { useQuery } from 'react-query';
 import { useSearchParams } from 'react-router-dom';
 
 import { FeedManagerApi } from '../../api/feedManagerApi';
@@ -9,20 +9,16 @@ import { analytics } from '../../stores/Analytics';
 import { browserStorage } from '../../stores/browserStorage';
 import domain from '../../stores/Domain';
 import { DomainAccount } from '../../stores/models/DomainAccount';
-import { disconnectAccount, formatAccountName } from '../../utils/account';
 import { invariant } from '../../utils/assert';
 import { asyncDelay } from '../../utils/asyncDelay';
 import { addressesEqual } from '../../utils/blockchain';
-import { checkout, CheckoutResult, isPaid, isTrialActive, useCheckoutSearchParams } from '../../utils/payments';
-import { truncateAddress } from '../../utils/string';
+import { isPaid, isTrialActive } from '../../utils/payments';
 import { useLatest } from '../../utils/useLatest';
 import { ActionButton, ActionButtonLook, ActionButtonSize } from '../ActionButton/ActionButton';
 import { ActionModal } from '../actionModal/actionModal';
 import { CoverageModal } from '../coverageModal/coverageModal';
 import { LoadingModal } from '../loadingModal/loadingModal';
-import { Modal } from '../modal/modal';
 import { toast } from '../toast/toast';
-import css from './mainViewOnboarding.module.scss';
 
 // <IosInstallPwaPopup />
 
@@ -71,185 +67,6 @@ export const AuthorizeAccountFlow = observer(({ address, onClose }: AuthorizeAcc
 
 	return <LoadingModal reason="Authorization ..." />;
 });
-
-//
-
-export interface PaymentFlowProps {
-	account: DomainAccount;
-	onPaid: () => void;
-	onCancel: () => void;
-}
-
-export const PaymentFlow = observer(({ account, onPaid, onCancel }: PaymentFlowProps) => {
-	const paymentInfoQuery = useQuery(['payments', 'info', 'account', account.mainviewKey], {
-		queryFn: async () => {
-			const [paymentInfo, prices] = await Promise.all([
-				FeedManagerApi.getPaymentInfo({ token: account.mainviewKey }),
-				FeedManagerApi.getPrices(),
-			]);
-
-			return {
-				...paymentInfo,
-				isTrialActive: isTrialActive(paymentInfo),
-				isPaid: isPaid(paymentInfo),
-				prices,
-			};
-		},
-	});
-
-	const checkoutMutation = useMutation({
-		mutationFn: (variables: { months: number }) => {
-			analytics.mainviewOnboardingEvent('payment-start', { payment_months: variables.months });
-			return checkout(account, variables.months);
-		},
-		onError: (e, variables) => {
-			console.error(e);
-			analytics.mainviewOnboardingEvent('payment-start-error', { payment_months: variables.months });
-			toast('Failed to open payments page 😟');
-		},
-	});
-
-	useEffect(() => {
-		if (paymentInfoQuery.data?.isPaid) {
-			onPaid();
-		} else if (paymentInfoQuery.data?.isTrialActive) {
-			analytics.mainviewOnboardingEvent('trial-in-progress-dialog');
-		} else if (paymentInfoQuery.data) {
-			analytics.mainviewOnboardingEvent('payment-dialog');
-		}
-	}, [onPaid, paymentInfoQuery.data]);
-
-	return (
-		<>
-			{paymentInfoQuery.isLoading || paymentInfoQuery.data?.isPaid ? (
-				<LoadingModal reason="Loading payment details ..." />
-			) : paymentInfoQuery.data?.isTrialActive ? (
-				<ActionModal
-					title="Welcome to Mainview!"
-					buttons={
-						<ActionButton
-							size={ActionButtonSize.XLARGE}
-							look={ActionButtonLook.PRIMARY}
-							onClick={() => onPaid()}
-						>
-							Continue
-						</ActionButton>
-					}
-				>
-					Your free 7-day trial period has started. Utilize full access to the smart news aggregator
-					personalized to your crypto holdings. Experience the full power of our product without any
-					limitations and master your portfolio to boost your returns.
-				</ActionModal>
-			) : paymentInfoQuery.data ? (
-				<Modal className={css.payModal}>
-					<div className={css.payModalTitle}>Save 50% for 12 months</div>
-
-					<div className={css.payModalDescription}>
-						Use the special offer to get annual access and save 50% 🔥
-					</div>
-
-					<div className={css.payModalPlans}>
-						{paymentInfoQuery.data.prices.map(price => (
-							<div key={price.months} className={css.payModalPlan}>
-								<div className={css.payModalPlanTitle}>
-									{price.months} {price.months === 1 ? 'month' : 'months'}
-								</div>
-								<div className={css.payModalPrice}>{price.price} USD</div>
-								<div className={css.payModalSubtle}>One-time payment</div>
-								<ActionButton
-									className={css.payModalCra}
-									isLoading={
-										checkoutMutation.isLoading &&
-										checkoutMutation.variables?.months === price.months
-									}
-									size={ActionButtonSize.XLARGE}
-									look={ActionButtonLook.PRIMARY}
-									onClick={() => checkoutMutation.mutate({ months: price.months })}
-								>
-									Pay Now
-								</ActionButton>
-							</div>
-						))}
-					</div>
-
-					<ActionButton
-						className={css.payModalDisconnectButton}
-						size={ActionButtonSize.MEDIUM}
-						look={ActionButtonLook.LITE}
-						onClick={onCancel}
-					>
-						Use another account · {formatAccountName(account)}
-					</ActionButton>
-				</Modal>
-			) : (
-				<ActionModal
-					title="Failed to fetch payment details 😟"
-					buttons={
-						<ActionButton
-							size={ActionButtonSize.LARGE}
-							look={ActionButtonLook.HEAVY}
-							onClick={() => paymentInfoQuery.refetch()}
-						>
-							Try Again
-						</ActionButton>
-					}
-				/>
-			)}
-		</>
-	);
-});
-
-interface PaymentSuccessFlowProps {
-	account: DomainAccount;
-	onClose: (isPaid: boolean) => void;
-}
-
-export function PaymentSuccessFlow({ account, onClose }: PaymentSuccessFlowProps) {
-	const startTime = useMemo(() => Date.now(), []);
-
-	const paymentInfo = useQuery(['payment-success', account.mainviewKey], {
-		queryFn: () => {
-			invariant(Date.now() - startTime < 1000 * 60);
-
-			return FeedManagerApi.getPaymentInfo({ token: account.mainviewKey });
-		},
-		onSuccess: info => {
-			if (isPaid(info)) {
-				analytics.mainviewOnboardingEvent('successful-payment-confirmed');
-			}
-		},
-		onError: () => {
-			analytics.mainviewOnboardingEvent('successful-payment-error');
-			onClose(false);
-		},
-		refetchInterval: 5000,
-	});
-
-	return (
-		<>
-			<LoadingModal reason="Processing payment ..." />
-
-			{paymentInfo.data && isPaid(paymentInfo.data) && (
-				<ActionModal
-					title="Payment Successful"
-					buttons={
-						<ActionButton
-							size={ActionButtonSize.XLARGE}
-							look={ActionButtonLook.PRIMARY}
-							onClick={() => onClose(true)}
-						>
-							Continue
-						</ActionButton>
-					}
-				>
-					Your payment has been successfully processed.
-				</ActionModal>
-			)}
-		</>
-	);
-}
-
-//
 
 export interface BuildFeedFlowProps {
 	account: DomainAccount;
@@ -348,14 +165,13 @@ export const MainViewOnboarding = observer(({ onResolve }: { onResolve?: (accoun
 
 	// eslint-disable-next-line react-hooks/exhaustive-deps
 	const accounts = useMemo(() => (domain.account ? [domain.account] : []), [domain.account]);
-	const checkoutSearchParams = useCheckoutSearchParams();
 
 	const paymentInfoQuery = useQuery(
 		['payments', 'info', 'all-accounts', accounts.map(a => a.mainviewKey).join(',')],
 		() =>
 			Promise.all(
 				accounts.map(a =>
-					FeedManagerApi.getPaymentInfo({ token: a.mainviewKey })
+					FeedManagerApi.getAccountPlan({ token: a.mainviewKey })
 						.then(info => ({
 							address: a.address,
 							isTrialActive: isTrialActive(info),
@@ -394,52 +210,22 @@ export const MainViewOnboarding = observer(({ onResolve }: { onResolve?: (accoun
 		// Do nothing if something is happening already
 		if (step) return;
 
-		if (checkoutSearchParams.result) {
-			checkoutSearchParams.reset();
-
-			const account = accounts.find(a => addressesEqual(a.address, checkoutSearchParams.address));
-			if (!account) {
-				toast(
-					`Account ${truncateAddress(
-						checkoutSearchParams.address,
-					)} not connected. Please connect it to proceed.`,
-				);
-				return reset(undefined);
-			}
-
-			analytics.mainviewOnboardingEvent('payment-finish', {
-				payment_months: checkoutSearchParams.months,
-				payment_result: checkoutSearchParams.result,
-			});
-
-			if (checkoutSearchParams.result === CheckoutResult.SUCCESS) {
-				return setStep({
-					type: StepType.PAYMENT_SUCCESS,
-					account,
-				});
-			} else {
-				return setStep({
-					type: StepType.PAYMENT_FAILURE,
-					account,
-				});
-			}
-		}
-
 		const unpaidAccount = accounts.find(a =>
 			paymentInfoQuery.data?.some(
 				info => info && addressesEqual(info.address, a.address) && !info.isPaid && !info.isTrialActive,
 			),
 		);
+
 		if (unpaidAccount) {
 			return setStep({ type: StepType.PAYMENT, account: unpaidAccount });
 		}
-	}, [accounts, checkoutSearchParams, paymentInfoQuery.data, reset, step]);
+	}, [accounts, paymentInfoQuery.data, reset, step]);
 
 	return (
 		<>
 			{step && <LoadingModal />}
 
-			{step?.type === StepType.PAYMENT && (
+			{/* {step?.type === StepType.PAYMENT && (
 				<PaymentFlow
 					account={step.account}
 					onPaid={() => setStep({ type: StepType.BUILDING_FEED, account: step.account })}
@@ -460,9 +246,9 @@ export const MainViewOnboarding = observer(({ onResolve }: { onResolve?: (accoun
 						}
 					}}
 				/>
-			)}
+			)} */}
 
-			{step?.type === StepType.PAYMENT_FAILURE && (
+			{/* {step?.type === StepType.PAYMENT_FAILURE && (
 				<ActionModal
 					title="Payment Failed"
 					buttons={
@@ -477,7 +263,7 @@ export const MainViewOnboarding = observer(({ onResolve }: { onResolve?: (accoun
 				>
 					Your payment was not processed.
 				</ActionModal>
-			)}
+			)} */}
 
 			{step?.type === StepType.BUILDING_FEED && (
 				<BuildFeedFlow

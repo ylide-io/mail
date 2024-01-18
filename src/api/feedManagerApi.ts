@@ -240,103 +240,63 @@ export namespace FeedManagerApi {
 		return await request({ path: `/v3/set-config`, data: params.config, token: params.token });
 	}
 
-	//
-
-	// https://github.com/ylide-io/mainview-api/blob/main/src/entities/mainview/FanspaySubscription.entity.ts
-	// https://fanspayio.readme.io/reference/subscription
-	export enum PaymentSubscriptionStatus {
-		ACTIVE = 'active',
-		CANCELED = 'canceled',
-		FAILED = 'failed',
-		WAITING = 'waiting',
-	}
-
-	export interface PaymentSubscription {
-		id: string;
-		status: PaymentSubscriptionStatus;
+	export interface ReservationPlan {
+		name: string;
+		type: 'basic' | 'pro';
+		interval: 'month' | 'year';
+		totalPrice: number;
 		amount: number;
-		token: string; // USDT, USDC, DAI, BUSD
-		blockchain: string;
-		created: number;
-		duration: number;
-		next_charge: number;
-		from: string;
-		to: string;
-		transaction_hash: string;
 	}
 
-	// https://github.com/ylide-io/mainview-api/blob/main/src/entities/mainview/FanspayYearCharge.entity.ts
-	// https://fanspayio.readme.io/reference/charge
-	export enum PaymentChargeStatus {
-		SUCCEEDED = 'succeeded',
-		FAILED = 'failed',
+	export enum MVTreasuryBlockchain {
+		ETHEREUM = 'ethereum',
+		BNBCHAIN = 'bnbchain',
+		POLYGON = 'polygon',
+		GNOSIS = 'gnosis',
 	}
 
-	export interface PaymentCharge {
+	export interface TreasuryReservation {
 		id: string;
-		status: PaymentChargeStatus;
-		amount: number;
-		token: string; // USDT, USDC, DAI, BUSD
-		blockchain: string;
-		created: number;
-		endOfPeriod: number;
+		treasury: string;
+		plan: ReservationPlan;
+		start: number;
+		end: number;
+		fulfilled: boolean;
+	}
+
+	export interface TreasuryTransaction {
+		txHash: string;
+		blockchain: MVTreasuryBlockchain;
+		treasury: string;
+		timestamp: number;
 		from: string;
-		to: string;
-		transaction_hash: string;
+		token: string;
+		amountRaw: string;
+		amount: string;
+		accountId: string | null;
 	}
 
-	export interface PaymentInfo {
-		status: {
-			active: boolean;
-			until: number;
-		};
-		subscriptions: PaymentSubscription[];
-		charges: PaymentCharge[];
+	export interface AccountPlan {
+		plan: 'none' | 'trial' | 'basic' | 'pro';
+		planEndsAt: number;
+
+		activeReservations: TreasuryReservation[];
+		lastPaidTx: TreasuryTransaction | null;
 	}
 
-	export async function getPaymentInfo(params: { token: string }) {
-		// return {
-		// 	status: {
-		// 		active: false,
-		// 		until: 0,
-		// 	},
-		// 	subscriptions: [],
-		// 	charges: [],
-		// };
-		return await request<PaymentInfo>({ path: '/payment/info', token: params.token });
+	export async function getAccountPlan(params: { token: string }) {
+		return await request<AccountPlan>({ path: '/v3/payments/plan', token: params.token });
 	}
 
-	//
-
-	export type GetPricesResult = { months: number; price: string }[];
-
-	export async function getPrices() {
-		return await request<GetPricesResult>({ path: '/payment/prices' });
-	}
-
-	//
-
-	// https://github.com/ylide-io/mainview-api/blob/main/src/server/fanspay.ts
-	export interface CheckoutResponse {
-		id: unknown;
-		account: unknown;
-		amount_total: unknown;
-		created: unknown;
-		expires_at: unknown;
-		items: unknown;
-		object: unknown;
-		status: unknown;
-		success_url: unknown;
-		transaction_status: unknown;
-		type: unknown;
-		url: string;
-	}
-
-	export async function checkout(params: { token: string; months: number; success_url: string; cancel_url: string }) {
-		return await request<CheckoutResponse>({
-			path: '/payment/v2/checkout',
+	export async function buyPlan(params: { token: string; planId: string; amount: number }) {
+		return await request<TreasuryReservation>({
+			path: '/v3/payments/buy',
+			data: { planId: params.planId, amount: params.amount },
 			token: params.token,
-			data: { months: params.months, success_url: params.success_url, cancel_url: params.cancel_url },
 		});
+	}
+
+	export async function getTransactions(params: { token: string }) {
+		return await request<TreasuryTransaction[]>({ path: '/v3/payments/transactions', token: params.token });
 	}
 }

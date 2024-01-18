@@ -180,10 +180,8 @@ export class FeedSettings {
 			.catch(() => (this.isError = true));
 
 		autorun(() => {
-			console.log('yay1: ', domain.account && this.configs.has(domain.account));
 			if (domain.account && !this.configs.has(domain.account)) {
 				const acc = domain.account;
-				console.log('yay2');
 				(async () => {
 					try {
 						this.configs.set(acc, 'loading');

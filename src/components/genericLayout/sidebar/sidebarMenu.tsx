@@ -254,10 +254,9 @@ export const SidebarSmartFeedSection = observer(() => {
 //
 
 export const TrialPeriodSection = observer(() => {
-	const paymentInfo = domain.paymentInfo;
-	const trial = isTrialActive(paymentInfo);
+	const trial = isTrialActive(domain.accountPlan);
 
-	if (!paymentInfo || !trial || !domain.account) {
+	if (!domain.accountPlan || !trial || !domain.account) {
 		return null;
 	}
 
@@ -273,7 +272,7 @@ export const TrialPeriodSection = observer(() => {
 						style={{
 							width: `${
 								constrain(
-									1 - (paymentInfo.status.until - Date.now() / 1000) / (60 * 60 * 24 * 7),
+									1 - (domain.accountPlan.planEndsAt - Date.now() / 1000) / (60 * 60 * 24 * 7),
 									0,
 									1,
 								) * 100

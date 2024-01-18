@@ -1,10 +1,9 @@
-import { ActionButton, ActionButtonLook, ActionButtonSize } from '../components/ActionButton/ActionButton';
-import { ActionModal } from '../components/actionModal/actionModal';
 import {
 	AuthorizeAccountFlow,
 	BuildFeedFlow,
 	MainViewOnboarding,
 } from '../components/mainViewOnboarding/mainViewOnboarding';
+import { PaymentModal } from '../components/paymentModal/paymentModal';
 import { showStaticComponent } from '../components/staticComponentManager/staticComponentManager';
 import { analytics } from '../stores/Analytics';
 import { browserStorage } from '../stores/browserStorage';
@@ -21,22 +20,7 @@ export async function connectMainviewAccount(params?: { noCloseButton?: boolean;
 }
 
 const PayModal = ({ onClose }: { onClose: () => void }) => {
-	return (
-		<ActionModal
-			title="Activate paid account"
-			buttons={
-				<ActionButton size={ActionButtonSize.XLARGE} look={ActionButtonLook.PRIMARY} onClick={() => onClose()}>
-					Close
-				</ActionButton>
-			}
-		>
-			Please, write to Telegram{' '}
-			<a href="https://t.me/mainview_io" target="_blank" rel="noreferrer">
-				@mainview_io
-			</a>{' '}
-			to activate your account.
-		</ActionModal>
-	);
+	return <PaymentModal account={domain.account!} onResolve={() => onClose()} />;
 };
 
 export async function payAccount(params?: { noCloseButton?: boolean; place?: string }) {

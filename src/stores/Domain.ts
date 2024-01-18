@@ -22,7 +22,7 @@ export class Domain {
 	@observable devMode = false; //document.location.href.includes('localhost');
 	@observable address: string | null = null;
 	@observable account: DomainAccount | null = null;
-	@observable paymentInfo: FeedManagerApi.PaymentInfo | undefined = undefined;
+	@observable accountPlan: FeedManagerApi.AccountPlan | undefined = undefined;
 	@observable tooMuch: boolean = false;
 
 	feedSettings: FeedSettings;
@@ -34,6 +34,21 @@ export class Domain {
 	constructor() {
 		makeObservable(this);
 
+		autorun(() => {
+			if (this.account) {
+				this.accountPlan = undefined;
+				FeedManagerApi.getAccountPlan({ token: this.account.mainviewKey })
+					.then(plan => {
+						this.accountPlan = plan;
+					})
+					.catch(err => {
+						console.error(err);
+					});
+			} else {
+				this.accountPlan = undefined;
+			}
+		});
+
 		this.feedSettings = new FeedSettings(this);
 
 		window.addEventListener('keydown', e => {
@@ -41,21 +56,15 @@ export class Domain {
 				this.devMode = !this.devMode;
 			}
 		});
+	}
 
-		autorun(() => {
-			if (this.account) {
-				this.paymentInfo = undefined;
-				FeedManagerApi.getPaymentInfo({ token: this.account.mainviewKey })
-					.then(info => {
-						this.paymentInfo = info;
-					})
-					.catch(err => {
-						console.error(err);
-					});
-			} else {
-				this.paymentInfo = undefined;
-			}
-		});
+	async reloadAccountPlan() {
+		if (this.account) {
+			this.accountPlan = undefined;
+			this.accountPlan = await FeedManagerApi.getAccountPlan({ token: this.account.mainviewKey });
+		} else {
+			this.accountPlan = undefined;
+		}
 	}
 
 	get isTooMuch() {
@@ -63,11 +72,11 @@ export class Domain {
 	}
 
 	get isAccountActive() {
-		return this.account && this.paymentInfo && (isTrialActive(this.paymentInfo) || isPaid(this.paymentInfo));
+		return this.account && this.accountPlan && (isTrialActive(this.accountPlan) || isPaid(this.accountPlan));
 	}
 
 	get isAccountMustPay() {
-		return this.account && this.paymentInfo && !isTrialActive(this.paymentInfo) && !isPaid(this.paymentInfo);
+		return this.account && this.accountPlan && !isTrialActive(this.accountPlan) && !isPaid(this.accountPlan);
 	}
 
 	onGetAccount: null | ((addr: string | undefined) => void) = null;

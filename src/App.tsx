@@ -6,6 +6,7 @@ import { Helmet } from 'react-helmet';
 import { QueryClient, QueryClientProvider } from 'react-query';
 import { generatePath, Navigate, Route, Routes, useLocation } from 'react-router-dom';
 
+import { FeedManagerApi } from './api/feedManagerApi';
 import css from './app.module.scss';
 import { ActionButton, ActionButtonLook, ActionButtonSize } from './components/ActionButton/ActionButton';
 import { AuthContextProvider } from './components/authContext/authContext';
@@ -15,6 +16,7 @@ import { PopupManager } from './components/popup/popupManager/popupManager';
 import { StaticComponentManager } from './components/staticComponentManager/staticComponentManager';
 import { ToastManager } from './components/toast/toast';
 import { APP_NAME } from './constants';
+import { REACT_APP__VAPID_PUBLIC_KEY } from './env';
 import { FeedPage } from './pages/feed/feedPage/feedPage';
 import { FeedPostPage } from './pages/feed/feedPostPage/feedPostPage';
 import { SettingsPage } from './pages/settings/settingsPage';
@@ -22,6 +24,7 @@ import { ServiceWorkerUpdateCallback } from './serviceWorkerRegistration';
 import { analytics } from './stores/Analytics';
 import { browserStorage } from './stores/browserStorage';
 import domain from './stores/Domain';
+import { DomainAccount } from './stores/models/DomainAccount';
 import { RoutePath } from './stores/routePath';
 import { useIsMatchesPattern, useNav } from './utils/url';
 import { Web3ModalManager } from './utils/walletconnect';
@@ -52,6 +55,47 @@ const RemoveTrailingSlash = () => {
 
 	return <></>;
 };
+
+function enableNotifications(accounts: DomainAccount[]) {
+	function subscribe() {
+		navigator.serviceWorker
+			.getRegistration()
+			.then(registration => {
+				function urlBase64ToUint8Array(base64String: string) {
+					const padding = '='.repeat((4 - (base64String.length % 4)) % 4);
+					const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
+					const rawData = atob(base64);
+					const outputArray = new Uint8Array(rawData.length);
+					for (let i = 0; i < rawData.length; ++i) {
+						outputArray[i] = rawData.charCodeAt(i);
+					}
+					return outputArray;
+				}
+
+				return registration?.pushManager.subscribe({
+					applicationServerKey: urlBase64ToUint8Array(REACT_APP__VAPID_PUBLIC_KEY!),
+					userVisibleOnly: true,
+				});
+			})
+			.then(
+				subscription =>
+					subscription &&
+					Promise.all(accounts.map(a => FeedManagerApi.subscribe(a.mainviewKey, subscription))),
+			);
+	}
+
+	navigator?.permissions?.query({ name: 'notifications' }).then(r => {
+		if (r.state === 'prompt') {
+			Notification.requestPermission().then(result => {
+				if (result === 'granted') {
+					subscribe();
+				}
+			});
+		} else if (r.state === 'granted') {
+			subscribe();
+		}
+	});
+}
 
 interface AppProps {
 	serviceWorkerUpdateCallback: IObservableValue<ServiceWorkerUpdateCallback | undefined>;
@@ -104,6 +148,27 @@ export const App = observer(({ serviceWorkerUpdateCallback }: AppProps) => {
 	useEffect(() => {
 		analytics.pageView(location.pathname);
 	}, [location.pathname]);
+
+	useEffect(() => {
+		// Check notifications on page load.
+		// This will work on any device except iOS Safari,
+		// where it's required to check notifications on user interaction.
+
+		const clickListener = () => {
+			document.body.removeEventListener('click', clickListener);
+			enableNotifications([domain.account!]);
+		};
+
+		if (domain.account) {
+			enableNotifications([domain.account]);
+			document.body.addEventListener('click', clickListener);
+		}
+
+		return () => {
+			document.body.removeEventListener('click', clickListener);
+		};
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [domain.account]);
 
 	if (initErrorId) {
 		return (
