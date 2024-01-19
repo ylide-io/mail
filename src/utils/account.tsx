@@ -45,7 +45,12 @@ export async function connectAccount(params?: { noCloseButton?: boolean; place?:
 		browserStorage.isAuthorized = true;
 		domain.account = account;
 
-		await showStaticComponent<boolean>(resolve => <BuildFeedFlow account={account} onClose={resolve} />);
+		const res = await showStaticComponent<boolean>(resolve => (
+			<BuildFeedFlow account={account} onClose={resolve} />
+		));
+		if (res) {
+			document.location.href = '/feed/smart/' + encodeURIComponent(account.address);
+		}
 	} catch (e) {
 		console.error(e);
 		disconnectAccount();

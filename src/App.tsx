@@ -251,7 +251,7 @@ export const App = observer(({ serviceWorkerUpdateCallback }: AppProps) => {
 										<Navigate
 											replace
 											to={
-												(browserStorage.isAuthorized
+												(browserStorage.isAuthorized || true
 													? generatePath(RoutePath.FEED_SMART)
 													: generatePath(RoutePath.FEED_CATEGORY, { tag: '14' })) +
 												location.search
