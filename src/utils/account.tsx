@@ -1,8 +1,6 @@
-import {
-	AuthorizeAccountFlow,
-	BuildFeedFlow,
-	MainViewOnboarding,
-} from '../components/mainViewOnboarding/mainViewOnboarding';
+import { observer } from 'mobx-react';
+
+import { AuthorizeAccountFlow, BuildFeedFlow } from '../components/mainViewOnboarding/mainViewOnboarding';
 import { PaymentModal } from '../components/paymentModal/paymentModal';
 import { showStaticComponent } from '../components/staticComponentManager/staticComponentManager';
 import { analytics } from '../stores/Analytics';
@@ -15,13 +13,9 @@ export function formatAccountName(account: DomainAccount) {
 	return truncateInMiddle(account.address, 8, '..');
 }
 
-export async function connectMainviewAccount(params?: { noCloseButton?: boolean; place?: string }) {
-	return await showStaticComponent<DomainAccount | undefined>(resolve => <MainViewOnboarding onResolve={resolve} />);
-}
-
-const PayModal = ({ onClose }: { onClose: () => void }) => {
+const PayModal = observer(({ onClose }: { onClose: () => void }) => {
 	return <PaymentModal account={domain.account!} onResolve={() => onClose()} />;
-};
+});
 
 export async function payAccount(params?: { noCloseButton?: boolean; place?: string }) {
 	if (params?.place) {
@@ -53,7 +47,7 @@ export async function connectAccount(params?: { noCloseButton?: boolean; place?:
 		}
 	} catch (e) {
 		console.error(e);
-		disconnectAccount();
+		disconnectAccount(params);
 	}
 }
 
@@ -77,7 +71,7 @@ export async function requestAccount(params?: {
 		}
 	} catch (e) {
 		console.error(e);
-		disconnectAccount();
+		disconnectAccount(params);
 	}
 
 	return null;
