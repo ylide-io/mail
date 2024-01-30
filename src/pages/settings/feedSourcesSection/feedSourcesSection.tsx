@@ -134,6 +134,7 @@ export const FeedSourcesSection = observer(({ account }: FeedSourcesSectionProps
 									[FeedReason.BALANCE]: 'Tokens you hold',
 									[FeedReason.PROTOCOL]: 'Projects you have position in',
 									[FeedReason.TRANSACTION]: 'Projects you used',
+									[FeedReason.BALANCE_IN_PROTOCOL]: 'Your tokens in projects',
 							  }[reason]
 							: Object.keys(sourcesByReason).length === 1
 							? 'Source'

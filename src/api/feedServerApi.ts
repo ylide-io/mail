@@ -14,6 +14,7 @@ export enum FeedReason {
 	BALANCE = 'balance',
 	PROTOCOL = 'protocol',
 	TRANSACTION = 'transaction',
+	BALANCE_IN_PROTOCOL = 'balance-in-protocol',
 }
 
 export type FeedReasonOrEmpty = FeedReason | '';

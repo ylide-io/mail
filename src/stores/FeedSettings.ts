@@ -144,7 +144,13 @@ const calculateCoverage = (data: FeedManagerApi.CoverageData[]) => {
 export const getReasonOrder = (reasons: FeedReasonOrEmpty[]) =>
 	reasons.sort((a: FeedReasonOrEmpty, b: FeedReasonOrEmpty) => {
 		const getOrder = (reason: FeedReasonOrEmpty) =>
-			({ [FeedReason.BALANCE]: 1, [FeedReason.PROTOCOL]: 2, [FeedReason.TRANSACTION]: 3, '': 4 }[reason]);
+			({
+				[FeedReason.BALANCE]: 1,
+				[FeedReason.PROTOCOL]: 2,
+				[FeedReason.TRANSACTION]: 3,
+				[FeedReason.BALANCE_IN_PROTOCOL]: 4,
+				'': 5,
+			}[reason]);
 		return getOrder(a) - getOrder(b);
 	});
 

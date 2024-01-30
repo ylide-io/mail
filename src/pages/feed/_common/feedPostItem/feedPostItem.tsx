@@ -169,6 +169,7 @@ export const FeedPostItem = observer(({ post, feedType }: FeedPostItemProps) => 
 					[FeedReason.BALANCE]: 'You hold tokens of ',
 					[FeedReason.PROTOCOL]: 'Current position in ',
 					[FeedReason.TRANSACTION]: 'Historical tx in ',
+					[FeedReason.BALANCE_IN_PROTOCOL]: 'You hold tokens of ', // TODO
 				}[userCryptoProject.reasons[0]]
 			}
 
