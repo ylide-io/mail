@@ -10,7 +10,7 @@ enum BrowserStorageKey {
 	SIDEBAR_FOLDED_SECTIONS = 'ylide_sidebarFoldedSections',
 	SAVE_DECODED_MESSAGES = 'ylide_saveDecodedMessages',
 	WIDGET_ID = 'ylide_widgetId',
-	MAIN_VIEW_KEYS = 'ylide_mainViewKeys',
+	MAIN_VIEW_ACCOUNTS = 'ylide_mainViewAccounts',
 	REFERRER = 'ylide_referrer',
 	IS_AUTHORIZED = 'ylide_isAuthorized',
 	LAST_MAILBOX_INCOMING_DATE = 'ylide_lastMailboxCheckDate',
@@ -64,19 +64,19 @@ class BrowserStorage {
 
 	//
 
-	private _mainViewKeys =
+	private _mainviewAccounts =
 		BrowserStorage.getItemWithTransform(
-			BrowserStorageKey.MAIN_VIEW_KEYS,
-			item => JSON.parse(item) as Record<string, string | undefined>,
+			BrowserStorageKey.MAIN_VIEW_ACCOUNTS,
+			item => JSON.parse(item) as Record<string, { id: string; token: string } | undefined>,
 		) || {};
 
-	get mainViewKeys() {
-		return this._mainViewKeys;
+	get mainviewAccounts() {
+		return this._mainviewAccounts;
 	}
 
-	set mainViewKeys(value: Record<string, string | undefined>) {
-		BrowserStorage.setItem(BrowserStorageKey.MAIN_VIEW_KEYS, JSON.stringify(value));
-		this._mainViewKeys = value;
+	set mainviewAccounts(value: Record<string, { id: string; token: string } | undefined>) {
+		BrowserStorage.setItem(BrowserStorageKey.MAIN_VIEW_ACCOUNTS, JSON.stringify(value));
+		this._mainviewAccounts = value;
 	}
 
 	//

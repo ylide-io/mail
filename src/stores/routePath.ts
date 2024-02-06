@@ -24,7 +24,7 @@ export enum RoutePath {
 	FEED_CATEGORY = '/feed/tag/:tag',
 	FEED_SOURCE = '/feed/source/:source',
 	FEED_SMART = '/feed/smart',
-	FEED_SMART_ADDRESS = '/feed/smart/:address',
+	FEED_SMART_EXACT = '/feed/smart/:feedId',
 
 	SETTINGS_ADDRESS = '/settings/:address',
 	SETTINGS_ADDRESS_SECTION = '/settings/:address/:section',

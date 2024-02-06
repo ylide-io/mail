@@ -1,9 +1,9 @@
 import { REACT_APP__FEED_MANAGER } from '../env';
+import { PortfolioSource, PortfolioSourceToAffectedProjectsMap } from '../shared/PortfolioScope';
 import { AuthorizationPayload } from '../types';
 import { createCleanSerachParams } from '../utils/url';
-import { FeedReason } from './feedServerApi';
 
-export namespace FeedManagerApi {
+export namespace MainviewApi {
 	export enum ErrorCode {
 		INVALID_REQUEST = 'INVALID_REQUEST',
 		INVALID_TIMESTAMP = 'INVALID_TIMESTAMP',
@@ -81,6 +81,7 @@ export namespace FeedManagerApi {
 	//
 
 	export interface AuthAddressResponse {
+		id: string;
 		token: string;
 	}
 
@@ -199,34 +200,76 @@ export namespace FeedManagerApi {
 
 	//
 
-	export interface UserProject {
-		projectId: string;
-		projectName: string;
-		reasons: FeedReason[];
-		reasonsRaw: string[][];
-		reasonsDataRaw: any[];
-	}
-
 	export enum ConfigMode {
 		AUTO_ADD = 'auto-add',
 		DONT_ADD = 'dont-add',
 	}
 
-	export interface ConfigEntity {
-		address: string;
+	export interface MVFeedEntity {
+		id: string;
+		name: string;
+		emoji: string;
+		description: string;
+		ownerAccountId: string;
 		mode: ConfigMode;
+		sources: PortfolioSource[];
 		includedSourceIds: string[];
 		excludedSourceIds: string[];
-		lastLoginTimestamp: number;
+		settings: {
+			tresholdType: 'percent' | 'value';
+			tresholdValue: number;
+		};
 	}
 
-	export interface GetConfigResponse {
-		config: ConfigEntity;
-		defaultProjects: UserProject[];
+	export interface FeedDataResponse {
+		feed: MVFeedEntity;
+		owner: { id: string; name: string };
+		accesses: { type: 'email' | 'address'; value: string; role: MVFeedAccessRole }[];
+		portfolioSourceToAffectedProjects: PortfolioSourceToAffectedProjectsMap;
 	}
 
-	export async function getConfig(params: { token: string }) {
-		return await request<GetConfigResponse>({ path: '/v3/get-config', token: params.token });
+	export enum MVFeedAccessRole {
+		READ = 'read',
+		EDIT_SOURCES = 'edit-sources',
+		EDIT_USERS = 'edit-users',
+	}
+
+	export interface FeedsResponse {
+		feeds: {
+			accessLevel: MVFeedAccessRole;
+			data: FeedDataResponse;
+		}[];
+	}
+
+	export async function getFeedData({ token, feedId = 'default' }: { token: string; feedId: string }) {
+		return await request<FeedDataResponse>({ path: `/v4/feed/${feedId}`, token: token });
+	}
+
+	export async function getFeeds({ token }: { token: string }) {
+		return await request<FeedsResponse>({ path: `/v4/feeds`, token: token });
+	}
+
+	export async function checkAddressAvailability({ token, address }: { token: string; address: string }) {
+		return await request<{
+			available: boolean;
+			trackingWallets: string[];
+			isTracked: boolean;
+			quota: number;
+		}>({ path: `/v4/check-address`, token, query: { address } });
+	}
+
+	export async function getPortfolioSourcesData({ token, sources }: { token: string; sources: PortfolioSource[] }) {
+		return await request<PortfolioSourceToAffectedProjectsMap>({
+			path: `/v4/portfolio-sources?sources=${JSON.stringify(sources)}`,
+			token,
+		});
+	}
+
+	export async function getWalletsQuota({ token }: { token: string }) {
+		return await request<{ quota: number; uniqueWallets: string[] }>({
+			path: `/v4/quota`,
+			token,
+		});
 	}
 
 	export async function setConfig(params: {

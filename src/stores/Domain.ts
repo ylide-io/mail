@@ -2,11 +2,12 @@ import { useWeb3Modal } from '@web3modal/wagmi/react';
 import { autorun, makeObservable, observable } from 'mobx';
 import { useSignMessage } from 'wagmi';
 
-import { FeedManagerApi } from '../api/feedManagerApi';
+import { MainviewApi } from '../api/mainviewApi';
 import { ensurePageLoaded } from '../utils/ensurePageLoaded';
 import { isPaid, isTrialActive } from '../utils/payments';
 import { browserStorage } from './browserStorage';
 import { FeedSettings } from './FeedSettings';
+import { FeedSourcesStore } from './FeedSources';
 import { DomainAccount } from './models/DomainAccount';
 
 // Ylide.verbose();
@@ -22,10 +23,11 @@ export class Domain {
 	@observable devMode = false; //document.location.href.includes('localhost');
 	@observable address: string | null = null;
 	@observable account: DomainAccount | null = null;
-	@observable accountPlan: FeedManagerApi.AccountPlan | undefined = undefined;
+	@observable accountPlan: MainviewApi.AccountPlan | undefined = undefined;
 	@observable tooMuch: boolean = false;
 
 	feedSettings: FeedSettings;
+	feedSources: FeedSourcesStore = new FeedSourcesStore();
 
 	_open: (opts?: OpenOptions) => void = () => {};
 	_disconnect: () => void = () => {};
@@ -37,7 +39,7 @@ export class Domain {
 		autorun(() => {
 			if (this.account) {
 				this.accountPlan = undefined;
-				FeedManagerApi.getAccountPlan({ token: this.account.mainviewKey })
+				MainviewApi.getAccountPlan({ token: this.account.mainviewKey })
 					.then(plan => {
 						this.accountPlan = plan;
 					})
@@ -61,7 +63,7 @@ export class Domain {
 	async reloadAccountPlan() {
 		if (this.account) {
 			this.accountPlan = undefined;
-			this.accountPlan = await FeedManagerApi.getAccountPlan({ token: this.account.mainviewKey });
+			this.accountPlan = await MainviewApi.getAccountPlan({ token: this.account.mainviewKey });
 		} else {
 			this.accountPlan = undefined;
 		}
@@ -117,12 +119,13 @@ export class Domain {
 			this.onGetAccount(addr);
 		} else {
 			if (!addr) {
-				browserStorage.mainViewKeys = {};
+				browserStorage.mainviewAccounts = {};
 			}
 			const address = (addr || '').toLowerCase();
-			if (addr && browserStorage.mainViewKeys[address]) {
+			if (addr && browserStorage.mainviewAccounts[address]) {
 				browserStorage.isAuthorized = true;
-				this.account = new DomainAccount(address, browserStorage.mainViewKeys[address]!);
+				const d = browserStorage.mainviewAccounts[address]!;
+				this.account = new DomainAccount(d.id, address, d.token);
 			} else {
 				browserStorage.isAuthorized = false;
 				this.account = null;

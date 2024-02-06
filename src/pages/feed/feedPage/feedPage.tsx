@@ -33,41 +33,35 @@ export function reloadFeed() {
 }
 
 const FeedPageContent = observer(() => {
-	const { tag, source, address } = useParams<{ tag: string; source: string; address: string }>();
+	const { tag, source, feedId } = useParams<{ tag: string; source: string; feedId: string }>();
 
 	const navigate = useNav();
 	const genericLayoutApi = useGenericLayoutApi();
 	const tags = domain.feedSettings.tags;
 
-	useEffect(() => {
-		if (address && domain.account && domain.account.address !== address) {
-			navigate(generatePath(RoutePath.FEED));
-		}
-	}, [address, navigate, domain.account]);
-
-	const coverage = domain.account ? domain.feedSettings.coverages.get(domain.account) : undefined;
-	const totalCoverage = useMemo(() => {
-		if (!coverage || coverage === 'error' || coverage === 'loading') {
-			return null;
-		}
-		return coverage.totalCoverage;
-	}, [coverage]);
+	// const coverage = domain.account ? domain.feedSettings.coverages.get(domain.account) : undefined;
+	// const totalCoverage = useMemo(() => {
+	// 	if (!coverage || coverage === 'error' || coverage === 'loading') {
+	// 		return null;
+	// 	}
+	// 	return coverage.totalCoverage;
+	// }, [coverage]);
 	const [showCoverageModal, setShowCoverageModal] = useState(false);
 
 	const canLoadFeed = Boolean(tag || domain.account);
 
 	const reloadCounter = reloadFeedCounter.get();
 
-	const feedType = useMemo(() => {
-		if (!tag && !address && !source) {
-			return 'personal';
-		} else {
-			if (!tag && !source && address === domain.account?.address) {
-				return 'personal';
-			}
-			return 'generic';
-		}
-	}, [tag, source, address, domain.account]);
+	// const feedType = useMemo(() => {
+	// 	if (!tag && !address && !source) {
+	// 		return 'personal';
+	// 	} else {
+	// 		if (!tag && !source && address === domain.account?.address) {
+	// 			return 'personal';
+	// 		}
+	// 		return 'generic';
+	// 	}
+	// }, [tag, source, address, domain.account]);
 
 	const feed = useMemo(() => {
 		hookDependency(reloadCounter);
@@ -128,7 +122,7 @@ const FeedPageContent = observer(() => {
 							Show {feed.newPosts} new posts
 						</ActionButton>
 					)}
-					{feed.tags.length === 0 && !feed.sourceId && domain.account && address && totalCoverage && (
+					{/* {feed.tags.length === 0 && !feed.sourceId && domain.account && address && totalCoverage && (
 						<ActionButton
 							look={ActionButtonLook.PRIMARY}
 							onClick={() => {
@@ -138,13 +132,13 @@ const FeedPageContent = observer(() => {
 						>
 							USD Coverage: {totalCoverage}
 						</ActionButton>
-					)}
+					)} */}
 				</div>
 			}
 		>
-			{showCoverageModal && coverage && coverage !== 'error' && coverage !== 'loading' && (
+			{/* {showCoverageModal && coverage && coverage !== 'error' && coverage !== 'loading' && (
 				<CoverageModal onClose={() => setShowCoverageModal(false)} coverage={coverage} />
-			)}
+			)} */}
 			{!!feed.posts.length && (
 				<ActionButton
 					className={css.scrollToTop}
@@ -162,12 +156,12 @@ const FeedPageContent = observer(() => {
 						{domain.isTooMuch ? (
 							<>
 								{feed.posts.slice(0, 15).map(post => (
-									<FeedPostItem feedType={feedType} key={post.id} post={post} />
+									<FeedPostItem feedId={feedId} key={post.id} post={post} />
 								))}
 								<Paywall />
 							</>
 						) : (
-							feed.posts.map(post => <FeedPostItem feedType={feedType} key={post.id} post={post} />)
+							feed.posts.map(post => <FeedPostItem feedId={feedId} key={post.id} post={post} />)
 						)}
 
 						{!domain.isTooMuch && feed.moreAvailable && (

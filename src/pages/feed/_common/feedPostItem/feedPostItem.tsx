@@ -1,10 +1,9 @@
 import clsx from 'clsx';
 import { observer } from 'mobx-react';
-import { useMemo, useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 import { generatePath } from 'react-router-dom';
 
-import { FeedManagerApi } from '../../../../api/feedManagerApi';
-import { FeedPost, FeedReason, LinkType } from '../../../../api/feedServerApi';
+import { FeedPost, LinkType } from '../../../../api/feedServerApi';
 import { Avatar } from '../../../../components/avatar/avatar';
 import { GridRowBox, TruncateTextBox } from '../../../../components/boxes/boxes';
 import { CheckBox } from '../../../../components/checkBox/checkBox';
@@ -17,6 +16,7 @@ import { toast } from '../../../../components/toast/toast';
 import { ReactComponent as ContactSvg } from '../../../../icons/ic20/contact.svg';
 import { ReactComponent as MenuSvg } from '../../../../icons/ic20/menu.svg';
 import domain from '../../../../stores/Domain';
+import { DomainAccount } from '../../../../stores/models/DomainAccount';
 import { RoutePath } from '../../../../stores/routePath';
 import { formatAccountName } from '../../../../utils/account';
 import { HorizontalAlignment } from '../../../../utils/alignment';
@@ -24,10 +24,8 @@ import { invariant } from '../../../../utils/assert';
 import { toAbsoluteUrl, useNav } from '../../../../utils/url';
 import { FeedLinkTypeIcon } from '../feedLinkTypeIcon/feedLinkTypeIcon';
 import { PostItemContainer } from '../postItemContainer/postItemContainer';
-import css from './feedPostItem.module.scss';
-import UserProject = FeedManagerApi.UserProject;
-import { DomainAccount } from '../../../../stores/models/DomainAccount';
 import { FeedPostContent } from './feedPostContent';
+import css from './feedPostItem.module.scss';
 
 //
 
@@ -39,20 +37,20 @@ interface AddtoMyFeedItemProps {
 export const AddToMyFeedItem = observer(({ post, account }: AddtoMyFeedItemProps) => {
 	const [isUpdating, setUpdating] = useState(false);
 
-	const isSelected = domain.feedSettings.isSourceSelected(account, post.sourceId);
+	const isSelected = false; // domain.feedSettings.isSourceSelected(account, post.sourceId);
 
 	const toggle = async () => {
 		try {
 			setUpdating(true);
 
-			const selectedSourceIds = domain.feedSettings.getSelectedSourceIds(account);
+			// const selectedSourceIds = domain.feedSettings.getSelectedSourceIds(account);
 
-			await domain.feedSettings.updateFeedConfig(
-				account,
-				isSelected
-					? selectedSourceIds.filter(id => id !== post.sourceId)
-					: [...selectedSourceIds, post.sourceId],
-			);
+			// await domain.feedSettings.updateFeedConfig(
+			// 	account,
+			// 	isSelected
+			// 		? selectedSourceIds.filter(id => id !== post.sourceId)
+			// 		: [...selectedSourceIds, post.sourceId],
+			// );
 		} catch (e) {
 			toast('Error 🤦‍♀️');
 		} finally {
@@ -109,11 +107,11 @@ export const AddToMyFeedButton = observer(({ post }: AddToMyFeedButtonProps) => 
 //
 
 interface FeedPostItemProps {
-	feedType: 'personal' | 'generic';
+	feedId?: string;
 	post: FeedPost;
 }
 
-export const FeedPostItem = observer(({ post, feedType }: FeedPostItemProps) => {
+export const FeedPostItem = observer(({ post, feedId }: FeedPostItemProps) => {
 	const navigate = useNav();
 	const postPath = generatePath(RoutePath.FEED_POST, { postId: post.id });
 
@@ -130,52 +128,48 @@ export const FeedPostItem = observer(({ post, feedType }: FeedPostItemProps) => 
 	const [unfollowedState, setUnfollowState] = useState<'none' | 'unfollowing' | 'unfollowed'>('none');
 
 	const unfollow = async (projectId?: string) => {
-		try {
-			setUnfollowState('unfollowing');
-
-			invariant(account, 'No accounts');
-
-			const sourceIdsToExclude = projectId
-				? domain.feedSettings.sources.filter(s => s.cryptoProject?.id === projectId).map(s => s.id)
-				: [post.sourceId];
-
-			invariant(sourceIdsToExclude.length, 'No source ids to exclude');
-
-			const selectedSourceIds = domain.feedSettings
-				.getSelectedSourceIds(account)
-				.filter(id => !sourceIdsToExclude.includes(id));
-
-			await domain.feedSettings.updateFeedConfig(account, selectedSourceIds);
-
-			setUnfollowState('unfollowed');
-		} catch (e) {
-			setUnfollowState('none');
-			toast("Couldn't unfollow 🤦‍♀️");
-			throw e;
-		}
+		// try {
+		// 	setUnfollowState('unfollowing');
+		// 	invariant(account, 'No accounts');
+		// 	const sourceIdsToExclude = projectId
+		// 		? domain.feedSettings.sources.filter(s => s.cryptoProject?.id === projectId).map(s => s.id)
+		// 		: [post.sourceId];
+		// 	invariant(sourceIdsToExclude.length, 'No source ids to exclude');
+		// 	// const selectedSourceIds = domain.feedSettings
+		// 	// 	.getSelectedSourceIds(account)
+		// 	// 	.filter(id => !sourceIdsToExclude.includes(id));
+		// 	// await domain.feedSettings.updateFeedConfig(account, selectedSourceIds);
+		// 	setUnfollowState('unfollowed');
+		// } catch (e) {
+		// 	setUnfollowState('none');
+		// 	toast("Couldn't unfollow 🤦‍♀️");
+		// 	throw e;
+		// }
 	};
 
-	const userCryptoProject = useMemo(() => {
-		if (account && post.cryptoProjectId) {
-			const config = domain.feedSettings.getAccountConfig(account);
-			return config?.defaultProjects.find(p => p.projectId === post.cryptoProjectId);
-		}
-	}, [post.cryptoProjectId, account]);
+	const userCryptoProject: any = null;
+	const renderReason = (a: any) => null;
+	// const userCryptoProject = useMemo(() => {
+	// 	if (account && post.cryptoProjectId) {
+	// 		const config = domain.feedSettings.getAccountConfig(account);
+	// 		return config?.defaultProjects.find(p => p.projectId === post.cryptoProjectId);
+	// 	}
+	// }, [post.cryptoProjectId, account]);
 
-	const renderReason = (userCryptoProject: UserProject) => (
-		<>
-			{
-				{
-					[FeedReason.BALANCE]: 'You hold tokens of ',
-					[FeedReason.PROTOCOL]: 'Current position in ',
-					[FeedReason.TRANSACTION]: 'Historical tx in ',
-					[FeedReason.BALANCE_IN_PROTOCOL]: 'You hold tokens of ', // TODO
-				}[userCryptoProject.reasons[0]]
-			}
+	// const renderReason = (userCryptoProject: FeedProject) => (
+	// 	<>
+	// 		{
+	// 			{
+	// 				[FeedReason.BALANCE]: 'You hold tokens of ',
+	// 				[FeedReason.PROTOCOL]: 'Current position in ',
+	// 				[FeedReason.TRANSACTION]: 'Historical tx in ',
+	// 				[FeedReason.BALANCE_IN_PROTOCOL]: 'You hold tokens of ', // TODO
+	// 			}[userCryptoProject.reasons[0]]
+	// 		}
 
-			<b>{userCryptoProject.projectName}</b>
-		</>
-	);
+	// 		<b>{userCryptoProject.projectName}</b>
+	// 	</>
+	// );
 
 	return (
 		<>
@@ -206,7 +200,7 @@ export const FeedPostItem = observer(({ post, feedType }: FeedPostItemProps) => 
 						</div>
 
 						<div className={css.metaRight}>
-							{feedType === 'personal' ? (
+							{feedId ? (
 								userCryptoProject &&
 								!!userCryptoProject.reasons.length &&
 								!!userCryptoProject.projectName && (
@@ -218,7 +212,7 @@ export const FeedPostItem = observer(({ post, feedType }: FeedPostItemProps) => 
 										{renderReason(userCryptoProject)}
 									</div>
 								)
-							) : feedType === 'generic' && !userCryptoProject && account ? (
+							) : !userCryptoProject && account ? (
 								<AddToMyFeedButton post={post} />
 							) : null}
 

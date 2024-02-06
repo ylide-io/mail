@@ -1,7 +1,7 @@
 import { observer } from 'mobx-react';
 import { useEffect } from 'react';
 
-import { FeedManagerApi } from '../../api/feedManagerApi';
+import { MainviewApi } from '../../api/mainviewApi';
 import { analytics } from '../../stores/Analytics';
 import { browserStorage } from '../../stores/browserStorage';
 import domain from '../../stores/Domain';
@@ -38,17 +38,17 @@ export const AuthorizeAccountFlow = observer(({ address, onClose }: AuthorizeAcc
 					analytics.mainviewOnboardingEvent('signature-reject');
 					throw e;
 				}
-				const { token } = await FeedManagerApi.authAddress(
+				const { id, token } = await MainviewApi.authAddress(
 					{ address, timestamp, signature },
 					browserStorage.referrer,
 				);
 				if (token) {
-					browserStorage.mainViewKeys = {
-						...browserStorage.mainViewKeys,
-						[address]: token,
+					browserStorage.mainviewAccounts = {
+						...browserStorage.mainviewAccounts,
+						[address]: { id, token },
 					};
 					analytics.mainviewOnboardingEvent('account-authorized');
-					onCloseRef.current(new DomainAccount(address, token));
+					onCloseRef.current(new DomainAccount(id, address, token));
 				} else {
 					onCloseRef.current();
 				}
@@ -69,7 +69,7 @@ export interface BuildFeedFlowProps {
 
 export const BuildFeedFlow = observer(({ account, onClose }: BuildFeedFlowProps) => {
 	const onCloseRef = useLatest(onClose);
-	const coverage = domain.feedSettings.coverages.get(account);
+	const coverage = null; // domain.feedSettings.coverages.get(account);
 
 	useEffect(() => {
 		(async () => {
@@ -79,12 +79,12 @@ export const BuildFeedFlow = observer(({ account, onClose }: BuildFeedFlowProps)
 				console.log('account.mainviewKey: ', account.mainviewKey);
 				invariant(token, 'No main view key');
 
-				const res = await FeedManagerApi.init(token, undefined);
+				const res = await MainviewApi.init(token, undefined);
 
 				if (res?.inLine) {
 					async function checkInit() {
 						await asyncDelay(5000);
-						const initiated = await FeedManagerApi.checkInit(token);
+						const initiated = await MainviewApi.checkInit(token);
 						if (!initiated) {
 							await checkInit();
 						}

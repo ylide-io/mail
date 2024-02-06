@@ -61,4 +61,23 @@
 	.root_unchecked .input:focus-visible + & {
 		border-color: var(--border-heavy-color);
 	}
+
+	.root_smallSize & {
+		width: 14px;
+		height: 14px;
+
+		svg {
+			width: 8px;
+			height: 8px;
+		}
+	}
+}
+
+.root_smallSize {
+	.checkBox {
+		@include expand-click-area(4px);
+
+		width: 14px;
+		height: 14px;
+	}
 }

@@ -1,12 +1,12 @@
 import { IObservableValue } from 'mobx';
 import { observer } from 'mobx-react';
 import { nanoid } from 'nanoid';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Helmet } from 'react-helmet';
 import { QueryClient, QueryClientProvider } from 'react-query';
 import { generatePath, Navigate, Route, Routes, useLocation } from 'react-router-dom';
 
-import { FeedManagerApi } from './api/feedManagerApi';
+import { MainviewApi } from './api/mainviewApi';
 import css from './app.module.scss';
 import { ActionButton, ActionButtonLook, ActionButtonSize } from './components/ActionButton/ActionButton';
 import { AuthContextProvider } from './components/authContext/authContext';
@@ -79,8 +79,7 @@ function enableNotifications(accounts: DomainAccount[]) {
 			})
 			.then(
 				subscription =>
-					subscription &&
-					Promise.all(accounts.map(a => FeedManagerApi.subscribe(a.mainviewKey, subscription))),
+					subscription && Promise.all(accounts.map(a => MainviewApi.subscribe(a.mainviewKey, subscription))),
 			);
 	}
 
@@ -106,16 +105,18 @@ export const App = observer(({ serviceWorkerUpdateCallback }: AppProps) => {
 
 	const swUpdateCallback = serviceWorkerUpdateCallback.get();
 
-	const [queryClient] = useState(
-		new QueryClient({
-			defaultOptions: {
-				queries: {
-					cacheTime: 0,
-					retry: false,
-					refetchOnWindowFocus: false,
+	const queryClient = useMemo(
+		() =>
+			new QueryClient({
+				defaultOptions: {
+					queries: {
+						cacheTime: 0,
+						retry: false,
+						refetchOnWindowFocus: false,
+					},
 				},
-			},
-		}),
+			}),
+		[],
 	);
 
 	useEffect(() => {
@@ -264,7 +265,7 @@ export const App = observer(({ serviceWorkerUpdateCallback }: AppProps) => {
 								<Route path={RoutePath.FEED_CATEGORY} element={<FeedPage />} />
 								<Route path={RoutePath.FEED_SOURCE} element={<FeedPage />} />
 								<Route path={RoutePath.FEED_SMART} element={<FeedPage />} />
-								<Route path={RoutePath.FEED_SMART_ADDRESS} element={<FeedPage />} />
+								<Route path={RoutePath.FEED_SMART_EXACT} element={<FeedPage />} />
 
 								<Route path={RoutePath.SETTINGS_ADDRESS} element={<SettingsPage />} />
 								<Route path={RoutePath.SETTINGS_ADDRESS_SECTION} element={<SettingsPage />} />

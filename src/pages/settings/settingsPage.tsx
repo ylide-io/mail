@@ -22,75 +22,76 @@ export enum SettingsSection {
 }
 
 export const SettingsPage = observer(() => {
-	const navigate = useNav();
-	const { address: currentAddress, section: currentSection } = useParams<{
-		address: string;
-		section?: SettingsSection;
-	}>();
+	// const navigate = useNav();
+	// const { address: currentAddress, section: currentSection } = useParams<{
+	// 	address: string;
+	// 	section?: SettingsSection;
+	// }>();
 
-	const currentAccount = domain.account;
+	// const currentAccount = domain.account;
 
-	function renderTab(section: SettingsSection, name: ReactNode) {
-		const isActive = section === currentSection;
-		const look = isActive ? ActionButtonLook.HEAVY : ActionButtonLook.DEFAULT;
+	// function renderTab(section: SettingsSection, name: ReactNode) {
+	// 	const isActive = section === currentSection;
+	// 	const look = isActive ? ActionButtonLook.HEAVY : ActionButtonLook.DEFAULT;
 
-		return (
-			<ActionButton
-				size={ActionButtonSize.MEDIUM}
-				look={look}
-				onClick={() =>
-					isActive ||
-					navigate(generatePath(RoutePath.SETTINGS_ADDRESS_SECTION, { address: currentAddress!, section }), {
-						replace: true,
-					})
-				}
-			>
-				{name}
-			</ActionButton>
-		);
-	}
+	// 	return (
+	// 		<ActionButton
+	// 			size={ActionButtonSize.MEDIUM}
+	// 			look={look}
+	// 			onClick={() =>
+	// 				isActive ||
+	// 				navigate(generatePath(RoutePath.SETTINGS_ADDRESS_SECTION, { address: currentAddress!, section }), {
+	// 					replace: true,
+	// 				})
+	// 			}
+	// 		>
+	// 			{name}
+	// 		</ActionButton>
+	// 	);
+	// }
 
-	return !currentAddress || !currentAccount ? (
-		<Navigate to={generatePath(RoutePath.ROOT)} replace />
-	) : !currentSection ? (
-		<Navigate
-			replace
-			to={generatePath(RoutePath.SETTINGS_ADDRESS_SECTION, {
-				address: currentAddress,
-				section: SettingsSection.SOURCES,
-			})}
-		/>
-	) : (
-		<GenericLayout>
-			<NarrowContent
-				contentClassName={css.root}
-				title={
-					<GridRowBox>
-						<ActionButton
-							icon={<ArrowLeftSvg />}
-							onClick={() =>
-								navigate(generatePath(RoutePath.FEED_SMART_ADDRESS, { address: currentAddress }))
-							}
-						/>{' '}
-						Settings for {formatAccountName(currentAccount)}
-					</GridRowBox>
-				}
-			>
-				<div className={css.tabs}>
-					{renderTab(SettingsSection.SOURCES, 'Sources')}
-					{renderTab(SettingsSection.PAYMENTS, 'Payments')}
-				</div>
+	// return !currentAddress || !currentAccount ? (
+	// 	<Navigate to={generatePath(RoutePath.ROOT)} replace />
+	// ) : !currentSection ? (
+	// 	<Navigate
+	// 		replace
+	// 		to={generatePath(RoutePath.SETTINGS_ADDRESS_SECTION, {
+	// 			address: currentAddress,
+	// 			section: SettingsSection.SOURCES,
+	// 		})}
+	// 	/>
+	// ) : (
+	// 	<GenericLayout>
+	// 		<NarrowContent
+	// 			contentClassName={css.root}
+	// 			title={
+	// 				<GridRowBox>
+	// 					<ActionButton
+	// 						icon={<ArrowLeftSvg />}
+	// 						onClick={() =>
+	// 							navigate(generatePath(RoutePath.FEED_SMART_EXACT, { address: currentAddress }))
+	// 						}
+	// 					/>{' '}
+	// 					Settings for {formatAccountName(currentAccount)}
+	// 				</GridRowBox>
+	// 			}
+	// 		>
+	// 			<div className={css.tabs}>
+	// 				{renderTab(SettingsSection.SOURCES, 'Sources')}
+	// 				{renderTab(SettingsSection.PAYMENTS, 'Payments')}
+	// 			</div>
 
-				<div className={css.content}>
-					{currentSection === SettingsSection.SOURCES ? (
-						<FeedSourcesSection account={currentAccount} />
-					) : currentSection === SettingsSection.PAYMENTS ? (
-						<PaymentsSection account={currentAccount} />
-					) : (
-						assertUnreachable(currentSection)
-					)}
-				</div>
-			</NarrowContent>
-		</GenericLayout>
-	);
+	// 			<div className={css.content}>
+	// 				{currentSection === SettingsSection.SOURCES ? (
+	// 					<FeedSourcesSection account={currentAccount} />
+	// 				) : currentSection === SettingsSection.PAYMENTS ? (
+	// 					<PaymentsSection account={currentAccount} />
+	// 				) : (
+	// 					assertUnreachable(currentSection)
+	// 				)}
+	// 			</div>
+	// 		</NarrowContent>
+	// 	</GenericLayout>
+	// );
+	return null;
 });

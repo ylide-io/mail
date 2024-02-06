@@ -1,7 +1,7 @@
 import { observer } from 'mobx-react';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
-import { FeedManagerApi } from '../../api/feedManagerApi';
+import { MainviewApi } from '../../api/mainviewApi';
 import { BNBChainLogo } from '../../blockchain-icons/BNBChainLogo';
 import { EthereumLogo } from '../../blockchain-icons/EthereumLogo';
 import { GnosisLogo } from '../../blockchain-icons/GnosisLogo';
@@ -19,7 +19,7 @@ import domain from '../../stores/Domain';
 
 export interface PricingModalProps {
 	account: DomainAccount;
-	onReserved: (reservation: FeedManagerApi.TreasuryReservation) => void;
+	onReserved: (reservation: MainviewApi.TreasuryReservation) => void;
 	onReservationFailed: (message?: string) => void;
 	onCancel: () => void;
 }
@@ -67,7 +67,7 @@ export const PricingModal = observer(({ account, onReserved, onReservationFailed
 			setLoadingPlanId(planId);
 
 			try {
-				const reservation = await FeedManagerApi.buyPlan({
+				const reservation = await MainviewApi.buyPlan({
 					token: account.mainviewKey,
 					planId,
 					amount: 1,
@@ -173,20 +173,20 @@ interface PaymentInitFailedStep {
 interface PaymentWaitingStep {
 	type: StepType.PAYMENT_WAITING;
 	account: DomainAccount;
-	reservation: FeedManagerApi.TreasuryReservation;
+	reservation: MainviewApi.TreasuryReservation;
 }
 
 interface PaymentSuccessStep {
 	type: StepType.PAYMENT_SUCCESS;
 	account: DomainAccount;
-	reservation: FeedManagerApi.TreasuryReservation;
-	transation: FeedManagerApi.TreasuryTransaction;
+	reservation: MainviewApi.TreasuryReservation;
+	transation: MainviewApi.TreasuryTransaction;
 }
 
 interface PaymentTimeoutStep {
 	type: StepType.PAYMENT_TIMEOUT;
 	account: DomainAccount;
-	reservation: FeedManagerApi.TreasuryReservation;
+	reservation: MainviewApi.TreasuryReservation;
 }
 
 type Step =
@@ -230,7 +230,7 @@ export const PaymentModal = observer(({ account, onResolve }: { account: DomainA
 		type: StepType.LOADING,
 		account,
 	});
-	const [accountPlan, setAccountPlan] = useState<FeedManagerApi.AccountPlan | undefined>(undefined);
+	const [accountPlan, setAccountPlan] = useState<MainviewApi.AccountPlan | undefined>(undefined);
 
 	useEffect(() => {
 		setStep({
@@ -238,7 +238,7 @@ export const PaymentModal = observer(({ account, onResolve }: { account: DomainA
 			account,
 		});
 		let cancelled = false;
-		FeedManagerApi.getAccountPlan({ token: account.mainviewKey }).then(info => {
+		MainviewApi.getAccountPlan({ token: account.mainviewKey }).then(info => {
 			if (!cancelled) {
 				setAccountPlan(info);
 				if (info?.activeReservations.length) {
@@ -264,7 +264,7 @@ export const PaymentModal = observer(({ account, onResolve }: { account: DomainA
 		if (step.type === StepType.PAYMENT_WAITING) {
 			let cancelled = false;
 			const timer = setInterval(() => {
-				FeedManagerApi.getAccountPlan({ token: account.mainviewKey }).then(info => {
+				MainviewApi.getAccountPlan({ token: account.mainviewKey }).then(info => {
 					if (cancelled) {
 						return;
 					}

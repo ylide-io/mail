@@ -1,7 +1,7 @@
 import { observer } from 'mobx-react';
 import { useQuery } from 'react-query';
 
-import { FeedManagerApi } from '../../../api/feedManagerApi';
+import { MainviewApi } from '../../../api/mainviewApi';
 import { ErrorMessage, ErrorMessageLook } from '../../../components/errorMessage/errorMessage';
 import { YlideLoader } from '../../../components/ylideLoader/ylideLoader';
 import { DomainAccount } from '../../../stores/models/DomainAccount';
@@ -16,11 +16,11 @@ export interface PaymentsSectionProps {
 
 export const PaymentsSection = observer(({ account }: PaymentsSectionProps) => {
 	const accountPlan = useQuery(['payment', 'info', account.address], {
-		queryFn: () => FeedManagerApi.getAccountPlan({ token: account.mainviewKey }),
+		queryFn: () => MainviewApi.getAccountPlan({ token: account.mainviewKey }),
 	});
 
 	const transactions = useQuery(['payment', 'transactions', account.address], {
-		queryFn: () => FeedManagerApi.getTransactions({ token: account.mainviewKey }),
+		queryFn: () => MainviewApi.getTransactions({ token: account.mainviewKey }),
 	});
 
 	return (

@@ -1,6 +1,7 @@
 import { REACT_APP__FEED_SERVER } from '../env';
 import { invariant } from '../utils/assert';
 import { createCleanSerachParams } from '../utils/url';
+// import { MainviewApi } from './mainviewApi';
 
 export enum LinkType {
 	TELEGRAM = 'telegram',
@@ -10,27 +11,12 @@ export enum LinkType {
 	DISCORD = 'discord',
 }
 
-export enum FeedReason {
-	BALANCE = 'balance',
-	PROTOCOL = 'protocol',
-	TRANSACTION = 'transaction',
-	BALANCE_IN_PROTOCOL = 'balance-in-protocol',
-}
-
-export type FeedReasonOrEmpty = FeedReason | '';
-
-export interface FeedSource {
-	id: string;
-	name: string;
-	origin?: string;
-	avatar?: string;
-	link: string;
-	type: LinkType;
-	cryptoProject?: {
-		id: string;
-		name: string;
-	};
-}
+// export interface FeedReasonedProject extends FeedProject {
+// 	reasons: {
+// 		entityId: string; // debank/crypto entity id
+// 		reasonsData: MainviewApi.ReasonDataEntry[];
+// 	}[];
+// }
 
 //
 
@@ -56,7 +42,7 @@ export interface FeedPost {
 	thread: FeedPost[];
 	cryptoProjectId: string | null;
 	cryptoProjectName: string | null;
-	cryptoProjectReasons: FeedReason[];
+	// cryptoProjectReasons: ProjectRelation[];
 }
 
 export interface FeedPostEmbed {
@@ -137,9 +123,22 @@ export namespace FeedServerApi {
 		return await request(`/posts/${id}`);
 	}
 
-	//
+	export interface RawFeedProject {
+		id: number;
+		name: string;
+	}
 
-	export type GetSourcesResponse = { sources: FeedSource[] };
+	export interface RawFeedSource {
+		id: string;
+		name: string;
+		origin?: string;
+		avatar?: string;
+		link: string;
+		type: LinkType;
+		projectId: number | null;
+	}
+
+	export type GetSourcesResponse = { projects: RawFeedProject[]; sources: RawFeedSource[] };
 
 	export async function getSources(): Promise<GetSourcesResponse> {
 		return await request<GetSourcesResponse>('/sources');

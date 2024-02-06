@@ -1,0 +1,83 @@
+.simpleSlider {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+
+	padding-top: 26px;
+	padding-bottom: 20px;
+
+	user-select: none;
+
+	.minWrap,
+	.maxWrap {
+		flex: 0 0 0;
+		flex-basis: 1px;
+		height: 0px;
+		width: 0px;
+		position: relative;
+	}
+	.minLabel,
+	.maxLabel {
+		position: absolute;
+		width: 40px;
+		left: -20px;
+		top: 100%;
+		margin-top: 8px;
+
+		text-align: center;
+		font-size: 11px;
+		font-weight: 300;
+	}
+	.sliderBody {
+		display: flex;
+		flex-direction: row;
+		align-items: center;
+
+		flex-grow: 1;
+		position: relative;
+
+		.sliderLine {
+			flex-grow: 1;
+			height: 4px;
+			border-radius: 2px;
+			background-color: #b0b0b0;
+
+			cursor: pointer;
+		}
+		.sliderCaretWrap {
+			display: flex;
+			flex-direction: row;
+			align-items: center;
+			justify-content: center;
+
+			position: absolute;
+			height: 0px;
+			width: 0px;
+			top: 50%;
+			overflow: visible;
+
+			.sliderCaretImg {
+				min-width: 6px;
+				max-width: 6px;
+				width: 6px;
+				height: 14px;
+				border-radius: 3px;
+				background-color: #303030;
+				cursor: ew-resize;
+				z-index: 5;
+
+				&:hover {
+					background-color: #000000;
+				}
+			}
+			.sliderCaretLabel {
+				position: absolute;
+				bottom: 0px;
+				margin-bottom: 8px;
+
+				text-align: center;
+				font-size: 14px;
+			}
+		}
+	}
+}

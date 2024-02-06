@@ -2,20 +2,20 @@ import clsx from 'clsx';
 import { observer } from 'mobx-react';
 import { useMemo } from 'react';
 
-import { FeedManagerApi } from '../../api/feedManagerApi';
+import { MainviewApi } from '../../api/mainviewApi';
 import { ActionButton, ActionButtonLook, ActionButtonSize } from '../ActionButton/ActionButton';
 import { ActionModal } from '../actionModal/actionModal';
 import { CheckBox } from '../checkBox/checkBox';
 import css from './coverageModal.module.scss';
 
 type Props = {
-	coverage: FeedManagerApi.Coverage;
+	coverage: MainviewApi.Coverage;
 	onClose?: () => void;
 };
 
 export const CoverageModal = observer(({ onClose, coverage }: Props) => {
-	const uniq = (items: FeedManagerApi.CoverageItem[]) => {
-		const unique: FeedManagerApi.CoverageItem[] = [];
+	const uniq = (items: MainviewApi.CoverageItem[]) => {
+		const unique: MainviewApi.CoverageItem[] = [];
 		const seenValues = new Set();
 		for (const item of items) {
 			const feature = item.projectName || item.symbol || item.tokenId;

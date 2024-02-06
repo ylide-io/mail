@@ -85,7 +85,7 @@ export function FeedPostPage() {
 				}
 			>
 				{data ? (
-					<FeedPostItem feedType="generic" post={data.post} />
+					<FeedPostItem post={data.post} />
 				) : isLoading ? (
 					<YlideLoader className={css.loader} reason="Loading post ..." />
 				) : (

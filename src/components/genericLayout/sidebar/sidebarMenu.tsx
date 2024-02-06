@@ -13,7 +13,6 @@ import { ReactComponent as SidebarMenuSvg } from '../../../icons/ic28/sidebarMen
 import { ReactComponent as SidebarMenuCloseSvg } from '../../../icons/ic28/sidebarMenu_close.svg';
 import { ReactComponent as TwitterSvg } from '../../../icons/social/twitter.svg';
 import { sideFeedIcon } from '../../../icons/static/sideFeedIcon';
-import { SettingsSection } from '../../../pages/settings/settingsPage';
 import { analytics } from '../../../stores/Analytics';
 import { browserStorage } from '../../../stores/browserStorage';
 import domain from '../../../stores/Domain';
@@ -23,7 +22,7 @@ import { isTrialActive } from '../../../utils/payments';
 import { useNav } from '../../../utils/url';
 import { ActionButton, ActionButtonLook, ActionButtonSize } from '../../ActionButton/ActionButton';
 import { AdaptiveAddress } from '../../adaptiveAddress/adaptiveAddress';
-import { AdaptiveText } from '../../adaptiveText/adaptiveText';
+import { FeedSettingsModal } from '../../feedSettingsModal/feedSettingsModal';
 import { PropsWithClassName } from '../../props';
 import { toast } from '../../toast/toast';
 import css from './sidebarMenu.module.scss';
@@ -176,77 +175,48 @@ export const SidebarSmartFeedSection = observer(() => {
 
 	return (
 		<SidebarSection section={Section.FEED} title="Feed">
-			<SidebarButton
-				href={generatePath(RoutePath.FEED_SMART)}
-				icon={sideFeedIcon(14)}
-				onClick={() => {
-					analytics.mainviewSmartFeedClick();
-				}}
-				name="Smart feed"
-			/>
-
-			{accounts.map((account, i) => (
-				<SidebarButton
-					key={i}
-					look={SidebarButtonLook.SUBMENU}
-					href={generatePath(RoutePath.FEED_SMART_ADDRESS, { address: account.address })}
-					icon={<ContactSvg />}
-					name={<AdaptiveText text={account.address} />}
-					onClick={() => {
-						analytics.mainviewPersonalFeedClick(account.address);
-					}}
-					rightButton={{
-						icon: <SettingsSvg />,
-						title: 'Account Settings',
-						onClick: () => {
-							if (!account.mainviewKey) {
-								return toast('Please complete the onboarding first ❤');
-							}
-
-							analytics.mainviewFeedSettingsClick(account.address);
-
-							isSidebarOpen.set(false);
-							navigate(
-								generatePath(RoutePath.SETTINGS_ADDRESS_SECTION, {
-									address: account.address,
-									section: SettingsSection.SOURCES,
-								}),
-							);
-						},
-					}}
-				/>
-			))}
-			<SidebarButton
-				look={SidebarButtonLook.SUBMENU}
-				href={'#'}
-				disabled
-				icon={<AddContactSvg />}
-				name={
-					<div
-						style={{
-							display: 'flex',
-							flexDirection: 'row',
-							alignItems: 'center',
-							justifyContent: 'space-between',
-						}}
-					>
-						<span>Add address</span>
-						<span
-							style={{
-								padding: '0px 2px',
-								background: 'rgba(0, 0, 0, 0.1)',
-								borderRadius: 3,
-								fontSize: 11,
-							}}
-						>
-							Soon
-						</span>
-					</div>
+			{domain.feedSettings.feedAccesses.map((access, i) => {
+				const feedData = domain.feedSettings.feedDataById.get(access.feedId);
+				let name;
+				if (!feedData || feedData === 'loading') {
+					name = 'Loading...';
+				} else if (feedData === 'error') {
+					name = 'Feed error';
+				} else {
+					name = feedData.feed.name;
 				}
-				onClick={() => {
-					//
-				}}
-			/>
+				return (
+					<SidebarButton
+						key={access.feedId}
+						href={generatePath(RoutePath.FEED_SMART_EXACT, { feedId: access.feedId })}
+						icon={sideFeedIcon(14)}
+						onClick={() => {
+							analytics.mainviewSmartFeedClick();
+						}}
+						name={name}
+						rightButton={{
+							icon: <SettingsSvg />,
+							title: 'Account Settings',
+							onClick: () => {
+								FeedSettingsModal.show(access.feedId);
+								// if (!account.mainviewKey) {
+								// 	return toast('Please complete the onboarding first ❤');
+								// }
+
+								// analytics.mainviewFeedSettingsClick(account.address);
+
+								// isSidebarOpen.set(false);
+								// navigate(
+								// 	generatePath(RoutePath.SETTINGS_ADDRESS_SECTION, {
+								// 		address: account.address,
+								// 		section: SettingsSection.SOURCES,
+								// 	}),
+								// );
+							},
+						}}
+					/>
+				);
+			})}
 		</SidebarSection>
 	);
 });
