@@ -3,10 +3,10 @@ import { makeObservable, observable } from 'mobx';
 import { observer } from 'mobx-react';
 import { PureComponent } from 'react';
 
-import { LocalFeedSettings } from '../../stores/LocalFeedSettings';
+import domain from '../../stores/Domain';
+import { FeedSettings } from '../../stores/FeedSettings';
 import { Modal } from '../modal/modal';
 import { showStaticComponent } from '../staticComponentManager/staticComponentManager';
-import { YlideLoader } from '../ylideLoader/ylideLoader';
 import css from './feedSettingsModal.module.scss';
 import { FeedSettingsSidebar } from './feedSettingsSidebar';
 import { FeedSourcesTable } from './feedSettingsSourcesTable';
@@ -22,54 +22,64 @@ export class FeedSettingsModal extends PureComponent<FeedSettingsModalProps> {
 		return showStaticComponent(resolve => <FeedSettingsModal close={resolve} feedId={feedId} />);
 	}
 
-	@observable fs: LocalFeedSettings;
+	@observable fs: FeedSettings;
 	@observable searchTerm: string = '';
+	@observable saving = false;
 
 	constructor(props: FeedSettingsModalProps) {
 		super(props);
 
-		this.fs = new LocalFeedSettings(this.props.feedId);
+		const feedData = domain.feedsRepository.feedDataById.get(props.feedId);
+		if (!feedData) {
+			throw new Error('Feed not found');
+		}
+		this.fs = new FeedSettings(feedData, props.feedId);
 		makeObservable(this);
 	}
 
 	componentDidUpdate(prevProps: FeedSettingsModalProps): void {
 		if (prevProps.feedId !== this.props.feedId) {
-			this.fs.destroy();
-			this.fs = new LocalFeedSettings(this.props.feedId);
+			const feedData = domain.feedsRepository.feedDataById.get(this.props.feedId);
+			if (!feedData) {
+				throw new Error('Feed not found');
+			}
+			this.fs = new FeedSettings(feedData, this.props.feedId);
 		}
 	}
 
-	handleSave = () => {
-		//
+	handleSave = async () => {
+		this.saving = true;
+		await this.fs.save();
 		this.props.close();
 	};
 
 	render() {
-		if (this.fs.loading) {
-			return (
-				<Modal>
-					<YlideLoader style={{ marginTop: 30, marginBottom: 30 }} />
-				</Modal>
-			);
-		} else if (this.fs.error) {
-			return (
-				<Modal>
-					<div>
-						Error loading rawFeed,{' '}
-						<a
-							href="#close"
-							onClick={e => {
-								e.preventDefault();
-								e.stopPropagation();
-								this.props.close();
-							}}
-						>
-							Close
-						</a>
-					</div>
-				</Modal>
-			);
-		}
+		// if (this.fs.reloading) {
+		// 	return (
+		// 		<Modal>
+		// 			<YlideLoader style={{ marginTop: 30, marginBottom: 30 }} />
+		// 		</Modal>
+		// 	);
+		// }
+		// //  else if (this.fs.error) {
+		// // 	return (
+		// // 		<Modal>
+		// // 			<div>
+		// // 				Error loading rawFeed,{' '}
+		// // 				<a
+		// // 					href="#close"
+		// // 					onClick={e => {
+		// // 						e.preventDefault();
+		// // 						e.stopPropagation();
+		// // 						this.props.close();
+		// // 					}}
+		// // 				>
+		// // 					Close
+		// // 				</a>
+		// // 			</div>
+		// // 		</Modal>
+		// // 	);
+		// // }
 
 		const content = (
 			<div className={css.content}>

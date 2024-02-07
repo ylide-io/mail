@@ -1,5 +1,6 @@
 import { jitsuClient } from '@jitsu/sdk-js';
 
+import { FeedServerApi } from '../api/feedServerApi';
 import { REACT_APP__CIRCLE_BUILD_NUM, REACT_APP__CIRCLE_SHA1 } from '../env';
 import domain from './Domain';
 
@@ -68,12 +69,12 @@ class Analytics {
 
 	// FEED
 
-	feedView(tags: number[]) {
-		this.track('feed___view', { tags });
+	feedView(feed: FeedServerApi.FeedDescriptor) {
+		this.track('feed___view', { feed });
 	}
 
-	feedLoadMore(tags: number[]) {
-		this.track('feed___load_more', { tags });
+	feedLoadMore(feed: FeedServerApi.FeedDescriptor) {
+		this.track('feed___load_more', { feed });
 	}
 
 	// MAINVIEW

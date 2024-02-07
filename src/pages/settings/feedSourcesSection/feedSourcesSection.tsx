@@ -19,7 +19,7 @@ import { ReactComponent as ContactSvg } from '../../../icons/ic20/contact.svg';
 import { ReactComponent as SearchSvg } from '../../../icons/ic28/search.svg';
 import { sideFeedIcon } from '../../../icons/static/sideFeedIcon';
 import domain from '../../../stores/Domain';
-import { getReasonOrder } from '../../../stores/FeedSettings';
+import { getReasonOrder } from '../../../stores/FeedsRepository';
 import { DomainAccount } from '../../../stores/models/DomainAccount';
 import { toggleArrayItem } from '../../../utils/array';
 import { invariant } from '../../../utils/assert';
@@ -33,16 +33,16 @@ export interface FeedSourcesSectionProps {
 export const FeedSourcesSection = observer(({ account }: FeedSourcesSectionProps) => {
 	// invariant(account.mainviewKey, 'FeedSettings only supports MV accounts');
 
-	// const config = domain.feedSettings.getAccountConfig(account);
-	// const [selectedSourceIds, setSelectedSourceIds] = useState(domain.feedSettings.getSelectedSourceIds(account));
+	// const config = domain.feedsRepository.getAccountConfig(account);
+	// const [selectedSourceIds, setSelectedSourceIds] = useState(domain.feedsRepository.getSelectedSourceIds(account));
 
 	// const [isSearchOpen, setSearchOpen] = useState(false);
 	// const [searchTerm, setSearchTerm] = useState('');
 
 	// const [sourcesByReason, rows] = useMemo(() => {
-	// 	const config = domain.feedSettings.getAccountConfig(account);
+	// 	const config = domain.feedsRepository.getAccountConfig(account);
 
-	// 	const sources = domain.feedSettings.sources.slice().filter(source => {
+	// 	const sources = domain.feedsRepository.sources.slice().filter(source => {
 	// 		const term = searchTerm.trim().toLowerCase();
 	// 		if (!term) return true;
 
@@ -97,7 +97,7 @@ export const FeedSourcesSection = observer(({ account }: FeedSourcesSectionProps
 	// }, [account, searchTerm]);
 
 	// const saveConfigMutation = useMutation({
-	// 	mutationFn: () => domain.feedSettings.updateFeedConfig(account, selectedSourceIds),
+	// 	mutationFn: () => domain.feedsRepository.updateFeedConfig(account, selectedSourceIds),
 	// 	onError: () => toast("Couldn't save your feed settings. Please try again."),
 	// });
 
@@ -196,7 +196,7 @@ export const FeedSourcesSection = observer(({ account }: FeedSourcesSectionProps
 	// 						)}
 	// 					</AutoSizer>
 	// 				</div>
-	// 			) : domain.feedSettings.isError ? (
+	// 			) : domain.feedsRepository.isError ? (
 	// 				<ErrorMessage className={css.error}>Couldn't load source list</ErrorMessage>
 	// 			) : (
 	// 				<OverlappingLoader text="Loading sources ..." />

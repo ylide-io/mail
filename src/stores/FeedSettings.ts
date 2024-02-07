@@ -1,185 +1,283 @@
-import difference from 'lodash.difference';
-import { autorun, makeObservable, observable } from 'mobx';
+import { action, computed, makeObservable, observable } from 'mobx';
 
 import { MainviewApi } from '../api/mainviewApi';
-import { FeedSettingsModal } from '../components/feedSettingsModal/feedSettingsModal';
-import { ProjectRelation, ProjectRelationOrEmpty } from '../shared/PortfolioScope';
-import { analytics } from './Analytics';
-import type { Domain } from './Domain';
-import { DomainAccount } from './models/DomainAccount';
-
-export const getReasonOrder = (reasons: ProjectRelationOrEmpty[]) =>
-	reasons.sort((a: ProjectRelationOrEmpty, b: ProjectRelationOrEmpty) => {
-		const getOrder = (reason: ProjectRelationOrEmpty) =>
-			({
-				[ProjectRelation.ACTIVE_EXPOSURE]: 1,
-				[ProjectRelation.INTERACTED]: 2,
-				'': 3,
-			}[reason]);
-		return getOrder(a) - getOrder(b);
-	});
+import {
+	AffectedProjectLink,
+	ComputedPortfolio,
+	PortfolioScope,
+	PortfolioSource,
+	PortfolioSourceToAffectedProjectsMap,
+	ProjectRelation,
+	ProjectRelationOrEmpty,
+} from '../shared/PortfolioScope';
+import domain from './Domain';
 
 export class FeedSettings {
-	@observable
-	isError = false;
+	@observable portfolioSources: PortfolioSource[] = [];
+	@observable portfolioSourceToAffectedProjects: PortfolioSourceToAffectedProjectsMap = {};
 
-	@observable
-	feedAccesses: {
-		accessLevel: MainviewApi.MVFeedAccessRole;
-		feedId: string;
-	}[] = [];
+	@observable accesses: { type: 'email' | 'address'; value: string; role: MainviewApi.MVFeedAccessRole }[] = [];
 
-	@observable
-	readonly feedDataById = new Map<string, MainviewApi.FeedDataResponse | 'loading' | 'error'>();
+	@observable.shallow portfolio: ComputedPortfolio = {
+		totalExposure: 0,
+		exposurePerPortfolioSource: [],
+		projectToPortfolioMetaMap: {},
+	};
 
-	@observable
-	private defaultAccountFeedId = new Map<DomainAccount, string>();
+	@observable.shallow groups: Record<ProjectRelationOrEmpty, number[]> = {
+		[ProjectRelation.ACTIVE_EXPOSURE]: [],
+		[ProjectRelation.INTERACTED]: [],
+		'': [],
+	};
 
-	@observable
-	tags: { id: number; name: string }[] | 'loading' | 'error' = 'loading';
+	@observable activeProjectIds: number[] = [];
+	@observable defaultActiveSourceIds: Set<number> = new Set();
 
-	getFeedData(account: DomainAccount): MainviewApi.FeedDataResponse | 'loading' | 'error' | undefined {
-		const feedId = this.defaultAccountFeedId.get(account);
-		if (!feedId) return undefined;
+	@observable includedSourceIds: Set<number> = new Set();
+	@observable excludedSourceIds: Set<number> = new Set();
 
-		return this.feedDataById.get(feedId);
+	@observable activeSourceIds: Set<number> = new Set();
+
+	@observable mode: MainviewApi.ConfigMode = MainviewApi.ConfigMode.AUTO_ADD;
+	@observable tresholdType: 'value' | 'percent' = 'value';
+	@observable tresholdValue = 10000;
+
+	constructor(public readonly base: MainviewApi.FeedDataResponse, public readonly feedId: string) {
+		this.updateBase(base);
+
+		makeObservable(this);
 	}
 
-	async loadFeed(feedId: string, mainviewKey?: string) {
-		if (!mainviewKey) {
-			if (this.domain.account?.mainviewKey) {
-				mainviewKey = this.domain.account.mainviewKey;
-			} else {
-				throw new Error('Unauthorized');
+	@computed get changed() {
+		return (
+			this.mode !== this.base.feed.mode ||
+			this.tresholdType !== this.base.feed.settings.tresholdType ||
+			this.tresholdValue !== this.base.feed.settings.tresholdValue ||
+			this.portfolioSources.length !== this.base.feed.sources.length ||
+			this.portfolioSources.some(
+				(s, i) => s.type !== this.base.feed.sources[i].type || s.id !== this.base.feed.sources[i].id,
+			) ||
+			this.includedSourceIds.size !== this.validOriginalIncludedSourceIds.length ||
+			this.excludedSourceIds.size !== this.validOriginalExcludedSourceIds.length ||
+			false
+		);
+	}
+
+	private getValidIncludedSourceIds(defaultActiveSourceIds: Set<number>, includedSourceIds: string[]) {
+		const raw = new Set<number>(includedSourceIds.map(Number));
+		for (const id of defaultActiveSourceIds) {
+			raw.delete(id);
+		}
+		return [...raw].sort();
+	}
+
+	private getValidExcludedSourceIds(defaultActiveSourceIds: Set<number>, excludedSourceIds: string[]) {
+		const raw = new Set<number>(excludedSourceIds.map(Number));
+		for (const id of raw) {
+			if (!defaultActiveSourceIds.has(id)) {
+				raw.delete(id);
 			}
 		}
-		this.feedDataById.set(feedId, 'loading');
-		await MainviewApi.getFeedData({ token: mainviewKey, feedId: feedId })
-			.then(feedData => {
-				this.feedDataById.set(feedId, feedData);
-			})
-			.catch(() => {
-				this.feedDataById.set(feedId, 'error');
-			});
+		return [...raw].sort();
 	}
 
-	constructor(public readonly domain: Domain) {
-		makeObservable(this);
+	@computed get validOriginalIncludedSourceIds() {
+		return this.getValidIncludedSourceIds(this.defaultActiveSourceIds, this.base.feed.includedSourceIds);
+	}
 
-		MainviewApi.getTags()
-			.then(r => {
-				this.tags = r;
-			})
-			.catch(e => {
-				console.log(`Error fetching tags - ${e}`);
-			});
+	@computed get validOriginalExcludedSourceIds() {
+		return this.getValidExcludedSourceIds(this.defaultActiveSourceIds, this.base.feed.excludedSourceIds);
+	}
 
-		autorun(() => {
-			if (domain.account) {
-				const acc = domain.account;
-				(async () => {
-					try {
-						MainviewApi.getFeeds({ token: acc.mainviewKey }).then(({ feeds }) => {
-							this.feedAccesses = feeds.map(f => ({
-								accessLevel: f.accessLevel,
-								feedId: f.data.feed.id,
-							}));
-							for (const feed of feeds) {
-								this.feedDataById.set(feed.data.feed.id, feed.data);
-							}
-						});
-					} catch (e) {
-						this.isError = true;
-					}
-				})();
+	private updatePortfolio() {
+		const portfolio = PortfolioScope.compute(this.portfolioSources, this.portfolioSourceToAffectedProjects);
+		const groups: Record<ProjectRelationOrEmpty, number[]> = {
+			[ProjectRelation.ACTIVE_EXPOSURE]: [],
+			[ProjectRelation.INTERACTED]: [],
+			'': [],
+		};
+
+		for (const project of domain.feedSources.projectsArray) {
+			const meta = portfolio.projectToPortfolioMetaMap[project.id];
+			if (meta) {
+				groups[meta.relation].push(project.id);
+			} else {
+				groups[''].push(project.id);
+			}
+		}
+
+		groups[ProjectRelation.ACTIVE_EXPOSURE].sort((a, b) => {
+			const projectA = portfolio.projectToPortfolioMetaMap[a];
+			const projectB = portfolio.projectToPortfolioMetaMap[b];
+			const result = (projectB.exposure?.exposure || 0) - (projectA.exposure?.exposure || 0);
+			if (result === 0) {
+				const aName = domain.feedSources.projectsMap.get(a)?.name || '';
+				const bName = domain.feedSources.projectsMap.get(b)?.name || '';
+				return aName.localeCompare(bName);
+			} else {
+				return result;
 			}
 		});
+
+		groups[ProjectRelation.INTERACTED].sort((a, b) => {
+			const aName = domain.feedSources.projectsMap.get(a)?.name || '';
+			const bName = domain.feedSources.projectsMap.get(b)?.name || '';
+			return aName.localeCompare(bName);
+		});
+
+		this.groups = groups;
+		this.portfolio = portfolio;
+
+		this.updateActiveProjects(portfolio, this.tresholdType, this.tresholdValue);
 	}
 
-	// getSelectedSourceIds(feedId: string) {
-	// 	const config = this.feedDataById.get(feedId);
-	// 	if (!config || config === 'loading' || config === 'error') return [];
+	private updateActiveProjects(
+		portfolio: ComputedPortfolio,
+		tresholdType: 'value' | 'percent',
+		tresholdValue: number,
+	) {
+		const activeProjectIds = PortfolioScope.computeFilters(portfolio, {
+			type: tresholdType,
+			value: tresholdValue,
+		});
 
-	// 	const defaultProjectIds = Object.values(config.projectsByPortfolioSource)
-	// 		.map(projects => projects.map(p => p.id))
-	// 		.flat();
+		const defaultActiveSourceIds = PortfolioScope.compileSourcesList(
+			projectId => (domain.feedSources.sourcesByProjectId.get(projectId) || []).map(s => s.id),
+			activeProjectIds,
+		);
 
-	// 	return this.sources
-	// 		.filter(source =>
-	// 			source.cryptoProject?.id && defaultProjectIds.includes(source.cryptoProject.id)
-	// 				? !config.feed.excludedSourceIds.includes(source.id)
-	// 				: config.feed.includedSourceIds.includes(source.id),
-	// 		)
-	// 		.map(s => s.id);
-	// }
+		this.activeProjectIds = activeProjectIds;
+		this.defaultActiveSourceIds = defaultActiveSourceIds;
 
-	// isSourceSelected(feedId: string, sourceId: string) {
-	// 	return this.getSelectedSourceIds(feedId).includes(sourceId);
-	// }
+		this.includedSourceIds = new Set(
+			this.getValidIncludedSourceIds(this.defaultActiveSourceIds, [...this.includedSourceIds].map(String)),
+		);
+		this.excludedSourceIds = new Set(
+			this.getValidExcludedSourceIds(this.defaultActiveSourceIds, [...this.excludedSourceIds].map(String)),
+		);
 
-	// async updateFeedConfig(feedId: string, selectedSourceIds: string[]) {
-	// 	const config = this.feedDataById.get(feedId);
-	// 	if (!config || config === 'loading' || config === 'error') return [];
+		this.updateActiveSourceIds();
+	}
 
-	// 	const initiallySelectedSourceIds = this.getSelectedSourceIds(feedId);
-	// 	const sourceIdsToRemove = difference(initiallySelectedSourceIds, selectedSourceIds);
-	// 	const sourceIdsToAdd = difference(selectedSourceIds, initiallySelectedSourceIds);
+	private updateActiveSourceIds() {
+		this.activeSourceIds = PortfolioScope.updateSourcesList(
+			this.defaultActiveSourceIds,
+			this.includedSourceIds,
+			this.excludedSourceIds,
+		);
+	}
 
-	// 	if (sourceIdsToRemove.length) {
-	// 		analytics.mainviewFeedSettingsRemoveSources(account.address, sourceIdsToRemove);
-	// 	}
-	// 	if (sourceIdsToAdd.length) {
-	// 		analytics.mainviewFeedSettingsAddSources(account.address, sourceIdsToAdd);
-	// 	}
+	@action
+	addPortfolioSource(source: PortfolioSource, affectedProjectLinks: AffectedProjectLink[]) {
+		this.portfolioSources.push(source);
+		this.portfolioSourceToAffectedProjects[source.id] = affectedProjectLinks;
 
-	// 	const defaultProjectIds = config.defaultProjects.map(p => p.projectId);
+		this.updatePortfolio();
+	}
 
-	// 	config.excludedSourceIds = this.sources
-	// 		.filter(
-	// 			source =>
-	// 				!selectedSourceIds.includes(source.id) &&
-	// 				source.cryptoProject?.id &&
-	// 				defaultProjectIds.includes(source.cryptoProject.id),
-	// 		)
-	// 		.map(s => s.id);
+	@action
+	removePortfolioSource(source: PortfolioSource) {
+		delete this.portfolioSourceToAffectedProjects[source.id];
+		this.portfolioSources = this.portfolioSources.filter(s => s.id !== source.id);
 
-	// 	config.includedSourceIds = this.sources
-	// 		.filter(
-	// 			source =>
-	// 				selectedSourceIds.includes(source.id) &&
-	// 				(!source.cryptoProject?.id || !defaultProjectIds.includes(source.cryptoProject.id)),
-	// 		)
-	// 		.map(s => s.id);
+		this.updatePortfolio();
+	}
 
-	// 	await MainviewApi.setConfig({
-	// 		token: account.mainviewKey,
-	// 		config: {
-	// 			mode: config.mode,
-	// 			excludedSourceIds: config.excludedSourceIds,
-	// 			includedSourceIds: config.includedSourceIds,
-	// 		},
-	// 	});
-	// }
+	@action
+	updateBase(base: MainviewApi.FeedDataResponse) {
+		this.portfolioSources = base.feed.sources;
+		this.portfolioSourceToAffectedProjects = base.portfolioSourceToAffectedProjects;
+		this.accesses = base.accesses;
 
-	// async unfollowProject(feedId: string, projectId: string) {
-	// 	try {
-	// 		const sourceIdsToExclude = this.sources.filter(s => s.cryptoProject?.id === projectId).map(s => s.id);
+		this.mode = base.feed.mode;
+		this.tresholdType = base.feed.settings.tresholdType;
+		this.tresholdValue = base.feed.settings.tresholdValue;
 
-	// 		const selectedSourceIds = this.getSelectedSourceIds(feedId).filter(id => !sourceIdsToExclude.includes(id));
+		this.includedSourceIds = new Set(base.feed.includedSourceIds.map(Number));
+		this.excludedSourceIds = new Set(base.feed.excludedSourceIds.map(Number));
 
-	// 		// await domain.feedSettings.updateFeedConfig(account, selectedSourceIds);
-	// 	} catch (e) {
-	// 		throw e;
-	// 	}
-	// }
+		this.updatePortfolio();
+	}
 
-	// async unfollowSource(feedId: string, sourceId: string) {
-	// 	try {
-	// 		const selectedSourceIds = this.getSelectedSourceIds(feedId).filter(id => id !== sourceId);
+	@action
+	updateTreshold(type: 'value' | 'percent', value: number) {
+		this.tresholdType = type;
+		this.tresholdValue = value;
 
-	// 		// await domain.feedSettings.updateFeedConfig(account, selectedSourceIds);
-	// 	} catch (e) {
-	// 		throw e;
-	// 	}
-	// }
+		this.updateActiveProjects(this.portfolio, this.tresholdType, this.tresholdValue);
+	}
+
+	private _activateSource(sourceId: number) {
+		this.excludedSourceIds.delete(sourceId);
+		if (!this.defaultActiveSourceIds.has(sourceId)) {
+			this.includedSourceIds.add(sourceId);
+		}
+	}
+
+	private _deactivateSource(sourceId: number) {
+		this.includedSourceIds.delete(sourceId);
+		if (this.defaultActiveSourceIds.has(sourceId)) {
+			this.excludedSourceIds.add(sourceId);
+		}
+	}
+
+	@action
+	activateSource(sourceId: number) {
+		this._activateSource(sourceId);
+		this.updateActiveSourceIds();
+	}
+
+	@action
+	deactivateSource(sourceId: number) {
+		this._deactivateSource(sourceId);
+		this.updateActiveSourceIds();
+	}
+
+	@action
+	activateProject(projectId: number) {
+		const feedSources = domain.feedSources.sourcesByProjectId.get(projectId);
+		if (!feedSources) {
+			return;
+		}
+
+		for (const sourceId of feedSources.map(s => s.id)) {
+			this._activateSource(sourceId);
+		}
+
+		this.updateActiveSourceIds();
+	}
+
+	@action
+	deactivateProject(projectId: number) {
+		const feedSources = domain.feedSources.sourcesByProjectId.get(projectId);
+		if (!feedSources) {
+			return;
+		}
+
+		for (const sourceId of feedSources.map(s => s.id)) {
+			this._deactivateSource(sourceId);
+		}
+
+		this.updateActiveSourceIds();
+	}
+
+	async save() {
+		await MainviewApi.saveFeed({
+			token: domain.account!.token,
+			feedId: this.feedId,
+			config: {
+				mode: this.mode,
+				includedSourceIds: [...this.includedSourceIds].map(String),
+				excludedSourceIds: [...this.excludedSourceIds].map(String),
+				sources: this.portfolioSources,
+				settings: {
+					tresholdType: this.tresholdType,
+					tresholdValue: this.tresholdValue,
+				},
+			},
+		});
+
+		const newBase = await domain.feedsRepository.reloadFeed(this.feedId);
+		this.updateBase(newBase);
+	}
 }

@@ -2,6 +2,7 @@ import { makeAutoObservable } from 'mobx';
 
 import { Section } from '../components/genericLayout/sidebar/sidebarMenu';
 import { toggleArrayItem } from '../utils/array';
+import { IDomainAccount } from './models/DomainAccount';
 
 enum BrowserStorageKey {
 	ADMIN_PASSWORD = 'ylide_adminPassword',
@@ -67,14 +68,14 @@ class BrowserStorage {
 	private _mainviewAccounts =
 		BrowserStorage.getItemWithTransform(
 			BrowserStorageKey.MAIN_VIEW_ACCOUNTS,
-			item => JSON.parse(item) as Record<string, { id: string; token: string } | undefined>,
+			item => JSON.parse(item) as Record<string, IDomainAccount | undefined>,
 		) || {};
 
 	get mainviewAccounts() {
 		return this._mainviewAccounts;
 	}
 
-	set mainviewAccounts(value: Record<string, { id: string; token: string } | undefined>) {
+	set mainviewAccounts(value: Record<string, IDomainAccount | undefined>) {
 		BrowserStorage.setItem(BrowserStorageKey.MAIN_VIEW_ACCOUNTS, JSON.stringify(value));
 		this._mainviewAccounts = value;
 	}

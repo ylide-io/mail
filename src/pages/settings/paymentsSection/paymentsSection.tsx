@@ -16,11 +16,11 @@ export interface PaymentsSectionProps {
 
 export const PaymentsSection = observer(({ account }: PaymentsSectionProps) => {
 	const accountPlan = useQuery(['payment', 'info', account.address], {
-		queryFn: () => MainviewApi.getAccountPlan({ token: account.mainviewKey }),
+		queryFn: () => MainviewApi.getAccountPlan(account),
 	});
 
 	const transactions = useQuery(['payment', 'transactions', account.address], {
-		queryFn: () => MainviewApi.getTransactions({ token: account.mainviewKey }),
+		queryFn: () => MainviewApi.getTransactions(account),
 	});
 
 	return (

@@ -47,6 +47,17 @@ $contentPadding: 6px;
 	background: var(--surface-hover-color);
 }
 
+.item_danger {
+	color: var(--error-color);
+	cursor: pointer;
+}
+
+.item_danger:hover,
+.item_danger:focus-visible {
+	color: var(--primary-text-color);
+	background: var(--surface-hover-color);
+}
+
 .item_highlighted {
 	background: var(--selected-light-background-color);
 	cursor: pointer;

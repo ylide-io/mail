@@ -1,7 +1,6 @@
 import { REACT_APP__FEED_SERVER } from '../env';
 import { invariant } from '../utils/assert';
 import { createCleanSerachParams } from '../utils/url';
-// import { MainviewApi } from './mainviewApi';
 
 export enum LinkType {
 	TELEGRAM = 'telegram',
@@ -10,15 +9,6 @@ export enum LinkType {
 	MIRROR = 'mirror',
 	DISCORD = 'discord',
 }
-
-// export interface FeedReasonedProject extends FeedProject {
-// 	reasons: {
-// 		entityId: string; // debank/crypto entity id
-// 		reasonsData: MainviewApi.ReasonDataEntry[];
-// 	}[];
-// }
-
-//
 
 export interface FeedPost {
 	id: string;
@@ -40,9 +30,7 @@ export interface FeedPost {
 	sourceLink: string;
 	embeds: FeedPostEmbed[];
 	thread: FeedPost[];
-	cryptoProjectId: string | null;
-	cryptoProjectName: string | null;
-	// cryptoProjectReasons: ProjectRelation[];
+	cryptoProjectId: number | null;
 }
 
 export interface FeedPostEmbed {
@@ -52,8 +40,6 @@ export interface FeedPostEmbed {
 	title: string;
 	text: string;
 }
-
-//
 
 export namespace FeedServerApi {
 	export enum ErrorCode {
@@ -84,7 +70,14 @@ export namespace FeedServerApi {
 		data?: Data;
 	}
 
-	async function request<Data>(path: string, params?: RequestInit): Promise<Data> {
+	async function request<Data>(path: string, params?: RequestInit & { token?: string }): Promise<Data> {
+		if (params?.token) {
+			params.headers = {
+				...params.headers,
+				Authorization: `Bearer ${params.token}`,
+			};
+			delete params.token;
+		}
 		const response = await fetch(`${getUrl()}${path}`, params);
 		if (response.status < 200 || response.status >= 300) {
 			throw new Error(response.statusText);
@@ -103,18 +96,34 @@ export namespace FeedServerApi {
 
 	export type GetPostsResponse = { moreAvailable: boolean; newPosts: number; items: FeedPost[] };
 
+	export type FeedDescriptor =
+		| { type: 'tags'; tags: number[] }
+		| { type: 'source'; sourceId: number }
+		| { type: 'feed'; feedId: string };
+
 	export async function getPosts(params: {
+		feedDescriptor: FeedDescriptor;
 		needOld: boolean;
 		length: number;
+		token?: string;
 		lastPostId?: string;
 		firstPostId?: string;
-		tags?: number[];
-		sourceId?: string;
-		addressTokens?: string[];
 		checkNewPosts?: boolean;
 		signal?: AbortSignal;
 	}): Promise<GetPostsResponse> {
-		return await request(`/v3/posts?${createCleanSerachParams(params)}`, { signal: params.signal });
+		return await request(
+			`/v4/posts?${createCleanSerachParams({
+				...params,
+				feedDescriptor: undefined,
+				signal: undefined,
+				token: undefined,
+				feed: JSON.stringify(params.feedDescriptor),
+			})}`,
+			{
+				signal: params.signal,
+				token: params.token,
+			},
+		);
 	}
 
 	export type GetPostResponse = { post: FeedPost };

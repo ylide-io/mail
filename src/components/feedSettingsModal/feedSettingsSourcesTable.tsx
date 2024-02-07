@@ -1,5 +1,5 @@
 import clsx from 'clsx';
-import { computed, makeObservable, observable, runInAction, toJS } from 'mobx';
+import { computed, makeObservable, observable, toJS } from 'mobx';
 import { observer } from 'mobx-react';
 import { CSSProperties, PureComponent } from 'react';
 import AutoSizer from 'react-virtualized-auto-sizer';
@@ -10,78 +10,30 @@ import { ReactComponent as ContactSvg } from '../../icons/ic20/contact.svg';
 import { FeedLinkTypeIcon } from '../../pages/feed/_common/feedLinkTypeIcon/feedLinkTypeIcon';
 import { ProjectRelation, ProjectRelationOrEmpty } from '../../shared/PortfolioScope';
 import domain from '../../stores/Domain';
-import { getReasonOrder } from '../../stores/FeedSettings';
-import { LocalFeedSettings } from '../../stores/LocalFeedSettings';
-import { blockchainNames } from '../../utils/blockchainNames';
+import { FeedSettings } from '../../stores/FeedSettings';
+import { getReasonOrder } from '../../stores/FeedsRepository';
 import { formatNumberExt, formatUsdExt } from '../../utils/formatUsdExt';
 import { Avatar } from '../avatar/avatar';
 import { CheckBox, CheckBoxSize } from '../checkBox/checkBox';
 import { SimplePopup } from '../simplePopup/simplePopup';
 import css from './feedSettingsModal.module.scss';
+import { ProjectExposureTable } from './projectExposureTable';
 
 interface FeedReasonLabelProps {
 	projectId: number;
-	fs: LocalFeedSettings;
+	fs: FeedSettings;
 }
 
 @observer
 export class FeedReasonLabel extends PureComponent<FeedReasonLabelProps> {
 	renderPopupContent() {
-		const { fs, projectId } = this.props;
-		const meta = fs.portfolio.projectToPortfolioMetaMap[projectId];
-		const portfolioSources = fs.portfolioSources;
-
-		if (meta?.exposure) {
-			return (
-				<div className={css.balancePopup}>
-					{portfolioSources
-						.map((s, idx) => ({
-							portfolioSource: s,
-							portfolioSourceExposureData: meta.exposure!.exposurePerPortfolioSource[idx],
-						}))
-						.filter(s => s.portfolioSourceExposureData.total > 0)
-						.map(s => (
-							<div className={css.balanceBlock} key={s.portfolioSource.id}>
-								{portfolioSources.length > 1 && (
-									<div className={css.balanceTitle}>{s.portfolioSource.id}</div>
-								)}
-								<table className={css.balanceTable}>
-									<thead>
-										<tr>
-											<th className={clsx(css.bthValue, css.btValue)}>Value</th>
-											<th className={clsx(css.bthToken, css.btToken)}>Token</th>
-											<th className={clsx(css.bthChain, css.btChain)}>Chain</th>
-											<th className={clsx(css.bthProject, css.btProject)}>Where</th>
-										</tr>
-									</thead>
-									<tbody>
-										{s.portfolioSourceExposureData.entries.map((entry, idx) => (
-											<tr className={css.balanceRow} key={idx}>
-												<td className={clsx(css.btdValue, css.btValue)}>
-													{formatUsdExt(entry.leftValueUsd)}
-												</td>
-												<td className={clsx(css.btdToken, css.btToken)}>{entry.left.symbol}</td>
-												<td className={clsx(css.btdChain, css.btChain)}>
-													{entry.right
-														? blockchainNames[entry.right.id.split(':')[0]] ||
-														  entry.right.id.split(':')[0]
-														: blockchainNames[entry.left.id.split(':')[0]] ||
-														  entry.left.id.split(':')[0]}
-												</td>
-												<td className={clsx(css.btdProject, css.btProject)}>
-													{entry.right ? `in protocol` : 'on balance'}
-												</td>
-											</tr>
-										))}
-									</tbody>
-								</table>
-							</div>
-						))}
-				</div>
-			);
-		} else {
-			return null;
-		}
+		return (
+			<ProjectExposureTable
+				portfolio={this.props.fs.portfolio}
+				portfolioSources={this.props.fs.portfolioSources}
+				projectId={this.props.projectId}
+			/>
+		);
 	}
 
 	renderValue() {
@@ -122,10 +74,10 @@ export class FeedReasonLabel extends PureComponent<FeedReasonLabelProps> {
 
 interface FeedSourcesTableProps {
 	searchTerm: string;
-	fs: LocalFeedSettings;
+	fs: FeedSettings;
 }
 
-const FeedSourcesRow = (fs: LocalFeedSettings) =>
+const FeedSourcesRow = (fs: FeedSettings) =>
 	observer(({ index, data, style }: { index: number; data: string[]; style: CSSProperties }) => {
 		const [rowType, second, third] = data[index].split(':');
 
@@ -136,16 +88,7 @@ const FeedSourcesRow = (fs: LocalFeedSettings) =>
 					<CheckBox
 						isChecked={true} // sourcesByReason[reason].every(s => selectedSourceIds.includes(s.id))
 						onChange={isChecked => {
-							// const newSourceIds = selectedSourceIds.filter(
-							// 	id => !sourcesByReason[reason].find(s => typeof s !== 'string' && s.id === id),
-							// );
-							// console.log(selectedSourceIds);
-							// console.log(newSourceIds);
-							// setSelectedSourceIds(
-							// 	isChecked
-							// 		? [...newSourceIds, ...sourcesByReason[reason].map(s => s.id)]
-							// 		: newSourceIds,
-							// );
+							//
 						}}
 					/>
 					<div className={css.categoryReason}>
@@ -156,7 +99,14 @@ const FeedSourcesRow = (fs: LocalFeedSettings) =>
 							  }[reason]
 							: 'Others'}
 					</div>
-					<div className={css.categoryProject}>Your exposure</div>
+					<div className={css.categoryProject}>
+						{reason
+							? {
+									[ProjectRelation.ACTIVE_EXPOSURE]: `Your exposure`,
+									[ProjectRelation.INTERACTED]: `Your interactions`,
+							  }[reason]
+							: ''}
+					</div>
 				</div>
 			);
 		} else if (rowType === 'project') {
@@ -175,26 +125,11 @@ const FeedSourcesRow = (fs: LocalFeedSettings) =>
 					<CheckBox
 						isChecked={isChecked}
 						onChange={v => {
-							runInAction(() => {
-								if (!projectSources) {
-									return;
-								}
-								if (v) {
-									for (const source of projectSources) {
-										fs.excludeSourceIds.delete(source.id);
-										if (!fs.defaultActiveSourceIds.has(source.id)) {
-											fs.includeSourceIds.add(source.id);
-										}
-									}
-								} else {
-									for (const source of projectSources) {
-										fs.includeSourceIds.delete(source.id);
-										if (fs.defaultActiveSourceIds.has(source.id)) {
-											fs.excludeSourceIds.add(source.id);
-										}
-									}
-								}
-							});
+							if (v) {
+								fs.activateProject(projectId);
+							} else {
+								fs.deactivateProject(projectId);
+							}
 						}}
 					/>
 
@@ -232,15 +167,9 @@ const FeedSourcesRow = (fs: LocalFeedSettings) =>
 						isChecked={fs.activeSourceIds.has(sourceId)}
 						onChange={v => {
 							if (v) {
-								fs.excludeSourceIds.delete(source.id);
-								if (!fs.defaultActiveSourceIds.has(source.id)) {
-									fs.includeSourceIds.add(source.id);
-								}
+								fs.activateSource(source.id);
 							} else {
-								fs.includeSourceIds.delete(source.id);
-								if (fs.defaultActiveSourceIds.has(source.id)) {
-									fs.excludeSourceIds.add(source.id);
-								}
+								fs.deactivateSource(source.id);
 							}
 						}}
 					/>
@@ -374,7 +303,7 @@ export class FeedSourcesTable extends PureComponent<FeedSourcesTableProps> {
 							itemSize={idx => (rows[idx].startsWith('source') ? 24 : 40)}
 							itemCount={rows.length}
 							itemData={rows}
-							overscanCount={20}
+							overscanCount={40}
 						>
 							{this.Row}
 						</VariableSizeList>

@@ -1,13 +1,11 @@
 import clsx from 'clsx';
 import { observable } from 'mobx';
 import { observer } from 'mobx-react';
-import { AnchorHTMLAttributes, Fragment, PropsWithChildren, ReactNode } from 'react';
+import { AnchorHTMLAttributes, PropsWithChildren, ReactNode } from 'react';
 import { generatePath, useLocation } from 'react-router-dom';
 
-import { ReactComponent as AddContactSvg } from '../../../icons/ic20/addContact.svg';
 import { ReactComponent as ArrowDownSvg } from '../../../icons/ic20/arrowDown.svg';
 import { ReactComponent as ArrowUpSvg } from '../../../icons/ic20/arrowUp.svg';
-import { ReactComponent as ContactSvg } from '../../../icons/ic20/contact.svg';
 import { ReactComponent as SettingsSvg } from '../../../icons/ic20/settings.svg';
 import { ReactComponent as SidebarMenuSvg } from '../../../icons/ic28/sidebarMenu.svg';
 import { ReactComponent as SidebarMenuCloseSvg } from '../../../icons/ic28/sidebarMenu_close.svg';
@@ -24,7 +22,6 @@ import { ActionButton, ActionButtonLook, ActionButtonSize } from '../../ActionBu
 import { AdaptiveAddress } from '../../adaptiveAddress/adaptiveAddress';
 import { FeedSettingsModal } from '../../feedSettingsModal/feedSettingsModal';
 import { PropsWithClassName } from '../../props';
-import { toast } from '../../toast/toast';
 import css from './sidebarMenu.module.scss';
 
 export const isSidebarOpen = observable.box(false);
@@ -170,53 +167,64 @@ export const SidebarButton = observer(
 //
 
 export const SidebarSmartFeedSection = observer(() => {
-	const navigate = useNav();
-	const accounts = domain.account ? [domain.account] : [];
-
+	const acc = domain.account;
+	const accesses = [...domain.feedsRepository.feedAccesses];
+	accesses.sort((a, b) => {
+		return (b.feedId === acc?.defaultFeedId ? 1 : 0) - (a.feedId === acc?.defaultFeedId ? 1 : 0);
+	});
 	return (
 		<SidebarSection section={Section.FEED} title="Feed">
-			{domain.feedSettings.feedAccesses.map((access, i) => {
-				const feedData = domain.feedSettings.feedDataById.get(access.feedId);
-				let name;
-				if (!feedData || feedData === 'loading') {
-					name = 'Loading...';
-				} else if (feedData === 'error') {
-					name = 'Feed error';
-				} else {
-					name = feedData.feed.name;
-				}
-				return (
-					<SidebarButton
-						key={access.feedId}
-						href={generatePath(RoutePath.FEED_SMART_EXACT, { feedId: access.feedId })}
-						icon={sideFeedIcon(14)}
-						onClick={() => {
-							analytics.mainviewSmartFeedClick();
-						}}
-						name={name}
-						rightButton={{
-							icon: <SettingsSvg />,
-							title: 'Account Settings',
-							onClick: () => {
-								FeedSettingsModal.show(access.feedId);
-								// if (!account.mainviewKey) {
-								// 	return toast('Please complete the onboarding first ❤');
-								// }
+			{accesses.length ? (
+				accesses.map((access, i) => {
+					const defFeed = access.feedId === acc?.defaultFeedId;
+					const feedData = domain.feedsRepository.feedDataById.get(access.feedId);
 
-								// analytics.mainviewFeedSettingsClick(account.address);
+					let name;
+					if (!feedData) {
+						name = defFeed ? 'Smart feed' : 'Loading...';
+					} else {
+						name = feedData.feed.name;
+					}
 
-								// isSidebarOpen.set(false);
-								// navigate(
-								// 	generatePath(RoutePath.SETTINGS_ADDRESS_SECTION, {
-								// 		address: account.address,
-								// 		section: SettingsSection.SOURCES,
-								// 	}),
-								// );
-							},
-						}}
-					/>
-				);
-			})}
+					const path = generatePath(RoutePath.FEED_SMART_EXACT, { feedId: access.feedId });
+
+					return (
+						<SidebarButton
+							key={access.feedId}
+							isActiveChecker={defFeed ? p => p === RoutePath.FEED_SMART || p === path : undefined}
+							href={path}
+							icon={sideFeedIcon(14)}
+							onClick={() => {
+								analytics.mainviewSmartFeedClick();
+							}}
+							name={name}
+							rightButton={{
+								icon: <SettingsSvg />,
+								title: 'Account Settings',
+								onClick: () => {
+									FeedSettingsModal.show(access.feedId);
+								},
+							}}
+						/>
+					);
+				})
+			) : (
+				<SidebarButton
+					href={generatePath(RoutePath.FEED_SMART)}
+					icon={sideFeedIcon(14)}
+					onClick={() => {
+						analytics.mainviewSmartFeedClick();
+					}}
+					name={'Smart feed'}
+					// rightButton={{
+					// 	icon: <SettingsSvg />,
+					// 	title: 'Account Settings',
+					// 	onClick: () => {
+					// 		FeedSettingsModal.show(access.feedId);
+					// 	},
+					// }}
+				/>
+			)}
 		</SidebarSection>
 	);
 });
@@ -242,7 +250,7 @@ export const TrialPeriodSection = observer(() => {
 						style={{
 							width: `${
 								constrain(
-									1 - (domain.accountPlan.planEndsAt - Date.now() / 1000) / (60 * 60 * 24 * 7),
+									1 - (domain.account.planEndsAt - Date.now() / 1000) / (60 * 60 * 24 * 7),
 									0,
 									1,
 								) * 100
@@ -257,7 +265,7 @@ export const TrialPeriodSection = observer(() => {
 });
 
 export const SidebarMenu = observer(() => {
-	const tags = domain.feedSettings.tags;
+	const tags = domain.feedsRepository.tags;
 	const navigate = useNav();
 
 	return (

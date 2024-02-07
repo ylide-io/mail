@@ -1,6 +1,6 @@
 import clsx from 'clsx';
 import { observer } from 'mobx-react';
-import { useRef, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
 import { generatePath } from 'react-router-dom';
 
 import { FeedPost, LinkType } from '../../../../api/feedServerApi';
@@ -9,18 +9,21 @@ import { GridRowBox, TruncateTextBox } from '../../../../components/boxes/boxes'
 import { CheckBox } from '../../../../components/checkBox/checkBox';
 import { DropDown, DropDownItem, DropDownItemMode } from '../../../../components/dropDown/dropDown';
 import { ErrorMessage, ErrorMessageLook } from '../../../../components/errorMessage/errorMessage';
+import { ProjectExposureTable } from '../../../../components/feedSettingsModal/projectExposureTable';
 import { ReadableDate } from '../../../../components/readableDate/readableDate';
 import { SharePopup } from '../../../../components/sharePopup/sharePopup';
+import { SimplePopup } from '../../../../components/simplePopup/simplePopup';
 import { Spinner } from '../../../../components/spinner/spinner';
 import { toast } from '../../../../components/toast/toast';
 import { ReactComponent as ContactSvg } from '../../../../icons/ic20/contact.svg';
 import { ReactComponent as MenuSvg } from '../../../../icons/ic20/menu.svg';
+import { ProjectRelation } from '../../../../shared/PortfolioScope';
 import domain from '../../../../stores/Domain';
+import { FeedSettings } from '../../../../stores/FeedSettings';
 import { DomainAccount } from '../../../../stores/models/DomainAccount';
 import { RoutePath } from '../../../../stores/routePath';
 import { formatAccountName } from '../../../../utils/account';
 import { HorizontalAlignment } from '../../../../utils/alignment';
-import { invariant } from '../../../../utils/assert';
 import { toAbsoluteUrl, useNav } from '../../../../utils/url';
 import { FeedLinkTypeIcon } from '../feedLinkTypeIcon/feedLinkTypeIcon';
 import { PostItemContainer } from '../postItemContainer/postItemContainer';
@@ -37,15 +40,15 @@ interface AddtoMyFeedItemProps {
 export const AddToMyFeedItem = observer(({ post, account }: AddtoMyFeedItemProps) => {
 	const [isUpdating, setUpdating] = useState(false);
 
-	const isSelected = false; // domain.feedSettings.isSourceSelected(account, post.sourceId);
+	const isSelected = false; // domain.feedsRepository.isSourceSelected(account, post.sourceId);
 
 	const toggle = async () => {
 		try {
 			setUpdating(true);
 
-			// const selectedSourceIds = domain.feedSettings.getSelectedSourceIds(account);
+			// const selectedSourceIds = domain.feedsRepository.getSelectedSourceIds(account);
 
-			// await domain.feedSettings.updateFeedConfig(
+			// await domain.feedsRepository.updateFeedConfig(
 			// 	account,
 			// 	isSelected
 			// 		? selectedSourceIds.filter(id => id !== post.sourceId)
@@ -78,19 +81,37 @@ interface AddToMyFeedButtonProps {
 }
 
 export const AddToMyFeedButton = observer(({ post }: AddToMyFeedButtonProps) => {
-	const buttonRef = useRef(null);
-	const [isListOpen, setListOpen] = useState(false);
+	const [adding, setAdding] = useState(false);
+	// const buttonRef = useRef(null);
+	// const [isListOpen, setListOpen] = useState(false);
 
 	return (
 		<>
 			<div
-				ref={buttonRef}
+				// ref={buttonRef}
 				className={clsx(css.reason, css.reason_button)}
-				onClick={() => setListOpen(!isListOpen)}
-			>
-				Add to My Feed
-			</div>
+				onClick={() => {
+					// setListOpen(!isListOpen)
+					if (!domain.account?.defaultFeedId) {
+						return;
+					}
+					const feedData = domain.feedsRepository.feedDataById.get(domain.account.defaultFeedId);
+					if (!feedData) {
+						return;
+					}
 
+					const feedSettings = new FeedSettings(feedData, domain.account.defaultFeedId);
+
+					setAdding(true);
+					feedSettings.activateSource(Number(post.sourceId));
+					feedSettings.save().then(() => {
+						setAdding(false);
+					});
+				}}
+			>
+				{adding ? 'Adding...' : 'Add to My Feed'}
+			</div>
+			{/* 
 			{isListOpen && (
 				<DropDown
 					anchorRef={buttonRef}
@@ -99,7 +120,7 @@ export const AddToMyFeedButton = observer(({ post }: AddToMyFeedButtonProps) => 
 				>
 					{domain.account ? <AddToMyFeedItem post={post} account={domain.account} /> : null}
 				</DropDown>
-			)}
+			)} */}
 		</>
 	);
 });
@@ -108,68 +129,107 @@ export const AddToMyFeedButton = observer(({ post }: AddToMyFeedButtonProps) => 
 
 interface FeedPostItemProps {
 	feedId?: string;
+	affinity: 'external' | string;
 	post: FeedPost;
 }
 
-export const FeedPostItem = observer(({ post, feedId }: FeedPostItemProps) => {
+export const FeedPostItem = observer(({ post, affinity, feedId }: FeedPostItemProps) => {
 	const navigate = useNav();
 	const postPath = generatePath(RoutePath.FEED_POST, { postId: post.id });
 
 	const menuButtonRef = useRef(null);
 	const [isMenuOpen, setMenuOpen] = useState(false);
 	const [isSharePopupOpen, setSharePopupOpen] = useState(false);
+	const [unfollowedState, setUnfollowState] = useState<'none' | 'unfollowing' | 'unfollowed'>('none');
 
 	const account = domain.account;
+	const projectId = post.cryptoProjectId;
+	const project = projectId ? domain.feedSources.projectsMap.get(projectId) || null : null;
+	const feed =
+		affinity === 'external' || affinity === 'default' ? null : domain.feedsRepository.feedDataById.get(affinity);
+	const feedSettings = feed ? domain.feedsRepository.feedSettingsById.get(feed.feed.id) : null;
+	const defaultFeedSettings = domain.account?.defaultFeedId
+		? domain.feedsRepository.feedSettingsById.get(domain.account.defaultFeedId)
+		: null;
+	const isInDefaultFeed = defaultFeedSettings
+		? defaultFeedSettings.activeSourceIds.has(Number(post.sourceId))
+		: false;
 
 	const onSourceIdClick = () => {
 		navigate(generatePath(RoutePath.FEED_SOURCE, { source: post.sourceId }));
 	};
 
-	const [unfollowedState, setUnfollowState] = useState<'none' | 'unfollowing' | 'unfollowed'>('none');
+	const unfollowSource = async (_sourceId: string) => {
+		if (!feedSettings) {
+			return;
+		}
 
-	const unfollow = async (projectId?: string) => {
-		// try {
-		// 	setUnfollowState('unfollowing');
-		// 	invariant(account, 'No accounts');
-		// 	const sourceIdsToExclude = projectId
-		// 		? domain.feedSettings.sources.filter(s => s.cryptoProject?.id === projectId).map(s => s.id)
-		// 		: [post.sourceId];
-		// 	invariant(sourceIdsToExclude.length, 'No source ids to exclude');
-		// 	// const selectedSourceIds = domain.feedSettings
-		// 	// 	.getSelectedSourceIds(account)
-		// 	// 	.filter(id => !sourceIdsToExclude.includes(id));
-		// 	// await domain.feedSettings.updateFeedConfig(account, selectedSourceIds);
-		// 	setUnfollowState('unfollowed');
-		// } catch (e) {
-		// 	setUnfollowState('none');
-		// 	toast("Couldn't unfollow 🤦‍♀️");
-		// 	throw e;
-		// }
+		try {
+			setUnfollowState('unfollowing');
+
+			feedSettings.deactivateSource(Number(_sourceId));
+			await feedSettings.save();
+
+			setUnfollowState('unfollowed');
+		} catch (e) {
+			setUnfollowState('none');
+			toast("Couldn't unfollow 🤦‍♀️");
+			throw e;
+		}
 	};
 
-	const userCryptoProject: any = null;
-	const renderReason = (a: any) => null;
-	// const userCryptoProject = useMemo(() => {
-	// 	if (account && post.cryptoProjectId) {
-	// 		const config = domain.feedSettings.getAccountConfig(account);
-	// 		return config?.defaultProjects.find(p => p.projectId === post.cryptoProjectId);
-	// 	}
-	// }, [post.cryptoProjectId, account]);
+	const unfollowProject = async (_projectId: number) => {
+		if (!feedSettings) {
+			return;
+		}
 
-	// const renderReason = (userCryptoProject: FeedProject) => (
-	// 	<>
-	// 		{
-	// 			{
-	// 				[FeedReason.BALANCE]: 'You hold tokens of ',
-	// 				[FeedReason.PROTOCOL]: 'Current position in ',
-	// 				[FeedReason.TRANSACTION]: 'Historical tx in ',
-	// 				[FeedReason.BALANCE_IN_PROTOCOL]: 'You hold tokens of ', // TODO
-	// 			}[userCryptoProject.reasons[0]]
-	// 		}
+		try {
+			setUnfollowState('unfollowing');
 
-	// 		<b>{userCryptoProject.projectName}</b>
-	// 	</>
-	// );
+			feedSettings.deactivateProject(_projectId);
+			await feedSettings.save();
+
+			setUnfollowState('unfollowed');
+		} catch (e) {
+			setUnfollowState('none');
+			toast("Couldn't unfollow 🤦‍♀️");
+			throw e;
+		}
+	};
+
+	const relationContent = useMemo(() => {
+		if (project && feedSettings && feedSettings.portfolio.projectToPortfolioMetaMap[project.id]) {
+			const _relation = feedSettings.portfolio.projectToPortfolioMetaMap[project.id].relation;
+			if (_relation === ProjectRelation.ACTIVE_EXPOSURE) {
+				return (
+					<SimplePopup
+						content={
+							<ProjectExposureTable
+								portfolio={feedSettings.portfolio}
+								portfolioSources={feedSettings.base.feed.sources}
+								projectId={project.id}
+							/>
+						}
+					>
+						<div className={css.reason} title="The reason why you see this post">
+							{`Current position in ${project.name}`}
+						</div>
+					</SimplePopup>
+				);
+			} else if (_relation === ProjectRelation.INTERACTED) {
+				return (
+					<div
+						className={css.reason}
+						title="The reason why you see this post"
+					>{`Historical tx in ${project.name}`}</div>
+				);
+			} else {
+				// hmmmm?
+				return null;
+			}
+		}
+		return null;
+	}, [project, feedSettings]);
 
 	return (
 		<>
@@ -200,21 +260,11 @@ export const FeedPostItem = observer(({ post, feedId }: FeedPostItemProps) => {
 						</div>
 
 						<div className={css.metaRight}>
-							{feedId ? (
-								userCryptoProject &&
-								!!userCryptoProject.reasons.length &&
-								!!userCryptoProject.projectName && (
-									<div
-										className={css.reason}
-										title="The reason why you see this post"
-										onClick={() => toast(renderReason(userCryptoProject))}
-									>
-										{renderReason(userCryptoProject)}
-									</div>
-								)
-							) : !userCryptoProject && account ? (
+							{affinity === 'external' && !isInDefaultFeed ? (
 								<AddToMyFeedButton post={post} />
-							) : null}
+							) : (
+								relationContent
+							)}
 
 							<a
 								className={css.date}
@@ -261,7 +311,10 @@ export const FeedPostItem = observer(({ post, feedId }: FeedPostItemProps) => {
 
 									{account && (
 										<>
-											<DropDownItem mode={DropDownItemMode.LITE} onSelect={() => unfollow()}>
+											<DropDownItem
+												mode={DropDownItemMode.DANGER}
+												onSelect={() => unfollowSource(post.sourceId)}
+											>
 												Unfollow{' '}
 												<b>
 													{post.sourceType === LinkType.DISCORD
@@ -271,12 +324,12 @@ export const FeedPostItem = observer(({ post, feedId }: FeedPostItemProps) => {
 												{post.sourceType}
 											</DropDownItem>
 
-											{userCryptoProject && (
+											{project && (
 												<DropDownItem
-													mode={DropDownItemMode.LITE}
-													onSelect={() => unfollow(userCryptoProject.projectId)}
+													mode={DropDownItemMode.DANGER}
+													onSelect={() => unfollowProject(project.id)}
 												>
-													Unfollow everything about <b>{userCryptoProject.projectName}</b>
+													Unfollow everything about <b>{project.name}</b>
 												</DropDownItem>
 											)}
 										</>

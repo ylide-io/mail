@@ -38,20 +38,27 @@ export const AuthorizeAccountFlow = observer(({ address, onClose }: AuthorizeAcc
 					analytics.mainviewOnboardingEvent('signature-reject');
 					throw e;
 				}
-				const { id, token } = await MainviewApi.authAddress(
+				const accData = await MainviewApi.authAddress(
 					{ address, timestamp, signature },
 					browserStorage.referrer,
 				);
-				if (token) {
-					browserStorage.mainviewAccounts = {
-						...browserStorage.mainviewAccounts,
-						[address]: { id, token },
-					};
-					analytics.mainviewOnboardingEvent('account-authorized');
-					onCloseRef.current(new DomainAccount(id, address, token));
-				} else {
-					onCloseRef.current();
-				}
+
+				browserStorage.mainviewAccounts = {
+					...browserStorage.mainviewAccounts,
+					[address]: { ...accData },
+				};
+				analytics.mainviewOnboardingEvent('account-authorized');
+				onCloseRef.current(
+					new DomainAccount(
+						accData.id,
+						accData.address,
+						accData.email,
+						accData.defaultFeedId,
+						accData.plan,
+						accData.planEndsAt,
+						accData.token,
+					),
+				);
 			} catch (e) {
 				analytics.mainviewOnboardingEvent('authorization-error');
 				onCloseRef.current();
@@ -69,14 +76,14 @@ export interface BuildFeedFlowProps {
 
 export const BuildFeedFlow = observer(({ account, onClose }: BuildFeedFlowProps) => {
 	const onCloseRef = useLatest(onClose);
-	const coverage = null; // domain.feedSettings.coverages.get(account);
+	const coverage = null; // domain.feedsRepository.coverages.get(account);
 
 	useEffect(() => {
 		(async () => {
 			try {
-				const token = account.mainviewKey;
+				const token = account.token;
 
-				console.log('account.mainviewKey: ', account.mainviewKey);
+				console.log('account.token: ', account.token);
 				invariant(token, 'No main view key');
 
 				const res = await MainviewApi.init(token, undefined);

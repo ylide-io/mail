@@ -1,29 +1,26 @@
 import { observable } from 'mobx';
 import { observer } from 'mobx-react';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo } from 'react';
 import { InView } from 'react-intersection-observer';
 import { generatePath, useParams } from 'react-router-dom';
 
 import { FeedServerApi } from '../../../api/feedServerApi';
 import { ActionButton, ActionButtonLook, ActionButtonSize } from '../../../components/ActionButton/ActionButton';
-import { CoverageModal } from '../../../components/coverageModal/coverageModal';
 import { ErrorMessage, ErrorMessageLook } from '../../../components/errorMessage/errorMessage';
 import { NarrowContent } from '../../../components/genericLayout/content/narrowContent/narrowContent';
 import { GenericLayout, useGenericLayoutApi } from '../../../components/genericLayout/genericLayout';
 import { SimpleLoader } from '../../../components/simpleLoader/simpleLoader';
 import { ReactComponent as ArrowUpSvg } from '../../../icons/ic20/arrowUp.svg';
 import { ReactComponent as CrossSvg } from '../../../icons/ic20/cross.svg';
-import { analytics } from '../../../stores/Analytics';
 import domain from '../../../stores/Domain';
 import { FeedStore } from '../../../stores/Feed';
 import { RoutePath } from '../../../stores/routePath';
 import { hookDependency } from '../../../utils/react';
-import { truncateInMiddle } from '../../../utils/string';
 import { useNav } from '../../../utils/url';
 import { FeedPostItem } from '../_common/feedPostItem/feedPostItem';
 import css from './feedPage.module.scss';
 import ErrorCode = FeedServerApi.ErrorCode;
-import { connectAccount, payAccount } from '../../../utils/account';
+import { connectAccount } from '../../../utils/account';
 import { Paywall } from './paywall';
 
 const reloadFeedCounter = observable.box(0);
@@ -37,41 +34,42 @@ const FeedPageContent = observer(() => {
 
 	const navigate = useNav();
 	const genericLayoutApi = useGenericLayoutApi();
-	const tags = domain.feedSettings.tags;
-
-	// const coverage = domain.account ? domain.feedSettings.coverages.get(domain.account) : undefined;
-	// const totalCoverage = useMemo(() => {
-	// 	if (!coverage || coverage === 'error' || coverage === 'loading') {
-	// 		return null;
-	// 	}
-	// 	return coverage.totalCoverage;
-	// }, [coverage]);
-	const [showCoverageModal, setShowCoverageModal] = useState(false);
 
 	const canLoadFeed = Boolean(tag || domain.account);
 
 	const reloadCounter = reloadFeedCounter.get();
 
-	// const feedType = useMemo(() => {
-	// 	if (!tag && !address && !source) {
-	// 		return 'personal';
-	// 	} else {
-	// 		if (!tag && !source && address === domain.account?.address) {
-	// 			return 'personal';
-	// 		}
-	// 		return 'generic';
-	// 	}
-	// }, [tag, source, address, domain.account]);
+	const feedDescriptor: FeedServerApi.FeedDescriptor = useMemo(
+		() =>
+			tag
+				? {
+						type: 'tags',
+						tags: [Number(tag)],
+				  }
+				: source
+				? {
+						type: 'source',
+						sourceId: Number(source),
+				  }
+				: {
+						type: 'feed',
+						feedId: feedId || 'default',
+				  },
+		[tag, source, feedId],
+	);
+
+	const finalFeedId =
+		feedDescriptor.type === 'feed'
+			? feedId === 'default'
+				? domain.account?.defaultFeedId || null
+				: feedId
+			: undefined;
+	const feedData = finalFeedId ? domain.feedsRepository.feedDataById.get(finalFeedId) : null;
 
 	const feed = useMemo(() => {
 		hookDependency(reloadCounter);
 
-		const feed = new FeedStore({
-			// TODO: KONST
-			tags: tags !== 'error' && tags !== 'loading' ? tags.filter(t => t.id === Number(tag)) : [],
-			sourceId: source,
-			addressTokens: domain.account ? [domain.account.mainviewKey] : [],
-		});
+		const feed = new FeedStore(feedDescriptor);
 
 		genericLayoutApi.scrollToTop();
 
@@ -80,26 +78,55 @@ const FeedPageContent = observer(() => {
 		}
 
 		return feed;
-	}, [canLoadFeed, tags, tag, genericLayoutApi, domain.account, source, reloadCounter]);
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [reloadCounter, feedDescriptor, genericLayoutApi, canLoadFeed, feedData]);
 
 	useEffect(() => {
 		return () => {
-			feed.clearProcess();
+			feed.stopNewPostsChecking();
 		};
 	}, [feed]);
 
-	const title = useMemo(() => {
-		if (tag) {
-			return feed.tags.find(t => t.id === Number(tag))?.name;
+	const { affinity, title } = useMemo(() => {
+		if (tag && Array.isArray(domain.feedsRepository.tags)) {
+			return {
+				affinity: 'external',
+				title: domain.feedsRepository.tags.find(t => t.id === Number(tag))?.name || 'Feed for tag',
+			};
 		}
-		if (feed.tags.length === 1 && feed.tags[0].name) {
-			return feed.sourceId;
+		if (source) {
+			return {
+				affinity: 'external',
+				title: domain.feedSources.sourcesMap.get(Number(source))?.name || 'Feed for exact source',
+			};
 		}
-		if (domain.account) {
-			return `Feed for ${truncateInMiddle(domain.account.address, 8, '..')}`;
+		if (feedId) {
+			const defFeed = feedId === domain.account?.defaultFeedId;
+			const feedData = domain.feedsRepository.feedDataById.get(feedId);
+
+			let name;
+			if (!feedData) {
+				name = defFeed ? 'Smart feed' : 'Loading...';
+			} else {
+				name = feedData.feed.name;
+			}
+
+			return { affinity: feedId, title: name };
+		} else {
+			const defFeedId = domain.account?.defaultFeedId;
+			if (defFeedId) {
+				const feedData = domain.feedsRepository.feedDataById.get(defFeedId);
+				if (feedData) {
+					return { affinity: defFeedId, title: feedData.feed.name };
+				} else {
+					return { affinity: defFeedId, title: 'Smart feed' };
+				}
+			} else {
+				return { affinity: 'default', title: 'Smart feed' };
+			}
 		}
-		return 'Smart feed';
-	}, [feed, domain.account, tag]);
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [tag, source, feedId, domain.account, domain.feedsRepository.tags, domain.feedSources.sourcesMap]);
 
 	return (
 		<NarrowContent
@@ -136,9 +163,6 @@ const FeedPageContent = observer(() => {
 				</div>
 			}
 		>
-			{/* {showCoverageModal && coverage && coverage !== 'error' && coverage !== 'loading' && (
-				<CoverageModal onClose={() => setShowCoverageModal(false)} coverage={coverage} />
-			)} */}
 			{!!feed.posts.length && (
 				<ActionButton
 					className={css.scrollToTop}
@@ -156,12 +180,14 @@ const FeedPageContent = observer(() => {
 						{domain.isTooMuch ? (
 							<>
 								{feed.posts.slice(0, 15).map(post => (
-									<FeedPostItem feedId={feedId} key={post.id} post={post} />
+									<FeedPostItem affinity={affinity} feedId={feedId} key={post.id} post={post} />
 								))}
 								<Paywall />
 							</>
 						) : (
-							feed.posts.map(post => <FeedPostItem feedId={feedId} key={post.id} post={post} />)
+							feed.posts.map(post => (
+								<FeedPostItem affinity={affinity} feedId={feedId} key={post.id} post={post} />
+							))
 						)}
 
 						{!domain.isTooMuch && feed.moreAvailable && (

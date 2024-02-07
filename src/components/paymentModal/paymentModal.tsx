@@ -2,12 +2,10 @@ import { observer } from 'mobx-react';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
 import { MainviewApi } from '../../api/mainviewApi';
-import { BNBChainLogo } from '../../blockchain-icons/BNBChainLogo';
 import { EthereumLogo } from '../../blockchain-icons/EthereumLogo';
-import { GnosisLogo } from '../../blockchain-icons/GnosisLogo';
 import { PolygonLogo } from '../../blockchain-icons/PolygonLogo';
 import { ReactComponent as ExternalLinkSvg } from '../../icons/ic20/external.svg';
-import { analytics } from '../../stores/Analytics';
+import domain from '../../stores/Domain';
 import { DomainAccount } from '../../stores/models/DomainAccount';
 import { formatAccountName } from '../../utils/account';
 import { ActionButton, ActionButtonLook, ActionButtonSize } from '../ActionButton/ActionButton';
@@ -15,7 +13,6 @@ import { ActionModal } from '../actionModal/actionModal';
 import { LoadingModal } from '../loadingModal/loadingModal';
 import { Modal } from '../modal/modal';
 import css from './paymentModal.module.scss';
-import domain from '../../stores/Domain';
 
 export interface PricingModalProps {
 	account: DomainAccount;
@@ -68,7 +65,7 @@ export const PricingModal = observer(({ account, onReserved, onReservationFailed
 
 			try {
 				const reservation = await MainviewApi.buyPlan({
-					token: account.mainviewKey,
+					token: account.token,
 					planId,
 					amount: 1,
 				});
@@ -238,7 +235,7 @@ export const PaymentModal = observer(({ account, onResolve }: { account: DomainA
 			account,
 		});
 		let cancelled = false;
-		MainviewApi.getAccountPlan({ token: account.mainviewKey }).then(info => {
+		MainviewApi.getAccountPlan(account).then(info => {
 			if (!cancelled) {
 				setAccountPlan(info);
 				if (info?.activeReservations.length) {
@@ -258,13 +255,13 @@ export const PaymentModal = observer(({ account, onResolve }: { account: DomainA
 		return () => {
 			cancelled = true;
 		};
-	}, [account, account.mainviewKey]);
+	}, [account]);
 
 	useEffect(() => {
 		if (step.type === StepType.PAYMENT_WAITING) {
 			let cancelled = false;
 			const timer = setInterval(() => {
-				MainviewApi.getAccountPlan({ token: account.mainviewKey }).then(info => {
+				MainviewApi.getAccountPlan(account).then(info => {
 					if (cancelled) {
 						return;
 					}

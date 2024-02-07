@@ -61,13 +61,21 @@ export async function requestAccount(params?: {
 			return null;
 		}
 		const address = addr.toLowerCase();
-		const mainviewAccount = browserStorage.mainviewAccounts[address];
-		if (!mainviewAccount) {
+		const acc = browserStorage.mainviewAccounts[address];
+		if (!acc) {
 			return await showStaticComponent<DomainAccount | undefined>(resolve => (
 				<AuthorizeAccountFlow address={address} onClose={resolve} />
 			));
 		} else {
-			return new DomainAccount(mainviewAccount.id, address, mainviewAccount.token);
+			return new DomainAccount(
+				acc.id,
+				acc.address,
+				acc.email,
+				acc.defaultFeedId,
+				acc.plan,
+				acc.planEndsAt,
+				acc.token,
+			);
 		}
 	} catch (e) {
 		console.error(e);

@@ -16,20 +16,10 @@ export class FeedStore {
 	@observable newPosts = 0;
 	@observable moreAvailable = false;
 
-	readonly tags: { id: number; name: string }[] = [];
-	readonly sourceId: string | undefined;
-	readonly addressTokens: string[] | undefined;
-
 	abortController: AbortController | undefined;
-	checkNewPostsProcess: NodeJS.Timer | undefined;
+	checkNewPostsTimer: NodeJS.Timer | undefined;
 
-	constructor(params: { tags?: { id: number; name: string }[]; sourceId?: string; addressTokens?: string[] }) {
-		if (params.tags) {
-			this.tags = params.tags;
-		}
-		this.sourceId = params.sourceId;
-		this.addressTokens = params.addressTokens;
-
+	constructor(public readonly feed: FeedServerApi.FeedDescriptor) {
 		makeObservable(this);
 	}
 
@@ -43,15 +33,10 @@ export class FeedStore {
 	}): Promise<FeedServerApi.GetPostsResponse | undefined> {
 		try {
 			this.loading = true;
-
-			const sourceId = this.sourceId;
-			const tags = sourceId ? undefined : this.tags.map(t => t.id);
-
 			const response = await FeedServerApi.getPosts({
 				...params,
-				tags,
-				sourceId,
-				addressTokens: this.addressTokens,
+				feedDescriptor: this.feed,
+				token: domain.account?.token,
 			});
 
 			this.loaded = true;
@@ -59,9 +44,9 @@ export class FeedStore {
 
 			if (params.needOld) {
 				if (this.posts.length) {
-					analytics.feedLoadMore(this.tags.map(t => t.id));
+					analytics.feedLoadMore(this.feed);
 				} else {
-					analytics.feedView(this.tags.map(t => t.id));
+					analytics.feedView(this.feed);
 				}
 			}
 
@@ -97,8 +82,8 @@ export class FeedStore {
 			}
 			this.newPosts = data.newPosts;
 		}
-		if (!this.checkNewPostsProcess) {
-			this.checkNewPostsProcess = setInterval(() => {
+		if (!this.checkNewPostsTimer) {
+			this.checkNewPostsTimer = setInterval(() => {
 				this.checkNewPosts();
 			}, 10000);
 		}
@@ -162,14 +147,14 @@ export class FeedStore {
 		}
 	}
 
-	clearProcess() {
-		if (this.checkNewPostsProcess) {
-			clearInterval(this.checkNewPostsProcess);
+	stopNewPostsChecking() {
+		if (this.checkNewPostsTimer) {
+			clearInterval(this.checkNewPostsTimer);
 		} else {
 			// FeedPage unmounted before process has been created
 			// wait for it to cancel successfully
 			setTimeout(() => {
-				this.clearProcess();
+				this.stopNewPostsChecking();
 			}, 1000);
 		}
 	}

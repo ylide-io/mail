@@ -1,5 +1,6 @@
 import { REACT_APP__FEED_MANAGER } from '../env';
 import { PortfolioSource, PortfolioSourceToAffectedProjectsMap } from '../shared/PortfolioScope';
+import { IDomainAccount } from '../stores/models/DomainAccount';
 import { AuthorizationPayload } from '../types';
 import { createCleanSerachParams } from '../utils/url';
 
@@ -80,9 +81,8 @@ export namespace MainviewApi {
 
 	//
 
-	export interface AuthAddressResponse {
-		id: string;
-		token: string;
+	export interface AuthAddressResponse extends IDomainAccount {
+		//
 	}
 
 	export async function authAddress(data: AuthorizationPayload, referrer?: string | null) {
@@ -281,6 +281,23 @@ export namespace MainviewApi {
 		};
 	}) {
 		return await request({ path: `/v3/set-config`, data: params.config, token: params.token });
+	}
+
+	export async function saveFeed(params: {
+		token: string;
+		feedId: string;
+		config: {
+			mode: ConfigMode;
+			includedSourceIds: string[];
+			excludedSourceIds: string[];
+			sources: PortfolioSource[];
+			settings: {
+				tresholdType: 'percent' | 'value';
+				tresholdValue: number;
+			};
+		};
+	}) {
+		return await request({ path: `/v4/feed/${params.feedId}`, data: params.config, token: params.token });
 	}
 
 	export interface ReservationPlan {

@@ -85,7 +85,7 @@ export function FeedPostPage() {
 				}
 			>
 				{data ? (
-					<FeedPostItem post={data.post} />
+					<FeedPostItem affinity="external" post={data.post} />
 				) : isLoading ? (
 					<YlideLoader className={css.loader} reason="Loading post ..." />
 				) : (

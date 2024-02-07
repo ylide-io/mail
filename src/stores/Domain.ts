@@ -6,7 +6,7 @@ import { MainviewApi } from '../api/mainviewApi';
 import { ensurePageLoaded } from '../utils/ensurePageLoaded';
 import { isPaid, isTrialActive } from '../utils/payments';
 import { browserStorage } from './browserStorage';
-import { FeedSettings } from './FeedSettings';
+import { FeedsRepository } from './FeedsRepository';
 import { FeedSourcesStore } from './FeedSources';
 import { DomainAccount } from './models/DomainAccount';
 
@@ -26,7 +26,7 @@ export class Domain {
 	@observable accountPlan: MainviewApi.AccountPlan | undefined = undefined;
 	@observable tooMuch: boolean = false;
 
-	feedSettings: FeedSettings;
+	feedsRepository: FeedsRepository;
 	feedSources: FeedSourcesStore = new FeedSourcesStore();
 
 	_open: (opts?: OpenOptions) => void = () => {};
@@ -39,7 +39,7 @@ export class Domain {
 		autorun(() => {
 			if (this.account) {
 				this.accountPlan = undefined;
-				MainviewApi.getAccountPlan({ token: this.account.mainviewKey })
+				MainviewApi.getAccountPlan(this.account)
 					.then(plan => {
 						this.accountPlan = plan;
 					})
@@ -51,7 +51,7 @@ export class Domain {
 			}
 		});
 
-		this.feedSettings = new FeedSettings(this);
+		this.feedsRepository = new FeedsRepository(this);
 
 		window.addEventListener('keydown', e => {
 			if (e.ctrlKey && e.key === 'KeyD') {
@@ -63,7 +63,7 @@ export class Domain {
 	async reloadAccountPlan() {
 		if (this.account) {
 			this.accountPlan = undefined;
-			this.accountPlan = await MainviewApi.getAccountPlan({ token: this.account.mainviewKey });
+			this.accountPlan = await MainviewApi.getAccountPlan(this.account);
 		} else {
 			this.accountPlan = undefined;
 		}
@@ -125,7 +125,15 @@ export class Domain {
 			if (addr && browserStorage.mainviewAccounts[address]) {
 				browserStorage.isAuthorized = true;
 				const d = browserStorage.mainviewAccounts[address]!;
-				this.account = new DomainAccount(d.id, address, d.token);
+				this.account = new DomainAccount(
+					d.id,
+					d.address,
+					d.email,
+					d.defaultFeedId,
+					d.plan,
+					d.planEndsAt,
+					d.token,
+				);
 			} else {
 				browserStorage.isAuthorized = false;
 				this.account = null;

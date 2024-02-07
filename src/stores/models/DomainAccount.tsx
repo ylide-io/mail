@@ -1,15 +1,54 @@
-import { makeObservable, observable } from 'mobx';
+export interface IDomainAccount {
+	id: string;
+	address: string;
+	email: string | null;
+	defaultFeedId: string;
+	plan: 'none' | 'trial' | 'basic' | 'pro';
+	planEndsAt: number;
 
-export class DomainAccount {
-	@observable id: string;
-	@observable address: string;
-	@observable mainviewKey: string;
+	token: string;
+}
 
-	constructor(id: string, address: string, mainviewKey: string) {
+export class DomainAccount implements IDomainAccount {
+	id: string;
+	address: string;
+	email: string | null;
+	defaultFeedId: string;
+	private _plan: 'none' | 'trial' | 'basic' | 'pro';
+	planEndsAt: number;
+
+	token: string;
+
+	constructor(
+		id: string,
+		address: string,
+		email: string | null,
+		defaultFeedId: string,
+		plan: 'none' | 'trial' | 'basic' | 'pro',
+		planEndsAt: number,
+		token: string,
+	) {
 		this.id = id;
 		this.address = address;
-		this.mainviewKey = mainviewKey;
+		this.email = email;
+		this.defaultFeedId = defaultFeedId;
+		this._plan = plan;
+		this.planEndsAt = planEndsAt;
+		this.token = token;
+	}
 
-		makeObservable(this);
+	get name() {
+		return this.email || this.address;
+	}
+
+	get plan() {
+		const now = Math.floor(Date.now() / 1000);
+		if (this.planEndsAt < now) {
+			return 'none';
+		}
+		if (this._plan === 'trial') {
+			return 'basic';
+		}
+		return this._plan;
 	}
 }

@@ -6,7 +6,7 @@ import { PureComponent } from 'react';
 import { MainviewApi } from '../../api/mainviewApi';
 import { ReactComponent as PlusIcon } from '../../icons/ic20/plus.svg';
 import { ReactComponent as TrashIcon } from '../../icons/ic20/trash.svg';
-import { LocalFeedSettings } from '../../stores/LocalFeedSettings';
+import { FeedSettings } from '../../stores/FeedSettings';
 import { truncateAddress } from '../../utils/string';
 import { ActionButton, ActionButtonSize } from '../ActionButton/ActionButton';
 import { CheckBox } from '../checkBox/checkBox';
@@ -16,7 +16,7 @@ import css from './feedSettingsModal.module.scss';
 
 @observer
 export class FeedSettingsSidebar extends PureComponent<{
-	fs: LocalFeedSettings;
+	fs: FeedSettings;
 }> {
 	handleAddNewWallet = async () => {
 		const result = await AddWalletSourceModal.show(this.props.fs);
@@ -143,7 +143,7 @@ export class FeedSettingsSidebar extends PureComponent<{
 	}
 
 	renderAccesses() {
-		const { accesses, data } = this.props.fs;
+		const { accesses, base } = this.props.fs;
 		return (
 			<div className={css.portfolioBlock}>
 				<h4>Accesses to this feed</h4>
@@ -154,7 +154,7 @@ export class FeedSettingsSidebar extends PureComponent<{
 						})}
 					>
 						<span className={css.itemName}>
-							{data.owner.name.startsWith('0x') ? truncateAddress(data.owner.name, 24) : data.owner.name}{' '}
+							{base.owner.name.startsWith('0x') ? truncateAddress(base.owner.name, 24) : base.owner.name}{' '}
 							(Owner)
 						</span>
 					</div>
@@ -202,12 +202,12 @@ export class FeedSettingsSidebar extends PureComponent<{
 						</div>
 						<div className={css.filterValue} style={{ flexGrow: 0, paddingLeft: 10 }}>
 							<CheckBox
-								isChecked={this.props.fs.data.feed.mode === MainviewApi.ConfigMode.AUTO_ADD}
+								isChecked={this.props.fs.mode === MainviewApi.ConfigMode.AUTO_ADD}
 								onChange={v => {
 									if (v) {
-										this.props.fs.data.feed.mode = MainviewApi.ConfigMode.AUTO_ADD;
+										this.props.fs.mode = MainviewApi.ConfigMode.AUTO_ADD;
 									} else {
-										this.props.fs.data.feed.mode = MainviewApi.ConfigMode.DONT_ADD;
+										this.props.fs.mode = MainviewApi.ConfigMode.DONT_ADD;
 									}
 								}}
 							/>
@@ -289,7 +289,7 @@ export class FeedSettingsSidebar extends PureComponent<{
 	}
 
 	render() {
-		const { feed } = this.props.fs.data;
+		const { feed } = this.props.fs.base;
 
 		return (
 			<div className={css.sidebar}>

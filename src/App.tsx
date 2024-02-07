@@ -79,7 +79,7 @@ function enableNotifications(accounts: DomainAccount[]) {
 			})
 			.then(
 				subscription =>
-					subscription && Promise.all(accounts.map(a => MainviewApi.subscribe(a.mainviewKey, subscription))),
+					subscription && Promise.all(accounts.map(a => MainviewApi.subscribe(a.token, subscription))),
 			);
 	}
 

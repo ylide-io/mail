@@ -11,7 +11,7 @@ import {
 	PortfolioSourceToAffectedProjectsMap,
 } from '../../shared/PortfolioScope';
 import domain from '../../stores/Domain';
-import { LocalFeedSettings } from '../../stores/LocalFeedSettings';
+import { FeedSettings } from '../../stores/FeedSettings';
 import { formatUsdExt } from '../../utils/formatUsdExt';
 import { ActionButton, ActionButtonLook, ActionButtonSize } from '../ActionButton/ActionButton';
 import { Avatar } from '../avatar/avatar';
@@ -78,13 +78,13 @@ class CoverageBlock extends PureComponent<CoverageBlockProps> {
 }
 
 interface AddWalletSourceModalProps {
-	fs: LocalFeedSettings;
+	fs: FeedSettings;
 	close: (result?: { address: string; projects: AffectedProjectLink[] }) => void;
 }
 
 @observer
 export class AddWalletSourceModal extends PureComponent<AddWalletSourceModalProps> {
-	static show(fs: LocalFeedSettings) {
+	static show(fs: FeedSettings) {
 		return showStaticComponent<{ address: string; projects: AffectedProjectLink[] } | undefined>(resolve => (
 			<AddWalletSourceModal close={resolve} fs={fs} />
 		));
@@ -112,7 +112,7 @@ export class AddWalletSourceModal extends PureComponent<AddWalletSourceModalProp
 		this.loading = true;
 		const loadingFor = this.value.toLowerCase();
 		const sourcesData = await MainviewApi.getPortfolioSourcesData({
-			token: domain.account.mainviewKey,
+			token: domain.account.token,
 			sources: [
 				{
 					type: 'wallet',

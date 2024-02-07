@@ -7,7 +7,7 @@ export const formatUsdExt = (value: number, decimals = 1) => {
 		}
 		const sv = String(value);
 		if (sv.includes('e')) {
-			return '$' + value;
+			return '< $0.0000001';
 		} else {
 			const [v1, v2] = String(value).split('.');
 			let lz = 0;
@@ -26,7 +26,7 @@ export const formatNumberExt = (value: number, decimals = 1) => {
 		}
 		const sv = String(value);
 		if (sv.includes('e')) {
-			return sv;
+			return '< 0.0000001';
 		} else {
 			const [v1, v2] = String(value).split('.');
 			let lz = 0;
