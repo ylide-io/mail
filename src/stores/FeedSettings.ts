@@ -12,6 +12,133 @@ import {
 } from '../shared/PortfolioScope';
 import domain from './Domain';
 
+const getDefaultCoverage = (): MainviewApi.Coverage => ({
+	tokens: {
+		items: [],
+		ratio: 0,
+		ratioUsd: 0,
+		coveredCount: 0,
+		usdTotal: 0,
+		usdCovered: 0,
+		total: 0,
+	},
+	protocols: {
+		items: [],
+		ratio: 0,
+		ratioUsd: 0,
+		coveredCount: 0,
+		usdTotal: 0,
+		usdCovered: 0,
+		total: 0,
+	},
+	totalCoverage: 'N/A',
+});
+
+const calculateCoverage = (data: MainviewApi.CoverageData[]) => {
+	const coverage = data;
+	const result: MainviewApi.Coverage = getDefaultCoverage();
+	for (const c of coverage) {
+		if (c.missing) {
+			for (const reason of c.reasonsData) {
+				if (reason.type === 'balance') {
+					result.tokens.items.push({
+						tokenId: c.tokenId,
+						name: c.tokenName,
+						symbol: c.tokenSymbol,
+						missing: c.missing,
+						projectName: c.projectName,
+					});
+					result.tokens.usdTotal += reason.balanceUsd;
+				} else if (reason.type === 'protocol') {
+					result.protocols.items.push({
+						tokenId: c.tokenId,
+						name: c.protocolName,
+						symbol: c.protocolTokenSymbol,
+						missing: c.missing,
+						projectName: c.projectName,
+					});
+					let sum = 0;
+					if ('portfolio_item_list' in reason.data) {
+						sum = reason.data.portfolio_item_list.reduce((acc, s) => acc + s.stats.net_usd_value, 0);
+					} else if ('pools' in reason.data) {
+						sum =
+							Number(reason.data.liquidity?.totalUsdValue || 0) +
+							reason.data.pools.reduce((acc, p) => {
+								acc += Number(p.totalUsdValue);
+								return acc;
+							}, 0);
+					}
+					result.protocols.usdTotal += sum;
+				}
+			}
+		} else {
+			for (const reason of c.reasonsData) {
+				if (reason.type === 'balance') {
+					result.tokens.items.push({
+						tokenId: c.tokenId,
+						name: c.tokenName,
+						symbol: c.tokenSymbol,
+						missing: c.missing,
+						projectName: c.projectName,
+					});
+					result.tokens.coveredCount += 1;
+					result.tokens.usdTotal += reason.balanceUsd;
+					result.tokens.usdCovered += reason.balanceUsd;
+				} else if (reason.type === 'protocol') {
+					result.protocols.items.push({
+						tokenId: c.tokenId,
+						name: c.protocolName,
+						symbol: c.protocolTokenSymbol,
+						missing: c.missing,
+						projectName: c.projectName,
+					});
+					let sum = 0;
+					if ('portfolio_item_list' in reason.data) {
+						sum = reason.data.portfolio_item_list.reduce((acc, s) => acc + s.stats.net_usd_value, 0);
+					} else if ('pools' in reason.data) {
+						sum =
+							Number(reason.data.liquidity?.totalUsdValue || 0) +
+							reason.data.pools.reduce((acc, p) => {
+								acc += Number(p.totalUsdValue);
+								return acc;
+							}, 0);
+					}
+					result.protocols.usdTotal += sum;
+					result.protocols.usdCovered += sum;
+					result.protocols.coveredCount += 1;
+				}
+			}
+		}
+	}
+
+	result.tokens.total = result.tokens.items.length;
+	result.protocols.total = result.protocols.items.length;
+
+	result.tokens.usdCovered = Math.floor(result.tokens.usdCovered);
+	result.tokens.usdTotal = Math.floor(result.tokens.usdTotal);
+
+	result.protocols.usdTotal = Math.floor(result.protocols.usdTotal);
+	result.protocols.usdCovered = Math.floor(result.protocols.usdCovered);
+
+	if (result.tokens.items.length) {
+		result.tokens.ratio = Math.floor((result.tokens.coveredCount * 100) / result.tokens.items.length);
+	}
+	if (result.tokens.usdTotal) {
+		result.tokens.ratioUsd = Math.floor((result.tokens.usdCovered * 100) / result.tokens.usdTotal);
+	}
+	if (result.protocols.items.length) {
+		result.protocols.ratio = Math.floor((result.protocols.coveredCount * 100) / result.protocols.items.length);
+	}
+	if (result.protocols.usdTotal) {
+		result.protocols.ratioUsd = Math.floor((result.protocols.usdCovered * 100) / result.protocols.usdTotal);
+	}
+	const total = result.tokens.usdTotal + result.protocols.usdTotal;
+	const covered = result.tokens.usdCovered + result.protocols.usdCovered;
+	const totalResult = total > 0 ? (covered * 100) / total : 0;
+	result.totalCoverage = total === 0 ? 'N/A' : totalResult === 100 ? '100%' : `${totalResult.toFixed(1)}%`;
+	return result;
+};
+
 export class FeedSettings {
 	@observable portfolioSources: PortfolioSource[] = [];
 	@observable portfolioSourceToAffectedProjects: PortfolioSourceToAffectedProjectsMap = {};
@@ -41,6 +168,11 @@ export class FeedSettings {
 	@observable mode: MainviewApi.ConfigMode = MainviewApi.ConfigMode.AUTO_ADD;
 	@observable tresholdType: 'value' | 'percent' = 'value';
 	@observable tresholdValue = 10000;
+
+	@observable coverageDataByPortfolioSource: Record<string, MainviewApi.CoverageData[]> = {};
+
+	@observable coverageByPortfolioSource: Record<string, MainviewApi.Coverage> = {};
+	@observable totalCoverage: MainviewApi.Coverage = getDefaultCoverage();
 
 	constructor(public readonly base: MainviewApi.FeedDataResponse, public readonly feedId: string) {
 		this.updateBase(base);
@@ -125,8 +257,19 @@ export class FeedSettings {
 			return aName.localeCompare(bName);
 		});
 
+		const coverageByPortfolioSource: Record<string, MainviewApi.Coverage> = {};
+		for (const source of this.portfolioSources) {
+			coverageByPortfolioSource[source.id] = calculateCoverage(this.coverageDataByPortfolioSource[source.id]);
+		}
+
 		this.groups = groups;
 		this.portfolio = portfolio;
+		this.coverageByPortfolioSource = coverageByPortfolioSource;
+		this.totalCoverage = calculateCoverage(
+			([] as MainviewApi.CoverageData[]).concat(
+				...this.portfolioSources.map(s => this.coverageDataByPortfolioSource[s.id]),
+			),
+		);
 
 		this.updateActiveProjects(portfolio, this.tresholdType, this.tresholdValue);
 	}
@@ -168,9 +311,14 @@ export class FeedSettings {
 	}
 
 	@action
-	addPortfolioSource(source: PortfolioSource, affectedProjectLinks: AffectedProjectLink[]) {
+	addPortfolioSource(
+		source: PortfolioSource,
+		affectedProjectLinks: AffectedProjectLink[],
+		coverageData: MainviewApi.CoverageData[],
+	) {
 		this.portfolioSources.push(source);
 		this.portfolioSourceToAffectedProjects[source.id] = affectedProjectLinks;
+		this.coverageDataByPortfolioSource[source.id] = coverageData;
 
 		this.updatePortfolio();
 	}
@@ -178,6 +326,7 @@ export class FeedSettings {
 	@action
 	removePortfolioSource(source: PortfolioSource) {
 		delete this.portfolioSourceToAffectedProjects[source.id];
+		delete this.coverageDataByPortfolioSource[source.id];
 		this.portfolioSources = this.portfolioSources.filter(s => s.id !== source.id);
 
 		this.updatePortfolio();
@@ -188,6 +337,19 @@ export class FeedSettings {
 		this.portfolioSources = base.feed.sources;
 		this.portfolioSourceToAffectedProjects = base.portfolioSourceToAffectedProjects;
 		this.accesses = base.accesses;
+
+		const coverageDataByPortfolioSource: Record<string, MainviewApi.CoverageData[]> = {};
+		for (const portfolioSource of base.feed.sources) {
+			if (portfolioSource.type === 'wallet') {
+				coverageDataByPortfolioSource[portfolioSource.id] = base.coverage.filter(
+					c => c.address === portfolioSource.id,
+				);
+			} else {
+				coverageDataByPortfolioSource[portfolioSource.id] = [];
+			}
+		}
+
+		this.coverageDataByPortfolioSource = coverageDataByPortfolioSource;
 
 		this.mode = base.feed.mode;
 		this.tresholdType = base.feed.settings.tresholdType;
@@ -262,8 +424,8 @@ export class FeedSettings {
 	}
 
 	async save() {
-		await MainviewApi.saveFeed({
-			token: domain.account!.token,
+		await MainviewApi.feeds.saveFeed({
+			token: domain.session,
 			feedId: this.feedId,
 			config: {
 				mode: this.mode,

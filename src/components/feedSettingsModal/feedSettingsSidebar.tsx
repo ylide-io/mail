@@ -10,6 +10,7 @@ import { FeedSettings } from '../../stores/FeedSettings';
 import { truncateAddress } from '../../utils/string';
 import { ActionButton, ActionButtonSize } from '../ActionButton/ActionButton';
 import { CheckBox } from '../checkBox/checkBox';
+import { showCoverageModal } from '../coverageModal/coverageModal';
 import { SimpleSlider } from '../simpleSlider/simpleSlider';
 import { AddWalletSourceModal } from './addWalletSourceModal';
 import css from './feedSettingsModal.module.scss';
@@ -24,7 +25,7 @@ export class FeedSettingsSidebar extends PureComponent<{
 			return;
 		}
 		const { fs } = this.props;
-		const { address, projects } = result;
+		const { address, projects, coverageData } = result;
 		if (fs.portfolioSources.find(s => s.id === address)) {
 			return;
 		}
@@ -35,6 +36,7 @@ export class FeedSettingsSidebar extends PureComponent<{
 					type: 'wallet',
 				},
 				projects,
+				coverageData,
 			);
 		});
 	};
@@ -44,7 +46,21 @@ export class FeedSettingsSidebar extends PureComponent<{
 
 		return (
 			<div className={css.portfolioBlock}>
-				<h4>Wallets</h4>
+				<h4>
+					Wallets{' '}
+					<a
+						href="#total-coverage"
+						className={css.portfolioCoveragePlate}
+						onClick={e => {
+							e.preventDefault();
+							e.stopPropagation();
+
+							showCoverageModal(this.props.fs.totalCoverage);
+						}}
+					>
+						Coverage: {this.props.fs.totalCoverage.totalCoverage}
+					</a>
+				</h4>
 				<div className={css.itemsList}>
 					{wallets.map((s, idx) => (
 						<div
@@ -54,7 +70,21 @@ export class FeedSettingsSidebar extends PureComponent<{
 								[css.last]: idx === wallets.length - 1,
 							})}
 						>
-							<span className={css.itemName}>{s.id}</span>
+							<span className={css.itemName}>{truncateAddress(s.id, 30)}</span>
+							<span className={css.itemSub}>
+								<a
+									className={css.itemCoverage}
+									href="#coverage"
+									onClick={e => {
+										e.preventDefault();
+										e.stopPropagation();
+
+										showCoverageModal(this.props.fs.coverageByPortfolioSource[s.id]);
+									}}
+								>
+									{this.props.fs.coverageByPortfolioSource[s.id]?.totalCoverage}
+								</a>
+							</span>
 							<a
 								href="#delete"
 								className={css.itemDelete}

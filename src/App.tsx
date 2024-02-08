@@ -22,9 +22,7 @@ import { FeedPostPage } from './pages/feed/feedPostPage/feedPostPage';
 import { SettingsPage } from './pages/settings/settingsPage';
 import { ServiceWorkerUpdateCallback } from './serviceWorkerRegistration';
 import { analytics } from './stores/Analytics';
-import { browserStorage } from './stores/browserStorage';
 import domain from './stores/Domain';
-import { DomainAccount } from './stores/models/DomainAccount';
 import { RoutePath } from './stores/routePath';
 import { useIsMatchesPattern, useNav } from './utils/url';
 import { Web3ModalManager } from './utils/walletconnect';
@@ -56,7 +54,7 @@ const RemoveTrailingSlash = () => {
 	return <></>;
 };
 
-function enableNotifications(accounts: DomainAccount[]) {
+function enableNotifications() {
 	function subscribe() {
 		navigator.serviceWorker
 			.getRegistration()
@@ -79,7 +77,7 @@ function enableNotifications(accounts: DomainAccount[]) {
 			})
 			.then(
 				subscription =>
-					subscription && Promise.all(accounts.map(a => MainviewApi.subscribe(a.token, subscription))),
+					subscription && MainviewApi.general.subscribeToBrowserPushes(domain.session, subscription),
 			);
 	}
 
@@ -155,19 +153,20 @@ export const App = observer(({ serviceWorkerUpdateCallback }: AppProps) => {
 		// This will work on any device except iOS Safari,
 		// where it's required to check notifications on user interaction.
 
-		const clickListener = () => {
-			document.body.removeEventListener('click', clickListener);
-			enableNotifications([domain.account!]);
-		};
+		if (domain.session && domain.account) {
+			enableNotifications();
 
-		if (domain.account) {
-			enableNotifications([domain.account]);
+			const clickListener = () => {
+				document.body.removeEventListener('click', clickListener);
+				enableNotifications();
+			};
+
 			document.body.addEventListener('click', clickListener);
-		}
 
-		return () => {
-			document.body.removeEventListener('click', clickListener);
-		};
+			return () => {
+				document.body.removeEventListener('click', clickListener);
+			};
+		}
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [domain.account]);
 
@@ -252,7 +251,7 @@ export const App = observer(({ serviceWorkerUpdateCallback }: AppProps) => {
 										<Navigate
 											replace
 											to={
-												(browserStorage.isAuthorized || true
+												(domain.account || true
 													? generatePath(RoutePath.FEED_SMART)
 													: generatePath(RoutePath.FEED_CATEGORY, { tag: '14' })) +
 												location.search

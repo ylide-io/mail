@@ -2,20 +2,11 @@ import { makeAutoObservable } from 'mobx';
 
 import { Section } from '../components/genericLayout/sidebar/sidebarMenu';
 import { toggleArrayItem } from '../utils/array';
-import { IDomainAccount } from './models/DomainAccount';
 
 enum BrowserStorageKey {
-	ADMIN_PASSWORD = 'ylide_adminPassword',
-	IS_MAIN_VIEW_BANNER_HIDDEN = 'ylide_isMainViewBannerHidden',
-	ACCOUNT_REMOTE_KEYS = 'ylide_accountRemoteKeys',
 	SIDEBAR_FOLDED_SECTIONS = 'ylide_sidebarFoldedSections',
-	SAVE_DECODED_MESSAGES = 'ylide_saveDecodedMessages',
-	WIDGET_ID = 'ylide_widgetId',
-	MAIN_VIEW_ACCOUNTS = 'ylide_mainViewAccounts',
+	SESSION = 'ylide_session',
 	REFERRER = 'ylide_referrer',
-	IS_AUTHORIZED = 'ylide_isAuthorized',
-	LAST_MAILBOX_INCOMING_DATE = 'ylide_lastMailboxCheckDate',
-	SAVED_ACCOUNTS = 'ylide_savedAccounts',
 }
 
 class BrowserStorage {
@@ -65,19 +56,17 @@ class BrowserStorage {
 
 	//
 
-	private _mainviewAccounts =
-		BrowserStorage.getItemWithTransform(
-			BrowserStorageKey.MAIN_VIEW_ACCOUNTS,
-			item => JSON.parse(item) as Record<string, IDomainAccount | undefined>,
-		) || {};
+	private _session =
+		BrowserStorage.getItemWithTransform(BrowserStorageKey.SESSION, item => JSON.parse(item) as string | null) ||
+		null;
 
-	get mainviewAccounts() {
-		return this._mainviewAccounts;
+	get session(): string | null {
+		return this._session;
 	}
 
-	set mainviewAccounts(value: Record<string, IDomainAccount | undefined>) {
-		BrowserStorage.setItem(BrowserStorageKey.MAIN_VIEW_ACCOUNTS, JSON.stringify(value));
-		this._mainviewAccounts = value;
+	set session(value: string | null) {
+		BrowserStorage.setItem(BrowserStorageKey.SESSION, JSON.stringify(value));
+		this._session = value;
 	}
 
 	//
@@ -88,16 +77,6 @@ class BrowserStorage {
 
 	set referrer(value: string) {
 		BrowserStorage.setItem(BrowserStorageKey.REFERRER, value);
-	}
-
-	//
-
-	get isAuthorized() {
-		return BrowserStorage.getItem(BrowserStorageKey.IS_AUTHORIZED) === 'true' || false;
-	}
-
-	set isAuthorized(value: boolean) {
-		BrowserStorage.setItem(BrowserStorageKey.IS_AUTHORIZED, value ? 'true' : 'false');
 	}
 }
 

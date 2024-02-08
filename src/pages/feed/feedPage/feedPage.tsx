@@ -20,7 +20,7 @@ import { useNav } from '../../../utils/url';
 import { FeedPostItem } from '../_common/feedPostItem/feedPostItem';
 import css from './feedPage.module.scss';
 import ErrorCode = FeedServerApi.ErrorCode;
-import { connectAccount } from '../../../utils/account';
+import { connectWalletAccount } from '../../../utils/account';
 import { Paywall } from './paywall';
 
 const reloadFeedCounter = observable.box(0);
@@ -35,7 +35,7 @@ const FeedPageContent = observer(() => {
 	const navigate = useNav();
 	const genericLayoutApi = useGenericLayoutApi();
 
-	const canLoadFeed = Boolean(tag || domain.account);
+	const canLoadFeed = Boolean(tag || (domain.account && domain.account.inited));
 
 	const reloadCounter = reloadFeedCounter.get();
 
@@ -68,6 +68,7 @@ const FeedPageContent = observer(() => {
 
 	const feed = useMemo(() => {
 		hookDependency(reloadCounter);
+		hookDependency(feedData);
 
 		const feed = new FeedStore(feedDescriptor);
 
@@ -78,7 +79,6 @@ const FeedPageContent = observer(() => {
 		}
 
 		return feed;
-		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [reloadCounter, feedDescriptor, genericLayoutApi, canLoadFeed, feedData]);
 
 	useEffect(() => {
@@ -224,21 +224,23 @@ const FeedPageContent = observer(() => {
 					<div className={css.loader}>
 						<SimpleLoader />
 					</div>
-				) : (
-					canLoadFeed || (
-						<ErrorMessage look={ErrorMessageLook.INFO}>
-							<div>
-								You need to connect a crypto wallet in order to use <b>Smart feed</b> 🔥
-							</div>
-							<ActionButton
-								look={ActionButtonLook.PRIMARY}
-								onClick={() => connectAccount({ place: 'feed_no-accounts' })}
-							>
-								Connect wallet
-							</ActionButton>
-						</ErrorMessage>
-					)
-				)}
+				) : !domain.account ? (
+					<ErrorMessage look={ErrorMessageLook.INFO}>
+						<div>
+							You need to connect a crypto wallet in order to use <b>Smart feed</b> 🔥
+						</div>
+						<ActionButton
+							look={ActionButtonLook.PRIMARY}
+							onClick={() => connectWalletAccount({ place: 'feed_no-accounts' })}
+						>
+							Connect wallet
+						</ActionButton>
+					</ErrorMessage>
+				) : !domain.account.inited ? (
+					<ErrorMessage look={ErrorMessageLook.INFO}>
+						<div>You need to wait until your feed is initialized.</div>
+					</ErrorMessage>
+				) : null}
 			</div>
 		</NarrowContent>
 	);

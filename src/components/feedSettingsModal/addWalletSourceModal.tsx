@@ -79,27 +79,32 @@ class CoverageBlock extends PureComponent<CoverageBlockProps> {
 
 interface AddWalletSourceModalProps {
 	fs: FeedSettings;
-	close: (result?: { address: string; projects: AffectedProjectLink[] }) => void;
+	close: (result?: {
+		address: string;
+		projects: AffectedProjectLink[];
+		coverageData: MainviewApi.CoverageData[];
+	}) => void;
 }
 
 @observer
 export class AddWalletSourceModal extends PureComponent<AddWalletSourceModalProps> {
 	static show(fs: FeedSettings) {
-		return showStaticComponent<{ address: string; projects: AffectedProjectLink[] } | undefined>(resolve => (
-			<AddWalletSourceModal close={resolve} fs={fs} />
-		));
+		return showStaticComponent<
+			{ address: string; projects: AffectedProjectLink[]; coverageData: MainviewApi.CoverageData[] } | undefined
+		>(resolve => <AddWalletSourceModal close={resolve} fs={fs} />);
 	}
 
 	@observable value: string = '';
 	@observable loadedForAddress: string = '';
-	@observable currentMap: PortfolioSourceToAffectedProjectsMap = {};
+	@observable affectedProjectsMap: PortfolioSourceToAffectedProjectsMap = {};
+	@observable coverageDataMap: Record<string, MainviewApi.CoverageData[]> = {};
 
 	@observable loaded = false;
 	@observable loading = false;
 
 	@computed get data() {
-		if (this.loadedForAddress && this.currentMap[this.loadedForAddress]) {
-			return this.currentMap[this.loadedForAddress];
+		if (this.loadedForAddress && this.affectedProjectsMap[this.loadedForAddress]) {
+			return this.affectedProjectsMap[this.loadedForAddress];
 		} else {
 			return null;
 		}
@@ -111,18 +116,20 @@ export class AddWalletSourceModal extends PureComponent<AddWalletSourceModalProp
 		}
 		this.loading = true;
 		const loadingFor = this.value.toLowerCase();
-		const sourcesData = await MainviewApi.getPortfolioSourcesData({
-			token: domain.account.token,
-			sources: [
-				{
-					type: 'wallet',
-					id: loadingFor,
-				},
-			],
-		});
+		const { portfolioSourceToAffectedProjects, portfolioSourceToCoverageData } =
+			await MainviewApi.feeds.getPortfolioSourcesData({
+				token: domain.session,
+				sources: [
+					{
+						type: 'wallet',
+						id: loadingFor,
+					},
+				],
+			});
 		runInAction(() => {
 			this.loadedForAddress = loadingFor;
-			this.currentMap = sourcesData;
+			this.affectedProjectsMap = portfolioSourceToAffectedProjects;
+			this.coverageDataMap = portfolioSourceToCoverageData;
 			this.loaded = true;
 			this.loading = false;
 		});
@@ -169,7 +176,7 @@ export class AddWalletSourceModal extends PureComponent<AddWalletSourceModalProp
 												type: 'wallet',
 											},
 										]}
-										portfolioSourceToAffectedProjectsMap={this.currentMap}
+										portfolioSourceToAffectedProjectsMap={this.affectedProjectsMap}
 									/>
 								</div>
 							) : (
@@ -184,7 +191,8 @@ export class AddWalletSourceModal extends PureComponent<AddWalletSourceModalProp
 									onClick={e => {
 										this.props.close({
 											address: this.loadedForAddress,
-											projects: this.currentMap[this.loadedForAddress],
+											projects: this.affectedProjectsMap[this.loadedForAddress],
+											coverageData: this.coverageDataMap[this.loadedForAddress],
 										});
 									}}
 								>

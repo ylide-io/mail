@@ -1,29 +1,28 @@
 import { useWeb3Modal } from '@web3modal/wagmi/react';
-import { autorun, makeObservable, observable } from 'mobx';
+import { action, autorun, makeObservable, observable } from 'mobx';
 import { useSignMessage } from 'wagmi';
 
 import { MainviewApi } from '../api/mainviewApi';
+import asyncTimer from '../utils/asyncTimer';
 import { ensurePageLoaded } from '../utils/ensurePageLoaded';
 import { isPaid, isTrialActive } from '../utils/payments';
 import { browserStorage } from './browserStorage';
-import { FeedsRepository } from './FeedsRepository';
 import { FeedSourcesStore } from './FeedSources';
+import { FeedsRepository } from './FeedsRepository';
 import { DomainAccount } from './models/DomainAccount';
-
-// Ylide.verbose();
 
 type OpenOptions = Parameters<ReturnType<typeof useWeb3Modal>['open']>[0];
 type SignMessageArgs = Parameters<ReturnType<typeof useSignMessage>['signMessageAsync']>[0];
 
 export class Domain {
-	savedPassword: string | null = null;
-
 	@observable initialized = false;
 
-	@observable devMode = false; //document.location.href.includes('localhost');
-	@observable address: string | null = null;
+	address: string | undefined = undefined;
+
+	@observable session!: string;
 	@observable account: DomainAccount | null = null;
-	@observable accountPlan: MainviewApi.AccountPlan | undefined = undefined;
+	@observable accountPlan: MainviewApi.AccountPlan | null = null;
+
 	@observable tooMuch: boolean = false;
 
 	feedsRepository: FeedsRepository;
@@ -36,36 +35,14 @@ export class Domain {
 	constructor() {
 		makeObservable(this);
 
-		autorun(() => {
-			if (this.account) {
-				this.accountPlan = undefined;
-				MainviewApi.getAccountPlan(this.account)
-					.then(plan => {
-						this.accountPlan = plan;
-					})
-					.catch(err => {
-						console.error(err);
-					});
-			} else {
-				this.accountPlan = undefined;
-			}
-		});
-
 		this.feedsRepository = new FeedsRepository(this);
-
-		window.addEventListener('keydown', e => {
-			if (e.ctrlKey && e.key === 'KeyD') {
-				this.devMode = !this.devMode;
-			}
-		});
 	}
 
 	async reloadAccountPlan() {
 		if (this.account) {
-			this.accountPlan = undefined;
-			this.accountPlan = await MainviewApi.getAccountPlan(this.account);
+			this.accountPlan = await MainviewApi.payments.getAccountPlan({ token: this.session });
 		} else {
-			this.accountPlan = undefined;
+			this.accountPlan = null;
 		}
 	}
 
@@ -83,13 +60,13 @@ export class Domain {
 
 	onGetAccount: null | ((addr: string | undefined) => void) = null;
 
-	showAccountModal() {
-		this._open({
-			view: 'Account',
-		});
-	}
+	// showAccountModal() {
+	// 	this._open({
+	// 		view: 'Account',
+	// 	});
+	// }
 
-	async connectAccount(): Promise<string | undefined> {
+	async requestWalletAccount(): Promise<string | undefined> {
 		return new Promise(async (resolve, reject) => {
 			if (this.address) {
 				resolve(this.address);
@@ -109,44 +86,98 @@ export class Domain {
 		});
 	}
 
-	disconnectAccount() {
+	disconnectWalletAccount() {
 		this._disconnect();
 	}
 
 	_gotAddress(addr: string | undefined) {
-		this.address = addr || null;
+		if (addr === this.address) {
+			return;
+		}
+		this.address = addr;
+		console.log('addr: ', addr);
 		if (this.onGetAccount) {
 			this.onGetAccount(addr);
 		} else {
-			if (!addr) {
-				browserStorage.mainviewAccounts = {};
-			}
-			const address = (addr || '').toLowerCase();
-			if (addr && browserStorage.mainviewAccounts[address]) {
-				browserStorage.isAuthorized = true;
-				const d = browserStorage.mainviewAccounts[address]!;
-				this.account = new DomainAccount(
-					d.id,
-					d.address,
-					d.email,
-					d.defaultFeedId,
-					d.plan,
-					d.planEndsAt,
-					d.token,
-				);
-			} else {
-				browserStorage.isAuthorized = false;
-				this.account = null;
-			}
+			//
 		}
 	}
+
+	@action
+	async logout() {
+		await MainviewApi.auth.logout(this.session);
+
+		this.account = null;
+		this.accountPlan = null;
+		this.feedsRepository.feedAccesses = [];
+		this.feedsRepository.feedDataById.clear();
+		this.feedsRepository.feedSettingsById.clear();
+	}
+
+	// analytics.mainviewOnboardingEvent('feed-initialized');
+	// analytics.mainviewOnboardingEvent('feed-initialization-error');
+
+	initingTimer: null | (() => void) = null;
 
 	async init() {
 		if (this.initialized) {
 			return;
 		}
-		await ensurePageLoaded;
+		await Promise.all([
+			MainviewApi.auth.session(browserStorage.session).then(session => {
+				if (session.type === 'new') {
+					browserStorage.session = session.token;
+					this.session = session.token;
+					this.account = null;
+					this.accountPlan = null;
+				} else {
+					this.session = browserStorage.session!;
+					this.account = session.account
+						? new DomainAccount(
+								session.account.id,
+								session.account.address,
+								session.account.email,
+								session.account.defaultFeedId,
+								session.account.plan,
+								session.account.planEndsAt,
+								session.account.inited,
+						  )
+						: null;
+				}
+			}),
+		]);
+
 		this.initialized = true;
+
+		autorun(() => {
+			if (this.account && !this.account.inited) {
+				if (this.initingTimer) {
+					this.initingTimer();
+					this.initingTimer = null;
+				}
+				this.initingTimer = asyncTimer(async () => {
+					if (!this.account) {
+						return;
+					}
+					const { inited, initing } = await MainviewApi.general.checkInited(this.session);
+					if (inited) {
+						this.account.inited = true;
+					} else {
+						if (initing) {
+							console.log('just waiting');
+						} else {
+							console.log('requesting reinit');
+							await MainviewApi.general.reinit(this.session);
+						}
+					}
+				}, 2000);
+			} else {
+				if (this.initingTimer) {
+					this.initingTimer();
+					this.initingTimer = null;
+				}
+			}
+		});
 	}
 }
 

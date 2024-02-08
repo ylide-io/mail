@@ -36,7 +36,7 @@ export class FeedStore {
 			const response = await FeedServerApi.getPosts({
 				...params,
 				feedDescriptor: this.feed,
-				token: domain.account?.token,
+				token: domain.session,
 			});
 
 			this.loaded = true;

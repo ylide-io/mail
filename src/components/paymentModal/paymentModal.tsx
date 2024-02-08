@@ -64,8 +64,8 @@ export const PricingModal = observer(({ account, onReserved, onReservationFailed
 			setLoadingPlanId(planId);
 
 			try {
-				const reservation = await MainviewApi.buyPlan({
-					token: account.token,
+				const reservation = await MainviewApi.payments.buyPlan({
+					token: domain.session,
 					planId,
 					amount: 1,
 				});
@@ -235,7 +235,7 @@ export const PaymentModal = observer(({ account, onResolve }: { account: DomainA
 			account,
 		});
 		let cancelled = false;
-		MainviewApi.getAccountPlan(account).then(info => {
+		MainviewApi.payments.getAccountPlan({ token: domain.session }).then(info => {
 			if (!cancelled) {
 				setAccountPlan(info);
 				if (info?.activeReservations.length) {
@@ -261,7 +261,7 @@ export const PaymentModal = observer(({ account, onResolve }: { account: DomainA
 		if (step.type === StepType.PAYMENT_WAITING) {
 			let cancelled = false;
 			const timer = setInterval(() => {
-				MainviewApi.getAccountPlan(account).then(info => {
+				MainviewApi.payments.getAccountPlan({ token: domain.session }).then(info => {
 					if (cancelled) {
 						return;
 					}

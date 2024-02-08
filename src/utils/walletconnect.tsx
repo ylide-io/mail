@@ -32,13 +32,13 @@ const wagmiConfig = setupWeb3Modal();
 type Web3ModalManagerProps = PropsWithChildren;
 
 export function Web3ModalManager({ children }: Web3ModalManagerProps) {
-	const { setThemeVariables } = useWeb3ModalTheme();
+	// const { setThemeVariables } = useWeb3ModalTheme();
 
-	useEffect(() => {
-		setThemeVariables({
-			'--w3m-accent': '#f8cb53',
-		});
-	}, []);
+	// useEffect(() => {
+	// 	setThemeVariables({
+	// 		'--w3m-accent': '#f8cb53',
+	// 	});
+	// }, [setThemeVariables]);
 
 	return <WagmiConfig config={wagmiConfig}>{children}</WagmiConfig>;
 }

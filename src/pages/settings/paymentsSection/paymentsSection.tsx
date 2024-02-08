@@ -4,6 +4,7 @@ import { useQuery } from 'react-query';
 import { MainviewApi } from '../../../api/mainviewApi';
 import { ErrorMessage, ErrorMessageLook } from '../../../components/errorMessage/errorMessage';
 import { YlideLoader } from '../../../components/ylideLoader/ylideLoader';
+import domain from '../../../stores/Domain';
 import { DomainAccount } from '../../../stores/models/DomainAccount';
 import { DateFormatStyle, formatDate } from '../../../utils/date';
 import { constrain } from '../../../utils/number';
@@ -16,11 +17,11 @@ export interface PaymentsSectionProps {
 
 export const PaymentsSection = observer(({ account }: PaymentsSectionProps) => {
 	const accountPlan = useQuery(['payment', 'info', account.address], {
-		queryFn: () => MainviewApi.getAccountPlan(account),
+		queryFn: () => MainviewApi.payments.getAccountPlan({ token: domain.session }),
 	});
 
 	const transactions = useQuery(['payment', 'transactions', account.address], {
-		queryFn: () => MainviewApi.getTransactions(account),
+		queryFn: () => MainviewApi.payments.getTransactions({ token: domain.session }),
 	});
 
 	return (

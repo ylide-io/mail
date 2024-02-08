@@ -7,10 +7,15 @@ import { ActionButton, ActionButtonLook, ActionButtonSize } from '../ActionButto
 import { ActionModal } from '../actionModal/actionModal';
 import { CheckBox } from '../checkBox/checkBox';
 import css from './coverageModal.module.scss';
+import { showStaticComponent } from '../staticComponentManager/staticComponentManager';
 
 type Props = {
 	coverage: MainviewApi.Coverage;
 	onClose?: () => void;
+};
+
+export const showCoverageModal = async (coverage: MainviewApi.Coverage) => {
+	return await showStaticComponent(resolve => <CoverageModal coverage={coverage} onClose={resolve} />);
 };
 
 export const CoverageModal = observer(({ onClose, coverage }: Props) => {

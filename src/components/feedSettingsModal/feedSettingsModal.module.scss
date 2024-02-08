@@ -94,6 +94,15 @@
 
 	border-right: 1px solid #e0e0e0;
 
+	.portfolioCoveragePlate {
+		display: inline-flex;
+
+		font-size: 11px;
+		color: #404040;
+		border-bottom: 1px dotted #a0a0a0;
+		margin-left: 4px;
+	}
+
 	.portfolioBlock {
 		display: flex;
 		flex-direction: column;
@@ -166,6 +175,11 @@
 					font-family: monospace;
 					font-weight: 400;
 					font-size: 12px;
+				}
+
+				.itemCoverage {
+					color: #404040;
+					border-bottom: 1px dotted #a0a0a0;
 				}
 
 				.itemDelete {

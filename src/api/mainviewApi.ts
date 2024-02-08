@@ -1,7 +1,6 @@
 import { REACT_APP__FEED_MANAGER } from '../env';
 import { PortfolioSource, PortfolioSourceToAffectedProjectsMap } from '../shared/PortfolioScope';
 import { IDomainAccount } from '../stores/models/DomainAccount';
-import { AuthorizationPayload } from '../types';
 import { createCleanSerachParams } from '../utils/url';
 
 export namespace MainviewApi {
@@ -81,23 +80,14 @@ export namespace MainviewApi {
 
 	//
 
+	export interface SignatureAuthorizationPayload {
+		address: string;
+		signature: string;
+		timestamp: number;
+	}
+
 	export interface AuthAddressResponse extends IDomainAccount {
-		//
-	}
-
-	export async function authAddress(data: AuthorizationPayload, referrer?: string | null) {
-		const query = referrer ? { referrer } : undefined;
-		return await request<AuthAddressResponse>({ path: `/v3/new-auth-address`, data, query });
-	}
-
-	//
-
-	export async function init(token: string, tvm?: string) {
-		return await request<undefined | { inLine: boolean }>({ path: `/v3/init`, token, query: { tvm } });
-	}
-
-	export async function checkInit(token: string) {
-		return await request<boolean>({ path: `/v3/check-init`, token });
+		initing: boolean;
 	}
 
 	export interface CoverageItem {
@@ -181,25 +171,6 @@ export namespace MainviewApi {
 		};
 	};
 
-	export async function getCoverage(token: string) {
-		return await request<CoverageData[]>({ path: `/v3/coverage`, token });
-	}
-
-	export type TagsResponse = {
-		id: number;
-		name: string;
-	}[];
-
-	export async function getTags() {
-		return await request<TagsResponse>({ path: '/v3/tags' });
-	}
-
-	export async function subscribe(token: string, subscription: PushSubscription) {
-		return await request({ path: '/v3/save-subscription', token, data: { subscription } });
-	}
-
-	//
-
 	export enum ConfigMode {
 		AUTO_ADD = 'auto-add',
 		DONT_ADD = 'dont-add',
@@ -223,6 +194,7 @@ export namespace MainviewApi {
 
 	export interface FeedDataResponse {
 		feed: MVFeedEntity;
+		coverage: CoverageData[];
 		owner: { id: string; name: string };
 		accesses: { type: 'email' | 'address'; value: string; role: MVFeedAccessRole }[];
 		portfolioSourceToAffectedProjects: PortfolioSourceToAffectedProjectsMap;
@@ -241,64 +213,10 @@ export namespace MainviewApi {
 		}[];
 	}
 
-	export async function getFeedData({ token, feedId = 'default' }: { token: string; feedId: string }) {
-		return await request<FeedDataResponse>({ path: `/v4/feed/${feedId}`, token: token });
-	}
-
-	export async function getFeeds({ token }: { token: string }) {
-		return await request<FeedsResponse>({ path: `/v4/feeds`, token: token });
-	}
-
-	export async function checkAddressAvailability({ token, address }: { token: string; address: string }) {
-		return await request<{
-			available: boolean;
-			trackingWallets: string[];
-			isTracked: boolean;
-			quota: number;
-		}>({ path: `/v4/check-address`, token, query: { address } });
-	}
-
-	export async function getPortfolioSourcesData({ token, sources }: { token: string; sources: PortfolioSource[] }) {
-		return await request<PortfolioSourceToAffectedProjectsMap>({
-			path: `/v4/portfolio-sources?sources=${JSON.stringify(sources)}`,
-			token,
-		});
-	}
-
-	export async function getWalletsQuota({ token }: { token: string }) {
-		return await request<{ quota: number; uniqueWallets: string[] }>({
-			path: `/v4/quota`,
-			token,
-		});
-	}
-
-	export async function setConfig(params: {
-		token: string;
-		config: {
-			mode: ConfigMode;
-			includedSourceIds: string[];
-			excludedSourceIds: string[];
-		};
-	}) {
-		return await request({ path: `/v3/set-config`, data: params.config, token: params.token });
-	}
-
-	export async function saveFeed(params: {
-		token: string;
-		feedId: string;
-		config: {
-			mode: ConfigMode;
-			includedSourceIds: string[];
-			excludedSourceIds: string[];
-			sources: PortfolioSource[];
-			settings: {
-				tresholdType: 'percent' | 'value';
-				tresholdValue: number;
-			};
-		};
-	}) {
-		return await request({ path: `/v4/feed/${params.feedId}`, data: params.config, token: params.token });
-	}
+	export type TagsResponse = {
+		id: number;
+		name: string;
+	}[];
 
 	export interface ReservationPlan {
 		name: string;
@@ -344,19 +262,120 @@ export namespace MainviewApi {
 		lastPaidTx: TreasuryTransaction | null;
 	}
 
-	export async function getAccountPlan(params: { token: string }) {
-		return await request<AccountPlan>({ path: '/v3/payments/plan', token: params.token });
-	}
+	// --------------------------------------------
 
-	export async function buyPlan(params: { token: string; planId: string; amount: number }) {
-		return await request<TreasuryReservation>({
-			path: '/v3/payments/buy',
-			data: { planId: params.planId, amount: params.amount },
-			token: params.token,
-		});
-	}
+	export const auth = {
+		session: async (token?: string | undefined | null) => {
+			return await request<
+				{ type: 'new'; token: string } | { type: 'existing'; account: null | AuthAddressResponse }
+			>({
+				path: `/v4/auth/session`,
+				token: token || undefined,
+			});
+		},
 
-	export async function getTransactions(params: { token: string }) {
-		return await request<TreasuryTransaction[]>({ path: '/v3/payments/transactions', token: params.token });
-	}
+		authBySignature: async (token: string, data: SignatureAuthorizationPayload, referrer?: string | null) => {
+			const query = referrer ? { referrer } : undefined;
+			return await request<AuthAddressResponse>({ path: `/v4/auth/signature`, token, data, query });
+		},
+
+		logout: async (token: string) => {
+			return await request<void>({ path: `/v4/auth/logout`, token, data: {} });
+		},
+	};
+
+	//
+
+	export const general = {
+		reinit: async (token: string) => {
+			return await request<void>({ path: `/v4/reinit`, token });
+		},
+
+		checkInited: async (token: string) => {
+			return await request<{ initing: boolean; inited: boolean }>({ path: `/v4/check-inited`, token });
+		},
+
+		getTags: async () => {
+			return await request<TagsResponse>({ path: '/v4/tags' });
+		},
+
+		subscribeToBrowserPushes: async (token: string, subscription: PushSubscription) => {
+			return await request({ path: '/v4/push/browser', token, data: { subscription } });
+		},
+	};
+
+	//
+
+	export const feeds = {
+		getFeeds: async ({ token }: { token: string }) => {
+			return await request<FeedsResponse>({ path: `/v4/feeds`, token: token });
+		},
+
+		getFeedData: async ({ token, feedId = 'default' }: { token: string; feedId: string }) => {
+			return await request<FeedDataResponse>({ path: `/v4/feed/${feedId}`, token: token });
+		},
+
+		checkAddressAvailability: async ({ token, address }: { token: string; address: string }) => {
+			return await request<{
+				available: boolean;
+				trackingWallets: string[];
+				isTracked: boolean;
+				quota: number;
+			}>({ path: `/v4/check-address`, token, query: { address } });
+		},
+
+		getPortfolioSourcesData: async ({ token, sources }: { token: string; sources: PortfolioSource[] }) => {
+			return await request<{
+				portfolioSourceToAffectedProjects: PortfolioSourceToAffectedProjectsMap;
+				portfolioSourceToCoverageData: Record<string, CoverageData[]>;
+			}>({
+				path: `/v4/portfolio-sources?sources=${JSON.stringify(sources)}`,
+				token,
+			});
+		},
+
+		getWalletsQuota: async ({ token }: { token: string }) => {
+			return await request<{ quota: number; uniqueWallets: string[] }>({
+				path: `/v4/quota`,
+				token,
+			});
+		},
+
+		saveFeed: async (params: {
+			token: string;
+			feedId: string;
+			config: {
+				mode: ConfigMode;
+				includedSourceIds: string[];
+				excludedSourceIds: string[];
+				sources: PortfolioSource[];
+				settings: {
+					tresholdType: 'percent' | 'value';
+					tresholdValue: number;
+				};
+			};
+		}) => {
+			return await request({ path: `/v4/feed/${params.feedId}`, data: params.config, token: params.token });
+		},
+	};
+
+	//
+
+	export const payments = {
+		getAccountPlan: async (params: { token: string }) => {
+			return await request<AccountPlan>({ path: '/v3/payments/plan', token: params.token });
+		},
+
+		buyPlan: async (params: { token: string; planId: string; amount: number }) => {
+			return await request<TreasuryReservation>({
+				path: '/v3/payments/buy',
+				data: { planId: params.planId, amount: params.amount },
+				token: params.token,
+			});
+		},
+
+		getTransactions: async (params: { token: string }) => {
+			return await request<TreasuryTransaction[]>({ path: '/v3/payments/transactions', token: params.token });
+		},
+	};
 }

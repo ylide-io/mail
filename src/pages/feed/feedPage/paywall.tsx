@@ -2,7 +2,7 @@ import { observer } from 'mobx-react';
 
 import { ActionButton, ActionButtonLook, ActionButtonSize } from '../../../components/ActionButton/ActionButton';
 import domain from '../../../stores/Domain';
-import { connectAccount, payAccount } from '../../../utils/account';
+import { connectWalletAccount, payAccount } from '../../../utils/account';
 
 const PaywallRow = ({
 	title,
@@ -145,7 +145,7 @@ export const Paywall = observer(({ type = 'generic' }: { type?: 'generic' | 'sma
 			<ActionButton
 				size={ActionButtonSize.LARGE}
 				look={ActionButtonLook.PRIMARY}
-				onClick={() => (toPay ? payAccount({ place: 'paywall' }) : connectAccount({ place: 'paywall' }))}
+				onClick={() => (toPay ? payAccount({ place: 'paywall' }) : connectWalletAccount({ place: 'paywall' }))}
 			>
 				{toPay ? `Activate paid account` : `Connect wallet`}
 			</ActionButton>

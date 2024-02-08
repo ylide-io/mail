@@ -38,7 +38,8 @@ export class FeedsRepository {
 	constructor(public readonly domain: Domain) {
 		makeObservable(this);
 
-		MainviewApi.getTags()
+		MainviewApi.general
+			.getTags()
 			.then(r => {
 				this.tags = r;
 			})
@@ -49,7 +50,7 @@ export class FeedsRepository {
 		autorun(() => {
 			if (domain.account) {
 				try {
-					MainviewApi.getFeeds(domain.account).then(({ feeds }) => {
+					MainviewApi.feeds.getFeeds({ token: domain.session }).then(({ feeds }) => {
 						this.feedAccesses = feeds.map(f => ({
 							accessLevel: f.accessLevel,
 							feedId: f.data.feed.id,
@@ -70,7 +71,7 @@ export class FeedsRepository {
 	}
 
 	async reloadFeed(feedId: string) {
-		const feedData = await MainviewApi.getFeedData({ token: this.domain.account!.token, feedId: feedId });
+		const feedData = await MainviewApi.feeds.getFeedData({ token: this.domain.session, feedId: feedId });
 		if (feedData) {
 			this.feedDataById.set(feedId, feedData);
 			this.feedSettingsById.get(feedId)?.updateBase(feedData);

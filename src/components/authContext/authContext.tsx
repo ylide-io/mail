@@ -1,14 +1,17 @@
+import { useWeb3Modal } from '@web3modal/wagmi/react';
 import { PropsWithChildren, useEffect } from 'react';
-import { useAccount, useSignMessage, useDisconnect } from 'wagmi';
+import { useAccount, useDisconnect, useSignMessage } from 'wagmi';
 
 import domain from '../../stores/Domain';
-import { useWeb3Modal } from '@web3modal/wagmi/react';
 
 export function AuthContextProvider({ children }: PropsWithChildren) {
 	const { address } = useAccount();
 	const { disconnect } = useDisconnect();
 	const { signMessageAsync } = useSignMessage();
 	const { open } = useWeb3Modal();
+
+	console.log('domain._gotAddress', address);
+	domain._gotAddress(address);
 
 	useEffect(() => {
 		domain._open = open;
@@ -21,11 +24,6 @@ export function AuthContextProvider({ children }: PropsWithChildren) {
 	useEffect(() => {
 		domain._signMessageAsync = signMessageAsync;
 	}, [signMessageAsync]);
-
-	useEffect(() => {
-		console.log('address: ', address);
-		domain._gotAddress(address);
-	}, [address]);
 
 	return children;
 }

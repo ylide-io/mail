@@ -105,7 +105,7 @@ export namespace FeedServerApi {
 		feedDescriptor: FeedDescriptor;
 		needOld: boolean;
 		length: number;
-		token?: string;
+		token: string;
 		lastPostId?: string;
 		firstPostId?: string;
 		checkNewPosts?: boolean;

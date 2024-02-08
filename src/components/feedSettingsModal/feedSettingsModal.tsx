@@ -54,33 +54,6 @@ export class FeedSettingsModal extends PureComponent<FeedSettingsModalProps> {
 	};
 
 	render() {
-		// if (this.fs.reloading) {
-		// 	return (
-		// 		<Modal>
-		// 			<YlideLoader style={{ marginTop: 30, marginBottom: 30 }} />
-		// 		</Modal>
-		// 	);
-		// }
-		// //  else if (this.fs.error) {
-		// // 	return (
-		// // 		<Modal>
-		// // 			<div>
-		// // 				Error loading rawFeed,{' '}
-		// // 				<a
-		// // 					href="#close"
-		// // 					onClick={e => {
-		// // 						e.preventDefault();
-		// // 						e.stopPropagation();
-		// // 						this.props.close();
-		// // 					}}
-		// // 				>
-		// // 					Close
-		// // 				</a>
-		// // 			</div>
-		// // 		</Modal>
-		// // 	);
-		// // }
-
 		const content = (
 			<div className={css.content}>
 				<FeedSettingsSidebar fs={this.fs} />

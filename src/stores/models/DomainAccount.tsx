@@ -6,7 +6,7 @@ export interface IDomainAccount {
 	plan: 'none' | 'trial' | 'basic' | 'pro';
 	planEndsAt: number;
 
-	token: string;
+	inited: boolean;
 }
 
 export class DomainAccount implements IDomainAccount {
@@ -14,10 +14,10 @@ export class DomainAccount implements IDomainAccount {
 	address: string;
 	email: string | null;
 	defaultFeedId: string;
-	private _plan: 'none' | 'trial' | 'basic' | 'pro';
+	private __plan: 'none' | 'trial' | 'basic' | 'pro';
 	planEndsAt: number;
 
-	token: string;
+	inited: boolean;
 
 	constructor(
 		id: string,
@@ -26,19 +26,28 @@ export class DomainAccount implements IDomainAccount {
 		defaultFeedId: string,
 		plan: 'none' | 'trial' | 'basic' | 'pro',
 		planEndsAt: number,
-		token: string,
+		inited: boolean,
 	) {
 		this.id = id;
 		this.address = address;
 		this.email = email;
 		this.defaultFeedId = defaultFeedId;
-		this._plan = plan;
+		this.__plan = plan;
 		this.planEndsAt = planEndsAt;
-		this.token = token;
+
+		this.inited = inited;
 	}
 
 	get name() {
 		return this.email || this.address;
+	}
+
+	get _plan() {
+		return this.__plan;
+	}
+
+	set plan(plan: 'none' | 'trial' | 'basic' | 'pro') {
+		this.__plan = plan;
 	}
 
 	get plan() {
@@ -46,9 +55,9 @@ export class DomainAccount implements IDomainAccount {
 		if (this.planEndsAt < now) {
 			return 'none';
 		}
-		if (this._plan === 'trial') {
+		if (this.__plan === 'trial') {
 			return 'basic';
 		}
-		return this._plan;
+		return this.__plan;
 	}
 }
