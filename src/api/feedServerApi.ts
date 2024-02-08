@@ -129,12 +129,13 @@ export namespace FeedServerApi {
 	export type GetPostResponse = { post: FeedPost };
 
 	export async function getPost(id: string): Promise<GetPostResponse> {
-		return await request(`/posts/${id}`);
+		return await request(`/v4/posts/${id}`);
 	}
 
 	export interface RawFeedProject {
 		id: number;
 		name: string;
+		logoUrl: string | null;
 	}
 
 	export interface RawFeedSource {
@@ -149,7 +150,7 @@ export namespace FeedServerApi {
 
 	export type GetSourcesResponse = { projects: RawFeedProject[]; sources: RawFeedSource[] };
 
-	export async function getSources(): Promise<GetSourcesResponse> {
-		return await request<GetSourcesResponse>('/sources');
+	export async function getSources({ token }: { token: string }): Promise<GetSourcesResponse> {
+		return await request<GetSourcesResponse>('/v4/sources', { token });
 	}
 }

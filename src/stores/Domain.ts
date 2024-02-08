@@ -4,7 +4,6 @@ import { useSignMessage } from 'wagmi';
 
 import { MainviewApi } from '../api/mainviewApi';
 import asyncTimer from '../utils/asyncTimer';
-import { ensurePageLoaded } from '../utils/ensurePageLoaded';
 import { isPaid, isTrialActive } from '../utils/payments';
 import { browserStorage } from './browserStorage';
 import { FeedSourcesStore } from './FeedSources';
@@ -26,7 +25,7 @@ export class Domain {
 	@observable tooMuch: boolean = false;
 
 	feedsRepository: FeedsRepository;
-	feedSources: FeedSourcesStore = new FeedSourcesStore();
+	feedSources: FeedSourcesStore;
 
 	_open: (opts?: OpenOptions) => void = () => {};
 	_disconnect: () => void = () => {};
@@ -36,6 +35,7 @@ export class Domain {
 		makeObservable(this);
 
 		this.feedsRepository = new FeedsRepository(this);
+		this.feedSources = new FeedSourcesStore(this);
 	}
 
 	async reloadAccountPlan() {

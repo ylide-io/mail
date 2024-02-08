@@ -423,6 +423,38 @@ export class FeedSettings {
 		this.updateActiveSourceIds();
 	}
 
+	@action
+	activateProjects(projectIds: number[]) {
+		for (const projectId of projectIds) {
+			const feedSources = domain.feedSources.sourcesByProjectId.get(projectId);
+			if (!feedSources) {
+				return;
+			}
+
+			for (const sourceId of feedSources.map(s => s.id)) {
+				this._activateSource(sourceId);
+			}
+		}
+
+		this.updateActiveSourceIds();
+	}
+
+	@action
+	deactivateProjects(projectIds: number[]) {
+		for (const projectId of projectIds) {
+			const feedSources = domain.feedSources.sourcesByProjectId.get(projectId);
+			if (!feedSources) {
+				return;
+			}
+
+			for (const sourceId of feedSources.map(s => s.id)) {
+				this._deactivateSource(sourceId);
+			}
+		}
+
+		this.updateActiveSourceIds();
+	}
+
 	async save() {
 		await MainviewApi.feeds.saveFeed({
 			token: domain.session,

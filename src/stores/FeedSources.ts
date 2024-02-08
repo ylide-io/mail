@@ -1,17 +1,20 @@
-import { action, makeObservable, observable, runInAction } from 'mobx';
+import { action, autorun, makeObservable, observable, runInAction } from 'mobx';
 
 import { FeedServerApi, LinkType } from '../api/feedServerApi';
 import { BaseFeedProject, BaseFeedSource, FeedSourcesScope } from '../shared/FeedSourcesScope';
+import type { Domain } from './Domain';
 
 export class FeedProject extends BaseFeedProject {
 	readonly id: number;
 	readonly name: string;
+	readonly logoUrl: string | null;
 
-	constructor(public readonly store: FeedSourcesStore, id: number, name: string) {
+	constructor(public readonly store: FeedSourcesStore, id: number, name: string, logoUrl: string | null) {
 		super(id);
 
 		this.id = id;
 		this.name = name;
+		this.logoUrl = logoUrl;
 	}
 }
 
@@ -55,7 +58,7 @@ export class FeedSourcesStore extends FeedSourcesScope<FeedProject, FeedSource> 
 	loaded = false;
 	loading = true;
 
-	constructor() {
+	constructor(domain: Domain) {
 		super();
 
 		makeObservable(this, {
@@ -74,15 +77,21 @@ export class FeedSourcesStore extends FeedSourcesScope<FeedProject, FeedSource> 
 			updateProjectsAndSources: action,
 		});
 
-		FeedServerApi.getSources()
-			.then(({ projects, sources }) => {
-				runInAction(() => {
-					this.loading = false;
-					this.loaded = true;
-					this.updateRawProjectsAndSources(projects, sources);
-				});
-			})
-			.catch(() => (this.isError = true));
+		autorun(() => {
+			if (!domain.session || !domain.account) {
+				return;
+			}
+
+			FeedServerApi.getSources({ token: domain.session })
+				.then(({ projects, sources }) => {
+					runInAction(() => {
+						this.loading = false;
+						this.loaded = true;
+						this.updateRawProjectsAndSources(projects, sources);
+					});
+				})
+				.catch(() => (this.isError = true));
+		});
 	}
 
 	buildRawSources(newSources: FeedServerApi.RawFeedSource[]) {
@@ -93,7 +102,7 @@ export class FeedSourcesStore extends FeedSourcesScope<FeedProject, FeedSource> 
 
 	buildRawProjects(newProjects: FeedServerApi.RawFeedProject[]) {
 		return newProjects.map(project => {
-			return new FeedProject(this, project.id, project.name);
+			return new FeedProject(this, project.id, project.name, project.logoUrl);
 		});
 	}
 

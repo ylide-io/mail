@@ -86,9 +86,16 @@ const FeedSourcesRow = (fs: FeedSettings) =>
 			return (
 				<div className={css.category} key={`row-${index}`} style={style}>
 					<CheckBox
-						isChecked={true} // sourcesByReason[reason].every(s => selectedSourceIds.includes(s.id))
-						onChange={isChecked => {
-							//
+						isChecked={fs.groups[reason].some(projectId => {
+							const projectSources = domain.feedSources.sourcesByProjectId.get(projectId);
+							return projectSources ? projectSources.some(s => fs.activeSourceIds.has(s.id)) : false;
+						})}
+						onChange={v => {
+							if (v) {
+								fs.activateProjects(fs.groups[reason]);
+							} else {
+								fs.deactivateProjects(fs.groups[reason]);
+							}
 						}}
 					/>
 					<div className={css.categoryReason}>
@@ -113,7 +120,10 @@ const FeedSourcesRow = (fs: FeedSettings) =>
 			const projectId = Number(second);
 			const project = domain.feedSources.projectsMap.get(projectId);
 			const projectSources = domain.feedSources.sourcesByProjectId.get(projectId);
-			const sourceAvatar = projectSources ? projectSources.find(s => s.avatar)?.avatar : undefined;
+
+			// const sourceAvatar = projectSources ? projectSources.find(s => s.avatar)?.avatar : undefined;
+			const projectLogo = project?.logoUrl || null;
+
 			const isChecked = projectSources ? projectSources.some(s => fs.activeSourceIds.has(s.id)) : false;
 
 			return (
@@ -134,7 +144,11 @@ const FeedSourcesRow = (fs: FeedSettings) =>
 					/>
 
 					<div className={css.projectName}>
-						<Avatar image={sourceAvatar} placeholder={<ContactSvg width="100%" height="100%" />} />
+						<Avatar
+							image={projectLogo || undefined}
+							placeholder={<ContactSvg width="100%" height="100%" />}
+						/>
+						{/* <Avatar image={sourceAvatar} placeholder={<ContactSvg width="100%" height="100%" />} /> */}
 
 						<div className={css.projectNameText}>{project?.name || 'Unknown'}</div>
 					</div>
