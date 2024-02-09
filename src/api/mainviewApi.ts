@@ -324,12 +324,22 @@ export namespace MainviewApi {
 			}>({ path: `/v4/check-address`, token, query: { address } });
 		},
 
-		getPortfolioSourcesData: async ({ token, sources }: { token: string; sources: PortfolioSource[] }) => {
+		getPortfolioSourcesData: async ({
+			token,
+			sources,
+			reason,
+		}: {
+			token: string;
+			sources: PortfolioSource[];
+			reason: string;
+		}) => {
 			return await request<{
 				portfolioSourceToAffectedProjects: PortfolioSourceToAffectedProjectsMap;
 				portfolioSourceToCoverageData: Record<string, CoverageData[]>;
 			}>({
-				path: `/v4/portfolio-sources?sources=${JSON.stringify(sources)}`,
+				path: `/v4/portfolio-sources?sources=${encodeURIComponent(
+					JSON.stringify(sources),
+				)}&reason=${encodeURIComponent(reason)}`,
 				token,
 			});
 		},
@@ -354,16 +364,24 @@ export namespace MainviewApi {
 					tresholdValue: number;
 				};
 			};
+			updateType: string;
 		}) => {
-			return await request({ path: `/v4/feed/${params.feedId}`, data: params.config, token: params.token });
+			return await request({
+				path: `/v4/feed/${params.feedId}?updateType=${encodeURIComponent(params.updateType)}`,
+				data: params.config,
+				token: params.token,
+			});
 		},
 	};
 
 	//
 
 	export const payments = {
-		getAccountPlan: async (params: { token: string }) => {
-			return await request<AccountPlan>({ path: '/v3/payments/plan', token: params.token });
+		getAccountPlan: async (params: { token: string; reason: string }) => {
+			return await request<AccountPlan>({
+				path: `/v4/payments/plan?reason=${encodeURIComponent(params.reason)}`,
+				token: params.token,
+			});
 		},
 
 		buyPlan: async (params: { token: string; planId: string; amount: number }) => {
@@ -375,7 +393,7 @@ export namespace MainviewApi {
 		},
 
 		getTransactions: async (params: { token: string }) => {
-			return await request<TreasuryTransaction[]>({ path: '/v3/payments/transactions', token: params.token });
+			return await request<TreasuryTransaction[]>({ path: '/v4/payments/transactions', token: params.token });
 		},
 	};
 }

@@ -19,7 +19,6 @@ import { APP_NAME } from './constants';
 import { REACT_APP__VAPID_PUBLIC_KEY } from './env';
 import { FeedPage } from './pages/feed/feedPage/feedPage';
 import { FeedPostPage } from './pages/feed/feedPostPage/feedPostPage';
-import { SettingsPage } from './pages/settings/settingsPage';
 import { ServiceWorkerUpdateCallback } from './serviceWorkerRegistration';
 import { analytics } from './stores/Analytics';
 import domain from './stores/Domain';
@@ -265,9 +264,6 @@ export const App = observer(({ serviceWorkerUpdateCallback }: AppProps) => {
 								<Route path={RoutePath.FEED_SOURCE} element={<FeedPage />} />
 								<Route path={RoutePath.FEED_SMART} element={<FeedPage />} />
 								<Route path={RoutePath.FEED_SMART_EXACT} element={<FeedPage />} />
-
-								<Route path={RoutePath.SETTINGS_ADDRESS} element={<SettingsPage />} />
-								<Route path={RoutePath.SETTINGS_ADDRESS_SECTION} element={<SettingsPage />} />
 
 								<Route
 									path={RoutePath.ANY}

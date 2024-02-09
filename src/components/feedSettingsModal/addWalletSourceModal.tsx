@@ -57,13 +57,15 @@ class CoverageBlock extends PureComponent<CoverageBlockProps> {
 					const meta = portfolio.projectToPortfolioMetaMap[projectId];
 					const project = domain.feedSources.projectsMap.get(projectId);
 					return (
-						<div key={projectId} className={css.coverageItem}>
+						<div key={projectId} className={css.coverageItem} data-projectId={projectId}>
 							<div className={css.coverageItemLogo}>
-								<Avatar blockie="0x1234" />
+								<Avatar image={project?.logoUrl || undefined} />
 							</div>
 							<div className={css.coverageItemData}>
 								<div className={css.coverageItemTitle}>
-									<span className={css.coverateItemTitleText}>{project?.name || '[Unknown]'}</span>
+									<span className={css.coverateItemTitleText}>
+										{!projectId ? 'Others' : project?.name || '[Unknown]'}
+									</span>
 								</div>
 								<div className={css.coverageItemValue}>
 									{formatUsdExt(meta?.exposure?.exposure || 0)}
@@ -119,6 +121,7 @@ export class AddWalletSourceModal extends PureComponent<AddWalletSourceModalProp
 		const { portfolioSourceToAffectedProjects, portfolioSourceToCoverageData } =
 			await MainviewApi.feeds.getPortfolioSourcesData({
 				token: domain.session,
+				reason: 'ADD_WALLET_SOURCE_MODAL',
 				sources: [
 					{
 						type: 'wallet',

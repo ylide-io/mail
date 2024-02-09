@@ -104,7 +104,7 @@ export const AddToMyFeedButton = observer(({ post }: AddToMyFeedButtonProps) => 
 
 					setAdding(true);
 					feedSettings.activateSource(Number(post.sourceId));
-					feedSettings.save().then(() => {
+					feedSettings.save('FOLLOW').then(() => {
 						setAdding(false);
 					});
 				}}
@@ -168,7 +168,7 @@ export const FeedPostItem = observer(({ post, affinity, feedId }: FeedPostItemPr
 			setUnfollowState('unfollowing');
 
 			feedSettings.deactivateSource(Number(_sourceId));
-			await feedSettings.save();
+			await feedSettings.save('UNFOLLOW_SOURCE');
 
 			setUnfollowState('unfollowed');
 		} catch (e) {
@@ -187,7 +187,7 @@ export const FeedPostItem = observer(({ post, affinity, feedId }: FeedPostItemPr
 			setUnfollowState('unfollowing');
 
 			feedSettings.deactivateProject(_projectId);
-			await feedSettings.save();
+			await feedSettings.save('UNFOLLOW_PROJECT');
 
 			setUnfollowState('unfollowed');
 		} catch (e) {

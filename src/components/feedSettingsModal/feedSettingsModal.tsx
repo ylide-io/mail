@@ -49,7 +49,7 @@ export class FeedSettingsModal extends PureComponent<FeedSettingsModalProps> {
 
 	handleSave = async () => {
 		this.saving = true;
-		await this.fs.save();
+		await this.fs.save('GENERIC');
 		this.props.close();
 	};
 

@@ -17,7 +17,12 @@ export function Avatar({ className, image, blockie, placeholder }: AvatarProps) 
 			<div className={css.inner}>
 				<div className={css.inner2}>
 					{image && !imageLoadFailed ? (
-						<img className={css.content} src={image} onError={() => setImageLoadFailed(true)} />
+						<img
+							className={css.content}
+							src={image}
+							alt="Avatar"
+							onError={() => setImageLoadFailed(true)}
+						/>
 					) : blockie ? (
 						<Blockie className={css.content} address={blockie} />
 					) : (

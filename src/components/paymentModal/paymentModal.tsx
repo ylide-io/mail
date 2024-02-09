@@ -227,7 +227,7 @@ export const PaymentModal = observer(({ account, onResolve }: { account: DomainA
 		type: StepType.LOADING,
 		account,
 	});
-	const [accountPlan, setAccountPlan] = useState<MainviewApi.AccountPlan | undefined>(undefined);
+	const [, setAccountPlan] = useState<MainviewApi.AccountPlan | undefined>(undefined);
 
 	useEffect(() => {
 		setStep({
@@ -235,7 +235,7 @@ export const PaymentModal = observer(({ account, onResolve }: { account: DomainA
 			account,
 		});
 		let cancelled = false;
-		MainviewApi.payments.getAccountPlan({ token: domain.session }).then(info => {
+		MainviewApi.payments.getAccountPlan({ token: domain.session, reason: 'PAYMENT_MODAL_INITIAL' }).then(info => {
 			if (!cancelled) {
 				setAccountPlan(info);
 				if (info?.activeReservations.length) {
@@ -261,25 +261,27 @@ export const PaymentModal = observer(({ account, onResolve }: { account: DomainA
 		if (step.type === StepType.PAYMENT_WAITING) {
 			let cancelled = false;
 			const timer = setInterval(() => {
-				MainviewApi.payments.getAccountPlan({ token: domain.session }).then(info => {
-					if (cancelled) {
-						return;
-					}
-					if (info && info.plan !== 'none' && info.lastPaidTx) {
-						setStep({
-							type: StepType.PAYMENT_SUCCESS,
-							account,
-							reservation: step.reservation,
-							transation: info.lastPaidTx,
-						});
-					} else if (!info || !info.activeReservations.length) {
-						setStep({
-							type: StepType.PAYMENT_TIMEOUT,
-							account,
-							reservation: step.reservation,
-						});
-					}
-				});
+				MainviewApi.payments
+					.getAccountPlan({ token: domain.session, reason: 'PAYMENT_MODAL_WAITING' })
+					.then(info => {
+						if (cancelled) {
+							return;
+						}
+						if (info && info.plan !== 'none' && info.lastPaidTx) {
+							setStep({
+								type: StepType.PAYMENT_SUCCESS,
+								account,
+								reservation: step.reservation,
+								transation: info.lastPaidTx,
+							});
+						} else if (!info || !info.activeReservations.length) {
+							setStep({
+								type: StepType.PAYMENT_TIMEOUT,
+								account,
+								reservation: step.reservation,
+							});
+						}
+					});
 			}, 5000);
 			return () => {
 				cancelled = true;
@@ -287,12 +289,6 @@ export const PaymentModal = observer(({ account, onResolve }: { account: DomainA
 			};
 		}
 	}, [account, step]);
-
-	useEffect(() => {
-		if (account.address === domain.account?.address) {
-			domain.reloadAccountPlan();
-		}
-	}, [account, domain.account]);
 
 	return (
 		<>

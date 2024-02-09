@@ -455,7 +455,7 @@ export class FeedSettings {
 		this.updateActiveSourceIds();
 	}
 
-	async save() {
+	async save(updateType: string) {
 		await MainviewApi.feeds.saveFeed({
 			token: domain.session,
 			feedId: this.feedId,
@@ -469,6 +469,7 @@ export class FeedSettings {
 					tresholdValue: this.tresholdValue,
 				},
 			},
+			updateType,
 		});
 
 		const newBase = await domain.feedsRepository.reloadFeed(this.feedId);

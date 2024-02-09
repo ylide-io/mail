@@ -6,8 +6,8 @@ import { MainviewApi } from '../../api/mainviewApi';
 import { ActionButton, ActionButtonLook, ActionButtonSize } from '../ActionButton/ActionButton';
 import { ActionModal } from '../actionModal/actionModal';
 import { CheckBox } from '../checkBox/checkBox';
-import css from './coverageModal.module.scss';
 import { showStaticComponent } from '../staticComponentManager/staticComponentManager';
+import css from './coverageModal.module.scss';
 
 type Props = {
 	coverage: MainviewApi.Coverage;

@@ -38,9 +38,9 @@ export class Domain {
 		this.feedSources = new FeedSourcesStore(this);
 	}
 
-	async reloadAccountPlan() {
+	async reloadAccountPlan(reason: string) {
 		if (this.account) {
-			this.accountPlan = await MainviewApi.payments.getAccountPlan({ token: this.session });
+			this.accountPlan = await MainviewApi.payments.getAccountPlan({ token: this.session, reason });
 		} else {
 			this.accountPlan = null;
 		}

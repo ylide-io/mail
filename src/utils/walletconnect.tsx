@@ -1,5 +1,5 @@
-import { createWeb3Modal, defaultWagmiConfig, useWeb3ModalTheme } from '@web3modal/wagmi/react';
-import { PropsWithChildren, useEffect } from 'react';
+import { createWeb3Modal, defaultWagmiConfig } from '@web3modal/wagmi/react';
+import { PropsWithChildren } from 'react';
 import { mainnet, polygon } from 'viem/chains';
 import { WagmiConfig } from 'wagmi';
 
