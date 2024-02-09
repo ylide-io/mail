@@ -135,7 +135,7 @@ const calculateCoverage = (data: MainviewApi.CoverageData[]) => {
 	const total = result.tokens.usdTotal + result.protocols.usdTotal;
 	const covered = result.tokens.usdCovered + result.protocols.usdCovered;
 	const totalResult = total > 0 ? (covered * 100) / total : 0;
-	result.totalCoverage = total === 0 ? 'N/A' : totalResult === 100 ? '100%' : `${totalResult.toFixed(1)}%`;
+	result.totalCoverage = total === 0 ? 'N/A' : totalResult === 100 ? '100%' : `${Number(totalResult.toFixed(1))}%`;
 	return result;
 };
 

@@ -279,6 +279,10 @@ export namespace MainviewApi {
 			return await request<AuthAddressResponse>({ path: `/v4/auth/signature`, token, data, query });
 		},
 
+		authByLink: async (token: string, slug: string) => {
+			return await request<AuthAddressResponse>({ path: `/v4/auth/link`, token, data: { slug } });
+		},
+
 		logout: async (token: string) => {
 			return await request<void>({ path: `/v4/auth/logout`, token, data: {} });
 		},

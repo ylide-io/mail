@@ -1,5 +1,5 @@
 import { useWeb3Modal } from '@web3modal/wagmi/react';
-import { action, autorun, makeObservable, observable } from 'mobx';
+import { action, autorun, makeObservable, observable, runInAction } from 'mobx';
 import { useSignMessage } from 'wagmi';
 
 import { MainviewApi } from '../api/mainviewApi';
@@ -8,7 +8,7 @@ import { isPaid, isTrialActive } from '../utils/payments';
 import { browserStorage } from './browserStorage';
 import { FeedSourcesStore } from './FeedSources';
 import { FeedsRepository } from './FeedsRepository';
-import { DomainAccount } from './models/DomainAccount';
+import { DomainAccount, IDomainAccount } from './models/DomainAccount';
 
 type OpenOptions = Parameters<ReturnType<typeof useWeb3Modal>['open']>[0];
 type SignMessageArgs = Parameters<ReturnType<typeof useSignMessage>['signMessageAsync']>[0];
@@ -124,27 +124,38 @@ export class Domain {
 			return;
 		}
 		await Promise.all([
-			MainviewApi.auth.session(browserStorage.session).then(session => {
+			(async () => {
+				const session = await MainviewApi.auth.session(browserStorage.session);
+				let account: null | IDomainAccount = null;
 				if (session.type === 'new') {
 					browserStorage.session = session.token;
-					this.session = session.token;
-					this.account = null;
-					this.accountPlan = null;
+					account = null;
 				} else {
-					this.session = browserStorage.session!;
-					this.account = session.account
+					account = session.account;
+				}
+				const sessionToken = browserStorage.session!;
+				if (document.location.pathname.startsWith('/auth/')) {
+					const slug = document.location.pathname.split('/auth/')[1].split('?')[0];
+					const accountByLink = await MainviewApi.auth.authByLink(sessionToken, slug).catch(err => null);
+					if (accountByLink) {
+						account = accountByLink;
+					}
+				}
+				runInAction(() => {
+					this.session = sessionToken;
+					this.account = account
 						? new DomainAccount(
-								session.account.id,
-								session.account.address,
-								session.account.email,
-								session.account.defaultFeedId,
-								session.account.plan,
-								session.account.planEndsAt,
-								session.account.inited,
+								account.id,
+								account.address,
+								account.email,
+								account.defaultFeedId,
+								account.plan,
+								account.planEndsAt,
+								account.inited,
 						  )
 						: null;
-				}
-			}),
+				});
+			})(),
 		]);
 
 		this.initialized = true;

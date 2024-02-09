@@ -266,6 +266,21 @@ export const App = observer(({ serviceWorkerUpdateCallback }: AppProps) => {
 								<Route path={RoutePath.FEED_SMART_EXACT} element={<FeedPage />} />
 
 								<Route
+									path={RoutePath.AUTH}
+									element={
+										<Navigate
+											replace
+											to={
+												(domain.account || true
+													? generatePath(RoutePath.FEED_SMART)
+													: generatePath(RoutePath.FEED_CATEGORY, { tag: '14' })) +
+												location.search
+											}
+										/>
+									}
+								/>
+
+								<Route
 									path={RoutePath.ANY}
 									element={<Navigate replace to={generatePath(RoutePath.FEED) + location.search} />}
 								/>

@@ -251,21 +251,25 @@ export class FeedSettingsSidebar extends PureComponent<{
 								value={this.props.fs.tresholdType}
 								onChange={e => {
 									if (e.target.value === 'value') {
-										this.props.fs.tresholdType = 'value';
-										this.props.fs.tresholdValue = Math.max(
-											0,
-											Math.min(
-												this.props.fs.portfolio.totalExposure,
-												this.props.fs.tresholdValue * this.props.fs.portfolio.totalExposure,
+										this.props.fs.updateTreshold(
+											'value',
+											Math.max(
+												0,
+												Math.min(
+													this.props.fs.portfolio.totalExposure,
+													this.props.fs.tresholdValue * this.props.fs.portfolio.totalExposure,
+												),
 											),
 										);
 									} else {
-										this.props.fs.tresholdType = 'percent';
-										this.props.fs.tresholdValue = Math.max(
-											0,
-											Math.min(
-												1,
-												this.props.fs.tresholdValue / this.props.fs.portfolio.totalExposure,
+										this.props.fs.updateTreshold(
+											'percent',
+											Math.max(
+												0,
+												Math.min(
+													1,
+													this.props.fs.tresholdValue / this.props.fs.portfolio.totalExposure,
+												),
 											),
 										);
 									}
@@ -308,7 +312,12 @@ export class FeedSettingsSidebar extends PureComponent<{
 										const vlv = Number(lv.toPrecision(4));
 										return `${vlv}%`;
 									}}
-									onChange={v => (this.props.fs.tresholdValue = Math.floor(v / 0.01) * 0.01)}
+									onChange={v => {
+										this.props.fs.updateTreshold(
+											this.props.fs.tresholdType,
+											Math.floor(v / 0.01) * 0.01,
+										);
+									}}
 								/>
 							)}
 						</div>

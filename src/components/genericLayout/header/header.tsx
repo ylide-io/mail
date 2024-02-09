@@ -9,6 +9,7 @@ import domain from '../../../stores/Domain';
 import { RoutePath } from '../../../stores/routePath';
 import { connectWalletAccount } from '../../../utils/account';
 import { HorizontalAlignment } from '../../../utils/alignment';
+import { truncateAddress } from '../../../utils/string';
 import { useNav } from '../../../utils/url';
 import { ActionButton, ActionButtonLook, ActionButtonSize } from '../../ActionButton/ActionButton';
 import { AppLogo } from '../../appLogo/appLogo';
@@ -57,8 +58,9 @@ const Header = observer(() => {
 							</div>
 
 							<div className={css.usersText}>
-								1 account
-								<span>&nbsp;connected</span>
+								{domain.account.address
+									? truncateAddress(domain.account.address, 24)
+									: domain.account.email}
 							</div>
 
 							<ArrowDownSvg className={css.usersIcon} />
