@@ -288,10 +288,15 @@ export class FeedSettingsSidebar extends PureComponent<{
 									$
 									<input
 										type="number"
-										value={this.props.fs.tresholdValue}
+										value={this.props.fs.tempTresholdValue}
 										className={css.filterInput}
 										onChange={e => {
-											//
+											runInAction(() => {
+												this.props.fs.tempTresholdValue = e.target.value;
+												if (!isNaN(Number(e.target.value))) {
+													this.props.fs.updateTreshold('value', Number(e.target.value));
+												}
+											});
 										}}
 									/>
 								</div>

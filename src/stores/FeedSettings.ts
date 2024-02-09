@@ -168,6 +168,7 @@ export class FeedSettings {
 	@observable mode: MainviewApi.ConfigMode = MainviewApi.ConfigMode.AUTO_ADD;
 	@observable tresholdType: 'value' | 'percent' = 'value';
 	@observable tresholdValue = 10000;
+	@observable tempTresholdValue = '10000';
 
 	@observable coverageDataByPortfolioSource: Record<string, MainviewApi.CoverageData[]> = {};
 
@@ -354,6 +355,7 @@ export class FeedSettings {
 		this.mode = base.feed.mode;
 		this.tresholdType = base.feed.settings.tresholdType;
 		this.tresholdValue = base.feed.settings.tresholdValue;
+		this.tempTresholdValue = String(base.feed.settings.tresholdValue);
 
 		this.includedSourceIds = new Set(base.feed.includedSourceIds.map(Number));
 		this.excludedSourceIds = new Set(base.feed.excludedSourceIds.map(Number));
@@ -365,6 +367,7 @@ export class FeedSettings {
 	updateTreshold(type: 'value' | 'percent', value: number) {
 		this.tresholdType = type;
 		this.tresholdValue = value;
+		this.tempTresholdValue = String(value);
 
 		this.updateActiveProjects(this.portfolio, this.tresholdType, this.tresholdValue);
 	}
