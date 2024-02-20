@@ -7,6 +7,7 @@ import { analytics } from '../stores/Analytics';
 import domain from '../stores/Domain';
 import { DomainAccount } from '../stores/models/DomainAccount';
 import { truncateInMiddle } from './string';
+import { browserStorage } from '../stores/browserStorage';
 
 export function formatAccountName(account: DomainAccount) {
 	return truncateInMiddle(account.address, 8, '..');
@@ -39,6 +40,7 @@ export async function connectWalletAccount(params?: { noCloseButton?: boolean; p
 
 		const { account } = result;
 
+		browserStorage.isOnboarded = false;
 		domain.account = account;
 	} catch (e) {
 		console.error(e);

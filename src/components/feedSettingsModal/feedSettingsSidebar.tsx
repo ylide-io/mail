@@ -17,6 +17,7 @@ import css from './feedSettingsModal.module.scss';
 
 @observer
 export class FeedSettingsSidebar extends PureComponent<{
+	visible: boolean;
 	fs: FeedSettings;
 }> {
 	handleAddNewWallet = async () => {
@@ -336,7 +337,7 @@ export class FeedSettingsSidebar extends PureComponent<{
 		const { feed } = this.props.fs.base;
 
 		return (
-			<div className={css.sidebar}>
+			<div className={clsx(css.sidebar, this.props.visible && css.visible)}>
 				<div className={css.title}>Settings for "{feed.name}"</div>
 				{this.renderWallets()}
 				{this.renderCEXAccounts()}

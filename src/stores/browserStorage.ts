@@ -6,6 +6,7 @@ import { toggleArrayItem } from '../utils/array';
 enum BrowserStorageKey {
 	SIDEBAR_FOLDED_SECTIONS = 'ylide_sidebarFoldedSections',
 	SESSION = 'ylide_session',
+	ONBOARDED = 'ylide_isOnboarded',
 	REFERRER = 'ylide_referrer',
 }
 
@@ -67,6 +68,21 @@ class BrowserStorage {
 	set session(value: string | null) {
 		BrowserStorage.setItem(BrowserStorageKey.SESSION, JSON.stringify(value));
 		this._session = value;
+	}
+
+	//
+
+	private _isOnboarded =
+		BrowserStorage.getItemWithTransform(BrowserStorageKey.ONBOARDED, item => !!JSON.parse(item) as boolean) ||
+		false;
+
+	get isOnboarded(): boolean {
+		return this._isOnboarded;
+	}
+
+	set isOnboarded(value: boolean) {
+		BrowserStorage.setItem(BrowserStorageKey.ONBOARDED, JSON.stringify(!!value));
+		this._isOnboarded = !!value;
 	}
 
 	//

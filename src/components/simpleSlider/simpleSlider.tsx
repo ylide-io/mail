@@ -30,18 +30,37 @@ export class SimpleSlider extends PureComponent<SimpleSliderProps> {
 		}
 	};
 
+	handleTouchMove = (e: TouchEvent) => {
+		if (this.isDown) {
+			e.preventDefault();
+			e.stopPropagation();
+
+			if (this.ref.current) {
+				const rect = this.ref.current.getBoundingClientRect();
+				const x = e.touches[0].clientX - rect.left;
+				const w = rect.width;
+
+				this.props.onChange(Math.min(1, Math.max(0, x / w)));
+			}
+		}
+	};
+
 	handleMouseUp = () => {
 		this.isDown = false;
 	};
 
 	componentDidMount(): void {
 		window.addEventListener('mousemove', this.handleMouseMove);
+		window.addEventListener('touchmove', this.handleTouchMove);
 		window.addEventListener('mouseup', this.handleMouseUp);
+		window.addEventListener('touchend', this.handleMouseUp);
 	}
 
 	componentWillUnmount(): void {
 		window.removeEventListener('mousemove', this.handleMouseMove);
+		window.removeEventListener('touchmove', this.handleTouchMove);
 		window.removeEventListener('mouseup', this.handleMouseUp);
+		window.removeEventListener('touchend', this.handleMouseUp);
 	}
 
 	render() {
@@ -59,6 +78,15 @@ export class SimpleSlider extends PureComponent<SimpleSliderProps> {
 						this.isDown = true;
 					}}
 					onMouseUp={e => {
+						this.isDown = false;
+					}}
+					onTouchStart={e => {
+						e.preventDefault();
+						e.stopPropagation();
+
+						this.isDown = true;
+					}}
+					onTouchEnd={e => {
 						this.isDown = false;
 					}}
 				>

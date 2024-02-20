@@ -74,5 +74,10 @@ export function Popup({
 		</div>
 	);
 
+	if (align) {
+		console.log('yappya');
+	}
+	console.log('render popup: ', { root, portalLevel });
+
 	return popupManagerApi.renderPopup(root, portalLevel);
 }

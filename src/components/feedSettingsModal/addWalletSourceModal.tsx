@@ -1,14 +1,16 @@
 import clsx from 'clsx';
 import { action, computed, makeObservable, observable, runInAction } from 'mobx';
 import { observer } from 'mobx-react';
-import { PureComponent } from 'react';
+import { PureComponent, ReactNode } from 'react';
 
 import { MainviewApi } from '../../api/mainviewApi';
 import {
 	AffectedProjectLink,
+	ComputedPortfolio,
 	PortfolioScope,
 	PortfolioSource,
 	PortfolioSourceToAffectedProjectsMap,
+	ProjectPortfolioMeta,
 } from '../../shared/PortfolioScope';
 import domain from '../../stores/Domain';
 import { FeedSettings } from '../../stores/FeedSettings';
@@ -18,62 +20,92 @@ import { Avatar } from '../avatar/avatar';
 import { Modal } from '../modal/modal';
 import { showStaticComponent } from '../staticComponentManager/staticComponentManager';
 import css from './feedSettingsModal.module.scss';
+import { FeedProject } from '../../stores/FeedSources';
 
 interface CoverageBlockProps {
+	embedded?: boolean;
+	portfolio: ComputedPortfolio;
+	projectIds: number[];
+}
+
+@observer
+export class CoveragePlate extends PureComponent<{
+	meta?: ProjectPortfolioMeta;
+	project?: FeedProject;
+	embedded?: boolean;
+}> {
+	render() {
+		const { meta, project, embedded } = this.props;
+		return (
+			<div className={clsx(css.coverageItem, embedded && css.embedded)}>
+				<div className={css.coverageItemLogo}>
+					<Avatar image={project?.logoUrl || undefined} />
+				</div>
+				<div className={css.coverageItemData}>
+					<div className={css.coverageItemTitle}>
+						<span className={css.coverateItemTitleText}>
+							{!project ? 'Others' : project?.name || '[Unknown]'}
+						</span>
+					</div>
+					<div className={css.coverageItemValue}>{formatUsdExt(meta?.exposure?.exposure || 0)}</div>
+				</div>
+			</div>
+		);
+	}
+}
+
+@observer
+export class CoverageBlock extends PureComponent<CoverageBlockProps> {
+	render() {
+		const { portfolio, projectIds, embedded } = this.props;
+
+		return projectIds.map(projectId => {
+			const meta = portfolio.projectToPortfolioMetaMap[projectId];
+			const project = domain.feedSources.projectsMap.get(projectId);
+			return <CoveragePlate key={projectId} embedded={embedded} meta={meta} project={project} />;
+		});
+	}
+}
+
+interface PortfolioCoverageBlockProps {
+	embedded?: boolean;
+	max?: number;
+	showMore?: () => ReactNode;
 	portfolioSources: PortfolioSource[];
 	portfolioSourceToAffectedProjectsMap: PortfolioSourceToAffectedProjectsMap;
 }
 
 @observer
-class CoverageBlock extends PureComponent<CoverageBlockProps> {
-	portfolio = PortfolioScope.compute(this.props.portfolioSources, this.props.portfolioSourceToAffectedProjectsMap);
-	projectsSort = (a: number, b: number) => {
-		const aExposure = this.portfolio.projectToPortfolioMetaMap[a]?.exposure?.exposure || 0;
-		const bExposure = this.portfolio.projectToPortfolioMetaMap[b]?.exposure?.exposure || 0;
-		if (aExposure === bExposure) {
-			const aName = domain.feedSources.projectsMap.get(a)?.name || '';
-			const bName = domain.feedSources.projectsMap.get(b)?.name || '';
-			return aName.localeCompare(bName);
-		} else {
-			return bExposure - aExposure;
-		}
-	};
-	projectIds: number[] = Object.keys(this.portfolio.projectToPortfolioMetaMap).map(Number).sort(this.projectsSort);
+export class PortfolioCoverageBlock extends PureComponent<PortfolioCoverageBlockProps> {
+	portfolio: ComputedPortfolio = PortfolioScope.compute(
+		this.props.portfolioSources,
+		this.props.portfolioSourceToAffectedProjectsMap,
+	);
 
-	componentDidUpdate(prevProps: Readonly<CoverageBlockProps>, prevState: Readonly<{}>, snapshot?: any): void {
+	projectIds: number[] = PortfolioScope.getProjectIds(this.portfolio, domain.feedSources);
+
+	componentDidUpdate(
+		prevProps: Readonly<PortfolioCoverageBlockProps>,
+		prevState: Readonly<{}>,
+		snapshot?: any,
+	): void {
 		this.portfolio = PortfolioScope.compute(
 			this.props.portfolioSources,
 			this.props.portfolioSourceToAffectedProjectsMap,
 		);
-		this.projectIds = Object.keys(this.portfolio.projectToPortfolioMetaMap).map(Number).sort(this.projectsSort);
+		this.projectIds = PortfolioScope.getProjectIds(this.portfolio, domain.feedSources);
 	}
 
 	render() {
-		const { portfolio, projectIds } = this;
+		const { projectIds } = this;
+		const { embedded, max, showMore } = this.props;
+
+		const finalProjectIds = max ? projectIds.slice(0, max) : projectIds;
 
 		return (
-			<div className={css.coverageBlock}>
-				{projectIds.map(projectId => {
-					const meta = portfolio.projectToPortfolioMetaMap[projectId];
-					const project = domain.feedSources.projectsMap.get(projectId);
-					return (
-						<div key={projectId} className={css.coverageItem} data-projectId={projectId}>
-							<div className={css.coverageItemLogo}>
-								<Avatar image={project?.logoUrl || undefined} />
-							</div>
-							<div className={css.coverageItemData}>
-								<div className={css.coverageItemTitle}>
-									<span className={css.coverateItemTitleText}>
-										{!projectId ? 'Others' : project?.name || '[Unknown]'}
-									</span>
-								</div>
-								<div className={css.coverageItemValue}>
-									{formatUsdExt(meta?.exposure?.exposure || 0)}
-								</div>
-							</div>
-						</div>
-					);
-				})}
+			<div className={clsx(css.coverageBlock, embedded && css.embedded)}>
+				<CoverageBlock portfolio={this.portfolio} projectIds={finalProjectIds} />
+				{finalProjectIds.length < projectIds.length && showMore && showMore()}
 			</div>
 		);
 	}
@@ -172,7 +204,7 @@ export class AddWalletSourceModal extends PureComponent<AddWalletSourceModalProp
 						<div className={css.addressPreviewData}>
 							{this.data ? (
 								<div className={css.projectsCoverageBlock}>
-									<CoverageBlock
+									<PortfolioCoverageBlock
 										portfolioSources={[
 											{
 												id: this.loadedForAddress,

@@ -30,13 +30,15 @@ export class SimplePopup extends PureComponent<PropsWithChildren<{ content: Reac
 				>
 					{this.props.children}
 				</div>
-				<AnchoredPopup
-					anchorRef={this.targetRef}
-					horizontalAlign={HorizontalAlignment.END}
-					className={clsx(css.simplePopupContent, this.isOpen && css.visible)}
-				>
-					{this.props.content}
-				</AnchoredPopup>
+				{this.isOpen && (
+					<AnchoredPopup
+						anchorRef={this.targetRef}
+						horizontalAlign={HorizontalAlignment.END}
+						className={clsx(css.simplePopupContent, this.isOpen && css.visible)}
+					>
+						{this.props.content}
+					</AnchoredPopup>
+				)}
 			</div>
 		);
 	}

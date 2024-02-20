@@ -202,6 +202,7 @@ export const SidebarSmartFeedSection = observer(() => {
 								icon: <SettingsSvg />,
 								title: 'Account Settings',
 								onClick: () => {
+									isSidebarOpen.set(false);
 									FeedSettingsModal.show(access.feedId);
 								},
 							}}

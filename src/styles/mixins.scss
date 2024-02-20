@@ -77,6 +77,18 @@ $interactive-elem-size_xlarge: 44px;
 	}
 }
 
+@mixin dark() {
+	@media (prefers-color-scheme: dark) {
+		@content;
+	}
+}
+
+@mixin light() {
+	@media (prefers-color-scheme: light) {
+		@content;
+	}
+}
+
 // UTILS
 
 @mixin expand-click-area($size: 4px, $pseudo: before) {

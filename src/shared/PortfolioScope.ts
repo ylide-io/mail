@@ -1,3 +1,5 @@
+import { FeedSourcesScope } from './FeedSourcesScope';
+
 export enum ProjectRelation {
 	ACTIVE_EXPOSURE = 'active-exposure',
 	INTERACTED = 'interacted',
@@ -349,5 +351,24 @@ export class PortfolioScope {
 		}
 
 		return sourceIds;
+	}
+
+	static projectsSort(portfolio: ComputedPortfolio, feedSources: FeedSourcesScope<any, any>) {
+		return (a: number, b: number) => {
+			const aExposure = portfolio.projectToPortfolioMetaMap[a]?.exposure?.exposure || 0;
+			const bExposure = portfolio.projectToPortfolioMetaMap[b]?.exposure?.exposure || 0;
+			if (aExposure === bExposure) {
+				const aName = feedSources.projectsMap.get(a)?.name || '';
+				const bName = feedSources.projectsMap.get(b)?.name || '';
+				return aName.localeCompare(bName);
+			} else {
+				return bExposure - aExposure;
+			}
+		};
+	}
+
+	static getProjectIds(portfolio: ComputedPortfolio, feedSources: FeedSourcesScope<any, any>) {
+		const sort = this.projectsSort(portfolio, feedSources);
+		return Object.keys(portfolio.projectToPortfolioMetaMap).map(Number).sort(sort);
 	}
 }

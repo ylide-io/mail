@@ -25,6 +25,7 @@ export class FeedSettingsModal extends PureComponent<FeedSettingsModalProps> {
 	@observable fs: FeedSettings;
 	@observable searchTerm: string = '';
 	@observable saving = false;
+	@observable activeTab: 'settings' | 'sources' = 'settings';
 
 	constructor(props: FeedSettingsModalProps) {
 		super(props);
@@ -56,8 +57,26 @@ export class FeedSettingsModal extends PureComponent<FeedSettingsModalProps> {
 	render() {
 		const content = (
 			<div className={css.content}>
-				<FeedSettingsSidebar fs={this.fs} />
-				<div className={css.sources}>
+				<div className={css.tabs}>
+					<div
+						onClick={() => {
+							this.activeTab = 'settings';
+						}}
+						className={clsx(css.tab, this.activeTab === 'settings' && css.tabActive)}
+					>
+						Settings
+					</div>
+					<div
+						onClick={() => {
+							this.activeTab = 'sources';
+						}}
+						className={clsx(css.tab, this.activeTab === 'sources' && css.tabActive)}
+					>
+						News sources
+					</div>
+				</div>
+				<FeedSettingsSidebar visible={this.activeTab === 'settings'} fs={this.fs} />
+				<div className={clsx(css.sources, this.activeTab === 'sources' && css.visible)}>
 					<div className={css.searchBlock}>
 						<input
 							type="search"

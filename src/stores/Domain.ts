@@ -139,6 +139,7 @@ export class Domain {
 					const accountByLink = await MainviewApi.auth.authByLink(sessionToken, slug).catch(err => null);
 					if (accountByLink) {
 						account = accountByLink;
+						browserStorage.isOnboarded = false;
 					}
 				}
 				runInAction(() => {
@@ -173,6 +174,7 @@ export class Domain {
 					const { inited, initing } = await MainviewApi.general.checkInited(this.session);
 					if (inited) {
 						this.account.inited = true;
+						this.initingTimer?.();
 					} else {
 						if (initing) {
 							console.log('just waiting');

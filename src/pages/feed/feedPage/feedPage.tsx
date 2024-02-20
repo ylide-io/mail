@@ -22,6 +22,7 @@ import css from './feedPage.module.scss';
 import ErrorCode = FeedServerApi.ErrorCode;
 import { connectWalletAccount } from '../../../utils/account';
 import { Paywall } from './paywall';
+import { BuildFeedFlow, OnboardingFlow } from '../../../components/mainViewOnboarding/mainViewOnboarding';
 
 const reloadFeedCounter = observable.box(0);
 
@@ -250,6 +251,7 @@ export function FeedPage() {
 	return (
 		<GenericLayout>
 			<FeedPageContent />
+			<OnboardingFlow />
 		</GenericLayout>
 	);
 }

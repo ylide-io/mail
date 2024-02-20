@@ -57,6 +57,7 @@
 	--background-color: #e4ebf0;
 
 	--primary-text-color: #111;
+	--light-text-color: #505050;
 	--secondary-text-color: #888;
 
 	--surface-color: #fff;
@@ -102,6 +103,58 @@
 	--popup-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
 	--inverted-popup-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
 	--layout-shadow: 0 0 30px rgba(0, 0, 0, 0.15);
+
+	@include dark {
+		--background-color: #000000;
+
+		--primary-text-color: #fff;
+		--light-text-color: #a0a0a0;
+		--secondary-text-color: #888;
+
+		--surface-color: #000;
+		--surface-rgb-color: 0, 0, 0;
+		--surface-hover-color: #101010;
+		--secondary-surface-color: #101010;
+		--tertiary-surface-color: #202020;
+		--error-surface-color: rgba(255, 68, 85, 0.2);
+		--success-surface-color: #d1f3dd;
+		--inverted-surface-color: #eee;
+		--on-inverted-surface-color: #000;
+
+		--border-color: rgba(255, 255, 255, 0.1);
+		--border-lite-color: rgba(255, 255, 255, 0.05);
+		--border-heavy-color: rgba(255, 255, 255, 0.2);
+
+		--link-color: #0b9;
+
+		--field-border-color: rgba(255, 255, 255, 0.15);
+		--field-focus-border-color: #0b9;
+		--field-error-border-color: #f45;
+
+		--selected-text-color: #19f;
+		--selected-background-color: #92cffb;
+		--selected-light-background-color: #d1ecff;
+
+		--accent-color: #0b9;
+		--accent-rgb-color: 0, 187, 153;
+		--accent-hover-color: #097;
+		--on-accent-color: #000;
+
+		--accent2-color: #0b9;
+		--accent2-rgb-color: 0, 187, 153;
+		--accent2-hover-color: #097;
+		--on-accent2-color: #000;
+
+		--error-color: #f45;
+		--error-rgb-color: 255, 68, 85;
+		--success-color: #0b4;
+
+		--shade-color: #fff;
+		--shade-rgb-color: 255, 255, 255;
+		--popup-shadow: 0 4px 16px rgba(255, 255, 255, 0.2);
+		--inverted-popup-shadow: 0 4px 20px rgba(255, 255, 255, 0.5);
+		--layout-shadow: 0 0 30px rgba(255, 255, 255, 0.15);
+	}
 }
 
 //

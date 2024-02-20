@@ -1,3 +1,5 @@
+import { computed, makeObservable, observable } from 'mobx';
+
 export interface IDomainAccount {
 	id: string;
 	address: string;
@@ -11,13 +13,13 @@ export interface IDomainAccount {
 
 export class DomainAccount implements IDomainAccount {
 	id: string;
-	address: string;
-	email: string | null;
+	@observable address: string;
+	@observable email: string | null;
 	defaultFeedId: string;
-	private __plan: 'none' | 'trial' | 'basic' | 'pro';
-	planEndsAt: number;
+	@observable private __plan: 'none' | 'trial' | 'basic' | 'pro';
+	@observable planEndsAt: number;
 
-	inited: boolean;
+	@observable inited: boolean;
 
 	constructor(
 		id: string,
@@ -36,13 +38,15 @@ export class DomainAccount implements IDomainAccount {
 		this.planEndsAt = planEndsAt;
 
 		this.inited = inited;
+
+		makeObservable(this);
 	}
 
-	get name() {
+	@computed get name() {
 		return this.email || this.address;
 	}
 
-	get _plan() {
+	@computed get _plan() {
 		return this.__plan;
 	}
 
@@ -50,7 +54,7 @@ export class DomainAccount implements IDomainAccount {
 		this.__plan = plan;
 	}
 
-	get plan() {
+	@computed get plan() {
 		const now = Math.floor(Date.now() / 1000);
 		if (this.planEndsAt < now) {
 			return 'none';
