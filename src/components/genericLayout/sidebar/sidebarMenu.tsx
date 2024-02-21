@@ -321,6 +321,30 @@ export const SidebarMenu = observer(() => {
 					</a>
 				</div>
 			</div>
+			<div className={css.divider} />
+			<div>
+				{browserStorage.isDarkMode ? (
+					<a
+						onClick={e => {
+							e.preventDefault();
+							browserStorage.isDarkMode = false;
+						}}
+						href="#light"
+					>
+						Switch to light theme
+					</a>
+				) : (
+					<a
+						onClick={e => {
+							e.preventDefault();
+							browserStorage.isDarkMode = true;
+						}}
+						href="#dark"
+					>
+						Switch to dark theme
+					</a>
+				)}
+			</div>
 		</div>
 	);
 });

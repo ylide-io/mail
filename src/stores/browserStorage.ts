@@ -2,11 +2,13 @@ import { makeAutoObservable } from 'mobx';
 
 import { Section } from '../components/genericLayout/sidebar/sidebarMenu';
 import { toggleArrayItem } from '../utils/array';
+import { getIsDarkMode } from '../utils/ui';
 
 enum BrowserStorageKey {
 	SIDEBAR_FOLDED_SECTIONS = 'ylide_sidebarFoldedSections',
 	SESSION = 'ylide_session',
 	ONBOARDED = 'ylide_isOnboarded',
+	DARK_MODE = 'ylide_isDarkMode',
 	REFERRER = 'ylide_referrer',
 }
 
@@ -83,6 +85,21 @@ class BrowserStorage {
 	set isOnboarded(value: boolean) {
 		BrowserStorage.setItem(BrowserStorageKey.ONBOARDED, JSON.stringify(!!value));
 		this._isOnboarded = !!value;
+	}
+
+	//
+
+	private _isDarkMode =
+		BrowserStorage.getItemWithTransform(BrowserStorageKey.DARK_MODE, item => !!JSON.parse(item) as boolean) ??
+		getIsDarkMode();
+
+	get isDarkMode(): boolean {
+		return this._isDarkMode;
+	}
+
+	set isDarkMode(value: boolean) {
+		BrowserStorage.setItem(BrowserStorageKey.DARK_MODE, JSON.stringify(!!value));
+		this._isDarkMode = !!value;
 	}
 
 	//

@@ -25,7 +25,7 @@ export async function payAccount(params?: { noCloseButton?: boolean; place?: str
 	await showStaticComponent<boolean>(resolve => <PayModal onClose={resolve} />);
 }
 
-export async function connectWalletAccount(params?: { noCloseButton?: boolean; place?: string }): Promise<void> {
+export async function connectWalletAccount(params?: { noCloseButton?: boolean; place?: string }): Promise<boolean> {
 	if (params?.place) {
 		analytics.startConnectingWallet(params.place);
 	}
@@ -33,7 +33,7 @@ export async function connectWalletAccount(params?: { noCloseButton?: boolean; p
 	try {
 		const result = await requestWalletAccount(params);
 		if (!result) {
-			return;
+			return false;
 		}
 		// we don't need connection to the wallet after successful authorization
 		domain.disconnectWalletAccount();
@@ -42,9 +42,13 @@ export async function connectWalletAccount(params?: { noCloseButton?: boolean; p
 
 		browserStorage.isOnboarded = false;
 		domain.account = account;
+
+		return true;
 	} catch (e) {
 		console.error(e);
 		domain.disconnectWalletAccount();
+
+		return false;
 	}
 }
 

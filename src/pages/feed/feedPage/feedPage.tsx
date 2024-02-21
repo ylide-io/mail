@@ -202,25 +202,44 @@ const FeedPageContent = observer(() => {
 						)}
 					</>
 				) : feed.error ? (
-					feed.error === ErrorCode.NO_POSTS_FOR_ADDRESS && !domain.isAccountActive ? (
-						<Paywall type="smart-feed" />
-					) : (
-						<ErrorMessage
-							look={feed.error === ErrorCode.NO_POSTS_FOR_ADDRESS ? ErrorMessageLook.INFO : undefined}
-						>
-							{feed.error === ErrorCode.NO_POSTS_FOR_ADDRESS ? (
-								<>
-									<b>No posts for this account.</b>
-									<div>
-										Your crypto account doesn't have any tokens or transactions that we can use to
-										build the Feed for you. You can connect another account anytime.
-									</div>
-								</>
-							) : (
-								'Sorry, an error occured during feed loading. Please, try again later.'
-							)}
+					feed.error === ErrorCode.NOT_AUTHORIZED ? (
+						<ErrorMessage look={ErrorMessageLook.INFO}>
+							<div>
+								You need to connect a crypto wallet in order to use <b>Smart feed</b> 🔥
+							</div>
+							<ActionButton
+								look={ActionButtonLook.PRIMARY}
+								onClick={() => connectWalletAccount({ place: 'feed_no-accounts' })}
+							>
+								Connect wallet
+							</ActionButton>
 						</ErrorMessage>
-					)
+					) : feed.error === ErrorCode.INACTIVE_ACCOUNT ? (
+						<Paywall type="smart-feed" />
+					) : feed.error === ErrorCode.FEED_NOT_AVAILABLE ? (
+						<ErrorMessage look={ErrorMessageLook.INFO}>
+							<b>Sorry, this feed is unavailable to you.</b>
+							<div>
+								Seems like this feed is not available for your account. You can try to connect another
+								account or ask the owner to share access to the feed with you.
+							</div>
+							<div></div>
+							<ActionButton
+								look={ActionButtonLook.PRIMARY}
+								onClick={() => navigate(generatePath(RoutePath.FEED_SMART))}
+							>
+								Go to Smart feed
+							</ActionButton>
+						</ErrorMessage>
+					) : feed.error === ErrorCode.FEED_IS_EMPTY ? (
+						<ErrorMessage look={ErrorMessageLook.INFO}>
+							<b>No posts for this account.</b>
+							<div>
+								Your crypto account doesn't have any tokens or transactions that we can use to build the
+								Feed for you. You can connect another account anytime.
+							</div>
+						</ErrorMessage>
+					) : null
 				) : feed.loading ? (
 					<div className={css.loader}>
 						<SimpleLoader />

@@ -43,6 +43,11 @@ export interface FeedPostEmbed {
 
 export namespace FeedServerApi {
 	export enum ErrorCode {
+		NOT_AUTHORIZED = 'NOT_AUTHORIZED',
+		INACTIVE_ACCOUNT = 'INACTIVE_ACCOUNT',
+		FEED_NOT_AVAILABLE = 'FEED_NOT_AVAILABLE',
+		FEED_IS_EMPTY = 'FEED_IS_EMPTY',
+
 		NO_POSTS_FOR_ADDRESS = 'NO_POSTS_FOR_ADDRESS',
 	}
 

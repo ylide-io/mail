@@ -25,6 +25,7 @@ import domain from './stores/Domain';
 import { RoutePath } from './stores/routePath';
 import { useIsMatchesPattern, useNav } from './utils/url';
 import { Web3ModalManager } from './utils/walletconnect';
+import { browserStorage } from './stores/browserStorage';
 
 export enum AppTheme {
 	V1 = 'v1',
@@ -119,6 +120,10 @@ export const App = observer(({ serviceWorkerUpdateCallback }: AppProps) => {
 	useEffect(() => {
 		document.documentElement.dataset.theme = AppTheme.V2;
 	}, []);
+
+	useEffect(() => {
+		document.documentElement.dataset.lightness = browserStorage.isDarkMode ? 'dark' : 'light';
+	}, [browserStorage.isDarkMode]);
 
 	const [initErrorId, setInitErrorId] = useState('');
 

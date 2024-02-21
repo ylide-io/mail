@@ -28,3 +28,12 @@
 	justify-content: end;
 	gap: 8px;
 }
+
+.paywall {
+	&.paywallGeneric {
+		background: linear-gradient(180deg, rgba(220, 224, 226, 0) 0%, var(--tertiary-surface-color) 8.85%);
+	}
+	&.paywallSmartFeed {
+		background: var(--tertiary-surface-color);
+	}
+}

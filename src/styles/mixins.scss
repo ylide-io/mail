@@ -78,13 +78,7 @@ $interactive-elem-size_xlarge: 44px;
 }
 
 @mixin dark() {
-	@media (prefers-color-scheme: dark) {
-		@content;
-	}
-}
-
-@mixin light() {
-	@media (prefers-color-scheme: light) {
+	&[data-lightness='dark'] {
 		@content;
 	}
 }

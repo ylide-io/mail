@@ -90,7 +90,11 @@ const Header = observer(() => {
 						size={ActionButtonSize.MEDIUM}
 						look={ActionButtonLook.PRIMARY}
 						icon={<PlusSvg />}
-						onClick={() => connectWalletAccount({ place: 'header' })}
+						onClick={async () => {
+							if (await connectWalletAccount({ place: 'header' })) {
+								navigate(generatePath(RoutePath.FEED_SMART));
+							}
+						}}
 					>
 						Connect wallet
 					</ActionButton>

@@ -74,3 +74,9 @@ export function observeMutations(
 	observer.observe(target, options);
 	return () => observer.disconnect();
 }
+
+// THEME
+
+export const getIsDarkMode = () => {
+	return window.matchMedia ? window.matchMedia('(prefers-color-scheme: dark)').matches : false;
+};

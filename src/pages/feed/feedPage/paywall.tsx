@@ -4,6 +4,9 @@ import { ActionButton, ActionButtonLook, ActionButtonSize } from '../../../compo
 import domain from '../../../stores/Domain';
 import { connectWalletAccount, payAccount } from '../../../utils/account';
 
+import css from './feedPage.module.scss';
+import clsx from 'clsx';
+
 const PaywallRow = ({
 	title,
 	subtitle,
@@ -79,12 +82,9 @@ export const Paywall = observer(({ type = 'generic' }: { type?: 'generic' | 'sma
 	const toPay = !!domain.account;
 	return (
 		<div
+			className={clsx(css.paywall, type === 'generic' ? css.paywallGeneric : css.paywallSmartFeed)}
 			style={{
 				borderRadius: type === 'generic' ? '0px 0px 10px 10px' : 10,
-				background:
-					type === 'generic'
-						? 'linear-gradient(180deg, rgba(220, 224, 226, 0.00) 0%, #DCE0E2 8.85%)'
-						: '#DCE0E2',
 				paddingTop: type === 'generic' ? 100 : 50,
 				paddingBottom: 20,
 				paddingLeft: 50,
