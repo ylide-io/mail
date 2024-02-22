@@ -487,6 +487,10 @@
 				padding: 2px 10px;
 
 				font-size: 12px;
+
+				@include less920px {
+					font-size: 11px;
+				}
 			}
 
 			th {
@@ -495,18 +499,34 @@
 
 			.btValue {
 				width: 100px;
+
+				@include less920px {
+					width: 80px;
+				}
 			}
 
 			.btToken {
 				width: 100px;
+
+				@include less920px {
+					width: 80px;
+				}
 			}
 
 			.btChain {
 				width: 200px;
+
+				@include less920px {
+					width: 160px;
+				}
 			}
 
 			.btProject {
 				width: 100px;
+
+				@include less920px {
+					width: 80px;
+				}
 			}
 
 			.btdValue {

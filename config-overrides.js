@@ -40,5 +40,7 @@ module.exports = function override(config) {
 		],
 	});
 	// config.target.target = 'es2022';
+	// disable sourcemap generation:
+	config.devtool = false;
 	return config;
 };

@@ -265,7 +265,7 @@ export class FeedSourcesTable extends PureComponent<FeedSourcesTableProps> {
 	@computed get rows() {
 		const {
 			props: {
-				fs: { groups },
+				fs: { groups, activeSourceIds },
 			},
 			searchTerm,
 		} = this;
@@ -280,6 +280,15 @@ export class FeedSourcesTable extends PureComponent<FeedSourcesTableProps> {
 					return name.toLowerCase().includes(stlc);
 				});
 				if (projectsRows.length) {
+					if (reason === '') {
+						projectsRows.sort((a, b) => {
+							const aSources = domain.feedSources.sourcesByProjectId.get(a) || [];
+							const bSources = domain.feedSources.sourcesByProjectId.get(b) || [];
+							const aI = Number(aSources.some(s => activeSourceIds.has(s.id)));
+							const bI = Number(bSources.some(s => activeSourceIds.has(s.id)));
+							return bI - aI;
+						});
+					}
 					rows.push('reason:' + reason);
 					projectsRows.forEach(projectId => {
 						rows.push('project:' + projectId);

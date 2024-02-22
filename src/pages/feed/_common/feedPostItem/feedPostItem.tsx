@@ -212,7 +212,7 @@ export const FeedPostItem = observer(({ post, affinity, feedId }: FeedPostItemPr
 						}
 					>
 						<div className={css.reason} title="The reason why you see this post">
-							{`Current position in ${project.name}`}
+							{`Position in ${project.name}`}
 						</div>
 					</SimplePopup>
 				);
@@ -221,7 +221,7 @@ export const FeedPostItem = observer(({ post, affinity, feedId }: FeedPostItemPr
 					<div
 						className={css.reason}
 						title="The reason why you see this post"
-					>{`Historical tx in ${project.name}`}</div>
+					>{`Had tx in ${project.name}`}</div>
 				);
 			} else {
 				// hmmmm?

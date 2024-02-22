@@ -8,6 +8,8 @@
 	@include less920px {
 		--narrow-content-padding: 20px;
 		padding: 16px 0;
+
+		max-width: 100vw;
 	}
 
 	@include less720px {
