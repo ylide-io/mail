@@ -47,13 +47,5 @@ export const REACT_APP__BLOCKCHAIN_FEED = env('REACT_APP__BLOCKCHAIN_FEED', { op
 export const REACT_APP__MV_PUBLIC_KEY = env('REACT_APP__MV_PUBLIC_KEY');
 export const REACT_APP__VAPID_PUBLIC_KEY = env('REACT_APP__VAPID_PUBLIC_KEY', { optional: true });
 
-export enum OtcProvider {
-	AIRSWAP = 'AIRSWAP',
-	ONEINCH = 'ONEINCH',
-	PARASWAP = 'PARASWAP',
-}
-
-export const REACT_APP__OTC_PROVIDER = env('REACT_APP__OTC_PROVIDER') as OtcProvider;
-
 console.log('Build ID', REACT_APP__CIRCLE_BUILD_NUM);
 console.log('SHA1', REACT_APP__CIRCLE_SHA1);
