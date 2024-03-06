@@ -388,7 +388,7 @@ export const SidebarMenu = observer(() => {
 				</a>
 
 				<a
-					href="https://discord.gg/ylide"
+					href="https://discord.gg/ylideio"
 					target="_blank noreferrer"
 					title="Discord"
 					onClick={() => analytics.openSocial('discord')}
