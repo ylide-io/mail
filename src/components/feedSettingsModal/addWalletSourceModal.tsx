@@ -30,14 +30,15 @@ interface CoverageBlockProps {
 
 @observer
 export class CoveragePlate extends PureComponent<{
+	id?: any;
 	meta?: ProjectPortfolioMeta;
 	project?: FeedProject;
 	embedded?: boolean;
 }> {
 	render() {
-		const { meta, project, embedded } = this.props;
+		const { id, meta, project, embedded } = this.props;
 		return (
-			<div className={clsx(css.coverageItem, embedded && css.embedded)}>
+			<div className={clsx(css.coverageItem, embedded && css.embedded)} data-id={id}>
 				<div className={css.coverageItemLogo}>
 					<Avatar image={project?.logoUrl || undefined} />
 				</div>

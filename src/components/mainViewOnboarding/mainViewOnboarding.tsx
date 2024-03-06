@@ -118,6 +118,7 @@ export const PortfolioTable = observer(({ feed }: { feed: FeedSettings }) => {
 						<tr key={projectId} className={i % 2 === 0 ? css.even : css.odd}>
 							<td className={clsx(css.portfolioCol, css.bodyCol)}>
 								<CoveragePlate
+									id={projectId}
 									meta={feed.portfolio.projectToPortfolioMetaMap[projectId]}
 									project={domain.feedSources.projectsMap.get(projectId)}
 									embedded
